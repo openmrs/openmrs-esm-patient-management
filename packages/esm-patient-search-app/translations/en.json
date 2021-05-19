@@ -1,0 +1,11 @@
+{
+  "containing": "containing",
+  "found": "Found",
+  "noPatientChartsFoundMessage": "Sorry, no patient charts have been found",
+  "orPatientName": "OR the patient's name(s)",
+  "patient": "patient",
+  "searchAgain": "Search Again",
+  "searchForPatient": "Search for a patient",
+  "searchResultsFor": "Search results for:",
+  "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number"
+}
