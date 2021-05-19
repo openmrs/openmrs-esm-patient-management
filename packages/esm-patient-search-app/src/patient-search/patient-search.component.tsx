@@ -11,6 +11,7 @@ import { performPatientSearch } from './patient-search.resource';
 import styles from './patient-search.scss';
 import Search from 'carbon-components-react/es/components/Search';
 import { SearchedPatient } from '../types/index';
+import { usePagination } from '@openmrs/esm-framework';
 
 interface PatientSearchProps {
   hidePanel?: () => void;
@@ -28,11 +29,12 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [emptyResult, setEmptyResult] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Array<SearchedPatient>>([]);
-  const [pagedResults, setPagedResults] = React.useState<Array<SearchedPatient>>([]);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const [totalPages, setTotalPages] = React.useState(10);
   const searchInput = React.useRef<HTMLInputElement | null>(null);
   const { t } = useTranslation();
+  const { totalPages, currentPage, goToNext, goToPrevious, results, goTo } = usePagination(
+    searchResults,
+    resultsPerPage,
+  );
 
   useEffect(() => {
     const ac = new AbortController();
@@ -43,10 +45,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
           index: i + 1,
         }));
 
-        const pagedResults = results.slice(0, resultsPerPage);
         setSearchResults(results);
-        setPagedResults(pagedResults);
-        setTotalPages(Math.ceil(results.length / resultsPerPage));
 
         if (isEmpty(data.results)) {
           setEmptyResult(true);
@@ -57,7 +56,6 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
     } else {
       setEmptyResult(false);
       setSearchResults([]);
-      setPagedResults([]);
     }
     return () => ac.abort();
   }, [searchTerm, customReprestation]);
@@ -66,34 +64,21 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
     setSearchTerm(searchTerm);
   }, searchTimeout);
 
-  const nextPage = () => {
-    let upperBound = currentPage * resultsPerPage + resultsPerPage;
-    const lowerBound = currentPage * resultsPerPage;
-    if (upperBound > searchResults.length) {
-      upperBound = searchResults.length;
-    }
-    const pageResults = searchResults.slice(lowerBound, upperBound);
-    setPagedResults(pageResults);
-    setCurrentPage(currentPage + 1);
-  };
-
-  const previousPage = () => {
-    const lowerBound = currentPage * resultsPerPage - resultsPerPage * 2;
-    const upperBound = currentPage * resultsPerPage - resultsPerPage;
-    const pageResults = searchResults.slice(lowerBound, upperBound);
-    setPagedResults(pageResults);
-    setCurrentPage(currentPage - 1);
-  };
-
   const handlePageChange = (page) => {
     if (page === 0 && currentPage === 0) {
-      nextPage();
+      goToNext();
     } else if (page + 1 > currentPage) {
-      nextPage();
+      goToNext();
     } else if (page + 1 < currentPage) {
-      previousPage();
+      goToPrevious();
     }
   };
+
+  useEffect(() => {
+    if (searchResults.length) {
+      goTo(0);
+    }
+  }, [searchResults]);
 
   return (
     <div className={styles.patientSearch}>
@@ -115,7 +100,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
             </span>
           </p>
           <p className={styles.searchTerm}>"{searchTerm}"</p>
-          <PatientSearchResults hidePanel={hidePanel} searchTerm={searchTerm} patients={pagedResults} />
+          <PatientSearchResults hidePanel={hidePanel} searchTerm={searchTerm} patients={results} />
           <div className={styles.pagination}>
             <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
           </div>

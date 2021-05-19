@@ -980,17 +980,17 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@carbon/charts-react@^0.41.14":
-  version "0.41.64"
-  resolved "https://registry.yarnpkg.com/@carbon/charts-react/-/charts-react-0.41.64.tgz#c1a3e041845fa1f409ff1287e41ded405bf603fa"
-  integrity sha512-2aCBNAw1HBbE+7ydcOOXNTO/F9j2YC3yISMGxOWgLtYwz1dWp6XeFFstL3p7d+TAy77QVsfKt4sHpghD26/1wQ==
+  version "0.41.65"
+  resolved "https://registry.yarnpkg.com/@carbon/charts-react/-/charts-react-0.41.65.tgz#fe73ff3c102422c82fdf4e11c1f7c52880b0d00c"
+  integrity sha512-9Ex7y4fEJNcs57+giQV8Em+7DIcefkdPgc0FXVtRSL4o1VurLlH2vVCB7eW8G2/iKd8irat3ByX66jUfX/FfnA==
   dependencies:
-    "@carbon/charts" "^0.41.64"
+    "@carbon/charts" "^0.41.65"
     "@carbon/telemetry" "0.0.0-alpha.6"
 
-"@carbon/charts@^0.41.57", "@carbon/charts@^0.41.64":
-  version "0.41.64"
-  resolved "https://registry.yarnpkg.com/@carbon/charts/-/charts-0.41.64.tgz#a6fdfc0703c7bd478323f513b0d9249f39606254"
-  integrity sha512-SWqQ1kfdtpoxWh9yG455aAFd9ykGhZyUbnoM0JASk5jBN8oqwGDyloAxe48ciZCxvbWbNCxUH9yFn47krxXZgQ==
+"@carbon/charts@^0.41.57", "@carbon/charts@^0.41.65":
+  version "0.41.65"
+  resolved "https://registry.yarnpkg.com/@carbon/charts/-/charts-0.41.65.tgz#e3bbea58db800c5d7b380a9f5ac43e2fa16aa3fd"
+  integrity sha512-NX1NCNAMo2ZJf5OMIUxmX9Q4uvlgThA+uJw7IILY4HmQJA3eQYPdKzczQfcwGBHbiaF76T8zOc5SEeaa5awfMA==
   dependencies:
     "@carbon/colors" "10.15.0"
     "@carbon/telemetry" "0.0.0-alpha.6"
@@ -2517,20 +2517,20 @@
   dependencies:
     "@octokit/openapi-types" "^7.0.0"
 
-"@openmrs/esm-api@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.1.10-pre.252.tgz#b8b947cd30a1aa8010be82a8dec3df5696c5913f"
-  integrity sha512-F6QZvo5orb45OYym0NthZi/dnSYgL9dORaYZI2PZlyWdUHljWIA5m4J4u4Lnubn0z55Pzq/HL7g4gncjwLBDqg==
+"@openmrs/esm-api@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.1.10-pre.258.tgz#7bda64d7a71b4f56c9d500b1cc8d2cfc49c3a40f"
+  integrity sha512-AtBvSGEw4iiRL6mKUCBJAVycoStHC6cGvXY4u09iJbwrlHiGHZWsChQGydxTDQIi6+CLBNhvGTtdhcPAJiVoVQ==
   dependencies:
     fhir.js "0.0.22"
     lodash-es "^4.17.21"
 
-"@openmrs/esm-app-shell@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.1.10-pre.252.tgz#1b0f108a51b155555d43672461219f8dbc67d855"
-  integrity sha512-nDYyeMB1cpMtefs9LUqSzGM1rTxI9y5OUQGYRBDfof8FtmLg0469jFvd8lgXEJxsaEe5NEWucN3EFM94TbCn3w==
+"@openmrs/esm-app-shell@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.1.10-pre.258.tgz#61eeba9cc85506ea2a89d2e81a33f729818a5ae8"
+  integrity sha512-zv1YKmbu2XfekQvGlVpkLgBYqqYh0ULmbas/Fi0asaCQZllkF4NS9cpRGUajWvCvvP2y5DR6qhbXFInapP2DFQ==
   dependencies:
-    "@openmrs/esm-framework" "^3.1.10-pre.252"
+    "@openmrs/esm-framework" "^3.1.10-pre.258"
     carbon-components "10.31.0"
     carbon-icons "7.0.7"
     dayjs "^1.10.4"
@@ -2553,88 +2553,88 @@
     workbox-strategies "^6.1.5"
     workbox-window "^6.1.5"
 
-"@openmrs/esm-breadcrumbs@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.1.10-pre.252.tgz#d919087d31c5f9c3494bfc3e9288ac537c81259c"
-  integrity sha512-uu2MPLiHTQDDb6l9u1PY5t/KjhUNQsmoyUea0tA3PbkvgZNDnld+n/U3qjPksviEXSz2uG9RL+BKZRHAf9qudQ==
+"@openmrs/esm-breadcrumbs@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.1.10-pre.258.tgz#3f542e1024c0ce1b90f0ac1cadc9ef28cec6c9da"
+  integrity sha512-xlFEEjrdrFCcUnHCFj27lxl7d6uPnEHSj3gKwjsHfe9iBjC7LKYbidxeMrPNnsBt8+aT7mk2mcCCT9LJlsVA3A==
   dependencies:
     path-to-regexp "6.1.0"
 
-"@openmrs/esm-config@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-config/-/esm-config-3.1.10-pre.252.tgz#4f282c41c947c388fc0e624c6d4365117a0e9c2d"
-  integrity sha512-eWCOx1vGB5zWWddEUQeVcMbmd5UbvAj5IYBqMh53qLcpnuhFVwleNOAypnq/nxQBnjJ0VYLdrThj6qTjSFNt1Q==
+"@openmrs/esm-config@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-config/-/esm-config-3.1.10-pre.258.tgz#52d474457a3131112cf175947da3563e17987d3f"
+  integrity sha512-3B/hJBqoFhK+qT4YplTuJnMTwG0cI+YK2S2yCfIrajVZfjSeYsHd4dgqeQxL/Q6ALpbN1XpWqe1h3JGrva02Uw==
   dependencies:
     ramda "^0.26.1"
 
-"@openmrs/esm-error-handling@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-error-handling/-/esm-error-handling-3.1.10-pre.252.tgz#066449ee59ae54283d454fa3ebf14cadd2f0d561"
-  integrity sha512-Drcw6i/16CV3OUF6WDH0YWM23MJEHSbYmy4ANnCLZso8hmAyExJ3iIQBUQx4wJuydhzHMPw7kmOa/88qE8n1eg==
+"@openmrs/esm-error-handling@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-error-handling/-/esm-error-handling-3.1.10-pre.258.tgz#8b342c3c798a8aa03ead753ce9995b51b239429b"
+  integrity sha512-RPFl2pwCF76Pil5PCo77aDhtjs7gnL73bqKHtCTXSSqR2dm8hUupzZgtrNPfdh+ZRgZidp+MMps7ryWudx6tsg==
 
-"@openmrs/esm-extensions@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-extensions/-/esm-extensions-3.1.10-pre.252.tgz#54e9d78a7eb2562150bf3c08134431c6315ba6de"
-  integrity sha512-X1w3Hsj/FiU1wXsVPCfCN+7Gh9YYak1eiAdv00s/BbqlF0Q/DhEG8Fjy5KHvGd5OJvhnruM45CnF1rAsvgtbPQ==
+"@openmrs/esm-extensions@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-extensions/-/esm-extensions-3.1.10-pre.258.tgz#1ece77a0c7c04651b68919ec9d9af8fa8ffc6911"
+  integrity sha512-SgNtmGJAeJbh994+hf16iOR0DUvDgXnR7UwI35VcRxNNWvAgnhLe3R20L+k2JTnew89OdhBs+Ks9imGmMj89Zg==
 
-"@openmrs/esm-framework@^3.1.10-pre.252", "@openmrs/esm-framework@next":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.1.10-pre.252.tgz#ad449c36bd5e9b4e6a68be6d37b8b9c29c5f2db0"
-  integrity sha512-pf5YF7rPB62ehpEY8aRmhJMPURwcGoGTkfdYm+ma7dI5KcdXuMCvpX6J1BhaenhnUl3h+HKB8h83U5eBIwinmA==
+"@openmrs/esm-framework@^3.1.10-pre.258", "@openmrs/esm-framework@next":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.1.10-pre.258.tgz#b21a81c2d5901c5c999f9c3d0489d0520874d36d"
+  integrity sha512-ioLxjej8osPi1WF5OgOolEfJFGKfMOhblS5cIBGqQHpOFStqOW59qg3ExXRc1Pn7b0iTe9SvYHTkETpiaSczxA==
   dependencies:
-    "@openmrs/esm-api" "^3.1.10-pre.252"
-    "@openmrs/esm-breadcrumbs" "^3.1.10-pre.252"
-    "@openmrs/esm-config" "^3.1.10-pre.252"
-    "@openmrs/esm-error-handling" "^3.1.10-pre.252"
-    "@openmrs/esm-extensions" "^3.1.10-pre.252"
-    "@openmrs/esm-globals" "^3.1.10-pre.252"
-    "@openmrs/esm-offline" "^3.1.10-pre.252"
-    "@openmrs/esm-react-utils" "^3.1.10-pre.252"
-    "@openmrs/esm-state" "^3.1.10-pre.252"
-    "@openmrs/esm-styleguide" "^3.1.10-pre.252"
-    "@openmrs/esm-utils" "^3.1.10-pre.252"
+    "@openmrs/esm-api" "^3.1.10-pre.258"
+    "@openmrs/esm-breadcrumbs" "^3.1.10-pre.258"
+    "@openmrs/esm-config" "^3.1.10-pre.258"
+    "@openmrs/esm-error-handling" "^3.1.10-pre.258"
+    "@openmrs/esm-extensions" "^3.1.10-pre.258"
+    "@openmrs/esm-globals" "^3.1.10-pre.258"
+    "@openmrs/esm-offline" "^3.1.10-pre.258"
+    "@openmrs/esm-react-utils" "^3.1.10-pre.258"
+    "@openmrs/esm-state" "^3.1.10-pre.258"
+    "@openmrs/esm-styleguide" "^3.1.10-pre.258"
+    "@openmrs/esm-utils" "^3.1.10-pre.258"
 
-"@openmrs/esm-globals@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-globals/-/esm-globals-3.1.10-pre.252.tgz#0f476158bf1b703de96c90ac8383499a47ca243e"
-  integrity sha512-bAiyrhj3+rFNkF1zkMB0C7Yjmj+4frefCeetvjIqTV8XjsxK9PAsDiIGM4J4Yiyg7DfpahhUK3C5XO9cFqy9TA==
+"@openmrs/esm-globals@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-globals/-/esm-globals-3.1.10-pre.258.tgz#54e5faba649308cff846b7e28ba3ff40d24e35b9"
+  integrity sha512-GJAHwRUDV5FRMzFQ95UcsNq2nFBaP2j+AcYTDlFZgsWysrIIrWSBhs6EN+mIDcxeg+U0KfmdA7LE00rmcFA7Ow==
 
-"@openmrs/esm-offline@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.1.10-pre.252.tgz#ec1d69185fa39d9481cda729a5af01a3a72bfa65"
-  integrity sha512-y+ryYLZofuYE3y/5cObz8ihvTRP10pQZ3unAI7vwOMDOdJT87HmmR20AmrceUetZtAQMBxtwAR7uEjvHJ3aslA==
+"@openmrs/esm-offline@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.1.10-pre.258.tgz#164ba7a732d997fbe982768f1d84a37e2c43621f"
+  integrity sha512-AigakHbMCBfK5L2WxV5yxSIyvvLf+IqVkfcSDoS02quwZIzIS93jutR/kfb5k1KOPXXVQpo0AK1JsgO4metXvw==
   dependencies:
     lodash-es "4.17.21"
     workbox-window "^6.1.5"
 
-"@openmrs/esm-react-utils@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.1.10-pre.252.tgz#2a2e73a9169a5c3f61ef29249f3b57bf12f854ae"
-  integrity sha512-D1oStzQEepVM/tvl8auvCJcTbLwydQh4sX9hb2AEbr/X5movG98Upnb1W3Qh+Ntm46fr4fD7RJKLzp9N6XHZgQ==
+"@openmrs/esm-react-utils@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.1.10-pre.258.tgz#66a0696049f35c3e3a7bc6effa5970b7c88f9cd9"
+  integrity sha512-Av4gHsfIug8owEP1kJZZGc5ar4b9DbxQ/woHH5g+Gw3Q9azOAUNTD8fYOgGB4iuC2vKqzx3SatJihZ3kPFnmtw==
   dependencies:
     lodash-es "^4.17.21"
     single-spa-react "^4.1.1"
 
-"@openmrs/esm-state@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.1.10-pre.252.tgz#c03e698277d943ef79e3becefc18cfb8725ab749"
-  integrity sha512-2tUdNbBuEU26TGk2Tn+XyR7XUiNWOg7h3ma9pBOJwm0AEaOo/g5Q37AubgVR1jAnPLGqL+5VtevL78cgBax5BQ==
+"@openmrs/esm-state@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.1.10-pre.258.tgz#1433b2f2910ccba31b5b29eb9d55b86bb39369f9"
+  integrity sha512-F4BwCpiLEsxzlus45U4iONoNe30hwAaC4R72PaKFdodtzaMHm8HbvRbY7Qob+AtfUGqpvA3DK8U6x5KEiKUtuA==
   dependencies:
     unistore "^3.5.2"
 
-"@openmrs/esm-styleguide@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.1.10-pre.252.tgz#f42e0318f0b59bc54c9a198b97fa20f9b97bb955"
-  integrity sha512-PMXuog6hRnxfXVbJFp51YAyVSg32Y9fg4dfZ1r+RcnBUyoDbpkC3QamgzyX6NOeemXaKKDuJdT3aw5SDaI2PVA==
+"@openmrs/esm-styleguide@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.1.10-pre.258.tgz#f43e7c8da449cde38d33ca7ee176c2efc06804d7"
+  integrity sha512-3lDPXwshUY+svhysIRYzAuCPE6q5yt2SvmWcBOGU14fHtIPoWFFugUf5RXxrExtlvBkqJ/mespewuKogYbWM0w==
   dependencies:
     "@carbon/charts" "^0.41.57"
     carbon-components-react "7.31.0"
     lodash-es "^4.17.21"
 
-"@openmrs/esm-utils@^3.1.10-pre.252":
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.1.10-pre.252.tgz#b96a0471889c2f24e50f3a4b43c8bb32c88b5ef4"
-  integrity sha512-5BKhv2xekjSaqlPu0POQxusoBMzJR6Fxw4nNwdXYKNDkXf2Plfln2SMykY6zkWJj/fKMYvZZ3hHtUq9LB+3qEw==
+"@openmrs/esm-utils@^3.1.10-pre.258":
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.1.10-pre.258.tgz#af10068c67d8f4a718609b595f5a59c09ead3a4f"
+  integrity sha512-SDPJyec9JFII2w+VNtuyNd8P+F3sRWkqYRN0raiRmfdX9MYP5cIUHqMhGbN3cf8MLE58a0CcvPSa8bDQVJhhqg==
   dependencies:
     rxjs "^6.5.3"
 
@@ -10442,15 +10442,15 @@ opener@^1.5.2:
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
 openmrs@next:
-  version "3.1.10-pre.252"
-  resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.1.10-pre.252.tgz#1778e76ad4f477d07cd4e618eca4568aaff7cdab"
-  integrity sha512-aQEmAXGwNR17HxOR8mShBIAHgoiV71AbXT6hE+bchuGO5hOQfg3ae+BN3TWTcFtY5RpJMFXLpO7o4zY2b6KHkg==
+  version "3.1.10-pre.258"
+  resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.1.10-pre.258.tgz#e2b58d36797601a2fd1d86852d7487a0fed0477b"
+  integrity sha512-p8tB76sYmo1CZeOAD/Qvzv2etSU26fBpjz3lasxWqDkkJ2ZI0f/s7UI1zBt9MwnwkxMels2G4/YORyws1rc6nA==
   dependencies:
     "@babel/core" "^7.11.4"
     "@babel/preset-env" "^7.11.0"
     "@babel/preset-react" "^7.10.4"
     "@babel/preset-typescript" "^7.10.4"
-    "@openmrs/esm-app-shell" "^3.1.10-pre.252"
+    "@openmrs/esm-app-shell" "^3.1.10-pre.258"
     "@types/react" "^16.9.46"
     "@types/systemjs" "^6.1.0"
     autoprefixer "^9.6.1"
@@ -13508,9 +13508,9 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
   integrity sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
 
 ts-loader@^9.1.2:
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.2.0.tgz#0d9feeef60081729ab999af7c322651158de2a0c"
-  integrity sha512-9MlaeNNEk5juw5YL3Xfkvz2gGTsRcXMqfTEAW2mLFWNVsuQEa4jZc4lFB1UZjmA5cyPriCRmOFx+XKV47p5OZg==
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.2.1.tgz#5699af8d10aa3a763aadfced1d4b275a432b76eb"
+  integrity sha512-BLfLa4paMQyf819haKxxbZqA1aLDqsk8XEZLmd7E1eBa0NsEHYFcTWlUlPmYMGhvD/IMi0NcIW3A/G7vzr3oiA==
   dependencies:
     chalk "^4.1.0"
     enhanced-resolve "^5.0.0"
@@ -14032,9 +14032,9 @@ warning@^3.0.0:
     loose-envify "^1.0.0"
 
 watchpack@^2.0.0:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-2.1.1.tgz#e99630550fca07df9f90a06056987baa40a689c7"
-  integrity sha512-Oo7LXCmc1eE1AjyuSBmtC3+Wy4HcV8PxWh2kP6fOl8yTlNS7r0K9l1ao2lrrUza7V39Y3D/BbJgY8VeSlc5JKw==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-2.2.0.tgz#47d78f5415fe550ecd740f99fe2882323a58b1ce"
+  integrity sha512-up4YAn/XHgZHIxFBVCdlMiWDj6WaLKpwVeGQk2I5thdYxF/KmF0aaz6TfJZ/hfl1h/XlcDr7k1KH7ThDagpFaA==
   dependencies:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
@@ -14103,9 +14103,9 @@ webpack-cli@^4.7.0:
     webpack-merge "^5.7.3"
 
 webpack-dev-middleware@^4.1.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-4.2.0.tgz#a2578914757107ed9af826365d87bdaa3e3581d2"
-  integrity sha512-HVVpHw+5H4lfGasUKjpIkOy9TB27OyKiL13c+dhzVG1w77OQ87b408fp0qKDKQQkNGgShbStDzVJ8sK46JajXg==
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-4.3.0.tgz#179cc40795882cae510b1aa7f3710cbe93c9333e"
+  integrity sha512-PjwyVY95/bhBh6VUqt6z4THplYcsvQ8YNNBTBM873xLVmw8FLeALn0qurHbs9EmcfhzQis/eoqypSnZeuUz26w==
   dependencies:
     colorette "^1.2.2"
     mem "^8.1.1"
