@@ -1,0 +1,51 @@
+{
+  "name": "@openmrs/esm-patient-search-app",
+  "version": "3.0.0",
+  "description": "Patient Search microfrontend for the OpenMRS SPA",
+  "keywords": [
+    "openmrs"
+  ],
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
+  "bugs": {
+    "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
+  },
+  "license": "MPL-2.0",
+  "main": "src/index.ts",
+  "source": true,
+  "browser": "dist/openmrs-esm-patient-search-app.js",
+  "scripts": {
+    "start": "openmrs develop",
+    "serve": "webpack serve --mode=development",
+    "debug": "npm run serve",
+    "build": "webpack --mode production",
+    "analyze": "webpack --mode=production --env.analyze=true",
+    "lint": "eslint src --ext tsx",
+    "typescript": "tsc",
+    "extract-translations": "i18next 'src/**/*.component.tsx'"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "dependencies": {
+    "@carbon/charts-react": "^0.41.14",
+    "@carbon/icons-react": "^10.18.0",
+    "carbon-components-react": "^7.25.0",
+    "d3": "^5.16.0",
+    "lodash-es": "^4.17.15"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "@openmrs/esm-framework": "3.x",
+    "carbon-components": "10.x",
+    "carbon-icons": "7.x",
+    "dayjs": "1.x",
+    "react": "16.x",
+    "react-i18next": "11.x",
+    "react-router-dom": "5.x",
+    "rxjs": "6.x"
+  }
+}

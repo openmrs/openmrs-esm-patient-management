@@ -1,0 +1,13 @@
+.patientLaunchContainer {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    min-height: 3rem;
+    z-index: 1000000;
+}
+
+.headerGlobalAction {
+    background-color: transparent;
+}
