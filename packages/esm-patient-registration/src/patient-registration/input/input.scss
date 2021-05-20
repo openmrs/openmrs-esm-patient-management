@@ -1,0 +1,84 @@
+.fieldRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.subFieldRow{
+    margin-bottom: 5px;
+}
+
+.label {
+    width: 150px;
+    text-align: right;
+    margin-right: 5px;
+    padding-top: 8px;
+}
+
+.requiredField {
+    color: var(--omrs-color-danger);
+}
+
+.input {
+    margin-right: 5px;
+}
+
+.checkboxField {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 400px;
+    margin-left: 10px;
+}
+
+.textInput {
+    width: 250px !important;
+    height: 40px !important;
+}
+
+.numberInput {
+    width: 200px !important;
+    height: 40px !important;
+}
+
+.checkboxInput {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+    margin-top: 8px;
+}
+
+.selectInput {
+    width: 150px !important;
+    height: 40px !important;
+}
+
+.dateInput {
+    width: 200px !important;
+    height: 40px !important;
+    font-size: large !important;
+}
+
+.telInput {
+    width: 250px !important;
+    height: 40px !important;
+}
+
+.errorInput {
+    border: 2px solid var(--omrs-color-danger) !important;
+    padding-left: 0.875rem !important;
+}
+
+.errorMessage {
+    color: var(--omrs-color-danger);
+    align-self: center;
+}
+
+.dummyData {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.identifierInput {
+    height: 80px !important;
+}

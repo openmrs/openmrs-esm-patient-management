@@ -1,0 +1,62 @@
+@import "../root.scss";
+.title {
+    color: var(--omrs-color-brand-teal);
+}
+
+.submit {
+    width: 250px;
+}
+
+.submit:hover {
+    cursor: pointer;
+}
+
+.label01 {
+    @include carbon--type-style("label-01");
+    margin-top: $spacing-05;
+    margin-bottom: $spacing-05;
+    color: $ui-04;
+}
+
+.productiveHeading02 {
+    @include carbon--type-style("productive-heading-02");
+    color: $ui-04;
+    cursor: pointer;
+}
+
+.space05 {
+    margin: $spacing-05 0 $spacing-05 0;
+}
+
+.fixedPosition {
+    position: fixed;
+}
+
+$color-gray-70: #525252;
+$color-gray-100: #161616;
+$grey-2: #e0e0e0;
+.TouchTarget a:active {
+    color: $color-gray-100;
+}
+
+.LinkName {
+    color: $color-gray-70;
+    line-height: 1.38;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+a.LinkName:active {
+    text-decoration: none;
+    color: $color-gray-100;
+}
+
+a.LinkName:hover {
+    text-decoration: none;
+    color: $color-gray-100;
+    cursor: pointer;
+}
+
+.main {
+    background-color: white;
+}
