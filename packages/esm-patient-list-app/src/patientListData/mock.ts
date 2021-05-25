@@ -65,8 +65,6 @@ export function getAllPatientListsWithPatient(
       res.push(pl);
     }
 
-    console.log({ res });
-
     return res;
   });
 }

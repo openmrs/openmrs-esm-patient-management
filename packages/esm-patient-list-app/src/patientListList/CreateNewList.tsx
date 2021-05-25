@@ -34,7 +34,7 @@ const CreateNewList: React.FC<{ close: () => void; finished: () => void }> = ({ 
         label={'Chose which information to include in the list'}
         items={items}
         itemToString={(item) => (item ? item.text : '')}
-        onChange={console.log}
+        onChange={() => {}}
       />
       <div>
         <Button onClick={close}>Cancel</Button>

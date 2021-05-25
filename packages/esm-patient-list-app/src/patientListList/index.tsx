@@ -12,10 +12,6 @@ import './style.scss';
 import CreateNewList from './CreateNewList';
 import PatientList from '../PatientList';
 
-// setTimeout(() => {
-//   console.log({ style });
-// }, 10000);
-
 enum StateTypes {
   IDLE,
   SEARCH,
@@ -105,8 +101,6 @@ const PatientListList: React.FC = () => {
   const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
     updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
   }, []);
-
-  console.log({ patientData, routeState });
 
   return (
     <div
@@ -237,8 +231,6 @@ const PatientListList: React.FC = () => {
                 setListStarred={setListStarred}
                 enter={viewState.enter}
                 openPatientList={(listUuid) => {
-                  console.log(listUuid);
-
                   setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
                 }}
               />

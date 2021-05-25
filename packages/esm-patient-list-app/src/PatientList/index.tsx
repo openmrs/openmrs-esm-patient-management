@@ -6,8 +6,6 @@ import { PatientListBase } from '../patientListData/types';
 const PatientList: React.FC<{ close: () => void; listUuid: string }> = ({ close, listUuid }) => {
   const { data } = useSingePatientListData(false, listUuid);
 
-  console.log(data);
-
   return (
     <Overlay close={close} header={'patient list'}>
       <p>{listUuid}</p>
