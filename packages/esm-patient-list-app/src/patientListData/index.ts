@@ -26,7 +26,7 @@ interface ErrorState {
 
 type State<T> = LoadingState | DataState<T> | ErrorState;
 
-export const usePatientListData = (redo: any, ...args: Parameters<typeof getAllPatientLists>) => {
+export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
   const [data, setData] = React.useState<State<Array<PatientListBase & { id: string }>>>({
     loading: true,
     data: undefined,
@@ -54,9 +54,9 @@ export const usePatientListData = (redo: any, ...args: Parameters<typeof getAllP
   }, [redo, ...args]);
 
   return data;
-};
+}
 
-export const useSingePatientListData = (redo: any, ...args: Parameters<typeof getPatientListMembers>) => {
+export function useSingePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
   const [data, setData] = React.useState<State<Array<PatientListMember>>>({
     loading: true,
     data: undefined,
@@ -84,4 +84,4 @@ export const useSingePatientListData = (redo: any, ...args: Parameters<typeof ge
   }, [redo, ...args]);
 
   return data;
-};
+}

@@ -3,7 +3,7 @@ import { getAsyncLifecycle } from '@openmrs/esm-framework';
 import { registerBreadcrumbs } from '@openmrs/esm-framework';
 const backendDependencies = { 'webservices.rest': '^2.2.0' };
 
-// const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-patient-list-app';
 const options = {
@@ -31,7 +31,7 @@ function setupOpenMRS() {
   return {
     pages: [
       {
-        load: getAsyncLifecycle(() => import('./patientListList/index'), options),
+        load: getAsyncLifecycle(() => import('./patientListList'), options),
         route: (location: Location) => location.pathname.startsWith(window.getOpenmrsSpaBase() + 'patient-list'),
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },
@@ -41,4 +41,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, /*importTranslation, */ setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };

@@ -11,8 +11,9 @@ import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import './style.scss';
 import CreateNewList from './CreateNewList';
 import PatientList from '../PatientList';
+import SearchOverlay from './SearchOverlay';
 
-enum StateTypes {
+export enum StateTypes {
   IDLE,
   SEARCH,
   SEARCH_WITH_RESULTS,
@@ -40,7 +41,7 @@ interface SearchStateWithResults extends Omit<SearchState, 'type'> {
   enter: Object;
 }
 
-type ViewState = IdleState | SearchState | SearchStateWithResults;
+export type ViewState = IdleState | SearchState | SearchStateWithResults;
 
 const headersWithoutType = [
   { key: 'display', header: 'List Name' },
@@ -210,36 +211,13 @@ const PatientListList: React.FC = () => {
           }}
         />
       </div>
-      {(() => {
-        switch (viewState.type) {
-          case StateTypes.SEARCH:
-            return (
-              <div
-                style={{
-                  zIndex: 1,
-                  gridRow: '2 / 4',
-                  gridColumn: '1 / 2',
-                  backgroundColor: 'grey',
-                  opacity: 0.7,
-                }}></div>
-            );
-          case StateTypes.SEARCH_WITH_RESULTS:
-            return (
-              <PatientListResults
-                style={{ zIndex: 1, gridRow: '2 / 4', gridColumn: '1 / 2', backgroundColor: '#ededed' }}
-                nameFilter={viewState.searchTerm}
-                setListStarred={setListStarred}
-                enter={viewState.enter}
-                openPatientList={(listUuid) => {
-                  setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
-                }}
-              />
-            );
-          case StateTypes.IDLE:
-          default:
-            return null;
-        }
-      })()}
+      <SearchOverlay
+        viewState={viewState}
+        openPatientList={(listUuid) => {
+          setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
+        }}
+        setListStarred={setListStarred}
+      />
       {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
         <CreateNewList
           close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}

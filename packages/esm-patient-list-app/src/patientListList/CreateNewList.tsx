@@ -1,6 +1,9 @@
-import { ArrowLeft16 } from '@carbon/icons-react';
-import { Button, Header, MultiSelect, TextArea, TextInput } from 'carbon-components-react';
-import React, { CSSProperties } from 'react';
+import Button from 'carbon-components-react/lib/components/Button';
+import MultiSelect from 'carbon-components-react/lib/components/MultiSelect';
+import TextArea from 'carbon-components-react/lib/components/TextArea';
+import TextInput from 'carbon-components-react/lib/components/TextInput';
+import React from 'react';
+
 import { createPatientList } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import Overlay from '../Overlay';
