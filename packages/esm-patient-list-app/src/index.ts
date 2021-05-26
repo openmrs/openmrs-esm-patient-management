@@ -37,7 +37,15 @@ function setupOpenMRS() {
         offline: { syncUserPropertiesChangesOnLoad: false },
       },
     ],
-    extensions: [],
+    extensions: [
+      {
+        id: 'patient-list-link',
+        slot: 'app-menu-slot',
+        load: getAsyncLifecycle(() => import('./patient-list-link'), options),
+        online: true,
+        offline: true,
+      },
+    ],
   };
 }
 
