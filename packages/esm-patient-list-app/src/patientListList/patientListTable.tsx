@@ -12,6 +12,7 @@ import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { usePatientListData } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
+import { useTranslation } from 'react-i18next';
 
 const defaultHeaders = [
   { key: 'display', header: 'List Name' },
@@ -27,8 +28,9 @@ const PatientListTable: React.FC<{
   style?: CSSProperties;
   loading?: boolean;
   openPatientList: (uuid: string) => void;
-}> = ({ patientData, setListStarred, headers = defaultHeaders, style, loading = false, openPatientList }) =>
-  !loading ? (
+}> = ({ patientData, setListStarred, headers = defaultHeaders, style, loading = false, openPatientList }) => {
+  const { t } = useTranslation();
+  return !loading ? (
     <DataTable rows={patientData} headers={headers}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
         <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
@@ -69,7 +71,11 @@ const PatientListTable: React.FC<{
                       case 'type':
                         const val: PATIENT_LIST_TYPE = cell.value;
                         return (
-                          <TableCell key={cell.id}>{val === PATIENT_LIST_TYPE.SYSTEM ? 'system' : 'user'}</TableCell>
+                          <TableCell key={cell.id}>
+                            {val === PATIENT_LIST_TYPE.SYSTEM
+                              ? t('patientListTableTypeSystem', 'system')
+                              : t('patientListTableTypeUser', 'user')}
+                          </TableCell>
                         );
 
                       default:
@@ -93,5 +99,6 @@ const PatientListTable: React.FC<{
       zebra
     />
   );
+};
 
 export default PatientListTable;

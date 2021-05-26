@@ -1,1 +1,9 @@
-{}
+{
+    "newPatientListHeader": "New patient list",
+    "newPatientListNameLabel": "List name",
+    "newPatientListDescriptionLabel": "Describe the purpose of this list in a few words",
+    "newPatientListSeceltLabel": "Chose which information to include in the list",
+    "patientListSearchResultHeader": "Search results",
+    "patientListTableTypeUser": "user",
+    "patientListTableTypeSystem": "system"
+}
