@@ -28,6 +28,15 @@ const CreateNewList: React.FC<{ close: () => void; finished: () => void }> = ({ 
   const { t } = useTranslation();
   const nameInputRef = React.useRef<HTMLInputElement>();
   const decriptionInputRef = React.useRef<HTMLTextAreaElement>();
+
+  const createPL = React.useCallback(() => {
+    // set loading
+    createPatientList(nameInputRef.current.value, decriptionInputRef.current.value, PATIENT_LIST_TYPE.USER).then(() => {
+      finished();
+      close();
+    });
+  }, [finished, close]);
+
   return (
     <Overlay header={t('newPatientListHeader', 'New patient list')} close={close}>
       <h2>Configure your patient list using the fields below</h2>
@@ -46,20 +55,7 @@ const CreateNewList: React.FC<{ close: () => void; finished: () => void }> = ({ 
       />
       <div>
         <Button onClick={close}>Cancel</Button>
-        <Button
-          onClick={() => {
-            // set loading
-            createPatientList(
-              nameInputRef.current.value,
-              decriptionInputRef.current.value,
-              PATIENT_LIST_TYPE.USER,
-            ).then(() => {
-              finished();
-              close();
-            });
-          }}>
-          Save
-        </Button>
+        <Button onClick={createPL}>Save</Button>
       </div>
     </Overlay>
   );

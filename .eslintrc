@@ -3,5 +3,8 @@
     "plugins": [
       "@typescript-eslint"
     ],
-    "extends": ["ts-react-important-stuff", "plugin:prettier/recommended"]
+    "extends": ["ts-react-important-stuff", "plugin:prettier/recommended"],
+    "rules": {
+      "curly": ["error", "all"]
+    }
   }

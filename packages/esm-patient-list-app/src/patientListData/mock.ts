@@ -6,17 +6,19 @@ import {
   PATIENT_LIST_TYPE,
   PatientListMemberFilter,
 } from './types';
-const sleep = (time) => new Promise<void>((res) => setTimeout(() => res(), time));
+function sleep(time) {
+  return new Promise<void>((res) => setTimeout(() => res(), time));
+}
 export function newUuid() {
   return Math.random().toString(36).split('.')[1] + Math.random().toString(36).split('.')[1];
 }
 
-export const exist = (...args: any[]): boolean => {
+export function exist(...args: any[]): boolean {
   for (const y of args) {
     if (y === null || y === undefined) return false;
   }
   return true;
-};
+}
 
 const DELAY = 300;
 

@@ -4,9 +4,10 @@ import Button from 'carbon-components-react/lib/components/Button';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 
 import { getAllPatientLists, updatePatientListDetails, usePatientListData } from '../patientListData';
-import { Search, Tab, Tabs } from 'carbon-components-react';
+import Search from 'carbon-components-react/es/components/Search';
+import Tab from 'carbon-components-react/es/components/Tab';
+import Tabs from 'carbon-components-react/es/components/Tabs';
 import PatientListTable from './patientListTable';
-import PatientListResults from './PatientListResults';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import './style.scss';
 import CreateNewList from './CreateNewList';
@@ -125,14 +126,17 @@ const PatientListList: React.FC = () => {
           style={{ backgroundColor: 'white', borderBottomColor: '#e0e0e0' }}
           labelText="search me"
           onFocus={() => {
-            if (viewState.type === StateTypes.IDLE) setViewState({ type: StateTypes.SEARCH, searchTerm: '' });
+            if (viewState.type === StateTypes.IDLE) {
+              setViewState({ type: StateTypes.SEARCH, searchTerm: '' });
+            }
           }}
           onBlur={() => {
             if (
               viewState.type === StateTypes.SEARCH ||
               (viewState.type === StateTypes.SEARCH_WITH_RESULTS && viewState.searchTerm === '')
-            )
+            ) {
               setViewState({ type: StateTypes.IDLE });
+            }
           }}
           onChange={({ target }) => {
             if (target !== ref.current?.input) {
@@ -145,13 +149,14 @@ const PatientListList: React.FC = () => {
             }
           }}
           onKeyPress={(e) => {
-            if (e.key === 'Enter')
+            if (e.key === 'Enter') {
               setViewState(({ searchTerm }: SearchState) => ({
                 type: StateTypes.SEARCH_WITH_RESULTS,
                 searchTerm,
                 results: ['todo'],
                 enter: {},
               }));
+            }
           }}
           ref={ref}
           value={(viewState as SearchState)?.searchTerm || ''}
