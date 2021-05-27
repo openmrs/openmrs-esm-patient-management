@@ -99,9 +99,10 @@ export interface FormValues {
 }
 
 export interface PatientUuidMapType {
-  additionalNameUuid: string | undefined;
-  patientUuid: string | undefined;
-  preferredNameUuid: string | undefined;
+  additionalNameUuid?: string;
+  patientUuid?: string;
+  preferredNameUuid?: string;
+  preferredAddressUuid?: string;
 }
 
 export interface CapturePhotoProps {
