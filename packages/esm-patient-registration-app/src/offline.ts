@@ -1,4 +1,6 @@
+import { useCurrentPatient } from '@openmrs/esm-react-utils';
 import Dexie, { Table } from 'dexie';
+import { useEffect, useState } from 'react';
 import FormManager from './patient-registration/form-manager';
 import {
   CapturePhotoProps,
@@ -33,10 +35,40 @@ async function syncSinglePatientRegistration(queuedPatient: PatientRegistration,
     );
 
     await new PatientRegistrationDb().patientRegistrations.delete(queuedPatient.id);
-    console.info(`Successfully synced new patient. Its new ID is: `, newPatientId);
+    console.info(`Successfully synced new patient. Its new UUID is: `, newPatientId);
   } catch (e) {
     console.error('Failed to synchronize a patient.', e);
   }
+}
+
+export function useCurrentOfflinePatient() {
+  const [isLoadingOnlinePatient, patient, patientUuid] = useCurrentPatient();
+  const [isLoadingOfflinePatient, setIsLoadingOfflinePatient] = useState(false);
+  const [offlinePatient, setOfflinePatient] = useState<fhir.Patient | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => {
+      if (!isLoadingOnlinePatient && !patient) {
+        try {
+          setIsLoadingOfflinePatient(true);
+          const db = new PatientRegistrationDb();
+          const registration = db.patientRegistrations.get(+patientUuid);
+          if (!registration) {
+            return;
+          }
+
+          setOfflinePatient({
+            id: patientUuid,
+            // TODO: Recreate fhir patient structure from persisted form data.
+          });
+        } finally {
+          setIsLoadingOfflinePatient(false);
+        }
+      }
+    })();
+  }, [isLoadingOnlinePatient, patient, patientUuid]);
+
+  return [isLoadingOnlinePatient || isLoadingOfflinePatient, patient || offlinePatient];
 }
 
 export class PatientRegistrationDb extends Dexie {

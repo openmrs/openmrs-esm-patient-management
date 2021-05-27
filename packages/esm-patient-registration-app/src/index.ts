@@ -16,6 +16,12 @@ import FormManager from './patient-registration/form-manager';
 import { syncAddedPatients } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const resources = {
+  currentSession: fetchCurrentSession,
+  addressTemplate: fetchAddressTemplate,
+  relationshipTypes: fetchAllRelationshipTypes,
+  patientIdentifiers: fetchPatientIdentifierTypesWithSources,
+};
 
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-registration-app';
@@ -49,12 +55,7 @@ function setupOpenMRS() {
         offline: {
           savePatientForm: FormManager.savePatientFormOffline,
         },
-        resources: {
-          currentSession: fetchCurrentSession,
-          addressTemplate: fetchAddressTemplate,
-          relationshipTypes: fetchAllRelationshipTypes,
-          patientIdentifiers: fetchPatientIdentifierTypesWithSources,
-        },
+        resources,
       },
       {
         load: getAsyncLifecycle(() => import('./root.component'), {
@@ -62,6 +63,13 @@ function setupOpenMRS() {
           moduleName,
         }),
         route: /^patient\/([a-zA-Z0-9\-]+)\/edit/,
+        online: {
+          savePatientForm: FormManager.savePatientFormOnline,
+        },
+        offline: {
+          savePatientForm: FormManager.savePatientFormOffline,
+        },
+        resources,
       },
     ],
     extensions: [

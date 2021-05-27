@@ -4,9 +4,11 @@ import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonG
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { useField } from 'formik';
 
 export const GenderField: React.FC = () => {
   const { t } = useTranslation();
+  const [field] = useField('gender');
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
 
   const setGender = (gender: string) => {
@@ -18,7 +20,7 @@ export const GenderField: React.FC = () => {
       <h4 className={styles.productiveHeading02Light}>{t('genderLabelText', 'Sex')}</h4>
       <div style={{ marginBottom: '1rem' }}>
         <p className="bx--label">{t('genderLabelText', 'Sex')}</p>
-        <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender}>
+        <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
           <RadioButton id="male" labelText={t('maleLabelText', 'Male')} value="Male" />
           <RadioButton id="female" labelText={t('femaleLabelText', 'Female')} value="Female" />
           <RadioButton id="other" labelText={t('otherLabelText', 'Other')} value="Other" />
