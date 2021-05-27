@@ -34,35 +34,9 @@ import {
   getPatientUuidMapFromFhirPatient,
 } from './patient-registration-utils';
 import { ResourcesContext } from '../offline.resources';
+import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 
-const blankFormValues: FormValues = {
-  givenName: '',
-  middleName: '',
-  familyName: '',
-  unidentifiedPatient: false,
-  additionalGivenName: '',
-  additionalMiddleName: '',
-  additionalFamilyName: '',
-  addNameInLocalLanguage: false,
-  gender: '',
-  birthdate: null,
-  yearsEstimated: 0,
-  monthsEstimated: 0,
-  birthdateEstimated: false,
-  telephoneNumber: '',
-  address1: '',
-  address2: '',
-  cityVillage: '',
-  stateProvince: '',
-  country: '',
-  postalCode: '',
-  isDead: false,
-  deathDate: '',
-  deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
-};
-
-let exportedInitialFormValuesForTesting: FormValues = { ...blankFormValues };
+let exportedInitialFormValuesForTesting = {} as FormValues;
 const getUrlWithoutPrefix = (url) => url.split(window['getOpenmrsSpaBase']())?.[1];
 
 export interface PatientRegistrationProps {
@@ -85,11 +59,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
+  const [patientUuidMap] = usePatientUuidMap(patientUuid);
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
-  const [initialFormValues, setInitialFormValues] = useState<FormValues>(blankFormValues);
-  const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<object>({});
-  const [patientUuidMap, setPatientUuidMap] = useState({} as PatientUuidMapType);
   const cancelNavFn = useCallback(
     (evt: CustomEvent) => {
       if (!open && !evt.detail.navigationIsCanceled) {
@@ -129,21 +103,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldConfigs(config.fieldConfigurations);
     }
   }, [t, config]);
-
-  useEffect(() => {
-    if (patient) {
-      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
-      setInitialAddressFieldValues({ ...initialAddressFieldValues, ...getAddressFieldValuesFromFhirPatient(patient) });
-      setInitialFormValues({ ...initialFormValues, ...getFormValuesFromFhirPatient(patient) });
-
-      const abortController = new AbortController();
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
-        setCurrentPhoto(value),
-      );
-
-      return () => abortController.abort();
-    }
-  }, [patient]);
 
   useEffect(() => {
     for (const patientIdentifier of patientIdentifiers) {
@@ -188,11 +147,23 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   }, [capturePhotoProps]);
 
+  useEffect(() => {
+    if (patient) {
+      const abortController = new AbortController();
+      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
+        setCurrentPhoto(value),
+      );
+
+      return () => abortController.abort();
+    }
+  }, [patient, config]);
+
   const onFormSubmit = async (values: FormValues) => {
     const abortController = new AbortController();
 
     try {
-      const patientUuid = await savePatientForm(
+      const createdPatientUuid = await savePatientForm(
+        patientUuid,
         values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -219,7 +190,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       if (patientUuid) {
         const redirectUrl =
-          new URLSearchParams(search).get('afterUrl') || interpolateString(config.links.submitButton, { patientUuid });
+          new URLSearchParams(search).get('afterUrl') ||
+          interpolateString(config.links.submitButton, { createdPatientUuid });
         window.removeEventListener('single-spa:before-routing-event', cancelNavFn);
         navigate({ to: redirectUrl });
       }
