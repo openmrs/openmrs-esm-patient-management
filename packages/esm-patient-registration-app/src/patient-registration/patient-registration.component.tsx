@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import styles from './patient-registration.scss';
-import camelCase from 'lodash-es/camelCase';
-import capitalize from 'lodash-es/capitalize';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import { Grid, Row, Column } from 'carbon-components-react/es/components/Grid';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { PatientIdentifierType, FormValues, CapturePhotoProps, PatientUuidMapType } from './patient-registration-types';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import FormManager, { SavePatientForm } from './form-manager';
+import { SavePatientForm } from './form-manager';
 import BeforeSavePrompt from './before-save-prompt';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
 import {
@@ -25,44 +23,11 @@ import {
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { useTranslation } from 'react-i18next';
 import { getSection } from './section/section-helper';
-import {
-  cancelRegistration,
-  parseAddressTemplateXml,
-  scrollIntoView,
-  getFormValuesFromFhirPatient,
-  getAddressFieldValuesFromFhirPatient,
-  getPatientUuidMapFromFhirPatient,
-} from './patient-registration-utils';
+import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { ResourcesContext } from '../offline.resources';
+import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 
-const blankFormValues: FormValues = {
-  givenName: '',
-  middleName: '',
-  familyName: '',
-  unidentifiedPatient: false,
-  additionalGivenName: '',
-  additionalMiddleName: '',
-  additionalFamilyName: '',
-  addNameInLocalLanguage: false,
-  gender: '',
-  birthdate: null,
-  yearsEstimated: 0,
-  monthsEstimated: 0,
-  birthdateEstimated: false,
-  telephoneNumber: '',
-  address1: '',
-  address2: '',
-  cityVillage: '',
-  stateProvince: '',
-  country: '',
-  postalCode: '',
-  isDead: false,
-  deathDate: '',
-  deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
-};
-
-let exportedInitialFormValuesForTesting: FormValues = { ...blankFormValues };
+let exportedInitialFormValuesForTesting = {} as FormValues;
 const getUrlWithoutPrefix = (url) => url.split(window['getOpenmrsSpaBase']())?.[1];
 
 export interface PatientRegistrationProps {
@@ -85,11 +50,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
+  const [patientUuidMap] = usePatientUuidMap(patientUuid);
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
-  const [initialFormValues, setInitialFormValues] = useState<FormValues>(blankFormValues);
-  const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<object>({});
-  const [patientUuidMap, setPatientUuidMap] = useState({} as PatientUuidMapType);
   const cancelNavFn = useCallback(
     (evt: CustomEvent) => {
       if (!open && !evt.detail.navigationIsCanceled) {
@@ -129,21 +94,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldConfigs(config.fieldConfigurations);
     }
   }, [t, config]);
-
-  useEffect(() => {
-    if (patient) {
-      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
-      setInitialAddressFieldValues({ ...initialAddressFieldValues, ...getAddressFieldValuesFromFhirPatient(patient) });
-      setInitialFormValues({ ...initialFormValues, ...getFormValuesFromFhirPatient(patient) });
-
-      const abortController = new AbortController();
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
-        setCurrentPhoto(value),
-      );
-
-      return () => abortController.abort();
-    }
-  }, [patient]);
 
   useEffect(() => {
     for (const patientIdentifier of patientIdentifiers) {
@@ -188,11 +138,23 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   }, [capturePhotoProps]);
 
+  useEffect(() => {
+    if (patient) {
+      const abortController = new AbortController();
+      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
+        setCurrentPhoto(value),
+      );
+
+      return () => abortController.abort();
+    }
+  }, [patient, config]);
+
   const onFormSubmit = async (values: FormValues) => {
     const abortController = new AbortController();
 
     try {
-      const patientUuid = await savePatientForm(
+      const createdPatientUuid = await savePatientForm(
+        patientUuid,
         values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -219,7 +181,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       if (patientUuid) {
         const redirectUrl =
-          new URLSearchParams(search).get('afterUrl') || interpolateString(config.links.submitButton, { patientUuid });
+          new URLSearchParams(search).get('afterUrl') ||
+          interpolateString(config.links.submitButton, { createdPatientUuid });
         window.removeEventListener('single-spa:before-routing-event', cancelNavFn);
         navigate({ to: redirectUrl });
       }

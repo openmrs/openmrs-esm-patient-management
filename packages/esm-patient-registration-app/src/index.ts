@@ -3,6 +3,7 @@ import {
   defineConfigSchema,
   getAsyncLifecycle,
   registerSynchronizationCallback,
+  messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
 import { backendDependencies } from './openmrs-backend-dependencies';
 import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
@@ -43,6 +44,11 @@ function setupOpenMRS() {
   ]);
 
   registerSynchronizationCallback(() => syncAddedPatients(new AbortController()));
+
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/fhir2/R4/Patient/.+',
+  });
 
   return {
     pages: [

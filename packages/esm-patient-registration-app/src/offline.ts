@@ -23,6 +23,7 @@ export async function syncAddedPatients(abortController: AbortController) {
 async function syncSinglePatientRegistration(queuedPatient: PatientRegistration, abortController: AbortController) {
   try {
     const newPatientId = await FormManager.savePatientFormOnline(
+      undefined,
       queuedPatient.formValues,
       queuedPatient.patientUuidMap,
       queuedPatient.initialAddressFieldValues,
@@ -41,36 +42,6 @@ async function syncSinglePatientRegistration(queuedPatient: PatientRegistration,
   }
 }
 
-export function useCurrentOfflinePatient() {
-  const [isLoadingOnlinePatient, patient, patientUuid] = useCurrentPatient();
-  const [isLoadingOfflinePatient, setIsLoadingOfflinePatient] = useState(false);
-  const [offlinePatient, setOfflinePatient] = useState<fhir.Patient | undefined>(undefined);
-
-  useEffect(() => {
-    (async () => {
-      if (!isLoadingOnlinePatient && !patient) {
-        try {
-          setIsLoadingOfflinePatient(true);
-          const db = new PatientRegistrationDb();
-          const registration = db.patientRegistrations.get(+patientUuid);
-          if (!registration) {
-            return;
-          }
-
-          setOfflinePatient({
-            id: patientUuid,
-            // TODO: Recreate fhir patient structure from persisted form data.
-          });
-        } finally {
-          setIsLoadingOfflinePatient(false);
-        }
-      }
-    })();
-  }, [isLoadingOnlinePatient, patient, patientUuid]);
-
-  return [isLoadingOnlinePatient || isLoadingOfflinePatient, patient || offlinePatient];
-}
-
 export class PatientRegistrationDb extends Dexie {
   patientRegistrations: Table<PatientRegistration, number>;
 
@@ -78,7 +49,7 @@ export class PatientRegistrationDb extends Dexie {
     super('EsmPatientRegistration');
 
     this.version(1).stores({
-      patientRegistrations: '++id',
+      patientRegistrations: '++id,&patientUuid',
     });
 
     this.patientRegistrations = this.table('patientRegistrations');
@@ -87,6 +58,7 @@ export class PatientRegistrationDb extends Dexie {
 
 export interface PatientRegistration {
   id?: number;
+  patientUuid: string;
   formValues: FormValues;
   patientUuidMap: PatientUuidMapType;
   initialAddressFieldValues: Record<string, any>;

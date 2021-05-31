@@ -1,11 +1,11 @@
 import {
-  PatientIdentifier,
   FormValues,
   PatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
   Patient,
   CapturePhotoProps,
+  PatientIdentifier,
 } from './patient-registration-types';
 import {
   deletePersonName,
@@ -15,8 +15,10 @@ import {
   saveRelationship,
 } from './patient-registration.resource';
 import { PatientRegistrationDb } from '../offline';
+import { v4 } from 'uuid';
 
 export type SavePatientForm = (
+  patientUuid: string | undefined,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
@@ -30,6 +32,7 @@ export type SavePatientForm = (
 
 export default class FormManager {
   static async savePatientFormOffline(
+    patientUuid: string | undefined,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -39,8 +42,11 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
+    patientUuid = patientUuid ?? v4();
     const db = new PatientRegistrationDb();
+    await db.patientRegistrations.where({ patientUuid }).delete();
     await db.patientRegistrations.add({
+      patientUuid,
       formValues: values,
       patientUuidMap,
       initialAddressFieldValues,
@@ -55,6 +61,7 @@ export default class FormManager {
   }
 
   static async savePatientFormOnline(
+    patientUuid: string | undefined,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
