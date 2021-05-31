@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import styles from './patient-registration.scss';
-import camelCase from 'lodash-es/camelCase';
-import capitalize from 'lodash-es/capitalize';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import { Grid, Row, Column } from 'carbon-components-react/es/components/Grid';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { PatientIdentifierType, FormValues, CapturePhotoProps, PatientUuidMapType } from './patient-registration-types';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import FormManager, { SavePatientForm } from './form-manager';
+import { SavePatientForm } from './form-manager';
 import BeforeSavePrompt from './before-save-prompt';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
 import {
@@ -25,14 +23,7 @@ import {
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { useTranslation } from 'react-i18next';
 import { getSection } from './section/section-helper';
-import {
-  cancelRegistration,
-  parseAddressTemplateXml,
-  scrollIntoView,
-  getFormValuesFromFhirPatient,
-  getAddressFieldValuesFromFhirPatient,
-  getPatientUuidMapFromFhirPatient,
-} from './patient-registration-utils';
+import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { ResourcesContext } from '../offline.resources';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 
