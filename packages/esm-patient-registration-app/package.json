@@ -52,6 +52,5 @@
     "rxjs": "6.x"
   },
   "devDependencies": {
-    "@types/yup": "^0.29.3"
   }
 }
