@@ -1,6 +1,7 @@
 import { getAsyncLifecycle } from '@openmrs/esm-framework';
 // import { configSchema } from './config-schema';
 import { registerBreadcrumbs } from '@openmrs/esm-framework';
+import './offline/offlineData';
 const backendDependencies = { 'webservices.rest': '^2.2.0' };
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
