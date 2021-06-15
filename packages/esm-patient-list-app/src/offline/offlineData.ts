@@ -1,6 +1,6 @@
 import { createGlobalStore, getCurrentUser, getGlobalStore } from '@openmrs/esm-framework';
 import Dexie from 'dexie';
-import { LoadState, LOAD_STATE_TYPE, OfflinePatient } from './types';
+import { LoadState, OfflinePatient } from './types';
 
 /**
  * Thoughts on behaviour when LOADING or RELOADING are present on DB construction
@@ -46,15 +46,15 @@ export function getOfflineHandlers(): Array<string> {
 
 // Declare Database
 class OfflinePatientDatabase extends Dexie {
-  private offlinePatients: Dexie.Table<OfflinePatient, number>; // id is number in this case
+  private offlinePatients: Dexie.Table<OfflinePatient, string>; // id is number in this case
   private currentUser = 'unauthorized_user'; // will be automatically set to current user if logged in
   private changeSubscribers = new Set<(data: Array<OfflinePatient>) => void>();
   private broadcastChange = () => {}; // is overwritten if the Broadcastchannel is available
 
   public constructor() {
     super('OfflinePatientDatabase');
-    this.version(4).stores({
-      offlinePatients: '++id, uuid',
+    this.version(5).stores({
+      offlinePatients: 'uuid',
     });
     this.offlinePatients = this.table('offlinePatients');
     getCurrentUser().subscribe((user) => {
@@ -119,27 +119,25 @@ class OfflinePatientDatabase extends Dexie {
       const lastUpdate: OfflinePatient['lastUpdate'] = Object.fromEntries(
         Object.entries(patient.lastUpdate).map(([handlerUuid, { date }]: any) => [
           handlerUuid,
-          !!date ? { type: LOAD_STATE_TYPE.RELOADING, date } : { type: LOAD_STATE_TYPE.LOADING },
+          !!date ? { type: 'RELOADING', date } : { type: 'LOADING' },
         ]),
       );
       if (!patient.interestedUsers.includes(this.currentUser)) {
         // adding current user as interested
         updatePromise = db.offlinePatients.put(
           { ...patient, lastUpdate, interestedUsers: [...patient.interestedUsers, this.currentUser] },
-          patient.id,
+          patient.uuid,
         );
       } else {
         // reloading
-        updatePromise = db.offlinePatients.put({ ...patient, lastUpdate }, patient.id);
+        updatePromise = db.offlinePatients.put({ ...patient, lastUpdate }, patient.uuid);
       }
     } else {
       // creating patient entry
       updatePromise = this.offlinePatients.add({
         uuid: patientUuid,
         name,
-        lastUpdate: Object.fromEntries(
-          getOfflineHandlers().map((handlerUuid) => [handlerUuid, { type: LOAD_STATE_TYPE.LOADING }]),
-        ),
+        lastUpdate: Object.fromEntries(getOfflineHandlers().map((handlerUuid) => [handlerUuid, { type: 'LOADING' }])),
         interestedUsers: [this.currentUser],
       });
     }
@@ -156,13 +154,13 @@ class OfflinePatientDatabase extends Dexie {
       if (patient.interestedUsers.length > 1) {
         return this.offlinePatients.put(
           { ...patient, interestedUsers: patient.interestedUsers.filter((u) => u !== this.currentUser) },
-          patient.id,
+          patient.uuid,
         );
       } else {
         Object.values(patientStore.getState()).forEach((handlers) => {
           handlers.onRemovePatient(patientUuid);
         });
-        const updatePromise = this.offlinePatients.delete(patient.id);
+        const updatePromise = this.offlinePatients.delete(patient.uuid);
         updatePromise.then(() => this.handleDBChange());
         return updatePromise;
       }
@@ -179,9 +177,9 @@ class OfflinePatientDatabase extends Dexie {
       const updatePromise = db.offlinePatients.put(
         {
           ...pat,
-          lastUpdate: { ...pat.lastUpdate, [handlerUuid]: { type: LOAD_STATE_TYPE.LOADED, date: new Date() } },
+          lastUpdate: { ...pat.lastUpdate, [handlerUuid]: { type: 'LOADED', date: new Date() } },
         },
-        pat.id,
+        pat.uuid,
       );
       updatePromise.then(() => this.handleDBChange());
       return updatePromise;
@@ -199,12 +197,12 @@ class OfflinePatientDatabase extends Dexie {
       let newLoadState: LoadState;
       const prevState = pat.lastUpdate[handlerUuid];
       switch (prevState.type) {
-        case LOAD_STATE_TYPE.LOADING:
-          newLoadState = { type: LOAD_STATE_TYPE.LOADING_ERROR, error };
+        case 'LOADING':
+          newLoadState = { type: 'LOADING_ERROR', error };
           break;
 
-        case LOAD_STATE_TYPE.RELOADING:
-          newLoadState = { type: LOAD_STATE_TYPE.RELOADING_ERROR, error, date: prevState.date };
+        case 'RELOADING':
+          newLoadState = { type: 'RELOADING_ERROR', error, date: prevState.date };
           break;
 
         default:
@@ -212,7 +210,7 @@ class OfflinePatientDatabase extends Dexie {
       }
       const updatePromise = db.offlinePatients.put(
         { ...pat, lastUpdate: { ...pat.lastUpdate, [handlerUuid]: newLoadState } },
-        pat.id,
+        pat.uuid,
       );
       updatePromise.then(() => this.handleDBChange());
       return updatePromise;
@@ -221,6 +219,8 @@ class OfflinePatientDatabase extends Dexie {
 }
 
 const db = new OfflinePatientDatabase();
+
+export default db;
 
 globalThis.db = db;
 globalThis.store = patientStore;
