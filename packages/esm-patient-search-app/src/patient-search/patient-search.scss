@@ -64,7 +64,6 @@
 
 .patientSearchInput {
   width: 100%;
-  position: absolute;
   top: 0;
 }
 
@@ -72,7 +71,11 @@
   width: 100vw;
 }
 
+:global(.omrs-breakpoint-gt-tablet) .patientSearchInput input {
+  height: 2.75rem;
+}
 .patientSearch {
   width: 100%;
+  display: flex;
 }
 

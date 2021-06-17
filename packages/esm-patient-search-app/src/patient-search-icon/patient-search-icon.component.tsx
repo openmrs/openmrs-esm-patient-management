@@ -27,11 +27,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   }, [current]);
 
   return (
-    <div ref={patientSearchRef}>
+    <div style={{ order: -1 }} ref={patientSearchRef}>
       <HeaderGlobalAction
         onClick={togglePatientSearch}
         aria-label="Search Patient"
-        aria-labelledby="Searcch Patient"
+        aria-labelledby="Search Patient"
         name="SearchPatientIcon"
         className={styles.headerGlobalAction}>
         <Search20 />
