@@ -69,6 +69,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
         ref={searchBox}
         className={styles.autocompleteSearch}
         light
+        size="xl"
       />
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>

@@ -89,6 +89,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
         labelText=""
         ref={searchInput}
         autoFocus={true}
+        size="xl"
       />
 
       {!isEmpty(searchResults) && (
