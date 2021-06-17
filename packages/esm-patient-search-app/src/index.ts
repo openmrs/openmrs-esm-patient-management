@@ -10,7 +10,6 @@ function setupOpenMRS() {
   const options = {
     featureName: 'patient-search',
     moduleName,
-    style: { order: -1 },
   };
 
   defineConfigSchema(moduleName, configSchema);
