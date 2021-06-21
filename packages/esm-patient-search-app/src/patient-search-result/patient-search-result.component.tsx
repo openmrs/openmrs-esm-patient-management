@@ -15,7 +15,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         key={patient.display}
         role="button"
         tabIndex={0}
-        className={styles.patientCharts}
+        className={styles.patientChart}
         onClick={() => {
           navigate({
             to: interpolateString(config.search.patientResultUrl, {
