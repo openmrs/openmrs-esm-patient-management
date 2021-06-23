@@ -1,3 +1,6 @@
+import { queueSynchronizationItem } from '@openmrs/esm-framework';
+import { v4 } from 'uuid';
+import { patientRegistration } from '../constants';
 import {
   FormValues,
   PatientIdentifierType,
@@ -14,8 +17,6 @@ import {
   savePatientPhoto,
   saveRelationship,
 } from './patient-registration.resource';
-import { PatientRegistrationDb } from '../offline';
-import { v4 } from 'uuid';
 
 export type SavePatientForm = (
   patientUuid: string | undefined,
@@ -32,7 +33,7 @@ export type SavePatientForm = (
 
 export default class FormManager {
   static async savePatientFormOffline(
-    patientUuid: string | undefined,
+    patientUuid = v4(),
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -42,20 +43,24 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
-    patientUuid = patientUuid ?? v4();
-    const db = new PatientRegistrationDb();
-    await db.patientRegistrations.where({ patientUuid }).delete();
-    await db.patientRegistrations.add({
-      patientUuid,
-      formValues: values,
-      patientUuidMap,
-      initialAddressFieldValues,
-      identifierTypes,
-      capturePhotoProps,
-      patientPhotoConceptUuid,
-      currentLocation,
-      personAttributeSections,
-    });
+    await queueSynchronizationItem(
+      patientRegistration,
+      {
+        patientUuid,
+        formValues: values,
+        patientUuidMap,
+        initialAddressFieldValues,
+        identifierTypes,
+        capturePhotoProps,
+        patientPhotoConceptUuid,
+        currentLocation,
+        personAttributeSections,
+      },
+      {
+        id: patientUuid,
+        dependencies: [],
+      },
+    );
 
     return null;
   }

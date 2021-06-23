@@ -1,7 +1,7 @@
-import { useCurrentPatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
-import { PatientRegistrationDb } from '../offline';
-import { FormValues, PatientUuidMapType } from './patient-registration-types';
+import { patientRegistration } from '../constants';
+import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
@@ -103,6 +103,6 @@ export function usePatientUuidMap(
 }
 
 async function getPatientRegistration(patientUuid: string) {
-  const db = new PatientRegistrationDb();
-  return await db.patientRegistrations.get({ patientUuid });
+  const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
+  return items.find((item) => item.patientUuid === patientUuid);
 }

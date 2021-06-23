@@ -1,22 +1,31 @@
+import FormManager from './patient-registration/form-manager';
 import {
   registerBreadcrumbs,
   defineConfigSchema,
   getAsyncLifecycle,
-  registerSynchronizationCallback,
+  setupOfflineSync,
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
-import { backendDependencies } from './openmrs-backend-dependencies';
-import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
 import {
+  syncPatientRegistration,
   fetchCurrentSession,
   fetchAddressTemplate,
   fetchPatientIdentifierTypesWithSources,
   fetchAllRelationshipTypes,
 } from './offline.resources';
-import FormManager from './patient-registration/form-manager';
-import { syncAddedPatients } from './offline';
+import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
+import { moduleName, patientRegistration } from './constants';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+const backendDependencies = {
+  'webservices.rest': '2.24.0',
+};
+
+const frontendDependencies = {
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+};
+
 const resources = {
   currentSession: fetchCurrentSession,
   addressTemplate: fetchAddressTemplate,
@@ -25,9 +34,6 @@ const resources = {
 };
 
 function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-registration-app';
-  const pageName = 'patient-registration';
-
   const options = {
     featureName: 'Patient Registration',
     moduleName,
@@ -37,13 +43,13 @@ function setupOpenMRS() {
 
   registerBreadcrumbs([
     {
-      path: `${window.spaBase}/${pageName}`,
+      path: `${window.spaBase}/${patientRegistration}`,
       title: 'Patient Registration',
       parent: `${window.spaBase}/home`,
     },
   ]);
 
-  registerSynchronizationCallback(() => syncAddedPatients(new AbortController()));
+  setupOfflineSync(patientRegistration, [], syncPatientRegistration);
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
@@ -104,4 +110,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };

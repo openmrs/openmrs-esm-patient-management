@@ -23,6 +23,19 @@ export interface FetchedPatientIdentifierType {
   isPrimary: boolean;
 }
 
+export interface PatientRegistration {
+  id?: number;
+  patientUuid: string;
+  formValues: FormValues;
+  patientUuidMap: PatientUuidMapType;
+  initialAddressFieldValues: Record<string, any>;
+  identifierTypes: Array<PatientIdentifierType>;
+  capturePhotoProps: CapturePhotoProps;
+  patientPhotoConceptUuid: string;
+  currentLocation: string;
+  personAttributeSections: any;
+}
+
 /**
  * Extends the `FetchedPatientIdentifierType` with aggregated data.
  */

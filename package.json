@@ -16,12 +16,8 @@
     "test": "jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage",
+    "prepare": "husky install",
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged && lerna run lint && lerna run test && lerna run typescript && yarn run extract-translations"
-    }
   },
   "dependencies": {},
   "devDependencies": {
@@ -55,7 +51,7 @@
     "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "husky": "^3.1.0",
+    "husky": "^6.0.0",
     "i18next": "^19.7.0",
     "i18next-parser": "^3.11.0",
     "identity-obj-proxy": "^3.0.0",
