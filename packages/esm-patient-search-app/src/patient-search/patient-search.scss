@@ -1,13 +1,31 @@
 @import "../root.scss";
 @import "~@openmrs/esm-styleguide/src/vars";
 
+.searchResultsContainer {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  top: 3rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color:$ui-02;
+  padding: 0rem 1rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
+  padding: 0;
+  background-color:var(--omrs-color-bg-low-contrast);
+}
+
 .searchResults {
-  margin-top: 3rem;
-  width: 100%;
-  padding: 1rem;
-  background: $ui-background;
-  min-height: 100vh;
-  position: relative;
+  height: 100%;
+  width: 100vw;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .searchResults {
+  width: 50vw;
 }
 
 .searchTerm {
@@ -21,6 +39,11 @@
   color: $text-02;
   border-bottom: 0.063rem solid $ui-03;
   padding: 0.5rem 0rem;
+  
+}
+
+:global(.omrs-breakpoint-gt-tablet) .resultsText {
+  margin: 1rem;
 }
 
 .patientSearchInput {
@@ -77,9 +100,6 @@
   width: 100vw;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .patientSearchInput input {
-  height: 2.75rem;
-}
 .patientSearch {
   width: 100%;
   display: flex;
@@ -89,4 +109,9 @@
   text-align: center;
   margin-top: 1rem;
   padding: 3rem 0rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
+  margin: 1rem;
+  background-color: $ui-02;
 }

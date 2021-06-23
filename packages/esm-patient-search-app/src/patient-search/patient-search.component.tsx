@@ -84,38 +84,39 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel }) => {
       <Search
         className={styles.patientSearchInput}
         onChange={($event) => handleChange($event.target.value)}
-        placeholder={t('searchForPatient', 'Search for a patient')}
+        placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
         labelText=""
         ref={searchInput}
         autoFocus={true}
-        size="xl"
       />
 
-      {!isEmpty(searchResults) && (
-        <div className={styles.searchResults}>
-          <p className={styles.resultsText}>{t('patientsFound', { count: searchResults.length })}</p>
-          <PatientSearchResults hidePanel={hidePanel} searchTerm={searchTerm} patients={results} />
-          <div className={styles.pagination}>
-            <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
+      <div className={styles.searchResultsContainer}>
+        {!isEmpty(searchResults) && (
+          <div className={styles.searchResults}>
+            <p className={styles.resultsText}>{t('patientsFound', { count: searchResults.length })}</p>
+            <PatientSearchResults hidePanel={hidePanel} searchTerm={searchTerm} patients={results} />
+            <div className={styles.pagination}>
+              <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
+            </div>
           </div>
-        </div>
-      )}
-      {emptyResult && (
-        <div className={styles.searchResults}>
-          <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
-          <Tile className={styles.emptySearchResultsTile}>
-            <EmptyDataIllustration />
-            <p className={styles.emptyResultText}>
-              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
-            </p>
-            <p className={styles.actionText}>
-              <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
-              <br />
-              <span>{t('orPatientName', "OR the patient's name(s)")}</span>
-            </p>
-          </Tile>
-        </div>
-      )}
+        )}
+        {emptyResult && (
+          <div className={styles.searchResults}>
+            <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
+            <Tile className={styles.emptySearchResultsTile}>
+              <EmptyDataIllustration />
+              <p className={styles.emptyResultText}>
+                {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
+              </p>
+              <p className={styles.actionText}>
+                <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
+                <br />
+                <span>{t('orPatientName', "OR the patient's name(s)")}</span>
+              </p>
+            </Tile>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

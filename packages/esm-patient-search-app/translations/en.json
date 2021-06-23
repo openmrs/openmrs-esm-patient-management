@@ -4,6 +4,6 @@
   "orPatientName": "OR the patient's name(s)",
   "patientsFound": "Found {count, plural, one{{count} patient} other{{count} patients}}",
   "patientsFound_plural": "",
-  "searchForPatient": "Search for a patient",
+  "searchForPatient": "Search for a patient by name or identifier number",
   "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number"
 }

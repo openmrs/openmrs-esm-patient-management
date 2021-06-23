@@ -1,13 +1,23 @@
 @import "carbon-components/scss/globals/scss/typography.scss";
+@import "~@openmrs/esm-styleguide/src/vars";
 
 .patientChart {
   text-decoration: none;
   cursor: pointer;
 }
+:global(.omrs-breakpoint-gt-tablet) .patientChart {
+  background-color: $ui-02;
+  margin: 0rem 1rem;
+}
 
 .container {
   border-bottom: 0.063rem solid $ui-03;
 }
+
+:global(.omrs-breakpoint-gt-tablet) .container {
+  padding: 0rem 1rem;
+}
+
 
 .patientBanner {
   display: flex;
