@@ -28,8 +28,9 @@
     margin: $spacing-05 0 $spacing-05 0;
 }
 
-.fixedPosition {
+.fixedColumn {
     position: fixed;
+    margin-top: 2rem;
 }
 
 $color-gray-70: #525252;

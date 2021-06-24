@@ -224,7 +224,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             <Grid>
               <Row>
                 <Column lg={2} md={2} sm={1}>
-                  <div className={styles.fixedPosition}>
+                  <div className={styles.fixedColumn}>
                     <h4>
                       {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
                     </h4>
