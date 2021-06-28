@@ -22,16 +22,6 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
   const [field, meta] = useField('addNameInLocalLanguage');
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
 
-  const onCapturePhoto = (dataUri: string, selectedFile: File, photoDateTime: string) => {
-    if (setCapturePhotoProps) {
-      setCapturePhotoProps({
-        base64EncodedImage: dataUri,
-        imageFile: selectedFile,
-        photoDateTime: photoDateTime,
-      });
-    }
-  };
-
   useEffect(() => {
     if (!field.value && meta.touched) {
       setFieldValue('additionalGivenName', '');
@@ -42,10 +32,6 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">
-      <ExtensionSlot
-        extensionSlotName="capture-patient-photo-slot"
-        state={{ onCapturePhoto, initialState: currentPatientPhoto }}
-      />
       {fields.map((field) => (
         <div key={field}>{getField(field)}</div>
       ))}

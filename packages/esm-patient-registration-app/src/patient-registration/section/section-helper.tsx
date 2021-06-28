@@ -54,22 +54,11 @@ export const getField = (fieldName: string) => {
   }
 };
 
-export const getSection = (
-  sectionProps: any,
-  index: number,
-  setCapturePhotoProps: (value: SetStateAction<CapturePhotoProps>) => void,
-  currentPhoto: string,
-) => {
+export const getSection = (sectionProps: any, index: number) => {
   let section = null;
   switch (sectionProps.id) {
     case Section.Demographics:
-      section = (
-        <DemographicsSection
-          {...sectionProps}
-          setCapturePhotoProps={setCapturePhotoProps}
-          currentPatientPhoto={currentPhoto}
-        />
-      );
+      section = <DemographicsSection {...sectionProps} />;
       break;
     case Section.Contact:
       section = <ContactInfoSection {...sectionProps} />;
