@@ -28,8 +28,11 @@
     margin: $spacing-05 0 $spacing-05 0;
 }
 
-.fixedPosition {
-    position: fixed;
+.stickyColumn {
+    position: sticky;
+    margin-top: 2rem;
+    // 3rem for the nav height and 2rem for top margin
+    top: 5rem;
 }
 
 $color-gray-70: #525252;
