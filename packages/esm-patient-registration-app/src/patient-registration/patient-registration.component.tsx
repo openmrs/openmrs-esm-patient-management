@@ -19,6 +19,8 @@ import {
   useConfig,
   navigate,
   interpolateString,
+  ExtensionSlot,
+  Extension,
 } from '@openmrs/esm-framework';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { useTranslation } from 'react-i18next';
@@ -222,6 +224,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               }}
             />
             <Grid>
+              <Row>
+                <ExtensionSlot extensionSlotName="breadcrumbs-slot">
+                  <div className={styles.breadcrumbsContainer}>
+                    <Extension />
+                  </div>
+                </ExtensionSlot>
+              </Row>
               <Row>
                 <Column lg={3} md={3} sm={1}>
                   <div className={styles.stickyColumn}>
