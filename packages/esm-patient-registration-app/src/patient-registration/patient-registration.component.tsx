@@ -223,8 +223,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             />
             <Grid>
               <Row>
-                <Column lg={2} md={2} sm={1}>
-                  <div className={styles.fixedColumn}>
+                <Column lg={3} md={3} sm={1}>
+                  <div className={styles.stickyColumn}>
                     <h4>
                       {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
                     </h4>
@@ -247,7 +247,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Button>
                   </div>
                 </Column>
-                <Column lg={10} md={6}>
+                <Column lg={9} md={9}>
                   <Grid>
                     <PatientRegistrationContext.Provider
                       value={{
