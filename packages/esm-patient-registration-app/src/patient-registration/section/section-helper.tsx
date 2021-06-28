@@ -6,22 +6,20 @@ import { RelationshipsSection } from './patient-relationships/relationships-sect
 import { DeathInfoSection } from './death-info/death-info-section.component';
 import { SectionWrapper } from './section-wrapper.component';
 import { AddressField } from '../field/address/address-field.component';
-import { EmailField } from '../field/email/email-field.component';
+import { PhoneEmailField } from '../field/email/email-field.component';
 import { PhoneField } from '../field/phone/phone-field.component';
 import { NameField } from '../field/name/name-field.component';
-import { GenderField } from '../field/gender/gender-field.component';
+import { GenderBirthField } from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
 import { DobField } from '../field/dob/dob.component';
 import { CapturePhotoProps } from '../patient-registration-types';
 
 enum Field {
   Address = 'address',
-  Email = 'email',
-  Phone = 'phone',
+  PhoneEmail = 'phone & email',
   Name = 'name',
   Id = 'id',
-  Gender = 'gender',
-  Dob = 'dob',
+  GenderBirth = 'gender & dob',
   Default = 'default',
 }
 
@@ -37,18 +35,14 @@ export const getField = (fieldName: string) => {
   switch (fieldName) {
     case Field.Address:
       return <AddressField />;
-    case Field.Email:
-      return <EmailField />;
-    case Field.Phone:
-      return <PhoneField />;
+    case Field.PhoneEmail:
+      return <PhoneEmailField />;
     case Field.Name:
       return <NameField />;
-    case Field.Gender:
-      return <GenderField />;
+    case Field.GenderBirth:
+      return <GenderBirthField />;
     case Field.Id:
       return <IdField />;
-    case Field.Dob:
-      return <DobField />;
     case Field.Default:
       return <div>Unknown Field {fieldName} </div>;
   }

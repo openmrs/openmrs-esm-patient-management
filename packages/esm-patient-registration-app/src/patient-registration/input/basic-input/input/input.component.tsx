@@ -15,7 +15,7 @@ export const Input: React.FC<InputProps> = (props) => {
   const [field, meta] = useField(props.name);
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
+    <div style={{ marginBottom: '1rem', maxWidth: '360px' }}>
       <TextInput
         {...props}
         {...field}

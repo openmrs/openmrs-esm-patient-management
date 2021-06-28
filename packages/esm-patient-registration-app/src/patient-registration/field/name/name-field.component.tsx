@@ -23,15 +23,17 @@ export const NameField = () => {
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
-      <Input id="givenName" name="givenName" labelText={t('givenNameLabelText', 'Given Name')} light />
-      <ExtensionSlot
-        extensionSlotName="capture-patient-photo-slot"
-        state={{ onCapturePhoto, initialState: currentPhoto }}
-      />
-      {fieldConfigs.displayMiddleName && (
-        <Input id="middleName" name="middleName" labelText={t('middleNameLabelText', 'Middle Name')} light />
-      )}
-      <Input id="familyName" name="familyName" labelText={t('familyNameLabelText', 'Family Name')} light />
+      <div className={styles.grid}>
+        <Input id="givenName" name="givenName" labelText={t('givenNameLabelText', 'Given Name')} light />
+        <ExtensionSlot
+          extensionSlotName="capture-patient-photo-slot"
+          state={{ onCapturePhoto, initialState: currentPhoto }}
+        />
+        {fieldConfigs.displayMiddleName && (
+          <Input id="middleName" name="middleName" labelText={t('middleNameLabelText', 'Middle Name')} light />
+        )}
+        <Input id="familyName" name="familyName" labelText={t('familyNameLabelText', 'Family Name')} light />
+      </div>
     </div>
   );
 };

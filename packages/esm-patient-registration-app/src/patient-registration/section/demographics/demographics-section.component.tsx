@@ -1,23 +1,15 @@
-import React, { SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CapturePhotoProps } from '../../patient-registration-types';
 import styles from './../section.scss';
 import { useField } from 'formik';
-import { ExtensionSlot } from '@openmrs/esm-framework';
 import { getField } from '../section-helper';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
 interface DemographicsSectionProps {
   fields: Array<any>;
-  setCapturePhotoProps: (value: SetStateAction<CapturePhotoProps>) => void;
-  currentPatientPhoto?: string;
 }
 
-export const DemographicsSection: React.FC<DemographicsSectionProps> = ({
-  fields,
-  setCapturePhotoProps,
-  currentPatientPhoto,
-}) => {
+export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
   const { t } = useTranslation();
   const [field, meta] = useField('addNameInLocalLanguage');
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
