@@ -8,7 +8,6 @@ const Modal: React.FC<{ close: () => void }> = ({ children, close }) => {
   React.useEffect(() => {
     const m = document.createElement('div');
     document.body.append(m);
-    console.log('new modal', m);
 
     m.className = style.modal;
     m.onclick = (e) => {

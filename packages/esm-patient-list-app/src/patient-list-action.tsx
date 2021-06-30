@@ -8,7 +8,6 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = React.useState(false);
   const handleClick = React.useCallback(() => {
-    console.log('handling click');
     setModalOpen((m) => !m);
   }, []);
   const closeModal = React.useCallback(() => setModalOpen(false), []);
