@@ -40,7 +40,7 @@ export function addPatientHandler(uuid: string, handlerObject: PatientHandlerObj
   }));
 }
 
-export function getOfflineHandlers(): Array<string> {
+function getOfflineHandlers(): Array<string> {
   return Object.keys(patientStore.getState());
 }
 
@@ -51,7 +51,7 @@ class OfflinePatientDatabase extends Dexie {
   private changeSubscribers = new Set<(data: Array<OfflinePatient>) => void>();
   private broadcastChange = () => {}; // is overwritten if the Broadcastchannel is available
 
-  public constructor() {
+  constructor() {
     super('OfflinePatientDatabase');
     this.version(5).stores({
       offlinePatients: 'uuid',
@@ -220,7 +220,14 @@ class OfflinePatientDatabase extends Dexie {
 
 const db = new OfflinePatientDatabase();
 
-export default db;
+export default {
+  addPatient: db.addPatient,
+  reloadPatient: db.addPatient,
+  removePatient: db.removePatient,
+  subscribe: db.subscribe,
+  getPatientData: db.getPatientData,
+  getOfflineHandlers,
+};
 
 globalThis.db = db;
 globalThis.store = patientStore;

@@ -3,6 +3,7 @@ import React from 'react';
 import { getAllPatientLists, getPatientListMembers } from './mock';
 import setup from './setupMockState';
 import { PatientListBase, PatientListMember } from './types';
+import './api';
 
 const setupPromise = setup();
 
