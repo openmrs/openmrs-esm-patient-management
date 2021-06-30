@@ -26,7 +26,7 @@ function setupOpenMRS() {
     extensions: [
       {
         id: 'active-visits-widget',
-        slot: 'active-visits-widget',
+        slot: 'homepage-widgets-slot',
         load: getAsyncLifecycle(() => import('./active-visits-widget/active-visits.component'), options),
       },
     ],
