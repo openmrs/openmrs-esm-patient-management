@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   DataTable,
   TableContainer,
@@ -10,7 +10,6 @@ import {
   TableCell,
 } from 'carbon-components-react';
 import { useLayoutType, Visit } from '@openmrs/esm-framework';
-import { useEffect } from 'react';
 import { fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 
@@ -50,7 +49,6 @@ const headerData = [
 function getWaitTime(startTime): number {
   const d = new Date();
   const d2 = new Date(startTime);
-  console.log(d.getTime() - d2.getTime(), typeof (d.getTime() - d2.getTime()));
   return (d.getTime() - d2.getTime()) / 60000;
 }
 
@@ -74,7 +72,6 @@ const ActiveVisitsTable = (props) => {
     });
     return () => activeVisits.unsubscribe();
   }, []);
-  console.log(activeVisits);
   return (
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
