@@ -13,10 +13,10 @@ const frontendDependencies = {
 };
 
 function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-search-app';
+  const moduleName = '@openmrs/esm-active-visits-app';
 
   const options = {
-    featureName: 'patient-search',
+    featureName: 'active-visits',
     moduleName,
   };
 

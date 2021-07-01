@@ -1,7 +1,7 @@
 {
   "name": "@openmrs/esm-active-visits-app",
   "version": "3.0.0",
-  "description": "Patient search microfrontend for the OpenMRS SPA",
+  "description": "Active visits widget microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-active-visits-app.js",
   "main": "src/index.ts",
   "source": true,

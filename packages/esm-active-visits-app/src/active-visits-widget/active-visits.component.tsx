@@ -12,6 +12,7 @@ import {
 import { useLayoutType, Visit } from '@openmrs/esm-framework';
 import { fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
+import { useTranslation } from 'react-i18next';
 
 const headerData = [
   {
@@ -56,6 +57,7 @@ const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
   const [activeVisits, setActiveVisits] = React.useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
@@ -75,7 +77,7 @@ const ActiveVisitsTable = (props) => {
   return (
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
-        <h4 className={styles.productiveHeading02}>Active Visits in Clinic</h4>
+        <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits in Clinic')}</h4>
       </div>
       <DataTable rows={activeVisits} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
