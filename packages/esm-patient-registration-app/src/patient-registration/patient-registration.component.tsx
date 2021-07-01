@@ -225,11 +225,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             />
             <Grid>
               <Row>
-                <ExtensionSlot extensionSlotName="breadcrumbs-slot">
-                  <div className={styles.breadcrumbsContainer}>
-                    <Extension />
-                  </div>
-                </ExtensionSlot>
+                <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
               </Row>
               <Row>
                 <Column lg={3} md={3} sm={1}>
@@ -257,7 +253,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   </div>
                 </Column>
                 <Column lg={9} md={9}>
-                  <Grid>
+                  <Grid style={{ marginBottom: '40vh' }}>
                     <PatientRegistrationContext.Provider
                       value={{
                         identifierTypes: patientIdentifiers,

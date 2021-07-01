@@ -24,6 +24,7 @@ export const AddressField: React.FC = () => {
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
+    console.log(templateXmlDoc);
     const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
     const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
     const properties = nameMappings.getElementsByTagName('property');
