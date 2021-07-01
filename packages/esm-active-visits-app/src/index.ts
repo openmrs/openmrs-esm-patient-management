@@ -5,7 +5,6 @@ const importTranslation = require.context('../translations', false, /.json$/, 'l
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
-  fhir: '^1.4.2',
 };
 
 const frontendDependencies = {
