@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  DataTable,
+import React, { useEffect, useState } from 'react';
+import DataTable, {
   TableContainer,
   Table,
   TableHead,
@@ -8,9 +7,11 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-} from 'carbon-components-react';
+  DataTableSkeleton,
+} from 'carbon-components-react/es/components/DataTable';
+import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { useLayoutType, Visit } from '@openmrs/esm-framework';
-import { fetchActiveVisits } from './active-visits.resource';
+import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
 
@@ -56,7 +57,8 @@ function getWaitTime(startTime): number {
 const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
-  const [activeVisits, setActiveVisits] = React.useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -71,6 +73,7 @@ const ActiveVisitsTable = (props) => {
         visitType: visit?.visitType.display,
       }));
       setActiveVisits(rowData);
+      setLoading(false);
     });
     return () => activeVisits.unsubscribe();
   }, []);
@@ -79,7 +82,7 @@ const ActiveVisitsTable = (props) => {
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits in Clinic')}</h4>
       </div>
-      <DataTable rows={activeVisits} headers={headerData} isSortable>
+      <DataTable rows={activeVisits ? activeVisits : []} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()} useZebraStyles>
@@ -91,15 +94,21 @@ const ActiveVisitsTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {activeVisits &&
+                  rows.map((row) => (
+                    <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
+            {loading && (
+              <div className={styles.skeletonContainer}>
+                <SkeletonText />
+              </div>
+            )}
           </TableContainer>
         )}
       </DataTable>

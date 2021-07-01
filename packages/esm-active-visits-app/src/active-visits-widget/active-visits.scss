@@ -13,3 +13,11 @@
   padding: $spacing-04 0 $spacing-04 $spacing-05;
   background-color: $ui-background;
 }
+
+.skeletonContainer {
+  padding: 0.5rem 1rem;
+}
+
+.skeletonContainer p {
+  margin: 0;
+}
