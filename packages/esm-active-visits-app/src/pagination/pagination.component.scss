@@ -1,0 +1,32 @@
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
+.paginationContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $ui-02;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  width: 100%;
+  min-height: 3rem;
+  overflow: hidden;
+  border-top: 0.063rem solid $ui-03;
+}
+
+.pagination {
+  border: none;
+  background-color: $ui-02;
+}
+
+.pagination :nth-child(2),
+.pagination :nth-child(2) > div {
+  display: flex;
+}

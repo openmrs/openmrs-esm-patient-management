@@ -7,13 +7,13 @@ import DataTable, {
   TableHeader,
   TableBody,
   TableCell,
-  DataTableSkeleton,
 } from 'carbon-components-react/es/components/DataTable';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import { useLayoutType, Visit } from '@openmrs/esm-framework';
+import { useLayoutType, useConfig, usePagination } from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
+import ActiveVisitsPagination from '../pagination/pagination.component';
 
 const headerData = [
   {
@@ -57,8 +57,12 @@ function getWaitTime(startTime): number {
 const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
+  const config = useConfig();
+
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
+  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize);
+  const { results, goTo, currentPage } = usePagination(activeVisits, pageSize);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -82,7 +86,7 @@ const ActiveVisitsTable = (props) => {
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits in Clinic')}</h4>
       </div>
-      <DataTable rows={activeVisits ? activeVisits : []} headers={headerData} isSortable>
+      <DataTable rows={activeVisits ? results : []} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()} useZebraStyles>
@@ -112,6 +116,19 @@ const ActiveVisitsTable = (props) => {
           </TableContainer>
         )}
       </DataTable>
+      <div>
+        <ActiveVisitsPagination
+          pageNumber={currentPage}
+          totalItems={activeVisits.length}
+          currentItems={results.length}
+          pageUrl={`$\{openmrsSpaBase}/home/`}
+          pageSize={pageSize}
+          onPageNumberChange={({ page, pageSize }) => {
+            setPageSize(pageSize);
+            goTo(page);
+          }}
+        />
+      </div>
     </div>
   );
 };
