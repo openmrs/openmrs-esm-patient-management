@@ -19,13 +19,7 @@ const ActiveVisitsPagination: React.FC<ActiveVisitsPaginationProps> = ({
   pageNumber,
 }) => {
   const config = useConfig();
-
-  const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(totalItems / config?.activeVisits?.pageSize);
-    return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * config?.activeVisits?.pageSize;
-    });
-  }, [pageSize, totalItems]);
+  const pageSizes = config?.activeVisits?.pageSizes;
 
   return (
     <>

@@ -7,5 +7,10 @@ export const configSchema = {
       _description: 'Count of active visits to be shown in a single page.',
       _default: 10,
     },
+    pageSizes: {
+      _type: Type.Array,
+      _description: 'Customizable page sizes that user can choose',
+      _default: [10, 20, 50],
+    },
   },
 };
