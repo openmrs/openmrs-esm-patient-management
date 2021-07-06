@@ -30,6 +30,8 @@ const ActiveVisitsPagination: React.FC<ActiveVisitsPaginationProps> = ({
       {totalItems > 0 && (
         <div className={styles.paginationContainer}>
           <Pagination
+            backwardText=""
+            forwardText=""
             className={styles.pagination}
             page={pageNumber}
             pageSize={pageSize}
