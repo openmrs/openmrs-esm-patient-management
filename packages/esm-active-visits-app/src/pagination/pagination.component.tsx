@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import styles from './pagination.component.scss';
-import { useTranslation } from 'react-i18next';
-import { ConfigurableLink } from '@openmrs/esm-framework';
-import { usePaginationInfo } from './usePaginationInfo';
+import { useConfig } from '@openmrs/esm-framework';
 
 interface ActiveVisitsPaginationProps {
   currentItems: number;
@@ -19,11 +17,15 @@ const ActiveVisitsPagination: React.FC<ActiveVisitsPaginationProps> = ({
   pageSize,
   onPageNumberChange,
   pageNumber,
-  pageUrl = '',
-  currentItems,
 }) => {
-  const { t } = useTranslation();
-  const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
+  const config = useConfig();
+
+  const pageSizes = useMemo(() => {
+    const numberOfPages = Math.ceil(totalItems / config?.activeVisits?.pageSize);
+    return [...Array(numberOfPages).keys()].map((x) => {
+      return (x + 1) * config?.activeVisits?.pageSize;
+    });
+  }, [pageSize, totalItems]);
 
   return (
     <>

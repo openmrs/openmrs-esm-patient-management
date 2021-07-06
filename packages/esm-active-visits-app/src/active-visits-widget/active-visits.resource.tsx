@@ -3,7 +3,7 @@ import { take, map } from 'rxjs/operators';
 
 export interface ActiveVisitRow {
   id: string;
-  wait: number;
+  visitStartTime: string;
   IDNumber: string;
   name: string;
   gender: string;

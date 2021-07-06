@@ -14,12 +14,13 @@ import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
 import ActiveVisitsPagination from '../pagination/pagination.component';
+import dayjs from 'dayjs';
 
 const headerData = [
   {
     id: 0,
-    header: 'Wait (mins)',
-    key: 'wait',
+    header: 'Visit Time',
+    key: 'visitStartTime',
   },
   {
     id: 1,
@@ -48,10 +49,17 @@ const headerData = [
   },
 ];
 
-function getWaitTime(startTime): number {
-  const d = new Date();
-  const d2 = new Date(startTime);
-  return (d.getTime() - d2.getTime()) / 60000;
+function formatDatetime(startDatetime) {
+  const todayDate = dayjs();
+  const today =
+    dayjs(startDatetime).get('date') == todayDate.get('date') &&
+    dayjs(startDatetime).get('month') == todayDate.get('month') &&
+    dayjs(startDatetime).get('year') == todayDate.get('year');
+  if (today) {
+    return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
+  } else {
+    return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
+  }
 }
 
 const ActiveVisitsTable = (props) => {
@@ -69,7 +77,7 @@ const ActiveVisitsTable = (props) => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
       const rowData = data.results.map((visit, ind) => ({
         id: `${ind}`,
-        wait: Math.ceil(getWaitTime(visit.startDatetime)),
+        visitStartTime: formatDatetime(visit.startDatetime),
         IDNumber: visit?.patient?.identifiers[0]?.identifier,
         name: visit?.patient?.person?.display,
         gender: visit?.patient?.person?.gender,
@@ -121,7 +129,6 @@ const ActiveVisitsTable = (props) => {
           pageNumber={currentPage}
           totalItems={activeVisits.length}
           currentItems={results.length}
-          pageUrl={`$\{openmrsSpaBase}/home/`}
           pageSize={currentPageSize}
           onPageNumberChange={({ page, pageSize }) => {
             if (pageSize != currentPageSize) {
