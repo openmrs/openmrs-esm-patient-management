@@ -227,8 +227,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               <Row>
                 <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
               </Row>
-              <Row>
-                <Column lg={3} md={3} sm={1}>
+              <div className={styles.formContainer}>
+                <div>
                   <div className={styles.stickyColumn}>
                     <h4>
                       {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
@@ -251,8 +251,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       {t('cancel', 'Cancel')}
                     </Button>
                   </div>
-                </Column>
-                <Column lg={9} md={9}>
+                </div>
+                <div>
                   <Grid style={{ marginBottom: '40vh' }}>
                     <PatientRegistrationContext.Provider
                       value={{
@@ -271,8 +271,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       ))}
                     </PatientRegistrationContext.Provider>
                   </Grid>
-                </Column>
-              </Row>
+                </div>
+              </div>
             </Grid>
           </Form>
         )}

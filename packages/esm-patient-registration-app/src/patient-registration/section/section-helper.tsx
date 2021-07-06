@@ -70,12 +70,8 @@ export const getSection = (sectionProps: any, index: number) => {
   }
 
   return (
-    <Row>
-      <Column lg={8} md={8} sm={3}>
-        <SectionWrapper {...sectionProps} index={index}>
-          {section}
-        </SectionWrapper>
-      </Column>
-    </Row>
+    <SectionWrapper {...sectionProps} index={index}>
+      {section}
+    </SectionWrapper>
   );
 };
