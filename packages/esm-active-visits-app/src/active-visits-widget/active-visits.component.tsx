@@ -61,8 +61,8 @@ const ActiveVisitsTable = (props) => {
 
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
-  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize);
-  const { results, goTo, currentPage } = usePagination(activeVisits, pageSize);
+  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize);
+  const { results, goTo, currentPage } = usePagination(activeVisits, currentPageSize);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -122,10 +122,14 @@ const ActiveVisitsTable = (props) => {
           totalItems={activeVisits.length}
           currentItems={results.length}
           pageUrl={`$\{openmrsSpaBase}/home/`}
-          pageSize={pageSize}
+          pageSize={currentPageSize}
           onPageNumberChange={({ page, pageSize }) => {
-            setPageSize(pageSize);
-            goTo(page);
+            if (pageSize != currentPageSize) {
+              setPageSize(pageSize);
+            }
+            if (page != currentPage) {
+              goTo(page);
+            }
           }}
         />
       </div>

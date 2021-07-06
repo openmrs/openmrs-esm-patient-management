@@ -4,11 +4,12 @@ import { useConfig } from '@openmrs/esm-framework';
 
 export function usePaginationInfo(pageSize: number, totalItems: number, pageNumber: number, currentItems: number) {
   const { t } = useTranslation();
+  const config = useConfig();
 
   const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(totalItems / pageSize);
+    const numberOfPages = Math.ceil(totalItems / config?.activeVisits?.pageSize);
     return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * pageSize;
+      return (x + 1) * config?.activeVisits?.pageSize;
     });
   }, [pageSize, totalItems]);
 
