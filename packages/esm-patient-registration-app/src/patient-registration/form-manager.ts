@@ -1,11 +1,14 @@
+import { queueSynchronizationItem } from '@openmrs/esm-framework';
+import { v4 } from 'uuid';
+import { patientRegistration } from '../constants';
 import {
-  PatientIdentifier,
   FormValues,
   PatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
   Patient,
   CapturePhotoProps,
+  PatientIdentifier,
 } from './patient-registration-types';
 import {
   deletePersonName,
@@ -14,9 +17,9 @@ import {
   savePatientPhoto,
   saveRelationship,
 } from './patient-registration.resource';
-import { PatientRegistrationDb } from '../offline';
 
 export type SavePatientForm = (
+  patientUuid: string | undefined,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
@@ -30,6 +33,7 @@ export type SavePatientForm = (
 
 export default class FormManager {
   static async savePatientFormOffline(
+    patientUuid = v4(),
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -39,22 +43,30 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
-    const db = new PatientRegistrationDb();
-    await db.patientRegistrations.add({
-      formValues: values,
-      patientUuidMap,
-      initialAddressFieldValues,
-      identifierTypes,
-      capturePhotoProps,
-      patientPhotoConceptUuid,
-      currentLocation,
-      personAttributeSections,
-    });
+    await queueSynchronizationItem(
+      patientRegistration,
+      {
+        patientUuid,
+        formValues: values,
+        patientUuidMap,
+        initialAddressFieldValues,
+        identifierTypes,
+        capturePhotoProps,
+        patientPhotoConceptUuid,
+        currentLocation,
+        personAttributeSections,
+      },
+      {
+        id: patientUuid,
+        dependencies: [],
+      },
+    );
 
     return null;
   }
 
   static async savePatientFormOnline(
+    patientUuid: string | undefined,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,

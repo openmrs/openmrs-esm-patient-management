@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import styles from './patient-registration.scss';
-import camelCase from 'lodash-es/camelCase';
-import capitalize from 'lodash-es/capitalize';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import { Grid, Row, Column } from 'carbon-components-react/es/components/Grid';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { PatientIdentifierType, FormValues, CapturePhotoProps, PatientUuidMapType } from './patient-registration-types';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import FormManager, { SavePatientForm } from './form-manager';
+import { SavePatientForm } from './form-manager';
 import BeforeSavePrompt from './before-save-prompt';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
 import {
@@ -27,44 +25,9 @@ import { useTranslation } from 'react-i18next';
 import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { ResourcesContext } from '../offline.resources';
+import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 
-const initialAddressFieldValues = {};
-
-const patientUuidMap: PatientUuidMapType = {
-  additionalNameUuid: undefined,
-  patientUuid: undefined,
-  preferredNameUuid: undefined,
-};
-
-const blankFormValues: FormValues = {
-  givenName: '',
-  middleName: '',
-  familyName: '',
-  unidentifiedPatient: false,
-  additionalGivenName: '',
-  additionalMiddleName: '',
-  additionalFamilyName: '',
-  addNameInLocalLanguage: false,
-  gender: '',
-  birthdate: null,
-  yearsEstimated: 0,
-  monthsEstimated: 0,
-  birthdateEstimated: false,
-  telephoneNumber: '',
-  address1: '',
-  address2: '',
-  cityVillage: '',
-  stateProvince: '',
-  country: '',
-  postalCode: '',
-  isDead: false,
-  deathDate: '',
-  deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
-};
-
-// If a patient is fetched, this will be updated with their information
-const initialFormValues: FormValues = { ...blankFormValues };
+let exportedInitialFormValuesForTesting = {} as FormValues;
 const getUrlWithoutPrefix = (url) => url.split(window['getOpenmrsSpaBase']())?.[1];
 
 export interface PatientRegistrationProps {
@@ -87,8 +50,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
+  const [patientUuidMap] = usePatientUuidMap(patientUuid);
   const location = currentSession.sessionLocation?.uuid;
-  const inEditMode = !!(patientUuid && patient);
+  const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const cancelNavFn = useCallback(
     (evt: CustomEvent) => {
       if (!open && !evt.detail.navigationIsCanceled) {
@@ -103,14 +69,18 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     },
     [open],
   );
+
+  useEffect(() => {
+    exportedInitialFormValuesForTesting = initialFormValues;
+  }, [initialFormValues]);
+
   const onRequestClose = useCallback(() => {
     setModalOpen(false);
     // add the route blocked when
     window.addEventListener('single-spa:before-routing-event', cancelNavFn);
-  }, []);
-  const onRequestSubmit = useCallback(() => {
-    history.push(`/${getUrlWithoutPrefix(newUrl)}`);
-  }, [newUrl]);
+  }, [cancelNavFn]);
+
+  const onRequestSubmit = useCallback(() => history.push(`/${getUrlWithoutPrefix(newUrl)}`), [history, newUrl]);
 
   useEffect(() => {
     if (config?.sections) {
@@ -126,105 +96,18 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [t, config]);
 
   useEffect(() => {
-    if (!inEditMode) {
-      Object.assign(initialFormValues, blankFormValues);
-    } else {
-      patientUuidMap['patientUuid'] = patient.id;
-
-      // set names
-      if (patient.name.length) {
-        let name = patient.name[0];
-        patientUuidMap['preferredNameUuid'] = name.id;
-        initialFormValues.givenName = name.given[0];
-        initialFormValues.middleName = name.given[1];
-        initialFormValues.familyName = name.family;
-        if (name.given[0] === 'UNKNOWN' && name.family === 'UNKNOWN') {
-          initialFormValues.unidentifiedPatient = true;
-        }
-        if (patient.name.length > 1) {
-          name = patient.name[1];
-          patientUuidMap['additionalNameUuid'] = name.id;
-          initialFormValues.addNameInLocalLanguage = true;
-          initialFormValues.additionalGivenName = name.given[0];
-          initialFormValues.additionalMiddleName = name.given[1];
-          initialFormValues.additionalFamilyName = name.family;
-        }
-      }
-
-      initialFormValues.gender = capitalize(patient.gender);
-      initialFormValues.birthdate = patient.birthDate;
-      initialFormValues.telephoneNumber = patient.telecom ? patient.telecom[0].value : '';
-
-      patient.identifier.forEach((id) => {
-        const key = camelCase(id.system || id.type.text);
-        patientUuidMap[key] = {
-          uuid: id.id,
-          value: id.value,
-        };
-        initialFormValues[key] = id.value;
-      });
-
-      if (patient.address && patient.address[0]) {
-        const address = patient.address[0];
-        Object.keys(address).forEach((prop) => {
-          switch (prop) {
-            case 'id':
-              patientUuidMap['preferredAddressUuid'] = address[prop];
-              break;
-            case 'city':
-              initialAddressFieldValues['cityVillage'] = address[prop];
-              break;
-            case 'state':
-              initialAddressFieldValues['stateProvince'] = address[prop];
-              break;
-            case 'district':
-              initialAddressFieldValues['countyDistrict'] = address[prop];
-              break;
-            case 'extension':
-              address[prop].forEach((ext) => {
-                ext.extension.forEach((extension) => {
-                  initialAddressFieldValues[extension.url.split('#')[1]] = extension.valueString;
-                });
-              });
-              break;
-            default:
-              if (prop === 'country' || prop === 'postalCode') {
-                initialAddressFieldValues[prop] = address[prop];
-              }
-          }
-        });
-      }
-
-      if (patient.deceasedBoolean || patient.deceasedDateTime) {
-        initialFormValues.isDead = true;
-        initialFormValues.deathDate = patient.deceasedDateTime ? patient.deceasedDateTime.split('T')[0] : '';
-      }
-
-      const abortController = new AbortController();
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
-        setCurrentPhoto(value),
-      ); // TODO: Edit mode
-
-      return () => abortController.abort();
-    }
-  }, [inEditMode]);
-
-  useEffect(() => {
     for (const patientIdentifier of patientIdentifiers) {
       if (!initialFormValues[patientIdentifier.fieldName]) {
-        initialFormValues[patientIdentifier.fieldName] = '';
+        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
       }
 
-      initialFormValues['source-for-' + patientIdentifier.fieldName] =
-        patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '';
+      setInitialFormValues({
+        ...initialFormValues,
+        ['source-for-' + patientIdentifier.fieldName]:
+          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
+      });
     }
   }, [patientIdentifiers]);
-
-  useEffect(() => {
-    if (capturePhotoProps?.base64EncodedImage || capturePhotoProps?.imageFile) {
-      setCurrentPhoto(capturePhotoProps.base64EncodedImage || URL.createObjectURL(capturePhotoProps.imageFile));
-    }
-  }, [capturePhotoProps]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
@@ -233,22 +116,45 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
 
     const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
-
-    for (const { name, defaultValue } of addressFieldValues) {
-      if (!initialAddressFieldValues[name]) {
-        initialAddressFieldValues[name] = defaultValue;
-      }
-    }
-
     setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
-    Object.assign(initialFormValues, initialAddressFieldValues);
-  }, [addressTemplate]);
+
+    // `=== false` is here on purpose (`inEditMode` is a triple state value).
+    // We *only* want to set initial address field values when *creating* a patient.
+    // We must wait until after loading for this info.
+    if (inEditMode === false) {
+      for (const { name, defaultValue } of addressFieldValues) {
+        if (!initialAddressFieldValues[name]) {
+          initialAddressFieldValues[name] = defaultValue;
+        }
+      }
+
+      setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
+    }
+  }, [inEditMode, addressTemplate]);
+
+  useEffect(() => {
+    if (capturePhotoProps?.base64EncodedImage || capturePhotoProps?.imageFile) {
+      setCurrentPhoto(capturePhotoProps.base64EncodedImage || URL.createObjectURL(capturePhotoProps.imageFile));
+    }
+  }, [capturePhotoProps]);
+
+  useEffect(() => {
+    if (patient) {
+      const abortController = new AbortController();
+      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
+        setCurrentPhoto(value),
+      );
+
+      return () => abortController.abort();
+    }
+  }, [patient, config]);
 
   const onFormSubmit = async (values: FormValues) => {
     const abortController = new AbortController();
 
     try {
-      const patientUuid = await savePatientForm(
+      const createdPatientUuid = await savePatientForm(
+        patientUuid,
         values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -275,7 +181,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       if (patientUuid) {
         const redirectUrl =
-          new URLSearchParams(search).get('afterUrl') || interpolateString(config.links.submitButton, { patientUuid });
+          new URLSearchParams(search).get('afterUrl') ||
+          interpolateString(config.links.submitButton, { createdPatientUuid });
         window.removeEventListener('single-spa:before-routing-event', cancelNavFn);
         navigate({ to: redirectUrl });
       }
@@ -295,6 +202,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   return (
     <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
       <Formik
+        enableReinitialize
         initialValues={initialFormValues}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
@@ -315,8 +223,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             />
             <Grid>
               <Row>
-                <Column lg={2} md={2} sm={1}>
-                  <div className={styles.fixedPosition}>
+                <Column lg={3} md={3} sm={1}>
+                  <div className={styles.stickyColumn}>
                     <h4>
                       {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
                     </h4>
@@ -339,7 +247,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Button>
                   </div>
                 </Column>
-                <Column lg={10} md={6}>
+                <Column lg={9} md={9}>
                   <Grid>
                     <PatientRegistrationContext.Provider
                       value={{
@@ -370,4 +278,4 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
  * @internal
  * Just exported for testing
  */
-export { initialFormValues };
+export { exportedInitialFormValuesForTesting as initialFormValues };

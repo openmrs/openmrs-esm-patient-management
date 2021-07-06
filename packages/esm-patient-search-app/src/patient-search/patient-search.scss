@@ -1,13 +1,31 @@
 @import "../root.scss";
 @import "~@openmrs/esm-styleguide/src/vars";
 
+.searchResultsContainer {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  top: 3rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color:$ui-02;
+  padding: 0rem 1rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
+  padding: 0;
+  background-color:var(--omrs-color-bg-low-contrast);
+}
+
 .searchResults {
-  margin-top: 3rem;
-  width: 100%;
-  padding: 1rem;
-  background: $ui-background;
-  min-height: 100vh;
-  position: relative;
+  height: 100%;
+  width: 100vw;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .searchResults {
+  width: 50vw;
 }
 
 .searchTerm {
@@ -19,19 +37,25 @@
 .resultsText {
   @include carbon--type-style("label-01");
   color: $text-02;
+  border-bottom: 0.063rem solid $ui-03;
+  padding: 0.5rem 0rem;
+  
+}
+
+:global(.omrs-breakpoint-gt-tablet) .resultsText {
+  margin: 1rem;
 }
 
 .patientSearchInput {
   background: transparent;
   border: none;
-  caret-color: var(--omrs-color-interaction);
   padding: 0;
   width: 100%;
   text-align: center;
 }
 
 .patientSearchInput:focus {
-  outline: none;
+  outline: 2px solid #ff832b;
 }
 
 .patientSearchInput::placeholder {
@@ -44,16 +68,15 @@
 }
 
 .emptyResultText {
-  margin-top: 1rem;
-  margin-bottom: 0.313rem;
   @include carbon--type-style("productive-heading-01");
   color: $text-02;
+  margin-top: 1rem;
+  margin-bottom: 0.313rem;
 }
 
 .actionText {
   @include carbon--type-style("body-long-01");
   color: $text-02;
-  margin-bottom: 1rem;
 }
 
 .pagination {
@@ -64,8 +87,13 @@
 
 .patientSearchInput {
   width: 100%;
-  position: absolute;
   top: 0;
+}
+
+.patientSearchInput {
+  :global(.bx--search-input:focus) {
+    outline: 2px solid #ff832b;
+  }
 }
 
 .patientSearchInput input {
@@ -74,5 +102,16 @@
 
 .patientSearch {
   width: 100%;
+  display: flex;
 }
 
+.emptySearchResultsTile {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 3rem 0rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
+  margin: 1rem;
+  background-color: $ui-02;
+}

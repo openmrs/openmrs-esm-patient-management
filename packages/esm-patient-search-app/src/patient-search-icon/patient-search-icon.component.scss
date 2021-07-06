@@ -8,6 +8,14 @@
     z-index: 1000000;
 }
 
+:global(.omrs-breakpoint-gt-tablet) .patientLaunchContainer {
+    position: absolute;
+    width: 50vw;
+    right: 0;
+    height: 2.75rem;
+    left: unset;
+}
+
 .headerGlobalAction {
     background-color: transparent;
 }

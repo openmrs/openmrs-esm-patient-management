@@ -125,6 +125,7 @@ const PatientListList: React.FC = () => {
         <Search
           style={{ backgroundColor: 'white', borderBottomColor: '#e0e0e0' }}
           labelText="search me"
+          size="xl"
           onFocus={() => {
             if (viewState.type === StateTypes.IDLE) {
               setViewState({ type: StateTypes.SEARCH, searchTerm: '' });

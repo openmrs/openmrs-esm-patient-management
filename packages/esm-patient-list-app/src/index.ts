@@ -1,9 +1,15 @@
 import { getAsyncLifecycle } from '@openmrs/esm-framework';
-// import { configSchema } from './config-schema';
 import { registerBreadcrumbs } from '@openmrs/esm-framework';
 import './offline/offlineData';
 import './patientListData/api';
-const backendDependencies = { 'webservices.rest': '^2.2.0' };
+
+const backendDependencies = {
+  'webservices.rest': '^2.2.0',
+};
+
+const frontendDependencies = {
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+};
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-patient-list-app';
@@ -14,8 +20,6 @@ const options = {
 const spaBasePath = `${window.spaBase}/patient-list`;
 
 function setupOpenMRS() {
-  // defineConfigSchema(moduleName, configSchema);
-
   registerBreadcrumbs([
     {
       path: spaBasePath,
@@ -58,4 +62,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
