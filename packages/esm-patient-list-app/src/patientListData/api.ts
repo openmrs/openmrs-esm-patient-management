@@ -16,7 +16,7 @@ async function postData(url = '', data = {}) {
   return response.json();
 }
 
-interface OpenmrsCohort {
+export interface OpenmrsCohort {
   attributes: Array<any>;
   description: string;
   endDate: string;
@@ -31,7 +31,7 @@ interface OpenmrsCohort {
   voided: boolean;
 }
 
-interface OpenmrsCohortMember {
+export interface OpenmrsCohortMember {
   attributes: Array<any>;
   description: string;
   endDate: string;

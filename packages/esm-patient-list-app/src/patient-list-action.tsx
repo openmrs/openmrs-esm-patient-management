@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
+import AddPatientToList from './AddPatientToList';
 
 interface AddPastVisitOverflowMenuItemProps {}
 
@@ -31,7 +32,9 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       </li>
       {modalOpen && (
         <Modal close={closeModal}>
-          <div style={{ backgroundColor: '#f4f4f4', height: '70vh', width: '90vw' }}>hello there</div>
+          <div style={{ backgroundColor: '#f4f4f4', height: '70vh', width: '90vw' }}>
+            <AddPatientToList close={closeModal} patientUuid="" />
+          </div>
         </Modal>
       )}
     </>
