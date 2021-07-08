@@ -52,9 +52,9 @@ const headerData = [
 function formatDatetime(startDatetime) {
   const todayDate = dayjs();
   const today =
-    dayjs(startDatetime).get('date') == todayDate.get('date') &&
-    dayjs(startDatetime).get('month') == todayDate.get('month') &&
-    dayjs(startDatetime).get('year') == todayDate.get('year');
+    dayjs(startDatetime).get('date') === todayDate.get('date') &&
+    dayjs(startDatetime).get('month') === todayDate.get('month') &&
+    dayjs(startDatetime).get('year') === todayDate.get('year');
   if (today) {
     return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
   } else {
