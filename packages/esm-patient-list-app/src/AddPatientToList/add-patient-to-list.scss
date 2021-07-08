@@ -1,0 +1,21 @@
+@import "../style.scss";
+
+.modalContent {
+  width: 100%;
+  max-width: 678px;
+  background-color: #f4f4f4;
+}
+
+.modalHeader {
+  margin: 1rem;
+}
+
+.buttonSet {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.largeButtons {
+  padding-bottom: 2rem;
+}

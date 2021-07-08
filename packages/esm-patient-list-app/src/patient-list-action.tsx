@@ -32,9 +32,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       </li>
       {modalOpen && (
         <Modal close={closeModal}>
-          <div style={{ backgroundColor: '#f4f4f4', height: '70vh', width: '90vw' }}>
-            <AddPatientToList close={closeModal} patientUuid="" />
-          </div>
+          <AddPatientToList close={closeModal} patientUuid="" />
         </Modal>
       )}
     </>

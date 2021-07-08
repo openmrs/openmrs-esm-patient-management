@@ -3,6 +3,7 @@ import Search from 'carbon-components-react/lib/components/Search';
 import ButtonSet from 'carbon-components-react/lib/components/ButtonSet';
 import Button from 'carbon-components-react/lib/components/Button';
 import { useTranslation } from 'react-i18next';
+import styles from './add-patient-to-list.scss';
 
 import { OpenmrsCohort } from '../patientListData/api';
 
@@ -14,49 +15,42 @@ const CheckboxedPatientList: React.FC<{
   return <div></div>;
 };
 
-/**
- * layout grid
- *
- * header | close
- * search
- * ListList
- * spacer
- * buttons
- *
- *
- */
-
 const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = React.useState('');
 
   return (
-    <div>
-      <h1>{t('add_patient_to_list', 'Add patient to list')}</h1>
-      <h3>{t('add_patient_to_list', 'Add patient to list')}</h3>
-      <Search
-        style={{ backgroundColor: 'white', borderBottomColor: '#e0e0e0' }}
-        labelText={t('search_for_list', 'Search for a list')}
-        onChange={({ target }) => {
-          setSearchValue(target.value);
-        }}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            // trigger search or search on typing?
-          }
-        }}
-        value={searchValue}
-      />
-      <div>
-        {
-          // list of five patients list here
-        }
+    <div className={styles.modalContent}>
+      <div className={styles.modalHeader}>
+        <h1 className={styles.productiveHeading03}>{t('addPatientToList', 'Add patient to list')}</h1>
+        <h3 className={styles.bodyLong01} style={{ margin: '1rem 0' }}>
+          {t('searchForAListToAddThisPatientTo', 'Search for a list to add this patient to.')}
+        </h3>
       </div>
-      <ButtonSet>
-        <Button>Create new patient list</Button>
-        <Button onClick={close}>Cancel</Button>
-        <Button>Add to list</Button>
-      </ButtonSet>
+      <div style={{ marginBottom: '0.875rem' }}>
+        <Search
+          style={{ backgroundColor: 'white', borderBottom: '1px solid #e0e0e0' }}
+          labelText={t('searchForList', 'Search for a list')}
+          onChange={({ target }) => {
+            setSearchValue(target.value);
+          }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              // trigger search or search on typing?
+            }
+          }}
+          value={searchValue}
+        />
+      </div>
+      <div className={styles.buttonSet}>
+        <Button kind="ghost">Create new patient list</Button>
+        <div>
+          <Button kind="secondary" className={styles.largeButtons} onClick={close}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button className={styles.largeButtons}>{t('addToList', 'Add to list')}</Button>
+        </div>
+      </div>
     </div>
   );
 };
