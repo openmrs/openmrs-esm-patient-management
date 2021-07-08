@@ -1,9 +1,9 @@
 export * from './mock';
 import React from 'react';
-import { getAllPatientLists, getPatientListMembers } from './mock';
+import { getPatientListMembers } from './mock';
 import setup from './setupMockState';
 import { PatientListBase, PatientListMember } from './types';
-import './api';
+import { getAllPatientLists, OpenmrsCohort } from './api';
 
 const setupPromise = setup();
 
@@ -28,7 +28,7 @@ interface ErrorState {
 type State<T> = LoadingState | DataState<T> | ErrorState;
 
 export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
-  const [data, setData] = React.useState<State<Array<PatientListBase & { id: string }>>>({
+  const [data, setData] = React.useState<State<Array<OpenmrsCohort & { id: string }>>>({
     loading: true,
     data: undefined,
     error: undefined,
