@@ -134,10 +134,10 @@ const ActiveVisitsTable = (props) => {
               pageSizes={pageSizes}
               totalItems={activeVisits.length}
               onChange={({ pageSize, page }) => {
-                if (pageSize != currentPageSize) {
+                if (pageSize !== currentPageSize) {
                   setPageSize(pageSize);
                 }
-                if (page != currentPage) {
+                if (page !== currentPage) {
                   goTo(page);
                 }
               }}
