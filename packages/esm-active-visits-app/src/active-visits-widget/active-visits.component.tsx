@@ -8,12 +8,12 @@ import DataTable, {
   TableBody,
   TableCell,
 } from 'carbon-components-react/es/components/DataTable';
-import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import Pagination from 'carbon-components-react/es/components/Pagination';
 import { useLayoutType, useConfig, usePagination } from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
-import ActiveVisitsPagination from '../pagination/pagination.component';
 import dayjs from 'dayjs';
 
 const headerData = [
@@ -66,10 +66,10 @@ const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
   const config = useConfig();
-
+  const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize);
+  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const { results, goTo, currentPage } = usePagination(activeVisits, currentPageSize);
   const { t } = useTranslation();
 
@@ -94,52 +94,57 @@ const ActiveVisitsTable = (props) => {
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits in Clinic')}</h4>
       </div>
-      <DataTable rows={activeVisits ? results : []} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} useZebraStyles>
-              <TableHead>
-                <TableRow style={{ height: desktopView ? '2rem' : '3rem' }}>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {activeVisits &&
-                  rows.map((row) => (
-                    <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-            {loading && (
-              <div className={styles.skeletonContainer}>
-                <SkeletonText />
-              </div>
-            )}
-          </TableContainer>
-        )}
-      </DataTable>
-      <div>
-        <ActiveVisitsPagination
-          pageNumber={currentPage}
-          totalItems={activeVisits.length}
-          currentItems={results.length}
-          pageSize={currentPageSize}
-          onPageNumberChange={({ page, pageSize }) => {
-            if (pageSize != currentPageSize) {
-              setPageSize(pageSize);
-            }
-            if (page != currentPage) {
-              goTo(page);
-            }
-          }}
-        />
-      </div>
+      {!loading ? (
+        <DataTable rows={activeVisits ? results : []} headers={headerData} isSortable>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow style={{ height: desktopView ? '2rem' : '3rem' }}>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {activeVisits &&
+                    rows.map((row) => (
+                      <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+      ) : (
+        <div className={styles.skeletonContainer}>
+          <DataTableSkeleton />
+        </div>
+      )}
+      {activeVisits.length > 0 && (
+        <div>
+          <div className={styles.paginationContainer}>
+            <Pagination
+              page={currentPage}
+              pageSize={currentPageSize}
+              pageSizes={pageSizes}
+              totalItems={activeVisits.length}
+              onChange={({ pageSize, page }) => {
+                if (pageSize != currentPageSize) {
+                  setPageSize(pageSize);
+                }
+                if (page != currentPage) {
+                  goTo(page);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
