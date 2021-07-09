@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import DataTable, {
   TableContainer,
   Table,
@@ -7,9 +7,12 @@ import DataTable, {
   TableHeader,
   TableBody,
   TableCell,
+  TableToolbar,
+  TableToolbarContent,
 } from 'carbon-components-react/es/components/DataTable';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/es/components/Pagination';
+import Search from 'carbon-components-react/es/components/Search';
 import { useLayoutType, useConfig, usePagination } from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
@@ -63,15 +66,19 @@ function formatDatetime(startDatetime) {
 }
 
 const ActiveVisitsTable = (props) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
   const config = useConfig();
+  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
-  const { results, goTo, currentPage } = usePagination(activeVisits, currentPageSize);
-  const { t } = useTranslation();
+  const { goTo, currentPage } = usePagination(activeVisits, currentPageSize);
+  const [lowerBound, upperBound] = useMemo(
+    () => [(currentPage - 1) * currentPageSize, (currentPage + 0) * currentPageSize],
+    [currentPage, currentPageSize],
+  );
 
   useEffect(() => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
@@ -89,50 +96,48 @@ const ActiveVisitsTable = (props) => {
     });
     return () => activeVisits.unsubscribe();
   }, []);
-  return (
+  return !loading ? (
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
-        <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits in Clinic')}</h4>
+        <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
       </div>
-      {!loading ? (
-        <DataTable rows={activeVisits ? results : []} headers={headerData} isSortable>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <TableContainer>
-              <Table {...getTableProps()} useZebraStyles>
-                <TableHead>
-                  <TableRow style={{ height: desktopView ? '2rem' : '3rem' }}>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {activeVisits &&
-                    rows.map((row) => (
-                      <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-      ) : (
-        <div className={styles.skeletonContainer}>
-          <DataTableSkeleton />
-        </div>
-      )}
-      {activeVisits.length > 0 && (
-        <div>
-          <div className={styles.paginationContainer}>
+      <DataTable rows={activeVisits} headers={headerData} isSortable>
+        {({ rows, headers, getHeaderProps, onInputChange, getTableProps, getBatchActionProps }) => (
+          <TableContainer title="" className={styles.tableContainer}>
+            <TableToolbar>
+              <TableToolbarContent>
+                <Search
+                  id="search-1"
+                  tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                  placeHolderText="Filter table"
+                  onChange={onInputChange}
+                />
+              </TableToolbarContent>
+            </TableToolbar>
+            <Table {...getTableProps()} useZebraStyles>
+              <TableHead>
+                <TableRow style={{ height: desktopView ? '2rem' : '3rem' }}>
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {activeVisits &&
+                  rows.slice(lowerBound, upperBound).map((row) => (
+                    <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
             <Pagination
               page={currentPage}
               pageSize={currentPageSize}
               pageSizes={pageSizes}
-              totalItems={activeVisits.length}
+              totalItems={rows.length}
               onChange={({ pageSize, page }) => {
                 if (pageSize !== currentPageSize) {
                   setPageSize(pageSize);
@@ -142,10 +147,12 @@ const ActiveVisitsTable = (props) => {
                 }
               }}
             />
-          </div>
-        </div>
-      )}
+          </TableContainer>
+        )}
+      </DataTable>
     </div>
+  ) : (
+    <DataTableSkeleton className={styles.tableSkeleton} />
   );
 };
 

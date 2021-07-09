@@ -2,7 +2,8 @@
 
 .activeVisitsContainer {
   background-color: $ui-background;
-  width: 100%;
+  // feedback needed
+  width: 90vw;
   border: 1px solid #e0e0e0;
 }
 
@@ -14,10 +15,19 @@
   background-color: $ui-background;
 }
 
-.skeletonContainer {
-  padding: 0.5rem 1rem;
+.productiveHeading02::after {
+  content: "";
+  display: block;
+  width: 2rem;
+  padding-top: 0.188rem;
+  border-bottom: 0.375rem solid #007d79;
 }
 
-.skeletonContainer p {
-  margin: 0;
+.tableContainer section{
+  position: relative;
+}
+
+.tableSkeleton {
+  // Feedback needed
+  width: 90vw;
 }
