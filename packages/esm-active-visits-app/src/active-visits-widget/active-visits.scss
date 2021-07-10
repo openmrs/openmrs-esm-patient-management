@@ -27,6 +27,17 @@
   position: relative;
 }
 
+.tableContainer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.emptyRow {
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+}
+
 .tableSkeleton {
   // Feedback needed
   width: 90vw;

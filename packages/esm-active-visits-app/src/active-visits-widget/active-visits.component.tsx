@@ -13,7 +13,7 @@ import DataTable, {
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import Search from 'carbon-components-react/es/components/Search';
-import { useLayoutType, useConfig, usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, useConfig, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
@@ -90,12 +90,14 @@ const ActiveVisitsTable = (props) => {
         gender: visit?.patient?.person?.gender,
         age: visit?.patient?.person?.age,
         visitType: visit?.visitType.display,
+        patientUuid: visit?.patient?.uuid,
       }));
       setActiveVisits(rowData);
       setLoading(false);
     });
     return () => activeVisits.unsubscribe();
   }, []);
+
   return !loading ? (
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
@@ -107,7 +109,6 @@ const ActiveVisitsTable = (props) => {
             <TableToolbar>
               <TableToolbarContent>
                 <Search
-                  id="search-1"
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   placeHolderText="Filter table"
                   onChange={onInputChange}
@@ -123,16 +124,30 @@ const ActiveVisitsTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {activeVisits &&
-                  rows.slice(lowerBound, upperBound).map((row) => (
-                    <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+                {rows.slice(lowerBound, upperBound).map((row) => (
+                  <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
+                    {row.cells.map((cell, ind) => (
+                      <TableCell key={cell.id}>
+                        {cell.info.header === 'name' ? (
+                          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${activeVisits[ind].patientUuid}/chart/`}>
+                            {cell.value}
+                          </ConfigurableLink>
+                        ) : (
+                          cell.value
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
+            {rows.length === 0 && (
+              <p
+                style={{ height: desktopView ? '2rem' : '3rem' }}
+                className={`${styles.emptyRow} ${styles.bodyLong01}`}>
+                {t('noVisitsFound', 'No visits found')}
+              </p>
+            )}
             <Pagination
               page={currentPage}
               pageSize={currentPageSize}
