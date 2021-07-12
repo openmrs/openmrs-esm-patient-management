@@ -1,23 +1,26 @@
 import React from 'react';
 import Search from 'carbon-components-react/lib/components/Search';
-import ButtonSet from 'carbon-components-react/lib/components/ButtonSet';
 import Button from 'carbon-components-react/lib/components/Button';
+import Checkbox from 'carbon-components-react/lib/components/Checkbox';
+import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
 import styles from './add-patient-to-list.scss';
 
 import { OpenmrsCohort } from '../patientListData/api';
+import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 
-const CheckboxedPatientList: React.FC<{
-  patientListList: Array<OpenmrsCohort>;
-  selectedPatientListList: Array<string>;
-  setSelectedPatientListList: (value: Array<string>) => void;
-}> = () => {
-  return <div></div>;
+const CheckboxedPatientList = (props) => {
+  return (
+    <div className={styles.checkbox}>
+      <Checkbox labelText={props.patientList.display} id={props.patientList.display} />{' '}
+    </div>
+  );
 };
 
 const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = React.useState('');
+  const { loading, data } = usePatientListData(undefined, undefined, undefined, searchValue);
 
   return (
     <div className={styles.modalContent}>
@@ -41,6 +44,20 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
           }}
           value={searchValue}
         />
+      </div>
+      <div className={styles.patientListList}>
+        <fieldset className="bx--fieldset">
+          <label className="bx--label">Patient Lists</label>
+          {!loading && data ? (
+            data.length > 0 ? (
+              data.map((patientList, ind) => <CheckboxedPatientList key={ind} patientList={patientList} />)
+            ) : (
+              <p className={styles.bodyLong01}>No patient list found</p>
+            )
+          ) : (
+            <SkeletonText />
+          )}
+        </fieldset>
       </div>
       <div className={styles.buttonSet}>
         <Button kind="ghost">Create new patient list</Button>

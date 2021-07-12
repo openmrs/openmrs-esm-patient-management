@@ -10,6 +10,10 @@
   margin: 1rem;
 }
 
+.patientListList {
+  padding: 0 1rem;
+}
+
 .buttonSet {
   display: flex;
   justify-content: space-between;
@@ -18,4 +22,8 @@
 
 .largeButtons {
   padding-bottom: 2rem;
+}
+
+.checkbox {
+  padding-bottom: 0.875rem;
 }
