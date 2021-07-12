@@ -15,7 +15,7 @@ import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
 
 const defaultHeaders = [
-  { key: 'display', header: 'List Name' },
+  { key: 'name', header: 'List Name' },
   { key: 'type', header: 'List Type' },
   { key: 'memberCount', header: 'No. Patients' },
   { key: 'isStarred', header: '' },

@@ -1,4 +1,5 @@
 import { Location, OpenmrsResource } from '@openmrs/esm-api';
+import { PATIENT_LIST_TYPE } from './types';
 
 async function postData(url = '', data = {}) {
   const response = await fetch(url, {
@@ -42,7 +43,7 @@ export interface OpenmrsCohortMember {
   };
 }
 
-async function getAllPatientLists() {
+export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: boolean, nameFilter?: string) {
   const {
     results,
     error,
@@ -50,6 +51,8 @@ async function getAllPatientLists() {
     results: Array<OpenmrsCohort>;
     error: Error;
   } = await (await fetch('/openmrs/ws/rest/v1/cohortm/cohort?v=default')).json();
+
+  console.log({ results });
 
   if (error) throw error;
 
@@ -80,7 +83,7 @@ async function addPatientToList(patient: { name: string; patient: string; cohort
   return postData('/openmrs/ws/rest/v1/cohortm/cohortmember', patient);
 }
 
-async function createPatientList(cohort: { name: string }) {
+export async function createPatientList(cohort: { name: string }) {
   return postData('/openmrs/ws/rest/v1/cohortm/cohort', {
     ...cohort,
     cohortType: '6df786bf-f15a-49c2-8d2b-1832d961c270',

@@ -1,11 +1,9 @@
-export * from './mock';
+// export * from './mock';
 import React from 'react';
-import { getAllPatientLists, getPatientListMembers } from './mock';
-import setup from './setupMockState';
+import { getPatientListMembers } from './mock';
 import { PatientListBase, PatientListMember } from './types';
-import './api';
+import { getAllPatientLists, OpenmrsCohort } from './api';
 
-const setupPromise = setup();
 
 interface LoadingState {
   loading: true;
@@ -28,22 +26,19 @@ interface ErrorState {
 type State<T> = LoadingState | DataState<T> | ErrorState;
 
 export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
-  const [data, setData] = React.useState<State<Array<PatientListBase & { id: string }>>>({
+  const [data, setData] = React.useState<State<Array<OpenmrsCohort & { id: string }>>>({
     loading: true,
     data: undefined,
     error: undefined,
   });
 
   React.useEffect(() => {
-    setupPromise
-      .then(() => {
-        setData({
-          loading: true,
-          data: undefined,
-          error: undefined,
-        });
-        return getAllPatientLists(...args);
-      })
+    setData({
+      loading: true,
+      data: undefined,
+      error: undefined,
+    });
+    getAllPatientLists(...args)
       .then((y) => {
         setData({
           loading: false,
@@ -65,15 +60,12 @@ export function useSingePatientListData(redo: any, ...args: Parameters<typeof ge
   });
 
   React.useEffect(() => {
-    setupPromise
-      .then(() => {
-        setData({
-          loading: true,
-          data: undefined,
-          error: undefined,
-        });
-        return getPatientListMembers(...args);
-      })
+    setData({
+      loading: true,
+      data: undefined,
+      error: undefined,
+    });
+    getPatientListMembers(...args)
       .then((data) => {
         setData({
           loading: false,
