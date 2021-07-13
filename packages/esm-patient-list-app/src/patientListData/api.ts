@@ -77,14 +77,14 @@ async function getPatientListMembers(cohortUuid: string) {
   return patients;
 }
 
-async function getPatientListsForPatient(patientUuid: string) {
+export async function getPatientListsForPatient(patientUuid: string) {
   const {
     results,
     error,
   }: {
     results: Array<OpenmrsCohortMember>;
     error: Error;
-  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
+  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=full`)).json();
 
   if (error) throw error;
 
@@ -116,6 +116,7 @@ globalThis.api = {
   addPatientToList,
   getPatientListMembers,
   getAllPatientLists,
+  getPatientListsForPatient,
 };
 
 export default globalThis.api;
