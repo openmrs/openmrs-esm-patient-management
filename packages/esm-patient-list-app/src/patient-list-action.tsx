@@ -19,15 +19,13 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
         <button
           className="bx--overflow-menu-options__btn"
           role="menuitem"
-          title={t('openPatientList', 'Add To Patient List')}
+          title={t('openPatientList', 'Add to list')}
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
             maxWidth: '100vw',
           }}>
-          <span className="bx--overflow-menu-options__option-content">
-            {t('openPatientList', 'Add To Patient List')}
-          </span>
+          <span className="bx--overflow-menu-options__option-content">{t('openPatientList', 'Add to list')}</span>
         </button>
       </li>
       {modalOpen && (
