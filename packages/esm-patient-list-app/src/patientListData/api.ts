@@ -84,17 +84,11 @@ export async function getPatientListsForPatient(patientUuid: string) {
   }: {
     results: Array<OpenmrsCohortMember>;
     error: Error;
-  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=full`)).json();
+  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
 
   if (error) throw error;
 
-  const patients: Array<OpenmrsResource> = (
-    await fetch('/openmrs/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','), {
-      method: 'POST',
-    }).then((res) => res.json())
-  ).entry.map((e) => e.resource);
-
-  return patients;
+  return results;
 }
 
 export async function addPatientToList(data: { patient: string; cohort: string; startDate: string }) {
