@@ -9,6 +9,7 @@ export interface ActiveVisitRow {
   gender: string;
   age: string;
   visitType: string;
+  patientUuid: string;
 }
 
 export function fetchActiveVisits() {
