@@ -2,8 +2,7 @@
 
 .activeVisitsContainer {
   background-color: $ui-background;
-  // feedback needed
-  width: 90vw;
+  max-width: 48rem;
   border: 1px solid #e0e0e0;
 }
 
@@ -39,6 +38,5 @@
 }
 
 .tableSkeleton {
-  // Feedback needed
-  width: 90vw;
+  max-width: 48rem;
 }
