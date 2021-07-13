@@ -42,3 +42,23 @@ export interface PatientListMemberProperty {
 export interface PatientListMemberFilter {
   // ??
 }
+
+interface LoadingState {
+  loading: true;
+  data: undefined;
+  error: undefined;
+}
+
+interface DataState<T> {
+  loading: false;
+  data: T;
+  error: undefined;
+}
+
+interface ErrorState {
+  loading: false;
+  data: undefined;
+  error: Error;
+}
+
+export type State<T> = LoadingState | DataState<T> | ErrorState;

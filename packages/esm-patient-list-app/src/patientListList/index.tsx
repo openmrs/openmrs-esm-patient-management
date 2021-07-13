@@ -3,7 +3,10 @@ import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/lib/components/Button';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 
-import { getAllPatientLists, updatePatientListDetails, usePatientListData } from '../patientListData';
+import { getAllPatientLists, usePatientListData } from '../patientListData';
+// Yet to be built
+// import { updatePatientListDetails } from '../patientListData';
+
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
@@ -101,7 +104,7 @@ const PatientListList: React.FC = () => {
   );
 
   const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
-    updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    // updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
   }, []);
 
   return (

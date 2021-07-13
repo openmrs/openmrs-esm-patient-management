@@ -52,8 +52,6 @@ export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: bo
     error: Error;
   } = await (await fetch('/openmrs/ws/rest/v1/cohortm/cohort?v=default')).json();
 
-  console.log({ results });
-
   if (error) throw error;
 
   return results;
@@ -79,8 +77,8 @@ async function getPatientListMembers(cohortUuid: string) {
   return patients;
 }
 
-async function addPatientToList(patient: { name: string; patient: string; cohort: string }) {
-  return postData('/openmrs/ws/rest/v1/cohortm/cohortmember', patient);
+export async function addPatientToList(data: { name: string; patient: string; cohort: string }) {
+  return postData('/openmrs/ws/rest/v1/cohortm/cohortmember', data);
 }
 
 export async function createPatientList(cohort: { name: string }) {
