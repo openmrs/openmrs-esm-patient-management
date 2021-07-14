@@ -8,6 +8,7 @@ import styles from './add-patient-to-list.scss';
 
 import { OpenmrsCohort, addPatientToList } from '../patientListData/api';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
 
 const CheckboxedPatientList = ({ name, uuid, checked, handleChange }) => {
   return (
@@ -45,8 +46,8 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
       if (selectedLists[patientList.uuid]) {
         addPatientToList({
           patient: 'b2f86b28-7998-4812-83a9-7f8ad3c47e66',
-          name: patientList.name,
           cohort: patientList.uuid,
+          startDate: toOmrsIsoString(new Date()),
         });
       }
     });

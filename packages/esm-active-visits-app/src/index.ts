@@ -12,10 +12,10 @@ const frontendDependencies = {
 };
 
 function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-search-app';
+  const moduleName = '@openmrs/esm-active-visits-app';
 
   const options = {
-    featureName: 'patient-search',
+    featureName: 'active-visits',
     moduleName,
   };
 
@@ -24,9 +24,9 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'patient-search-icon',
-        slot: 'top-nav-actions-slot',
-        load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
+        id: 'active-visits-widget',
+        slot: 'homepage-widgets-slot',
+        load: getAsyncLifecycle(() => import('./active-visits-widget/active-visits.component'), options),
       },
     ],
   };

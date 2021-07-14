@@ -77,7 +77,21 @@ async function getPatientListMembers(cohortUuid: string) {
   return patients;
 }
 
-export async function addPatientToList(data: { name: string; patient: string; cohort: string }) {
+export async function getPatientListsForPatient(patientUuid: string) {
+  const {
+    results,
+    error,
+  }: {
+    results: Array<OpenmrsCohortMember>;
+    error: Error;
+  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
+
+  if (error) throw error;
+
+  return results;
+}
+
+export async function addPatientToList(data: { patient: string; cohort: string; startDate: string }) {
   return postData('/openmrs/ws/rest/v1/cohortm/cohortmember', data);
 }
 
@@ -96,6 +110,7 @@ globalThis.api = {
   addPatientToList,
   getPatientListMembers,
   getAllPatientLists,
+  getPatientListsForPatient,
 };
 
 export default globalThis.api;
