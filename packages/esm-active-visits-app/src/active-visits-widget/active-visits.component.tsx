@@ -74,11 +74,23 @@ const ActiveVisitsTable = (props) => {
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
-  const { goTo, currentPage } = usePagination(activeVisits, currentPageSize);
-  const [lowerBound, upperBound] = useMemo(
-    () => [(currentPage - 1) * currentPageSize, (currentPage + 0) * currentPageSize],
-    [currentPage, currentPageSize],
-  );
+  const [searchString, setSearchString] = useState('');
+
+  const searchResults: ActiveVisitRow[] = useMemo(() => {
+    if (searchString && searchString.trim() != '') {
+      return activeVisits.filter((activeVisitRow) =>
+        Object.keys(activeVisitRow).some((header) => {
+          if (header === 'patientUuid') {
+            return false;
+          }
+          return `${activeVisitRow[header]}`.toLowerCase().includes(searchString.toLowerCase());
+        }),
+      );
+    } else {
+      return activeVisits;
+    }
+  }, [searchString, activeVisits]);
+  const { goTo, currentPage, results } = usePagination(searchResults, currentPageSize);
 
   useEffect(() => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
@@ -103,15 +115,15 @@ const ActiveVisitsTable = (props) => {
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
       </div>
-      <DataTable rows={activeVisits} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, onInputChange, getTableProps, getBatchActionProps }) => (
+      <DataTable rows={results} headers={headerData} isSortable>
+        {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps }) => (
           <TableContainer title="" className={styles.tableContainer}>
             <TableToolbar>
               <TableToolbarContent>
                 <Search
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                  placeHolderText="Filter table"
-                  onChange={onInputChange}
+                  placeholder="Filter table"
+                  onChange={(e) => setSearchString(e.target.value)}
                 />
               </TableToolbarContent>
             </TableToolbar>
@@ -124,13 +136,12 @@ const ActiveVisitsTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.slice(lowerBound, upperBound).map((row, ind) => (
+                {rows.map((row, ind) => (
                   <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>
                         {cell.info.header === 'name' ? (
-                          <ConfigurableLink
-                            to={`\${openmrsSpaBase}/patient/${activeVisits[lowerBound + ind].patientUuid}/chart/`}>
+                          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${results[ind]?.patientUuid}/chart/`}>
                             {cell.value}
                           </ConfigurableLink>
                         ) : (
@@ -153,7 +164,7 @@ const ActiveVisitsTable = (props) => {
               page={currentPage}
               pageSize={currentPageSize}
               pageSizes={pageSizes}
-              totalItems={rows.length}
+              totalItems={searchResults.length}
               onChange={({ pageSize, page }) => {
                 if (pageSize !== currentPageSize) {
                   setPageSize(pageSize);
