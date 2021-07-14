@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import DataTable, {
   TableContainer,
   Table,
@@ -76,14 +76,15 @@ const ActiveVisitsTable = (props) => {
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
   const [searchString, setSearchString] = useState('');
 
-  const searchResults: ActiveVisitRow[] = useMemo(() => {
-    if (searchString && searchString.trim() != '') {
+  const searchResults = useMemo(() => {
+    if (searchString && searchString.trim() !== '') {
+      const search = searchString.toLowerCase();
       return activeVisits.filter((activeVisitRow) =>
         Object.keys(activeVisitRow).some((header) => {
           if (header === 'patientUuid') {
             return false;
           }
-          return `${activeVisitRow[header]}`.toLowerCase().includes(searchString.toLowerCase());
+          return `${activeVisitRow[header]}`.toLowerCase().includes(search);
         }),
       );
     } else {
@@ -110,6 +111,8 @@ const ActiveVisitsTable = (props) => {
     return () => activeVisits.unsubscribe();
   }, []);
 
+  const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
+
   return !loading ? (
     <div className={styles.activeVisitsContainer}>
       <div className={styles.activeVisitsDetailHeaderContainer}>
@@ -123,7 +126,7 @@ const ActiveVisitsTable = (props) => {
                 <Search
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   placeholder="Filter table"
-                  onChange={(e) => setSearchString(e.target.value)}
+                  onChange={handleSearch}
                 />
               </TableToolbarContent>
             </TableToolbar>
@@ -161,10 +164,13 @@ const ActiveVisitsTable = (props) => {
               </p>
             )}
             <Pagination
+              forwardText=""
+              backwardText=""
               page={currentPage}
               pageSize={currentPageSize}
               pageSizes={pageSizes}
               totalItems={searchResults.length}
+              className={styles.pagination}
               onChange={({ pageSize, page }) => {
                 if (pageSize !== currentPageSize) {
                   setPageSize(pageSize);
@@ -179,7 +185,7 @@ const ActiveVisitsTable = (props) => {
       </DataTable>
     </div>
   ) : (
-    <DataTableSkeleton className={styles.tableSkeleton} />
+    <DataTableSkeleton />
   );
 };
 
