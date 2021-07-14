@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
 import AddPatientToList from './AddPatientToList';
 
-interface AddPastVisitOverflowMenuItemProps {}
+interface AddPastVisitOverflowMenuItemProps {
+  patientUuid: string;
+}
 
-const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
+const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = React.useState(false);
   const handleClick = React.useCallback(() => {
@@ -30,7 +32,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       </li>
       {modalOpen && (
         <Modal close={closeModal}>
-          <AddPatientToList close={closeModal} patientUuid="" />
+          <AddPatientToList close={closeModal} patientUuid={patientUuid} />
         </Modal>
       )}
     </>

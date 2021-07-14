@@ -6,52 +6,46 @@ import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
 import styles from './add-patient-to-list.scss';
 
-import { OpenmrsCohort, addPatientToList } from '../patientListData/api';
+import { OpenmrsCohort, addPatientToList, getPatientListsForPatient } from '../patientListData/api';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
-
-const CheckboxedPatientList = ({ name, uuid, checked, handleChange }) => {
-  return (
-    <div className={styles.checkbox}>
-      <Checkbox checked={checked} labelText={name} id={uuid} onChange={(e) => handleChange(uuid, e)} />
-    </div>
-  );
-};
+import { useCallback } from 'react';
 
 const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
-  const [searchValue, setSearchValue] = React.useState('');
+  const [searchValue, setSearchValue] = useState('');
   const { loading, data } = usePatientListData(undefined, undefined, undefined, searchValue);
   const [selectedLists, setSelectedList] = useState({});
 
   useEffect(() => {
     const lists = {};
     if (data) {
-      data.map((patientList, ind) => {
+      data.map((patientList) => {
         lists[patientList.uuid] = false;
       });
     }
+    getPatientListsForPatient(patientUuid).then((res) => console.log(res));
     setSelectedList(lists);
   }, [data]);
 
-  const handleChange = (uuid, e) => {
+  const handleChange = useCallback((uuid, e) => {
     setSelectedList((selectedLists) => ({
       ...selectedLists,
       [uuid]: e,
     }));
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     data.map((patientList) => {
       if (selectedLists[patientList.uuid]) {
         addPatientToList({
-          patient: 'b2f86b28-7998-4812-83a9-7f8ad3c47e66',
+          patient: patientUuid,
           cohort: patientList.uuid,
           startDate: toOmrsIsoString(new Date()),
         });
       }
     });
-  };
+  }, []);
 
   return (
     <div className={styles.modalContent}>
@@ -65,6 +59,7 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
         <Search
           style={{ backgroundColor: 'white', borderBottom: '1px solid #e0e0e0' }}
           labelText={t('searchForList', 'Search for a list')}
+          placeholder="Filter list"
           onChange={({ target }) => {
             setSearchValue(target.value);
           }}
@@ -82,13 +77,15 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
           {!loading && data ? (
             data.length > 0 ? (
               data.map((patientList, ind) => (
-                <CheckboxedPatientList
-                  key={ind}
-                  handleChange={handleChange}
-                  checked={selectedLists[patientList.uuid] === undefined}
-                  name={patientList.name}
-                  uuid={patientList.uuid}
-                />
+                <div key={ind} className={styles.checkbox}>
+                  <Checkbox
+                    key={ind}
+                    onChange={(e) => handleChange(patientList.uuid, e)}
+                    checked={selectedLists[patientList.uuid] === undefined}
+                    labelText={patientList.name}
+                    id={patientList.uuid}
+                  />
+                </div>
               ))
             ) : (
               <p className={styles.bodyLong01}>No patient list found</p>

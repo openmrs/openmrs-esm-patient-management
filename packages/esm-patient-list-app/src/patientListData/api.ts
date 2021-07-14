@@ -1,8 +1,8 @@
-import { Location, OpenmrsResource } from '@openmrs/esm-api';
+import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import { PATIENT_LIST_TYPE } from './types';
 
 async function postData(url = '', data = {}) {
-  const response = await fetch(url, {
+  const response = await openmrsFetch(url, {
     method: 'POST',
     mode: 'cors',
     cache: 'no-cache',
@@ -14,7 +14,7 @@ async function postData(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   });
-  return response.json();
+  return response.data;
 }
 
 export interface OpenmrsCohort {
@@ -50,26 +50,33 @@ export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: bo
   }: {
     results: Array<OpenmrsCohort>;
     error: Error;
-  } = await (await fetch('/openmrs/ws/rest/v1/cohortm/cohort?v=default')).json();
+  } = await (
+    await openmrsFetch<{ results: Array<OpenmrsCohort>; error: Error }>('/openmrs/ws/rest/v1/cohortm/cohort?v=default')
+  ).data;
 
   if (error) throw error;
 
   return results;
 }
 
-async function getPatientListMembers(cohortUuid: string) {
+export async function getPatientListMembers(cohortUuid: string) {
   const {
     results,
     error,
   }: {
     results: Array<OpenmrsCohortMember>;
     error: Error;
-  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?cohort=${cohortUuid}&v=default`)).json();
+  } = await (
+    await openmrsFetch<{
+      results: Array<OpenmrsCohortMember>;
+      error: Error;
+    }>(`/openmrs/ws/rest/v1/cohortm/cohortmember?cohort=${cohortUuid}&v=default`)
+  ).data;
 
   if (error) throw error;
 
   const patients: Array<OpenmrsResource> = (
-    await fetch('/openmrs/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','), {
+    await openmrsFetch('/openmrs/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','), {
       method: 'POST',
     }).then((res) => res.json())
   ).entry.map((e) => e.resource);
@@ -84,7 +91,11 @@ export async function getPatientListsForPatient(patientUuid: string) {
   }: {
     results: Array<OpenmrsCohortMember>;
     error: Error;
-  } = await (await fetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
+  } = await (
+    await openmrsFetch<{ results: Array<OpenmrsCohortMember>; error: Error }>(
+      `/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`,
+    )
+  ).data;
 
   if (error) throw error;
 
@@ -104,13 +115,3 @@ export async function createPatientList(cohort: { name: string }) {
     groupCohort: true,
   });
 }
-
-globalThis.api = {
-  createPatientList,
-  addPatientToList,
-  getPatientListMembers,
-  getAllPatientLists,
-  getPatientListsForPatient,
-};
-
-export default globalThis.api;
