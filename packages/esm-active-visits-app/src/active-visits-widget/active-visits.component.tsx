@@ -124,12 +124,13 @@ const ActiveVisitsTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.slice(lowerBound, upperBound).map((row) => (
+                {rows.slice(lowerBound, upperBound).map((row, ind) => (
                   <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                    {row.cells.map((cell, ind) => (
+                    {row.cells.map((cell) => (
                       <TableCell key={cell.id}>
                         {cell.info.header === 'name' ? (
-                          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${activeVisits[ind].patientUuid}/chart/`}>
+                          <ConfigurableLink
+                            to={`\${openmrsSpaBase}/patient/${activeVisits[lowerBound + ind].patientUuid}/chart/`}>
                             {cell.value}
                           </ConfigurableLink>
                         ) : (
