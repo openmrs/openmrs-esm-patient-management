@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Checkbox from 'carbon-components-react/lib/components/Checkbox';
@@ -9,12 +9,11 @@ import styles from './add-patient-to-list.scss';
 import { OpenmrsCohort, addPatientToList, getPatientListsForPatient } from '../patientListData/api';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
-import { useCallback } from 'react';
 
 const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const { loading, data } = usePatientListData(undefined, undefined, undefined, searchValue);
+  const { loading, data } = usePatientListData(undefined, undefined, undefined, undefined);
   const [selectedLists, setSelectedList] = useState({});
 
   useEffect(() => {
@@ -24,9 +23,21 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
         lists[patientList.uuid] = false;
       });
     }
-    getPatientListsForPatient(patientUuid).then((res) => console.log(res));
     setSelectedList(lists);
   }, [data]);
+
+  const searchResults = useMemo(() => {
+    if (data) {
+      if (searchValue && searchValue.trim() !== '') {
+        const search = searchValue.toLowerCase();
+        return data.filter((patientList) => patientList.name.toLowerCase().includes(search));
+      } else {
+        return data;
+      }
+    } else {
+      return [];
+    }
+  }, [searchValue, data]);
 
   const handleChange = useCallback((uuid, e) => {
     setSelectedList((selectedLists) => ({
@@ -74,14 +85,14 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
       <div className={styles.patientListList}>
         <fieldset className="bx--fieldset">
           <p className="bx--label">Patient Lists</p>
-          {!loading && data ? (
-            data.length > 0 ? (
-              data.map((patientList, ind) => (
+          {!loading && searchResults ? (
+            searchResults.length > 0 ? (
+              searchResults.map((patientList, ind) => (
                 <div key={ind} className={styles.checkbox}>
                   <Checkbox
                     key={ind}
                     onChange={(e) => handleChange(patientList.uuid, e)}
-                    checked={selectedLists[patientList.uuid] === undefined}
+                    checked={selectedLists[patientList.uuid]}
                     labelText={patientList.name}
                     id={patientList.uuid}
                   />
