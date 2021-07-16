@@ -13,17 +13,25 @@ import { toOmrsIsoString } from '@openmrs/esm-framework';
 const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const { loading, data } = usePatientListData(undefined, undefined, undefined, undefined);
+  const { loading, data } = usePatientListData(undefined);
   const [selectedLists, setSelectedList] = useState({});
 
   useEffect(() => {
-    const lists = {};
     if (data) {
+      const lists = {};
       data.map((patientList) => {
-        lists[patientList.uuid] = false;
+        lists[patientList.uuid] = {
+          visible: true,
+          selected: false,
+        };
+      });
+      getPatientListsForPatient(patientUuid).then((enrolledPatientLists) => {
+        enrolledPatientLists.forEach((patientList) => {
+          lists[patientList.cohort.uuid].visible = false;
+        });
+        setSelectedList(lists);
       });
     }
-    setSelectedList(lists);
   }, [data]);
 
   const searchResults = useMemo(() => {
@@ -42,21 +50,24 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
   const handleChange = useCallback((uuid, e) => {
     setSelectedList((selectedLists) => ({
       ...selectedLists,
-      [uuid]: e,
+      [uuid]: {
+        ...selectedLists[uuid],
+        selected: e,
+      },
     }));
   }, []);
 
   const handleSubmit = useCallback(() => {
-    data.map((patientList) => {
-      if (selectedLists[patientList.uuid]) {
+    Object.keys(selectedLists).forEach((patientListUuid) => {
+      if (selectedLists[patientListUuid].selected) {
         addPatientToList({
           patient: patientUuid,
-          cohort: patientList.uuid,
+          cohort: patientListUuid,
           startDate: toOmrsIsoString(new Date()),
         });
       }
     });
-  }, []);
+  }, [selectedLists]);
 
   return (
     <div className={styles.modalContent}>
@@ -87,17 +98,20 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
           <p className="bx--label">Patient Lists</p>
           {!loading && searchResults ? (
             searchResults.length > 0 ? (
-              searchResults.map((patientList, ind) => (
-                <div key={ind} className={styles.checkbox}>
-                  <Checkbox
-                    key={ind}
-                    onChange={(e) => handleChange(patientList.uuid, e)}
-                    checked={selectedLists[patientList.uuid]}
-                    labelText={patientList.name}
-                    id={patientList.uuid}
-                  />
-                </div>
-              ))
+              searchResults.map(
+                (patientList, ind) =>
+                  selectedLists[patientList.uuid]?.visible && (
+                    <div key={ind} className={styles.checkbox}>
+                      <Checkbox
+                        key={ind}
+                        onChange={(e) => handleChange(patientList.uuid, e)}
+                        checked={selectedLists[patientList.uuid]?.selected}
+                        labelText={patientList.name}
+                        id={patientList.uuid}
+                      />
+                    </div>
+                  ),
+              )
             ) : (
               <p className={styles.bodyLong01}>No patient list found</p>
             )
