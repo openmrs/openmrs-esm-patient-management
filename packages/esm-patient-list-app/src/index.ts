@@ -1,5 +1,7 @@
 import { getAsyncLifecycle } from '@openmrs/esm-framework';
 import { registerBreadcrumbs } from '@openmrs/esm-framework';
+import './offline/offlineData';
+import './patientListData/api';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -8,7 +10,6 @@ const backendDependencies = {
 const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
-
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-patient-list-app';
@@ -48,6 +49,22 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./patient-list-link'), options),
         online: true,
         offline: true,
+      },
+      {
+        id: 'add-patient-to-patient-list-button',
+        slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./patient-list-action'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
+        id: 'add-patient-to-patient-list-modal',
+        // slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./AddPatientToList'), {
+          featureName: 'patient-actions-modal',
+          moduleName,
+        }),
       },
     ],
   };

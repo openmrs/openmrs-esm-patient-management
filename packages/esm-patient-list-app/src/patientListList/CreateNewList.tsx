@@ -4,11 +4,10 @@ import TextArea from 'carbon-components-react/lib/components/TextArea';
 import TextInput from 'carbon-components-react/lib/components/TextInput';
 import React from 'react';
 
-import { createPatientList } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import Overlay from '../Overlay';
 import { useTranslation } from 'react-i18next';
-
+import { createPatientList } from '../patientListData/api';
 const items = [
   {
     id: 'age',
@@ -31,7 +30,10 @@ const CreateNewList: React.FC<{ close: () => void; finished: () => void }> = ({ 
 
   const createPL = React.useCallback(() => {
     // set loading
-    createPatientList(nameInputRef.current.value, decriptionInputRef.current.value, PATIENT_LIST_TYPE.USER).then(() => {
+    createPatientList({
+      name: nameInputRef.current.value,
+      // , decription: decriptionInputRef.current.value
+    }).then(() => {
       finished();
       close();
     });

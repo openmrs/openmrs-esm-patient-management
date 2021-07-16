@@ -38,6 +38,7 @@
     "@carbon/icons-react": "^10.18.0",
     "carbon-components-react": "^7.25.0",
     "d3": "^5.16.0",
+    "dexie": "^3.0.3",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
