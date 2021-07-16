@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Checkbox from 'carbon-components-react/lib/components/Checkbox';
@@ -6,14 +6,22 @@ import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
 import styles from './add-patient-to-list.scss';
 
-import { OpenmrsCohort, addPatientToList } from '../patientListData/api';
+import { addPatientToList } from '../patientListData/api';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
 
-const CheckboxedPatientList = ({ name, uuid, checked, handleChange }) => {
+interface CheckboxedPatientListProps {
+  name: string;
+  uuid: string;
+  checked: boolean;
+  handleChange: (uuid: string, e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const CheckboxedPatientList: React.FC<CheckboxedPatientListProps> = ({ name, uuid, checked, handleChange }) => {
+  const onChange = React.useCallback((e) => handleChange(uuid, e), [uuid]);
   return (
     <div className={styles.checkbox}>
-      <Checkbox checked={checked} labelText={name} id={uuid} onChange={(e) => handleChange(uuid, e)} />
+      <Checkbox checked={checked} labelText={name} id={uuid} onChange={onChange} />
     </div>
   );
 };
@@ -22,9 +30,9 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = React.useState('');
   const { loading, data } = usePatientListData(undefined, undefined, undefined, searchValue);
-  const [selectedLists, setSelectedList] = useState({});
+  const [selectedLists, setSelectedList] = React.useState({});
 
-  useEffect(() => {
+  React.useEffect(() => {
     const lists = {};
     if (data) {
       data.map((patientList, ind) => {
@@ -34,14 +42,14 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
     setSelectedList(lists);
   }, [data]);
 
-  const handleChange = (uuid, e) => {
+  const handleChange = React.useCallback((uuid, e) => {
     setSelectedList((selectedLists) => ({
       ...selectedLists,
       [uuid]: e,
     }));
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = React.useCallback(() => {
     data.map((patientList) => {
       if (selectedLists[patientList.uuid]) {
         addPatientToList({
@@ -51,7 +59,7 @@ const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ clos
         });
       }
     });
-  };
+  }, []);
 
   return (
     <div className={styles.modalContent}>

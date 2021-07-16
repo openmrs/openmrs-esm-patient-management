@@ -30,7 +30,7 @@ export function usePatientListData(redo: any, ...args: Parameters<typeof getAllP
   return data;
 }
 
-export function useSingePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
+export function useSinglePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
   const [data, setData] = React.useState<State<Array<PatientListMember>>>({
     loading: true,
     data: undefined,

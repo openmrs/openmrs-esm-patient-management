@@ -51,10 +51,18 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'add-patient-to-patient-list',
+        id: 'add-patient-to-patient-list-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./patient-list-action'), {
           featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
+        id: 'add-patient-to-patient-list-modal',
+        // slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./AddPatientToList'), {
+          featureName: 'patient-actions-modal',
           moduleName,
         }),
       },
