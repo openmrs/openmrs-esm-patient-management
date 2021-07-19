@@ -24,7 +24,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           id: index,
         };
         columns.forEach((column) => {
-          const value = column.getValue ? column.getValue(patient) : patient[column.key];
+          const value = column.getValue?.(patient) || patient[column.key];
           row[column.key] = column.link ? (
             <Link
               onClick={(e) => {
