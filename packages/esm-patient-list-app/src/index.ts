@@ -1,5 +1,4 @@
-import { getAsyncLifecycle } from '@openmrs/esm-framework';
-import { registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import './offline/offlineData';
 import './patientListData/api';
 
@@ -65,6 +64,15 @@ function setupOpenMRS() {
           featureName: 'patient-actions-modal',
           moduleName,
         }),
+      },
+      {
+        id: 'patient-table',
+        load: getAsyncLifecycle(() => import('./PatientTable/patient-table.component'), {
+          featureName: 'patient-table',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
       },
     ],
   };
