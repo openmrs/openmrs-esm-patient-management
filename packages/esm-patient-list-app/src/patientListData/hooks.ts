@@ -1,16 +1,16 @@
-import React from 'react';
-import { getPatientListMembers } from './mock';
-import { PatientListBase, PatientListMember, State } from './types';
+import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
+import { getPatientListMembers } from './mock';
+import { PatientListMember, State } from './types';
 
 export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
-  const [data, setData] = React.useState<State<Array<OpenmrsCohort & { id: string }>>>({
+  const [data, setData] = useState<State<Array<OpenmrsCohort & { id: string }>>>({
     loading: true,
     data: undefined,
     error: undefined,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setData({
       loading: true,
       data: undefined,
@@ -31,13 +31,13 @@ export function usePatientListData(redo: any, ...args: Parameters<typeof getAllP
 }
 
 export function useSinglePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
-  const [data, setData] = React.useState<State<Array<PatientListMember>>>({
+  const [data, setData] = useState<State<Array<PatientListMember>>>({
     loading: true,
     data: undefined,
     error: undefined,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     setData({
       loading: true,
       data: undefined,

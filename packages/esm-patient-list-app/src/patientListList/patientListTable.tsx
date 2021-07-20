@@ -21,15 +21,25 @@ const defaultHeaders = [
   { key: 'isStarred', header: '' },
 ];
 
-const PatientListTable: React.FC<{
+interface PatientListTableProps {
   patientData: ReturnType<typeof usePatientListData>['data'];
   setListStarred: (listUuid: string, star: boolean) => void;
   headers?: Array<{ key: string; header: string }>;
   style?: CSSProperties;
   loading?: boolean;
   openPatientList: (uuid: string) => void;
-}> = ({ patientData, setListStarred, headers = defaultHeaders, style, loading = false, openPatientList }) => {
+}
+
+const PatientListTable: React.FC<PatientListTableProps> = ({
+  patientData,
+  setListStarred,
+  headers = defaultHeaders,
+  style,
+  loading = false,
+  openPatientList,
+}) => {
   const { t } = useTranslation();
+
   return !loading ? (
     <DataTable rows={patientData} headers={headers}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (

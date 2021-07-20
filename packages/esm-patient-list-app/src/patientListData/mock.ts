@@ -6,9 +6,11 @@ import {
   PATIENT_LIST_TYPE,
   PatientListMemberFilter,
 } from './types';
-function sleep(time) {
+
+function sleep(time: number) {
   return new Promise<void>((res) => setTimeout(() => res(), time));
 }
+
 export function newUuid() {
   return Math.random().toString(36).split('.')[1] + Math.random().toString(36).split('.')[1];
 }
@@ -70,6 +72,7 @@ export function getAllPatientListsWithPatient(
     return res;
   });
 }
+
 export function getPatientListMembers(listUuid: PatientListUuid, filters?: Array<PatientListMemberFilter>) {
   return sleep(DELAY).then(() => patientListMembers.get(listUuid)) as Promise<Array<PatientListMember>>;
 }
@@ -112,12 +115,14 @@ export function updatePatientListDetails(
     });
   });
 }
+
 export function deletePatientList(uuid: PatientListUuid) {
   return sleep(DELAY).then(() => {
     patientLists.delete(uuid);
     patientListMembers.delete(uuid);
   });
 }
+
 export function addPatientToPatientList(patientUuid: PatientUuid, listUuid: PatientListUuid) {
   return sleep(DELAY).then(() => {
     const members = patientListMembers.get(listUuid);

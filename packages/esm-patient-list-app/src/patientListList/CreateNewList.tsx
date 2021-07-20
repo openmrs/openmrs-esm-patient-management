@@ -1,13 +1,12 @@
+import React from 'react';
 import Button from 'carbon-components-react/lib/components/Button';
 import MultiSelect from 'carbon-components-react/lib/components/MultiSelect';
 import TextArea from 'carbon-components-react/lib/components/TextArea';
 import TextInput from 'carbon-components-react/lib/components/TextInput';
-import React from 'react';
-
-import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import Overlay from '../Overlay';
 import { useTranslation } from 'react-i18next';
 import { createPatientList } from '../patientListData/api';
+
 const items = [
   {
     id: 'age',
@@ -23,7 +22,12 @@ const items = [
   },
 ];
 
-const CreateNewList: React.FC<{ close: () => void; finished: () => void }> = ({ close, finished }) => {
+interface CreateNewListProps {
+  close: () => void;
+  finished: () => void;
+}
+
+const CreateNewList: React.FC<CreateNewListProps> = ({ close, finished }) => {
   const { t } = useTranslation();
   const nameInputRef = React.useRef<HTMLInputElement>();
   const decriptionInputRef = React.useRef<HTMLTextAreaElement>();

@@ -1,5 +1,6 @@
+import React, { useMemo, CSSProperties } from 'react';
 import { navigate } from '@openmrs/esm-framework';
-import { Link } from 'carbon-components-react';
+import Link from 'carbon-components-react/es/components/Link';
 import DataTable, {
   Table,
   TableBody,
@@ -12,9 +13,37 @@ import DataTable, {
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
 import Search from 'carbon-components-react/lib/components/Search';
-import { debounce } from 'lodash';
-import React, { useMemo, CSSProperties } from 'react';
+import debounce from 'lodash-es/debounce';
 import styles from './patient-table.component.scss';
+
+interface PatientTableProps {
+  patients: Array<Object>;
+  columns: Array<PatientTableColumn>;
+  style?: CSSProperties;
+  autoFocus?: boolean;
+  isLoading: boolean;
+  search: {
+    onSearch(searchTerm: string): any;
+    placeHolder: string;
+    currentSearchTerm?: string;
+  };
+  pagination: {
+    usePagination: boolean;
+    currentPage: number;
+    onChange(props: any): any;
+    pageSize: number;
+    totalItems: number;
+  };
+}
+
+interface PatientTableColumn {
+  key: string;
+  header: string;
+  getValue?(patient: any): any;
+  link?: {
+    getUrl(patient: any): string;
+  };
+}
 
 const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, pagination, isLoading, autoFocus }) => {
   const rows: Array<any> = useMemo(
@@ -108,33 +137,5 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
     </>
   );
 };
-
-interface PatientTableProps {
-  patients: Array<Object>;
-  columns: Array<PatientTableColumn>;
-  style?: CSSProperties;
-  autoFocus?: boolean;
-  isLoading: boolean;
-  search: {
-    onSearch(searchTerm: string): any;
-    placeHolder: string;
-    currentSearchTerm?: string;
-  };
-  pagination: {
-    usePagination: boolean;
-    currentPage: number;
-    onChange(props: any): any;
-    pageSize: number;
-    totalItems: number;
-  };
-}
-export interface PatientTableColumn {
-  key: string;
-  header: string;
-  getValue?(patient: any): any;
-  link?: {
-    getUrl(patient: any): string;
-  };
-}
 
 export default PatientTable;

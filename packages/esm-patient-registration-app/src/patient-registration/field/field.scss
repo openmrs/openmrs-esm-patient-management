@@ -1,4 +1,6 @@
-@import "../../root.scss";
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+
 .productiveHeading02 {
     @include carbon--type-style("productive-heading-02");
     margin-bottom: 1rem;

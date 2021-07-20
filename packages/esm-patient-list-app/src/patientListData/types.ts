@@ -21,6 +21,7 @@ export interface PatientListOption {
   name: string;
   value: any;
 }
+
 /**
  * identifier -> uuid
  * age
@@ -28,7 +29,6 @@ export interface PatientListOption {
  * date of birth
  * last visit -> last visit/encounter date
  */
-
 export interface PatientListMember {
   patientUuid: string;
   properies: Array<PatientListMemberProperty>;
@@ -43,19 +43,19 @@ export interface PatientListMemberFilter {
   // ??
 }
 
-interface LoadingState {
+export interface LoadingState {
   loading: true;
   data: undefined;
   error: undefined;
 }
 
-interface DataState<T> {
+export interface DataState<T> {
   loading: false;
   data: T;
   error: undefined;
 }
 
-interface ErrorState {
+export interface ErrorState {
   loading: false;
   data: undefined;
   error: Error;

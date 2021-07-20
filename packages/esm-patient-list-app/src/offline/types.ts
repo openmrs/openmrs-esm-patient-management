@@ -1,29 +1,30 @@
-interface LoadingState {
+export interface LoadingState {
   type: 'LOADING';
 }
 
-interface LoadedState {
+export interface LoadedState {
   type: 'LOADED';
   date: Date;
 }
 
-interface ReloadingState {
+export interface ReloadingState {
   type: 'RELOADING';
   date: Date;
 }
 
-interface LoadingErrorState {
+export interface LoadingErrorState {
   type: 'LOADING_ERROR';
   error: Error;
 }
 
-interface ReloadingErrorState {
+export interface ReloadingErrorState {
   type: 'RELOADING_ERROR';
   error: Error;
   date: Date;
 }
 
 export type LoadState = LoadingState | LoadedState | LoadingErrorState | ReloadingState | ReloadingErrorState;
+
 export type LoadStateType = LoadState['type'];
 
 export interface OfflinePatient {

@@ -23,7 +23,6 @@ import { LoadState, OfflinePatient } from './types';
  * - retrieving the list of patients
  * - retrieving the list of handlers (should not change after the setup)
  */
-
 interface PatientHandlerObject {
   onLoadPatient: (patientUuid: string, onSuccess: () => void, onError: (err: Error) => void) => void;
   onRemovePatient: (patientUuid: string) => void;

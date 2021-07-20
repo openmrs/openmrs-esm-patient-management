@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { usePatientListData } from '../patientListData';
+import { useTranslation } from 'react-i18next';
+import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Checkbox from 'carbon-components-react/lib/components/Checkbox';
-import { usePatientListData } from '../patientListData';
-import { useTranslation } from 'react-i18next';
+import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import styles from './add-patient-to-list.scss';
 
-import { OpenmrsCohort, addPatientToList, getPatientListsForPatient } from '../patientListData/api';
-import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import { toOmrsIsoString } from '@openmrs/esm-framework';
+interface AddPatientProps {
+  close: () => void;
+  patientUuid: string;
+}
 
-const AddPatient: React.FC<{ close: () => void; patientUuid: string }> = ({ close, patientUuid }) => {
+const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const { loading, data } = usePatientListData(undefined);

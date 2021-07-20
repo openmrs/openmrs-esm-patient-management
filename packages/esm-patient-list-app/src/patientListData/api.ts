@@ -1,5 +1,4 @@
-import { Location, OpenmrsResource } from '@openmrs/esm-api';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import { PATIENT_LIST_TYPE } from './types';
 
 async function postData(url = '', data = {}) {
@@ -58,7 +57,7 @@ export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: bo
   return results;
 }
 
-async function getPatientListMembers(cohortUuid: string) {
+export async function getPatientListMembers(cohortUuid: string) {
   const {
     results,
     error,

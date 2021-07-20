@@ -1,27 +1,18 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/lib/components/Button';
-import { ExtensionSlot } from '@openmrs/esm-framework';
-
-import { getAllPatientLists, usePatientListData } from '../patientListData';
-// Yet to be built
-// import { updatePatientListDetails } from '../patientListData';
-
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import PatientListTable from './patientListTable';
-import { PATIENT_LIST_TYPE } from '../patientListData/types';
-import './style.scss';
 import CreateNewList from './CreateNewList';
 import PatientList from '../PatientList';
 import SearchOverlay from './SearchOverlay';
-
-export enum StateTypes {
-  IDLE,
-  SEARCH,
-  SEARCH_WITH_RESULTS,
-}
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import { getAllPatientLists, usePatientListData } from '../patientListData';
+import { PATIENT_LIST_TYPE } from '../patientListData/types';
+import { SearchState, StateTypes, ViewState } from './types';
+import './style.scss';
 
 enum TabTypes {
   STARRED,
@@ -31,21 +22,6 @@ enum TabTypes {
 }
 
 const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
-
-interface IdleState {
-  type: StateTypes.IDLE;
-}
-interface SearchState {
-  type: StateTypes.SEARCH;
-  searchTerm: string;
-}
-interface SearchStateWithResults extends Omit<SearchState, 'type'> {
-  type: StateTypes.SEARCH_WITH_RESULTS;
-  results: Array<any>;
-  enter: Object;
-}
-
-export type ViewState = IdleState | SearchState | SearchStateWithResults;
 
 const headersWithoutType = [
   { key: 'display', header: 'List Name' },
@@ -79,9 +55,11 @@ enum RouteStateTypes {
 interface AllListRouteState {
   type: RouteStateTypes.ALL_LISTS;
 }
+
 interface CreateNewListState {
   type: RouteStateTypes.CREATE_NEW_LIST;
 }
+
 interface SingleListState {
   type: RouteStateTypes.SINGLE_LIST;
   listUuid: string;

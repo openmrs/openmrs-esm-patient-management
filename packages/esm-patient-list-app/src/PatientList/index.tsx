@@ -1,16 +1,25 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import Overlay from '../Overlay';
+import { useTranslation } from 'react-i18next';
 import { useSinglePatientListData } from '../patientListData';
 
-const PatientList: React.FC<{ close: () => void; listUuid: string }> = ({ close, listUuid }) => {
+export interface PatientListProps {
+  close: () => void;
+  listUuid: string;
+}
+
+const PatientList: React.FC<PatientListProps> = ({ close, listUuid }) => {
   const { data } = useSinglePatientListData(false, listUuid);
   const { t } = useTranslation();
 
   return (
-    <Overlay close={close} header={'patient list'}>
+    <Overlay close={close} header={t('patientListHeader', 'patient list')}>
       <p>{listUuid}</p>
-      <p>patient list goes here</p>
+      <ul>
+        {data.map((item) => (
+          <li key={item.patientUuid}>{item.patientUuid}</li>
+        ))}
+      </ul>
     </Overlay>
   );
 };

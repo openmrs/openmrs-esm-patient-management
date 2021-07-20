@@ -3,13 +3,21 @@ import { useTranslation } from 'react-i18next';
 import { usePatientListData } from '../patientListData';
 import PatientListTable from './patientListTable';
 
-const PatientListResults: React.FC<{
+interface PatientListResultsProps {
   nameFilter?: string;
   setListStarred: (listUuid: string, star: boolean) => void;
   style?: CSSProperties;
   enter: Object;
   openPatientList: (uuid: string) => void;
-}> = ({ nameFilter, setListStarred, style, enter, openPatientList }) => {
+}
+
+const PatientListResults: React.FC<PatientListResultsProps> = ({
+  nameFilter,
+  setListStarred,
+  style,
+  enter,
+  openPatientList,
+}) => {
   const { t } = useTranslation();
   const [filter, setFilter] = React.useState<string>();
   const { data: data, loading } = usePatientListData(undefined, undefined, undefined, filter);

@@ -1,6 +1,5 @@
 import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import './offline/offlineData';
-import './patientListData/api';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -9,6 +8,7 @@ const backendDependencies = {
 const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-patient-list-app';
@@ -16,9 +16,11 @@ const options = {
   featureName: 'patient list',
   moduleName,
 };
-const spaBasePath = `${window.spaBase}/patient-list`;
 
 function setupOpenMRS() {
+  const route = `patient-list`;
+  const spaBasePath = `${window.spaBase}/${route}`;
+
   registerBreadcrumbs([
     {
       path: spaBasePath,
@@ -36,7 +38,7 @@ function setupOpenMRS() {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./patientListList'), options),
-        route: (location: Location) => location.pathname.startsWith(window.getOpenmrsSpaBase() + 'patient-list'),
+        route,
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },
       },
@@ -59,7 +61,6 @@ function setupOpenMRS() {
       },
       {
         id: 'add-patient-to-patient-list-modal',
-        // slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./AddPatientToList'), {
           featureName: 'patient-actions-modal',
           moduleName,

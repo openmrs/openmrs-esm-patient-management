@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import AddPatientToList from './AddPatientToList';
 import { showModal } from '@openmrs/esm-framework';
+
 interface AddPastVisitOverflowMenuItemProps {}
 
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {

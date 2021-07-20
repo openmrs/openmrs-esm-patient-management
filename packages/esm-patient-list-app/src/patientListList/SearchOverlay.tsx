@@ -1,12 +1,14 @@
 import React from 'react';
-import { ViewState, StateTypes } from './index';
 import PatientListResults from './PatientListResults';
+import { ViewState, StateTypes } from './types';
 
-const SearchOverlay: React.FC<{
+interface SearchOverlayProps {
   viewState: ViewState;
   setListStarred: (listUuid: string, star: boolean) => void;
   openPatientList: (uuid: string) => void;
-}> = ({ viewState, setListStarred, openPatientList }) => {
+}
+
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ viewState, setListStarred, openPatientList }) => {
   switch (viewState.type) {
     case StateTypes.SEARCH:
       return (
