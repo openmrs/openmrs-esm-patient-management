@@ -83,7 +83,7 @@ export async function getPatientListsForPatient(patientUuid: string) {
     results,
     error,
   }: {
-    results: Array<OpenmrsCohortMember>;
+    results: Array<{ cohort: OpenmrsCohortMember }>;
     error: Error;
   } = await (await openmrsFetch(`/openmrs/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
 
