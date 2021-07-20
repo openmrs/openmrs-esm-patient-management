@@ -9,3 +9,9 @@
     margin-bottom: 1rem;
     color: #525252;
 }
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
+}

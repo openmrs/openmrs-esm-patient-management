@@ -113,7 +113,6 @@ class OfflinePatientDatabase extends Dexie {
       );
     });
     const patient = await this.offlinePatients.where({ uuid: patientUuid }).first();
-    let updatePromise;
 
     if (patient) {
       const lastUpdate: OfflinePatient['lastUpdate'] = Object.fromEntries(
@@ -124,24 +123,24 @@ class OfflinePatientDatabase extends Dexie {
       );
       if (!patient.interestedUsers.includes(this.currentUser)) {
         // adding current user as interested
-        updatePromise = db.offlinePatients.put(
+        await db.offlinePatients.put(
           { ...patient, lastUpdate, interestedUsers: [...patient.interestedUsers, this.currentUser] },
           patient.uuid,
         );
       } else {
         // reloading
-        updatePromise = db.offlinePatients.put({ ...patient, lastUpdate }, patient.uuid);
+        await db.offlinePatients.put({ ...patient, lastUpdate }, patient.uuid);
       }
     } else {
       // creating patient entry
-      updatePromise = this.offlinePatients.add({
+      await this.offlinePatients.add({
         uuid: patientUuid,
         name,
         lastUpdate: Object.fromEntries(getOfflineHandlers().map((handlerUuid) => [handlerUuid, { type: 'LOADING' }])),
         interestedUsers: [this.currentUser],
       });
     }
-    updatePromise.then(() => this.handleDBChange());
+    this.handleDBChange();
   }
 
   /**
@@ -221,19 +220,10 @@ class OfflinePatientDatabase extends Dexie {
 const db = new OfflinePatientDatabase();
 
 export default {
-  addPatient: db.addPatient,
-  reloadPatient: db.addPatient,
-  removePatient: db.removePatient,
-  subscribe: db.subscribe,
-  getPatientData: db.getPatientData,
+  addPatient: db.addPatient.bind(db),
+  reloadPatient: db.addPatient.bind(db),
+  removePatient: db.removePatient.bind(db),
+  subscribe: db.subscribe.bind(db),
+  getPatientData: db.getPatientData.bind(db),
   getOfflineHandlers,
 };
-
-globalThis.db = db;
-globalThis.store = patientStore;
-globalThis.addPatientHandler = addPatientHandler;
-
-addPatientHandler('test-handler', {
-  onLoadPatient: (uuid) => console.log('onLoadPatient', uuid),
-  onRemovePatient: (uuid) => console.log('onRemovePatient', uuid),
-});

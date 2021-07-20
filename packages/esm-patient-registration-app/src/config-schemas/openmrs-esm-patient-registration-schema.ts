@@ -27,8 +27,8 @@ export const esmPatientRegistrationSchema = {
       },
     },
     _default: {
-      demographics: { name: 'Basic Info', fields: ['name', 'gender', 'dob', 'id'] },
-      contact: { name: 'Contact Details', fields: ['address', 'phone', 'email'] },
+      demographics: { name: 'Basic Info', fields: ['name', 'gender & dob', 'id'] },
+      contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
     },

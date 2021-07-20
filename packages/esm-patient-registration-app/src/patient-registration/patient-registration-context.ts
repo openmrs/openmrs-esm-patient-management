@@ -1,5 +1,5 @@
-import React from 'react';
-import { FormValues } from './patient-registration-types';
+import React, { SetStateAction } from 'react';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 
 type PatientRegistrationContextProps = {
   identifierTypes: Array<any>;
@@ -9,6 +9,8 @@ type PatientRegistrationContextProps = {
   inEditMode: boolean;
   fieldConfigs: Record<string, any>;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
+  setCapturePhotoProps: (value: SetStateAction<CapturePhotoProps>) => void;
+  currentPhoto: string;
 };
 
 export const PatientRegistrationContext = React.createContext<PatientRegistrationContextProps | undefined>(undefined);

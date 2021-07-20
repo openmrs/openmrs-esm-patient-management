@@ -1,5 +1,4 @@
-import { getAsyncLifecycle } from '@openmrs/esm-framework';
-import { registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import './offline/offlineData';
 import './patientListData/api';
 
@@ -51,12 +50,29 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'add-patient-to-patient-list',
+        id: 'add-patient-to-patient-list-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./patient-list-action'), {
           featureName: 'patient-actions-slot',
           moduleName,
         }),
+      },
+      {
+        id: 'add-patient-to-patient-list-modal',
+        // slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./AddPatientToList'), {
+          featureName: 'patient-actions-modal',
+          moduleName,
+        }),
+      },
+      {
+        id: 'patient-table',
+        load: getAsyncLifecycle(() => import('./PatientTable/patient-table.component'), {
+          featureName: 'patient-table',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
       },
     ],
   };

@@ -8,7 +8,6 @@ export const PhoneField: React.FC = () => {
 
   return (
     <div>
-      <h4 className={styles.productiveHeading02Light}>{t('phoneLabelText', 'Phone')}</h4>
       <Input
         id="phone"
         name="phone"
