@@ -1,32 +1,31 @@
 :global(.deactivate-tabs-content) {
-    display: none;
+  display: none;
 }
 
 :global(.bx--data-table-container) {
-    padding: 1rem;
+  padding: 1rem;
 }
 
 title {
-    width: 6.938rem;
-    height: 1.75rem;
-    margin: 0.438rem 22.875rem 0.813rem 0;
-    font-family: IBMPlexSans;
-    font-size: 1.25rem;
-    font-weight: normal;
-    font-stretch: normal;
-    font-style: normal;
-    line-height: 1.4;
-    letter-spacing: normal;
-    // color: var(--color-gray-100);
+  width: 6.938rem;
+  height: 1.75rem;
+  margin: 0.438rem 22.875rem 0.813rem 0;
+  font-family: IBMPlexSans;
+  font-size: 1.25rem;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.4;
+  letter-spacing: normal;
 }
 
 :global(.bx--skeleton):global(.bx--data-table-container) {
-    background-color: transparent;
-    padding: 0rem;
-    margin: 1rem;
-    overflow: hidden;
+  background-color: transparent;
+  padding: 0rem;
+  margin: 1rem;
+  overflow: hidden;
 
-    tr {
-        height: 3rem;
-    }
+  tr {
+    height: 3rem;
+  }
 }

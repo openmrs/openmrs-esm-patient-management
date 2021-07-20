@@ -29,6 +29,16 @@ const headersWithoutType = [
   { key: 'isStarred', header: '' },
 ];
 
+function createLabels() {
+  const res = [];
+
+  for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
+    res.push(<Tab label={labelMap[index]} key={index} id={'tab-' + index} />);
+  }
+
+  return res;
+}
+
 const deducePatientFilter = (tabState: TabTypes): Parameters<typeof getAllPatientLists> => {
   switch (tabState) {
     case TabTypes.STARRED:
@@ -176,15 +186,9 @@ const PatientListList: React.FC = () => {
           style={{
             gridColumn: 'span 2',
           }}
-          tabContentClassName={'deactivate-tabs-content'}
+          tabContentClassName="deactivate-tabs-content"
           onSelectionChange={setTabState}>
-          {(() => {
-            const res = [];
-            for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
-              res.push(<Tab label={labelMap[index]} id={'tab-' + index}></Tab>);
-            }
-            return res;
-          })()}
+          {createLabels()}
         </Tabs>
       </div>
       <div style={{ gridRow: '3 / 4', gridColumn: '1 / 2', height: '100%' }}>
