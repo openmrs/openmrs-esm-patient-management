@@ -17,8 +17,11 @@ export function newUuid() {
 
 export function exist(...args: any[]): boolean {
   for (const y of args) {
-    if (y === null || y === undefined) return false;
+    if (y === null || y === undefined) {
+      return false;
+    }
   }
+
   return true;
 }
 
@@ -35,6 +38,7 @@ const patientListMembers = new Map<string, Array<PatientListMember>>();
 export function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: boolean, nameFilter?: string) {
   return sleep(DELAY).then(() => {
     const res: Array<PatientListBase> = [];
+
     for (const pl of patientLists.values()) {
       if (exist(filter) && filter !== pl.type) continue;
       if (exist(stared) && stared !== pl.isStarred) continue;
@@ -60,6 +64,7 @@ export function getAllPatientListsWithPatient(
 ) {
   return sleep(DELAY).then(() => {
     const res: Array<PatientListDetails> = [];
+
     for (const pl of patientLists.values()) {
       if (exist(filter) && filter !== pl.type) continue;
       if (exist(stared) && stared !== pl.isStarred) continue;
@@ -107,7 +112,10 @@ export function updatePatientListDetails(
 ) {
   return sleep(DELAY).then(() => {
     const patientList = patientLists.get(listUuid);
-    if (!patientList) throw new Error('list does not exist');
+
+    if (!patientList) {
+      throw new Error('list does not exist');
+    }
 
     patientLists.set(listUuid, {
       ...patientList,
@@ -126,7 +134,10 @@ export function deletePatientList(uuid: PatientListUuid) {
 export function addPatientToPatientList(patientUuid: PatientUuid, listUuid: PatientListUuid) {
   return sleep(DELAY).then(() => {
     const members = patientListMembers.get(listUuid);
-    if (!members) throw new Error('list does not exist');
+
+    if (!members) {
+      throw new Error('list does not exist');
+    }
 
     members.push({
       patientUuid,
@@ -140,7 +151,6 @@ export function addPatientToPatientList(patientUuid: PatientUuid, listUuid: Pati
 export function deletePatientFromPatientList(patientUuid: PatientUuid, listUuid: PatientListUuid) {
   return sleep(DELAY).then(() => {
     const members = patientListMembers.get(listUuid);
-
     const toBeDeleted = members.findIndex((x) => x.patientUuid === patientUuid);
 
     if (toBeDeleted !== -1) {

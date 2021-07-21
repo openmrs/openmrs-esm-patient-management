@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
-import styles from './patient-registration.scss';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
+import BeforeSavePrompt from './before-save-prompt';
+import styles from './patient-registration.scss';
 import { useLocation, useHistory } from 'react-router-dom';
 import { Formik, Form } from 'formik';
-import { Grid, Row, Column } from 'carbon-components-react/es/components/Grid';
-import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration-types';
-import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm } from './form-manager';
-import BeforeSavePrompt from './before-save-prompt';
-import { fetchPatientPhotoUrl } from './patient-registration.resource';
+import { Grid, Row } from 'carbon-components-react/es/components/Grid';
 import {
   createErrorHandler,
   showToast,
@@ -20,14 +15,18 @@ import {
   navigate,
   interpolateString,
   ExtensionSlot,
-  Extension,
 } from '@openmrs/esm-framework';
-import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { useTranslation } from 'react-i18next';
+import { validationSchema as initialSchema } from './validation/patient-registration-validation';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
+import { PatientRegistrationContext } from './patient-registration-context';
+import { SavePatientForm } from './form-manager';
+import { fetchPatientPhotoUrl } from './patient-registration.resource';
+import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
-import { ResourcesContext } from '../offline.resources';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import { ResourcesContext } from '../offline.resources';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 const getUrlWithoutPrefix = (url) => url.split(window['getOpenmrsSpaBase']())?.[1];
@@ -238,8 +237,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     )}
                     <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
                     {sections.map((section) => (
-                      <div className={`${styles.space05} ${styles.TouchTarget}`} key={section.name}>
-                        <Link className={styles.LinkName} onClick={() => scrollIntoView(section.id)}>
+                      <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
+                        <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
                           <XAxis16 /> {section.name}
                         </Link>
                       </div>

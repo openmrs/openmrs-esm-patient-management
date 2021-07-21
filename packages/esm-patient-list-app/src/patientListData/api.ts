@@ -14,7 +14,7 @@ async function postData(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   });
-  return response.json();
+  return response.data;
 }
 
 export interface OpenmrsCohort {
@@ -32,6 +32,10 @@ export interface OpenmrsCohort {
   voided: boolean;
 }
 
+export interface OpenmrsCohortRef {
+  cohort: OpenmrsCohortMember;
+}
+
 export interface OpenmrsCohortMember {
   attributes: Array<any>;
   description: string;
@@ -43,50 +47,56 @@ export interface OpenmrsCohortMember {
   };
 }
 
+interface CohortRepsonse<T> {
+  results: Array<T>;
+  error: any;
+}
+
 export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: boolean, nameFilter?: string) {
   const {
-    results,
-    error,
-  }: {
-    results: Array<OpenmrsCohort>;
-    error: Error;
-  } = await (await openmrsFetch('/ws/rest/v1/cohortm/cohort?v=default')).json();
+    data: { results, error },
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>('/ws/rest/v1/cohortm/cohort?v=default');
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return results;
 }
 
 export async function getPatientListMembers(cohortUuid: string) {
   const {
-    results,
-    error,
-  }: {
-    results: Array<OpenmrsCohortMember>;
-    error: Error;
-  } = await (await openmrsFetch(`/ws/rest/v1/cohortm/cohortmember?cohort=${cohortUuid}&v=default`)).json();
+    data: { results, error },
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohortMember>>(
+    `/ws/rest/v1/cohortm/cohortmember?cohort=${cohortUuid}&v=default`,
+  );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  const patients: Array<OpenmrsResource> = (
-    await openmrsFetch('/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','), {
+  const resources = await openmrsFetch(
+    '/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','),
+    {
       method: 'POST',
-    }).then((res) => res.json())
-  ).entry.map((e) => e.resource);
+    },
+  ).then((res) => res.data);
+
+  const patients: Array<OpenmrsResource> = resources.entry.map((e) => e.resource);
 
   return patients;
 }
 
 export async function getPatientListsForPatient(patientUuid: string) {
   const {
-    results,
-    error,
-  }: {
-    results: Array<{ cohort: OpenmrsCohortMember }>;
-    error: Error;
-  } = await (await openmrsFetch(`/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`)).json();
+    data: { results, error },
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohortRef>>(
+    `/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`,
+  );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return results;
 }

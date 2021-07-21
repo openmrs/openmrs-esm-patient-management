@@ -70,6 +70,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
       }),
     [patients, columns],
   );
+
   const handleSearch = React.useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
 
   if (isLoading) {
@@ -82,6 +83,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
       />
     );
   }
+
   return (
     <>
       <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>

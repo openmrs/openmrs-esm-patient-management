@@ -3,55 +3,49 @@ import { getAllPatientLists, OpenmrsCohort } from './api';
 import { getPatientListMembers } from './mock';
 import { PatientListMember, State } from './types';
 
+const initialData = {
+  loading: true,
+  data: undefined,
+  error: undefined,
+};
+
+const loadedData = {
+  loading: false,
+  data: undefined,
+  error: undefined,
+};
+
 export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
-  const [data, setData] = useState<State<Array<OpenmrsCohort & { id: string }>>>({
-    loading: true,
-    data: undefined,
-    error: undefined,
-  });
+  const [data, setData] = useState<State<Array<OpenmrsCohort & { id: string }>>>(initialData);
 
   useEffect(() => {
-    setData({
-      loading: true,
-      data: undefined,
-      error: undefined,
-    });
+    setData(initialData);
     getAllPatientLists(...args)
-      .then((y) => {
+      .then((y) =>
         setData({
-          loading: false,
+          ...(loadedData as any),
           data: y.map((x) => ({ ...x, id: x.uuid })),
-          error: undefined,
-        });
-      })
-      .catch((err) => setData({ loading: false, data: undefined, error: err }));
+        }),
+      )
+      .catch((error) => setData({ ...loadedData, error }));
   }, [redo, ...args]);
 
   return data;
 }
 
 export function useSinglePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
-  const [data, setData] = useState<State<Array<PatientListMember>>>({
-    loading: true,
-    data: undefined,
-    error: undefined,
-  });
+  const [data, setData] = useState<State<Array<PatientListMember>>>(initialData);
 
   useEffect(() => {
-    setData({
-      loading: true,
-      data: undefined,
-      error: undefined,
-    });
+    setData(initialData);
     getPatientListMembers(...args)
-      .then((data) => {
+      .then((data) =>
         setData({
-          loading: false,
+          ...(loadedData as any),
           data,
-          error: undefined,
-        });
-      })
-      .catch((err) => setData({ loading: false, data: undefined, error: err }));
+        }),
+      )
+      .catch((error) => setData({ ...loadedData, error }));
   }, [redo, ...args]);
 
   return data;

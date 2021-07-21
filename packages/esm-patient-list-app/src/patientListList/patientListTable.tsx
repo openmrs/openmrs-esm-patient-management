@@ -60,7 +60,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
               </TableRow>
             </TableHead>
             <TableBody style={{ backgroundColor: '#f4f4f4' }}>
-              {rows.map((row, i) => (
+              {rows.map((row) => (
                 <TableRow style={{ height: '3rem' }} key={row.id} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     switch (cell.info.header) {
@@ -73,7 +73,10 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
 
                       case 'isStarred':
                         return (
-                          <TableCell key={cell.id} onClick={() => setListStarred(row.id, !cell.value)}>
+                          <TableCell
+                            key={cell.id}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setListStarred(row.id, !cell.value)}>
                             {cell.value ? <StarFilled16 color="#0f62fe" /> : <Star16 color="#0f62fe" />}
                           </TableCell>
                         );

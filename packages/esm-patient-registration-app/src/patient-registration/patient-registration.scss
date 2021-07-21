@@ -1,7 +1,6 @@
 @import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
-
-$ui-04: #8d8d8d;
+@import "~@openmrs/esm-styleguide/src/vars";
 
 .title {
   color: var(--omrs-color-brand-teal);
@@ -39,26 +38,26 @@ $ui-04: #8d8d8d;
   top: 5rem;
 }
 
-.TouchTarget a:active {
+.touchTarget a:active {
   color: $color-gray-100;
 }
 
-.LinkName {
+.linkName {
   color: $color-gray-70;
   line-height: 1.38;
   font-size: 1rem;
   font-weight: 600;
-}
 
-a.LinkName:active {
-  text-decoration: none;
-  color: $color-gray-100;
-}
+  &:active {
+    text-decoration: none;
+    color: $color-gray-100;
+  }
 
-a.LinkName:hover {
-  text-decoration: none;
-  color: $color-gray-100;
-  cursor: pointer;
+  &:hover {
+    text-decoration: none;
+    color: $color-gray-100;
+    cursor: pointer;
+  }
 }
 
 .main {

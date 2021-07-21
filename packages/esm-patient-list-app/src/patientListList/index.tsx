@@ -8,6 +8,7 @@ import PatientListTable from './patientListTable';
 import CreateNewList from './CreateNewList';
 import PatientList from '../PatientList';
 import SearchOverlay from './SearchOverlay';
+import { useTranslation } from 'react-i18next';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { getAllPatientLists, usePatientListData } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
@@ -24,7 +25,7 @@ enum TabTypes {
 const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
 
 const headersWithoutType = [
-  { key: 'display', header: 'List Name' },
+  { key: 'name', header: 'List Name' },
   { key: 'memberCount', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
@@ -78,13 +79,14 @@ interface SingleListState {
 type RouteState = AllListRouteState | CreateNewListState | SingleListState;
 
 const PatientListList: React.FC = () => {
+  const { t } = useTranslation();
   const [changed, setChanged] = React.useState(false);
   const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
   const [tabState, setTabState] = React.useState(TabTypes.STARRED);
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
   const ref = React.useRef<Search & { input: HTMLInputElement }>();
   const patientFilter = React.useMemo(() => deducePatientFilter(tabState), [tabState]);
-  const { data: patientData, loading } = usePatientListData(changed, ...patientFilter);
+  const { data: patientData, loading, error } = usePatientListData(changed, ...patientFilter);
 
   const customHeaders = React.useMemo(
     () => (tabState === TabTypes.SYSTEM || tabState === TabTypes.USER ? headersWithoutType : undefined),
@@ -92,8 +94,13 @@ const PatientListList: React.FC = () => {
   );
 
   const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
-    // updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
   }, []);
+
+  if (error) {
+    //TODO show toast with error
+    return null;
+  }
 
   return (
     <div
@@ -172,14 +179,14 @@ const PatientListList: React.FC = () => {
             fontSize: '1.25rem',
             lineHeight: 1.4,
           }}>
-          Patient Lists
+          {t('patientLists', 'Patient Lists')}
         </p>
         <Button
           style={{ width: 'fit-content', justifySelf: 'end', alignSelf: 'center' }}
           kind="ghost"
           renderIcon={Add16}
           onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
-          New List
+          {t('newList', 'New List')}
         </Button>
         <Tabs
           type="container"
