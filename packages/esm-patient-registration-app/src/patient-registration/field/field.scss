@@ -2,18 +2,18 @@
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 
 .productiveHeading02 {
-    @include carbon--type-style("productive-heading-02");
-    margin-bottom: 1rem;
+  @include carbon--type-style("productive-heading-02");
+  margin-bottom: 1rem;
 }
 
 .productiveHeading02Light {
-    @include carbon--type-style("productive-heading-02");
-    margin-bottom: 1rem;
-    color: #525252;
+  @include carbon--type-style("productive-heading-02");
+  margin-bottom: 1rem;
+  color: #525252;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
 }
