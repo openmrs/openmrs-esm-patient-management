@@ -30,6 +30,8 @@ export interface OpenmrsCohort {
   uuid: string;
   voidReason: string;
   voided: boolean;
+  isStarred?: boolean;
+  type?: string;
 }
 
 export interface OpenmrsCohortRef {
@@ -52,7 +54,7 @@ interface CohortRepsonse<T> {
   error: any;
 }
 
-export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: boolean, nameFilter?: string) {
+export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, starred?: boolean, nameFilter?: string) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>('/ws/rest/v1/cohortm/cohort?v=default');

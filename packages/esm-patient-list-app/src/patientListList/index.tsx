@@ -93,6 +93,19 @@ const PatientListList: React.FC = () => {
     [tabState === TabTypes.SYSTEM || tabState === TabTypes.USER],
   );
 
+  const patientRows = React.useMemo(() => {
+    switch (tabState) {
+      case TabTypes.ALL:
+        return patientData;
+      case TabTypes.STARRED:
+        return patientData.filter((m) => m.attributes);
+      case TabTypes.USER:
+        return patientData.filter((m) => m.type === 'user');
+      case TabTypes.SYSTEM:
+        return patientData.filter((m) => m.isStarred);
+    }
+  }, [tabState]);
+
   const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
     //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
   }, []);
@@ -185,6 +198,7 @@ const PatientListList: React.FC = () => {
           style={{ width: 'fit-content', justifySelf: 'end', alignSelf: 'center' }}
           kind="ghost"
           renderIcon={Add16}
+          iconDescription="Add"
           onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
           {t('newList', 'New List')}
         </Button>
@@ -202,7 +216,7 @@ const PatientListList: React.FC = () => {
         <PatientListTable
           loading={loading}
           headers={customHeaders}
-          patientData={patientData}
+          patientData={patientRows}
           setListStarred={setListStarred}
           openPatientList={(listUuid) => {
             setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
