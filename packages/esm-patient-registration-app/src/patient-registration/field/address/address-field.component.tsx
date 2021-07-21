@@ -29,7 +29,7 @@ export const AddressField: React.FC = () => {
     const properties = nameMappings.getElementsByTagName('property');
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
       const name = property.getAttribute('name');
-      const labelText = property.getAttribute('value');
+      const labelText = t(name, property.getAttribute('value'));
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
@@ -39,7 +39,7 @@ export const AddressField: React.FC = () => {
       };
     });
     setAddressFields(propertiesObj);
-  }, [addressTemplateXml]);
+  }, [t, addressTemplateXml]);
 
   return (
     <div>

@@ -10,16 +10,16 @@ export function parseAddressTemplateXml(addressTemplate: string) {
   const validationSchemaObjs: AddressValidationSchemaType[] = Array.prototype.map.call(
     nameMappings,
     (nameMapping: Element) => {
-      const field = nameMapping.getAttribute('name');
+      const name = nameMapping.getAttribute('name');
       const label = nameMapping.getAttribute('value');
-      const regex = findElementValueInXmlDoc(field, 'elementRegex', templateXmlDoc);
-      const regexFormat = findElementValueInXmlDoc(field, 'elementRegexFormats', templateXmlDoc);
+      const regex = findElementValueInXmlDoc(name, 'elementRegex', templateXmlDoc) || '.*';
+      const regexFormat = findElementValueInXmlDoc(name, 'elementRegexFormats', templateXmlDoc) || '';
 
       return {
-        name: field,
+        name,
         label,
-        regex: regex || '.*',
-        regexFormat: regexFormat || '',
+        regex,
+        regexFormat,
       };
     },
   );

@@ -14,6 +14,21 @@
   cursor: pointer;
 }
 
+.cancelButton {
+  width: 11.688rem;
+}
+
+.submitButton {
+  margin-bottom: 1rem;
+  width: 11.688rem;
+  display: block;
+}
+
+.infoGrid {
+  margin-bottom: 40vh;
+  margin-top: 1rem;
+}
+
 .label01 {
   @include carbon--type-style("label-01");
   margin-top: $spacing-05;
@@ -33,9 +48,9 @@
 
 .stickyColumn {
   position: sticky;
-  margin-top: 2rem;
-  // 3rem for the nav height and 2rem for top margin
-  top: 5rem;
+  margin-top: 1rem;
+  // 3rem for the nav height and 1rem for top margin
+  top: 4rem;
 }
 
 .touchTarget a:active {

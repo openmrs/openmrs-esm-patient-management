@@ -143,6 +143,7 @@ export default class FormManager {
   ): Promise<Array<PatientIdentifier>> {
     const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifierTypes.map(async (type) => {
       const idValue = values[type.fieldName];
+      
       if (idValue) {
         return {
           uuid: patientUuidMap[type.fieldName] ? patientUuidMap[type.fieldName].uuid : undefined,

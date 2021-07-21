@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 export const SectionWrapper = ({ id, children, name, index }) => {
   const { t } = useTranslation();
   return (
-    <div id={id} style={{ marginTop: '2rem' }}>
+    <div id={id}>
       <h3 className={styles.productiveHeading02} style={{ color: '#161616' }}>
         {index + 1}. {name}
       </h3>

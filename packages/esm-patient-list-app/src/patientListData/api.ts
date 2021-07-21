@@ -1,7 +1,9 @@
 import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import { PATIENT_LIST_TYPE } from './types';
 
-async function postData(url = '', data = {}) {
+const cohortUrl = '/ws/rest/v1/cohortm';
+
+async function postData(url: string, data = {}) {
   const response = await openmrsFetch(url, {
     method: 'POST',
     mode: 'cors',
@@ -57,7 +59,7 @@ interface CohortRepsonse<T> {
 export async function getAllPatientLists(filter?: PATIENT_LIST_TYPE, starred?: boolean, nameFilter?: string) {
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>('/ws/rest/v1/cohortm/cohort?v=default');
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?v=default`);
 
   if (error) {
     throw error;
@@ -70,22 +72,19 @@ export async function getPatientListMembers(cohortUuid: string) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortRepsonse<OpenmrsCohortMember>>(
-    `/ws/rest/v1/cohortm/cohortmember?cohort=${cohortUuid}&v=default`,
+    `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=default`,
   );
 
   if (error) {
     throw error;
   }
 
-  const resources = await openmrsFetch(
-    '/ws/fhir2/R4/Patient/_search?_id=' + results.map((p) => p.patient.uuid).join(','),
-    {
-      method: 'POST',
-    },
-  ).then((res) => res.data);
+  const searchQuery = results.map((p) => p.patient.uuid).join(',');
+  const result = await openmrsFetch(`/ws/fhir2/R4/Patient/_search?_id=${searchQuery}`, {
+    method: 'POST',
+  });
 
-  const patients: Array<OpenmrsResource> = resources.entry.map((e) => e.resource);
-
+  const patients: Array<OpenmrsResource> = result.data.entry.map((e) => e.resource);
   return patients;
 }
 
@@ -93,7 +92,7 @@ export async function getPatientListsForPatient(patientUuid: string) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortRepsonse<OpenmrsCohortRef>>(
-    `/ws/rest/v1/cohortm/cohortmember?patient=${patientUuid}&v=default`,
+    `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
   );
 
   if (error) {
@@ -104,11 +103,11 @@ export async function getPatientListsForPatient(patientUuid: string) {
 }
 
 export async function addPatientToList(data: { patient: string; cohort: string; startDate: string }) {
-  return postData('/ws/rest/v1/cohortm/cohortmember', data);
+  return postData(`${cohortUrl}/cohortmember`, data);
 }
 
 export async function createPatientList(cohort: { name: string }) {
-  return postData('/ws/rest/v1/cohortm/cohort', {
+  return postData(`${cohortUrl}/cohort`, {
     ...cohort,
     cohortType: '6df786bf-f15a-49c2-8d2b-1832d961c270',
     location: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',

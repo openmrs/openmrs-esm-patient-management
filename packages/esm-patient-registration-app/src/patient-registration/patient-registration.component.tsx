@@ -243,16 +243,16 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                         </Link>
                       </div>
                     ))}
-                    <Button style={{ marginBottom: '1rem', width: '11.688rem', display: 'block' }} type="submit">
+                    <Button className={styles.submitButton} type="submit">
                       {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                     </Button>
-                    <Button style={{ width: '11.688rem' }} kind="tertiary" onClick={cancelRegistration}>
+                    <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
                       {t('cancel', 'Cancel')}
                     </Button>
                   </div>
                 </div>
                 <div>
-                  <Grid style={{ marginBottom: '40vh' }}>
+                  <Grid className={styles.infoGrid}>
                     <PatientRegistrationContext.Provider
                       value={{
                         identifierTypes: patientIdentifiers,
