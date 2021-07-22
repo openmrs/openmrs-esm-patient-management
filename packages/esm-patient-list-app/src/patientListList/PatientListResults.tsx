@@ -20,7 +20,7 @@ const PatientListResults: React.FC<PatientListResultsProps> = ({
 }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = React.useState<string>();
-  const { data: data, loading } = usePatientListData(undefined, undefined, undefined, filter);
+  const { data: data, loading } = usePatientListData(undefined, undefined, filter);
 
   React.useEffect(() => {
     setFilter(nameFilter);

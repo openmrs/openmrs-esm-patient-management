@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
 import { getPatientListMembers } from './mock';
-import { PatientListMember, State } from './types';
+import { PatientListMember, PATIENT_LIST_TYPE, State } from './types';
 
 const initialData = {
   loading: true,
@@ -15,38 +15,42 @@ const loadedData = {
   error: undefined,
 };
 
-export function usePatientListData(redo: any, ...args: Parameters<typeof getAllPatientLists>) {
+export function usePatientListData(filter?: PATIENT_LIST_TYPE, starred?: boolean, nameFilter?: string) {
   const [data, setData] = useState<State<Array<OpenmrsCohort & { id: string }>>>(initialData);
 
   useEffect(() => {
+    const ac = new AbortController();
     setData(initialData);
-    getAllPatientLists(...args)
+    getAllPatientLists(filter, starred, nameFilter, ac)
       .then((y) =>
         setData({
           ...(loadedData as any),
           data: y.map((x) => ({ ...x, id: x.uuid })),
         }),
       )
-      .catch((error) => setData({ ...loadedData, error }));
-  }, [redo, ...args]);
+      .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
+    return () => ac.abort();
+  }, [filter, starred, nameFilter]);
 
   return data;
 }
 
-export function useSinglePatientListData(redo: any, ...args: Parameters<typeof getPatientListMembers>) {
+export function useSinglePatientListData(listUuid: string) {
   const [data, setData] = useState<State<Array<PatientListMember>>>(initialData);
 
   useEffect(() => {
+    const ac = new AbortController();
     setData(initialData);
-    getPatientListMembers(...args)
+    getPatientListMembers(listUuid)
       .then((data) =>
         setData({
           ...(loadedData as any),
           data,
         }),
       )
-      .catch((error) => setData({ ...loadedData, error }));
-  }, [redo, ...args]);
+      .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
+    return () => ac.abort();
+  }, [listUuid]);
 
   return data;
 }

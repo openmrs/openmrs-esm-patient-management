@@ -9,7 +9,7 @@ export interface PatientListProps {
 }
 
 const PatientList: React.FC<PatientListProps> = ({ close, listUuid }) => {
-  const { data } = useSinglePatientListData(false, listUuid);
+  const { data } = useSinglePatientListData(listUuid);
   const { t } = useTranslation();
 
   return (

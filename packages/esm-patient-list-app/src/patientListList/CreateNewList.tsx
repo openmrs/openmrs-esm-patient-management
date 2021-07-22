@@ -7,27 +7,11 @@ import Overlay from '../Overlay';
 import { useTranslation } from 'react-i18next';
 import { createPatientList } from '../patientListData/api';
 
-const items = [
-  {
-    id: 'age',
-    text: 'Age',
-  },
-  {
-    id: 'gender',
-    text: 'Gender',
-  },
-  {
-    id: 'phone-number',
-    text: 'Phone number',
-  },
-];
-
 interface CreateNewListProps {
   close: () => void;
-  finished: () => void;
 }
 
-const CreateNewList: React.FC<CreateNewListProps> = ({ close, finished }) => {
+const CreateNewList: React.FC<CreateNewListProps> = ({ close }) => {
   const { t } = useTranslation();
   const nameInputRef = React.useRef<HTMLInputElement>();
   const decriptionInputRef = React.useRef<HTMLTextAreaElement>();
@@ -36,16 +20,31 @@ const CreateNewList: React.FC<CreateNewListProps> = ({ close, finished }) => {
     // set loading
     createPatientList({
       name: nameInputRef.current.value,
-      // , decription: decriptionInputRef.current.value
-    }).then(() => {
-      finished();
-      close();
-    });
-  }, [finished, close]);
+      description: decriptionInputRef.current.value,
+    }).then(close);
+  }, [close]);
+
+  const items = React.useMemo(
+    () => [
+      {
+        id: 'age',
+        text: t('age', 'Age'),
+      },
+      {
+        id: 'gender',
+        text: t('gender', 'Gender'),
+      },
+      {
+        id: 'phone-number',
+        text: t('phoneNumber', 'Phone number'),
+      },
+    ],
+    [t],
+  );
 
   return (
     <Overlay header={t('newPatientListHeader', 'New patient list')} close={close}>
-      <h2>Configure your patient list using the fields below</h2>
+      <h2>{t('configureList', 'Configure your patient list using the fields below')}</h2>
       <TextInput labelText={t('newPatientListNameLabel', 'List name')} id="list_name" ref={nameInputRef} />
       <TextArea
         ref={decriptionInputRef}
@@ -60,8 +59,8 @@ const CreateNewList: React.FC<CreateNewListProps> = ({ close, finished }) => {
         onChange={() => {}}
       />
       <div>
-        <Button onClick={close}>Cancel</Button>
-        <Button onClick={createPL}>Save</Button>
+        <Button onClick={close}>{t('cancel', 'Cancel')}</Button>
+        <Button onClick={createPL}>{t('save', 'Save')}</Button>
       </div>
     </Overlay>
   );

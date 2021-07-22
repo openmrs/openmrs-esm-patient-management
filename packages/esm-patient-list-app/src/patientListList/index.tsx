@@ -10,7 +10,7 @@ import PatientList from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { getAllPatientLists, usePatientListData } from '../patientListData';
+import { usePatientListData } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
@@ -40,7 +40,7 @@ function createLabels() {
   return res;
 }
 
-const deducePatientFilter = (tabState: TabTypes): Parameters<typeof getAllPatientLists> => {
+const deducePatientFilter = (tabState: TabTypes): [PATIENT_LIST_TYPE, boolean, string] => {
   switch (tabState) {
     case TabTypes.STARRED:
       return [undefined, true, undefined];
@@ -80,13 +80,12 @@ type RouteState = AllListRouteState | CreateNewListState | SingleListState;
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const [changed, setChanged] = React.useState(false);
   const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
   const [tabState, setTabState] = React.useState(TabTypes.STARRED);
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
   const ref = React.useRef<Search & { input: HTMLInputElement }>();
   const patientFilter = React.useMemo(() => deducePatientFilter(tabState), [tabState]);
-  const { data: patientData, loading, error } = usePatientListData(changed, ...patientFilter);
+  const { data: patientData, loading, error } = usePatientListData(...patientFilter);
 
   const customHeaders = React.useMemo(
     () => (tabState === TabTypes.SYSTEM || tabState === TabTypes.USER ? headersWithoutType : undefined),
@@ -218,10 +217,7 @@ const PatientListList: React.FC = () => {
         setListStarred={setListStarred}
       />
       {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
-        <CreateNewList
-          close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}
-          finished={() => setChanged((c) => !c)}
-        />
+        <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
       )}
       {routeState.type === RouteStateTypes.SINGLE_LIST && (
         <PatientList
