@@ -26,6 +26,7 @@ function setupOpenMRS() {
       {
         id: 'patient-search-icon',
         slot: 'top-nav-actions-slot',
+        order: 0,
         load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
       },
     ],
