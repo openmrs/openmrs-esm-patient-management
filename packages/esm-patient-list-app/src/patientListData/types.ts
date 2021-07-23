@@ -1,5 +1,3 @@
-import { OpenmrsCohort } from './api';
-
 export enum PATIENT_LIST_TYPE {
   SYSTEM,
   USER,
