@@ -1,6 +1,6 @@
 import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
-import { PatientList, PatientListMember, PatientListMemberFilter, PatientListUpdate, PATIENT_LIST_TYPE } from './types';
+import { PatientList, PatientListMember, PatientListMemberFilter, PatientListUpdate, PatientListType } from './types';
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -13,7 +13,7 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
     description: 'Patients available while offline.',
     isStarred: false,
     memberCount: 0,
-    type: PATIENT_LIST_TYPE.USER,
+    type: PatientListType.USER,
   },
 ];
 
@@ -21,7 +21,7 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
  * Returns all patient lists stored locally on the user's device.
  */
 export async function getAllDeviceLocalPatientLists(
-  filter?: PATIENT_LIST_TYPE,
+  filter?: PatientListType,
   starred?: boolean,
   nameFilter?: string,
 ) {

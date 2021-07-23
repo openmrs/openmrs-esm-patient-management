@@ -11,7 +11,7 @@ import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, isOfflineUuid } from '@openmrs/esm-framework';
 import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
-import { PatientList, PATIENT_LIST_TYPE } from '../patientListData/types';
+import { PatientList, PatientListType } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
 import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
@@ -43,16 +43,16 @@ function createLabels() {
 
 const deducePatientFilterFromSelectedTab = (
   tabState: TabTypes,
-): [listTypeFilter?: PATIENT_LIST_TYPE, starredFilter?: boolean, nameFilter?: string] => {
+): [listTypeFilter?: PatientListType, starredFilter?: boolean, nameFilter?: string] => {
   switch (tabState) {
     case TabTypes.STARRED:
       return [undefined, true, undefined];
 
     case TabTypes.SYSTEM:
-      return [PATIENT_LIST_TYPE.SYSTEM, undefined, undefined];
+      return [PatientListType.SYSTEM, undefined, undefined];
 
     case TabTypes.USER:
-      return [PATIENT_LIST_TYPE.USER, undefined, undefined];
+      return [PatientListType.USER, undefined, undefined];
 
     case TabTypes.ALL:
     default:

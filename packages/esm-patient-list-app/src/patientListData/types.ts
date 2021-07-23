@@ -1,4 +1,4 @@
-export enum PATIENT_LIST_TYPE {
+export enum PatientListType {
   SYSTEM,
   USER,
 }
@@ -7,7 +7,7 @@ export interface PatientList {
   id: string;
   display: string;
   description: string;
-  type: PATIENT_LIST_TYPE;
+  type: PatientListType;
   memberCount: number;
   isStarred: boolean;
   options?: Array<PatientListOption>;

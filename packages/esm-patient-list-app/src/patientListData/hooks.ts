@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
 import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers } from './';
 import { getPatientListMembers } from './mock';
-import { PatientListMember, PATIENT_LIST_TYPE, FetchState, PatientList } from './types';
+import { PatientListMember, PatientListType, FetchState, PatientList } from './types';
 
 const initialData = {
   loading: true,
@@ -20,7 +20,7 @@ const loadedData = {
 /**
  * Hook for fetching all available patient lists with optionally provided filters and loading state information.
  */
-export function usePatientListData(listTypeFilter?: PATIENT_LIST_TYPE, starredFilter?: boolean, nameFilter?: string) {
+export function usePatientListData(listTypeFilter?: PatientListType, starredFilter?: boolean, nameFilter?: string) {
   const [data, setData] = useState<FetchState<Array<PatientList>>>(initialData);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function usePatientListData(listTypeFilter?: PATIENT_LIST_TYPE, starredFi
 
 /** Fetches and merges patient lists from the device and backend into a single patient list array. */
 async function getLocalAndOnlinePatientLists(
-  filter?: PATIENT_LIST_TYPE,
+  filter?: PatientListType,
   starred?: boolean,
   nameFilter?: string,
   ac = new AbortController(),
@@ -60,7 +60,7 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
     id: cohort.uuid,
     display: cohort.name,
     description: cohort.description,
-    type: PATIENT_LIST_TYPE.SYSTEM, // TODO
+    type: PatientListType.SYSTEM, // TODO
     memberCount: 0, // TODO
     isStarred: false, // TODO,
   };

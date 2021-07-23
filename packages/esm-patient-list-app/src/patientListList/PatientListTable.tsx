@@ -13,7 +13,7 @@ import TableBody from 'carbon-components-react/lib/components/DataTable/TableBod
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { PatientList, PATIENT_LIST_TYPE } from '../patientListData/types';
+import { PatientList, PatientListType } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
@@ -91,10 +91,10 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                         );
 
                       case 'type':
-                        const val: PATIENT_LIST_TYPE = cell.value;
+                        const val: PatientListType = cell.value;
                         return (
                           <TableCell key={cell.id}>
-                            {val === PATIENT_LIST_TYPE.SYSTEM
+                            {val === PatientListType.SYSTEM
                               ? t('patientListTableTypeSystem', 'system')
                               : t('patientListTableTypeUser', 'user')}
                           </TableCell>

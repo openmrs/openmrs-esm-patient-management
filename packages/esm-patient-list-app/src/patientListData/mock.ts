@@ -1,4 +1,4 @@
-import { PatientList, PatientListMember, PatientListOption, PATIENT_LIST_TYPE, PatientListMemberFilter } from './types';
+import { PatientList, PatientListMember, PatientListOption, PatientListType, PatientListMemberFilter } from './types';
 
 function sleep(time: number) {
   return new Promise<void>((res) => setTimeout(() => res(), time));
@@ -28,7 +28,7 @@ const patientLists = new Map<PatientListUuid, PatientList>();
 const patientListMembers = new Map<string, Array<PatientListMember>>();
 
 // use async iterator for pagination?
-export function getAllPatientLists(filter?: PATIENT_LIST_TYPE, stared?: boolean, nameFilter?: string) {
+export function getAllPatientLists(filter?: PatientListType, stared?: boolean, nameFilter?: string) {
   return sleep(DELAY).then(() => {
     const res: Array<PatientList> = [];
 
@@ -51,7 +51,7 @@ export function getPatientListDetails(listUuid: PatientListUuid) {
 // when adding a patient to new lists, we need to know which lists the patient is already on
 export function getAllPatientListsWithPatient(
   patientUuid: PatientUuid,
-  filter?: PATIENT_LIST_TYPE,
+  filter?: PatientListType,
   stared?: boolean,
   nameFilter?: string,
 ) {
@@ -78,7 +78,7 @@ export function getPatientListMembers(listUuid: PatientListUuid, filters?: Array
 export function createPatientList(
   name: string,
   description: string,
-  type = PATIENT_LIST_TYPE.USER,
+  type = PatientListType.USER,
   options?: Array<PatientListOption>,
 ) {
   return sleep(DELAY).then(() => {
