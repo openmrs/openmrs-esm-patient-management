@@ -31,8 +31,8 @@ export async function getAllDeviceLocalPatientLists(
     const relatedMetadata = allMetadata.find((metadata) => metadata.patientListId === defaultEntry.id);
     return {
       ...defaultEntry,
-      isStarred: relatedMetadata?.isStarred,
-      memberCount: relatedMetadata?.members.length,
+      isStarred: relatedMetadata?.isStarred ?? defaultEntry.isStarred,
+      memberCount: relatedMetadata?.members.length ?? defaultEntry.memberCount,
     };
   });
 }
