@@ -11,7 +11,7 @@ import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, isOfflineUuid } from '@openmrs/esm-framework';
 import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
-import { PatientList, PatientListType } from '../patientListData/types';
+import { PatientList, PatientListFilter, PatientListType } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
 import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
@@ -41,24 +41,21 @@ function createLabels() {
   return res;
 }
 
-const deducePatientFilterFromSelectedTab = (
-  tabState: TabTypes,
-): [listTypeFilter?: PatientListType, starredFilter?: boolean, nameFilter?: string] => {
-  switch (tabState) {
-    case TabTypes.STARRED:
-      return [undefined, true, undefined];
-
-    case TabTypes.SYSTEM:
-      return [PatientListType.SYSTEM, undefined, undefined];
-
-    case TabTypes.USER:
-      return [PatientListType.USER, undefined, undefined];
-
-    case TabTypes.ALL:
-    default:
-      return [undefined, undefined, undefined];
-  }
-};
+function usePatientListFilterForCurrentTab(selectedTab: TabTypes) {
+  return React.useMemo<PatientListFilter>(() => {
+    switch (selectedTab) {
+      case TabTypes.STARRED:
+        return { isStarred: true };
+      case TabTypes.SYSTEM:
+        return { type: PatientListType.SYSTEM };
+      case TabTypes.USER:
+        return { type: PatientListType.USER };
+      case TabTypes.ALL:
+      default:
+        return {};
+    }
+  }, [selectedTab]);
+}
 
 enum RouteStateTypes {
   ALL_LISTS,
@@ -84,15 +81,15 @@ type RouteState = AllListRouteState | CreateNewListState | SingleListState;
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
-  const [tabState, setTabState] = React.useState(TabTypes.STARRED);
+  const [selectedTab, setSelectedTab] = React.useState(TabTypes.STARRED);
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
   const searchRef = React.useRef<Search & { input: HTMLInputElement }>();
-  const patientFilter = React.useMemo(() => deducePatientFilterFromSelectedTab(tabState), [tabState]);
-  const { data: patientListData, loading, error } = usePatientListData(...patientFilter);
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
+  const { data: patientListData, loading, error } = usePatientListData(patientListFilter);
 
   const customHeaders = React.useMemo(
-    () => (tabState === TabTypes.SYSTEM || tabState === TabTypes.USER ? headersWithoutType : undefined),
-    [tabState === TabTypes.SYSTEM || tabState === TabTypes.USER],
+    () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
+    [selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER],
   );
 
   const setListStarred = React.useCallback((patientListId: string, isStarred: boolean) => {
@@ -201,7 +198,7 @@ const PatientListList: React.FC = () => {
             gridColumn: 'span 2',
           }}
           tabContentClassName="deactivate-tabs-content"
-          onSelectionChange={setTabState}>
+          onSelectionChange={setSelectedTab}>
           {createLabels()}
         </Tabs>
       </div>

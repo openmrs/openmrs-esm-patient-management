@@ -1,6 +1,13 @@
 import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
-import { PatientList, PatientListMember, PatientListMemberFilter, PatientListUpdate, PatientListType } from './types';
+import {
+  PatientList,
+  PatientListMember,
+  PatientListMemberFilter,
+  PatientListUpdate,
+  PatientListType,
+  PatientListFilter,
+} from './types';
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -20,14 +27,10 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
 /**
  * Returns all patient lists stored locally on the user's device.
  */
-export async function getAllDeviceLocalPatientLists(
-  filter?: PatientListType,
-  starred?: boolean,
-  nameFilter?: string,
-) {
+export async function getAllDeviceLocalPatientLists(filter: PatientListFilter = {}) {
   // TODO: Apply filtering.
   const allMetadata = await new PatientListDb().patientListMetadata.toArray();
-  return knownLocalPatientListTemplates.map((defaultEntry) => {
+  const patientLists = knownLocalPatientListTemplates.map((defaultEntry) => {
     const relatedMetadata = allMetadata.find((metadata) => metadata.patientListId === defaultEntry.id);
     return {
       ...defaultEntry,
@@ -35,6 +38,13 @@ export async function getAllDeviceLocalPatientLists(
       memberCount: relatedMetadata?.members.length ?? defaultEntry.memberCount,
     };
   });
+
+  return patientLists.filter(
+    (patientList) =>
+      (filter.name === undefined || patientList.display.toLowerCase().includes(filter.name.toLowerCase())) &&
+      (filter.isStarred === undefined || patientList.isStarred === filter.isStarred) &&
+      (filter.type === undefined || patientList.type == filter.type),
+  );
 }
 
 /**

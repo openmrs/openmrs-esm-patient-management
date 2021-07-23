@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
 import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers } from './';
 import { getPatientListMembers } from './mock';
-import { PatientListMember, PatientListType, FetchState, PatientList } from './types';
+import { PatientListMember, PatientListType, FetchState, PatientList, PatientListFilter } from './types';
 
 const initialData = {
   loading: true,
@@ -20,14 +20,14 @@ const loadedData = {
 /**
  * Hook for fetching all available patient lists with optionally provided filters and loading state information.
  */
-export function usePatientListData(listTypeFilter?: PatientListType, starredFilter?: boolean, nameFilter?: string) {
+export function usePatientListData(filter?: PatientListFilter) {
   const [data, setData] = useState<FetchState<Array<PatientList>>>(initialData);
 
   useEffect(() => {
     const ac = new AbortController();
     setData(initialData);
 
-    getLocalAndOnlinePatientLists(listTypeFilter, starredFilter, nameFilter)
+    getLocalAndOnlinePatientLists(filter)
       .then((patientLists) =>
         setData({
           ...(loadedData as any),
@@ -36,22 +36,18 @@ export function usePatientListData(listTypeFilter?: PatientListType, starredFilt
       )
       .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
     return () => ac.abort();
-  }, [listTypeFilter, starredFilter, nameFilter]);
+  }, [filter]);
 
   return data;
 }
 
 /** Fetches and merges patient lists from the device and backend into a single patient list array. */
 async function getLocalAndOnlinePatientLists(
-  filter?: PatientListType,
-  starred?: boolean,
-  nameFilter?: string,
+  filter?: PatientListFilter,
   ac = new AbortController(),
 ): Promise<Array<PatientList>> {
-  const localPromise = getAllDeviceLocalPatientLists(filter, starred, nameFilter);
-  const onlinePromise = getAllPatientLists(filter, starred, nameFilter, ac).then((cohorts) =>
-    cohorts.map(mapCohortToPatientList),
-  );
+  const localPromise = getAllDeviceLocalPatientLists(filter);
+  const onlinePromise = getAllPatientLists(filter, ac).then((cohorts) => cohorts.map(mapCohortToPatientList));
   return Promise.all([localPromise, onlinePromise]).then((lists) => [].concat.apply([], lists));
 }
 

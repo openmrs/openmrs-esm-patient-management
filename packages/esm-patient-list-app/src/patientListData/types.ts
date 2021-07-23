@@ -17,6 +17,12 @@ export interface PatientListUpdate {
   isStarred: boolean;
 }
 
+export interface PatientListFilter {
+  isStarred?: boolean;
+  name?: string;
+  type?: PatientListType;
+}
+
 export interface PatientListOption {
   type: string;
   name: string;

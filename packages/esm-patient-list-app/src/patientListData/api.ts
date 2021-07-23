@@ -1,5 +1,5 @@
 import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import { PatientListType } from './types';
+import { PatientListFilter, PatientListType } from './types';
 
 const cohortUrl = '/ws/rest/v1/cohortm';
 
@@ -57,12 +57,7 @@ interface CohortRepsonse<T> {
   error: any;
 }
 
-export async function getAllPatientLists(
-  filter?: PatientListType,
-  starred?: boolean,
-  nameFilter?: string,
-  ac = new AbortController(),
-) {
+export async function getAllPatientLists(filter?: PatientListFilter, ac = new AbortController()) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?v=default`, {
