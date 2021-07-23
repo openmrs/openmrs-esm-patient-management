@@ -36,7 +36,7 @@ const PatientListResults: React.FC<PatientListResultsProps> = ({
       )}
       <PatientListTable
         loading={loading}
-        patientData={data}
+        patientLists={data}
         setListStarred={setListStarred}
         style={{ paddingTop: '0.5rem' }}
         openPatientList={openPatientList}

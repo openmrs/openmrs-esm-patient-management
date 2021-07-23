@@ -24,7 +24,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
     if (data) {
       const lists = {};
       data.map((patientList) => {
-        lists[patientList.uuid] = {
+        lists[patientList.id] = {
           visible: true,
           selected: false,
         };
@@ -42,7 +42,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
     if (data) {
       if (searchValue && searchValue.trim() !== '') {
         const search = searchValue.toLowerCase();
-        return data.filter((patientList) => patientList.name.toLowerCase().includes(search));
+        return data.filter((patientList) => patientList.display.toLowerCase().includes(search));
       } else {
         return data;
       }
@@ -104,14 +104,14 @@ const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
             searchResults.length > 0 ? (
               searchResults.map(
                 (patientList, ind) =>
-                  selectedLists[patientList.uuid]?.visible && (
+                  selectedLists[patientList.id]?.visible && (
                     <div key={ind} className={styles.checkbox}>
                       <Checkbox
                         key={ind}
-                        onChange={(e) => handleChange(patientList.uuid, e)}
-                        checked={selectedLists[patientList.uuid]?.selected}
-                        labelText={patientList.name}
-                        id={patientList.uuid}
+                        onChange={(e) => handleChange(patientList.id, e)}
+                        checked={selectedLists[patientList.id]?.selected}
+                        labelText={patientList.display}
+                        id={patientList.id}
                       />
                     </div>
                   ),

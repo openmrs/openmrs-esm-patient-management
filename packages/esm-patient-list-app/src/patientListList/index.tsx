@@ -6,14 +6,15 @@ import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import PatientListTable from './PatientListTable';
 import CreateNewList from './CreateNewList';
-import PatientList from '../PatientList';
+import PatientListMembersOverlay from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { usePatientListData } from '../patientListData';
-import { PATIENT_LIST_TYPE } from '../patientListData/types';
+import { PatientList, PATIENT_LIST_TYPE } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
+import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
 
 enum TabTypes {
   STARRED,
@@ -24,8 +25,8 @@ enum TabTypes {
 
 const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
 
-const headersWithoutType = [
-  { key: 'name', header: 'List Name' },
+const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
+  { key: 'display', header: 'List Name' },
   { key: 'memberCount', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
@@ -204,7 +205,7 @@ const PatientListList: React.FC = () => {
         <PatientListTable
           loading={loading}
           headers={customHeaders}
-          patientData={patientListData}
+          patientLists={patientListData}
           setListStarred={setListStarred}
           openPatientList={(listUuid) => {
             setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
@@ -222,7 +223,7 @@ const PatientListList: React.FC = () => {
         <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
       )}
       {routeState.type === RouteStateTypes.SINGLE_LIST && (
-        <PatientList
+        <PatientListMembersOverlay
           close={() => {
             setRouteState({ type: RouteStateTypes.ALL_LISTS });
           }}
