@@ -56,7 +56,7 @@ export async function getDeviceLocalPatientListMembers(
 /**
  * Updates the local patient list with the given update values.
  */
-export async function updateLocalPatientList(patientListId: string, update: PatientListUpdate) {
+export async function updateDeviceLocalPatientList(patientListId: string, update: PatientListUpdate) {
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();

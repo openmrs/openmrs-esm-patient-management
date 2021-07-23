@@ -9,8 +9,8 @@ import CreateNewList from './CreateNewList';
 import PatientListMembersOverlay from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot } from '@openmrs/esm-framework';
-import { usePatientListData } from '../patientListData';
+import { ExtensionSlot, isOfflineUuid } from '@openmrs/esm-framework';
+import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
 import { PatientList, PATIENT_LIST_TYPE } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
@@ -95,8 +95,12 @@ const PatientListList: React.FC = () => {
     [tabState === TabTypes.SYSTEM || tabState === TabTypes.USER],
   );
 
-  const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
-    //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+  const setListStarred = React.useCallback((patientListId: string, isStarred: boolean) => {
+    if (isOfflineUuid(patientListId)) {
+      updateDeviceLocalPatientList(patientListId, { isStarred });
+    } else {
+      //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    }
   }, []);
 
   if (error) {
