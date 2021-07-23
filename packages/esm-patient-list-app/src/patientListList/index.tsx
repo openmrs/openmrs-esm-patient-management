@@ -4,7 +4,7 @@ import Button from 'carbon-components-react/lib/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
-import PatientListTable from './patientListTable';
+import PatientListTable from './xPatientListTable';
 import CreateNewList from './CreateNewList';
 import PatientList from '../PatientList';
 import SearchOverlay from './SearchOverlay';
