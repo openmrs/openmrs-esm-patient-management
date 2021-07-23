@@ -11,7 +11,6 @@ export interface PatientList {
   memberCount: number;
   isStarred: boolean;
   options?: Array<PatientListOption>;
-  isDeviceLocal: boolean;
 }
 
 export interface PatientListUpdate {

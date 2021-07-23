@@ -91,7 +91,6 @@ export function createPatientList(
       id: uuid,
       memberCount: 0,
       options,
-      isDeviceLocal: false,
     });
 
     patientListMembers.set(uuid, []);

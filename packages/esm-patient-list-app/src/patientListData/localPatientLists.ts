@@ -14,7 +14,6 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
     isStarred: false,
     memberCount: 0,
     type: PATIENT_LIST_TYPE.USER,
-    isDeviceLocal: true,
   },
 ];
 

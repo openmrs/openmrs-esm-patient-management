@@ -63,7 +63,6 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
     type: PATIENT_LIST_TYPE.SYSTEM, // TODO
     memberCount: 0, // TODO
     isStarred: false, // TODO,
-    isDeviceLocal: false,
   };
 }
 
