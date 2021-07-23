@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePatientListData } from '../patientListData';
-import PatientListTable from './xPatientListTable';
+import PatientListTable from './PatientListTable';
 
 interface PatientListResultsProps {
   nameFilter?: string;
