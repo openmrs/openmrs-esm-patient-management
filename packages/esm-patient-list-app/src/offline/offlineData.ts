@@ -51,7 +51,7 @@ class OfflinePatientDatabase extends Dexie {
   private broadcastChange = () => {}; // is overwritten if the Broadcastchannel is available
 
   constructor() {
-    super('OfflinePatientDatabase');
+    super('EsmPatientListOfflinePatients');
     this.version(5).stores({
       offlinePatients: 'uuid',
     });
