@@ -1,7 +1,7 @@
 import { isOfflineUuid } from '@openmrs/esm-framework';
 import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
-import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers } from './localPatientLists';
+import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers } from './';
 import { getPatientListMembers } from './mock';
 import { PatientListMember, PATIENT_LIST_TYPE, FetchState, PatientList } from './types';
 

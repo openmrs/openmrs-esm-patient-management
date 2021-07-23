@@ -14,6 +14,10 @@ export interface PatientList {
   isDeviceLocal: boolean;
 }
 
+export interface PatientListUpdate {
+  isStarred: boolean;
+}
+
 export interface PatientListOption {
   type: string;
   name: string;

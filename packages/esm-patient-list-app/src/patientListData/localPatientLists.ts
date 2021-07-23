@@ -1,6 +1,6 @@
-import { offlineUuidPrefix } from '@openmrs/esm-framework';
+import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
-import { PatientList, PatientListMember, PatientListMemberFilter, PATIENT_LIST_TYPE } from './types';
+import { PatientList, PatientListMember, PatientListMemberFilter, PatientListUpdate, PATIENT_LIST_TYPE } from './types';
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -46,9 +46,42 @@ export async function getDeviceLocalPatientListMembers(
   id: string,
   filters?: Array<PatientListMemberFilter>,
 ): Promise<Array<PatientListMember>> {
+  ensureIsLocalPatientList(id);
+
   // TODO: Apply filtering.
   const metadata = await new PatientListDb().patientListMetadata.where({ patientListId: id }).first();
   return metadata?.members ?? [];
+}
+
+/**
+ * Updates the local patient list with the given update values.
+ */
+export async function updateLocalPatientList(patientListId: string, update: PatientListUpdate) {
+  ensureIsLocalPatientList(patientListId);
+
+  const db = new PatientListDb();
+  const initialMetadata = (await db.patientListMetadata.where({ patientListId }).first()) ?? {
+    isStarred: false,
+    members: [],
+    patientListId,
+  };
+
+  const updatedMetadata = {
+    ...initialMetadata,
+    ...update,
+  };
+
+  await db.patientListMetadata.put(updatedMetadata);
+}
+
+function ensureIsLocalPatientList(patientListOrId: string | PatientList) {
+  const id = typeof patientListOrId === 'string' ? patientListOrId : patientListOrId.id;
+
+  if (!isOfflineUuid(id)) {
+    throw new Error(
+      'The given patient list is not a device local patient list. It cannot be accessed with this functions.',
+    );
+  }
 }
 
 class PatientListDb extends Dexie {
@@ -56,12 +89,13 @@ class PatientListDb extends Dexie {
 
   constructor() {
     super('EsmPatientListLocalPatientLists');
-    this.version(1).stores({ patientListMetadata: '++,&patientListId' });
+    this.version(1).stores({ patientListMetadata: '++id,&patientListId' });
     this.patientListMetadata = this.table('patientListMetadata');
   }
 }
 
 interface LocalPatientListMetadata {
+  id?: number;
   patientListId: string;
   isStarred: boolean;
   members: Array<PatientListMember>;
