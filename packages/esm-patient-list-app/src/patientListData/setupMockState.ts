@@ -1,5 +1,5 @@
 import { addPatientToPatientList, createPatientList, newUuid, updatePatientListDetails } from './mock';
-import { PATIENT_LIST_TYPE } from './types';
+import { PatientListType } from './types';
 
 const setup = async () => {
   const myListUuid = await createPatientList('my favorite patients', 'description');
@@ -10,7 +10,7 @@ const setup = async () => {
     }),
   );
 
-  const systemUuid = await createPatientList('waiting list', 'description', PATIENT_LIST_TYPE.SYSTEM);
+  const systemUuid = await createPatientList('waiting list', 'description', PatientListType.SYSTEM);
   const systemPatients = Array.from({ length: 24 }, newUuid);
   await Promise.all(
     systemPatients.map((p) => {
@@ -18,7 +18,7 @@ const setup = async () => {
     }),
   );
 
-  const systemUuid2 = await createPatientList('bathroom black list', 'description', PATIENT_LIST_TYPE.USER);
+  const systemUuid2 = await createPatientList('bathroom black list', 'description', PatientListType.USER);
   const systemPatient2s = Array.from({ length: 16 }, newUuid);
   await Promise.all(
     systemPatient2s.map((p) => {

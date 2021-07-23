@@ -51,7 +51,7 @@ class OfflinePatientDatabase extends Dexie {
   private broadcastChange = () => {}; // is overwritten if the Broadcastchannel is available
 
   constructor() {
-    super('OfflinePatientDatabase');
+    super('EsmPatientListOfflinePatients');
     this.version(5).stores({
       offlinePatients: 'uuid',
     });
@@ -219,10 +219,10 @@ class OfflinePatientDatabase extends Dexie {
 const db = new OfflinePatientDatabase();
 
 export default {
-  addPatient: db.addPatient.bind(db),
-  reloadPatient: db.addPatient.bind(db),
-  removePatient: db.removePatient.bind(db),
-  subscribe: db.subscribe.bind(db),
-  getPatientData: db.getPatientData.bind(db),
+  addPatient: db.addPatient.bind(db) as OfflinePatientDatabase['addPatient'],
+  reloadPatient: db.addPatient.bind(db) as OfflinePatientDatabase['addPatient'],
+  removePatient: db.removePatient.bind(db) as OfflinePatientDatabase['removePatient'],
+  subscribe: db.subscribe.bind(db) as OfflinePatientDatabase['subscribe'],
+  getPatientData: db.getPatientData.bind(db) as OfflinePatientDatabase['getPatientData'],
   getOfflineHandlers,
 };
