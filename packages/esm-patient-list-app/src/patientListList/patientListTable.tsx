@@ -1,5 +1,8 @@
 import React, { CSSProperties } from 'react';
-import DataTable from 'carbon-components-react/lib/components/DataTable';
+import DataTable, {
+  DataTableCustomRenderProps,
+  DataTableHeader,
+} from 'carbon-components-react/lib/components/DataTable';
 import Table from 'carbon-components-react/lib/components/DataTable/Table';
 import TableContainer from 'carbon-components-react/lib/components/DataTable/TableContainer';
 import TableHead from 'carbon-components-react/lib/components/DataTable/TableHead';
@@ -14,7 +17,7 @@ import { usePatientListData } from '../patientListData';
 import { PATIENT_LIST_TYPE } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
 
-const defaultHeaders = [
+const defaultHeaders: Array<DataTableHeader> = [
   { key: 'name', header: 'List Name' },
   { key: 'type', header: 'List Type' },
   { key: 'memberCount', header: 'No. Patients' },
@@ -22,11 +25,11 @@ const defaultHeaders = [
 ];
 
 interface PatientListTableProps {
-  patientData: ReturnType<typeof usePatientListData>['data'];
-  setListStarred: (listUuid: string, star: boolean) => void;
-  headers?: Array<{ key: string; header: string }>;
-  style?: CSSProperties;
   loading?: boolean;
+  patientData: ReturnType<typeof usePatientListData>['data'];
+  headers?: Array<DataTableHeader>;
+  style?: CSSProperties;
+  setListStarred: (listUuid: string, star: boolean) => void;
   openPatientList: (uuid: string) => void;
 }
 
@@ -42,7 +45,14 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
 
   return !loading ? (
     <DataTable rows={patientData} headers={headers}>
-      {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+      {({
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getTableProps,
+        getTableContainerProps,
+      }: DataTableCustomRenderProps) => (
         <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
           <Table {...getTableProps()} isSortable useZebraStyles>
             <colgroup>

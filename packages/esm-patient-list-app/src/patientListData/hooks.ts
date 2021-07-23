@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getAllPatientLists, OpenmrsCohort } from './api';
+import { getAllPatientLists } from './api';
+import { deviceLocalPatientLists } from './localPatientLists';
 import { getPatientListMembers } from './mock';
-import { PatientListMember, PATIENT_LIST_TYPE, State } from './types';
+import { PatientListMember, PATIENT_LIST_TYPE, FetchState, EnrichedCohort } from './types';
 
 const initialData = {
   loading: true,
@@ -15,28 +16,28 @@ const loadedData = {
   error: undefined,
 };
 
-export function usePatientListData(filter?: PATIENT_LIST_TYPE, starred?: boolean, nameFilter?: string) {
-  const [data, setData] = useState<State<Array<OpenmrsCohort & { id: string }>>>(initialData);
+export function usePatientListData(listTypeFilter?: PATIENT_LIST_TYPE, starredFilter?: boolean, nameFilter?: string) {
+  const [data, setData] = useState<FetchState<Array<EnrichedCohort>>>(initialData);
 
   useEffect(() => {
     const ac = new AbortController();
     setData(initialData);
-    getAllPatientLists(filter, starred, nameFilter, ac)
+    getAllPatientLists(listTypeFilter, starredFilter, nameFilter, ac)
       .then((y) =>
         setData({
           ...(loadedData as any),
-          data: y.map((x) => ({ ...x, id: x.uuid })),
+          data: [...deviceLocalPatientLists, ...y.map((x) => ({ ...x, id: x.uuid, isLocal: false }))],
         }),
       )
       .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
     return () => ac.abort();
-  }, [filter, starred, nameFilter]);
+  }, [listTypeFilter, starredFilter, nameFilter]);
 
   return data;
 }
 
 export function useSinglePatientListData(listUuid: string) {
-  const [data, setData] = useState<State<Array<PatientListMember>>>(initialData);
+  const [data, setData] = useState<FetchState<Array<PatientListMember>>>(initialData);
 
   useEffect(() => {
     const ac = new AbortController();

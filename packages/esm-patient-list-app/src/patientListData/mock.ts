@@ -141,7 +141,7 @@ export function addPatientToPatientList(patientUuid: PatientUuid, listUuid: Pati
 
     members.push({
       patientUuid,
-      properies: [],
+      properties: [],
     });
 
     patientLists.get(listUuid).memberCount++;

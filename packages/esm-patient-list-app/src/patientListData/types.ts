@@ -1,3 +1,21 @@
+import { OpenmrsCohort } from './api';
+
+/**
+ * A regular {@link OpenmrsCohort} enhanced with additional attributes required by the frontend.
+ */
+export interface EnrichedCohort extends OpenmrsCohort {
+  /**
+   * The cohort's ID.
+   * This an an alias for {@link OpenmrsCohort.uuid} and required for data tables.
+   */
+  id: string;
+  /**
+   * Whether the cohort only exists locally (e.g. in the case of the offline patient list which
+   * is not tracked by the backend).
+   */
+  isLocal: boolean;
+}
+
 export enum PATIENT_LIST_TYPE {
   SYSTEM,
   USER,
@@ -31,7 +49,7 @@ export interface PatientListOption {
  */
 export interface PatientListMember {
   patientUuid: string;
-  properies: Array<PatientListMemberProperty>;
+  properties: Array<PatientListMemberProperty>;
 }
 
 export interface PatientListMemberProperty {
@@ -61,4 +79,4 @@ export interface ErrorState {
   error: Error;
 }
 
-export type State<T> = LoadingState | DataState<T> | ErrorState;
+export type FetchState<T> = LoadingState | DataState<T> | ErrorState;

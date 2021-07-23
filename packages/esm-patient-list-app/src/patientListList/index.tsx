@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/lib/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
@@ -31,7 +31,7 @@ const headersWithoutType = [
 ];
 
 function createLabels() {
-  const res = [];
+  const res: Array<ReactNode> = [];
 
   for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
     res.push(<Tab label={labelMap[index]} key={index} id={'tab-' + index} />);
@@ -40,7 +40,9 @@ function createLabels() {
   return res;
 }
 
-const deducePatientFilter = (tabState: TabTypes): [PATIENT_LIST_TYPE, boolean, string] => {
+const deducePatientFilterFromSelectedTab = (
+  tabState: TabTypes,
+): [listTypeFilter?: PATIENT_LIST_TYPE, starredFilter?: boolean, nameFilter?: string] => {
   switch (tabState) {
     case TabTypes.STARRED:
       return [undefined, true, undefined];
@@ -83,9 +85,9 @@ const PatientListList: React.FC = () => {
   const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
   const [tabState, setTabState] = React.useState(TabTypes.STARRED);
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
-  const ref = React.useRef<Search & { input: HTMLInputElement }>();
-  const patientFilter = React.useMemo(() => deducePatientFilter(tabState), [tabState]);
-  const { data: patientData, loading, error } = usePatientListData(...patientFilter);
+  const searchRef = React.useRef<Search & { input: HTMLInputElement }>();
+  const patientFilter = React.useMemo(() => deducePatientFilterFromSelectedTab(tabState), [tabState]);
+  const { data: patientListData, loading, error } = usePatientListData(...patientFilter);
 
   const customHeaders = React.useMemo(
     () => (tabState === TabTypes.SYSTEM || tabState === TabTypes.USER ? headersWithoutType : undefined),
@@ -137,9 +139,9 @@ const PatientListList: React.FC = () => {
             }
           }}
           onChange={({ target }) => {
-            if (target !== ref.current?.input) {
+            if (target !== searchRef.current?.input) {
               setTimeout(() => {
-                ref.current.input.blur();
+                searchRef.current.input.blur();
               }, 0);
               setViewState({ type: StateTypes.IDLE });
             } else {
@@ -156,7 +158,7 @@ const PatientListList: React.FC = () => {
               }));
             }
           }}
-          ref={ref}
+          ref={searchRef}
           value={(viewState as SearchState)?.searchTerm || ''}
         />
       </div>
@@ -202,7 +204,7 @@ const PatientListList: React.FC = () => {
         <PatientListTable
           loading={loading}
           headers={customHeaders}
-          patientData={patientData}
+          patientData={patientListData}
           setListStarred={setListStarred}
           openPatientList={(listUuid) => {
             setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });

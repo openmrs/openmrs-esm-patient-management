@@ -17,7 +17,7 @@ interface AddPatientProps {
 const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const { loading, data } = usePatientListData(undefined);
+  const { loading, data } = usePatientListData();
   const [selectedLists, setSelectedList] = useState({});
 
   useEffect(() => {
