@@ -57,10 +57,27 @@ interface CohortRepsonse<T> {
   error: any;
 }
 
-export async function getAllPatientLists(filter?: PatientListFilter, ac = new AbortController()) {
+export async function getAllPatientLists(filter: PatientListFilter = {}, ac = new AbortController()) {
+  const query: Array<[string, string]> = [['v', 'default']];
+
+  if (filter.name !== undefined) {
+    query.push(['q', filter.name]);
+  }
+
+  if (filter.isStarred !== undefined) {
+    // TODO: correct this; it definitely is "attributes", but then we'd get back a 500 right now.
+    query.push(['attribute', `starred:${filter.isStarred}`]);
+  }
+
+  if (filter.type !== undefined) {
+    const type = filter.type === PatientListType.SYSTEM ? 'System Patient List' : '';
+    query.push(['cohortType', type]);
+  }
+
+  const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?v=default`, {
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
     signal: ac.signal,
   });
 

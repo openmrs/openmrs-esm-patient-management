@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
+import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
+import { usePatientListData } from '../patientListData';
 import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
-import { toOmrsIsoString, showToast, showModal, usePagination, useSessionUser } from '@openmrs/esm-framework';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
@@ -10,13 +10,9 @@ import Checkbox from 'carbon-components-react/lib/components/Checkbox';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import styles from './add-patient-to-list.scss';
 
-function getPatientUuidFromUrl(): string {
-  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
-  return match && match[1];
-}
-
 interface AddPatientProps {
   closeModal: () => void;
+  patientUuid: string;
 }
 
 interface PatientListProp {
@@ -27,14 +23,13 @@ interface PatientListProp {
 
 type PatientListObj = Record<string, PatientListProp>;
 
-const AddPatient: React.FC<AddPatientProps> = ({ closeModal }) => {
+const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
   const { loading, data } = usePatientListData(userId);
   const [page, setPage] = useState(1);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
-  const patientUuid = getPatientUuidFromUrl();
 
   useEffect(() => {
     if (data) {
@@ -154,7 +149,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal }) => {
                 </div>
               ))
             ) : (
-              <p className={styles.bodyLong01}>No patient list found</p>
+              <p className={styles.bodyLong01}>{t('noPatientListFound', 'No patient list found')}</p>
             )
           ) : (
             <SkeletonText />
@@ -164,7 +159,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal }) => {
       {paginated && (
         <div className={styles.paginationContainer}>
           <span className={`${styles.itemsCountDisplay} ${styles.bodyLong01}`}>
-            {results.length * currentPage} / {searchResults.length} items
+            {results.length * currentPage} / {searchResults.length} {t('items', 'items')}
           </span>
           <Pagination
             className={styles.pagination}
