@@ -13,10 +13,10 @@ import DataTable, {
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import Search from 'carbon-components-react/es/components/Search';
+import { useTranslation } from 'react-i18next';
 import { useLayoutType, useConfig, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 
 const headerData = [
@@ -125,6 +125,7 @@ const ActiveVisitsTable = (props) => {
               <TableToolbarContent>
                 <Search
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                  labelText=""
                   placeholder="Filter table"
                   onChange={handleSearch}
                 />

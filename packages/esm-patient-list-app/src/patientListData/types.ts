@@ -1,19 +1,26 @@
-export enum PATIENT_LIST_TYPE {
+export enum PatientListType {
   SYSTEM,
   USER,
 }
 
-export interface PatientListBase {
+export interface PatientList {
+  id: string;
   display: string;
-  uuid: string;
   description: string;
-  type: PATIENT_LIST_TYPE;
+  type: PatientListType;
   memberCount: number;
+  isStarred: boolean;
+  options?: Array<PatientListOption>;
+}
+
+export interface PatientListUpdate {
   isStarred: boolean;
 }
 
-export interface PatientListDetails extends PatientListBase {
-  options?: Array<PatientListOption>;
+export interface PatientListFilter {
+  isStarred?: boolean;
+  name?: string;
+  type?: PatientListType;
 }
 
 export interface PatientListOption {
@@ -31,7 +38,7 @@ export interface PatientListOption {
  */
 export interface PatientListMember {
   patientUuid: string;
-  properies: Array<PatientListMemberProperty>;
+  properties: Array<PatientListMemberProperty>;
 }
 
 export interface PatientListMemberProperty {
@@ -61,4 +68,4 @@ export interface ErrorState {
   error: Error;
 }
 
-export type State<T> = LoadingState | DataState<T> | ErrorState;
+export type FetchState<T> = LoadingState | DataState<T> | ErrorState;

@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/lib/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
-import PatientListTable from './patientListTable';
+import PatientListTable from './PatientListTable';
 import CreateNewList from './CreateNewList';
-import PatientList from '../PatientList';
+import PatientListMembersOverlay from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot } from '@openmrs/esm-framework';
-import { usePatientListData } from '../patientListData';
-import { PATIENT_LIST_TYPE } from '../patientListData/types';
+import { ExtensionSlot, isOfflineUuid, useSessionUser } from '@openmrs/esm-framework';
+import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
+import { PatientList, PatientListFilter, PatientListType } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
+import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
 
 enum TabTypes {
   STARRED,
@@ -24,14 +25,14 @@ enum TabTypes {
 
 const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
 
-const headersWithoutType = [
-  { key: 'name', header: 'List Name' },
+const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
+  { key: 'display', header: 'List Name' },
   { key: 'memberCount', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
 
 function createLabels() {
-  const res = [];
+  const res: Array<ReactNode> = [];
 
   for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
     res.push(<Tab label={labelMap[index]} key={index} id={'tab-' + index} />);
@@ -40,22 +41,21 @@ function createLabels() {
   return res;
 }
 
-const deducePatientFilter = (tabState: TabTypes): [PATIENT_LIST_TYPE, boolean, string] => {
-  switch (tabState) {
-    case TabTypes.STARRED:
-      return [undefined, true, undefined];
-
-    case TabTypes.SYSTEM:
-      return [PATIENT_LIST_TYPE.SYSTEM, undefined, undefined];
-
-    case TabTypes.USER:
-      return [PATIENT_LIST_TYPE.USER, undefined, undefined];
-
-    case TabTypes.ALL:
-    default:
-      return [undefined, undefined, undefined];
-  }
-};
+function usePatientListFilterForCurrentTab(selectedTab: TabTypes) {
+  return React.useMemo<PatientListFilter>(() => {
+    switch (selectedTab) {
+      case TabTypes.STARRED:
+        return { isStarred: true };
+      case TabTypes.SYSTEM:
+        return { type: PatientListType.SYSTEM };
+      case TabTypes.USER:
+        return { type: PatientListType.USER };
+      case TabTypes.ALL:
+      default:
+        return {};
+    }
+  }, [selectedTab]);
+}
 
 enum RouteStateTypes {
   ALL_LISTS,
@@ -81,20 +81,28 @@ type RouteState = AllListRouteState | CreateNewListState | SingleListState;
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
-  const [tabState, setTabState] = React.useState(TabTypes.STARRED);
+  const [selectedTab, setSelectedTab] = React.useState(TabTypes.STARRED);
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
-  const ref = React.useRef<Search & { input: HTMLInputElement }>();
-  const patientFilter = React.useMemo(() => deducePatientFilter(tabState), [tabState]);
-  const { data: patientData, loading, error } = usePatientListData(...patientFilter);
+  const searchRef = React.useRef<Search & { input: HTMLInputElement }>();
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
+  const userId = useSessionUser()?.user.uuid;
+  const { data: patientListData, loading, error } = usePatientListData(userId, patientListFilter);
 
   const customHeaders = React.useMemo(
-    () => (tabState === TabTypes.SYSTEM || tabState === TabTypes.USER ? headersWithoutType : undefined),
-    [tabState === TabTypes.SYSTEM || tabState === TabTypes.USER],
+    () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
+    [selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER],
   );
 
-  const setListStarred = React.useCallback((listUuid: string, star: boolean) => {
-    //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
-  }, []);
+  const setListStarred = React.useCallback(
+    (patientListId: string, isStarred: boolean) => {
+      if (isOfflineUuid(patientListId)) {
+        updateDeviceLocalPatientList(userId, patientListId, { isStarred });
+      } else {
+        //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+      }
+    },
+    [userId],
+  );
 
   if (error) {
     //TODO show toast with error
@@ -137,9 +145,9 @@ const PatientListList: React.FC = () => {
             }
           }}
           onChange={({ target }) => {
-            if (target !== ref.current?.input) {
+            if (target !== searchRef.current?.input) {
               setTimeout(() => {
-                ref.current.input.blur();
+                searchRef.current.input.blur();
               }, 0);
               setViewState({ type: StateTypes.IDLE });
             } else {
@@ -156,7 +164,7 @@ const PatientListList: React.FC = () => {
               }));
             }
           }}
-          ref={ref}
+          ref={searchRef}
           value={(viewState as SearchState)?.searchTerm || ''}
         />
       </div>
@@ -194,7 +202,7 @@ const PatientListList: React.FC = () => {
             gridColumn: 'span 2',
           }}
           tabContentClassName="deactivate-tabs-content"
-          onSelectionChange={setTabState}>
+          onSelectionChange={setSelectedTab}>
           {createLabels()}
         </Tabs>
       </div>
@@ -202,7 +210,7 @@ const PatientListList: React.FC = () => {
         <PatientListTable
           loading={loading}
           headers={customHeaders}
-          patientData={patientData}
+          patientLists={patientListData}
           setListStarred={setListStarred}
           openPatientList={(listUuid) => {
             setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
@@ -220,7 +228,7 @@ const PatientListList: React.FC = () => {
         <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
       )}
       {routeState.type === RouteStateTypes.SINGLE_LIST && (
-        <PatientList
+        <PatientListMembersOverlay
           close={() => {
             setRouteState({ type: RouteStateTypes.ALL_LISTS });
           }}

@@ -1,5 +1,8 @@
 import React, { CSSProperties } from 'react';
-import DataTable from 'carbon-components-react/lib/components/DataTable';
+import DataTable, {
+  DataTableCustomRenderProps,
+  DataTableHeader,
+} from 'carbon-components-react/lib/components/DataTable';
 import Table from 'carbon-components-react/lib/components/DataTable/Table';
 import TableContainer from 'carbon-components-react/lib/components/DataTable/TableContainer';
 import TableHead from 'carbon-components-react/lib/components/DataTable/TableHead';
@@ -10,28 +13,27 @@ import TableBody from 'carbon-components-react/lib/components/DataTable/TableBod
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { usePatientListData } from '../patientListData';
-import { PATIENT_LIST_TYPE } from '../patientListData/types';
+import { PatientList, PatientListType } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
 
-const defaultHeaders = [
-  { key: 'name', header: 'List Name' },
+const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
+  { key: 'display', header: 'List Name' },
   { key: 'type', header: 'List Type' },
   { key: 'memberCount', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
 
 interface PatientListTableProps {
-  patientData: ReturnType<typeof usePatientListData>['data'];
-  setListStarred: (listUuid: string, star: boolean) => void;
-  headers?: Array<{ key: string; header: string }>;
-  style?: CSSProperties;
+  patientLists: Array<PatientList>;
   loading?: boolean;
+  headers?: Array<DataTableHeader<keyof PatientList>>;
+  style?: CSSProperties;
+  setListStarred: (listUuid: string, star: boolean) => void;
   openPatientList: (uuid: string) => void;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
-  patientData,
+  patientLists,
   setListStarred,
   headers = defaultHeaders,
   style,
@@ -41,8 +43,15 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   const { t } = useTranslation();
 
   return !loading ? (
-    <DataTable rows={patientData} headers={headers}>
-      {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+    <DataTable rows={patientLists} headers={headers}>
+      {({
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getTableProps,
+        getTableContainerProps,
+      }: DataTableCustomRenderProps) => (
         <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
           <Table {...getTableProps()} isSortable useZebraStyles>
             <colgroup>
@@ -82,10 +91,10 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                         );
 
                       case 'type':
-                        const val: PATIENT_LIST_TYPE = cell.value;
+                        const val: PatientListType = cell.value;
                         return (
                           <TableCell key={cell.id}>
-                            {val === PATIENT_LIST_TYPE.SYSTEM
+                            {val === PatientListType.SYSTEM
                               ? t('patientListTableTypeSystem', 'system')
                               : t('patientListTableTypeUser', 'user')}
                           </TableCell>

@@ -1,5 +1,5 @@
 import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import { PATIENT_LIST_TYPE } from './types';
+import { PatientListFilter, PatientListType } from './types';
 
 const cohortUrl = '/ws/rest/v1/cohortm';
 
@@ -21,17 +21,17 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
 }
 
 export interface OpenmrsCohort {
-  attributes: Array<any>;
-  description: string;
-  endDate: string;
-  groupCohort: boolean;
-  links: Array<any>;
-  location: Location;
-  name: string;
-  resourceVersion: string;
-  startDate: string;
   uuid: string;
-  voidReason: string;
+  resourceVersion: string;
+  name: string;
+  description: string;
+  attributes: Array<any>;
+  links: Array<any>;
+  location: Location | null;
+  groupCohort: boolean | null;
+  startDate: string | null;
+  endDate: string | null;
+  voidReason: string | null;
   voided: boolean;
   isStarred?: boolean;
   type?: string;
@@ -57,15 +57,27 @@ interface CohortRepsonse<T> {
   error: any;
 }
 
-export async function getAllPatientLists(
-  filter?: PATIENT_LIST_TYPE,
-  starred?: boolean,
-  nameFilter?: string,
-  ac = new AbortController(),
-) {
+export async function getAllPatientLists(filter: PatientListFilter = {}, ac = new AbortController()) {
+  const query: Array<[string, string]> = [['v', 'default']];
+
+  if (filter.name !== undefined) {
+    query.push(['q', filter.name]);
+  }
+
+  if (filter.isStarred !== undefined) {
+    // TODO: correct this; it definitely is "attributes", but then we'd get back a 500 right now.
+    query.push(['attribute', `starred:${filter.isStarred}`]);
+  }
+
+  if (filter.type !== undefined) {
+    const type = filter.type === PatientListType.SYSTEM ? 'System Patient List' : '';
+    query.push(['cohortType', type]);
+  }
+
+  const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?v=default`, {
+  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
     signal: ac.signal,
   });
 
