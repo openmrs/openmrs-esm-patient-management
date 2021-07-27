@@ -20,14 +20,14 @@ const loadedData = {
 /**
  * Hook for fetching all available patient lists with optionally provided filters and loading state information.
  */
-export function usePatientListData(filter?: PatientListFilter) {
+export function usePatientListData(userId: string, filter?: PatientListFilter) {
   const [data, setData] = useState<FetchState<Array<PatientList>>>(initialData);
 
   useEffect(() => {
     const ac = new AbortController();
     setData(initialData);
 
-    getLocalAndOnlinePatientLists(filter)
+    getLocalAndOnlinePatientLists(userId, filter)
       .then((patientLists) =>
         setData({
           ...(loadedData as any),
@@ -36,17 +36,18 @@ export function usePatientListData(filter?: PatientListFilter) {
       )
       .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
     return () => ac.abort();
-  }, [filter]);
+  }, [userId, filter]);
 
   return data;
 }
 
 /** Fetches and merges patient lists from the device and backend into a single patient list array. */
 async function getLocalAndOnlinePatientLists(
+  userId: string,
   filter?: PatientListFilter,
   ac = new AbortController(),
 ): Promise<Array<PatientList>> {
-  const localPromise = getAllDeviceLocalPatientLists(filter);
+  const localPromise = getAllDeviceLocalPatientLists(userId, filter);
   const onlinePromise = getAllPatientLists(filter, ac).then((cohorts) => cohorts.map(mapCohortToPatientList));
   return Promise.all([localPromise, onlinePromise]).then((lists) => [].concat.apply([], lists));
 }

@@ -15,7 +15,7 @@ import {
  */
 const knownLocalPatientListTemplates: Array<PatientList> = [
   {
-    id: `${offlineUuidPrefix}78e936dc-5240-4b9b-b5d6-6d3351503ab7`,
+    id: `${offlineUuidPrefix}l0c4l000-5240-4b9b-b5d6-000000000001`,
     display: 'Offline Patients',
     description: 'Patients available while offline.',
     isStarred: false,
@@ -25,11 +25,12 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
 ];
 
 /**
- * Returns all patient lists stored locally on the user's device.
+ * Returns all patient lists of the given user stored locally on the user's device.
+ * @param userId The ID of the user whose patient list information should be retrieved.
  */
-export async function getAllDeviceLocalPatientLists(filter: PatientListFilter = {}) {
+export async function getAllDeviceLocalPatientLists(userId: string, filter: PatientListFilter = {}) {
   // TODO: Apply filtering.
-  const allMetadata = await new PatientListDb().patientListMetadata.toArray();
+  const allMetadata = await new PatientListDb().patientListMetadata.where({ userId }).toArray();
   const patientLists = knownLocalPatientListTemplates.map((defaultEntry) => {
     const relatedMetadata = allMetadata.find((metadata) => metadata.patientListId === defaultEntry.id);
     return {
@@ -65,14 +66,15 @@ export async function getDeviceLocalPatientListMembers(
 /**
  * Updates the local patient list with the given update values.
  */
-export async function updateDeviceLocalPatientList(patientListId: string, update: PatientListUpdate) {
+export async function updateDeviceLocalPatientList(userId: string, patientListId: string, update: PatientListUpdate) {
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();
-  const initialMetadata = (await db.patientListMetadata.where({ patientListId }).first()) ?? {
+  const initialMetadata = (await db.patientListMetadata.where({ userId, patientListId }).first()) ?? {
+    userId,
+    patientListId,
     isStarred: false,
     members: [],
-    patientListId,
   };
 
   const updatedMetadata = {
@@ -98,13 +100,14 @@ class PatientListDb extends Dexie {
 
   constructor() {
     super('EsmPatientListLocalPatientLists');
-    this.version(1).stores({ patientListMetadata: '++id,&patientListId' });
+    this.version(2).stores({ patientListMetadata: '++id,&[userId+patientListId]' });
     this.patientListMetadata = this.table('patientListMetadata');
   }
 }
 
 interface LocalPatientListMetadata {
   id?: number;
+  userId: string;
   patientListId: string;
   isStarred: boolean;
   members: Array<PatientListMember>;

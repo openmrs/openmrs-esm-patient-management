@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
 import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
-import { toOmrsIsoString, showToast, showModal, usePagination } from '@openmrs/esm-framework';
+import { toOmrsIsoString, showToast, showModal, usePagination, useSessionUser } from '@openmrs/esm-framework';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
@@ -30,7 +30,8 @@ type PatientListObj = Record<string, PatientListProp>;
 const AddPatient: React.FC<AddPatientProps> = ({ closeModal }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const { loading, data } = usePatientListData();
+  const userId = useSessionUser()?.user.uuid;
+  const { loading, data } = usePatientListData(userId);
   const [page, setPage] = useState(1);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
   const patientUuid = getPatientUuidFromUrl();
