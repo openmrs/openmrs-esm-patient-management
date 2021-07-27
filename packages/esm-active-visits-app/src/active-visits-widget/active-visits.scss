@@ -41,3 +41,15 @@
   display: flex;
   align-items: center;
 }
+
+.customTable tr[data-parent-row]:nth-child(odd) td {
+  background-color: #fff;
+}
+
+.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
+  background-color: #f4f4f4;
+}
+
+.expandedRow > td > div {
+  max-height: max-content !important;
+}

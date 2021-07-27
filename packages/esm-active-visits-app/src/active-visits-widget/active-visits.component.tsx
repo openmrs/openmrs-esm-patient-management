@@ -9,6 +9,9 @@ import DataTable, {
   TableCell,
   TableToolbar,
   TableToolbarContent,
+  TableExpandRow,
+  TableExpandedRow,
+  TableExpandHeader,
 } from 'carbon-components-react/es/components/DataTable';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/es/components/Pagination';
@@ -70,6 +73,7 @@ const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
   const config = useConfig();
+  const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
   const [loading, setLoading] = useState(true);
@@ -77,6 +81,9 @@ const ActiveVisitsTable = (props) => {
   const [searchString, setSearchString] = useState('');
 
   const searchResults = useMemo(() => {
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    }
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
       return activeVisits.filter((activeVisitRow) =>
@@ -91,7 +98,11 @@ const ActiveVisitsTable = (props) => {
       return activeVisits;
     }
   }, [searchString, activeVisits]);
-  const { goTo, currentPage, results } = usePagination(searchResults, currentPageSize);
+  const { goTo, results } = usePagination(searchResults, currentPageSize);
+
+  useEffect(() => {
+    goTo(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
@@ -119,7 +130,7 @@ const ActiveVisitsTable = (props) => {
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
       </div>
       <DataTable rows={results} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
           <TableContainer title="" className={styles.tableContainer}>
             <TableToolbar>
               <TableToolbarContent>
@@ -130,9 +141,10 @@ const ActiveVisitsTable = (props) => {
                 />
               </TableToolbarContent>
             </TableToolbar>
-            <Table {...getTableProps()} useZebraStyles>
+            <Table className={styles.customTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
               <TableHead>
-                <TableRow style={{ height: desktopView ? '2rem' : '3rem' }}>
+                <TableRow>
+                  <TableExpandHeader />
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                   ))}
@@ -140,19 +152,29 @@ const ActiveVisitsTable = (props) => {
               </TableHead>
               <TableBody>
                 {rows.map((row, ind) => (
-                  <TableRow key={row.id} style={{ height: desktopView ? '2rem' : '3rem' }}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>
-                        {cell.info.header === 'name' ? (
-                          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${results[ind]?.patientUuid}/chart/`}>
-                            {cell.value}
-                          </ConfigurableLink>
-                        ) : (
-                          cell.value
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>
+                          {cell.info.header === 'name' ? (
+                            <ConfigurableLink to={`\${openmrsSpaBase}/patient/${results[ind]?.patientUuid}/chart/`}>
+                              {cell.value}
+                            </ConfigurableLink>
+                          ) : (
+                            cell.value
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableExpandRow>
+                    {row.isExpanded && (
+                      <TableExpandedRow
+                        className={styles.expandedRow}
+                        style={{ paddingLeft: desktopView ? '3rem' : '4rem' }}
+                        colSpan={headers.length + 2}>
+                        <p>Aux squad rules</p>
+                      </TableExpandedRow>
+                    )}
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
@@ -176,7 +198,7 @@ const ActiveVisitsTable = (props) => {
                   setPageSize(pageSize);
                 }
                 if (page !== currentPage) {
-                  goTo(page);
+                  setCurrentPage(page);
                 }
               }}
             />

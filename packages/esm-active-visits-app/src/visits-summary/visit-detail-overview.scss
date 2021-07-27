@@ -1,0 +1,223 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+@import "../../root.scss";
+
+// Typography
+
+.caption01 {
+  @include carbon--type-style("caption-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.productiveHeading01 {
+  @include carbon--type-style("productive-heading-01");
+}
+
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
+.text02 {
+  color: #525252;
+}
+
+.text01 {
+  color: #161616;
+}
+
+.container  {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.encounterHeading {
+  text-align: left;
+  width: 100%;
+  max-width: 688px;
+  margin: 0 1rem 1.3125rem 1rem;
+  color: #161616;
+}
+
+.visitsDetailWidgetContainer {
+  background-color: $ui-background;
+  width: 100%;
+  max-width: 688px;
+  margin: 0 1rem 1.3125rem 1rem;
+  border: 1px solid #e0e0e0;
+}
+
+.visitsDetailHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  background-color: $ui-background;
+}
+
+.visitsDetailHeaderContainer > h4:after {
+  content: "";
+  display: block;
+  width: 2rem;
+  padding-top: 0.188rem;
+  border-bottom: 0.375rem solid $brand-teal-01;
+}
+
+.toggleButtons {
+  margin: 0 1rem;
+  height: 2.5rem;
+}
+
+.toggle{
+  border: 1px solid #A6C8FF;
+}
+
+.toggle:hover {
+  background-color: #EDF5FF;
+}
+
+.toggle:active, .toggle:focus {
+  box-shadow: none;
+  background-color: #EDF5FF;
+}
+
+.toggleActive{
+  background-color: #EDF5FF;
+  border: 1px solid $link-01;
+}
+
+.toggleActive:active, .toggleActive:focus {
+  box-shadow: none;
+  border: 1px solid $link-01;
+  background-color: #EDF5FF;
+}
+
+.toggle:first-of-type {
+  border-radius: $spacing-02 0 0 $spacing-02;
+}
+
+.toggle:last-of-type {
+  border-radius: 0 $spacing-02 $spacing-02 0;
+}
+
+.customTable tr[data-parent-row]:nth-child(odd) td {
+  background-color: #fff;
+}
+
+.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
+  background-color: #f4f4f4;
+}
+
+.encounterEmptyState {
+  text-align: center;
+  margin: 0 1rem 1rem 1rem; 
+}
+
+.expandedRow > td {
+  padding: inherit !important
+}
+
+.expandedRow > td > div {
+  max-height: max-content !important;
+}
+
+.observation {
+  display: grid;
+  grid-template-columns: max-content auto;
+  grid-gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.observation > span {
+  align-self: center;
+}
+
+.summaryContainer {
+  margin-left: 1rem;
+  display: grid;
+  grid-template-columns: max-content auto;
+}
+
+.flexSections {
+  display: flex;
+}
+
+.verticalTabs {
+  margin: 1rem 0;
+}
+
+.verticalTabs > ul {
+  flex-direction: column !important;
+}
+
+.tab > button {
+  border-bottom: 0 !important;
+  border-left: 3px solid #e0e0e0 !important;
+}
+
+tab > button:first {
+  margin-left: 10px;
+}
+
+.tab > button, .tab > button:focus, .tab > button:active {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+.selectedTab > button {
+  border-left: 3px solid #007d79 !important;
+  border-bottom: 0 !important;
+  font-weight: 600 !important;
+}
+
+.tabContent {
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 0;
+  width: 70%;
+}
+
+.medicationBlock {
+  background-color: #f4f4f4;
+  padding: 0.625rem 6.75rem 0.75rem 1.063rem;
+  margin-top: 1.5rem;
+  width: 100% !important;
+}
+
+.medicationBlock:first-child {
+  margin-top: 0;
+}
+
+.diagnosesList {
+  display: flex;
+  padding-bottom: 0.5rem;
+  margin: 0 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.diagnosis {
+  border-radius: 12px;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.primaryDiagnose {
+  background-color: #d0e2ff;
+  color: #0043ce;
+}
+
+.secondaryDiagnose {
+  background-color: #ffd7d9;
+  color:#a2191f;
+}
