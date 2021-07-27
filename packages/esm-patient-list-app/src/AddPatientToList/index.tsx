@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { usePatientListData } from '../patientListData';
 import { useTranslation } from 'react-i18next';
 import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
-import { toOmrsIsoString } from '@openmrs/esm-framework';
+import { toOmrsIsoString, useSessionUser } from '@openmrs/esm-framework';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Checkbox from 'carbon-components-react/lib/components/Checkbox';
@@ -17,7 +17,8 @@ interface AddPatientProps {
 const AddPatient: React.FC<AddPatientProps> = ({ close, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const { loading, data } = usePatientListData();
+  const userId = useSessionUser()?.user.uuid;
+  const { loading, data } = usePatientListData(userId);
   const [selectedLists, setSelectedList] = useState({});
 
   useEffect(() => {
