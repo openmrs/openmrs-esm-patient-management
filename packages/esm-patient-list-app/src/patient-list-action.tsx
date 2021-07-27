@@ -7,7 +7,9 @@ interface AddPastVisitOverflowMenuItemProps {}
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
   const { t } = useTranslation();
   const openModal = React.useCallback(() => {
-    showModal('add-patient-to-patient-list-modal', { patientUuid: '' });
+    const dispose = showModal('add-patient-to-patient-list-modal', {
+      closeModal: () => dispose(),
+    });
   }, []);
 
   return (
