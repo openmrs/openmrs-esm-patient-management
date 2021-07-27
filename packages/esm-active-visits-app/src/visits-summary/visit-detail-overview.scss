@@ -1,7 +1,7 @@
 @import "~@openmrs/esm-styleguide/src/vars";
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
-@import "../../root.scss";
+@import "../root.scss";
 
 // Typography
 
@@ -43,7 +43,6 @@
 .encounterHeading {
   text-align: left;
   width: 100%;
-  max-width: 688px;
   margin: 0 1rem 1.3125rem 1rem;
   color: #161616;
 }
@@ -51,8 +50,6 @@
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
   width: 100%;
-  max-width: 688px;
-  margin: 0 1rem 1.3125rem 1rem;
   border: 1px solid #e0e0e0;
 }
 
@@ -157,6 +154,10 @@
 
 .verticalTabs > ul {
   flex-direction: column !important;
+}
+
+.tab {
+  margin-left: 0 !important;
 }
 
 .tab > button {

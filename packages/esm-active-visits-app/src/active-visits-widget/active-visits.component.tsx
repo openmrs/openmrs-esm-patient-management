@@ -16,7 +16,14 @@ import DataTable, {
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import Search from 'carbon-components-react/es/components/Search';
-import { useLayoutType, useConfig, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  useConfig,
+  usePagination,
+  ConfigurableLink,
+  ExtensionSlot,
+  Visit,
+} from '@openmrs/esm-framework';
 import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import { useTranslation } from 'react-i18next';
@@ -113,8 +120,9 @@ const ActiveVisitsTable = (props) => {
         name: visit?.patient?.person?.display,
         gender: visit?.patient?.person?.gender,
         age: visit?.patient?.person?.age,
-        visitType: visit?.visitType.display,
+        visitType: visit?.visitType?.display,
         patientUuid: visit?.patient?.uuid,
+        visitUuid: visit?.uuid,
       }));
       setActiveVisits(rowData);
       setLoading(false);
@@ -129,6 +137,13 @@ const ActiveVisitsTable = (props) => {
       <div className={styles.activeVisitsDetailHeaderContainer}>
         <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
       </div>
+      <ExtensionSlot
+        extensionSlotName="visit-summary-slot"
+        state={{
+          visitUuid: '0331e86a-5bc3-4faf-b69e-26d007073f52',
+          patientUuid: '',
+        }}
+      />
       <DataTable rows={results} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
           <TableContainer title="" className={styles.tableContainer}>
@@ -141,7 +156,7 @@ const ActiveVisitsTable = (props) => {
                 />
               </TableToolbarContent>
             </TableToolbar>
-            <Table className={styles.customTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
+            <Table className={styles.activeVisitsTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
@@ -167,12 +182,19 @@ const ActiveVisitsTable = (props) => {
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
-                      <TableExpandedRow
-                        className={styles.expandedRow}
-                        style={{ paddingLeft: desktopView ? '3rem' : '4rem' }}
-                        colSpan={headers.length + 2}>
-                        <p>Aux squad rules</p>
-                      </TableExpandedRow>
+                      <TableRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                        <TableExpandHeader />
+
+                        <th colSpan={headers.length + 1}>
+                          <ExtensionSlot
+                            extensionSlotName="visit-summary-slot"
+                            state={{
+                              visitUuid: '0331e86a-5bc3-4faf-b69e-26d007073f52',
+                              patientUuid: '',
+                            }}
+                          />
+                        </th>
+                      </TableRow>
                     )}
                   </React.Fragment>
                 ))}

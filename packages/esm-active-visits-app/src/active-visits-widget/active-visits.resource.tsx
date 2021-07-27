@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, openmrsObservableFetch, OpenmrsResource } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, openmrsObservableFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 import { take, map } from 'rxjs/operators';
 
 export interface ActiveVisitRow {
@@ -10,6 +10,7 @@ export interface ActiveVisitRow {
   age: string;
   visitType: string;
   patientUuid: string;
+  visitUuid: string;
 }
 
 export function fetchActiveVisits() {
@@ -23,5 +24,5 @@ export function fetchActiveVisits() {
     },
   })
     .pipe(take(1))
-    .pipe(map((response: FetchResponse<{ results: Array<any> }>) => response.data));
+    .pipe(map((response: FetchResponse<{ results: Array<Visit> }>) => response.data));
 }

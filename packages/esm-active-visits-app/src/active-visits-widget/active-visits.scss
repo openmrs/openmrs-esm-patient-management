@@ -42,14 +42,14 @@
   align-items: center;
 }
 
-.customTable tr[data-parent-row]:nth-child(odd) td {
-  background-color: #fff;
+.activeVisitsTable tr[data-parent-row]:nth-child(odd) td {
+  background-color: #ffffff;
 }
 
-.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
+.activeVisitsTable  tbody  tr[data-parent-row]:nth-child(even)  td {
   background-color: #f4f4f4;
 }
 
-.expandedRow > td > div {
+.expandedActiveVisitRow > td > div {
   max-height: max-content !important;
 }

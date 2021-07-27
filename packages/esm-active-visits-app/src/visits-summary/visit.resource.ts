@@ -1,3 +1,7 @@
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+import { FetchResponse, openmrsObservableFetch, Visit } from '@openmrs/esm-framework';
+
 export interface Encounter {
   uuid: string;
   encounterDateTime: string;
@@ -121,6 +125,35 @@ export interface OrderItem {
     name: string;
     role: string;
   };
+}
+
+export function fetchVisit(visitUuid: string, abortController: AbortController): Observable<FetchResponse<Visit>> {
+  const custom =
+    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
+    'orders:(uuid,dateActivated,' +
+    'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
+    'dose,route:(uuid,display),frequency:(uuid,display),' +
+    'duration,durationUnits:(uuid,display),numRefills,' +
+    'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
+    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
+    'display,groupMembers:(uuid,concept:(uuid,display),' +
+    'value:(uuid,display)),value),encounterType:(uuid,display),' +
+    'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
+    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
+
+  return openmrsObservableFetch(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`, {
+    signal: abortController.signal,
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json',
+    },
+  })
+    .pipe(take(1))
+    .pipe(
+      map((response: FetchResponse<Visit>) => {
+        return response;
+      }),
+    );
 }
 
 export function getDosage(strength: string, doseNumber: number) {
