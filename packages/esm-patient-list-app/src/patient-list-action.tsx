@@ -1,12 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
-import { openModal } from './AddPatientToList';
 
 interface AddPastVisitOverflowMenuItemProps {}
 
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
   const { t } = useTranslation();
+  const openModal = React.useCallback(() => {
+    const dispose = showModal('add-patient-to-patient-list-modal', {
+      closeModal: () => dispose(),
+    });
+  }, []);
 
   return (
     <>

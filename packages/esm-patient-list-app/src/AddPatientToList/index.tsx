@@ -10,20 +10,13 @@ import Checkbox from 'carbon-components-react/lib/components/Checkbox';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import styles from './add-patient-to-list.scss';
 
-let closeModal = () => {};
-
-export const openModal = () => {
-  closeModal = showModal('add-patient-to-patient-list-modal');
-};
-
 function getPatientUuidFromUrl(): string {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
   return match && match[1];
 }
 
 interface AddPatientProps {
-  close: () => void;
-  patientUuid: string;
+  closeModal: () => void;
 }
 
 interface PatientListProp {
@@ -34,7 +27,7 @@ interface PatientListProp {
 
 type PatientListObj = Record<string, PatientListProp>;
 
-const AddPatient: React.FC<AddPatientProps> = ({ close }) => {
+const AddPatient: React.FC<AddPatientProps> = ({ closeModal }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const { loading, data } = usePatientListData();
