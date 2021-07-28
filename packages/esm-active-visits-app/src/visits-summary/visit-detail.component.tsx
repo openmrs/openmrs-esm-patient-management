@@ -7,7 +7,7 @@ import { Visit, createErrorHandler } from '@openmrs/esm-framework';
 import styles from './visit-detail-overview.scss';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
-import { DataTableSkeleton } from 'carbon-components-react';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 
 function formatDateTime(date) {
   return dayjs(date).format('MMM DD, YYYY - hh:mm');

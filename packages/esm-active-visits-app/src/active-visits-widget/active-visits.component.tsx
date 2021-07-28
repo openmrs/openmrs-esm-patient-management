@@ -72,7 +72,6 @@ const ActiveVisitsTable = (props) => {
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
   const config = useConfig();
-  const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
   const [loading, setLoading] = useState(true);
@@ -80,9 +79,6 @@ const ActiveVisitsTable = (props) => {
   const [searchString, setSearchString] = useState('');
 
   const searchResults = useMemo(() => {
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    }
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
       return activeVisits.filter((activeVisitRow) =>
@@ -97,11 +93,13 @@ const ActiveVisitsTable = (props) => {
       return activeVisits;
     }
   }, [searchString, activeVisits]);
-  const { goTo, results } = usePagination(searchResults, currentPageSize);
+  const { goTo, results, currentPage } = usePagination(searchResults, currentPageSize);
 
   useEffect(() => {
-    goTo(currentPage);
-  }, [currentPage]);
+    if (currentPage !== 1) {
+      goTo(1);
+    }
+  }, [searchString]);
 
   useEffect(() => {
     const activeVisits = fetchActiveVisits().subscribe((data) => {
@@ -205,7 +203,7 @@ const ActiveVisitsTable = (props) => {
                   setPageSize(pageSize);
                 }
                 if (page !== currentPage) {
-                  setCurrentPage(page);
+                  goTo(page);
                 }
               }}
             />
