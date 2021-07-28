@@ -50,6 +50,21 @@
   background-color: #f4f4f4;
 }
 
+.visitSummaryContainer {
+  width: 100%;
+  max-width: 768px;
+  margin: 1rem auto;
+}
+
 .expandedActiveVisitRow > td > div {
   max-height: max-content !important;
 }
+
+.expandedActiveVisitRow td {
+  padding: 0 2rem;
+}
+
+.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
+  padding: 0 1rem;
+}
+
