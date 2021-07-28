@@ -1,4 +1,20 @@
 {
   "activeVisits": "Active Visits",
-  "noVisitsFound": "No visits found"
+  "allEncounters": "All Encounters",
+  "diagnoses": "Diagnoses",
+  "dose": "Dose",
+  "medications": "Medications",
+  "noDiagnosesFound": "No diagnoses found",
+  "noEncountersFound": "No encounters found",
+  "noMedicationsFound": "No medications found",
+  "noNotesFound": "No notes found",
+  "noObservationsFound": "No observations found",
+  "notes": "Notes",
+  "noVisitsFound": "No visits found",
+  "orderDurationAndUnit": "for {duration} {durationUnit}",
+  "orderIndefiniteDuration": "Indefinite duration",
+  "refills": "Refills",
+  "tests": "Tests",
+  "thereIsNoInformationToDisplayHere": "There is no information to display here",
+  "visitSummary": "Visit Summary"
 }

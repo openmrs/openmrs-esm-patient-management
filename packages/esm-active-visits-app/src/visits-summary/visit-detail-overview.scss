@@ -222,3 +222,7 @@ tab > button:first {
   background-color: #ffd7d9;
   color:#a2191f;
 }
+
+.testSummaryExtension p {
+  @include carbon--type-style("body-long-01");
+}
