@@ -2,7 +2,6 @@
 
 .modalContent {
   width: 100%;
-  max-width: 678px;
   background-color: #f4f4f4;
 }
 
@@ -14,16 +13,43 @@
   padding: 0 1rem;
 }
 
-.buttonSet {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
 .largeButtons {
   padding-bottom: 2rem;
 }
 
 .checkbox {
   padding-bottom: 0.875rem;
+}
+
+.pagination {
+  width: 100%;
+  overflow: hidden;
+}
+
+.paginationContainer { 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.itemsCountDisplay {
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  color: #525252
+}
+
+.pagination > div:first-child {
+  visibility: hidden;
+  width: 0;
+}
+
+.buttonSet {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }

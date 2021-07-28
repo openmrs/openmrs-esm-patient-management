@@ -1,3 +1,4 @@
+import { useSessionUser } from '@openmrs/esm-framework';
 import React, { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePatientListData } from '../patientListData';
@@ -20,7 +21,8 @@ const PatientListResults: React.FC<PatientListResultsProps> = ({
 }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = React.useState<string>();
-  const { data, loading } = usePatientListData({ name: filter });
+  const userId = useSessionUser()?.user.uuid;
+  const { data, loading } = usePatientListData(userId, { name: filter });
 
   React.useEffect(() => {
     setFilter(nameFilter);

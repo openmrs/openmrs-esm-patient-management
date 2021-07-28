@@ -9,7 +9,7 @@ import CreateNewList from './CreateNewList';
 import PatientListMembersOverlay from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, isOfflineUuid } from '@openmrs/esm-framework';
+import { ExtensionSlot, isOfflineUuid, useSessionUser } from '@openmrs/esm-framework';
 import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
 import { PatientList, PatientListFilter, PatientListType } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
@@ -85,20 +85,24 @@ const PatientListList: React.FC = () => {
   const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
   const searchRef = React.useRef<Search & { input: HTMLInputElement }>();
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
-  const { data: patientListData, loading, error } = usePatientListData(patientListFilter);
+  const userId = useSessionUser()?.user.uuid;
+  const { data: patientListData, loading, error } = usePatientListData(userId, patientListFilter);
 
   const customHeaders = React.useMemo(
     () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
     [selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER],
   );
 
-  const setListStarred = React.useCallback((patientListId: string, isStarred: boolean) => {
-    if (isOfflineUuid(patientListId)) {
-      updateDeviceLocalPatientList(patientListId, { isStarred });
-    } else {
-      //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
-    }
-  }, []);
+  const setListStarred = React.useCallback(
+    (patientListId: string, isStarred: boolean) => {
+      if (isOfflineUuid(patientListId)) {
+        updateDeviceLocalPatientList(userId, patientListId, { isStarred });
+      } else {
+        //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+      }
+    },
+    [userId],
+  );
 
   if (error) {
     //TODO show toast with error

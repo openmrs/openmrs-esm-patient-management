@@ -2,13 +2,29 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
 
-interface AddPastVisitOverflowMenuItemProps {}
+function closeOverflowMenu() {
+  document.body.dispatchEvent(
+    new MouseEvent('mousedown', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+}
 
-const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
+interface AddPastVisitOverflowMenuItemProps {
+  patientUuid: string;
+}
+
+const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const openModal = React.useCallback(() => {
-    showModal('add-patient-to-patient-list-modal', { patientUuid: '' });
-  }, []);
+    const dispose = showModal('add-patient-to-patient-list-modal', {
+      closeModal: () => dispose(),
+      patientUuid,
+    });
+    closeOverflowMenu();
+  }, [patientUuid]);
 
   return (
     <>

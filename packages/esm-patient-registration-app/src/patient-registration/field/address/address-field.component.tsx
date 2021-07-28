@@ -29,6 +29,13 @@ export const AddressField: React.FC = () => {
     const properties = nameMappings.getElementsByTagName('property');
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
       const name = property.getAttribute('name');
+      /*
+      t('postalCode')
+      t('address1')
+      t('stateProvince')
+      t('cityVillage')
+      t('country')
+      */
       const labelText = t(name, property.getAttribute('value'));
       const value = getFieldValue(name, elementDefaults);
       return {
