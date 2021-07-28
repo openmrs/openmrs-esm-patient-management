@@ -28,7 +28,6 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
   const { loading, data } = usePatientListData(userId);
-  const [page, setPage] = useState(1);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 
   useEffect(() => {
@@ -95,7 +94,6 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     if (data && patientListsObj) {
       if (searchValue && searchValue.trim() !== '') {
         const search = searchValue.toLowerCase();
-        setPage(1);
         return data.filter(
           (patientList) =>
             patientListsObj[patientList.id]?.visible && patientList.display.toLowerCase().includes(search),
@@ -110,8 +108,10 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { results, goTo, currentPage, paginated } = usePagination(searchResults, 5);
 
   useEffect(() => {
-    goTo(page);
-  }, [page]);
+    if (currentPage !== 1) {
+      goTo(1);
+    }
+  }, [searchValue]);
 
   return (
     <div className={styles.modalContent}>
@@ -169,7 +169,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             pageSize={5}
             pageSizes={[5]}
             totalItems={searchResults.length}
-            onChange={({ page }) => setPage(page)}
+            onChange={({ page }) => goTo(page)}
           />
         </div>
       )}
