@@ -1,9 +1,14 @@
 {
   "activeVisits": "Active Visits",
+  "age": "Age",
   "allEncounters": "All Encounters",
   "diagnoses": "Diagnoses",
   "dose": "Dose",
+  "encounterType": "Encounter Type",
+  "gender": "Gender",
+  "IDNumber": "ID Number",
   "medications": "Medications",
+  "name": "Name",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "No encounters found",
   "noMedicationsFound": "No medications found",
@@ -13,8 +18,12 @@
   "noVisitsFound": "No visits found",
   "orderDurationAndUnit": "for {duration} {durationUnit}",
   "orderIndefiniteDuration": "Indefinite duration",
+  "provider": "Provider",
   "refills": "Refills",
   "tests": "Tests",
   "thereIsNoInformationToDisplayHere": "There is no information to display here",
-  "visitSummary": "Visit Summary"
+  "time": "Time",
+  "visitStartTime": "Visit Time",
+  "visitSummary": "Visit Summary",
+  "visitType": "Visit Type"
 }
