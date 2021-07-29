@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import DataTable, {
   TableContainer,
   Table,
@@ -33,28 +33,32 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   const layout = useLayoutType();
   const isDesktop = layout === 'desktop';
   const [headerWidth, setHeaderWidth] = useState(0);
+  const headerRef = useRef(null);
 
-  const headerData = [
-    {
-      id: 1,
-      header: 'Time',
-      key: 'time',
-    },
-    {
-      id: 2,
-      header: 'Encounter Type',
-      key: 'encounterType',
-    },
-    {
-      id: 3,
-      header: 'Provider',
-      key: 'provider',
-    },
-  ];
+  const headerData = useMemo(
+    () => [
+      {
+        id: 1,
+        header: t('time', 'Time'),
+        key: 'time',
+      },
+      {
+        id: 2,
+        header: t('encounterType', 'Encounter Type'),
+        key: 'encounterType',
+      },
+      {
+        id: 3,
+        header: t('provider', 'Provider'),
+        key: 'provider',
+      },
+    ],
+    [t],
+  );
 
   useEffect(() => {
-    setHeaderWidth(document.getElementById(`header_${visitUuid}_0`)?.clientWidth);
-    const handler = () => setHeaderWidth(document.getElementById(`header_${visitUuid}_0`)?.clientWidth);
+    setHeaderWidth(headerRef?.current?.clientWidth);
+    const handler = () => setHeaderWidth(headerRef?.current?.clientWidth);
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
@@ -68,18 +72,24 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
-                  {headers.map((header, ind) => (
-                    <TableHeader id={`header_${visitUuid}_${ind}`} {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
+                  {headers.map((header, ind) =>
+                    ind === 0 ? (
+                      <TableHeader id={`header_${visitUuid}_${ind}`} ref={headerRef} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ) : (
+                      <TableHeader id={`header_${visitUuid}_${ind}`} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ),
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {rows.map((row, ind) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell, ind) => (
+                      {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                     </TableExpandRow>

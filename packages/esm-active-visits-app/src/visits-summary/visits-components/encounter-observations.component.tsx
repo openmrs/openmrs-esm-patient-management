@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { Observation } from '../visit.resource';

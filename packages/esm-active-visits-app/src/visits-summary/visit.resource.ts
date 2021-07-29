@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { FetchResponse, openmrsObservableFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
 
 export interface Encounter {
   uuid: string;
@@ -127,7 +125,7 @@ export interface OrderItem {
   };
 }
 
-export function fetchVisit(visitUuid: string, abortController: AbortController): Observable<FetchResponse<Visit>> {
+export function fetchVisit(visitUuid: string) {
   const custom =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
     'orders:(uuid,dateActivated,' +
@@ -141,19 +139,7 @@ export function fetchVisit(visitUuid: string, abortController: AbortController):
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
-  return openmrsObservableFetch(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`, {
-    signal: abortController.signal,
-    method: 'GET',
-    headers: {
-      'Content-type': 'application/json',
-    },
-  })
-    .pipe(take(1))
-    .pipe(
-      map((response: FetchResponse<Visit>) => {
-        return response;
-      }),
-    );
+  return openmrsFetch<Visit>(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`);
 }
 
 export function getDosage(strength: string, doseNumber: number) {

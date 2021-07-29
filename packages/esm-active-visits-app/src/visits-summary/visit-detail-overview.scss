@@ -3,36 +3,6 @@
 @import "~carbon-components/src/globals/scss/mixins";
 @import "../root.scss";
 
-// Typography
-
-.caption01 {
-  @include carbon--type-style("caption-01");
-}
-
-.bodyShort02 {
-  @include carbon--type-style("body-short-02");
-}
-
-.productiveHeading01 {
-  @include carbon--type-style("productive-heading-01");
-}
-
-.productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
-}
-
-.bodyLong01 {
-  @include carbon--type-style("body-long-01");
-}
-
-.text02 {
-  color: #525252;
-}
-
-.text01 {
-  color: #161616;
-}
-
 .container  {
   display: flex;
   flex-direction: column;
@@ -165,10 +135,6 @@
   border-left: 3px solid #e0e0e0 !important;
 }
 
-tab > button:first {
-  margin-left: 10px;
-}
-
 .tab > button, .tab > button:focus, .tab > button:active {
   outline: 0 !important;
   outline-offset: 0 !important;
@@ -225,4 +191,5 @@ tab > button:first {
 
 .testSummaryExtension p {
   @include carbon--type-style("body-long-01");
+  color: #525252
 }

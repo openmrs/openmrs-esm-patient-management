@@ -21,39 +21,6 @@ import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 import dayjs from 'dayjs';
 
-const headerData = [
-  {
-    id: 0,
-    header: 'Visit Time',
-    key: 'visitStartTime',
-  },
-  {
-    id: 1,
-    header: 'ID Number',
-    key: 'IDNumber',
-  },
-  {
-    id: 2,
-    header: 'Name',
-    key: 'name',
-  },
-  {
-    id: 3,
-    header: 'Gender',
-    key: 'gender',
-  },
-  {
-    id: 4,
-    header: 'Age',
-    key: 'age',
-  },
-  {
-    id: 5,
-    header: 'Visit Type',
-    key: 'visitType',
-  },
-];
-
 function formatDatetime(startDatetime) {
   const todayDate = dayjs();
   const today =
@@ -67,7 +34,7 @@ function formatDatetime(startDatetime) {
   }
 }
 
-const ActiveVisitsTable = (props) => {
+const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const desktopView = layout === 'desktop';
@@ -77,6 +44,60 @@ const ActiveVisitsTable = (props) => {
   const [loading, setLoading] = useState(true);
   const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
   const [searchString, setSearchString] = useState('');
+
+  const headerData = useMemo(
+    () => [
+      {
+        id: 0,
+        header: t('visitStartTime', 'Visit Time'),
+        key: 'visitStartTime',
+      },
+      {
+        id: 1,
+        header: t('IDNumber', 'ID Number'),
+        key: 'IDNumber',
+      },
+      {
+        id: 2,
+        header: t('name', 'Name'),
+        key: 'name',
+      },
+      {
+        id: 3,
+        header: t('gender', 'Gender'),
+        key: 'gender',
+      },
+      {
+        id: 4,
+        header: t('age', 'Age'),
+        key: 'age',
+      },
+      {
+        id: 5,
+        header: t('visitType', 'Visit Type'),
+        key: 'visitType',
+      },
+    ],
+    [t],
+  );
+
+  useEffect(() => {
+    fetchActiveVisits().then(({ data }) => {
+      const rowData = data.results.map((visit, ind) => ({
+        id: `${ind}`,
+        visitStartTime: formatDatetime(visit.startDatetime),
+        IDNumber: visit?.patient?.identifiers[0]?.identifier,
+        name: visit?.patient?.person?.display,
+        gender: visit?.patient?.person?.gender,
+        age: visit?.patient?.person?.age,
+        visitType: visit?.visitType?.display,
+        patientUuid: visit?.patient?.uuid,
+        visitUuid: visit?.uuid,
+      }));
+      setActiveVisits(rowData);
+      setLoading(false);
+    });
+  }, []);
 
   const searchResults = useMemo(() => {
     if (searchString && searchString.trim() !== '') {
@@ -93,34 +114,15 @@ const ActiveVisitsTable = (props) => {
       return activeVisits;
     }
   }, [searchString, activeVisits]);
+
   const { goTo, results, currentPage } = usePagination(searchResults, currentPageSize);
+  const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
 
   useEffect(() => {
     if (currentPage !== 1) {
       goTo(1);
     }
   }, [searchString]);
-
-  useEffect(() => {
-    const activeVisits = fetchActiveVisits().subscribe((data) => {
-      const rowData = data.results.map((visit, ind) => ({
-        id: `${ind}`,
-        visitStartTime: formatDatetime(visit.startDatetime),
-        IDNumber: visit?.patient?.identifiers[0]?.identifier,
-        name: visit?.patient?.person?.display,
-        gender: visit?.patient?.person?.gender,
-        age: visit?.patient?.person?.age,
-        visitType: visit?.visitType?.display,
-        patientUuid: visit?.patient?.uuid,
-        visitUuid: visit?.uuid,
-      }));
-      setActiveVisits(rowData);
-      setLoading(false);
-    });
-    return () => activeVisits.unsubscribe();
-  }, []);
-
-  const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
 
   return !loading ? (
     <div className={styles.activeVisitsContainer}>
@@ -185,7 +187,7 @@ const ActiveVisitsTable = (props) => {
             </Table>
             {rows.length === 0 && (
               <p
-                style={{ height: desktopView ? '2rem' : '3rem' }}
+                style={{ height: desktopView ? '2rem' : '3rem', marginLeft: desktopView ? '2rem' : '3rem' }}
                 className={`${styles.emptyRow} ${styles.bodyLong01}`}>
                 {t('noVisitsFound', 'No visits found')}
               </p>

@@ -12,3 +12,19 @@
 .bodyLong01 {
   @include carbon--type-style("body-long-01");
 }
+
+.caption01 {
+  @include carbon--type-style("caption-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.text02 {
+  color: #525252;
+}
+
+.text01 {
+  color: #161616;
+}

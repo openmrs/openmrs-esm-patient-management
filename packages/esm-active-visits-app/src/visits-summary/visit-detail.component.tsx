@@ -37,14 +37,9 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   );
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const sub = fetchVisit(visitUuid, abortController).subscribe(({ data }) => {
+    fetchVisit(visitUuid).then(({ data }) => {
       setVisit(data);
     }, createErrorHandler());
-    return () => {
-      abortController.abort();
-      sub.unsubscribe();
-    };
   }, []);
 
   return visit ? (
