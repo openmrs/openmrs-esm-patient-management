@@ -12,10 +12,12 @@ export interface ActiveVisitRow {
   visitUuid: string;
 }
 
-export function fetchActiveVisits() {
+export function fetchActiveVisits(abortController: AbortController) {
   const v =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
-  return openmrsFetch<{ results: Visit[] }>(`/ws/rest/v1/visit?includeInactive=false&v=${v}`);
+  return openmrsFetch<{ results: Visit[] }>(`/ws/rest/v1/visit?includeInactive=false&v=${v}`, {
+    signal: abortController.signal,
+  });
 }

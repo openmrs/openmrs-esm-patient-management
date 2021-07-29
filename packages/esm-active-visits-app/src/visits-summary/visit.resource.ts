@@ -125,7 +125,7 @@ export interface OrderItem {
   };
 }
 
-export function fetchVisit(visitUuid: string) {
+export function fetchVisit(visitUuid: string, abortController: AbortController) {
   const custom =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
     'orders:(uuid,dateActivated,' +
@@ -139,7 +139,9 @@ export function fetchVisit(visitUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
-  return openmrsFetch<Visit>(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`);
+  return openmrsFetch<Visit>(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`, {
+    signal: abortController.signal,
+  });
 }
 
 export function getDosage(strength: string, doseNumber: number) {

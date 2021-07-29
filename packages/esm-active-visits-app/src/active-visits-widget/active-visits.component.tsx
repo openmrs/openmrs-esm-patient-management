@@ -82,7 +82,8 @@ const ActiveVisitsTable = () => {
   );
 
   useEffect(() => {
-    fetchActiveVisits().then(({ data }) => {
+    const abortController = new AbortController();
+    fetchActiveVisits(abortController).then(({ data }) => {
       const rowData = data.results.map((visit, ind) => ({
         id: `${ind}`,
         visitStartTime: formatDatetime(visit.startDatetime),
@@ -97,6 +98,8 @@ const ActiveVisitsTable = () => {
       setActiveVisits(rowData);
       setLoading(false);
     });
+
+    return () => abortController.abort();
   }, []);
 
   const searchResults = useMemo(() => {
