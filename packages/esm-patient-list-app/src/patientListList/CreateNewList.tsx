@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import Button from 'carbon-components-react/lib/components/Button';
 import MultiSelect from 'carbon-components-react/lib/components/MultiSelect';
 import TextArea from 'carbon-components-react/lib/components/TextArea';
@@ -13,10 +13,10 @@ interface CreateNewListProps {
 
 const CreateNewList: React.FC<CreateNewListProps> = ({ close }) => {
   const { t } = useTranslation();
-  const nameInputRef = React.useRef<HTMLInputElement>();
-  const decriptionInputRef = React.useRef<HTMLTextAreaElement>();
+  const nameInputRef = useRef<HTMLInputElement>();
+  const decriptionInputRef = useRef<HTMLTextAreaElement>();
 
-  const createPL = React.useCallback(() => {
+  const createPL = useCallback(() => {
     // set loading
     createPatientList({
       name: nameInputRef.current.value,
@@ -24,7 +24,7 @@ const CreateNewList: React.FC<CreateNewListProps> = ({ close }) => {
     }).then(close);
   }, [close]);
 
-  const items = React.useMemo(
+  const items = useMemo(
     () => [
       {
         id: 'age',

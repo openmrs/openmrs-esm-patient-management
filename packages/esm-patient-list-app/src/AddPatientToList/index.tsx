@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
-import { usePatientListData } from '../patientListData';
+import { usePatientListDataQuery } from '../patientListData';
 import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
@@ -27,7 +27,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
-  const { loading, data } = usePatientListData(userId);
+  const { isFetching, data } = usePatientListDataQuery(userId);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="bx--fieldset">
           <p className="bx--label">Patient Lists</p>
-          {!loading && patientListsObj && results ? (
+          {!isFetching && patientListsObj && results ? (
             results.length > 0 ? (
               results.map((patientList, ind) => (
                 <div key={ind} className={styles.checkbox}>

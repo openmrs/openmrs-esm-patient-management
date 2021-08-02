@@ -71,7 +71,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
     [patients, columns],
   );
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
 
   if (isLoading) {
     return (

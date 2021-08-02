@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/lib/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
@@ -9,8 +9,8 @@ import CreateNewList from './CreateNewList';
 import PatientListMembersOverlay from '../PatientList';
 import SearchOverlay from './SearchOverlay';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, isOfflineUuid, useSessionUser } from '@openmrs/esm-framework';
-import { updateDeviceLocalPatientList, usePatientListData } from '../patientListData';
+import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
+import { usePatientListDataQuery, useToggleStarredMutation } from '../patientListData';
 import { PatientList, PatientListFilter, PatientListType } from '../patientListData/types';
 import { SearchState, StateTypes, ViewState } from './types';
 import './style.scss';
@@ -42,7 +42,7 @@ function createLabels() {
 }
 
 function usePatientListFilterForCurrentTab(selectedTab: TabTypes) {
-  return React.useMemo<PatientListFilter>(() => {
+  return useMemo<PatientListFilter>(() => {
     switch (selectedTab) {
       case TabTypes.STARRED:
         return { isStarred: true };
@@ -55,6 +55,13 @@ function usePatientListFilterForCurrentTab(selectedTab: TabTypes) {
         return {};
     }
   }, [selectedTab]);
+}
+
+function useAppropriateTableHeadersForSelectedTab(selectedTab: TabTypes) {
+  return useMemo(
+    () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
+    [selectedTab],
+  );
 }
 
 enum RouteStateTypes {
@@ -80,31 +87,29 @@ type RouteState = AllListRouteState | CreateNewListState | SingleListState;
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const [routeState, setRouteState] = React.useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
-  const [selectedTab, setSelectedTab] = React.useState(TabTypes.STARRED);
-  const [viewState, setViewState] = React.useState<ViewState>({ type: StateTypes.IDLE });
-  const searchRef = React.useRef<Search & { input: HTMLInputElement }>();
+  const [routeState, setRouteState] = useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
+  const [selectedTab, setSelectedTab] = useState(TabTypes.STARRED);
+  const [viewState, setViewState] = useState<ViewState>({ type: StateTypes.IDLE });
+  const searchRef = useRef<Search & { input: HTMLInputElement }>();
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const userId = useSessionUser()?.user.uuid;
-  const { data: patientListData, loading, error } = usePatientListData(userId, patientListFilter);
+  const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
+  const patientListQuery = usePatientListDataQuery(userId, patientListFilter);
+  const toggleStarredMutation = useToggleStarredMutation();
 
-  const customHeaders = React.useMemo(
-    () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
-    [selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER],
-  );
-
-  const setListStarred = React.useCallback(
-    (patientListId: string, isStarred: boolean) => {
-      if (isOfflineUuid(patientListId)) {
-        updateDeviceLocalPatientList(userId, patientListId, { isStarred });
-      } else {
-        //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
-      }
+  const handleListStarred = useCallback(
+    async (listUuid: string, isStarred: boolean) => {
+      await toggleStarredMutation.refetch({ userId, patientListId: listUuid, isStarred });
+      await patientListQuery.refetch();
     },
-    [userId],
+    [toggleStarredMutation, patientListQuery, userId],
   );
 
-  if (error) {
+  const handleOpenPatientList = useCallback((listUuid) => {
+    setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
+  }, []);
+
+  if (patientListQuery.error) {
     //TODO show toast with error
     return null;
   }
@@ -160,7 +165,7 @@ const PatientListList: React.FC = () => {
                 type: StateTypes.SEARCH_WITH_RESULTS,
                 searchTerm,
                 results: ['todo'],
-                enter: {},
+                enter: true,
               }));
             }
           }}
@@ -208,22 +213,14 @@ const PatientListList: React.FC = () => {
       </div>
       <div style={{ gridRow: '3 / 4', gridColumn: '1 / 2', height: '100%' }}>
         <PatientListTable
-          loading={loading}
+          loading={patientListQuery.isFetching}
           headers={customHeaders}
-          patientLists={patientListData}
-          setListStarred={setListStarred}
-          openPatientList={(listUuid) => {
-            setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
-          }}
+          patientLists={patientListQuery.data}
+          refetch={patientListQuery.refetch}
+          openPatientList={handleOpenPatientList}
         />
       </div>
-      <SearchOverlay
-        viewState={viewState}
-        openPatientList={(listUuid) => {
-          setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
-        }}
-        setListStarred={setListStarred}
-      />
+      <SearchOverlay viewState={viewState} openPatientList={handleOpenPatientList} setListStarred={handleListStarred} />
       {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
         <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
       )}

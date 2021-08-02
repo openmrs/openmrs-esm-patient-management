@@ -1,44 +1,37 @@
 import { isOfflineUuid } from '@openmrs/esm-framework';
-import { useState, useEffect } from 'react';
 import { getAllPatientLists, OpenmrsCohort } from './api';
-import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers } from './';
+import { getAllDeviceLocalPatientLists, getDeviceLocalPatientListMembers, updateDeviceLocalPatientList } from './';
 import { getPatientListMembers } from './mock';
-import { PatientListMember, PatientListType, FetchState, PatientList, PatientListFilter } from './types';
+import { PatientListType, PatientList, PatientListFilter } from './types';
+import { useAsync, useAsyncQuery } from '../utils/use-async.hook';
 
-const initialData = {
-  loading: true,
-  data: undefined,
-  error: undefined,
-};
+export function usePatientListDataQuery(userId?: string, filter?: PatientListFilter) {
+  return useAsyncQuery(
+    ({ abortController }) => {
+      if (!userId) {
+        return Promise.resolve<Array<PatientList>>([]);
+      }
 
-const loadedData = {
-  loading: false,
-  data: undefined,
-  error: undefined,
-};
+      return getLocalAndOnlinePatientLists(userId, filter, abortController);
+    },
+    [userId, filter],
+  );
+}
 
-/**
- * Hook for fetching all available patient lists with optionally provided filters and loading state information.
- */
-export function usePatientListData(userId: string, filter?: PatientListFilter) {
-  const [data, setData] = useState<FetchState<Array<PatientList>>>(initialData);
+export interface ToggleStarredMutationArgs {
+  userId: string;
+  patientListId: string;
+  isStarred: boolean;
+}
 
-  useEffect(() => {
-    const ac = new AbortController();
-    setData(initialData);
-
-    getLocalAndOnlinePatientLists(userId, filter)
-      .then((patientLists) =>
-        setData({
-          ...(loadedData as any),
-          data: patientLists,
-        }),
-      )
-      .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
-    return () => ac.abort();
-  }, [userId, filter]);
-
-  return data;
+export function useToggleStarredMutation() {
+  return useAsync(({ userId, patientListId, isStarred }: ToggleStarredMutationArgs, { abortController }) => {
+    if (isOfflineUuid(patientListId)) {
+      return updateDeviceLocalPatientList(userId, patientListId, { isStarred });
+    } else {
+      //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    }
+  });
 }
 
 /** Fetches and merges patient lists from the device and backend into a single patient list array. */
@@ -63,29 +56,10 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
   };
 }
 
-/**
- * Hook for fetching the members of the single patient list with the given {@link patientListId}.
- * @param patientListId The ID of the patient list whose memnbers should be resolved.
- */
-export function useSinglePatientListData(patientListId: string) {
-  const [data, setData] = useState<FetchState<Array<PatientListMember>>>(initialData);
-
-  useEffect(() => {
-    setData(initialData);
-
-    const fetchingPromise = isOfflineUuid(patientListId)
+export function useGetAllPatientListMembersQuery(patientListId: string) {
+  return useAsyncQuery(() => {
+    return isOfflineUuid(patientListId)
       ? getDeviceLocalPatientListMembers(patientListId)
       : getPatientListMembers(patientListId);
-
-    fetchingPromise
-      .then((data) =>
-        setData({
-          ...(loadedData as any),
-          data,
-        }),
-      )
-      .catch((error) => error?.name !== 'AbortError' && setData({ ...loadedData, error }));
-  }, [patientListId]);
-
-  return data;
+  });
 }

@@ -15,6 +15,8 @@ import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { PatientList, PatientListType } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
+import { useToggleStarredMutation } from '../patientListData';
+import { useSessionUser } from '@openmrs/esm-framework';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -24,23 +26,32 @@ const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
 ];
 
 interface PatientListTableProps {
+  style?: CSSProperties;
   patientLists: Array<PatientList>;
   loading?: boolean;
   headers?: Array<DataTableHeader<keyof PatientList>>;
-  style?: CSSProperties;
-  setListStarred: (listUuid: string, star: boolean) => void;
+  refetch(): void;
   openPatientList: (uuid: string) => void;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
-  patientLists,
-  setListStarred,
-  headers = defaultHeaders,
   style,
+  patientLists = [],
   loading = false,
+  headers = defaultHeaders,
+  refetch,
   openPatientList,
 }) => {
   const { t } = useTranslation();
+  const userId = useSessionUser()?.user.uuid;
+  const toggleStarredMutation = useToggleStarredMutation();
+
+  const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
+    if (userId) {
+      await toggleStarredMutation.refetch({ userId, patientListId, isStarred });
+      refetch();
+    }
+  };
 
   return !loading ? (
     <DataTable rows={patientLists} headers={headers}>
@@ -85,7 +96,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                           <TableCell
                             key={cell.id}
                             style={{ cursor: 'pointer' }}
-                            onClick={() => setListStarred(row.id, !cell.value)}>
+                            onClick={() => handleToggleStarred(row.id, !cell.value)}>
                             {cell.value ? <StarFilled16 color="#0f62fe" /> : <Star16 color="#0f62fe" />}
                           </TableCell>
                         );
@@ -113,7 +124,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
     </DataTable>
   ) : (
     <DataTableSkeleton
-      style={{ ...style, backgroundColor: 'transparent', padding: '0rem', margin: '1rem' }}
+      style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
       showToolbar={false}
       showHeader={false}
       rowCount={4}
