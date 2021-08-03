@@ -1,14 +1,6 @@
 import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
-import {
-  PatientList,
-  PatientListMember,
-  PatientListMemberFilter,
-  PatientListUpdate,
-  PatientListType,
-  PatientListFilter,
-  AddPatientData,
-} from './types';
+import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from '.';
 import uniqBy from 'lodash-es/uniqBy';
 
 /**
@@ -58,11 +50,8 @@ export async function getLocalPatientListIdsForPatient(userId: string, patientId
 export async function getLocalPatientListMembers(
   userId: string,
   patientListId: string,
-  filters?: Array<PatientListMemberFilter>,
 ): Promise<Array<PatientListMember>> {
   ensureIsLocalPatientList(patientListId);
-
-  // TODO: Apply filtering.
   const metadata = await findFirstPatientListMetadata(userId, patientListId);
   return metadata?.members ?? [];
 }

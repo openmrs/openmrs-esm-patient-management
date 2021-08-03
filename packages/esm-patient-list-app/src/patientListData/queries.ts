@@ -1,4 +1,4 @@
-import { AddPatientData, PatientList, PatientListFilter, PatientListMember } from './types';
+import { PatientList, PatientListFilter, PatientListMember } from './types';
 import { useAsync, useAsyncQuery } from '../utils/use-async.hook';
 import {
   getLocalAndRemotePatientListMembers,
@@ -7,6 +7,10 @@ import {
   updateLocalOrRemotePatientList,
 } from './api';
 
+/**
+ * A hook for querying all local and remote patient lists belonging to a given user,
+ * optionally filtered by the specified {@link filter}.
+ */
 export function usePatientListDataQuery(userId?: string, filter?: PatientListFilter) {
   return useAsyncQuery(
     ({ abortController }) => {
@@ -20,6 +24,9 @@ export function usePatientListDataQuery(userId?: string, filter?: PatientListFil
   );
 }
 
+/**
+ * A hook for querying all members of a given local or remote patient list.
+ */
 export function useGetAllPatientListMembersQuery(userId?: string, patientListId?: string) {
   return useAsyncQuery(() => {
     if (!userId || !patientListId) {
@@ -30,6 +37,12 @@ export function useGetAllPatientListMembersQuery(userId?: string, patientListId?
   }, [userId, patientListId]);
 }
 
+/**
+ * A hook for querying all local and remote patient lists that exist for a given user,
+ * but without those patient lists where a specific patient has already been added as a member.
+ *
+ * This is intended for displaying all lists to which a given patient can still be added.
+ */
 export function useGetAllPatientListsWithoutPatientQuery(userId?: string, patientUuid?: string) {
   return useAsyncQuery(
     async ({ abortController }) => {
@@ -55,13 +68,11 @@ export interface ToggleStarredMutationArgs {
   isStarred: boolean;
 }
 
+/**
+ * A hook for mutating a local or remote patient list's `isStarred` attribute.
+ */
 export function useToggleStarredMutation() {
   return useAsync(({ userId, patientListId, isStarred }: ToggleStarredMutationArgs, { abortController }) => {
     return updateLocalOrRemotePatientList(userId, patientListId, { isStarred }, abortController);
   });
-}
-
-export interface AddPatientToPatientListMutationArgs {
-  userId: string;
-  data: Array<AddPatientData>;
 }
