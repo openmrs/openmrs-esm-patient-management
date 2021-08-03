@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
-import { usePatientListData } from '../patientListData';
-import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
+import { addPatientToLocalOrRemotePatientList, useGetAllPatientListsWithoutPatientQuery } from '../api';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
 import Checkbox from 'carbon-components-react/lib/components/Checkbox';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import styles from './add-patient-to-list.scss';
+import styles from './add-patient.scss';
 
 interface AddPatientProps {
   closeModal: () => void;
@@ -27,25 +26,22 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
-  const { loading, data } = usePatientListData(userId);
+  const { data, isFetching } = useGetAllPatientListsWithoutPatientQuery(userId, patientUuid);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 
   useEffect(() => {
     if (data) {
-      const lists: PatientListObj = {};
-      data.map((patientList) => {
-        lists[patientList.id] = {
+      const newPatientListsObj: PatientListObj = {};
+
+      for (const patientList of data) {
+        newPatientListsObj[patientList.id] = {
           visible: true,
           selected: false,
           name: patientList?.display,
         };
-      });
-      getPatientListsForPatient(patientUuid).then((enrolledPatientLists) => {
-        enrolledPatientLists.forEach((patientList) => {
-          lists[patientList.cohort.uuid].visible = false;
-        });
-        setPatientListsObj(lists);
-      });
+      }
+
+      setPatientListsObj(newPatientListsObj);
     }
   }, [data]);
 
@@ -66,7 +62,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const handleSubmit = useCallback(() => {
     Object.keys(patientListsObj).forEach((patientListUuid) => {
       if (patientListsObj[patientListUuid].selected) {
-        addPatientToList({
+        addPatientToLocalOrRemotePatientList(userId, {
           patient: patientUuid,
           cohort: patientListUuid,
           startDate: toOmrsIsoString(new Date()),
@@ -135,7 +131,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="bx--fieldset">
           <p className="bx--label">Patient Lists</p>
-          {!loading && patientListsObj && results ? (
+          {!isFetching && patientListsObj && results ? (
             results.length > 0 ? (
               results.map((patientList, ind) => (
                 <div key={ind} className={styles.checkbox}>

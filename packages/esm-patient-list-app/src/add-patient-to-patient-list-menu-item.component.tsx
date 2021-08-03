@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
 
@@ -16,9 +16,9 @@ interface AddPastVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
-const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
+const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const openModal = React.useCallback(() => {
+  const openModal = useCallback(() => {
     const dispose = showModal('add-patient-to-patient-list-modal', {
       closeModal: () => dispose(),
       patientUuid,
@@ -45,4 +45,4 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
   );
 };
 
-export default AddPastVisitOverflowMenuItem;
+export default AddPatientToPatientListMenuItem;

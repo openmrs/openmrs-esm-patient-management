@@ -1,5 +1,15 @@
-import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import { PatientListFilter, PatientListType } from './types';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import {
+  AddPatientData,
+  CohortResponse,
+  NewCohortData,
+  OpenmrsCohort,
+  OpenmrsCohortMember,
+  OpenmrsCohortRef,
+  PatientListFilter,
+  PatientListMember,
+  PatientListType,
+} from './types';
 
 const cohortUrl = '/ws/rest/v1/cohortm';
 
@@ -18,43 +28,6 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
     body: JSON.stringify(data),
   });
   return response.data;
-}
-
-export interface OpenmrsCohort {
-  uuid: string;
-  resourceVersion: string;
-  name: string;
-  description: string;
-  attributes: Array<any>;
-  links: Array<any>;
-  location: Location | null;
-  groupCohort: boolean | null;
-  startDate: string | null;
-  endDate: string | null;
-  voidReason: string | null;
-  voided: boolean;
-  isStarred?: boolean;
-  type?: string;
-}
-
-export interface OpenmrsCohortRef {
-  cohort: OpenmrsCohortMember;
-}
-
-export interface OpenmrsCohortMember {
-  attributes: Array<any>;
-  description: string;
-  endDate: string;
-  name: string;
-  uuid: string;
-  patient: {
-    uuid: string;
-  };
-}
-
-interface CohortRepsonse<T> {
-  results: Array<T>;
-  error: any;
 }
 
 export async function getAllPatientLists(filter: PatientListFilter = {}, ac = new AbortController()) {
@@ -77,7 +50,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
+  } = await openmrsFetch<CohortResponse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
     signal: ac.signal,
   });
 
@@ -91,7 +64,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
 export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohortMember>>(
+  } = await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(
     `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=default`,
     {
       signal: ac.signal,
@@ -108,14 +81,14 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
     signal: ac.signal,
   });
 
-  const patients: Array<OpenmrsResource> = result.data.entry.map((e) => e.resource);
+  const patients: Array<PatientListMember> = result.data.entry.map((e) => e.resource);
   return patients;
 }
 
-export async function getPatientListsForPatient(patientUuid: string, ac = new AbortController()) {
+export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortRepsonse<OpenmrsCohortRef>>(
+  } = await openmrsFetch<CohortResponse<OpenmrsCohortRef>>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     {
       signal: ac.signal,
@@ -126,22 +99,11 @@ export async function getPatientListsForPatient(patientUuid: string, ac = new Ab
     throw error;
   }
 
-  return results;
-}
-
-export interface AddPatientData {
-  patient: string;
-  cohort: string;
-  startDate: string;
+  return results.map((ref) => ref.cohort.uuid);
 }
 
 export async function addPatientToList(data: AddPatientData, ac = new AbortController()) {
   return postData(`${cohortUrl}/cohortmember`, data, ac);
-}
-
-export interface NewCohortData {
-  name: string;
-  description: string;
 }
 
 export async function createPatientList(cohort: NewCohortData, ac = new AbortController()) {

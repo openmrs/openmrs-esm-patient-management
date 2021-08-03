@@ -1,5 +1,5 @@
 import React from 'react';
-import PatientListResults from './PatientListResults';
+import PatientListResults from './patient-list-results.component';
 import { ViewState, StateTypes } from './types';
 
 interface SearchOverlayProps {
@@ -26,7 +26,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ viewState, setListStarred
         <PatientListResults
           style={{ zIndex: 1, gridRow: '2 / 4', gridColumn: '1 / 2', backgroundColor: '#ededed' }}
           nameFilter={viewState.searchTerm}
-          setListStarred={setListStarred}
           enter={viewState.enter}
           openPatientList={openPatientList}
         />
