@@ -29,23 +29,10 @@ export interface PatientListOption {
   value: any;
 }
 
-/**
- * identifier -> uuid
- * age
- * gender
- * date of birth
- * last visit -> last visit/encounter date
- */
 export interface PatientListMember {
-  patientUuid: string;
-  properties: Array<PatientListMemberProperty>;
-}
-
-export interface PatientListMemberProperty {
-  type: string;
-  value: string | number;
+  id: string;
 }
 
 export interface PatientListMemberFilter {
-  // ??
+  // TODO
 }

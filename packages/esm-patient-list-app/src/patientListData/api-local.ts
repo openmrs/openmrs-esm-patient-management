@@ -28,7 +28,7 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
  * Returns all patient lists of the given user stored locally on the user's device.
  * @param userId The ID of the user whose patient list information should be retrieved.
  */
-export async function getAllDeviceLocalPatientLists(userId: string, filter: PatientListFilter = {}) {
+export async function getAllLocalPatientLists(userId: string, filter: PatientListFilter = {}) {
   // TODO: Apply filtering.
   const allMetadata = await new PatientListDb().patientListMetadata.where({ userId }).toArray();
   const patientLists = knownLocalPatientListTemplates.map((defaultEntry) => {
@@ -52,7 +52,7 @@ export async function getAllDeviceLocalPatientLists(userId: string, filter: Pati
  * Returns the members of the patient list with the given {@link id} stored locally on the user's device.
  * Returns an empty array if the patient list is not found.
  */
-export async function getDeviceLocalPatientListMembers(
+export async function getLocalPatientListMembers(
   id: string,
   filters?: Array<PatientListMemberFilter>,
 ): Promise<Array<PatientListMember>> {
@@ -66,7 +66,7 @@ export async function getDeviceLocalPatientListMembers(
 /**
  * Updates the local patient list with the given update values.
  */
-export async function updateDeviceLocalPatientList(userId: string, patientListId: string, update: PatientListUpdate) {
+export async function updateLocalPatientList(userId: string, patientListId: string, update: PatientListUpdate) {
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();

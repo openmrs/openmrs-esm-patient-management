@@ -5,7 +5,7 @@ import TextArea from 'carbon-components-react/lib/components/TextArea';
 import TextInput from 'carbon-components-react/lib/components/TextInput';
 import Overlay from '../Overlay';
 import { useTranslation } from 'react-i18next';
-import { createPatientList } from '../patientListData/api';
+import { createPatientList } from '../patientListData/api-remote';
 
 interface CreateNewListProps {
   close: () => void;

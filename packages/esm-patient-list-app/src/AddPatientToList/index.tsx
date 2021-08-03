@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
 import { usePatientListDataQuery } from '../patientListData';
-import { addPatientToList, getPatientListsForPatient } from '../patientListData/api';
+import { addPatientToList, getPatientListsForPatient } from '../patientListData/api-remote';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Pagination from 'carbon-components-react/lib/components/Pagination';

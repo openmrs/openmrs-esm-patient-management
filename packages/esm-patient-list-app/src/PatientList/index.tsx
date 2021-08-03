@@ -15,7 +15,7 @@ const PatientListMembersOverlay: React.FC<PatientListMembersOverlayProps> = ({ c
   return (
     <Overlay close={close} header={t('patientListHeader', 'patient list')}>
       <p>{listUuid}</p>
-      <ul>{data && data.map((item) => <li key={item.patientUuid}>{item.patientUuid}</li>)}</ul>
+      <ul>{data && data.map((item) => <li key={item.id}>{item.id}</li>)}</ul>
     </Overlay>
   );
 };
