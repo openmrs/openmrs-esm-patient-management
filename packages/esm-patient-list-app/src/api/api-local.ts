@@ -1,6 +1,6 @@
 import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
-import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from '.';
+import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from './types';
 import uniqBy from 'lodash-es/uniqBy';
 import { notifyOnPatientAdded } from '../global-store';
 

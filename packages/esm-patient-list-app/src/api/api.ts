@@ -1,15 +1,20 @@
 import { isOfflineUuid } from '@openmrs/esm-framework';
 import {
+  addPatientToLocalPatientList,
   getAllLocalPatientLists,
-  getAllPatientLists,
-  OpenmrsCohort,
+  getLocalPatientListIdsForPatient,
   getLocalPatientListMembers,
-  getPatientListMembers,
   updateLocalPatientList,
-} from '.';
-import { addPatientToLocalPatientList, getLocalPatientListIdsForPatient } from './api-local';
-import { addPatientToList, getPatientListIdsForPatient } from './api-remote';
-import { PatientListFilter, PatientList, PatientListType, PatientListUpdate, AddPatientData } from './types';
+} from './api-local';
+import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
+import {
+  AddPatientData,
+  OpenmrsCohort,
+  PatientList,
+  PatientListFilter,
+  PatientListType,
+  PatientListUpdate,
+} from './types';
 
 export async function getLocalAndRemotePatientLists(
   userId: string,
