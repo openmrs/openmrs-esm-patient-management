@@ -125,7 +125,7 @@ class PatientListDb extends Dexie {
   patientListMetadata: Table<LocalPatientListMetadata, number>;
 
   constructor() {
-    super('EsmPatientListLocalPatientLists');
+    super('EsmPatientList');
     this.version(2).stores({ patientListMetadata: '++id,&[userId+patientListId]' });
     this.patientListMetadata = this.table('patientListMetadata');
   }
