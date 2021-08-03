@@ -1,5 +1,4 @@
-import { FetchResponse, openmrsFetch, openmrsObservableFetch, OpenmrsResource } from '@openmrs/esm-framework';
-import { take, map } from 'rxjs/operators';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
 
 export interface ActiveVisitRow {
   id: string;
@@ -10,18 +9,15 @@ export interface ActiveVisitRow {
   age: string;
   visitType: string;
   patientUuid: string;
+  visitUuid: string;
 }
 
-export function fetchActiveVisits() {
+export function fetchActiveVisits(abortController: AbortController) {
   const v =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
-  return openmrsObservableFetch(`/ws/rest/v1/visit?includeInactive=false&v=${v}`, {
-    headers: {
-      contentType: 'application/json',
-    },
-  })
-    .pipe(take(1))
-    .pipe(map((response: FetchResponse<{ results: Array<any> }>) => response.data));
+  return openmrsFetch<{ results: Visit[] }>(`/ws/rest/v1/visit?includeInactive=false&v=${v}`, {
+    signal: abortController.signal,
+  });
 }
