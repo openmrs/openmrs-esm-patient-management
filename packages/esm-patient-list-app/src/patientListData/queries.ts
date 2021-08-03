@@ -1,9 +1,9 @@
 import { AddPatientData, PatientList, PatientListFilter, PatientListMember } from './types';
 import { useAsync, useAsyncQuery } from '../utils/use-async.hook';
 import {
-  addPatientToLocalOrRemotePatientList,
   getLocalAndRemotePatientListMembers,
   getLocalAndRemotePatientLists,
+  getLocalAndRemotePatientListsForPatient,
   updateLocalOrRemotePatientList,
 } from './api';
 
@@ -28,6 +28,25 @@ export function useGetAllPatientListMembersQuery(userId?: string, patientListId?
 
     return getLocalAndRemotePatientListMembers(userId, patientListId);
   }, [userId, patientListId]);
+}
+
+export function useGetAllPatientListsWithoutPatientQuery(userId?: string, patientUuid?: string) {
+  return useAsyncQuery(
+    async ({ abortController }) => {
+      if (!userId || !patientUuid) {
+        return [];
+      }
+
+      const [allLists, listsIdsOfThisPatient] = await Promise.all([
+        getLocalAndRemotePatientLists(userId, undefined, abortController),
+        getLocalAndRemotePatientListsForPatient(userId, patientUuid, abortController),
+      ]);
+
+      const listsWithoutPatient = allLists.filter((list) => !listsIdsOfThisPatient.includes(list.id));
+      return listsWithoutPatient;
+    },
+    [userId, patientUuid],
+  );
 }
 
 export interface ToggleStarredMutationArgs {

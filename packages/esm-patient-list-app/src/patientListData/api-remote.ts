@@ -112,7 +112,7 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   return patients;
 }
 
-export async function getPatientListsForPatient(patientUuid: string, ac = new AbortController()) {
+export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortRepsonse<OpenmrsCohortRef>>(
@@ -126,7 +126,7 @@ export async function getPatientListsForPatient(patientUuid: string, ac = new Ab
     throw error;
   }
 
-  return results;
+  return results.map((ref) => ref.cohort.uuid);
 }
 
 export async function addPatientToList(data: AddPatientData, ac = new AbortController()) {

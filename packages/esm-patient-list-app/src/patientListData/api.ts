@@ -7,8 +7,8 @@ import {
   getPatientListMembers,
   updateLocalPatientList,
 } from '.';
-import { addPatientToLocalPatientList } from './api-local';
-import { addPatientToList } from './api-remote';
+import { addPatientToLocalPatientList, getLocalPatientListIdsForPatient } from './api-local';
+import { addPatientToList, getPatientListIdsForPatient } from './api-remote';
 import { PatientListFilter, PatientList, PatientListType, PatientListUpdate, AddPatientData } from './types';
 
 export async function getLocalAndRemotePatientLists(
@@ -17,10 +17,10 @@ export async function getLocalAndRemotePatientLists(
   abortController = new AbortController(),
 ): Promise<Array<PatientList>> {
   const localPromise = getAllLocalPatientLists(userId, filter);
-  const onlinePromise = getAllPatientLists(filter, abortController).then((cohorts) =>
+  const remotePromise = getAllPatientLists(filter, abortController).then((cohorts) =>
     cohorts.map(mapCohortToPatientList),
   );
-  return Promise.all([localPromise, onlinePromise]).then((lists) => [].concat.apply([], lists));
+  return awaitAllAndMerge(localPromise, remotePromise);
 }
 
 function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
@@ -32,6 +32,20 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
     memberCount: 0, // TODO
     isStarred: false, // TODO,
   };
+}
+
+export async function getLocalAndRemotePatientListsForPatient(
+  userId: string,
+  patientId: string,
+  abortController?: AbortController,
+) {
+  const localPromise = getLocalPatientListIdsForPatient(userId, patientId);
+  const remotePromise = getPatientListIdsForPatient(patientId, abortController);
+  return awaitAllAndMerge(localPromise, remotePromise);
+}
+
+function awaitAllAndMerge<T>(...promises: Array<Promise<Array<T>>>): Promise<Array<T>> {
+  return Promise.all(promises).then((lists) => [].concat.apply([], lists));
 }
 
 export function getLocalAndRemotePatientListMembers(

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
-import { addPatientToLocalOrRemotePatientList, usePatientListDataQuery } from '../patientListData';
-import { addPatientToList, getPatientListsForPatient } from '../patientListData/api-remote';
+import { addPatientToLocalOrRemotePatientList, useGetAllPatientListsWithoutPatientQuery } from '../patientListData';
 import Search from 'carbon-components-react/lib/components/Search';
 import Button from 'carbon-components-react/lib/components/Button';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
@@ -27,25 +26,22 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
-  const { isFetching, data } = usePatientListDataQuery(userId);
+  const { data, isFetching } = useGetAllPatientListsWithoutPatientQuery(userId, patientUuid);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 
   useEffect(() => {
     if (data) {
-      const lists: PatientListObj = {};
-      data.map((patientList) => {
-        lists[patientList.id] = {
+      const newPatientListsObj: PatientListObj = {};
+
+      for (const patientList of data) {
+        newPatientListsObj[patientList.id] = {
           visible: true,
           selected: false,
           name: patientList?.display,
         };
-      });
-      getPatientListsForPatient(patientUuid).then((enrolledPatientLists) => {
-        enrolledPatientLists.forEach((patientList) => {
-          lists[patientList.cohort.uuid].visible = false;
-        });
-        setPatientListsObj(lists);
-      });
+      }
+
+      setPatientListsObj(newPatientListsObj);
     }
   }, [data]);
 

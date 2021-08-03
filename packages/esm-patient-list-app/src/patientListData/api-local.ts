@@ -30,17 +30,12 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
  * Returns all patient lists of the given user stored locally on the user's device.
  * @param userId The ID of the user whose patient list information should be retrieved.
  */
-export async function getAllLocalPatientLists(userId: string, filter: PatientListFilter = {}) {
-  // TODO: Apply filtering.
-  const allMetadata = await new PatientListDb().patientListMetadata.where({ userId }).toArray();
-  const patientLists = knownLocalPatientListTemplates.map((defaultEntry) => {
-    const relatedMetadata = allMetadata.find((metadata) => metadata.patientListId === defaultEntry.id);
-    return {
-      ...defaultEntry,
-      isStarred: relatedMetadata?.isStarred ?? defaultEntry.isStarred,
-      memberCount: relatedMetadata?.members.length ?? defaultEntry.memberCount,
-    };
-  });
+export async function getAllLocalPatientLists(
+  userId: string,
+  filter: PatientListFilter = {},
+): Promise<Array<PatientList>> {
+  const allMetadata = await findAllPatientListMetadata(userId);
+  const patientLists = allMetadata.map(enrichMetadataWithPatientListTemplate);
 
   return patientLists.filter(
     (patientList) =>
@@ -48,6 +43,12 @@ export async function getAllLocalPatientLists(userId: string, filter: PatientLis
       (filter.isStarred === undefined || patientList.isStarred === filter.isStarred) &&
       (filter.type === undefined || patientList.type == filter.type),
   );
+}
+
+export async function getLocalPatientListIdsForPatient(userId: string, patientId: string): Promise<Array<string>> {
+  const allMetadata = await findAllPatientListMetadata(userId);
+  const metadataWithPatients = allMetadata.filter((metadata) => metadata.members.some((x) => x.id === patientId));
+  return metadataWithPatients.map((metadata) => metadata.patientListId);
 }
 
 /**
@@ -62,7 +63,7 @@ export async function getLocalPatientListMembers(
   ensureIsLocalPatientList(patientListId);
 
   // TODO: Apply filtering.
-  const metadata = await findPatientListMetadata(userId, patientListId);
+  const metadata = await findFirstPatientListMetadata(userId, patientListId);
   return metadata?.members ?? [];
 }
 
@@ -73,7 +74,7 @@ export async function updateLocalPatientList(userId: string, patientListId: stri
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();
-  const initialMetadata = (await findPatientListMetadata(userId, patientListId, db)) ?? {
+  const initialMetadata = (await findFirstPatientListMetadata(userId, patientListId, db)) ?? {
     userId,
     patientListId,
     isStarred: false,
@@ -92,7 +93,7 @@ export async function addPatientToLocalPatientList(userId: string, patientListId
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();
-  const entry = await findPatientListMetadata(userId, patientListId, db);
+  const entry = await findFirstPatientListMetadata(userId, patientListId, db);
 
   entry.members.push({ id: patientId });
   entry.members = uniqBy(entry.members, (x) => x.id);
@@ -100,8 +101,22 @@ export async function addPatientToLocalPatientList(userId: string, patientListId
   await db.patientListMetadata.put(entry);
 }
 
-async function findPatientListMetadata(userId: string, patientListId: string, db = new PatientListDb()) {
+async function findAllPatientListMetadata(userId: string, db = new PatientListDb()) {
+  return await db.patientListMetadata.where({ userId }).toArray();
+}
+
+async function findFirstPatientListMetadata(userId: string, patientListId: string, db = new PatientListDb()) {
+  ensureIsLocalPatientList(patientListId);
   return await db.patientListMetadata.where({ userId, patientListId }).first();
+}
+
+function enrichMetadataWithPatientListTemplate(metadata: LocalPatientListMetadata) {
+  const patientListTemplate = knownLocalPatientListTemplates.find((template) => template.id === metadata.patientListId);
+  return {
+    ...patientListTemplate,
+    isStarred: metadata.isStarred ?? patientListTemplate.isStarred,
+    memberCount: metadata?.members.length ?? patientListTemplate.memberCount,
+  };
 }
 
 function ensureIsLocalPatientList(patientListOrId: string | PatientList) {
