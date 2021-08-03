@@ -7,7 +7,9 @@ import {
   PatientListUpdate,
   PatientListType,
   PatientListFilter,
+  AddPatientData,
 } from './types';
+import uniqBy from 'lodash-es/uniqBy';
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -49,17 +51,18 @@ export async function getAllLocalPatientLists(userId: string, filter: PatientLis
 }
 
 /**
- * Returns the members of the patient list with the given {@link id} stored locally on the user's device.
+ * Returns the members of the patient list with the given {@link patientListId} stored locally on the user's device.
  * Returns an empty array if the patient list is not found.
  */
 export async function getLocalPatientListMembers(
-  id: string,
+  userId: string,
+  patientListId: string,
   filters?: Array<PatientListMemberFilter>,
 ): Promise<Array<PatientListMember>> {
-  ensureIsLocalPatientList(id);
+  ensureIsLocalPatientList(patientListId);
 
   // TODO: Apply filtering.
-  const metadata = await new PatientListDb().patientListMetadata.where({ patientListId: id }).first();
+  const metadata = await findPatientListMetadata(userId, patientListId);
   return metadata?.members ?? [];
 }
 
@@ -70,7 +73,7 @@ export async function updateLocalPatientList(userId: string, patientListId: stri
   ensureIsLocalPatientList(patientListId);
 
   const db = new PatientListDb();
-  const initialMetadata = (await db.patientListMetadata.where({ userId, patientListId }).first()) ?? {
+  const initialMetadata = (await findPatientListMetadata(userId, patientListId, db)) ?? {
     userId,
     patientListId,
     isStarred: false,
@@ -83,6 +86,22 @@ export async function updateLocalPatientList(userId: string, patientListId: stri
   };
 
   await db.patientListMetadata.put(updatedMetadata);
+}
+
+export async function addPatientToLocalPatientList(userId: string, patientListId: string, patientId: string) {
+  ensureIsLocalPatientList(patientListId);
+
+  const db = new PatientListDb();
+  const entry = await findPatientListMetadata(userId, patientListId, db);
+
+  entry.members.push({ id: patientId });
+  entry.members = uniqBy(entry.members, (x) => x.id);
+
+  await db.patientListMetadata.put(entry);
+}
+
+async function findPatientListMetadata(userId: string, patientListId: string, db = new PatientListDb()) {
+  return await db.patientListMetadata.where({ userId, patientListId }).first();
 }
 
 function ensureIsLocalPatientList(patientListOrId: string | PatientList) {
@@ -110,5 +129,9 @@ interface LocalPatientListMetadata {
   userId: string;
   patientListId: string;
   isStarred: boolean;
-  members: Array<PatientListMember>;
+  members: Array<PatientListMemberRef>;
+}
+
+interface PatientListMemberRef {
+  id: string;
 }

@@ -7,7 +7,9 @@ import {
   getPatientListMembers,
   updateLocalPatientList,
 } from '.';
-import { PatientListFilter, PatientList, PatientListType, PatientListUpdate } from './types';
+import { addPatientToLocalPatientList } from './api-local';
+import { addPatientToList } from './api-remote';
+import { PatientListFilter, PatientList, PatientListType, PatientListUpdate, AddPatientData } from './types';
 
 export async function getLocalAndRemotePatientLists(
   userId: string,
@@ -32,10 +34,26 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
   };
 }
 
-export function getLocalAndRemotePatientListMembers(patientListId: string, abortController?: AbortController) {
+export function getLocalAndRemotePatientListMembers(
+  userId: string,
+  patientListId: string,
+  abortController?: AbortController,
+) {
   return isOfflineUuid(patientListId)
-    ? getLocalPatientListMembers(patientListId)
+    ? getLocalPatientListMembers(userId, patientListId)
     : getPatientListMembers(patientListId, abortController);
+}
+
+export function addPatientToLocalOrRemotePatientList(
+  userId: string,
+  data: AddPatientData,
+  abortController = new AbortController(),
+) {
+  if (isOfflineUuid(data.cohort)) {
+    return addPatientToLocalPatientList(userId, data.cohort, data.patient);
+  } else {
+    return addPatientToList(data, abortController);
+  }
 }
 
 export function updateLocalOrRemotePatientList(

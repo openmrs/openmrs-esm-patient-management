@@ -2,6 +2,7 @@ import React from 'react';
 import Overlay from '../Overlay';
 import { useTranslation } from 'react-i18next';
 import { useGetAllPatientListMembersQuery } from '../patientListData';
+import { useSessionUser } from '@openmrs/esm-framework';
 
 export interface PatientListMembersOverlayProps {
   close: () => void;
@@ -9,7 +10,8 @@ export interface PatientListMembersOverlayProps {
 }
 
 const PatientListMembersOverlay: React.FC<PatientListMembersOverlayProps> = ({ close, listUuid }) => {
-  const { data } = useGetAllPatientListMembersQuery(listUuid);
+  const userId = useSessionUser()?.user.uuid;
+  const { data } = useGetAllPatientListMembersQuery(userId, listUuid);
   const { t } = useTranslation();
 
   return (

@@ -36,3 +36,9 @@ export interface PatientListMember {
 export interface PatientListMemberFilter {
   // TODO
 }
+
+export interface AddPatientData {
+  patient: string;
+  cohort: string;
+  startDate: string;
+}

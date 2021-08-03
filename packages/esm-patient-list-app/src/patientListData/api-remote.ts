@@ -1,5 +1,5 @@
 import { Location, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import { PatientListFilter, PatientListMember, PatientListType } from './types';
+import { AddPatientData, PatientListFilter, PatientListMember, PatientListType } from './types';
 
 const cohortUrl = '/ws/rest/v1/cohortm';
 
@@ -127,12 +127,6 @@ export async function getPatientListsForPatient(patientUuid: string, ac = new Ab
   }
 
   return results;
-}
-
-export interface AddPatientData {
-  patient: string;
-  cohort: string;
-  startDate: string;
 }
 
 export async function addPatientToList(data: AddPatientData, ac = new AbortController()) {
