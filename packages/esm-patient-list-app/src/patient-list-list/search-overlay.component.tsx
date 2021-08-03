@@ -1,5 +1,5 @@
 import React from 'react';
-import PatientListResults from './PatientListResults';
+import PatientListResults from './patient-list-results.component';
 import { ViewState, StateTypes } from './types';
 
 interface SearchOverlayProps {

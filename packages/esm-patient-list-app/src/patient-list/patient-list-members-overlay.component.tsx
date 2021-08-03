@@ -1,7 +1,7 @@
 import React from 'react';
-import Overlay from '../Overlay';
+import Overlay from '../overlay.component';
 import { useTranslation } from 'react-i18next';
-import { useGetAllPatientListMembersQuery } from '../patientListData';
+import { useGetAllPatientListMembersQuery } from '../api';
 import { useSessionUser } from '@openmrs/esm-framework';
 
 export interface PatientListMembersOverlayProps {

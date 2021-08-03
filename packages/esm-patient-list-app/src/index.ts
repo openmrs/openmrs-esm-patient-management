@@ -36,7 +36,7 @@ function setupOpenMRS() {
   return {
     pages: [
       {
-        load: getAsyncLifecycle(() => import('./patientListList'), options),
+        load: getAsyncLifecycle(() => import('./patient-list-list/patient-list-list.component'), options),
         route,
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },
@@ -46,28 +46,28 @@ function setupOpenMRS() {
       {
         id: 'patient-list-link',
         slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-link'), options),
+        load: getAsyncLifecycle(() => import('./patient-list-link.component'), options),
         online: true,
         offline: true,
       },
       {
         id: 'add-patient-to-patient-list-button',
         slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-action'), {
+        load: getAsyncLifecycle(() => import('./add-patient-to-patient-list-menu-item.component'), {
           featureName: 'patient-actions-slot',
           moduleName,
         }),
       },
       {
         id: 'add-patient-to-patient-list-modal',
-        load: getAsyncLifecycle(() => import('./AddPatientToList'), {
+        load: getAsyncLifecycle(() => import('./add-patient/add-patient.component'), {
           featureName: 'patient-actions-modal',
           moduleName,
         }),
       },
       {
         id: 'patient-table',
-        load: getAsyncLifecycle(() => import('./PatientTable/patient-table.component'), {
+        load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
           featureName: 'patient-table',
           moduleName,
         }),

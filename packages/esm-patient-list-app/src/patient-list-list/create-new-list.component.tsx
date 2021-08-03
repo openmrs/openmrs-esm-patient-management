@@ -3,9 +3,9 @@ import Button from 'carbon-components-react/lib/components/Button';
 import MultiSelect from 'carbon-components-react/lib/components/MultiSelect';
 import TextArea from 'carbon-components-react/lib/components/TextArea';
 import TextInput from 'carbon-components-react/lib/components/TextInput';
-import Overlay from '../Overlay';
+import Overlay from '../overlay.component';
 import { useTranslation } from 'react-i18next';
-import { createPatientList } from '../patientListData/api-remote';
+import { createPatientList } from '../api';
 
 interface CreateNewListProps {
   close: () => void;

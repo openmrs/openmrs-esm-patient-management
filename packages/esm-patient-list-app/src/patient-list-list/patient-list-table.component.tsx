@@ -13,9 +13,8 @@ import TableBody from 'carbon-components-react/lib/components/DataTable/TableBod
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { PatientList, PatientListType } from '../patientListData/types';
 import { useTranslation } from 'react-i18next';
-import { useToggleStarredMutation } from '../patientListData';
+import { useToggleStarredMutation, PatientList, PatientListType } from '../api';
 import { useSessionUser } from '@openmrs/esm-framework';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [

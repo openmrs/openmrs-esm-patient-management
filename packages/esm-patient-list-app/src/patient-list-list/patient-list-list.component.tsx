@@ -4,17 +4,22 @@ import Button from 'carbon-components-react/lib/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
-import PatientListTable from './PatientListTable';
-import CreateNewList from './CreateNewList';
-import PatientListMembersOverlay from '../PatientList';
-import SearchOverlay from './SearchOverlay';
+import PatientListTable from './patient-list-table.component';
+import CreateNewList from './create-new-list.component';
+import PatientListMembersOverlay from '../patient-list/patient-list-members-overlay.component';
+import SearchOverlay from './search-overlay.component';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
-import { usePatientListDataQuery, useToggleStarredMutation } from '../patientListData';
-import { PatientList, PatientListFilter, PatientListType } from '../patientListData/types';
+import {
+  usePatientListDataQuery,
+  useToggleStarredMutation,
+  PatientList,
+  PatientListFilter,
+  PatientListType,
+} from '../api';
 import { SearchState, StateTypes, ViewState } from './types';
-import './style.scss';
 import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
+import './patient-list-list.scss';
 
 enum TabTypes {
   STARRED,

@@ -16,7 +16,7 @@ interface AddPastVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
-const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
+const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const openModal = useCallback(() => {
     const dispose = showModal('add-patient-to-patient-list-modal', {
@@ -45,4 +45,4 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
   );
 };
 
-export default AddPastVisitOverflowMenuItem;
+export default AddPatientToPatientListMenuItem;

@@ -1,8 +1,8 @@
 import { useSessionUser } from '@openmrs/esm-framework';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePatientListDataQuery } from '../patientListData';
-import PatientListTable from './PatientListTable';
+import { usePatientListDataQuery } from '../api';
+import PatientListTable from './patient-list-table.component';
 
 interface PatientListResultsProps {
   nameFilter?: string;
