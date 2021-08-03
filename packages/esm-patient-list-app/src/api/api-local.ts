@@ -2,6 +2,7 @@ import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
 import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from '.';
 import uniqBy from 'lodash-es/uniqBy';
+import { notifyOnPatientAdded } from '../global-store';
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -88,6 +89,8 @@ export async function addPatientToLocalPatientList(userId: string, patientListId
   entry.members = uniqBy(entry.members, (x) => x.id);
 
   await db.patientListMetadata.put(entry);
+
+  notifyOnPatientAdded({ userUuid: userId, patientUuid: patientId });
 }
 
 async function findAllPatientListMetadata(userId: string, db = new PatientListDb()) {
