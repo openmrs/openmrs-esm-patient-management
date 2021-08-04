@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import TextInput from 'carbon-components-react/es/components/TextInput';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -10,24 +10,35 @@ interface InputProps {
   light: boolean;
   disabled?: boolean;
   placeholder?: string;
+  checkWarning?(value: string): string;
 }
 
-export const Input: React.FC<InputProps> = (props) => {
+export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   const [field, meta] = useField(props.name);
   const { t } = useTranslation();
   /*
     t('givenNameRequired')
-    t('familyNameRequired', 'Family name is required')
-    t('genderUnspecified', 'Gender is unspecified')
-    t('genderRequired', 'Gender is required')
-    t('birthdayRequired', 'Birthdate is required')
-    t('birthdayNotInTheFuture', 'Birthdate cannot be in the future')
-    t('negativeYears', 'Years cannot be less than 0')
-    t('negativeMonths', 'Months cannot be less than 0')
-    t('deathdayNotInTheFuture', 'Date of Death cannot be in the future')
-    t('invalidEmail', 'A valid email has to be given')
+    t('familyNameRequired')
+    t('genderUnspecified')
+    t('genderRequired')
+    t('birthdayRequired')
+    t('birthdayNotInTheFuture')
+    t('negativeYears')
+    t('negativeMonths')
+    t('deathdayNotInTheFuture')
+    t('invalidEmail')
+    t('numberInNameDubious')
   */
+  const value = field.value || '';
   const invalidText = meta.error && t(meta.error);
+  const warnText = useMemo(() => {
+    if (!invalidText && typeof checkWarning === 'function') {
+      const warning = checkWarning(value);
+      return warning && t(warning);
+    }
+
+    return undefined;
+  }, [checkWarning, invalidText, value, t]);
 
   return (
     <div style={{ marginBottom: '1rem', maxWidth: '360px' }}>
@@ -36,7 +47,9 @@ export const Input: React.FC<InputProps> = (props) => {
         {...field}
         invalid={!!(meta.touched && meta.error)}
         invalidText={invalidText}
-        value={field.value || ''}
+        warn={!!warnText}
+        warnText={warnText}
+        value={value}
       />
     </div>
   );
