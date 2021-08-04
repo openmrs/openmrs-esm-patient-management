@@ -119,9 +119,8 @@ export interface PatientUuidMapType {
 }
 
 export interface CapturePhotoProps {
-  base64EncodedImage: string;
-  imageFile: File;
-  photoDateTime: string;
+  imageData: string;
+  dateTime: string;
 }
 
 export interface AddressValidationSchemaType {

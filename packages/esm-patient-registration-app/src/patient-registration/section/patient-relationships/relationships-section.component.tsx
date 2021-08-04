@@ -17,7 +17,11 @@ interface RelationshipType {
   direction: string;
 }
 
-export const RelationshipsSection: React.FC = () => {
+export interface RelationshipsSectionProps {
+  id: 'relationships';
+}
+
+export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
   const { relationshipTypes } = useContext(ResourcesContext);
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { setFieldValue } = React.useContext(PatientRegistrationContext);

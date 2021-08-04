@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
+import { Grid } from 'carbon-components-react/es/components/Grid';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 import { useLocation } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
-import { Grid } from 'carbon-components-react/es/components/Grid';
 import {
   createErrorHandler,
   showToast,
@@ -46,7 +46,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
-  const [currentPhoto, setCurrentPhoto] = useState(null);
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
   const [patientUuidMap] = usePatientUuidMap(patientUuid);
@@ -87,6 +86,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
+
     if (!addressTemplateXml) {
       return;
     }
@@ -109,17 +109,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [inEditMode, addressTemplate]);
 
   useEffect(() => {
-    if (capturePhotoProps?.base64EncodedImage || capturePhotoProps?.imageFile) {
-      setCurrentPhoto(capturePhotoProps.base64EncodedImage || URL.createObjectURL(capturePhotoProps.imageFile));
-    }
-  }, [capturePhotoProps]);
-
-  useEffect(() => {
     if (patient) {
       const abortController = new AbortController();
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then((value) =>
-        setCurrentPhoto(value),
-      );
+
+      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then(setCapturePhotoProps);
 
       return () => abortController.abort();
     }
@@ -223,7 +216,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     inEditMode,
                     setFieldValue: props.setFieldValue,
                     setCapturePhotoProps,
-                    currentPhoto,
+                    currentPhoto: capturePhotoProps?.imageData,
                   }}>
                   {sections.map((section, index) => (
                     <div key={index}>{getSection(section, index)}</div>

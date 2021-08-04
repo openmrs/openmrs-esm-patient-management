@@ -12,6 +12,8 @@
   "dateOfBirthLabelText": "Date of Birth",
   "deathDateInputLabel": "Date of Death",
   "discard": "Discard",
+  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
+  "discardModalHeader": "Confirm Discard Changes",
   "edit": "Edit",
   "editPatientDetails": "Edit Patient Details",
   "emailLabelText": "Email",

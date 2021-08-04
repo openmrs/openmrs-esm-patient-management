@@ -2,10 +2,14 @@ import React from 'react';
 import { Input } from '../../input/basic-input/input/input.component';
 import { SelectInput } from '../../input/basic-input/select/select-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import styles from './../section.scss';
 import { useTranslation } from 'react-i18next';
+import styles from './../section.scss';
 
-export const DeathInfoSection: React.FC = () => {
+export interface DeathInfoSectionProps {
+  id: 'death';
+}
+
+export const DeathInfoSection: React.FC<DeathInfoSectionProps> = () => {
   const { values } = React.useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 

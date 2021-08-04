@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useContext } from 'react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext, useFieldConfig } from '../../patient-registration-context';
@@ -7,19 +7,19 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto } = React.useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto } = useContext(PatientRegistrationContext);
 
-  const onCapturePhoto = (dataUri: string, selectedFile: File, photoDateTime: string) => {
+  const onCapturePhoto = useCallback((dataUri: string, photoDateTime: string) => {
     if (setCapturePhotoProps) {
       setCapturePhotoProps({
-        base64EncodedImage: dataUri,
-        imageFile: selectedFile,
-        photoDateTime: photoDateTime,
+        imageData: dataUri,
+        dateTime: photoDateTime,
       });
     }
-  };
+  }, []);
 
   const fieldConfigs = useFieldConfig('name');
+
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>

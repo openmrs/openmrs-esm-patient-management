@@ -1,5 +1,5 @@
-import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { v4 } from 'uuid';
+import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -118,20 +118,14 @@ export default class FormManager {
           }),
       );
 
-      if (
-        capturePhotoProps &&
-        patientPhotoConceptUuid &&
-        (capturePhotoProps.base64EncodedImage || capturePhotoProps.imageFile)
-      ) {
+      if (patientPhotoConceptUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
           savePatientResponse.data.uuid,
-          capturePhotoProps.imageFile,
-          null,
-          abortController,
-          capturePhotoProps.base64EncodedImage,
+          capturePhotoProps.imageData,
           '/ws/rest/v1/obs',
-          capturePhotoProps.photoDateTime || new Date().toISOString(),
+          capturePhotoProps.dateTime || new Date().toISOString(),
           patientPhotoConceptUuid,
+          abortController,
         );
       }
     }

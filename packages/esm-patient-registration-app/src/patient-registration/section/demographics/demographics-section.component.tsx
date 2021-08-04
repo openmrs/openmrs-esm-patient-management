@@ -4,7 +4,8 @@ import { useField } from 'formik';
 import { getField } from '../section-helper';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
-interface DemographicsSectionProps {
+export interface DemographicsSectionProps {
+  id: 'demographics';
   fields: Array<any>;
 }
 
