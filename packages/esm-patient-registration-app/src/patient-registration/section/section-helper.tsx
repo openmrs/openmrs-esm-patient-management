@@ -1,5 +1,4 @@
-import React, { SetStateAction } from 'react';
-import { Row, Column } from 'carbon-components-react/es/components/Grid';
+import React from 'react';
 import { DemographicsSection } from './demographics/demographics-section.component';
 import { ContactInfoSection } from './contact-info/contact-info-section.component';
 import { RelationshipsSection } from './patient-relationships/relationships-section.component';
@@ -7,12 +6,9 @@ import { DeathInfoSection } from './death-info/death-info-section.component';
 import { SectionWrapper } from './section-wrapper.component';
 import { AddressField } from '../field/address/address-field.component';
 import { PhoneEmailField } from '../field/email/email-field.component';
-import { PhoneField } from '../field/phone/phone-field.component';
 import { NameField } from '../field/name/name-field.component';
 import { GenderBirthField } from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
-import { DobField } from '../field/dob/dob.component';
-import { CapturePhotoProps } from '../patient-registration-types';
 
 enum Field {
   Address = 'address',
@@ -31,7 +27,7 @@ enum Section {
   Default = 'default',
 }
 
-export const getField = (fieldName: string) => {
+export function getField(fieldName: string) {
   switch (fieldName) {
     case Field.Address:
       return <AddressField />;
@@ -46,10 +42,11 @@ export const getField = (fieldName: string) => {
     case Field.Default:
       return <div>Unknown Field {fieldName} </div>;
   }
-};
+}
 
-export const getSection = (sectionProps: any, index: number) => {
+export function getSection(sectionProps: any, index: number) {
   let section = null;
+  
   switch (sectionProps.id) {
     case Section.Demographics:
       section = <DemographicsSection {...sectionProps} />;
@@ -74,4 +71,4 @@ export const getSection = (sectionProps: any, index: number) => {
       {section}
     </SectionWrapper>
   );
-};
+}

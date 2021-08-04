@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
@@ -56,6 +56,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [patientUuidMap] = usePatientUuidMap(patientUuid);
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
+  const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
+
   const cancelNavFn = useCallback(
     (evt: CustomEvent) => {
       if (!open && !evt.detail.navigationIsCanceled) {
@@ -232,9 +234,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     <h4>
                       {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
                     </h4>
-                    {localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode && (
-                      <DummyDataInput setValues={props.setValues} />
-                    )}
+                    {showDummyData && <DummyDataInput setValues={props.setValues} />}
                     <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
                     {sections.map((section) => (
                       <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
