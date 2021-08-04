@@ -98,34 +98,39 @@ export default class FormManager {
     });
 
     const savePatientResponse = await savePatient(abortController, createdPatient, patientUuidMap.patientUuid);
-    if (savePatientResponse.ok) {
-      values.relationships.map(({ relatedPerson: relatedPersonUuid, relationship }) => {
-        const relationshipType = relationship.split('/')[0];
-        const direction = relationship.split('/')[1];
-        const thisPatientUuid = savePatientResponse.data.uuid;
-        const isAToB = direction === 'aIsToB';
-        const relationshipToSave = {
-          personA: isAToB ? relatedPersonUuid : thisPatientUuid,
-          personB: isAToB ? thisPatientUuid : relatedPersonUuid,
-          relationshipType,
-        };
 
-        saveRelationship(abortController, relationshipToSave);
-      });
+    if (savePatientResponse.ok) {
+      await Promise.all(
+        values.relationships
+          .filter((m) => m.relationship)
+          .map(({ relatedPerson: relatedPersonUuid, relationship }) => {
+            const relationshipType = relationship.split('/')[0];
+            const direction = relationship.split('/')[1];
+            const thisPatientUuid = savePatientResponse.data.uuid;
+            const isAToB = direction === 'aIsToB';
+            const relationshipToSave = {
+              personA: isAToB ? relatedPersonUuid : thisPatientUuid,
+              personB: isAToB ? thisPatientUuid : relatedPersonUuid,
+              relationshipType,
+            };
+
+            return saveRelationship(abortController, relationshipToSave);
+          }),
+      );
 
       if (
         capturePhotoProps &&
         patientPhotoConceptUuid &&
         (capturePhotoProps.base64EncodedImage || capturePhotoProps.imageFile)
       ) {
-        savePatientPhoto(
+        await savePatientPhoto(
           savePatientResponse.data.uuid,
           capturePhotoProps.imageFile,
           null,
           abortController,
           capturePhotoProps.base64EncodedImage,
           '/ws/rest/v1/obs',
-          capturePhotoProps.photoDateTime,
+          capturePhotoProps.photoDateTime || new Date().toISOString(),
           patientPhotoConceptUuid,
         );
       }

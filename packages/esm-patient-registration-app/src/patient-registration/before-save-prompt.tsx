@@ -1,55 +1,71 @@
-import React, { useEffect } from 'react';
-import Modal from 'carbon-components-react/es/components/Modal';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
-const noop = () => {};
+function getUrlWithoutPrefix(url: string) {
+  return url.split(window['getOpenmrsSpaBase']())?.[1];
+}
 
 interface BeforeSavePromptProps {
   when: boolean;
-  open: boolean;
-  cancelNavFn: EventListener;
-  onRequestClose: Function;
-  onRequestSubmit: Function;
+  redirect?: string;
 }
 
-const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({
-  when,
-  open,
-  cancelNavFn,
-  onRequestClose,
-  onRequestSubmit,
-}) => {
+const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) => {
+  const history = useHistory();
   const { t } = useTranslation();
+  const ref = useRef<boolean>(false);
+  const [localTarget, setTarget] = useState<string | undefined>();
+  const target = localTarget || redirect;
+  const cancelUnload = useCallback((e: BeforeUnloadEvent) => {
+    const message = t(
+      'discardModalBody',
+      "The changes you made to this patient's details have not been saved. Discard changes?",
+    );
+    e.preventDefault();
+    e.returnValue = message;
+    return message;
+  }, []);
+
+  const cancelNavigation = useCallback((evt: CustomEvent) => {
+    if (!evt.detail.navigationIsCanceled && !ref.current) {
+      ref.current = true;
+      evt.detail.cancelNavigation();
+      const dispose = showModal(
+        'cancel-patient-edit-modal',
+        {
+          onConfirm: () => {
+            setTarget(evt.detail.newUrl);
+            dispose();
+          },
+        },
+        () => {
+          ref.current = false;
+        },
+      );
+    }
+  }, []);
 
   useEffect(() => {
-    if (when) {
-      window.addEventListener('single-spa:before-routing-event', cancelNavFn);
-      window.onbeforeunload = () => {
-        return 'do you want to leave?';
+    if (when && typeof target === 'undefined') {
+      window.addEventListener('single-spa:before-routing-event', cancelNavigation);
+      window.addEventListener('beforeunload', cancelUnload);
+
+      return () => {
+        window.removeEventListener('beforeunload', cancelUnload);
+        window.removeEventListener('single-spa:before-routing-event', cancelNavigation);
       };
     }
+  }, [target, when, cancelUnload, cancelNavigation]);
 
-    return () => {
-      window.onbeforeunload = noop;
-      window.removeEventListener('single-spa:before-routing-event', cancelNavFn);
-    };
-  }, [when, cancelNavFn]);
+  useEffect(() => {
+    if (typeof target === 'string') {
+      history.push(`/${getUrlWithoutPrefix(target)}`);
+    }
+  }, [target]);
 
-  return (
-    <Modal
-      {...{
-        open,
-        danger: true,
-        size: 'sm',
-        modalHeading: t('discardModalHeader', 'Confirm Discard Changes'),
-        primaryButtonText: t('discard'),
-        secondaryButtonText: t('cancel'),
-        onRequestClose,
-        onRequestSubmit,
-      }}>
-      {t('discardModalBody', "The changes you made to this patient's details have not been saved. Discard changes?")}
-    </Modal>
-  );
+  return null;
 };
 
 export default BeforeSavePrompt;

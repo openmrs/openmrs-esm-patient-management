@@ -1,20 +1,19 @@
-import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
-import { useLocation, useHistory } from 'react-router-dom';
-import { Formik, Form } from 'formik';
-import { Grid, Row } from 'carbon-components-react/es/components/Grid';
+import { useLocation } from 'react-router-dom';
+import { Formik, Form, FormikHelpers } from 'formik';
+import { Grid } from 'carbon-components-react/es/components/Grid';
 import {
   createErrorHandler,
   showToast,
   useCurrentPatient,
   useConfig,
-  navigate,
   interpolateString,
-  ExtensionSlot,
+  interpolateUrl,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
@@ -29,7 +28,6 @@ import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap }
 import { ResourcesContext } from '../offline.resources';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
-const getUrlWithoutPrefix = (url) => url.split(window['getOpenmrsSpaBase']())?.[1];
 
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
@@ -41,10 +39,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig();
   const { patientUuid } = match.params;
-  const history = useHistory();
-  const [open, setModalOpen] = useState(false);
-  const [newUrl, setNewUrl] = useState(undefined);
   const [sections, setSections] = useState([]);
+  const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const [loading, patient] = useCurrentPatient(patientUuid);
   const { t } = useTranslation();
@@ -58,32 +54,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
 
-  const cancelNavFn = useCallback(
-    (evt: CustomEvent) => {
-      if (!open && !evt.detail.navigationIsCanceled) {
-        evt.detail.cancelNavigation();
-        setNewUrl(evt.detail.newUrl);
-        setModalOpen(true);
-
-        // once the listener is run, we want to remove it immediately in case an infinite loop occurs due
-        // to constant redirects
-        evt.target.removeEventListener('single-spa:before-routing-event', cancelNavFn);
-      }
-    },
-    [open],
-  );
-
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
-
-  const onRequestClose = useCallback(() => {
-    setModalOpen(false);
-    // add the route blocked when
-    window.addEventListener('single-spa:before-routing-event', cancelNavFn);
-  }, [cancelNavFn]);
-
-  const onRequestSubmit = useCallback(() => history.push(`/${getUrlWithoutPrefix(newUrl)}`), [history, newUrl]);
 
   useEffect(() => {
     if (config?.sections) {
@@ -152,8 +125,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   }, [patient, config]);
 
-  const onFormSubmit = async (values: FormValues) => {
+  const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
+    helpers.setSubmitting(true);
 
     try {
       const createdPatientUuid = await savePatientForm(
@@ -182,12 +156,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         kind: 'success',
       });
 
-      if (patientUuid) {
-        const redirectUrl =
+      if (createdPatientUuid) {
+        const redirectUrl = interpolateUrl(
           new URLSearchParams(search).get('afterUrl') ||
-          interpolateString(config.links.submitButton, { createdPatientUuid });
-        window.removeEventListener('single-spa:before-routing-event', cancelNavFn);
-        navigate({ to: redirectUrl });
+            interpolateString(config.links.submitButton, { patientUuid: createdPatientUuid }),
+        );
+
+        setTarget(redirectUrl);
       }
     } catch (error) {
       if (error.responseBody && error.responseBody.error.globalErrors) {
@@ -199,84 +174,67 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       } else {
         createErrorHandler()(error);
       }
+
+      helpers.setSubmitting(false);
     }
   };
 
   return (
-    <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
-      <Formik
-        enableReinitialize
-        initialValues={initialFormValues}
-        validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          onFormSubmit(values);
-          setSubmitting(false);
-        }}>
-        {(props) => (
-          <Form className={styles.form}>
-            <BeforeSavePrompt
-              {...{
-                when: props.dirty,
-                open,
-                newUrl,
-                cancelNavFn,
-                onRequestClose,
-                onRequestSubmit,
-              }}
-            />
-            <Grid>
-              <Row>
-                <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-              </Row>
-              <div className={styles.formContainer}>
-                <div>
-                  <div className={styles.stickyColumn}>
-                    <h4>
-                      {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
-                    </h4>
-                    {showDummyData && <DummyDataInput setValues={props.setValues} />}
-                    <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-                    {sections.map((section) => (
-                      <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
-                        <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                          <XAxis16 /> {section.name}
-                        </Link>
-                      </div>
-                    ))}
-                    <Button className={styles.submitButton} type="submit">
-                      {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
-                    </Button>
-                    <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
-                      {t('cancel', 'Cancel')}
-                    </Button>
+    <Formik
+      enableReinitialize
+      initialValues={initialFormValues}
+      validationSchema={validationSchema}
+      onSubmit={onFormSubmit}>
+      {(props) => (
+        <Form className={styles.form}>
+          <BeforeSavePrompt when={props.dirty} redirect={target} />
+          <div className={styles.formContainer}>
+            <div>
+              <div className={styles.stickyColumn}>
+                <h4>
+                  {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
+                </h4>
+                {showDummyData && <DummyDataInput setValues={props.setValues} />}
+                <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
+                {sections.map((section) => (
+                  <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
+                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                      <XAxis16 /> {section.name}
+                    </Link>
                   </div>
-                </div>
-                <div>
-                  <Grid className={styles.infoGrid}>
-                    <PatientRegistrationContext.Provider
-                      value={{
-                        identifierTypes: patientIdentifiers,
-                        validationSchema,
-                        setValidationSchema,
-                        fieldConfigs,
-                        values: props.values,
-                        inEditMode,
-                        setFieldValue: props.setFieldValue,
-                        setCapturePhotoProps,
-                        currentPhoto,
-                      }}>
-                      {sections.map((section, index) => (
-                        <div key={index}>{getSection(section, index)}</div>
-                      ))}
-                    </PatientRegistrationContext.Provider>
-                  </Grid>
-                </div>
+                ))}
+                <Button className={styles.submitButton} type="submit">
+                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                </Button>
+                <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
+                  {t('cancel', 'Cancel')}
+                </Button>
               </div>
-            </Grid>
-          </Form>
-        )}
-      </Formik>
-    </main>
+            </div>
+            <div>
+              <Grid className={styles.infoGrid}>
+                <PatientRegistrationContext.Provider
+                  value={{
+                    identifierTypes: patientIdentifiers,
+                    validationSchema,
+                    setValidationSchema,
+                    fieldConfigs,
+                    values: props.values,
+                    inEditMode,
+                    setFieldValue: props.setFieldValue,
+                    setCapturePhotoProps,
+                    currentPhoto,
+                  }}>
+                  {sections.map((section, index) => (
+                    <div key={index}>{getSection(section, index)}</div>
+                  ))}
+                </PatientRegistrationContext.Provider>
+              </Grid>
+            </div>
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

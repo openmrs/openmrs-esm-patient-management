@@ -46,7 +46,7 @@ export function getField(fieldName: string) {
 
 export function getSection(sectionProps: any, index: number) {
   let section = null;
-  
+
   switch (sectionProps.id) {
     case Section.Demographics:
       section = <DemographicsSection {...sectionProps} />;

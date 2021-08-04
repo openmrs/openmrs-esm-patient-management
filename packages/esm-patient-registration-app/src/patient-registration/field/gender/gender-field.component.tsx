@@ -9,7 +9,7 @@ import { DobField } from '../dob/dob.component';
 
 export const GenderBirthField: React.FC = () => {
   const { t } = useTranslation();
-  const [field] = useField('gender');
+  const [field, meta] = useField('gender');
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
 
   const setGender = (gender: string) => {
@@ -28,6 +28,12 @@ export const GenderBirthField: React.FC = () => {
             <RadioButton id="female" labelText={t('femaleLabelText', 'Female')} value="Female" />
             <RadioButton id="other" labelText={t('otherLabelText', 'Other')} value="Other" />
           </RadioButtonGroup>
+          {meta.touched && meta.error && (
+            <>
+              <input type="hidden" data-invalid="true" />
+              <div className="bx--form-requirement">{meta.error}</div>
+            </>
+          )}
         </div>
       </div>
     </div>
