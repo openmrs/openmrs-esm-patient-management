@@ -31,7 +31,7 @@ export const GenderBirthField: React.FC = () => {
           {meta.touched && meta.error && (
             <>
               <input type="hidden" data-invalid="true" />
-              <div className="bx--form-requirement">{meta.error}</div>
+              <div className="bx--form-requirement">{t(meta.error)}</div>
             </>
           )}
         </div>

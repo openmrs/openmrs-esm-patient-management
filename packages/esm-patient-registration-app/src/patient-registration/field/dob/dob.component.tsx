@@ -11,6 +11,7 @@ export const DobField: React.FC = () => {
   const [field, meta] = useField('birthdate');
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
+  const invalidText = meta.error && t(meta.error);
 
   const onDateChange = ([birthdate]) => {
     setFieldValue('birthdate', birthdate);
@@ -24,7 +25,7 @@ export const DobField: React.FC = () => {
           placeholder={placeHolder}
           labelText={t('dateOfBirthLabelText', 'Date of Birth')}
           invalid={!!(meta.touched && meta.error)}
-          invalidText={meta.error}
+          invalidText={invalidText}
           {...field}
           value={format(field.value)}
         />
