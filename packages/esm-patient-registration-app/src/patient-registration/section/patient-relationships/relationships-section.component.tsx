@@ -104,7 +104,11 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
                             text={t('relationshipToPatient', 'Relationship to patient')}
                           />
                           {displayRelationshipTypes.map((type) => (
-                            <SelectItem text={type.display} value={`${type.uuid}/${type.direction}`} key={index} />
+                            <SelectItem
+                              text={type.display}
+                              value={`${type.uuid}/${type.direction}`}
+                              key={type.display}
+                            />
                           ))}
                         </Select>
                       </div>

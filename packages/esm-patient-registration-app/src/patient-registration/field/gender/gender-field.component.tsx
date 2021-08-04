@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import RadioButton from 'carbon-components-react/es/components/RadioButton';
 import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
 import styles from '../field.scss';
@@ -10,7 +10,7 @@ import { DobField } from '../dob/dob.component';
 export const GenderBirthField: React.FC = () => {
   const { t } = useTranslation();
   const [field, meta] = useField('gender');
-  const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const setGender = (gender: string) => {
     setFieldValue('gender', gender);
