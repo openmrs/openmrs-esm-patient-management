@@ -1,13 +1,6 @@
 import FormManager from './patient-registration/form-manager';
+import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import {
-  registerBreadcrumbs,
-  defineConfigSchema,
-  getAsyncLifecycle,
-  setupOfflineSync,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
-import {
-  syncPatientRegistration,
   fetchCurrentSession,
   fetchAddressTemplate,
   fetchPatientIdentifierTypesWithSources,
@@ -15,6 +8,7 @@ import {
 } from './offline.resources';
 import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
 import { moduleName, patientRegistration } from './constants';
+import { setupOffline } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -49,12 +43,7 @@ function setupOpenMRS() {
     },
   ]);
 
-  setupOfflineSync(patientRegistration, [], syncPatientRegistration);
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/fhir2/R4/Patient/.+',
-  });
+  setupOffline();
 
   return {
     pages: [

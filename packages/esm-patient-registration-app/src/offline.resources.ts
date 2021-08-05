@@ -1,9 +1,6 @@
 import React from 'react';
 import find from 'lodash/find';
 import camelCase from 'lodash/camelCase';
-import FormManager from './patient-registration/form-manager';
-import { SyncProcessOptions } from '@openmrs/esm-framework';
-import { PatientRegistration } from './patient-registration/patient-registration-types';
 import { FetchResponse, makeUrl, messageOmrsServiceWorker, openmrsFetch, SessionUser } from '@openmrs/esm-framework';
 import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-registration/patient-registration-types';
 import { mockAutoGenerationOptionsResult } from '../__mocks__/autogenerationoptions.mock';
@@ -141,22 +138,4 @@ async function cacheUrl(url: string) {
     type: 'registerDynamicRoute',
     url: fullUrl,
   });
-}
-
-export async function syncPatientRegistration(
-  queuedPatient: PatientRegistration,
-  options: SyncProcessOptions<PatientRegistration>,
-) {
-  await FormManager.savePatientFormOnline(
-    undefined,
-    queuedPatient.formValues,
-    queuedPatient.patientUuidMap,
-    queuedPatient.initialAddressFieldValues,
-    queuedPatient.identifierTypes,
-    queuedPatient.capturePhotoProps,
-    queuedPatient.patientPhotoConceptUuid,
-    queuedPatient.currentLocation,
-    queuedPatient.personAttributeSections,
-    options.abort,
-  );
 }
