@@ -31,7 +31,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view?`,
-      title: ([x]) => `${x} Dashboard`,
+      title: ([x]) => 'Dashboard',
       parent: spaBasePath,
     },
   ]);
@@ -39,7 +39,7 @@ function setupOpenMRS() {
   return {
     pages: [
       {
-        load: getAsyncLifecycle(() => import('./patient-list-list/patient-list-list.component'), options),
+        load: getAsyncLifecycle(() => import('./root.component'), options),
         route,
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },
