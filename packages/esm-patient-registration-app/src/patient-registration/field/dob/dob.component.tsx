@@ -28,7 +28,7 @@ export const DobField: React.FC = () => {
           invalid={!!(meta.touched && meta.error)}
           invalidText={meta.error}
           {...field}
-          value={format(new Date(field.value))}
+          value={format(field.value)}
         />
       </DatePicker>
     </div>
