@@ -8,7 +8,11 @@ import PatientListDataTable from '../patient-table/patient-table.component';
 import styles from './patient-list-detail.scss';
 import { fetchPatientListDetails, OpenmrsCohort, fetchPatientListMembers, OpenmrsCohortMember } from '../api';
 
-const PatientListDetails: React.FC<RouteComponentProps<{ patientListUuid: string }>> = ({ match }) => {
+interface PatientListDetailProps {
+  patientListUuid: string;
+}
+
+const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> = ({ match }) => {
   const { t } = useTranslation();
   const { patientListUuid } = match?.params;
   const [patientListDetails, setPatientListDetails] = useState<OpenmrsCohort>(null);

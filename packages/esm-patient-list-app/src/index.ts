@@ -30,7 +30,7 @@ function setupOpenMRS() {
       parent: `${window.spaBase}/home`,
     },
     {
-      path: `${spaBasePath}/:view?`,
+      path: `${spaBasePath}/:patientListUuid`,
       title: ([x]) => 'Dashboard',
       parent: spaBasePath,
     },
