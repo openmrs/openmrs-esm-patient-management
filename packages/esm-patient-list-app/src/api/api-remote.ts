@@ -1,4 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { string } from 'yup';
 import {
   AddPatientData,
   CohortResponse,
@@ -61,15 +62,12 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   return results;
 }
 
-export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
+export async function getPatientListMembers(cohortUuid: string, ac = new AbortController(), v: string = 'default') {
   const {
     data: { results, error },
-  } = await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(
-    `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=default`,
-    {
-      signal: ac.signal,
-    },
-  );
+  } = await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(`${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=${v}`, {
+    signal: ac.signal,
+  });
 
   if (error) {
     throw error;
@@ -118,4 +116,31 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
     },
     ac,
   );
+}
+
+export function fetchPatientListDetails(cohortUuid: string, abortController: AbortController) {
+  return openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${cohortUuid}`, {
+    signal: abortController.signal,
+  });
+}
+
+export async function fetchPatientListMembers(
+  cohortUuid: string,
+  abortController: AbortController,
+  v: string = 'default',
+) {
+  const {
+    data: { results, error },
+  } = await await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(
+    `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=${v}`,
+    {
+      signal: abortController.signal,
+    },
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return results;
 }
