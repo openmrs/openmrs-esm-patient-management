@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePagination } from '@openmrs/esm-framework';
 import CustomOverflowMenu from '../ui-components/overflow-menu.component';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
 import PatientListDataTable from '../patient-table/patient-table.component';
@@ -16,16 +16,59 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
   const { t } = useTranslation();
   const { patientListUuid } = match?.params;
   const [patientListDetails, setPatientListDetails] = useState<OpenmrsCohort>(null);
-  const [patientListMembers, setPatientListMembers] = useState([]);
+  const [patientListMembers, setPatientListMembers] = useState<{ name: string }[]>([]);
+  const [isLoading, setLoading] = useState(true);
+  const [searchString, setSearchString] = useState('');
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     const abortController = new AbortController();
     fetchPatientListDetails(patientListUuid, abortController).then(({ data }) => setPatientListDetails(data));
-    const custom = 'cohort,head,role,startDate,attributes,description,endDate,name,patient:(uuid,display),uuid,voided';
-    fetchPatientListMembers(patientListUuid, abortController).then((results) => setPatientListMembers(results));
+    fetchPatientListMembers(patientListUuid, abortController).then((results) => {
+      setPatientListMembers(
+        results.map((cohortMember: OpenmrsCohortMember) => ({
+          name: cohortMember?.patient?.display,
+          startDate: cohortMember?.startDate,
+        })),
+      );
+      setLoading(false);
+    });
 
     return () => abortController.abort();
   }, []);
+
+  const headers = useMemo(
+    () => [
+      {
+        id: '1',
+        key: 'name',
+        header: 'Name',
+      },
+      {
+        id: '2',
+        key: 'startDate',
+        header: 'Start Date',
+      },
+    ],
+    [],
+  );
+
+  const { results, paginated, currentPage, goTo } = usePagination(patientListMembers, pageSize);
+
+  const handlePageChange = useCallback(({ page, newPageSize }) => {
+    if (currentPage != page) {
+      goTo(page);
+    }
+    if (pageSize != newPageSize) {
+      setPageSize(newPageSize);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentPage != 1) {
+      goTo(1);
+    }
+  }, [searchString]);
 
   return (
     <div className="omrs-main-content">
@@ -57,6 +100,23 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
           </CustomOverflowMenu>
         </div>
       </div>
+      <PatientListDataTable
+        columns={headers}
+        patients={results}
+        isLoading={isLoading}
+        pagination={{
+          usePagination: paginated,
+          currentPage,
+          pageSize: 10,
+          totalItems: patientListMembers.length,
+          onChange: handlePageChange,
+        }}
+        search={{
+          onSearch: setSearchString,
+          placeHolder: 'Search',
+          currentSearchTerm: searchString,
+        }}
+      />
     </div>
   );
 };

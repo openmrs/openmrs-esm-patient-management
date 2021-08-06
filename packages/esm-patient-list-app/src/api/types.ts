@@ -68,7 +68,9 @@ export interface OpenmrsCohortMember {
   uuid: string;
   patient: {
     uuid: string;
+    display: string;
   };
+  startDate?: string;
 }
 
 export interface CohortResponse<T> {
