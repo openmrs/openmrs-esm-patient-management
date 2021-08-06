@@ -1,4 +1,4 @@
-import React, { useMemo, CSSProperties } from 'react';
+import React, { useMemo, CSSProperties, useCallback } from 'react';
 import { navigate } from '@openmrs/esm-framework';
 import Link from 'carbon-components-react/es/components/Link';
 import DataTable, {
@@ -15,7 +15,6 @@ import Pagination from 'carbon-components-react/lib/components/Pagination';
 import Search from 'carbon-components-react/lib/components/Search';
 import debounce from 'lodash-es/debounce';
 import styles from './patient-table.component.scss';
-import { useCallback } from 'react';
 
 interface PatientTableProps {
   patients: Array<Object>;
@@ -72,7 +71,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
     [patients, columns],
   );
 
-  const handleSearch = useCallback((searchTerm) => search.onSearch(searchTerm), []);
+  const handleSearch = useCallback((searchTerm) => search.onSearch(searchTerm), [search]);
 
   if (isLoading) {
     return (
