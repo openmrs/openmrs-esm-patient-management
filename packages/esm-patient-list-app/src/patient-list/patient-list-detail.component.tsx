@@ -8,6 +8,9 @@ import PatientListDataTable from '../patient-table/patient-table.component';
 import styles from './patient-list-detail.scss';
 import { fetchPatientListDetails, OpenmrsCohort, fetchPatientListMembers, OpenmrsCohortMember } from '../api';
 import dayjs from 'dayjs';
+import EditPatientListDetailsButton from '../patient-list-actions/edit-patient-list.component';
+import DuplicatePatientListButton from '../patient-list-actions/duplicate-patient-list.component';
+import DeletePatientListButton from '../patient-list-actions/delete-patient-list.component';
 
 function formatDateTime(datetime: string): string {
   return dayjs(datetime).format('DD-MMM-YYYY');
@@ -71,14 +74,17 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
     return () => abortController.abort();
   }, []);
 
-  const handlePageChange = ({ page, pageSize }) => {
-    if (currentPage != page) {
-      goTo(page);
-    }
-    if (currentPageSize != pageSize) {
-      setCurrentPageSize(pageSize);
-    }
-  };
+  const handlePageChange = useCallback(
+    ({ page, pageSize }) => {
+      if (currentPage != page) {
+        goTo(page);
+      }
+      if (currentPageSize != pageSize) {
+        setCurrentPageSize(pageSize);
+      }
+    },
+    [currentPage, currentPageSize],
+  );
 
   useEffect(() => {
     if (currentPage != 1) {
@@ -92,11 +98,12 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
       <div className={styles.patientListBanner}>
         <div className={styles.leftBannerSection}>
           <h4 className={styles.expressiveHeading03}>{patientListDetails?.name}</h4>
+          <h5 className={styles.bodyShort02}>{patientListDetails?.description}</h5>
           <div className={`${styles.secondaryText} ${styles.bodyShort01}`} style={{ marginTop: '0.5rem' }}>
             <span>
               {patientListMembers?.length} {t('patients', 'patients')}
             </span>{' '}
-            · <span className={styles.label01}>Last Updated:</span> 12 / Oct / 2020
+            · <span className={styles.label01}>Last Updated:</span>
           </div>
         </div>
         <div className={styles.rightBannerSection}>
@@ -107,6 +114,9 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
                 <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
               </>
             }>
+            <EditPatientListDetailsButton />
+            <DuplicatePatientListButton />
+            <DeletePatientListButton />
             <ExtensionSlot extensionSlotName="patient-list-actions-slot" />
           </CustomOverflowMenu>
         </div>

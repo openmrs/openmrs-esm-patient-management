@@ -26,7 +26,7 @@ function setupOpenMRS() {
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: 'Patient List',
+      title: 'Patient Lists',
       parent: `${window.spaBase}/home`,
     },
     {

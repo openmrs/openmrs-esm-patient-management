@@ -223,6 +223,9 @@ const PatientListList: React.FC = () => {
           patientLists={patientListQuery.data}
           refetch={patientListQuery.refetch}
           openPatientList={handleOpenPatientList}
+          style={{
+            padding: '1rem',
+          }}
         />
       </div>
       <SearchOverlay viewState={viewState} openPatientList={handleOpenPatientList} setListStarred={handleListStarred} />

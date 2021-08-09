@@ -13,7 +13,6 @@ import DataTable, {
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 import Pagination from 'carbon-components-react/lib/components/Pagination';
 import Search from 'carbon-components-react/lib/components/Search';
-import debounce from 'lodash-es/debounce';
 import styles from './patient-table.component.scss';
 
 interface PatientTableProps {
