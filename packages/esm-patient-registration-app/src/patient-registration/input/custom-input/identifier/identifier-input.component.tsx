@@ -63,12 +63,11 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
 
         if (selectedSource.autoGenerationOption.automaticGenerationEnabled) {
           identifierType.autoGenerationSource = selectedSource;
+          setFieldValue(name, '');
 
           if (validationSchema.fields[identifierType.fieldName]) {
             validationSchema.fields[identifierType.fieldName] = Yup.string();
           }
-
-          setFieldValue(name,'');
         } else {
           setValidationSchema(validationSchema.concat(identifierValidationSchema));
         }
