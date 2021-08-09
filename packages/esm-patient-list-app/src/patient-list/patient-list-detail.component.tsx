@@ -7,6 +7,11 @@ import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertic
 import PatientListDataTable from '../patient-table/patient-table.component';
 import styles from './patient-list-detail.scss';
 import { fetchPatientListDetails, OpenmrsCohort, fetchPatientListMembers, OpenmrsCohortMember } from '../api';
+import dayjs from 'dayjs';
+
+function formatDateTime(datetime: string): string {
+  return dayjs(datetime).format('DD-MMM-YYYY');
+}
 
 interface PatientListDetailProps {
   patientListUuid: string;
@@ -16,26 +21,23 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
   const { t } = useTranslation();
   const { patientListUuid } = match?.params;
   const [patientListDetails, setPatientListDetails] = useState<OpenmrsCohort>(null);
-  const [patientListMembers, setPatientListMembers] = useState<{ name: string }[]>([]);
+  const [patientListMembers, setPatientListMembers] = useState<{ name: string; startDate: string }[]>([]);
   const [isLoading, setLoading] = useState(true);
   const [searchString, setSearchString] = useState('');
-  const [pageSize, setPageSize] = useState(10);
+  const [currentPageSize, setCurrentPageSize] = useState(10);
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    fetchPatientListDetails(patientListUuid, abortController).then(({ data }) => setPatientListDetails(data));
-    fetchPatientListMembers(patientListUuid, abortController).then((results) => {
-      setPatientListMembers(
-        results.map((cohortMember: OpenmrsCohortMember) => ({
-          name: cohortMember?.patient?.display,
-          startDate: cohortMember?.startDate,
-        })),
+  const searchResults = useMemo(() => {
+    if (searchString && searchString.trim() != '') {
+      const search = searchString.toLowerCase();
+      return patientListMembers.filter((patient) =>
+        Object.values(patient).some((value) => value.toLowerCase().includes(search)),
       );
-      setLoading(false);
-    });
+    } else {
+      return patientListMembers;
+    }
+  }, [searchString, patientListMembers]);
 
-    return () => abortController.abort();
-  }, []);
+  const { results, paginated, currentPage, goTo } = usePagination(searchResults, currentPageSize);
 
   const headers = useMemo(
     () => [
@@ -53,16 +55,30 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
     [],
   );
 
-  const { results, paginated, currentPage, goTo } = usePagination(patientListMembers, pageSize);
+  useEffect(() => {
+    const abortController = new AbortController();
+    fetchPatientListDetails(patientListUuid, abortController).then(({ data }) => setPatientListDetails(data));
+    fetchPatientListMembers(patientListUuid, abortController).then((results) => {
+      setPatientListMembers(
+        results.map((cohortMember: OpenmrsCohortMember) => ({
+          name: cohortMember?.patient?.display,
+          startDate: formatDateTime(cohortMember?.startDate),
+        })),
+      );
+      setLoading(false);
+    });
 
-  const handlePageChange = useCallback(({ page, newPageSize }) => {
+    return () => abortController.abort();
+  }, []);
+
+  const handlePageChange = ({ page, pageSize }) => {
     if (currentPage != page) {
       goTo(page);
     }
-    if (pageSize != newPageSize) {
-      setPageSize(newPageSize);
+    if (currentPageSize != pageSize) {
+      setCurrentPageSize(pageSize);
     }
-  }, []);
+  };
 
   useEffect(() => {
     if (currentPage != 1) {
@@ -75,12 +91,7 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
       <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
       <div className={styles.patientListBanner}>
         <div className={styles.leftBannerSection}>
-          <h5 className={styles.bodyShort02}>
-            {t(
-              'aListOfPatientsThatHaventBeenSeenFor30DaysSinceTheirMissedAppointment',
-              "A list of patients that haven't been seen for 30 days, since their missed appointment",
-            )}
-          </h5>
+          <h4 className={styles.expressiveHeading03}>{patientListDetails?.name}</h4>
           <div className={`${styles.secondaryText} ${styles.bodyShort01}`} style={{ marginTop: '0.5rem' }}>
             <span>
               {patientListMembers?.length} {t('patients', 'patients')}
@@ -105,10 +116,10 @@ const PatientListDetails: React.FC<RouteComponentProps<PatientListDetailProps>> 
         patients={results}
         isLoading={isLoading}
         pagination={{
-          usePagination: paginated,
+          usePagination: true,
           currentPage,
-          pageSize: 10,
-          totalItems: patientListMembers.length,
+          pageSize: currentPageSize,
+          totalItems: searchResults.length,
           onChange: handlePageChange,
         }}
         search={{

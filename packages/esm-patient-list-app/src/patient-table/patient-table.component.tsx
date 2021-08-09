@@ -129,6 +129,9 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
       </DataTable>
       {pagination.usePagination && (
         <Pagination
+          className={styles.paginationBar}
+          forwardText=""
+          backwardText=""
           page={pagination.currentPage}
           pageSize={pagination.pageSize}
           pageSizes={[10, 20, 30, 40, 50]}

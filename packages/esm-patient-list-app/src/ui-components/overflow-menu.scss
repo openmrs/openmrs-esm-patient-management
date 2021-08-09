@@ -1,16 +1,16 @@
 @import "../style.scss";
 
 .overflowMenu {
-  width: 'auto';
-  height: 'auto';
-  padding: '1rem';
-  color: '#0f62fe';
+  width: auto !important;
+  height: auto !important;
+  padding: 1rem !important;
+  color: #0f62fe !important;
 }
 
 .overflowMenuItemContainer {
-  top: '3.125rem';
-  min-width: 'initial';
-  left: 'auto';
-  right: '0';
-  background-color: '#f4f4f4';
+  top: 3.125rem !important;
+  min-width: initial !important;
+  left: auto !important;
+  right: 0 !important;
+  background-color: #f4f4f4 !important;
 }

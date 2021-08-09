@@ -1,9 +1,9 @@
 {
-  "A list of patients that haven't been seen for 30 days, since their missed appointment": "",
   "actions": "Actions",
   "addPatientToList": "Add patient to list",
   "addToList": "Add to list",
   "age": "Age",
+  "aListOfPatientsThatHaventBeenSeenFor30DaysSinceTheirMissedAppointment": "A list of patients that haven't been seen for 30 days, since their missed appointment",
   "cancel": "Cancel",
   "configureList": "Configure your patient list using the fields below",
   "createNewPatientList": "Create new patient list",
