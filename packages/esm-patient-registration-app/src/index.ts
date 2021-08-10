@@ -82,6 +82,12 @@ function setupOpenMRS() {
         offline: true,
       },
       {
+        id: 'cancel-patient-edit-modal',
+        load: getAsyncLifecycle(() => import('./widgets/cancel-patient-edit.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
         id: 'patient-photo-widget',
         slot: 'patient-photo-slot',
         load: getAsyncLifecycle(() => import('./widgets/display-photo.component'), options),

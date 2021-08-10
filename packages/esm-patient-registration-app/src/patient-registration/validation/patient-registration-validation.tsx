@@ -1,23 +1,22 @@
 import * as Yup from 'yup';
 
 export const validationSchema = Yup.object({
-  givenName: Yup.string().required('Given name is required'),
-  familyName: Yup.string().required('Family name is required'),
+  givenName: Yup.string().required('givenNameRequired'),
+  familyName: Yup.string().required('familyNameRequired'),
   additionalGivenName: Yup.string().when('addNameInLocalLanguage', {
     is: true,
-    then: Yup.string().required('Given name is required'),
+    then: Yup.string().required('givenNameRequired'),
     otherwise: Yup.string().notRequired(),
   }),
   additionalFamilyName: Yup.string().when('addNameInLocalLanguage', {
     is: true,
-    then: Yup.string().required('Family name is required'),
+    then: Yup.string().required('familyNameRequired'),
     otherwise: Yup.string().notRequired(),
   }),
-  gender: Yup.string()
-    .oneOf(['Male', 'Female', 'Other', 'Unknown'], 'Gender is unspecified')
-    .required('Gender is required'),
-  birthdate: Yup.date().required('Birthdate is required').max(Date(), 'Birthdate cannot be in the future').nullable(),
-  yearsEstimated: Yup.number().min(0, 'Years cannot be less than 0'),
-  monthsEstimated: Yup.number().min(0, 'Months cannot be less than 0'),
-  deathDate: Yup.date().max(Date(), 'Date of Death cannot be in the future').nullable(),
+  gender: Yup.string().oneOf(['Male', 'Female', 'Other', 'Unknown'], 'genderUnspecified').required('genderRequired'),
+  birthdate: Yup.date().required('birthdayRequired').max(Date(), 'birthdayNotInTheFuture').nullable(),
+  yearsEstimated: Yup.number().min(0, 'negativeYears'),
+  monthsEstimated: Yup.number().min(0, 'negativeMonths'),
+  deathDate: Yup.date().max(Date(), 'deathdayNotInTheFuture').nullable(),
+  email: Yup.string().optional().email('invalidEmail'),
 });

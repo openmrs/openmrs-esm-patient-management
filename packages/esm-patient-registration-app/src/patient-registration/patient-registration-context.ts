@@ -1,21 +1,21 @@
-import React, { SetStateAction } from 'react';
+import { createContext, SetStateAction, useContext } from 'react';
 import { FormValues, CapturePhotoProps } from './patient-registration-types';
 
-type PatientRegistrationContextProps = {
+export interface PatientRegistrationContextProps {
   identifierTypes: Array<any>;
   values: FormValues;
   validationSchema: any;
-  setValidationSchema: (value: any) => void;
+  setValidationSchema(value: any): void;
   inEditMode: boolean;
   fieldConfigs: Record<string, any>;
-  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
-  setCapturePhotoProps: (value: SetStateAction<CapturePhotoProps>) => void;
+  setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
+  setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
-};
+}
 
-export const PatientRegistrationContext = React.createContext<PatientRegistrationContextProps | undefined>(undefined);
+export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);
 
-export const useFieldConfig = (field) => {
-  const { fieldConfigs } = React.useContext(PatientRegistrationContext);
+export function useFieldConfig(field: string) {
+  const { fieldConfigs } = useContext(PatientRegistrationContext);
   return fieldConfigs[field];
-};
+}

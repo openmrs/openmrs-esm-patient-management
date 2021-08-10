@@ -1,7 +1,8 @@
 import React from 'react';
 import { getField } from '../section-helper';
 
-interface ContactInfoSectionProps {
+export interface ContactInfoSectionProps {
+  id: 'contact';
   fields: Array<string>;
 }
 

@@ -1,0 +1,13 @@
+.photoFrame {
+  height: 5rem;
+  width: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ccc;
+
+  & > img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}

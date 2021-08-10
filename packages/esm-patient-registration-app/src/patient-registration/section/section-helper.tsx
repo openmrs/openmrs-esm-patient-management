@@ -1,77 +1,65 @@
-import React, { SetStateAction } from 'react';
-import { Row, Column } from 'carbon-components-react/es/components/Grid';
-import { DemographicsSection } from './demographics/demographics-section.component';
-import { ContactInfoSection } from './contact-info/contact-info-section.component';
-import { RelationshipsSection } from './patient-relationships/relationships-section.component';
-import { DeathInfoSection } from './death-info/death-info-section.component';
+import React from 'react';
+import { DemographicsSection, DemographicsSectionProps } from './demographics/demographics-section.component';
+import { ContactInfoSection, ContactInfoSectionProps } from './contact-info/contact-info-section.component';
+import {
+  RelationshipsSection,
+  RelationshipsSectionProps,
+} from './patient-relationships/relationships-section.component';
+import { DeathInfoSection, DeathInfoSectionProps } from './death-info/death-info-section.component';
 import { SectionWrapper } from './section-wrapper.component';
 import { AddressField } from '../field/address/address-field.component';
 import { PhoneEmailField } from '../field/email/email-field.component';
-import { PhoneField } from '../field/phone/phone-field.component';
 import { NameField } from '../field/name/name-field.component';
 import { GenderBirthField } from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
-import { DobField } from '../field/dob/dob.component';
-import { CapturePhotoProps } from '../patient-registration-types';
 
-enum Field {
-  Address = 'address',
-  PhoneEmail = 'phone & email',
-  Name = 'name',
-  Id = 'id',
-  GenderBirth = 'gender & dob',
-  Default = 'default',
-}
-
-enum Section {
-  Demographics = 'demographics',
-  Contact = 'contact',
-  Death = 'death',
-  Relationships = 'relationships',
-  Default = 'default',
-}
-
-export const getField = (fieldName: string) => {
+export function getField(fieldName: string) {
   switch (fieldName) {
-    case Field.Address:
+    case 'address':
       return <AddressField />;
-    case Field.PhoneEmail:
+    case 'phone & email':
       return <PhoneEmailField />;
-    case Field.Name:
+    case 'name':
       return <NameField />;
-    case Field.GenderBirth:
+    case 'gender & dob':
       return <GenderBirthField />;
-    case Field.Id:
+    case 'id':
       return <IdField />;
-    case Field.Default:
+    default:
       return <div>Unknown Field {fieldName} </div>;
   }
-};
+}
 
-export const getSection = (sectionProps: any, index: number) => {
-  let section = null;
+function renderSection(sectionProps: SectionProps) {
   switch (sectionProps.id) {
-    case Section.Demographics:
-      section = <DemographicsSection {...sectionProps} />;
-      break;
-    case Section.Contact:
-      section = <ContactInfoSection {...sectionProps} />;
-      break;
-    case Section.Death:
-      section = <DeathInfoSection {...sectionProps} />;
-      break;
-    case Section.Relationships:
-      section = <RelationshipsSection {...sectionProps} />;
-      break;
-    case Section.Default:
+    case 'demographics':
+      return <DemographicsSection {...sectionProps} />;
+    case 'contact':
+      return <ContactInfoSection {...sectionProps} />;
+    case 'death':
+      return <DeathInfoSection {...sectionProps} />;
+    case 'relationships':
+      return <RelationshipsSection {...sectionProps} />;
     default:
-      section = <div>Unknown Section {sectionProps.id}</div>;
-      break;
+      return <div>Unknown Section {sectionProps.id}</div>;
   }
+}
 
+export interface DefaultSectionProps {
+  id: 'default';
+}
+
+export type SectionProps =
+  | DemographicsSectionProps
+  | ContactInfoSectionProps
+  | DeathInfoSectionProps
+  | RelationshipsSectionProps
+  | DefaultSectionProps;
+
+export function getSection(sectionProps: SectionProps & { name: string }, index: number) {
   return (
     <SectionWrapper {...sectionProps} index={index}>
-      {section}
+      {renderSection(sectionProps)}
     </SectionWrapper>
   );
-};
+}

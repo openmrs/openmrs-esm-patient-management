@@ -1,20 +1,23 @@
 import React, { useContext, useEffect, useState } from 'react';
-import styles from '../field.scss';
-import { Input } from '../../input/basic-input/input/input.component';
 import { useTranslation } from 'react-i18next';
+import { Input } from '../../input/basic-input/input/input.component';
 import { ResourcesContext } from '../../../offline.resources';
+import styles from '../field.scss';
 
-const parseString = (xmlDockAsString: string) => new DOMParser().parseFromString(xmlDockAsString, 'text/xml');
+function parseString(xmlDockAsString: string) {
+  const parser = new DOMParser();
+  return parser.parseFromString(xmlDockAsString, 'text/xml');
+}
 
-const getTagAsDocument = (tagName: string, template: XMLDocument) => {
+function getTagAsDocument(tagName: string, template: XMLDocument) {
   const tmp = template.getElementsByTagName(tagName)[0];
   return tmp ? parseString(tmp.outerHTML) : parseString('');
-};
+}
 
-const getFieldValue = (field: string, doc: XMLDocument) => {
+function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByTagName(field)[0];
   return fieldElement ? fieldElement.getAttribute('value') : null;
-};
+}
 
 export const AddressField: React.FC = () => {
   const { addressTemplate } = useContext(ResourcesContext);
@@ -30,11 +33,11 @@ export const AddressField: React.FC = () => {
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
       const name = property.getAttribute('name');
       /*
-      t('postalCode')
-      t('address1')
-      t('stateProvince')
-      t('cityVillage')
-      t('country')
+        t('postalCode')
+        t('address1')
+        t('stateProvince')
+        t('cityVillage')
+        t('country')
       */
       const labelText = t(name, property.getAttribute('value'));
       const value = getFieldValue(name, elementDefaults);

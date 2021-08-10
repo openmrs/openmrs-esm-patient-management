@@ -17,7 +17,11 @@ interface RelationshipType {
   direction: string;
 }
 
-export const RelationshipsSection: React.FC = () => {
+export interface RelationshipsSectionProps {
+  id: 'relationships';
+}
+
+export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
   const { relationshipTypes } = useContext(ResourcesContext);
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
@@ -100,7 +104,11 @@ export const RelationshipsSection: React.FC = () => {
                             text={t('relationshipToPatient', 'Relationship to patient')}
                           />
                           {displayRelationshipTypes.map((type) => (
-                            <SelectItem text={type.display} value={`${type.uuid}/${type.direction}`} key={index} />
+                            <SelectItem
+                              text={type.display}
+                              value={`${type.uuid}/${type.direction}`}
+                              key={type.display}
+                            />
                           ))}
                         </Select>
                       </div>
