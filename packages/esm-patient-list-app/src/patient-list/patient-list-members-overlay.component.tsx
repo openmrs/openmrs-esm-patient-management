@@ -15,7 +15,7 @@ const PatientListMembersOverlay: React.FC<PatientListMembersOverlayProps> = ({ c
   const { t } = useTranslation();
 
   return (
-    <Overlay close={close} header={t('patientListHeader', 'patient list')}>
+    <Overlay close={close} header={t('patientListHeader', 'Patient list')}>
       <p>{listUuid}</p>
       <ul>{data && data.map((item) => <li key={item.id}>{item.id}</li>)}</ul>
     </Overlay>
