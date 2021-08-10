@@ -53,7 +53,7 @@ const CreateNewList: React.FC<CreateNewListProps> = ({ close }) => {
       <br />
       <MultiSelect
         id="select"
-        label={t('newPatientListSeceltLabel', 'Chose which information to include in the list')}
+        label={t('newPatientListSeceltLabel', 'Choose which information to include in the list')}
         items={items}
         itemToString={(item) => (item ? item.text : '')}
         onChange={() => {}}
