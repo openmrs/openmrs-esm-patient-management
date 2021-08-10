@@ -1,5 +1,5 @@
 import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
-import { setupOfflinePatientListHandlersStore } from './global-store';
+import './global-store';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -21,12 +21,10 @@ function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
 
-  setupOfflinePatientListHandlersStore();
-
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: 'Patient List',
+      title: 'Patient Lists',
       parent: `${window.spaBase}/home`,
     },
     {

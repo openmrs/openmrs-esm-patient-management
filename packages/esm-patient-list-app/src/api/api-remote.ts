@@ -43,7 +43,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   }
 
   if (filter.type !== undefined) {
-    const type = filter.type === PatientListType.SYSTEM ? 'System Patient List' : '';
+    const type = filter.type === PatientListType.SYSTEM ? 'System Patient Lists' : '';
     query.push(['cohortType', type]);
   }
 
