@@ -1,6 +1,6 @@
 .searchOverrides {
-    width: 250px !important;
-    padding-top: 17px !important;
+    width: 250px ;
+    padding-top: 17px;
     border: 0px !important;
 }
 
@@ -17,12 +17,12 @@
     top: 10px;
 }
 
-div.table1  {
+div.tableOverride  {
     background-color: #f4f4f4;
     margin: -16px;
 }
 
-div.table1 > div {
+div.tableOverride > div {
     white-space:nowrap;
     padding: 0px !important;
 }
@@ -32,7 +32,7 @@ div#table-tool-bar {
     height: 48px !important;
 }
 
-div.table1 > div > div {
+div.tableOverride > div > div {
     border: solid 1px #e0e0e0;
 }
 

@@ -85,7 +85,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   }
 
   return (
-    <div className={styles.table1}>
+    <div className={styles.tableOverride}>
       <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
         <Search
           id="patient-list-search"
