@@ -103,7 +103,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  {headers.map(header => (
+                  {headers.map((header) => (
                     <TableHeader
                       {...getHeaderProps({
                         header,
@@ -115,9 +115,9 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map(row => (
+                {rows.map((row) => (
                   <TableRow key={row.id}>
-                    {row.cells.map(cell => (
+                    {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                   </TableRow>
