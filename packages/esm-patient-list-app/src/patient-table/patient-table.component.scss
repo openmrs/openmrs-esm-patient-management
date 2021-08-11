@@ -1,3 +1,48 @@
 .searchOverrides {
-    width: 50% !important;
+    width: 250px !important;
+    padding-top: 17px !important;
+    border: 0px !important;
+}
+
+.searchOverrides > input {
+    height: 32px !important;
+}
+
+.searchOverrides > div {
+   top: 70%;
+}
+
+.searchOverrides > button {
+    height: 32px !important;
+    top: 10px;
+}
+
+div.table1  {
+    background-color: #f4f4f4;
+    margin: -16px;
+}
+
+div.table1 > div {
+    white-space:nowrap;
+    padding: 0px !important;
+}
+
+div#table-tool-bar {
+    margin-top: 50px;
+    height: 48px !important;
+}
+
+div.table1 > div > div {
+    border: solid 1px #e0e0e0;
+}
+
+.paginationOverride{
+    background-color: #ffffff;
+    border-bottom: solid 1px #e0e0e0 !important;
+}
+
+.paginationOverride > div {
+    background-color: #ffffff;
+    border-bottom: 0px!important;
+    border-top: 0px !important;
 }

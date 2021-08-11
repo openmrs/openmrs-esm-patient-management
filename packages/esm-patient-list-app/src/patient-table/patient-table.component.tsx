@@ -85,7 +85,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   }
 
   return (
-    <>
+    <div className={styles.table1}>
       <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
         <Search
           id="patient-list-search"
@@ -94,16 +94,16 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           onChange={(evnt) => handleSearch(evnt.target.value)}
           className={styles.searchOverrides}
           value={search.currentSearchTerm}
-          autoFocus={autoFocus}
+          light
         />
       </div>
-      <DataTable rows={rows} headers={columns} isSortable={true} size="normal" useZebraStyles={true}>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>
+        {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
           <TableContainer>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  {headers.map((header) => (
+                  {headers.map(header => (
                     <TableHeader
                       {...getHeaderProps({
                         header,
@@ -115,9 +115,9 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {rows.map(row => (
                   <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
+                    {row.cells.map(cell => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                   </TableRow>
@@ -134,9 +134,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           pageSizes={[10, 20, 30, 40, 50]}
           totalItems={pagination.totalItems}
           onChange={pagination.onChange}
+          className={styles.paginationOverride}
         />
       )}
-    </>
+    </div>
   );
 };
 
