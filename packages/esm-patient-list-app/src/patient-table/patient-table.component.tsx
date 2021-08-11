@@ -95,6 +95,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           className={styles.searchOverrides}
           value={search.currentSearchTerm}
           light
+          size='sm'
         />
       </div>
       <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>

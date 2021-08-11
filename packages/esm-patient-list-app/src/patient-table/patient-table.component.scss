@@ -1,25 +1,24 @@
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import "~@openmrs/esm-styleguide/src/vars";
+
 .searchOverrides {
     width: 250px ;
-    padding-top: 17px;
+    padding-top: $carbon--spacing-05;
     border: 0px !important;
 }
 
-.searchOverrides > input {
-    height: 32px !important;
-}
-
-.searchOverrides > div {
-   top: 70%;
+.searchOverrides > div:first-child {
+    top: $carbon--spacing-07;
 }
 
 .searchOverrides > button {
-    height: 32px !important;
-    top: 10px;
+    top: $carbon--spacing-04;
 }
 
 div.tableOverride  {
-    background-color: #f4f4f4;
-    margin: -16px;
+    background-color: $ui-01;
+    margin: -$carbon--spacing-05;
 }
 
 div.tableOverride > div {
@@ -28,21 +27,20 @@ div.tableOverride > div {
 }
 
 div#table-tool-bar {
-    margin-top: 50px;
-    height: 48px !important;
+    margin-top: $carbon--spacing-09;
 }
 
 div.tableOverride > div > div {
-    border: solid 1px #e0e0e0;
+    border: solid 1px $ui-03;
 }
 
 .paginationOverride{
-    background-color: #ffffff;
-    border-bottom: solid 1px #e0e0e0 !important;
+    background-color: $ui-background;
+    border-bottom: solid 1px $ui-03 !important;
 }
 
 .paginationOverride > div {
-    background-color: #ffffff;
+    background-color: $ui-background;
     border-bottom: 0px!important;
     border-top: 0px !important;
 }
