@@ -14,6 +14,7 @@ interface IdentifierInputProps {
 }
 
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType }) => {
+  const { validationSchema, setValidationSchema, setFieldValue } = React.useContext(PatientRegistrationContext);
   const sources = identifierType.identifierSources;
   const name = identifierType.fieldName;
   const { t } = useTranslation();
@@ -24,7 +25,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
   const sourceName = `source-for-${name}`;
   const [selectSourceField] = useField(sourceName);
   const [identifierValidationSchema, setIdentifierValidationSchema] = useState(Yup.object({}));
-  const { validationSchema, setValidationSchema } = React.useContext(PatientRegistrationContext);
 
   useEffect(() => {
     if (
@@ -62,6 +62,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
 
         if (selectedSource.autoGenerationOption.automaticGenerationEnabled) {
           identifierType.autoGenerationSource = selectedSource;
+          setFieldValue(name, '');
 
           if (validationSchema.fields[identifierType.fieldName]) {
             validationSchema.fields[identifierType.fieldName] = Yup.string();
