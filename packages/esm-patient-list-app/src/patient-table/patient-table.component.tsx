@@ -85,7 +85,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   }
 
   return (
-    <>
+    <div className={styles.tableOverride}>
       <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
         <Search
           id="patient-list-search"
@@ -94,10 +94,11 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           onChange={(evnt) => handleSearch(evnt.target.value)}
           className={styles.searchOverrides}
           value={search.currentSearchTerm}
-          autoFocus={autoFocus}
+          light
+          size="sm"
         />
       </div>
-      <DataTable rows={rows} headers={columns} isSortable={true} size="normal" useZebraStyles={true}>
+      <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
@@ -134,9 +135,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           pageSizes={[10, 20, 30, 40, 50]}
           totalItems={pagination.totalItems}
           onChange={pagination.onChange}
+          className={styles.paginationOverride}
         />
       )}
-    </>
+    </div>
   );
 };
 

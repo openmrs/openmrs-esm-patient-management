@@ -1,3 +1,47 @@
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import "~@openmrs/esm-styleguide/src/vars";
+
 .searchOverrides {
-    width: 50% !important;
+    width: 100%;
+    max-width: 250px;
+    padding-top: $carbon--spacing-05;
+    border: 0px !important;
+}
+
+.searchOverrides > div:first-child {
+    top: $carbon--spacing-07;
+}
+
+.searchOverrides > button {
+    top: $carbon--spacing-04;
+}
+
+div.tableOverride  {
+    background-color: $ui-01;
+    margin: -$carbon--spacing-05;
+}
+
+div.tableOverride > div {
+    white-space:nowrap;
+    padding: 0px !important;
+}
+
+div#table-tool-bar {
+    margin-top: $carbon--spacing-09;
+}
+
+div.tableOverride > div > div {
+    border: solid 1px $ui-03;
+}
+
+.paginationOverride{
+    background-color: $ui-background;
+    border-bottom: solid 1px $ui-03 !important;
+}
+
+.paginationOverride > div {
+    background-color: $ui-background;
+    border-bottom: 0px!important;
+    border-top: 0px !important;
 }
