@@ -55,7 +55,6 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
-  searchTerm: string;
   hidePanel?: any;
 }
 

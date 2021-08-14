@@ -1,21 +1,50 @@
-.patientLaunchContainer {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    min-height: 3rem;
-    z-index: 1000000;
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+$inverse-02:#393939;
+
+.patientSearchIconWrapper {
+  display: flex;
+  width: 50vw;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .patientLaunchContainer {
-    position: absolute;
-    width: 50vw;
-    right: 0;
-    height: 2.75rem;
-    left: unset;
+.patientSearchInput input:focus {
+  outline: none;
 }
 
-.headerGlobalAction {
-    background-color: transparent;
+// desktop mode styling
+:global(.omrs-breakpoint-gt-tablet) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 50vw;
+  border: $spacing-01 solid var(--omrs-color-brand-orange);
+  height: calc($spacing-08 - 0.25rem);
+  margin-right: $spacing-01;
+}
+
+// tablet mode styling
+:global(.omrs-breakpoint-lt-desktop) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 100vw;
+  border: $spacing-01 solid var(--omrs-color-brand-orange);
+  margin-right: $spacing-01;
+  position: fixed;
+  top: $spacing-09;
+  right: 0;
+  left: 0;
+}
+
+
+.closeButton {
+  background-color: $brand-02;
+}
+
+.searchButton {
+  background-color: $inverse-02;
 }
