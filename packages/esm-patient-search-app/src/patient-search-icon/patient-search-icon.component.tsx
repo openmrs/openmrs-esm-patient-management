@@ -6,7 +6,7 @@ import styles from './patient-search-icon.component.scss';
 import PatientSearch from '../patient-search/patient-search.component';
 import Search from 'carbon-components-react/es/components/Search';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'carbon-components-react';
+import Button from 'carbon-components-react/es/components/Button';
 import debounce from 'lodash-es/debounce';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { performPatientSearch } from '../patient-search/patient-search.resource';
@@ -75,11 +75,14 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const initialState: PatientSearch = { status: 'idle', searchResults: [] };
   const [{ searchResults, status }, dispatch] = useReducer(reducer, initialState);
 
-  const performSearch = () => {
-    const ac = new AbortController();
-    if (searchTerm) {
-      dispatch({ type: ActionTypes.searching, payload: [] });
-      performPatientSearch(searchTerm, customRepresentation).then(
+  const performSearch = useCallback(() => {
+    !isEmpty(searchTerm) && dispatch({ type: ActionTypes.searching, payload: [] });
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (searchTerm && status === 'searching') {
+      const ac = new AbortController();
+      performPatientSearch(searchTerm, customRepresentation, ac).then(
         ({ data }) => {
           const results: Array<SearchedPatient> = data.results.map((res, i) => ({
             ...res,
@@ -91,9 +94,9 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           dispatch({ type: ActionTypes.error, payload: error });
         },
       );
+      return () => ac.abort();
     }
-    return () => ac.abort();
-  };
+  }, [searchTerm, status]);
 
   const handleEnterKeyPressed = (event: KeyboardEvent) => event.key.toLowerCase() === 'enter' && performSearch();
 
