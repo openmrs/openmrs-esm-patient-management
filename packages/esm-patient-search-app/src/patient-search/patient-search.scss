@@ -90,3 +90,16 @@
   margin: $spacing-05;
   background-color: $ui-02;
 }
+
+.errorMessage {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-01;
+  margin-top: 2.25rem;
+  margin-bottom: $spacing-03;
+}
+
+.errorCopy {
+  margin-bottom: $spacing-03;
+  @include carbon--type-style("body-long-01");
+  color: $text-02;
+}

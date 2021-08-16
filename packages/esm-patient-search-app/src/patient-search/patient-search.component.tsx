@@ -16,9 +16,10 @@ interface PatientSearchProps {
   hidePanel?: () => void;
   searchResults: Array<SearchedPatient>;
   status: 'searching' | 'resolved' | 'error' | 'idle';
+  error;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults, status }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults, status, error }) => {
   const { t } = useTranslation();
   const { totalPages, currentPage, goToNext, goToPrevious, results, goTo } = usePagination(
     searchResults,
@@ -73,6 +74,26 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults,
         </>
       )}
       {status === 'searching' && <Loading description="Active loading indicator" withOverlay={true} />}
+      {status === 'error' && (
+        <div className={styles.searchResults}>
+          <p className={styles.resultsText}>{t('errorText', 'An error occurred while performing search')}</p>
+          <Tile className={styles.emptySearchResultsTile}>
+            <EmptyDataIllustration />
+            <div>
+              <p className={styles.errorMessage}>
+                {t('error', 'Error')} {`${error?.status}: `}
+                {error?.statusText}
+              </p>
+              <p className={styles.errorCopy}>
+                {t(
+                  'errorCopy',
+                  'Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
+                )}
+              </p>
+            </div>
+          </Tile>
+        </div>
+      )}
     </div>
   );
 };

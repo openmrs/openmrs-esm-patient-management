@@ -28,7 +28,7 @@ interface Searching {
 
 interface Error {
   type: ActionTypes.error;
-  payload: Error;
+  error: Error;
 }
 interface Resolved {
   type: ActionTypes.resolved;
@@ -45,18 +45,15 @@ type Action = Searching | Error | Resolved | Idle;
 interface PatientSearch {
   status: 'searching' | 'resolved' | 'error' | 'idle';
   searchResults: Array<SearchedPatient>;
+  error?: null | Error;
 }
 
 function reducer(state: PatientSearch, action: Action): PatientSearch {
   switch (action.type) {
-    case ActionTypes.resolved:
-      return { status: 'resolved', searchResults: action.payload };
-    case ActionTypes.searching:
-      return { status: 'searching', searchResults: action.payload };
     case ActionTypes.error:
-      return { ...state, status: 'error' };
-    case ActionTypes.idle:
-      return { status: 'idle', searchResults: action.payload };
+      return { status: action.type, error: action.error, ...state };
+    default:
+      return { status: action.type, searchResults: action.payload };
   }
 }
 
@@ -73,7 +70,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>();
   const initialState: PatientSearch = { status: 'idle', searchResults: [] };
-  const [{ searchResults, status }, dispatch] = useReducer(reducer, initialState);
+  const [{ searchResults, status, error }, dispatch] = useReducer(reducer, initialState);
 
   const performSearch = useCallback(() => {
     !isEmpty(searchTerm) && dispatch({ type: ActionTypes.searching, payload: [] });
@@ -91,7 +88,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           dispatch({ type: ActionTypes.resolved, payload: results });
         },
         (error) => {
-          dispatch({ type: ActionTypes.error, payload: error });
+          dispatch({ type: ActionTypes.error, error: error?.response });
         },
       );
       return () => ac.abort();
@@ -159,7 +156,9 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           </HeaderGlobalAction>
         </div>
       </div>
-      {open && <PatientSearch hidePanel={handleCloseSearchPanel} searchResults={searchResults} status={status} />}
+      {open && (
+        <PatientSearch hidePanel={handleCloseSearchPanel} searchResults={searchResults} status={status} error={error} />
+      )}
     </>
   );
 };
