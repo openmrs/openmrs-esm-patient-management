@@ -148,6 +148,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
 
         <div className={`${open && styles.closeButton}`}>
           <HeaderGlobalAction
+            className={`${open ? styles.activeSearchIconButton : styles.searchIconButton}`}
             onClick={() => setOpen((prevState) => !prevState)}
             aria-label="Search Patient"
             aria-labelledby="Search Patient"

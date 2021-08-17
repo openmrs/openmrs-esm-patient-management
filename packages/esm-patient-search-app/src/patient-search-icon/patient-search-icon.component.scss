@@ -40,6 +40,13 @@ $inverse-02:#393939;
   left: 0;
 }
 
+.searchIconButton {
+  background-color: $brand-01;
+}
+
+.activeSearchIconButton {
+  background-color: $brand-02;
+}
 
 .closeButton {
   background-color: $brand-02;
