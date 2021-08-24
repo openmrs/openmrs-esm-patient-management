@@ -6,6 +6,8 @@ import {
   getLocalAndRemotePatientListsForPatient,
   updateLocalOrRemotePatientList,
 } from './api';
+import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
+import { fetchCurrentPatient } from '@openmrs/esm-framework';
 
 /**
  * A hook for querying all local and remote patient lists belonging to a given user,
@@ -62,6 +64,21 @@ export function useGetAllPatientListsWithoutPatientQuery(userId?: string, patien
   );
 }
 
+export function useGetAllPatientsFromOfflineListQuery(userId?: string) {
+  return useAsyncQuery<Array<fhir.Patient>>(async () => {
+    if (!userId) {
+      return [];
+    }
+
+    const allPatientUuids = await getLocalPatientListMembers(userId, offlinePatientListId);
+    const patients: Array<{ data: fhir.Patient } | null> = await Promise.all(
+      allPatientUuids.map(({ id }) => fetchCurrentPatient(id)),
+    );
+
+    return patients.filter(Boolean).map((result) => result.data);
+  }, [userId]);
+}
+
 export interface ToggleStarredMutationArgs {
   userId: string;
   patientListId: string;
@@ -74,5 +91,25 @@ export interface ToggleStarredMutationArgs {
 export function useToggleStarredMutation() {
   return useAsync(({ userId, patientListId, isStarred }: ToggleStarredMutationArgs, { abortController }) => {
     return updateLocalOrRemotePatientList(userId, patientListId, { isStarred }, abortController);
+  });
+}
+
+export interface RemovePatientsFromOfflinePatientListMutationArgs {
+  userId: string;
+  patientUuids: Array<string>;
+}
+
+/**
+ * A hook for removing multiple patients at once from the offline patient list.
+ */
+export function useRemovePatientsFromOfflinePatientListMutation() {
+  return useAsync(async ({ userId, patientUuids }: RemovePatientsFromOfflinePatientListMutationArgs) => {
+    if (!userId) {
+      return;
+    }
+
+    for (const patientUuid of patientUuids) {
+      await removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid);
+    }
   });
 }

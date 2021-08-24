@@ -6,6 +6,7 @@ const store = createGlobalStore<OfflinePatientListHandlersState>('offline-patien
 
 /**
  * Data passed to `onPatientAdded` handlers in the global offline patient list handlers store.
+ * @deprecated
  */
 interface OnPatientAddedData {
   /**
@@ -21,11 +22,13 @@ interface OnPatientAddedData {
 /**
  * Defines the handler function which is invoked when a patient is added to a user's
  * offline patient list.
+ * @deprecated
  */
 type OnPatientAddedHandler = (data: OnPatientAddedData) => void;
 
 /**
  * The shape of the global offline patient list handlers store.
+ * @deprecated
  */
 interface OfflinePatientListHandlersState {
   /**
@@ -37,6 +40,7 @@ interface OfflinePatientListHandlersState {
 /**
  *
  * @param data Notification data about the patient that was just added to the user's offline patient list.
+ * @deprecated
  */
 export function notifyOnPatientAdded(data: OnPatientAddedData) {
   for (const handler of store.getState().onPatientAdded) {
@@ -47,6 +51,7 @@ export function notifyOnPatientAdded(data: OnPatientAddedData) {
 /**
  * Registers the given `onPatientAdded` handler in the global offline patient list handlers store.
  * @param handler The `onPatientAdded` handler to be registered.
+ * @deprecated
  */
 export function registerOnPatientAddedHandler(handler: OnPatientAddedHandler) {
   const state = store.getState();

@@ -1,5 +1,6 @@
-import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, registerBreadcrumbs, getOfflinePatientDataStore } from '@openmrs/esm-framework';
 import './global-store';
+import { setupOffline } from './offline';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -20,6 +21,7 @@ const options = {
 function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
+  setupOffline();
 
   registerBreadcrumbs([
     {
@@ -70,6 +72,26 @@ function setupOpenMRS() {
         id: 'patient-table',
         load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
           featureName: 'patient-table',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'overview-offline-patient-table',
+        slot: 'offline-tools-home-overview-slot',
+        load: getAsyncLifecycle(() => import('./offline-patient-table/overview-offline-patient-table.component'), {
+          featureName: 'overview-offline-patient-table',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'offline-patient-table',
+        slot: 'offline-tools-offline-patients-slot',
+        load: getAsyncLifecycle(() => import('./offline-patient-table/interactive-offline-patient-table.component'), {
+          featureName: 'offline-patient-table',
           moduleName,
         }),
         online: true,

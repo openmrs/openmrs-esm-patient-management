@@ -14,7 +14,7 @@ import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableS
 import Pagination from 'carbon-components-react/lib/components/Pagination';
 import Search from 'carbon-components-react/lib/components/Search';
 import debounce from 'lodash-es/debounce';
-import styles from './patient-table.component.scss';
+import styles from './patient-table.scss';
 
 interface PatientTableProps {
   patients: Array<Object>;
