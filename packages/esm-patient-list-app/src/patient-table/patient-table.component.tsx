@@ -9,10 +9,10 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/lib/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
-import Pagination from 'carbon-components-react/lib/components/Pagination';
-import Search from 'carbon-components-react/lib/components/Search';
+} from 'carbon-components-react/es/components/DataTable';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import Pagination from 'carbon-components-react/es/components/Pagination';
+import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import styles from './patient-table.scss';
 

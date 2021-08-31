@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/lib/components/Button';
+import Button from 'carbon-components-react/es/components/Button';
 import Search from 'carbon-components-react/es/components/Search';
 import Tab from 'carbon-components-react/es/components/Tab';
 import Tabs from 'carbon-components-react/es/components/Tabs';
@@ -18,7 +18,7 @@ import {
   PatientListType,
 } from '../api';
 import { SearchState, StateTypes, ViewState } from './types';
-import { DataTableHeader } from 'carbon-components-react/lib/components/DataTable';
+import { DataTableHeader } from 'carbon-components-react/es/components/DataTable';
 import './patient-list-list.scss';
 
 enum TabTypes {

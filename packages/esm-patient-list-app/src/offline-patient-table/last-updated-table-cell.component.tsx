@@ -5,8 +5,8 @@ import PendingFilled16 from '@carbon/icons-react/es/pending--filled/16';
 import WarningAltFilled16 from '@carbon/icons-react/es/warning--alt--filled/16';
 import CheckmarkOutline16 from '@carbon/icons-react/es/checkmark--outline/16';
 import styles from './last-updated-table-cell.scss';
-import { TableCell } from 'carbon-components-react/lib/components/DataTable';
-import Link from 'carbon-components-react/lib/components/Link';
+import { TableCell } from 'carbon-components-react/es/components/DataTable';
+import Link from 'carbon-components-react/es/components/Link';
 
 export interface LastUpdatedTableCellProps {
   patientUuid: string;

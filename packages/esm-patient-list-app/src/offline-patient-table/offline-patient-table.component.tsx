@@ -10,8 +10,8 @@ import DataTable, {
   FilterRowsData,
   TableSelectAll,
   TableSelectRow,
-} from 'carbon-components-react/lib/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
+} from 'carbon-components-react/es/components/DataTable';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import {
   useStore,
   getOfflinePatientDataStore,
@@ -25,11 +25,11 @@ import { useGetAllPatientsFromOfflineListQuery, useRemovePatientsFromOfflinePati
 import capitalize from 'lodash-es/capitalize';
 import LastUpdatedTableCell from './last-updated-table-cell.component';
 import styles from './offline-patient-table.scss';
-import Search from 'carbon-components-react/lib/components/Search';
+import Search from 'carbon-components-react/es/components/Search';
 import PatientNameTableCell from './patient-name-table-cell.component';
-import Button from 'carbon-components-react/lib/components/Button';
-import SearchSkeleton from 'carbon-components-react/lib/components/Search/Search.Skeleton';
-import SkeletonText from 'carbon-components-react/lib/components/SkeletonText';
+import Button from 'carbon-components-react/es/components/Button';
+import SearchSkeleton from 'carbon-components-react/es/components/Search/Search.Skeleton';
+import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import Renew32 from '@carbon/icons-react/es/renew/32';
 import { useAsync } from '../utils/use-async.hook';
 
