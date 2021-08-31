@@ -1,8 +1,10 @@
-import { isOfflineUuid, offlineUuidPrefix } from '@openmrs/esm-framework';
+import { isOfflineUuid, offlineUuidPrefix, syncOfflinePatientData } from '@openmrs/esm-framework';
 import Dexie, { Table } from 'dexie';
 import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from './types';
 import uniqBy from 'lodash-es/uniqBy';
 import { notifyOnPatientAdded } from '../global-store';
+
+export const offlinePatientListId = `${offlineUuidPrefix}l0c4l000-5240-4b9b-b5d6-000000000001`;
 
 /**
  * A basic template of those patient lists that are known to be stored on the user's local device.
@@ -10,7 +12,7 @@ import { notifyOnPatientAdded } from '../global-store';
  */
 const knownLocalPatientListTemplates: Array<PatientList> = [
   {
-    id: `${offlineUuidPrefix}l0c4l000-5240-4b9b-b5d6-000000000001`,
+    id: offlinePatientListId,
     display: 'Offline Patients',
     description: 'Patients available while offline.',
     isStarred: false,
@@ -91,7 +93,17 @@ export async function addPatientToLocalPatientList(userId: string, patientListId
 
   await db.patientListMetadata.put(entry);
 
-  notifyOnPatientAdded({ userUuid: userId, patientUuid: patientId });
+  if (patientListId === offlinePatientListId) {
+    syncOfflinePatientData(patientId);
+  }
+}
+
+export async function removePatientFromLocalPatientList(userId: string, patientListId: string, patientId: string) {
+  ensureIsLocalPatientList(patientListId);
+  const db = new PatientListDb();
+  const entry = await getOrCreateMetadataEntry(userId, patientListId, db);
+  entry.members = entry.members.filter((x) => x.id !== patientId);
+  await db.patientListMetadata.put(entry);
 }
 
 async function findAllPatientListMetadata(userId: string, db = new PatientListDb()) {
