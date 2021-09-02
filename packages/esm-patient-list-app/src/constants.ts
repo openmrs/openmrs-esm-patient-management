@@ -1,5 +1,5 @@
-import { OmrsOfflineHttpHeaders } from '@openmrs/esm-framework';
+import { omrsOfflineCachingStrategyHttpHeaderName, OmrsOfflineHttpHeaders } from '@openmrs/esm-framework';
 
 export const cacheForOfflineHeaders: OmrsOfflineHttpHeaders = {
-  'x-omrs-offline-caching-strategy': 'network-first',
+  [omrsOfflineCachingStrategyHttpHeaderName]: 'network-first',
 };

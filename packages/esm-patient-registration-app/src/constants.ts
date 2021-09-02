@@ -1,8 +1,8 @@
-import { OmrsOfflineHttpHeaders } from '@openmrs/esm-framework';
+import { omrsOfflineCachingStrategyHttpHeaderName, OmrsOfflineHttpHeaders } from '@openmrs/esm-framework';
 
 export const moduleName = '@openmrs/esm-patient-registration-app';
 export const patientRegistration = 'patient-registration';
 
 export const cacheForOfflineHeaders: OmrsOfflineHttpHeaders = {
-  'x-omrs-offline-caching-strategy': 'network-first',
+  [omrsOfflineCachingStrategyHttpHeaderName]: 'network-first',
 };
