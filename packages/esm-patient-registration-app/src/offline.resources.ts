@@ -1,6 +1,6 @@
 import React from 'react';
-import find from 'lodash/find';
-import camelCase from 'lodash/camelCase';
+import find from 'lodash-es/find';
+import camelCase from 'lodash-es/camelCase';
 import { FetchResponse, makeUrl, messageOmrsServiceWorker, openmrsFetch, SessionUser } from '@openmrs/esm-framework';
 import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-registration/patient-registration-types';
 import { mockAutoGenerationOptionsResult } from '../__mocks__/autogenerationoptions.mock';
