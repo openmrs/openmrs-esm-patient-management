@@ -17,7 +17,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label }
   ];
 
   return (
-    <div style={{ maxWidth: '360px' }}>
+    <div style={{ marginBottom: '1rem' }}>
       <Select id="identifier" {...field} labelText={label} light>
         {selectOptions}
       </Select>

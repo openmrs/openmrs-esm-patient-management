@@ -37,11 +37,7 @@ export const IdField: React.FC = () => {
         identifierType.autoGenerationSource = identifierType.identifierSources[0];
         return null;
       } else {
-        return (
-          <div key={identifierType.fieldName} style={{ marginBottom: '1rem' }}>
-            <IdentifierInput key={identifierType.fieldName} identifierType={identifierType} />
-          </div>
-        );
+        return <IdentifierInput key={identifierType.fieldName} identifierType={identifierType} />;
       }
     })
     .filter(Boolean);
@@ -50,7 +46,7 @@ export const IdField: React.FC = () => {
     return (
       <div>
         <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
-        {identifierInputs}
+        <div className={styles.grid}>{identifierInputs}</div>
       </div>
     );
   } else {
