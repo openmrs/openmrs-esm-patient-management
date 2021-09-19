@@ -17,3 +17,16 @@
   grid-template-columns: 1fr 1fr;
   column-gap: 1rem;
 }
+
+:global(.omrs-breakpoint-lt-desktop){
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .sexField {
+    grid-row: 1;
+  }
+  .ageField {
+    grid-row: 2;
+  }
+}
