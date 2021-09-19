@@ -71,10 +71,12 @@ export const NameField = () => {
         </div>
       </div>
       {desktop && (
-        <ExtensionSlot
-          extensionSlotName="capture-patient-photo-slot"
-          state={{ onCapturePhoto, initialState: currentPhoto }}
-        />
+        <div className={styles.patientPhoto}>
+          <ExtensionSlot
+            extensionSlotName="capture-patient-photo-slot"
+            state={{ onCapturePhoto, initialState: currentPhoto }}
+          />
+        </div>
       )}
     </div>
   );
