@@ -1,5 +1,11 @@
 import React from 'react';
-import { navigate, OfflinePatientDataSyncState } from '@openmrs/esm-framework';
+import {
+  getOfflinePatientDataStore,
+  navigate,
+  OfflinePatientDataSyncState,
+  OfflinePatientDataSyncStore,
+  useStore,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import PendingFilled16 from '@carbon/icons-react/es/pending--filled/16';
 import WarningAltFilled16 from '@carbon/icons-react/es/warning--alt--filled/16';
@@ -15,12 +21,23 @@ export interface LastUpdatedTableCellProps {
 
 const LastUpdatedTableCell: React.FC<LastUpdatedTableCellProps> = ({ patientUuid, syncState }) => {
   const { t } = useTranslation();
+  const store = useStore(getOfflinePatientDataStore());
+
   const InnerContent = () => {
     if (!syncState) {
       return (
         <>
           <WarningAltFilled16 className={styles.errorIcon} />
-          Not yet synchronized
+          {t('offlinePatientsTableLastUpdatedNotYetSynchronized', 'Not synchronized')}
+        </>
+      );
+    }
+
+    if (hasNewUnknownHandlers(store, syncState)) {
+      return (
+        <>
+          <WarningAltFilled16 className={styles.errorIcon} />
+          {t('offlinePatientsTableLastUpdatedOutdatedData', 'Outdated data')}
         </>
       );
     }
@@ -67,5 +84,14 @@ const LastUpdatedTableCell: React.FC<LastUpdatedTableCellProps> = ({ patientUuid
     </TableCell>
   );
 };
+
+function hasNewUnknownHandlers(store: OfflinePatientDataSyncStore, syncState?: OfflinePatientDataSyncState) {
+  if (!syncState) {
+    return false;
+  }
+
+  const allCurrentHandlers = [...syncState.syncingHandlers, ...syncState.syncedHandlers, ...syncState.failedHandlers];
+  return Object.keys(store.handlers).some((identifier) => !allCurrentHandlers.includes(identifier));
+}
 
 export default LastUpdatedTableCell;

@@ -1,12 +1,12 @@
 import {
   fetchCurrentPatient,
-  getGlobalStore,
-  messageOmrsServiceWorker,
+  OfflinePatientArgs,
+  registerOfflinePatientHandler,
   setupOfflineSync,
   subscribePrecacheStaticDependencies,
   SyncProcessOptions,
 } from '@openmrs/esm-framework';
-import { patientRegistration } from './constants';
+import { cacheForOfflineHeaders, patientRegistration } from './constants';
 import {
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
@@ -17,9 +17,14 @@ import FormManager from './patient-registration/form-manager';
 import { PatientRegistration } from './patient-registration/patient-registration-types';
 
 export function setupOffline() {
-  subscribePrecacheStaticDependencies(precacheStaticAssets);
   setupOfflineSync(patientRegistration, [], syncPatientRegistration);
-  setupOnPatientAddedToOfflineListHandler();
+  subscribePrecacheStaticDependencies(precacheStaticAssets);
+  registerOfflinePatientHandler('esm-patient-registration-app', {
+    displayName: 'Patient registration',
+    async onOfflinePatientAdded({ patientUuid }) {
+      await fetchCurrentPatient(patientUuid, { headers: cacheForOfflineHeaders });
+    },
+  });
 }
 
 async function precacheStaticAssets() {
@@ -47,20 +52,4 @@ export async function syncPatientRegistration(
     queuedPatient.personAttributeSections,
     options.abort,
   );
-}
-
-function setupOnPatientAddedToOfflineListHandler() {
-  const patientListStore = getGlobalStore('offline-patient-list-handlers', { onPatientAdded: [] });
-  const patientListState = patientListStore.getState();
-  patientListStore.setState({ onPatientAdded: [...patientListState.onPatientAdded, onPatientAddedToOfflineList] });
-}
-
-async function onPatientAddedToOfflineList({ patientUuid }: { patientUuid: string }) {
-  const url = `/ws/fhir2/R4/Patient/${patientUuid}`;
-  await messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `.+${url}`,
-  });
-
-  await fetchCurrentPatient(patientUuid);
 }
