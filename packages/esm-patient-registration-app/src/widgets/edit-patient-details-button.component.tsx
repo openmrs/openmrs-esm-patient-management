@@ -12,7 +12,7 @@ export default function EditPatientDetailsButton({ patientUuid }) {
         className={`bx--overflow-menu-options__btn ${styles.link}`}
         title={t('editPatientDetails', 'Edit Patient Details')}>
         <span className="bx--overflow-menu-options__option-content">
-          {t('editPatientDetails', 'Edit Patient Details')}
+          {t('editPatientDetails', 'Edit patient details')}
         </span>
       </ConfigurableLink>
     </li>
