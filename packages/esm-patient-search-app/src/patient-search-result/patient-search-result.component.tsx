@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styles from './patient-search-result.scss';
-import { ExtensionSlot, useConfig, fetchCurrentPatient, interpolateString } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, fetchCurrentPatient, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
@@ -17,6 +17,14 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
     });
   }, [patients]);
 
+  const onClickSearchResult = useCallback(
+    (patientUrl) => {
+      navigate({ to: patientUrl });
+      hidePanel();
+    },
+    [hidePanel],
+  );
+
   function renderPatient(patient) {
     return (
       <div key={patient.display} className={styles.patientChart}>
@@ -29,7 +37,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
               patientUrl: interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
               }),
-              hidePatientSearchPanel: hidePanel,
+              onClick: onClickSearchResult,
             }}
           />
         </div>
