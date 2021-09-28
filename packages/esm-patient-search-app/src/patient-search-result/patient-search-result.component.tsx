@@ -17,13 +17,14 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
     });
   }, [patients]);
 
-  const onClickSearchResult = useCallback(
-    (patientUrl) => {
-      navigate({ to: patientUrl });
-      hidePanel();
-    },
-    [hidePanel],
-  );
+  const onClickSearchResult = useCallback((patientUuid) => {
+    navigate({
+      to: interpolateString(config.search.patientResultUrl, {
+        patientUuid: patientUuid,
+      }),
+    });
+    hidePanel();
+  }, []);
 
   function renderPatient(patient) {
     return (
@@ -34,9 +35,6 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
             state={{
               patient,
               patientUuid: patient.id,
-              patientUrl: interpolateString(config.search.patientResultUrl, {
-                patientUuid: patient.id,
-              }),
               onClick: onClickSearchResult,
             }}
           />
