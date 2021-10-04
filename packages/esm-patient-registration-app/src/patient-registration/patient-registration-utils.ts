@@ -1,6 +1,11 @@
 import { navigate } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
-import { AddressValidationSchemaType, FormValues, PatientUuidMapType } from './patient-registration-types';
+import {
+  AddressValidationSchemaType,
+  FormValues,
+  PatientIdentifier,
+  PatientUuidMapType,
+} from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';
 
@@ -145,4 +150,13 @@ export function getPatientUuidMapFromFhirPatient(patient: fhir.Patient): Patient
       return { [key]: { uuid: identifier.id, value: identifier.value } };
     }),
   };
+}
+
+export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Array<PatientIdentifier> {
+  return patient.identifier.map((identifier) => {
+    return {
+      uuid: identifier.id,
+      identifier: identifier.value,
+    };
+  });
 }

@@ -134,6 +134,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         location,
         config?.personAttributeSections,
         abortController,
+        inEditMode,
       );
 
       showToast({

@@ -34,6 +34,7 @@ export interface PatientRegistration {
   patientPhotoConceptUuid: string;
   currentLocation: string;
   personAttributeSections: any;
+  inEditMode: boolean;
 }
 
 /**
@@ -47,9 +48,9 @@ export interface PatientIdentifierType extends FetchedPatientIdentifierType {
 export interface PatientIdentifier {
   uuid: string;
   identifier: string;
-  identifierType: string;
-  location: string;
-  preferred: boolean;
+  identifierType?: string;
+  location?: string;
+  preferred?: boolean;
 }
 
 export type Relationship = {
@@ -109,6 +110,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
+  identifiers?: Array<PatientIdentifier>;
 }
 
 export interface PatientUuidMapType {
