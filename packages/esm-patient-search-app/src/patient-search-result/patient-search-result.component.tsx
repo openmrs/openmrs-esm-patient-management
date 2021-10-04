@@ -1,21 +1,27 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
-import { ExtensionSlot, useConfig, fetchCurrentPatient, interpolateString, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 
-const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
-  const [fhirPatients, setFhirPatients] = useState([]);
-  const config = useConfig();
+const RenderPatient: React.FC<RenderPatientProps> = ({ patient, onClickResult }) => {
+  return (
+    <div key={patient.id} className={styles.patientChart}>
+      <div className={styles.container}>
+        <ExtensionSlot
+          extensionSlotName="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: patient.id,
+            onClick: onClickResult,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
-  useEffect(() => {
-    const fhirPatientsBuffer = [];
-    patients.forEach((patient) => {
-      fetchCurrentPatient(patient.uuid).then((response) => {
-        fhirPatientsBuffer.push(response.data);
-        setFhirPatients([...fhirPatientsBuffer]);
-      });
-    });
-  }, [patients]);
+const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
+  const config = useConfig();
 
   const onClickSearchResult = useCallback((patientUuid) => {
     navigate({
@@ -26,23 +32,47 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
     hidePanel();
   }, []);
 
-  function renderPatient(patient) {
-    return (
-      <div key={patient.display} className={styles.patientChart}>
-        <div className={styles.container}>
-          <ExtensionSlot
-            extensionSlotName="patient-header-slot"
-            state={{
-              patient,
-              patientUuid: patient.id,
-              onClick: onClickSearchResult,
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-  return <>{fhirPatients.map((patient) => renderPatient(patient))}</>;
+  const fhirPatients = useMemo(() => {
+    return patients.map((patient) => {
+      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
+      return {
+        id: patient.uuid,
+        name: [
+          {
+            given: [patient.person.personName.givenName, patient.person.personName.middleName],
+            family: patient.person.personName.familyName,
+          },
+        ],
+        gender: patient.person.gender,
+        birthDate: patient.person.birthdate,
+        identifier: [
+          {
+            value: patient.patientIdentifier.identifier,
+          },
+        ],
+        address: preferredAddress
+          ? [
+              {
+                city: preferredAddress.cityVillage,
+                country: preferredAddress.country,
+                postalCode: preferredAddress.postalCode,
+                state: preferredAddress.stateProvince,
+                use: 'home',
+              },
+            ]
+          : [],
+        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.name == 'Telephone Number'),
+      };
+    });
+  }, [patients]);
+
+  return (
+    <>
+      {fhirPatients.map((patient, index) => (
+        <RenderPatient patient={patient} key={index} onClickResult={onClickSearchResult} />
+      ))}
+    </>
+  );
 };
 
 interface PatientSearchResultsProps {
@@ -50,4 +80,8 @@ interface PatientSearchResultsProps {
   hidePanel?: any;
 }
 
+interface RenderPatientProps {
+  patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
+  onClickResult: (patientUuid: string) => void;
+}
 export default PatientSearchResults;
