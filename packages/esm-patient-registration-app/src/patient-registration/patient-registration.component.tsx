@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import Button from 'carbon-components-react/es/components/Button';
 import Link from 'carbon-components-react/es/components/Link';
@@ -17,7 +17,13 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration-types';
+import {
+  FormValues,
+  CapturePhotoProps,
+  IdentifierSource,
+  PatientIdentifierType,
+  CustomPatientIdentifierType,
+} from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
@@ -26,6 +32,7 @@ import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
+import PatientIdentifierOverlay from './identifier-selection-overlay.component';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -52,6 +59,14 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
+  const [customPatientIdentifierTypes, setCustomPatientIdentifiers] = useState<CustomPatientIdentifierType[] | null>(
+    null,
+  );
+  const [showPatientidentifiersOverlay, setPatientidentifiersOverlay] = useState(false);
+
+  const togglePatientIdentifiersOverlay = useCallback((action) => {
+    setPatientidentifiersOverlay(action);
+  }, []);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -71,18 +86,42 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [t, config]);
 
   useEffect(() => {
-    for (const patientIdentifier of patientIdentifiers) {
-      if (!initialFormValues[patientIdentifier.fieldName]) {
-        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
-      }
-
-      setInitialFormValues({
-        ...initialFormValues,
-        ['source-for-' + patientIdentifier.fieldName]:
-          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
-      });
+    if (customPatientIdentifierTypes) {
+      setCustomPatientIdentifiers(
+        patientIdentifiers.map((patientIdentifierType, ind) => ({
+          ...patientIdentifierType,
+          selected: customPatientIdentifierTypes[ind].selected,
+          sourceSelected: customPatientIdentifierTypes[ind].sourceSelected,
+        })),
+      );
+    } else {
+      setCustomPatientIdentifiers(
+        patientIdentifiers.map((patientIdentifierType, ind) => ({
+          ...patientIdentifierType,
+          selected: false,
+          sourceSelected: null,
+        })),
+      );
     }
   }, [patientIdentifiers]);
+
+  useEffect(() => {
+    if (customPatientIdentifierTypes) {
+      for (const patientIdentifierType of customPatientIdentifierTypes) {
+        if (patientIdentifierType.selected) {
+          if (!initialFormValues[patientIdentifierType.fieldName]) {
+            setInitialFormValues({ ...initialFormValues, [patientIdentifierType.fieldName]: '' });
+          }
+
+          setInitialFormValues({
+            ...initialFormValues,
+            ['source-for-' + patientIdentifierType.fieldName]:
+              patientIdentifierType.identifierSources.length > 0 ? patientIdentifierType.identifierSources[0].name : '',
+          });
+        }
+      }
+    }
+  }, [customPatientIdentifierTypes]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
@@ -128,7 +167,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         values,
         patientUuidMap,
         initialAddressFieldValues,
-        patientIdentifiers,
+        customPatientIdentifierTypes,
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
@@ -173,61 +212,70 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   };
 
   return (
-    <Formik
-      enableReinitialize
-      initialValues={initialFormValues}
-      validationSchema={validationSchema}
-      onSubmit={onFormSubmit}>
-      {(props) => (
-        <Form className={styles.form}>
-          <BeforeSavePrompt when={props.dirty} redirect={target} />
-          <div className={styles.formContainer}>
-            <div>
-              <div className={styles.stickyColumn}>
-                <h4>
-                  {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
-                </h4>
-                {showDummyData && <DummyDataInput setValues={props.setValues} />}
-                <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-                {sections.map((section) => (
-                  <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
-                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                      <XAxis16 /> {section.name}
-                    </Link>
-                  </div>
-                ))}
-                <Button className={styles.submitButton} type="submit">
-                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
-                </Button>
-                <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
-                  {t('cancel', 'Cancel')}
-                </Button>
+    <>
+      <Formik
+        enableReinitialize
+        initialValues={initialFormValues}
+        validationSchema={validationSchema}
+        onSubmit={onFormSubmit}>
+        {(props) => (
+          <Form className={styles.form}>
+            <BeforeSavePrompt when={props.dirty} redirect={target} />
+            <div className={styles.formContainer}>
+              <div>
+                <div className={styles.stickyColumn}>
+                  <h4>
+                    {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
+                  </h4>
+                  {showDummyData && <DummyDataInput setValues={props.setValues} />}
+                  <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
+                  {sections.map((section) => (
+                    <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
+                      <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
+                        <XAxis16 /> {section.name}
+                      </Link>
+                    </div>
+                  ))}
+                  <Button className={styles.submitButton} type="submit">
+                    {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                  </Button>
+                  <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
+                    {t('cancel', 'Cancel')}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <Grid className={styles.infoGrid}>
+                  <PatientRegistrationContext.Provider
+                    value={{
+                      identifierTypes: customPatientIdentifierTypes,
+                      validationSchema,
+                      setValidationSchema,
+                      fieldConfigs,
+                      values: props.values,
+                      inEditMode,
+                      setFieldValue: props.setFieldValue,
+                      setCapturePhotoProps,
+                      currentPhoto: capturePhotoProps?.imageData,
+                      togglePatientIdentifiersOverlay,
+                    }}>
+                    {sections.map((section, index) => (
+                      <div key={index}>{getSection(section, index)}</div>
+                    ))}
+                  </PatientRegistrationContext.Provider>
+                </Grid>
               </div>
             </div>
-            <div>
-              <Grid className={styles.infoGrid}>
-                <PatientRegistrationContext.Provider
-                  value={{
-                    identifierTypes: patientIdentifiers,
-                    validationSchema,
-                    setValidationSchema,
-                    fieldConfigs,
-                    values: props.values,
-                    inEditMode,
-                    setFieldValue: props.setFieldValue,
-                    setCapturePhotoProps,
-                    currentPhoto: capturePhotoProps?.imageData,
-                  }}>
-                  {sections.map((section, index) => (
-                    <div key={index}>{getSection(section, index)}</div>
-                  ))}
-                </PatientRegistrationContext.Provider>
-              </Grid>
-            </div>
-          </div>
-        </Form>
+          </Form>
+        )}
+      </Formik>
+      {showPatientidentifiersOverlay && (
+        <PatientIdentifierOverlay
+          patientIdentifierTypes={customPatientIdentifierTypes}
+          closeOverlay={() => togglePatientIdentifiersOverlay(false)}
+        />
       )}
-    </Formik>
+    </>
   );
 };
 

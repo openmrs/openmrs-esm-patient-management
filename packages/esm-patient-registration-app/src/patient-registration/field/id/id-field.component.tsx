@@ -1,34 +1,31 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { IdentifierSource } from '../../patient-registration-types';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Button } from 'carbon-components-react';
+import { showModal, WorkspaceItem, getNewWorkspaceItem } from '@openmrs/esm-framework';
 
-function containsSourceWithAnOption(sources: Array<IdentifierSource>): boolean {
-  for (const source of sources) {
-    if (source.autoGenerationOption) {
-      return true;
-    }
-  }
-
-  return false;
+function containsSourceWithAnOption(source: IdentifierSource): boolean {
+  return source.autoGenerationOption ? true : false;
 }
 
 export const IdField: React.FC = () => {
-  const { identifierTypes, inEditMode, values } = useContext(PatientRegistrationContext);
+  const { identifierTypes, inEditMode, values, togglePatientIdentifiersOverlay } =
+    useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 
+  const openModal = useCallback(() => {
+    togglePatientIdentifiersOverlay(true);
+  }, []);
+
   const identifierInputs = identifierTypes
+    .filter((identifierType) => identifierType.selected)
     .map((identifierType) => {
-      const sources = identifierType.identifierSources;
-      const hasSourcesButWithoutOptions = sources.length > 0 && !containsSourceWithAnOption(sources);
-      const mayOnlySupportAuto =
-        sources.length == 1
-          ? sources[0].autoGenerationOption
-            ? !sources[0].autoGenerationOption.manualEntryEnabled
-            : true
-          : false;
+      const source = identifierType.sourceSelected;
+      const hasSourcesButWithoutOptions = !containsSourceWithAnOption(source);
+      const mayOnlySupportAuto = source.autoGenerationOption ? !source.autoGenerationOption.manualEntryEnabled : true;
 
       if (inEditMode && values[identifierType.fieldName]) {
         return null;
@@ -46,14 +43,17 @@ export const IdField: React.FC = () => {
     })
     .filter(Boolean);
 
-  if (identifierInputs.length > 0) {
-    return (
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
+  return (
+    <div>
+      <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
+      <div className={styles.grid}>
         {identifierInputs}
+        <div className={styles.addNewIdentifierButton}>
+          <Button kind="ghost" size="small" onClick={openModal}>
+            Add new identifier
+          </Button>
+        </div>
       </div>
-    );
-  } else {
-    return null;
-  }
+    </div>
+  );
 };
