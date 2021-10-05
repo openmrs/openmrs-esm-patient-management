@@ -22,8 +22,6 @@ export const IdField: React.FC = () => {
     useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 
-  console.log('id', patientIdentifiersMap);
-
   const identifierInputs = useMemo(
     () =>
       identifierTypes

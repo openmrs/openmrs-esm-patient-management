@@ -80,8 +80,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     [],
   );
 
-  console.log(patientIdentifiersMap);
-
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
