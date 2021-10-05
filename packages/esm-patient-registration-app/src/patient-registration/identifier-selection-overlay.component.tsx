@@ -25,7 +25,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const patientIdentifierTypes = useMemo(
     () =>
       Object.values(patientIdentifierMap)
-        .filter(({ selected }) => !selected)
+        // .filter(({ selected }) => !selected)
         .map(({ patientIdentifierType }) => patientIdentifierType),
     [patientIdentifierMap],
   );
