@@ -33,6 +33,7 @@
   "givenNameLabelText": "Given Name",
   "givenNameRequired": "Given name is required",
   "idFieldLabelText": "Id",
+  "IDInstructions": "Select the type of ID Number you'd like to add for this patient:",
   "invalidEmail": "A valid email has to be given",
   "isDeadInputLabel": "Is Dead",
   "jumpTo": "Jump to",

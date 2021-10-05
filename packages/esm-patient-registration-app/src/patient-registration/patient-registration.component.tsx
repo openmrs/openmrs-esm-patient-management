@@ -66,20 +66,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     setPatientidentifiersOverlay(action);
   }, []);
 
-  const addIdentifier = useCallback(
-    (patientIdentifierType: PatientIdentifierType, sourceSelected: IdentifierSource) => {
-      setPatientIdentifiersMap((map) => ({
-        ...map,
-        [patientIdentifierType.uuid]: {
-          selected: true,
-          patientIdentifierType,
-          sourceSelected,
-        },
-      }));
-    },
-    [],
-  );
-
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
@@ -99,13 +85,15 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   useEffect(() => {
     if (patientIdentifiers) {
+      const identifierMap = {};
       for (const patientIdentifier of patientIdentifiers) {
-        patientIdentifiersMap[patientIdentifier.uuid] = {
+        identifierMap[patientIdentifier.uuid] = {
           patientIdentifierType: patientIdentifier,
-          selected: false,
+          selected: patientIdentifier.isPrimary,
           sourceSelected: null,
         };
       }
+      setPatientIdentifiersMap(identifierMap);
     }
   }, [patientIdentifiers]);
 
@@ -260,7 +248,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         <PatientIdentifierOverlay
           patientIdentifierMap={patientIdentifiersMap}
           closeOverlay={() => showPatientIdentifiersOverlay(false)}
-          addIdentifier={addIdentifier}
+          setPatientIdentifiersMap={setPatientIdentifiersMap}
         />
       )}
     </>

@@ -5,7 +5,6 @@ import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Button } from 'carbon-components-react';
-import { showModal, WorkspaceItem, getNewWorkspaceItem } from '@openmrs/esm-framework';
 
 function containsSourceWithAnOption(sources: Array<IdentifierSource>): boolean {
   for (const source of sources) {
@@ -25,7 +24,11 @@ export const IdField: React.FC = () => {
   const identifierInputs = useMemo(
     () =>
       identifierTypes
-        .filter((identifierType) => patientIdentifiersMap[identifierType.uuid].selected)
+        .filter(
+          (identifierType) =>
+            patientIdentifiersMap[identifierType.uuid].selected &&
+            patientIdentifiersMap[identifierType.uuid].sourceSelected,
+        )
         .map((identifierType) => {
           const sources = identifierType.identifierSources;
           const hasSourcesButWithoutOptions = sources.length > 0 && !containsSourceWithAnOption(sources);
@@ -59,7 +62,7 @@ export const IdField: React.FC = () => {
       <div className={styles.grid}>
         {identifierInputs}
         <div className={styles.addNewIdentifierButton}>
-          <Button kind="ghost" size="small" onClick={() => showPatientIdentifiersOverlay(true)}>
+          <Button kind="tertiary" size="sm" onClick={() => showPatientIdentifiersOverlay(true)}>
             Add new identifier
           </Button>
         </div>

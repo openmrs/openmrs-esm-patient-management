@@ -30,7 +30,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('invalidEmail')
     t('numberInNameDubious')
   */
-  const value = field.value || '' || props.value;
+  const value = field.value || props.value || '';
   const invalidText = meta.error && t(meta.error);
   const warnText = useMemo(() => {
     if (!invalidText && typeof checkWarning === 'function') {
