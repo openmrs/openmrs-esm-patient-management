@@ -3,23 +3,6 @@ import styles from './patient-search-result.scss';
 import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 
-const RenderPatient: React.FC<RenderPatientProps> = ({ patient, onClickResult }) => {
-  return (
-    <div key={patient.id} className={styles.patientChart}>
-      <div className={styles.container}>
-        <ExtensionSlot
-          extensionSlotName="patient-header-slot"
-          state={{
-            patient,
-            patientUuid: patient.id,
-            onClick: onClickResult,
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
 
@@ -68,8 +51,19 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
 
   return (
     <>
-      {fhirPatients.map((patient, index) => (
-        <RenderPatient patient={patient} key={index} onClickResult={onClickSearchResult} />
+      {fhirPatients.map((patient) => (
+        <div key={patient.id} className={styles.patientChart}>
+          <div className={styles.container}>
+            <ExtensionSlot
+              extensionSlotName="patient-header-slot"
+              state={{
+                patient,
+                patientUuid: patient.id,
+                onClick: onClickSearchResult,
+              }}
+            />
+          </div>
+        </div>
       ))}
     </>
   );
@@ -80,8 +74,4 @@ interface PatientSearchResultsProps {
   hidePanel?: any;
 }
 
-interface RenderPatientProps {
-  patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
-  onClickResult: (patientUuid: string) => void;
-}
 export default PatientSearchResults;
