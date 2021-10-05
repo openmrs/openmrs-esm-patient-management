@@ -91,8 +91,8 @@
 .overlay {
   position: fixed;
   right: 0;
-  top: 3rem;
   bottom: 0;
+  top: 3rem;
   width: 27rem;
   z-index: 10000;
   border: 1px solid $ui-05;
@@ -116,8 +116,10 @@
   padding: 1rem;
 }
 
-.radioButtonGroup {
-  margin-top: 1rem;
+.revertButton {
+  @include carbon--type-style("label-01");
+  margin-top: $spacing-05;
+  cursor: pointer;
 }
 
 .overlayButtons {

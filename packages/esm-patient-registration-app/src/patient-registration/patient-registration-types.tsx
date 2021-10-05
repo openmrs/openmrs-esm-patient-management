@@ -44,9 +44,12 @@ export interface PatientIdentifierType extends FetchedPatientIdentifierType {
   autoGenerationSource?: IdentifierSource;
 }
 
-export interface CustomPatientIdentifierType extends PatientIdentifierType {
-  selected: boolean;
-  sourceSelected: IdentifierSource;
+export interface PatientIdentifiersMapType {
+  [uuid: string]: {
+    patientIdentifierType: PatientIdentifierType;
+    selected: boolean;
+    sourceSelected: IdentifierSource;
+  };
 }
 
 export interface PatientIdentifier {

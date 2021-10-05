@@ -12,18 +12,14 @@ function containsSourceWithAnOption(source: IdentifierSource): boolean {
 }
 
 export const IdField: React.FC = () => {
-  const { identifierTypes, inEditMode, values, togglePatientIdentifiersOverlay } =
+  const { identifierTypes, inEditMode, values, showPatientIdentifiersOverlay, patientIdentifiersMap } =
     useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 
-  const openModal = useCallback(() => {
-    togglePatientIdentifiersOverlay(true);
-  }, []);
-
   const identifierInputs = identifierTypes
-    .filter((identifierType) => identifierType.selected)
+    .filter((identifierType) => patientIdentifiersMap[identifierType.uuid].selected)
     .map((identifierType) => {
-      const source = identifierType.sourceSelected;
+      const source = patientIdentifiersMap[identifierType.uuid].sourceSelected;
       const hasSourcesButWithoutOptions = !containsSourceWithAnOption(source);
       const mayOnlySupportAuto = source.autoGenerationOption ? !source.autoGenerationOption.manualEntryEnabled : true;
 
@@ -49,7 +45,7 @@ export const IdField: React.FC = () => {
       <div className={styles.grid}>
         {identifierInputs}
         <div className={styles.addNewIdentifierButton}>
-          <Button kind="ghost" size="small" onClick={openModal}>
+          <Button kind="ghost" size="small" onClick={() => showPatientIdentifiersOverlay(true)}>
             Add new identifier
           </Button>
         </div>

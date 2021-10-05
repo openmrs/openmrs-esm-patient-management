@@ -22,7 +22,7 @@ import {
   CapturePhotoProps,
   IdentifierSource,
   PatientIdentifierType,
-  CustomPatientIdentifierType,
+  PatientIdentifiersMapType,
 } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
@@ -59,14 +59,28 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
-  const [customPatientIdentifierTypes, setCustomPatientIdentifiers] = useState<CustomPatientIdentifierType[] | null>(
-    null,
-  );
+  const [patientIdentifiersMap, setPatientIdentifiersMap] = useState<PatientIdentifiersMapType>({});
   const [showPatientidentifiersOverlay, setPatientidentifiersOverlay] = useState(false);
 
-  const togglePatientIdentifiersOverlay = useCallback((action) => {
+  const showPatientIdentifiersOverlay = useCallback((action) => {
     setPatientidentifiersOverlay(action);
   }, []);
+
+  const addIdentifier = useCallback(
+    (patientIdentifierType: PatientIdentifierType, sourceSelected: IdentifierSource) => {
+      setPatientIdentifiersMap((map) => ({
+        ...map,
+        [patientIdentifierType.uuid]: {
+          selected: true,
+          patientIdentifierType,
+          sourceSelected,
+        },
+      }));
+    },
+    [],
+  );
+
+  console.log(patientIdentifiersMap);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -86,42 +100,16 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [t, config]);
 
   useEffect(() => {
-    if (customPatientIdentifierTypes) {
-      setCustomPatientIdentifiers(
-        patientIdentifiers.map((patientIdentifierType, ind) => ({
-          ...patientIdentifierType,
-          selected: customPatientIdentifierTypes[ind].selected,
-          sourceSelected: customPatientIdentifierTypes[ind].sourceSelected,
-        })),
-      );
-    } else {
-      setCustomPatientIdentifiers(
-        patientIdentifiers.map((patientIdentifierType, ind) => ({
-          ...patientIdentifierType,
+    if (patientIdentifiers) {
+      for (const patientIdentifier of patientIdentifiers) {
+        patientIdentifiersMap[patientIdentifier.uuid] = {
+          patientIdentifierType: patientIdentifier,
           selected: false,
           sourceSelected: null,
-        })),
-      );
-    }
-  }, [patientIdentifiers]);
-
-  useEffect(() => {
-    if (customPatientIdentifierTypes) {
-      for (const patientIdentifierType of customPatientIdentifierTypes) {
-        if (patientIdentifierType.selected) {
-          if (!initialFormValues[patientIdentifierType.fieldName]) {
-            setInitialFormValues({ ...initialFormValues, [patientIdentifierType.fieldName]: '' });
-          }
-
-          setInitialFormValues({
-            ...initialFormValues,
-            ['source-for-' + patientIdentifierType.fieldName]:
-              patientIdentifierType.identifierSources.length > 0 ? patientIdentifierType.identifierSources[0].name : '',
-          });
-        }
+        };
       }
     }
-  }, [customPatientIdentifierTypes]);
+  }, [patientIdentifiers]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
@@ -167,7 +155,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         values,
         patientUuidMap,
         initialAddressFieldValues,
-        customPatientIdentifierTypes,
+        patientIdentifiers.filter((patientIdentifier) => patientIdentifiersMap[patientIdentifier.uuid].selected),
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
@@ -248,7 +236,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 <Grid className={styles.infoGrid}>
                   <PatientRegistrationContext.Provider
                     value={{
-                      identifierTypes: customPatientIdentifierTypes,
+                      identifierTypes: patientIdentifiers,
+                      patientIdentifiersMap,
                       validationSchema,
                       setValidationSchema,
                       fieldConfigs,
@@ -257,7 +246,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       setFieldValue: props.setFieldValue,
                       setCapturePhotoProps,
                       currentPhoto: capturePhotoProps?.imageData,
-                      togglePatientIdentifiersOverlay,
+                      showPatientIdentifiersOverlay,
                     }}>
                     {sections.map((section, index) => (
                       <div key={index}>{getSection(section, index)}</div>
@@ -271,8 +260,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       </Formik>
       {showPatientidentifiersOverlay && (
         <PatientIdentifierOverlay
-          patientIdentifierTypes={customPatientIdentifierTypes}
-          closeOverlay={() => togglePatientIdentifiersOverlay(false)}
+          patientIdentifierMap={patientIdentifiersMap}
+          closeOverlay={() => showPatientIdentifiersOverlay(false)}
+          addIdentifier={addIdentifier}
         />
       )}
     </>
