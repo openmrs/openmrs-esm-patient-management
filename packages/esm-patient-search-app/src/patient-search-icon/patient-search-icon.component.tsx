@@ -61,7 +61,7 @@ const searchTimeout = 300;
 const customRepresentation =
   'custom:(patientId,uuid,identifiers,display,' +
   'patientIdentifier:(uuid,identifier),' +
-  'person:(gender,age,birthdate,birthdateEstimated,personName,display),' +
+  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display),' +
   'attributes:(value,attributeType:(name)))';
 
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {

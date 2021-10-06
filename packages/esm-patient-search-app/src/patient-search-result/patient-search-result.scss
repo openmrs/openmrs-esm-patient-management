@@ -3,7 +3,6 @@
 
 .patientChart {
   text-decoration: none;
-  cursor: pointer;
 }
 :global(.omrs-breakpoint-gt-tablet) .patientChart {
   background-color: $ui-02;
@@ -15,7 +14,7 @@
 }
 
 :global(.omrs-breakpoint-gt-tablet) .container {
-  padding: 0rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .patientBanner {
@@ -39,6 +38,7 @@
   display: flex;
   flex-flow: column wrap;
   margin: 1rem 0;
+  cursor: pointer;
 }
 
 .demographics {
@@ -50,4 +50,9 @@
 .identifiers {
   @include carbon--type-style("body-short-02");
   color: $ui-04;
+}
+
+.actionsContainer {
+  padding-top: 0.5rem;
+  margin-top: 1rem;
 }
