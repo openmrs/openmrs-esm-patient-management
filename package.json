@@ -19,7 +19,9 @@
     "prepare": "husky install",
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "swr": "^1.0.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.12.1",

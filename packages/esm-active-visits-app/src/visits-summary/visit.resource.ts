@@ -1,4 +1,5 @@
 import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 
 export interface Encounter {
   uuid: string;
@@ -125,8 +126,8 @@ export interface OrderItem {
   };
 }
 
-export function fetchVisit(visitUuid: string, abortController: AbortController) {
-  const custom =
+export function useVisit(visitUuid: string) {
+  const customRepresentation =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
     'orders:(uuid,dateActivated,' +
     'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
@@ -139,9 +140,17 @@ export function fetchVisit(visitUuid: string, abortController: AbortController) 
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
-  return openmrsFetch<Visit>(`/ws/rest/v1/visit/${visitUuid}?v=${custom}`, {
-    signal: abortController.signal,
-  });
+  const { data, error, isValidating } = useSWR<{ data: Visit }, Error>(
+    `/ws/rest/v1/visit/${visitUuid}?v=${customRepresentation}`,
+    openmrsFetch,
+  );
+
+  return {
+    data: data ? data.data : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 export function getDosage(strength: string, doseNumber: number) {
