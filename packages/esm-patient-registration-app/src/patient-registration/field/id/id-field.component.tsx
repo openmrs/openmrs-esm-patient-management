@@ -63,8 +63,10 @@ export const IdField: React.FC = () => {
         {identifierInputs}
         <span
           className={`${styles.bodyShort01} ${styles.linkText} ${styles.addNewIdentifierButton}`}
-          onClick={() => showPatientIdentifiersOverlay(true)}>
-          {t('addIDNumber', 'Add ID Number')} +
+          onClick={() => showPatientIdentifiersOverlay(true)}
+          role="button"
+          tabIndex={0}>
+          {t('addIDNumber', 'Add ID number')} +
         </span>
       </div>
     </div>
