@@ -51,6 +51,5 @@ export async function syncPatientRegistration(
     queuedPatient.currentLocation,
     queuedPatient.personAttributeSections,
     options.abort,
-    queuedPatient.inEditMode,
   );
 }

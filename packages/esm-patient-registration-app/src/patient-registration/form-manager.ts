@@ -29,7 +29,6 @@ export type SavePatientForm = (
   currentLocation: string,
   personAttributeSections: any,
   abortController?: AbortController,
-  isEditMode?: boolean,
 ) => Promise<string | null>;
 
 export default class FormManager {
@@ -78,17 +77,16 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
     abortController: AbortController,
-    inEditMode: boolean,
   ): Promise<string> {
-    const patientIdentifiers = inEditMode
-      ? values.identifiers
-      : await FormManager.getPatientIdentifiersToCreate(
-          values,
-          patientUuidMap,
-          identifierTypes,
-          currentLocation,
-          abortController,
-        );
+    const patientIdentifiers =
+      values.identifiers ||
+      (await FormManager.getPatientIdentifiersToCreate(
+        values,
+        patientUuidMap,
+        identifierTypes,
+        currentLocation,
+        abortController,
+      ));
 
     const createdPatient = FormManager.getPatientToCreate(
       values,

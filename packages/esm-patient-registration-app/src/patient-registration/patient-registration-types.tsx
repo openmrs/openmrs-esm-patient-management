@@ -34,7 +34,6 @@ export interface PatientRegistration {
   patientPhotoConceptUuid: string;
   currentLocation: string;
   personAttributeSections: any;
-  inEditMode: boolean;
 }
 
 /**
