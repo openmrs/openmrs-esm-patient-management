@@ -1,4 +1,6 @@
 {
+  "addidentifier": "Add Identifier",
+  "addIDNumber": "Add a new ID Number",
   "addRelationshipButtonText": "Add Relationship",
   "address1": "Address Line 1",
   "addressHeader": "Address",
@@ -53,6 +55,7 @@
   "registrationSuccessToastTitle": "New Patient Created",
   "relationship": "Relationship",
   "relationshipToPatient": "Relationship to patient",
+  "searchID": "Search an ID Number",
   "sexAndBirthLabel": "Sex & Birth",
   "stateProvince": "Region",
   "stroke": "Stroke",
