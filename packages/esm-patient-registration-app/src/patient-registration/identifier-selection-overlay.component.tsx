@@ -1,9 +1,9 @@
-import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-registration.scss';
 import { Close24 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup, RadioButton, Button, Checkbox } from 'carbon-components-react';
+import { RadioButtonGroup, RadioButton, Button, Checkbox, Search } from 'carbon-components-react';
 import { PatientIdentifiersMapType, PatientUuidMapType } from './patient-registration-types';
 
 interface PatientIdentifierOverlayProps {
@@ -19,6 +19,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 }) => {
   const [selectedIdentifierTypes, setIdentifierTypes] = useState<PatientUuidMapType>(patientIdentifierMap);
   const [error, setError] = useState<boolean>(false);
+  const [searchString, setSearchString] = useState<string>('');
   const layout = useLayoutType();
   const { t } = useTranslation();
 
@@ -28,12 +29,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     }
   }, [patientIdentifierMap]);
 
+  const handleSearch = useCallback((event) => setSearchString(event?.target?.value), []);
+
   const patientIdentifierTypes = useMemo(
     () =>
       Object.values(patientIdentifierMap)
-        // .filter(({ selected }) => !selected)
-        ?.map(({ patientIdentifierType }) => patientIdentifierType),
-    [patientIdentifierMap],
+        ?.map(({ patientIdentifierType }) => patientIdentifierType)
+        ?.filter((identifierType) => identifierType.name.toLowerCase().includes(searchString.toLowerCase())),
+    [patientIdentifierMap, searchString],
   );
 
   const handleChange = useCallback(
@@ -131,6 +134,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           <p className={styles.bodyLong02}>
             {t('IDInstructions', "Select the type of ID Number you'd like to add for this patient:")}
           </p>
+          <div className={styles.space05}>
+            <Search
+              labelText="Search an identifier"
+              placeholder="Search an identifier"
+              onChange={handleSearch}
+              value={searchString}
+            />
+          </div>
           <fieldset>{identifierTypeCheckboxes}</fieldset>
         </div>
       </div>
