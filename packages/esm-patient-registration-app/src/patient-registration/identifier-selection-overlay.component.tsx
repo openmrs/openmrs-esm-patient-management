@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-registration.scss';
 import { Close24, ArrowLeft24 } from '@carbon/icons-react';

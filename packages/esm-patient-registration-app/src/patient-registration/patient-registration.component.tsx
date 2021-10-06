@@ -17,13 +17,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import {
-  FormValues,
-  CapturePhotoProps,
-  IdentifierSource,
-  PatientIdentifierType,
-  PatientIdentifiersMapType,
-} from './patient-registration-types';
+import { FormValues, CapturePhotoProps, PatientIdentifiersMapType } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';

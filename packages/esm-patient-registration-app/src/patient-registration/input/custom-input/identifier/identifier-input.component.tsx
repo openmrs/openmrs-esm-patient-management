@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 import React, { useState, useEffect } from 'react';
 import find from 'lodash-es/find';
 import { useField } from 'formik';
-import { Row, Column } from 'carbon-components-react/es/components/Grid';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../../patient-registration-context';

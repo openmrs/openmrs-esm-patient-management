@@ -1,10 +1,9 @@
-import React, { useContext, useCallback, useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { IdentifierSource } from '../../patient-registration-types';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Button } from 'carbon-components-react';
 
 function containsSourceWithAnOption(sources: Array<IdentifierSource>): boolean {
   for (const source of sources) {
