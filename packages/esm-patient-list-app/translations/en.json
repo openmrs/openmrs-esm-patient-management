@@ -20,6 +20,8 @@
   "offlinePatientsTableLastUpdatedDownloading": "Downloading...",
   "offlinePatientsTableLastUpdatedError": "error",
   "offlinePatientsTableLastUpdatedErrors": "errors",
+  "offlinePatientsTableLastUpdatedNotYetSynchronized": "Not synchronized",
+  "offlinePatientsTableLastUpdatedOutdatedData": "Outdated data",
   "offlinePatientsTableRemoveFromOfflineList": "Remove from list",
   "offlinePatientsTableSearchLabel": "Search this list",
   "offlinePatientsTableSearchPlaceholder": "Search this list",
