@@ -47,6 +47,10 @@
   color: $ui-05;
 }
 
+.space03 {
+  margin: $spacing-03 0 $spacing-03 0;
+}
+
 .space05 {
   margin: $spacing-05 0 $spacing-05 0;
 }
@@ -133,4 +137,8 @@
 
 .radioGroup {
   margin-left: 1.625rem;
+}
+
+.errorLabel {
+  color: #da1e28;
 }

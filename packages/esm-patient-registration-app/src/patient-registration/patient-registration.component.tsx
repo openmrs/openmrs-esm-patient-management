@@ -248,7 +248,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         <PatientIdentifierOverlay
           patientIdentifierMap={patientIdentifiersMap}
           closeOverlay={() => showPatientIdentifiersOverlay(false)}
-          setPatientIdentifiersMap={setPatientIdentifiersMap}
+          setPatientIdentifierMap={setPatientIdentifiersMap}
         />
       )}
     </>
