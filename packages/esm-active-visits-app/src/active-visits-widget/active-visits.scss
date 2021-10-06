@@ -16,6 +16,13 @@
   background-color: $ui-background;
 }
 
+.backgroundDataFetchingIndicator {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: center;
+}
+
 .productiveHeading02::after {
   content: "";
   display: block;

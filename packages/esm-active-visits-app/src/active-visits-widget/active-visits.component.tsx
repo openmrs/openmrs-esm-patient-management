@@ -13,36 +13,30 @@ import DataTable, {
   TableExpandHeader,
 } from 'carbon-components-react/es/components/DataTable';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import InlineLoading from 'carbon-components-react/lib/components/InlineLoading';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import Search from 'carbon-components-react/es/components/Search';
 import { useLayoutType, useConfig, usePagination, ConfigurableLink, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { ActiveVisitRow, fetchActiveVisits } from './active-visits.resource';
+import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
-import dayjs from 'dayjs';
 
-function formatDatetime(startDatetime) {
-  const todayDate = dayjs();
-  const today =
-    dayjs(startDatetime).get('date') === todayDate.get('date') &&
-    dayjs(startDatetime).get('month') === todayDate.get('month') &&
-    dayjs(startDatetime).get('year') === todayDate.get('year');
-  if (today) {
-    return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
-  } else {
-    return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
-  }
+interface PaginationData {
+  goTo: (page: number) => void;
+  results: Array<ActiveVisit>;
+  currentPage: number;
 }
 
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
-  const desktopView = layout === 'desktop';
   const config = useConfig();
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
+  const layout = useLayoutType();
+
+  const { data: activeVisits, isError, isLoading, isValidating } = useActiveVisits();
+
+  const desktopView = layout === 'desktop';
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
-  const [loading, setLoading] = useState(true);
-  const [activeVisits, setActiveVisits] = useState<ActiveVisitRow[]>([]);
+  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
 
   const headerData = useMemo(
@@ -54,8 +48,8 @@ const ActiveVisitsTable = () => {
       },
       {
         id: 1,
-        header: t('IDNumber', 'ID Number'),
-        key: 'IDNumber',
+        header: t('idNumber', 'ID Number'),
+        key: 'idNumber',
       },
       {
         id: 2,
@@ -81,27 +75,6 @@ const ActiveVisitsTable = () => {
     [t],
   );
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    fetchActiveVisits(abortController).then(({ data }) => {
-      const rowData = data.results.map((visit, ind) => ({
-        id: `${ind}`,
-        visitStartTime: formatDatetime(visit.startDatetime),
-        IDNumber: visit?.patient?.identifiers[0]?.identifier,
-        name: visit?.patient?.person?.display,
-        gender: visit?.patient?.person?.gender,
-        age: visit?.patient?.person?.age,
-        visitType: visit?.visitType?.display,
-        patientUuid: visit?.patient?.uuid,
-        visitUuid: visit?.uuid,
-      }));
-      setActiveVisits(rowData);
-      setLoading(false);
-    });
-
-    return () => abortController.abort();
-  }, []);
-
   const searchResults = useMemo(() => {
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
@@ -118,7 +91,12 @@ const ActiveVisitsTable = () => {
     }
   }, [searchString, activeVisits]);
 
-  const { goTo, results, currentPage } = usePagination(searchResults, currentPageSize);
+  const {
+    goTo,
+    results: paginatedActiveVisits,
+    currentPage,
+  }: PaginationData = usePagination(searchResults, currentPageSize);
+
   const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
 
   useEffect(() => {
@@ -127,98 +105,105 @@ const ActiveVisitsTable = () => {
     }
   }, [searchString]);
 
-  return !loading ? (
-    <div className={styles.activeVisitsContainer}>
-      <div className={styles.activeVisitsDetailHeaderContainer}>
-        <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
-      </div>
-      <DataTable rows={results} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
-          <TableContainer title="" className={styles.tableContainer}>
-            <TableToolbar>
-              <TableToolbarContent>
-                <Search
-                  tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                  labelText=""
-                  placeholder="Filter table"
-                  onChange={handleSearch}
-                />
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table className={styles.activeVisitsTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+  if (activeVisits?.length) {
+    return (
+      <div className={styles.activeVisitsContainer}>
+        <div className={styles.activeVisitsDetailHeaderContainer}>
+          <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
+          <div className={styles.backgroundDataFetchingIndicator}>
+            <span>{isValidating ? <InlineLoading /> : null}</span>
+          </div>
+        </div>
+        <DataTable rows={paginatedActiveVisits} headers={headerData} isSortable>
+          {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
+            <TableContainer title="" className={styles.tableContainer}>
+              <TableToolbar>
+                <TableToolbarContent>
+                  <Search
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                    labelText=""
+                    placeholder={t('filterTable', 'Filter table')}
+                    onChange={handleSearch}
+                  />
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table className={styles.activeVisitsTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader />
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => (
+                    <React.Fragment key={index}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>
+                            {cell.info.header === 'name' ? (
+                              <ConfigurableLink
+                                to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
+                                {cell.value}
+                              </ConfigurableLink>
+                            ) : (
+                              cell.value
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableExpandRow>
+                      {row.isExpanded && (
+                        <TableRow className={styles.expandedActiveVisitRow}>
+                          <th colSpan={headers.length + 2}>
+                            <ExtensionSlot
+                              className={styles.visitSummaryContainer}
+                              extensionSlotName="visit-summary-slot"
+                              state={{
+                                visitUuid: paginatedActiveVisits[index]?.visitUuid,
+                                patientUuid: paginatedActiveVisits[index]?.patientUuid,
+                              }}
+                            />
+                          </th>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
                   ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, ind) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>
-                          {cell.info.header === 'name' ? (
-                            <ConfigurableLink to={`\${openmrsSpaBase}/patient/${results[ind]?.patientUuid}/chart/`}>
-                              {cell.value}
-                            </ConfigurableLink>
-                          ) : (
-                            cell.value
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableExpandRow>
-                    {row.isExpanded && (
-                      <TableRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
-                        <th colSpan={headers.length + 2}>
-                          <ExtensionSlot
-                            className={styles.visitSummaryContainer}
-                            extensionSlotName="visit-summary-slot"
-                            state={{
-                              visitUuid: results[ind]?.visitUuid,
-                              patientUuid: results[ind]?.patientUuid,
-                            }}
-                          />
-                        </th>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-            {rows.length === 0 && (
-              <p
-                style={{ height: desktopView ? '2rem' : '3rem', marginLeft: desktopView ? '2rem' : '3rem' }}
-                className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                {t('noVisitsFound', 'No visits found')}
-              </p>
-            )}
-            <Pagination
-              forwardText=""
-              backwardText=""
-              page={currentPage}
-              pageSize={currentPageSize}
-              pageSizes={pageSizes}
-              totalItems={searchResults.length}
-              className={styles.pagination}
-              onChange={({ pageSize, page }) => {
-                if (pageSize !== currentPageSize) {
-                  setPageSize(pageSize);
-                }
-                if (page !== currentPage) {
-                  goTo(page);
-                }
-              }}
-            />
-          </TableContainer>
-        )}
-      </DataTable>
-    </div>
-  ) : (
-    <DataTableSkeleton />
-  );
+                </TableBody>
+              </Table>
+              {rows.length === 0 && (
+                <p
+                  style={{ height: desktopView ? '2rem' : '3rem', marginLeft: desktopView ? '2rem' : '3rem' }}
+                  className={`${styles.emptyRow} ${styles.bodyLong01}`}>
+                  {t('noVisitsFound', 'No visits found')}
+                </p>
+              )}
+              <Pagination
+                forwardText="Next page"
+                backwardText="Previous page"
+                page={currentPage}
+                pageSize={currentPageSize}
+                pageSizes={pageSizes}
+                totalItems={searchResults.length}
+                className={styles.pagination}
+                onChange={({ pageSize, page }) => {
+                  if (pageSize !== currentPageSize) {
+                    setPageSize(pageSize);
+                  }
+                  if (page !== currentPage) {
+                    goTo(page);
+                  }
+                }}
+              />
+            </TableContainer>
+          )}
+        </DataTable>
+      </div>
+    );
+  }
 };
 
 export default ActiveVisitsTable;
