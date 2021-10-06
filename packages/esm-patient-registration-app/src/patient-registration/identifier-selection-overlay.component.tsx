@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-registration.scss';
-import { Close24 } from '@carbon/icons-react';
+import { Close24, ArrowLeft24 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { RadioButtonGroup, RadioButton, Button, Checkbox, Search } from 'carbon-components-react';
 import { PatientIdentifiersMapType, PatientUuidMapType } from './patient-registration-types';
@@ -122,35 +122,45 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   }, [selectedIdentifierTypes]);
 
   return (
-    <div className={layout === 'tablet' ? styles.fullScreenOverlay : styles.overlay}>
+    <div className={`${styles.overlay} ${layout === 'tablet' ? styles.fullScreenOverlay : styles.desktopOverlay}`}>
       <div>
-        <div className={styles.patientIdentifierOverlayHeader}>
-          <h4 className={styles.productiveHeading02}>Add a new ID Number</h4>
-          <Button kind="ghost" size="small" onClick={closeOverlay} hasIconOnly>
-            <Close24 />
-          </Button>
-        </div>
+        {layout === 'desktop' ? (
+          <div className={styles.patientIdentifierOverlayHeaderDesktop}>
+            <h4 className={styles.productiveHeading02}>{t('addIDNumber', 'Add a new ID Number')}</h4>
+            <Button kind="ghost" iconDescription="" size="small" onClick={closeOverlay} hasIconOnly>
+              <Close24 />
+            </Button>
+          </div>
+        ) : (
+          <div className={styles.patientIdentifierOverlayHeaderTablet}>
+            <Button kind="ghost" iconDescription="" size="small" onClick={closeOverlay} hasIconOnly>
+              <ArrowLeft24 />
+            </Button>
+            <h4 className={styles.productiveHeading02}>{t('addIDNumber', 'Add a new ID Number')}</h4>
+          </div>
+        )}
         <div className={styles.overlayContent}>
           <p className={styles.bodyLong02}>
             {t('IDInstructions', "Select the type of ID Number you'd like to add for this patient:")}
           </p>
           <div className={styles.space05}>
             <Search
-              labelText="Search an identifier"
-              placeholder="Search an identifier"
+              labelText={t('searchID', 'Search an ID Number')}
+              placeholder={t('searchID', 'Search an ID Number')}
               onChange={handleSearch}
               value={searchString}
+              size="sm"
             />
           </div>
           <fieldset>{identifierTypeCheckboxes}</fieldset>
         </div>
       </div>
       <div className={styles.overlayButtons}>
-        <Button kind="primary" onClick={handleAddIdentifier}>
-          Add Identifier
+        <Button kind="secondary" onClick={closeOverlay}>
+          {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={closeOverlay}>
-          Cancel
+        <Button kind="primary" onClick={handleAddIdentifier}>
+          {t('addidentifier', 'Add Identifier')}
         </Button>
       </div>
     </div>

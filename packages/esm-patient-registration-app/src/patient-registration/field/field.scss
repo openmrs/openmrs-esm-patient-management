@@ -19,5 +19,15 @@
 }
 
 .addNewIdentifierButton {
-  justify-self: baseline;
+  align-self: end;
+  margin-bottom: 1rem;
+}
+
+.bodyShort01 {
+  @include carbon--type-style('body-short-01');
+}
+
+.linkText {
+  color: #0f62fe;
+  cursor: pointer;
 }

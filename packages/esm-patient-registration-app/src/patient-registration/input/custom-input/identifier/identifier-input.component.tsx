@@ -25,7 +25,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
   });
   const sourceName = `source-for-${name}`;
   const [selectSourceField] = useField(sourceName);
-  selectSourceField.value = sourceSelected.name;
+  selectSourceField.value = sourceSelected?.name;
   const [identifierValidationSchema, setIdentifierValidationSchema] = useState(Yup.object({}));
 
   useEffect(() => {
@@ -55,10 +55,10 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
     if (sourceSelected) {
       const selectedSource = find(sources, { name: selectSourceField.value });
 
-      if (sourceSelected && sourceSelected.autoGenerationOption) {
-        setAutoGenerationOption(sourceSelected.autoGenerationOption);
+      if (sourceSelected && sourceSelected?.autoGenerationOption) {
+        setAutoGenerationOption(sourceSelected?.autoGenerationOption);
 
-        if (sourceSelected.autoGenerationOption.automaticGenerationEnabled) {
+        if (sourceSelected?.autoGenerationOption.automaticGenerationEnabled) {
           identifierType.autoGenerationSource = sourceSelected;
           setFieldValue(name, '');
 

@@ -47,7 +47,7 @@ export const IdField: React.FC = () => {
             return null;
           } else {
             return (
-              <div key={identifierType.fieldName} style={{ marginBottom: '1rem' }}>
+              <div key={identifierType.fieldName}>
                 <IdentifierInput key={identifierType.fieldName} identifierType={identifierType} />
               </div>
             );
@@ -61,11 +61,11 @@ export const IdField: React.FC = () => {
       <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
       <div className={styles.grid}>
         {identifierInputs}
-        <div className={styles.addNewIdentifierButton}>
-          <Button kind="tertiary" size="sm" onClick={() => showPatientIdentifiersOverlay(true)}>
-            Add new identifier
-          </Button>
-        </div>
+        <span
+          className={`${styles.bodyShort01} ${styles.linkText} ${styles.addNewIdentifierButton}`}
+          onClick={() => showPatientIdentifiersOverlay(true)}>
+          {t('addIDNumber', 'Add ID Number')} +
+        </span>
       </div>
     </div>
   );
