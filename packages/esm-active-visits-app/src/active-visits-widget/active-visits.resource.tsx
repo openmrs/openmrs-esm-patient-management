@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, Visit } from '@openmrs/esm-framework';
 
@@ -25,19 +24,6 @@ export function useActiveVisits() {
     openmrsFetch,
   );
 
-  const formatDatetime = (startDatetime) => {
-    const todayDate = dayjs();
-    const today =
-      dayjs(startDatetime).get('date') === todayDate.get('date') &&
-      dayjs(startDatetime).get('month') === todayDate.get('month') &&
-      dayjs(startDatetime).get('year') === todayDate.get('year');
-    if (today) {
-      return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
-    } else {
-      return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
-    }
-  };
-
   const mapVisitProperties = (visit: Visit): ActiveVisit => ({
     age: visit?.patient?.person?.age,
     id: visit.uuid,
@@ -45,7 +31,7 @@ export function useActiveVisits() {
     gender: visit?.patient?.person?.gender,
     name: visit?.patient?.person?.display,
     patientUuid: visit?.patient?.uuid,
-    visitStartTime: formatDatetime(visit.startDate),
+    visitStartTime: visit.startDate,
     visitType: visit?.visitType?.display,
     visitUuid: visit.uuid,
   });

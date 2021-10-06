@@ -20,6 +20,7 @@ import { useLayoutType, useConfig, usePagination, ConfigurableLink, ExtensionSlo
 import { useTranslation } from 'react-i18next';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
+import dayjs from 'dayjs';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -75,10 +76,15 @@ const ActiveVisitsTable = () => {
     [t],
   );
 
+  const rowData = activeVisits.map((visit) => ({
+    ...visit,
+    visitStartTime: formatDatetime(visit.visitStartTime),
+  }));
+
   const searchResults = useMemo(() => {
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
-      return activeVisits.filter((activeVisitRow) =>
+      return rowData.filter((activeVisitRow) =>
         Object.keys(activeVisitRow).some((header) => {
           if (header === 'patientUuid') {
             return false;
@@ -87,9 +93,9 @@ const ActiveVisitsTable = () => {
         }),
       );
     } else {
-      return activeVisits;
+      return rowData;
     }
-  }, [searchString, activeVisits]);
+  }, [searchString, rowData]);
 
   const {
     goTo,
@@ -205,5 +211,18 @@ const ActiveVisitsTable = () => {
     );
   }
 };
+
+function formatDatetime(startDatetime) {
+  const dateToday = dayjs();
+  const today =
+    dayjs(startDatetime).get('date') === dateToday.get('date') &&
+    dayjs(startDatetime).get('month') === dateToday.get('month') &&
+    dayjs(startDatetime).get('year') === dateToday.get('year');
+  if (today) {
+    return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
+  } else {
+    return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
+  }
+}
 
 export default ActiveVisitsTable;
