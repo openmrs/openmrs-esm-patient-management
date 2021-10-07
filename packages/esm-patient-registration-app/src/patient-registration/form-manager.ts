@@ -58,6 +58,7 @@ export default class FormManager {
       },
       {
         id: patientUuid,
+        displayName: 'Patient registration',
         dependencies: [],
       },
     );
