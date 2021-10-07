@@ -155,7 +155,7 @@ export default class FormManager {
         const generateIdentifierResponse = await generateIdentifier(type.autoGenerationSource.uuid, abortController);
         return {
           // is this undefined?
-          uuid: undefined,
+          uuid: type.uuid,
           identifier: generateIdentifierResponse.data.identifier,
           identifierType: type.uuid,
           location: location,

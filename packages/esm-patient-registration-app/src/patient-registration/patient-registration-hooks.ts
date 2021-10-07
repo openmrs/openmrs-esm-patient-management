@@ -1,5 +1,5 @@
 import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
-import { Dispatch, useEffect, useState } from 'react';
+import { Dispatch, useEffect, useState, SetStateAction } from 'react';
 import { patientRegistration } from '../constants';
 import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
 import {
@@ -33,12 +33,13 @@ const blankFormValues: FormValues = {
   deathDate: '',
   deathCause: '',
   relationships: [{ relatedPerson: '', relationship: '' }],
+  identifiers: {},
 };
 
 export function useInitialFormValues(
   patientUuid: string,
   fallback = blankFormValues,
-): [FormValues, Dispatch<FormValues>] {
+): [FormValues, Dispatch<SetStateAction<FormValues>>] {
   const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>(fallback);
 

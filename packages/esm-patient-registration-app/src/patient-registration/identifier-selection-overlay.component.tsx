@@ -149,7 +149,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               placeholder={t('searchID', 'Search an ID Number')}
               onChange={handleSearch}
               value={searchString}
-              size="sm"
             />
           </div>
           <fieldset>{identifierTypeCheckboxes}</fieldset>

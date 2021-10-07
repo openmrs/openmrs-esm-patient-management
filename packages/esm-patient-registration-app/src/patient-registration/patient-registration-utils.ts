@@ -87,13 +87,16 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
     result.deathDate = patient.deceasedDateTime ? patient.deceasedDateTime.split('T')[0] : '';
   }
 
+  const identifiers = {};
+  for (const identifier of patient.identifier) {
+    const fieldName = camelCase(identifier.system || identifier.type.text);
+    identifiers[fieldName] = identifier.value;
+  }
+
   return {
     ...result,
-    ...patient.identifier.map((identifier) => {
-      const key = camelCase(identifier.system || identifier.type.text);
-      return { [key]: identifier.value };
-    }),
-  };
+    identifiers,
+  } as FormValues;
 }
 
 export function getAddressFieldValuesFromFhirPatient(patient: fhir.Patient) {

@@ -9,22 +9,20 @@ import { PatientIdentifierType } from '../../../patient-registration-types';
 
 interface IdentifierInputProps {
   identifierType: PatientIdentifierType;
+  disabled?: boolean;
 }
 
-export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType }) => {
-  const { validationSchema, setValidationSchema, setFieldValue, patientIdentifiersMap } =
+export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType, disabled }) => {
+  const { validationSchema, setValidationSchema, setFieldValue, patientIdentifiersMap, inEditMode } =
     React.useContext(PatientRegistrationContext);
   const sources = identifierType.identifierSources;
   const sourceSelected = patientIdentifiersMap[identifierType.uuid]?.sourceSelected;
-  const name = identifierType.fieldName;
+  const name = `identifiers.${identifierType.fieldName}`;
   const { t } = useTranslation();
   const [option, setAutoGenerationOption] = useState({
     manualEntryEnabled: sources.length === 0 ? true : undefined,
     automaticGenerationEnabled: undefined,
   });
-  const sourceName = `source-for-${name}`;
-  const [selectSourceField] = useField(sourceName);
-  selectSourceField.value = sourceSelected?.name;
   const [identifierValidationSchema, setIdentifierValidationSchema] = useState(Yup.object({}));
 
   useEffect(() => {
@@ -52,8 +50,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
 
   useEffect(() => {
     if (sourceSelected) {
-      const selectedSource = find(sources, { name: selectSourceField.value });
-
       if (sourceSelected && sourceSelected?.autoGenerationOption) {
         setAutoGenerationOption(sourceSelected?.autoGenerationOption);
 
@@ -79,7 +75,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
 
   return (
     <>
-      {sourceSelected && (
+      {sourceSelected || inEditMode ? (
         <Input
           id={name}
           light
@@ -92,9 +88,9 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
           }
           labelText={identifierType?.name}
           name={name}
-          disabled={!option.manualEntryEnabled}
+          disabled={!option.manualEntryEnabled || disabled}
         />
-      )}
+      ) : null}
     </>
   );
 };

@@ -117,6 +117,9 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
+  identifiers: {
+    [identifierFieldName: string]: string;
+  };
 }
 
 export interface PatientUuidMapType {

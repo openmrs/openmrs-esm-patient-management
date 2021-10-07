@@ -92,6 +92,33 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [patientIdentifiers]);
 
   useEffect(() => {
+    if (inEditMode === false) {
+      const identifiers = initialFormValues?.identifiers;
+      patientIdentifiers.forEach((identifier) => {
+        if (!identifiers[identifier.fieldName]) identifiers[identifier.fieldName] = '';
+      });
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        identifiers,
+      }));
+    }
+  }, [inEditMode, patientIdentifiers]);
+
+  useEffect(() => {
+    if (inEditMode) {
+      const identifiersSelected = patientIdentifiers.filter(
+        (identifier) => !!initialFormValues.identifiers[identifier.fieldName],
+      );
+      setPatientIdentifiersMap((identifierMap) => {
+        identifiersSelected.forEach((identifier) => {
+          identifierMap[identifier.uuid].selected = true;
+        });
+        return identifierMap;
+      });
+    }
+  }, [inEditMode, patientIdentifiers, initialFormValues]);
+
+  useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
 
     if (!addressTemplateXml) {
