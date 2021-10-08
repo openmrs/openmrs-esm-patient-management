@@ -1,10 +1,11 @@
 import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
-import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
+import { FormValues, Patient, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
+  getPatientIdentifiersFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
 } from './patient-registration-utils';
 
@@ -49,6 +50,7 @@ export function useInitialFormValues(
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
+          identifiers: [...getPatientIdentifiersFromFhirPatient(patient)],
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
