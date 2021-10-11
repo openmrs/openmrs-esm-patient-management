@@ -1,7 +1,5 @@
 import React, { useContext } from 'react';
-import TextInput from 'carbon-components-react/es/components/TextInput';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
+import { DatePicker, DatePickerInput, TextInput } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';

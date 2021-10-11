@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import DataTable, {
+import {
+  DataTable,
   TableContainer,
   Table,
   TableHead,
@@ -10,7 +11,7 @@ import DataTable, {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 import { Observation } from '../visit.resource';

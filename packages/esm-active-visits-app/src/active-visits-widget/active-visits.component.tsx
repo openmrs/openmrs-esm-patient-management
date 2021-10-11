@@ -1,7 +1,12 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
-import DataTable, {
-  TableContainer,
+import {
+  DataTable,
+  DataTableSkeleton,
+  InlineLoading,
+  Pagination,
+  Search,
   Table,
+  TableContainer,
   TableHead,
   TableRow,
   TableHeader,
@@ -11,11 +16,7 @@ import DataTable, {
   TableToolbarContent,
   TableExpandRow,
   TableExpandHeader,
-} from 'carbon-components-react/es/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import InlineLoading from 'carbon-components-react/lib/components/InlineLoading';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import Search from 'carbon-components-react/es/components/Search';
+} from 'carbon-components-react';
 import { useLayoutType, useConfig, usePagination, ConfigurableLink, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';

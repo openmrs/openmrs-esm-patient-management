@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import Button from 'carbon-components-react/es/components/Button';
+import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { Encounter, useVisit } from './visit.resource';
 import dayjs from 'dayjs';
 import styles from './visit-detail-overview.scss';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 
 interface VisitDetailComponentProps {
   visitUuid: string;

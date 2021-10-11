@@ -1,16 +1,17 @@
 import React, { CSSProperties } from 'react';
-import DataTable, {
+import {
+  DataTable,
   DataTableCustomRenderProps,
   DataTableHeader,
-} from 'carbon-components-react/es/components/DataTable';
-import Table from 'carbon-components-react/es/components/DataTable/Table';
-import TableContainer from 'carbon-components-react/es/components/DataTable/TableContainer';
-import TableHead from 'carbon-components-react/es/components/DataTable/TableHead';
-import TableHeader from 'carbon-components-react/es/components/DataTable/TableHeader';
-import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
-import TableCell from 'carbon-components-react/es/components/DataTable/TableCell';
-import TableBody from 'carbon-components-react/es/components/DataTable/TableBody';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+  DataTableSkeleton,
+  Table,
+  TableBody,
+  TableContainer,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'carbon-components-react';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { useTranslation } from 'react-i18next';

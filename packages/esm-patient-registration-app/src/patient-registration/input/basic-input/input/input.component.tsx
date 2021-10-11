@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import TextInput from 'carbon-components-react/es/components/TextInput';
+import { TextInput } from 'carbon-components-react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
