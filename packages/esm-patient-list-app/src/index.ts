@@ -1,6 +1,7 @@
 import { getAsyncLifecycle, registerBreadcrumbs, getOfflinePatientDataStore } from '@openmrs/esm-framework';
 import './global-store';
 import { setupOffline } from './offline';
+import { fetchPatientListDetails } from './api';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -30,8 +31,8 @@ function setupOpenMRS() {
       parent: `${window.spaBase}/home`,
     },
     {
-      path: `${spaBasePath}/:view?`,
-      title: ([x]) => `${x} Dashboard`,
+      path: `${spaBasePath}/:uuid?`,
+      title: ([x]) => `${x}`,
       parent: spaBasePath,
     },
   ]);
@@ -39,7 +40,7 @@ function setupOpenMRS() {
   return {
     pages: [
       {
-        load: getAsyncLifecycle(() => import('./patient-list-list/patient-list-list.component'), options),
+        load: getAsyncLifecycle(() => import('./root.component'), options),
         route,
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },

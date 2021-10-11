@@ -15,7 +15,7 @@ import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { useTranslation } from 'react-i18next';
 import { useToggleStarredMutation, PatientList, PatientListType } from '../api';
-import { useSessionUser } from '@openmrs/esm-framework';
+import { useSessionUser, ConfigurableLink } from '@openmrs/esm-framework';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -79,14 +79,16 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
               </TableRow>
             </TableHead>
             <TableBody style={{ backgroundColor: '#f4f4f4' }}>
-              {rows.map((row) => (
+              {rows.map((row, ind) => (
                 <TableRow style={{ height: '3rem' }} key={row.id} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     switch (cell.info.header) {
                       case 'display':
                         return (
-                          <TableCell style={{ color: '#0f62fe' }} key={cell.id} onClick={() => openPatientList(row.id)}>
-                            {cell.value}
+                          <TableCell style={{ color: '#0f62fe' }} key={cell.id}>
+                            <ConfigurableLink to={`\${openmrsSpaBase}/patient-list/${patientLists[ind].id}`}>
+                              {cell.value}
+                            </ConfigurableLink>
                           </TableCell>
                         );
 

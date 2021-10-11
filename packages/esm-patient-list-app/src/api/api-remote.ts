@@ -119,3 +119,31 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
     ac,
   );
 }
+
+export function fetchPatientListDetails(cohortUuid: string, abortController: AbortController) {
+  return openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${cohortUuid}`, {
+    signal: abortController.signal,
+  });
+}
+
+export async function fetchPatientListMembers(
+  cohortUuid: string,
+  abortController: AbortController,
+  v: string = 'full',
+  startIndex: number = 0,
+) {
+  const {
+    data: { results, error },
+  } = await await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(
+    `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=${v}&startIndex=${startIndex}`,
+    {
+      signal: abortController.signal,
+    },
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return results;
+}

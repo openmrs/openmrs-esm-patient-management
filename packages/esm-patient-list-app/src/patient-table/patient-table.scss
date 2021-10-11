@@ -38,6 +38,7 @@ div.tableOverride > div > div {
 .paginationOverride{
     background-color: $ui-background;
     border-bottom: solid 1px $ui-03 !important;
+    overflow-x:hidden;
 }
 
 .paginationOverride > div {
