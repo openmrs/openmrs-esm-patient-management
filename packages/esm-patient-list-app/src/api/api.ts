@@ -33,8 +33,8 @@ function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
     id: cohort.uuid,
     display: cohort.name,
     description: cohort.description,
-    type: PatientListType.SYSTEM, // TODO
-    memberCount: 0, // TODO
+    type: cohort.attributes.find((att) => att?.cohortAttributeType?.name === 'Patient List Type')?.value,
+    size: cohort.size,
     isStarred: false, // TODO,
   };
 }

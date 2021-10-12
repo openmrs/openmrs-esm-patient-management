@@ -10,7 +10,7 @@ export interface PatientList {
   display: string;
   description: string;
   type: PatientListType;
-  memberCount: number;
+  size: number;
   isStarred: boolean;
   options?: Array<PatientListOption>;
 }

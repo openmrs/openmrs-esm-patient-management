@@ -20,7 +20,7 @@ import { useSessionUser, ConfigurableLink } from '@openmrs/esm-framework';
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
   { key: 'type', header: 'List Type' },
-  { key: 'memberCount', header: 'No. Patients' },
+  { key: 'size', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
 
@@ -103,14 +103,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                         );
 
                       case 'type':
-                        const val: PatientListType = cell.value;
-                        return (
-                          <TableCell key={cell.id}>
-                            {val === PatientListType.SYSTEM
-                              ? t('patientListTableTypeSystem', 'system')
-                              : t('patientListTableTypeUser', 'user')}
-                          </TableCell>
-                        );
+                        return <TableCell key={cell.id}>{cell.value}</TableCell>;
 
                       default:
                         return <TableCell key={cell.id}>{cell.value}</TableCell>;
