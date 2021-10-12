@@ -1,6 +1,5 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { navigate } from '@openmrs/esm-framework';
-import Link from 'carbon-components-react/es/components/Link';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 import DataTable, {
   Table,
   TableBody,
@@ -55,13 +54,9 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
         columns.forEach((column) => {
           const value = column.getValue?.(patient) || patient[column.key];
           row[column.key] = column.link ? (
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                navigate({ to: column.link.getUrl(patient) });
-              }}>
+            <ConfigurableLink className={styles.link} to={column.link.getUrl(patient)}>
               {value}
-            </Link>
+            </ConfigurableLink>
           ) : (
             value
           );
