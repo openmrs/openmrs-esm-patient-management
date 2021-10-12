@@ -32,7 +32,7 @@ const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
 
 const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
-  { key: 'memberCount', header: 'No. Patients' },
+  { key: 'size', header: 'No. Patients' },
   { key: 'isStarred', header: '' },
 ];
 

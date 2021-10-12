@@ -16,7 +16,7 @@ const knownLocalPatientListTemplates: Array<PatientList> = [
     display: 'Offline Patients',
     description: 'Patients available while offline.',
     isStarred: false,
-    memberCount: 0,
+    size: 0,
     type: PatientListType.USER,
   },
 ];
@@ -35,7 +35,7 @@ export async function getAllLocalPatientLists(
     return {
       ...template,
       isStarred: associatedMetadata?.isStarred ?? template.isStarred,
-      memberCount: associatedMetadata?.members.length ?? template.memberCount,
+      size: associatedMetadata?.members.length ?? template.size,
     };
   });
 
