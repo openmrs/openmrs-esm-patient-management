@@ -31,7 +31,8 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
 }
 
 export async function getAllPatientLists(filter: PatientListFilter = {}, ac = new AbortController()) {
-  const query: Array<[string, string]> = [['v', 'default']];
+  const custom = 'custom:(uuid,name,description,display,size,attributes)';
+  const query: Array<[string, string]> = [['v', custom]];
 
   if (filter.name !== undefined) {
     query.push(['q', filter.name]);
@@ -43,8 +44,9 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   }
 
   if (filter.type !== undefined) {
-    const type = filter.type === PatientListType.SYSTEM ? 'System Patient Lists' : '';
-    query.push(['cohortType', type]);
+    const type =
+      filter.type === PatientListType.SYSTEM ? '"Patient List Type":"System"' : '"Patient List Type":"My lists"';
+    query.push(['attributes', type]);
   }
 
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
