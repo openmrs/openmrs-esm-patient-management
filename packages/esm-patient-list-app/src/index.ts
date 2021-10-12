@@ -1,7 +1,7 @@
 import { getAsyncLifecycle, registerBreadcrumbs, getOfflinePatientDataStore } from '@openmrs/esm-framework';
+import { usePatientListDetails } from './api';
 import './global-store';
 import { setupOffline } from './offline';
-import { fetchPatientListDetails } from './api';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
@@ -32,7 +32,10 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:uuid?`,
-      title: ([x]) => `${x}`,
+      title: ([x]) => {
+        const [patientListDetails] = usePatientListDetails(x);
+        return `${patientListDetails?.name ?? ''}`;
+      },
       parent: spaBasePath,
     },
   ]);

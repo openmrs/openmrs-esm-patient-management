@@ -79,14 +79,14 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
               </TableRow>
             </TableHead>
             <TableBody style={{ backgroundColor: '#f4f4f4' }}>
-              {rows.map((row, ind) => (
+              {rows.map((row, index) => (
                 <TableRow style={{ height: '3rem' }} key={row.id} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     switch (cell.info.header) {
                       case 'display':
                         return (
                           <TableCell style={{ color: '#0f62fe' }} key={cell.id}>
-                            <ConfigurableLink to={`\${openmrsSpaBase}/patient-list/${patientLists[ind].id}`}>
+                            <ConfigurableLink to={`\${openmrsSpaBase}/patient-list/${patientLists[index].id}`}>
                               {cell.value}
                             </ConfigurableLink>
                           </TableCell>

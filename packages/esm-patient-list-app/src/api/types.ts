@@ -56,6 +56,7 @@ export interface OpenmrsCohort {
   voided: boolean;
   isStarred?: boolean;
   type?: string;
+  size: number;
 }
 
 export interface OpenmrsCohortRef {

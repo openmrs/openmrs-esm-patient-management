@@ -20,3 +20,7 @@
   @include carbon--type-style("body-short-01");
   color: $interactive-01;
 }
+
+.tableContainer {
+  padding: $spacing-05 2rem;
+}
