@@ -93,13 +93,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     }
   }, [searchTerm, status]);
 
-  const handleEnterKeyPressed = (event: KeyboardEvent) => event.key.toLowerCase() === 'enter' && performSearch();
-
-  const withButtonSize = useCallback(() => {
-    if (layout === 'desktop') {
-      return { size: 'small' };
-    }
-  }, [layout]);
+  const handleEnterKeyPressed = (event: React.KeyboardEvent<HTMLInputElement>) =>
+    event.key.toLowerCase() === 'enter' && performSearch();
 
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
 
@@ -136,9 +131,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             <Button
               disabled={status === 'searching'}
               onClick={performSearch}
-              style={{ background: '#393939' }}
-              {...withButtonSize()}
-              className={styles.searchButton}>
+              className={styles.searchButton}
+              size={layout === 'desktop' ? 'small' : 'default'}>
               {t('search', 'Search')}
             </Button>
           </div>

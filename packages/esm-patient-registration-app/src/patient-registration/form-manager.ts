@@ -58,6 +58,7 @@ export default class FormManager {
       },
       {
         id: patientUuid,
+        // @ts-ignore
         displayName: 'Patient registration',
         dependencies: [],
       },
