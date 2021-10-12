@@ -151,7 +151,6 @@ export function usePatientListMembers(
     if (error) {
       throw error;
     }
-    console.log(data?.data?.results);
     return [!data && !error, data?.data?.results, mutate];
   }
   return [true, undefined, undefined];

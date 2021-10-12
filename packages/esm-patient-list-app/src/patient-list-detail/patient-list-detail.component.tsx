@@ -69,8 +69,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     [patientListMembers],
   );
 
-  console.log(patients, isLoading);
-
   const searchResults = useMemo(
     () =>
       patients.filter((patient) =>
