@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { ExtensionSlot, usePagination } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
 import { usePatientListDetails, usePatientListMembers } from '../api';
@@ -21,17 +21,68 @@ function formatDate(date: string): string {
   return dayjs(date).format('DD / MMM / YYYY');
 }
 
+interface PatientListMemberRow {
+  name: string;
+  identifier: string;
+  sex: string;
+  startDate: string;
+  uuid: string;
+}
+
 interface PatientListDetailProps {
   patientListUuid: string;
 }
 
 const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetailProps>> = ({ match }) => {
   const { patientListUuid } = match.params;
-  const [patientListDetails, patientListDetailMutate] = usePatientListDetails(patientListUuid);
+  const [patientListDetails] = usePatientListDetails(patientListUuid);
+  const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);
-  const [isLoading, patientListMembers, patientListMembersMutate] = usePatientListMembers(patientListUuid);
+  const patientListMembers = usePatientListMembers(
+    patientListUuid,
+    (currentPage - 1) * currentPageSize,
+    currentPageSize,
+  );
   const { t } = useTranslation();
   const [searchString, setSearchString] = useState('');
+
+  console.log(patientListMembers);
+
+  // useEffect(() => {
+  //   usePatientListMembers(patientListUuid, (currentPage - 1) * currentPageSize, currentPageSize).then((res) =>
+  //     setPatientListMembers(
+  //       res.data.results.map((member) => ({
+  //         name: member?.patient?.person?.display,
+  //         identifier: member?.patient?.identifiers[0].identifier ?? null,
+  //         sex: member?.patient?.person?.gender,
+  //         startDate: formatDate(member?.patient?.startDate),
+  //         uuid: member?.patient?.uuid,
+  //       })),
+  //     ),
+  //   );
+  // }, [patientListUuid, currentPage, currentPageSize]);
+
+  const patients: PatientListMemberRow[] = useMemo(
+    () =>
+      patientListMembers
+        ? patientListMembers?.map((member) => ({
+            name: member?.patient?.person?.display,
+            identifier: member?.patient?.identifiers[0].identifier ?? null,
+            sex: member?.patient?.person?.gender,
+            startDate: formatDate(member?.patient?.startDate),
+            uuid: member?.patient?.uuid,
+          }))
+        : [
+            {
+              name: 'Fetching...',
+              identifier: '',
+              sex: '',
+              startDate: '',
+              uuid: '',
+            },
+          ],
+    [patientListMembers],
+  );
 
   const headers = useMemo(
     () => [
@@ -58,20 +109,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     [],
   );
 
-  const patients: PatientRow[] = useMemo(
-    () =>
-      patientListMembers
-        ? patientListMembers?.map((member) => ({
-            name: member?.patient?.person?.display,
-            identifier: member?.patient?.identifiers[0].identifier ?? null,
-            sex: member?.patient?.person?.gender,
-            startDate: formatDate(member?.patient?.startDate),
-            uuid: member?.patient?.uuid,
-          }))
-        : [],
-    [patientListMembers],
-  );
-
   const searchResults = useMemo(
     () =>
       patients.filter((patient) =>
@@ -80,10 +117,8 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     [patients, searchString],
   );
 
-  const { paginated, results, goTo, currentPage } = usePagination(searchResults, currentPageSize);
-
   const handleSearch = useCallback((str) => {
-    goTo(1);
+    setPageCount(1);
     setSearchString(str);
   }, []);
 
@@ -111,31 +146,33 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
               <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
             </>
           }>
-          <OverflowMenuItem itemText="Edit Name/ Description" />
+          <OverflowMenuItem itemText={t('editNameDescription', 'Edit Name/ Description')} />
         </CustomOverflowMenuComponent>
       </div>
       <div className={styles.tableContainer}>
         <PatientListTable
-          patients={results}
+          patients={searchResults}
           columns={headers}
-          isLoading={isLoading}
+          isLoading={!patientListMembers && !patients}
           search={{
             onSearch: handleSearch,
             placeHolder: 'Search',
           }}
           pagination={{
-            usePagination: paginated,
+            usePagination: true,
             currentPage,
             onChange: ({ page, pageSize }) => {
               if (currentPage !== page) {
-                goTo(page);
+                setPageCount(page);
               }
               if (currentPageSize !== pageSize) {
                 setCurrentPageSize(pageSize);
               }
             },
             pageSize: 10,
-            totalItems: patients.length,
+            totalItems: patientListDetails?.size,
+            pagesUnknown: true,
+            lastPage: searchResults?.length < currentPageSize,
           }}
         />
       </div>

@@ -32,6 +32,8 @@ interface PatientTableProps {
     onChange(props: any): any;
     pageSize: number;
     totalItems: number;
+    pagesUnknown?: boolean;
+    lastPage?: boolean;
   };
 }
 
@@ -71,7 +73,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   if (isLoading) {
     return (
       <DataTableSkeleton
-        style={{ backgroundColor: 'transparent', padding: '0rem', margin: '1rem' }}
+        style={{ backgroundColor: 'transparent', padding: '0rem' }}
         rowCount={5}
         columnCount={5}
         zebra
@@ -131,6 +133,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           totalItems={pagination.totalItems}
           onChange={pagination.onChange}
           className={styles.paginationOverride}
+          pagesUnknown={pagination?.pagesUnknown}
+          lastPage={pagination.lastPage}
         />
       )}
     </div>

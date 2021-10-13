@@ -7,7 +7,7 @@ import {
   updateLocalOrRemotePatientList,
 } from './api';
 import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
-import { fetchCurrentPatient, openmrsFetch } from '@openmrs/esm-framework';
+import { fetchCurrentPatient, openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
 import { OpenmrsCohort, OpenmrsCohortMember } from '.';
 import useSWR, { KeyedMutator } from 'swr';
 
@@ -142,16 +142,15 @@ export function usePatientListMembers(
   startIndex: number = 0,
   pageSize: number = 10,
   v: string = 'full',
-): [boolean, OpenmrsCohortMember[], KeyedMutator<{ data: CohortResponse<OpenmrsCohortMember> }>] {
+): OpenmrsCohortMember[] {
   if (patientListUuid) {
     const { data, error, mutate } = useSWR<{ data: CohortResponse<OpenmrsCohortMember> }, Error>(
-      `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&pageSize=${pageSize}&v=${v}`,
+      `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}`,
       openmrsFetch,
     );
     if (error) {
       throw error;
     }
-    return [!data && !error, data?.data?.results, mutate];
+    return data?.data?.results;
   }
-  return [true, undefined, undefined];
 }
