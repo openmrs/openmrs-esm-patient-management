@@ -46,22 +46,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
   const { t } = useTranslation();
   const [searchString, setSearchString] = useState('');
 
-  console.log(patientListMembers);
-
-  // useEffect(() => {
-  //   usePatientListMembers(patientListUuid, (currentPage - 1) * currentPageSize, currentPageSize).then((res) =>
-  //     setPatientListMembers(
-  //       res.data.results.map((member) => ({
-  //         name: member?.patient?.person?.display,
-  //         identifier: member?.patient?.identifiers[0].identifier ?? null,
-  //         sex: member?.patient?.person?.gender,
-  //         startDate: formatDate(member?.patient?.startDate),
-  //         uuid: member?.patient?.uuid,
-  //       })),
-  //     ),
-  //   );
-  // }, [patientListUuid, currentPage, currentPageSize]);
-
   const patients: PatientListMemberRow[] = useMemo(
     () =>
       patientListMembers
@@ -72,15 +56,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             startDate: formatDate(member?.patient?.startDate),
             uuid: member?.patient?.uuid,
           }))
-        : [
-            {
-              name: 'Fetching...',
-              identifier: '',
-              sex: '',
-              startDate: '',
-              uuid: '',
-            },
-          ],
+        : [],
     [patientListMembers],
   );
 
@@ -106,7 +82,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
         header: t('startDate', 'Start Date'),
       },
     ],
-    [],
+    [t],
   );
 
   const searchResults = useMemo(
