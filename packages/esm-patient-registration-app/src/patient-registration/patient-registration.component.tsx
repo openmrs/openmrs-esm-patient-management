@@ -204,26 +204,24 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 </Button>
               </div>
             </div>
-            <div>
-              <Grid className={styles.infoGrid}>
-                <PatientRegistrationContext.Provider
-                  value={{
-                    identifierTypes: patientIdentifiers,
-                    validationSchema,
-                    setValidationSchema,
-                    fieldConfigs,
-                    values: props.values,
-                    inEditMode,
-                    setFieldValue: props.setFieldValue,
-                    setCapturePhotoProps,
-                    currentPhoto: capturePhotoProps?.imageData,
-                  }}>
-                  {sections.map((section, index) => (
-                    <div key={index}>{getSection(section, index)}</div>
-                  ))}
-                </PatientRegistrationContext.Provider>
-              </Grid>
-            </div>
+            <Grid className={styles.infoGrid}>
+              <PatientRegistrationContext.Provider
+                value={{
+                  identifierTypes: patientIdentifiers,
+                  validationSchema,
+                  setValidationSchema,
+                  fieldConfigs,
+                  values: props.values,
+                  inEditMode,
+                  setFieldValue: props.setFieldValue,
+                  setCapturePhotoProps,
+                  currentPhoto: capturePhotoProps?.imageData,
+                }}>
+                {sections.map((section, index) => (
+                  <div key={index}>{getSection(section, index)}</div>
+                ))}
+              </PatientRegistrationContext.Provider>
+            </Grid>
           </div>
         </Form>
       )}

@@ -6,7 +6,7 @@
     max-height: 143px;
     overflow-y: auto;
     padding-left: 0;
-    width: calc(300px + 1rem);
+    width: 100%;
     position: absolute;
     left: 0;
     background-color: #fff;
@@ -36,7 +36,7 @@
 }
 
 .autocompleteSearch {
-    width: calc(300px + 1rem);
+    width: 100%;
 }
 
 .suggestions a {

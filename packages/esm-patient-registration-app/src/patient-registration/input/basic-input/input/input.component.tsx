@@ -41,7 +41,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   }, [checkWarning, invalidText, value, t]);
 
   return (
-    <div style={{ marginBottom: '1rem', maxWidth: '360px' }}>
+    <div style={{ marginBottom: '1rem' }}>
       <TextInput
         {...props}
         {...field}
