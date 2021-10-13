@@ -2,13 +2,11 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { usePagination } from '@openmrs/esm-framework';
-import PaginationNav from 'carbon-components-react/es/components/PaginationNav';
-import { Tile } from 'carbon-components-react/es/components/Tile';
+import { Loading, PaginationNav, Tile } from 'carbon-components-react';
 import { SearchedPatient } from '../types/index';
 import EmptyDataIllustration from './empty-data-illustration.component';
 import PatientSearchResults from '../patient-search-result/patient-search-result.component';
 import styles from './patient-search.scss';
-import Loading from 'carbon-components-react/es/components/Loading';
 
 const resultsPerPage = 5;
 

@@ -1,7 +1,11 @@
 import React, { useMemo, CSSProperties } from 'react';
 import { navigate } from '@openmrs/esm-framework';
-import Link from 'carbon-components-react/es/components/Link';
-import DataTable, {
+import {
+  DataTable,
+  DataTableSkeleton,
+  Link,
+  Pagination,
+  Search,
   Table,
   TableBody,
   TableCell,
@@ -9,10 +13,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import Search from 'carbon-components-react/es/components/Search';
+} from 'carbon-components-react';
 import debounce from 'lodash-es/debounce';
 import styles from './patient-table.scss';
 

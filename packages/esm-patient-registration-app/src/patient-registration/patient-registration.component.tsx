@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
-import Button from 'carbon-components-react/es/components/Button';
-import Link from 'carbon-components-react/es/components/Link';
-import { Grid } from 'carbon-components-react/es/components/Grid';
+import { Button, Grid, Link } from 'carbon-components-react';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 import { useLocation } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
+import { SkeletonText } from 'carbon-components-react';
 import { Observation } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
