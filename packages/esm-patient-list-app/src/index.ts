@@ -32,10 +32,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:uuid?`,
-      title: ([x]) => {
-        const [patientListDetails] = usePatientListDetails(x);
-        return `${patientListDetails?.name ?? ''}`;
-      },
+      title: ([x]) => `${x}`,
       parent: spaBasePath,
     },
   ]);
