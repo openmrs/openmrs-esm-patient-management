@@ -19,6 +19,7 @@ import {
   age,
   useLayoutType,
   syncOfflinePatientData,
+  showModal,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useGetAllPatientsFromOfflineListQuery, useRemovePatientsFromOfflinePatientListMutation } from '../api';
@@ -85,11 +86,23 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
   };
 
   const handleRemovePatientsFromOfflineListClick = async (selectedRows: Array<{ id: string }>) => {
-    await removePatientsFromOfflinePatientListMutation.refetch({
-      userId,
-      patientUuids: selectedRows.map((row) => row.id),
+    const closeModal = showModal('offline-tools-confirmation-modal', {
+      title: t('offlinePatientsTableDeleteConfirmationModalTitle', 'Remove offline patients'),
+      children: t(
+        'offlinePatientsTableDeleteConfirmationModalContent',
+        'Are you sure that you want to remove all selected patients from the offline list? The charts will no longer be available in offline mode.',
+      ),
+      confirmText: t('offlinePatientsTableDeleteConfirmationModalConfirm', 'Remove patients'),
+      cancelText: t('offlinePatientsTableDeleteConfirmationModalCancel', 'Cancel'),
+      closeModal: () => closeModal(),
+      onConfirm: async () => {
+        await removePatientsFromOfflinePatientListMutation.refetch({
+          userId,
+          patientUuids: selectedRows.map((row) => row.id),
+        });
+        refetch();
+      },
     });
-    refetch();
   };
 
   if (isFetching) {

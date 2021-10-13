@@ -39,7 +39,7 @@ module.exports = {
     default: ['JavascriptLexer'],
   },
 
-  lineEnding: 'auto',
+  lineEnding: 'lf',
   // Control the line ending. See options at https://github.com/ryanve/eol
 
   locales: ['en'],

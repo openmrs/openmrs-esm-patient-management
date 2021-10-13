@@ -1,56 +1,72 @@
-import React from 'react';
-import dayjs from 'dayjs';
+import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
-import { interpolateString, ExtensionSlot, useConfig, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
 
-  function renderPatient(patient: SearchedPatient) {
-    const preferredIdentifier = patient.identifiers.find((i) => i.preferred) || patient.identifiers[0];
+  const onClickSearchResult = useCallback((patientUuid) => {
+    navigate({
+      to: interpolateString(config.search.patientResultUrl, {
+        patientUuid: patientUuid,
+      }),
+    });
+    hidePanel();
+  }, []);
 
-    return (
-      <div
-        key={patient.display}
-        role="button"
-        tabIndex={0}
-        className={styles.patientChart}
-        onClick={() => {
-          navigate({
-            to: interpolateString(config.search.patientResultUrl, {
-              patientUuid: patient.uuid,
-            }),
-          });
-          hidePanel();
-        }}>
-        <div className={styles.container}>
-          <div className={styles.patientBanner}>
-            <div className={styles.patientAvatar}>
-              <ExtensionSlot extensionSlotName="patient-photo-slot" state={{ patientUuid: patient.uuid }} />
-            </div>
-            <div className={styles.patientInfo}>
-              <div>
-                <span className={styles.patientName}>{patient.person.display}</span>
-              </div>
-              <div className={styles.demographics}>
-                <span>{patient.person.gender === 'M' ? 'Male' : 'Female'}</span> &middot;{' '}
-                <span>
-                  {patient.person.age} {patient.person.age === 1 ? 'year' : 'years'}
-                </span>{' '}
-                &middot; <span>{dayjs(patient.person.birthdate).format('DD - MMM - YYYY')}</span>
-              </div>
-              <div>
-                <span className={styles.identifiers}>{preferredIdentifier.identifier}</span>
-              </div>
-            </div>
+  const fhirPatients = useMemo(() => {
+    return patients.map((patient) => {
+      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
+      return {
+        id: patient.uuid,
+        name: [
+          {
+            given: [patient.person.personName.givenName, patient.person.personName.middleName],
+            family: patient.person.personName.familyName,
+          },
+        ],
+        gender: patient.person.gender,
+        birthDate: patient.person.birthdate,
+        identifier: [
+          {
+            value: patient.patientIdentifier.identifier,
+          },
+        ],
+        address: preferredAddress
+          ? [
+              {
+                city: preferredAddress.cityVillage,
+                country: preferredAddress.country,
+                postalCode: preferredAddress.postalCode,
+                state: preferredAddress.stateProvince,
+                use: 'home',
+              },
+            ]
+          : [],
+        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.name == 'Telephone Number'),
+      };
+    });
+  }, [patients]);
+
+  return (
+    <>
+      {fhirPatients.map((patient) => (
+        <div key={patient.id} className={styles.patientChart}>
+          <div className={styles.container}>
+            <ExtensionSlot
+              extensionSlotName="patient-header-slot"
+              state={{
+                patient,
+                patientUuid: patient.id,
+                onClick: onClickSearchResult,
+              }}
+            />
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return <>{patients.map((patient) => renderPatient(patient))}</>;
+      ))}
+    </>
+  );
 };
 
 interface PatientSearchResultsProps {

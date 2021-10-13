@@ -8,7 +8,7 @@ export interface PatientList {
   display: string;
   description: string;
   type: PatientListType;
-  memberCount: number;
+  size: number;
   isStarred: boolean;
   options?: Array<PatientListOption>;
 }
@@ -54,6 +54,7 @@ export interface OpenmrsCohort {
   voided: boolean;
   isStarred?: boolean;
   type?: string;
+  size: number;
 }
 
 export interface OpenmrsCohortRef {
