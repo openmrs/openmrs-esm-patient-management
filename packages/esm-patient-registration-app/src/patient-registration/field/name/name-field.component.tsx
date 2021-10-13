@@ -33,18 +33,16 @@ export const NameField = () => {
   const fieldConfigs = useFieldConfig('name');
 
   return (
-    <div className={desktop && styles.grid}>
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
-        <div>
-          {!desktop && (
-            <div style={{ margin: '1rem 0' }}>
-              <ExtensionSlot
-                extensionSlotName="capture-patient-photo-slot"
-                state={{ onCapturePhoto, initialState: currentPhoto }}
-              />
-            </div>
-          )}
+    <div>
+      <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
+      <div className={styles.grid}>
+        <ExtensionSlot
+          className={styles.photoExtension}
+          extensionSlotName="capture-patient-photo-slot"
+          state={{ onCapturePhoto, initialState: currentPhoto }}
+        />
+
+        <div className={styles.nameField}>
           <Input
             id="givenName"
             name="givenName"
@@ -70,14 +68,6 @@ export const NameField = () => {
           />
         </div>
       </div>
-      {desktop && (
-        <div className={styles.patientPhoto}>
-          <ExtensionSlot
-            extensionSlotName="capture-patient-photo-slot"
-            state={{ onCapturePhoto, initialState: currentPhoto }}
-          />
-        </div>
-      )}
     </div>
   );
 };
