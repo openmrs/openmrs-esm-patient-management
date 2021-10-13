@@ -121,3 +121,9 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
     ac,
   );
 }
+
+export function getPatientListDetails(patientListUuid: string) {
+  if (patientListUuid) {
+    return openmrsFetch<OpenmrsCohort>(`${cohortUrl}/cohort/${patientListUuid}`);
+  }
+}
