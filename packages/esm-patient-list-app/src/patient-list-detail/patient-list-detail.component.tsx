@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
@@ -6,7 +6,7 @@ import { usePatientListDetails, usePatientListMembers } from '../api';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem, SkeletonText } from 'carbon-components-react';
+import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
 import dayjs from 'dayjs';
 
@@ -102,19 +102,19 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     <main className="omrs-main-content">
       <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
       <div className={styles.cohortHeader}>
-        {patientListDetails ? (
-          <div>
-            <h1 className={styles.productiveHeading03}>{patientListDetails?.name}</h1>
-            <h4 className={`${styles.bodyShort02} ${styles.marginTop}`}>{patientListDetails?.description}</h4>
-            <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
-              {patientListDetails?.size} {t('patients', 'patients')} &middot;{' '}
-              <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
-              {formatDate(patientListDetails?.startDate ?? '')}
-            </div>
-          </div>
-        ) : (
-          <SkeletonText heading />
-        )}
+        <div>
+          {patientListDetails && (
+            <>
+              <h1 className={styles.productiveHeading03}>{patientListDetails?.name}</h1>
+              <h4 className={`${styles.bodyShort02} ${styles.marginTop}`}>{patientListDetails?.description}</h4>
+              <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
+                {patientListDetails?.size} {t('patients', 'patients')} &middot;{' '}
+                <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
+                {formatDate(patientListDetails?.startDate ?? '')}
+              </div>
+            </>
+          )}
+        </div>
         <CustomOverflowMenuComponent
           menuTitle={
             <>
