@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-registration-app",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Patient registration microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-registration-app.js",
   "main": "src/index.ts",
@@ -49,7 +49,5 @@
     "react-i18next": "11.x",
     "react-router-dom": "5.x",
     "rxjs": "6.x"
-  },
-  "devDependencies": {
   }
 }
