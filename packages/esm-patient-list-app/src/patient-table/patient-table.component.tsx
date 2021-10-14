@@ -71,14 +71,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
 
   if (isLoading) {
-    return (
-      <DataTableSkeleton
-        style={{ backgroundColor: 'transparent', padding: '0rem' }}
-        rowCount={5}
-        columnCount={5}
-        zebra
-      />
-    );
+    return <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />;
   }
 
   return (

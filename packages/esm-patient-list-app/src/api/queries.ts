@@ -8,10 +8,8 @@ import {
 } from './api';
 import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
 import { fetchCurrentPatient, openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
-import { OpenmrsCohort, OpenmrsCohortMember } from '.';
-import useSWR, { KeyedMutator } from 'swr';
-
-const cohortUrl = '/ws/rest/v1/cohortm';
+import { OpenmrsCohort, OpenmrsCohortMember, CohortResponse, cohortUrl } from '.';
+import useSWR from 'swr';
 
 /**
  * A hook for querying all local and remote patient lists belonging to a given user,
@@ -118,23 +116,9 @@ export function useRemovePatientsFromOfflinePatientListMutation() {
   });
 }
 
-export function usePatientListDetails(patientListUuid: string): [OpenmrsCohort, KeyedMutator<{ data: OpenmrsCohort }>] {
-  if (patientListUuid) {
-    const {
-      data: cohortDetails,
-      error,
-      mutate,
-    } = useSWR<{ data: OpenmrsCohort }, Error>(`${cohortUrl}/cohort/${patientListUuid}`, openmrsFetch);
-    if (error) {
-      throw error;
-    }
-    return [cohortDetails?.data, mutate];
-  }
-}
-
-interface CohortResponse<T = any> {
-  results: T[];
-  error;
+export function usePatientListDetails(patientListUuid: string) {
+  const swrResult = useSWR<FetchResponse<OpenmrsCohort>, Error>(`${cohortUrl}/cohort/${patientListUuid}`, openmrsFetch);
+  return { ...swrResult, data: swrResult?.data?.data };
 }
 
 export function usePatientListMembers(
@@ -142,15 +126,10 @@ export function usePatientListMembers(
   startIndex: number = 0,
   pageSize: number = 10,
   v: string = 'full',
-): OpenmrsCohortMember[] {
-  if (patientListUuid) {
-    const { data, error, mutate } = useSWR<{ data: CohortResponse<OpenmrsCohortMember> }, Error>(
-      `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}`,
-      openmrsFetch,
-    );
-    if (error) {
-      throw error;
-    }
-    return data?.data?.results;
-  }
+) {
+  const swrResult = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
+    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}`,
+    openmrsFetch,
+  );
+  return { ...swrResult, data: swrResult?.data?.data?.results };
 }

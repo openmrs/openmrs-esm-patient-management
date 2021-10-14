@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, useCurrentPatient } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
 import { usePatientListDetails, usePatientListMembers } from '../api';
@@ -21,6 +21,11 @@ function formatDate(date: string): string {
   return dayjs(date).format('DD / MMM / YYYY');
 }
 
+function getPatientListUuidFromUrl(): string {
+  const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
+  return match && match[1];
+}
+
 interface PatientListMemberRow {
   name: string;
   identifier: string;
@@ -34,11 +39,11 @@ interface PatientListDetailProps {
 }
 
 const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetailProps>> = ({ match }) => {
-  const { patientListUuid } = match.params;
-  const [patientListDetails] = usePatientListDetails(patientListUuid);
+  const patientListUuid = getPatientListUuidFromUrl();
+  const { data: patientListDetails } = usePatientListDetails(patientListUuid);
   const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);
-  const patientListMembers = usePatientListMembers(
+  const { data: patientListMembers } = usePatientListMembers(
     patientListUuid,
     (currentPage - 1) * currentPageSize,
     currentPageSize,
@@ -138,12 +143,8 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             usePagination: true,
             currentPage,
             onChange: ({ page, pageSize }) => {
-              if (currentPage !== page) {
-                setPageCount(page);
-              }
-              if (currentPageSize !== pageSize) {
-                setCurrentPageSize(pageSize);
-              }
+              setPageCount(page);
+              setCurrentPageSize(pageSize);
             },
             pageSize: 10,
             totalItems: patientListDetails?.size,

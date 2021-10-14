@@ -11,7 +11,7 @@ import {
   PatientListType,
 } from './types';
 
-const cohortUrl = '/ws/rest/v1/cohortm';
+export const cohortUrl = '/ws/rest/v1/cohortm';
 
 async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {

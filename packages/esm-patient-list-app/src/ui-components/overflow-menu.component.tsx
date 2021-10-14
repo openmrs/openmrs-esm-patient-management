@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
@@ -28,16 +29,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   }, [wrapperRef]);
 
   return (
-    <div
-      data-overflow-menu
-      className="bx--overflow-menu"
-      style={{
-        width: 'auto',
-        height: 'auto',
-        marginBottom: '-1.5rem',
-        marginTop: '-1.25rem',
-      }}
-      ref={wrapperRef}>
+    <div data-overflow-menu className={`bx--overflow-menu ${styles.overflowMenu}`} ref={wrapperRef}>
       <button
         className={`bx--overflow-menu__trigger ${showMenu && 'bx--overflow-menu--open'}`}
         aria-haspopup="true"
@@ -64,13 +56,6 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         id="custom-actions-overflow-menu"
         style={{
           display: showMenu ? 'block' : 'none',
-          top: '3.125rem',
-          minWidth: 'initial',
-          left: 'auto',
-          right: '0',
-          backgroundColor: '#f4f4f4',
-          marginRight: '0.2rem',
-          boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
         }}>
         <ul className="bx--overflow-menu-options__content">{children}</ul>
         <span />

@@ -13,7 +13,7 @@
 }
 
 .marginTop {
-  margin-top: 0.5rem;
+  margin-top: $spacing-03;
 }
 
 .actionsButtonText {
@@ -22,5 +22,5 @@
 }
 
 .tableContainer {
-  padding: $spacing-05;
+  padding: 0 $spacing-05 $spacing-05;
 }
