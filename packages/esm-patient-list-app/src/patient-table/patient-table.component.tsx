@@ -1,6 +1,10 @@
 import React, { useMemo, CSSProperties } from 'react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import DataTable, {
+import {
+  DataTable,
+  DataTableSkeleton,
+  Pagination,
+  Search,
   Table,
   TableBody,
   TableCell,
@@ -8,10 +12,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import Search from 'carbon-components-react/es/components/Search';
+} from 'carbon-components-react';
 import debounce from 'lodash-es/debounce';
 import styles from './patient-table.scss';
 
@@ -127,7 +128,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           onChange={pagination.onChange}
           className={styles.paginationOverride}
           pagesUnknown={pagination?.pagesUnknown}
-          lastPage={pagination.lastPage}
+          isLastPage={pagination.lastPage}
         />
       )}
     </div>

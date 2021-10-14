@@ -1,6 +1,5 @@
 import React from 'react';
-import Select from 'carbon-components-react/es/components/Select';
-import SelectItem from 'carbon-components-react/es/components/SelectItem';
+import { Select, SelectItem } from 'carbon-components-react';
 import { useField } from 'formik';
 
 interface SelectInputProps {
@@ -17,7 +16,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label }
   ];
 
   return (
-    <div style={{ maxWidth: '360px' }}>
+    <div style={{ marginBottom: '1rem' }}>
       <Select id="identifier" {...field} labelText={label} light>
         {selectOptions}
       </Select>

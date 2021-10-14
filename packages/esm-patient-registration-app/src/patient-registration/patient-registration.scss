@@ -25,6 +25,7 @@
 }
 
 .infoGrid {
+  width: 100%;
   margin-bottom: 40vh;
   margin-top: 1rem;
 }
@@ -44,6 +45,11 @@
 
 .space05 {
   margin: $spacing-05 0 $spacing-05 0;
+}
+
+.formContainer {
+  display: flex;
+  width: 100%;
 }
 
 .stickyColumn {
@@ -79,6 +85,3 @@
   background-color: white;
 }
 
-.formContainer {
-  display: flex;
-}

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Tabs from 'carbon-components-react/es/components/Tabs';
-import Tab from 'carbon-components-react/es/components/Tab';
+import { Tab, Tabs } from 'carbon-components-react';
 import dayjs from 'dayjs';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';

@@ -1,17 +1,15 @@
 import React, { useCallback, useState, useEffect, useReducer, useMemo } from 'react';
 import Search20 from '@carbon/icons-react/es/search/20';
 import Close20 from '@carbon/icons-react/es/close/20';
-import { HeaderGlobalAction } from 'carbon-components-react/es/components/UIShell';
-import styles from './patient-search-icon.component.scss';
+import { Button, HeaderGlobalAction, Search } from 'carbon-components-react';
 import PatientSearch from '../patient-search/patient-search.component';
-import Search from 'carbon-components-react/es/components/Search';
 import { useTranslation } from 'react-i18next';
-import Button from 'carbon-components-react/es/components/Button';
 import debounce from 'lodash-es/debounce';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { performPatientSearch } from '../patient-search/patient-search.resource';
 import isEmpty from 'lodash-es/isEmpty';
 import { SearchedPatient } from '../types';
+import styles from './patient-search-icon.component.scss';
 
 interface PatientSearchLaunchProps {}
 
@@ -95,13 +93,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     }
   }, [searchTerm, status]);
 
-  const handleEnterKeyPressed = (event: KeyboardEvent) => event.key.toLowerCase() === 'enter' && performSearch();
-
-  const withButtonSize = useCallback(() => {
-    if (layout === 'desktop') {
-      return { size: 'small' };
-    }
-  }, [layout]);
+  const handleEnterKeyPressed = (event: React.KeyboardEvent<HTMLInputElement>) =>
+    event.key.toLowerCase() === 'enter' && performSearch();
 
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
 
@@ -138,9 +131,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             <Button
               disabled={status === 'searching'}
               onClick={performSearch}
-              style={{ background: '#393939' }}
-              {...withButtonSize()}
-              className={styles.searchButton}>
+              className={styles.searchButton}
+              size={layout === 'desktop' ? 'small' : 'default'}>
               {t('search', 'Search')}
             </Button>
           </div>

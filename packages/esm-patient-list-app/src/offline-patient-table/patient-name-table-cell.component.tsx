@@ -1,6 +1,5 @@
 import { navigate } from '@openmrs/esm-framework';
-import { TableCell } from 'carbon-components-react/es/components/DataTable';
-import Link from 'carbon-components-react/es/components/Link';
+import { Link, TableCell } from 'carbon-components-react';
 import React from 'react';
 
 export interface PatientNameTableCellProps {

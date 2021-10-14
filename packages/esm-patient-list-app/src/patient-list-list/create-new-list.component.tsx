@@ -1,8 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import Button from 'carbon-components-react/es/components/Button';
-import MultiSelect from 'carbon-components-react/es/components/MultiSelect';
-import TextArea from 'carbon-components-react/es/components/TextArea';
-import TextInput from 'carbon-components-react/es/components/TextInput';
+import { Button, MultiSelect, TextArea, TextInput } from 'carbon-components-react';
 import Overlay from '../overlay.component';
 import { useTranslation } from 'react-i18next';
 import { createPatientList } from '../api';

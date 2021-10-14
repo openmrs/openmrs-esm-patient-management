@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
-import Button from 'carbon-components-react/es/components/Button';
-import Link from 'carbon-components-react/es/components/Link';
-import { Grid } from 'carbon-components-react/es/components/Grid';
+import { Button, Grid, Link } from 'carbon-components-react';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 import { useLocation } from 'react-router-dom';
@@ -204,26 +202,24 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 </Button>
               </div>
             </div>
-            <div>
-              <Grid className={styles.infoGrid}>
-                <PatientRegistrationContext.Provider
-                  value={{
-                    identifierTypes: patientIdentifiers,
-                    validationSchema,
-                    setValidationSchema,
-                    fieldConfigs,
-                    values: props.values,
-                    inEditMode,
-                    setFieldValue: props.setFieldValue,
-                    setCapturePhotoProps,
-                    currentPhoto: capturePhotoProps?.imageData,
-                  }}>
-                  {sections.map((section, index) => (
-                    <div key={index}>{getSection(section, index)}</div>
-                  ))}
-                </PatientRegistrationContext.Provider>
-              </Grid>
-            </div>
+            <Grid className={styles.infoGrid}>
+              <PatientRegistrationContext.Provider
+                value={{
+                  identifierTypes: patientIdentifiers,
+                  validationSchema,
+                  setValidationSchema,
+                  fieldConfigs,
+                  values: props.values,
+                  inEditMode,
+                  setFieldValue: props.setFieldValue,
+                  setCapturePhotoProps,
+                  currentPhoto: capturePhotoProps?.imageData,
+                }}>
+                {sections.map((section, index) => (
+                  <div key={index}>{getSection(section, index)}</div>
+                ))}
+              </PatientRegistrationContext.Provider>
+            </Grid>
           </div>
         </Form>
       )}

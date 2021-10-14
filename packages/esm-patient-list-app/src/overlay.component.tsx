@@ -1,7 +1,6 @@
 import React from 'react';
 import ArrowLeft16 from '@carbon/icons-react/es/arrow--left/16';
-import Button from 'carbon-components-react/es/components/Button';
-import Header from 'carbon-components-react/es/components/UIShell/Header';
+import { Button, Header } from 'carbon-components-react';
 
 const Overlay: React.FC<{ close: () => void; header: string }> = ({ close, children, header }) => {
   return (

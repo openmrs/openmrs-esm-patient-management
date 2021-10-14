@@ -2,11 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
 import { addPatientToLocalOrRemotePatientList, useGetAllPatientListsWithoutPatientQuery } from '../api';
-import Search from 'carbon-components-react/es/components/Search';
-import Button from 'carbon-components-react/es/components/Button';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import Checkbox from 'carbon-components-react/es/components/Checkbox';
-import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
+import { Button, Checkbox, Pagination, Search, SkeletonText } from 'carbon-components-react';
 import styles from './add-patient.scss';
 
 interface AddPatientProps {

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import TextInput from 'carbon-components-react/es/components/TextInput';
+import { TextInput } from 'carbon-components-react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
@@ -41,7 +41,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   }, [checkWarning, invalidText, value, t]);
 
   return (
-    <div style={{ marginBottom: '1rem', maxWidth: '360px' }}>
+    <div style={{ marginBottom: '1rem' }}>
       <TextInput
         {...props}
         {...field}
