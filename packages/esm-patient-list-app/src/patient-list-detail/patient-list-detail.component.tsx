@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ExtensionSlot, useCurrentPatient } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
 import { usePatientListDetails, usePatientListMembers } from '../api';
@@ -56,9 +56,9 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
       patientListMembers
         ? patientListMembers?.map((member) => ({
             name: member?.patient?.person?.display,
-            identifier: member?.patient?.identifiers[0].identifier ?? null,
+            identifier: member?.patient?.identifiers[0]?.identifier ?? null,
             sex: member?.patient?.person?.gender,
-            startDate: formatDate(member?.patient?.startDate),
+            startDate: formatDate(member?.startDate),
             uuid: member?.patient?.uuid,
           }))
         : [],
@@ -140,7 +140,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             placeHolder: 'Search',
           }}
           pagination={{
-            usePagination: true,
+            usePagination: patientListDetails?.size > currentPageSize,
             currentPage,
             onChange: ({ page, pageSize }) => {
               setPageCount(page);
@@ -149,7 +149,8 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             pageSize: 10,
             totalItems: patientListDetails?.size,
             pagesUnknown: true,
-            lastPage: searchResults?.length < currentPageSize,
+            lastPage:
+              searchResults?.length < currentPageSize || currentPage * currentPageSize === patientListDetails?.size,
           }}
         />
       </div>
