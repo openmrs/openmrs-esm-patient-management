@@ -1,0 +1,26 @@
+@import '../style.scss';
+
+.flex {
+  display: flex;
+}
+
+.cohortHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border: 1px solid $ui-03;
+  padding: $spacing-05 0 $spacing-05 $spacing-05;
+}
+
+.marginTop {
+  margin-top: $spacing-03;
+}
+
+.actionsButtonText {
+  @include carbon--type-style("body-short-01");
+  color: $interactive-01;
+}
+
+.tableContainer {
+  padding: 0 $spacing-05 $spacing-05;
+}

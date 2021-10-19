@@ -10,8 +10,28 @@
   @include carbon--type-style("productive-heading-03");
 }
 
+.productiveHeading04 {
+  @include carbon--type-style("productive-heading-04");
+}
+
 .bodyLong01 {
   @include carbon--type-style("body-long-01");
+}
+
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.text02 {
+  color: $text-02;
+}
+
+.label01 {
+  @include carbon--type-style("label-01")
 }
 
 .modal {

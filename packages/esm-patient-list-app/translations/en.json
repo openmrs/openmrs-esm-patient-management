@@ -1,12 +1,17 @@
 {
+  "actions": "Actions",
   "addPatientToList": "Add patient to list",
   "addToList": "Add to list",
   "age": "Age",
   "cancel": "Cancel",
   "configureList": "Configure your patient list using the fields below",
+  "createdOn": "Created on",
   "createNewPatientList": "Create new patient list",
+  "editNameDescription": "Edit Name/ Description",
   "gender": "Gender",
+  "identifier": "Identifier",
   "items": "items",
+  "name": "Name",
   "newList": "New List",
   "newPatientListDescriptionLabel": "Describe the purpose of this list in a few words",
   "newPatientListHeader": "New patient list",
@@ -37,10 +42,11 @@
   "patientListHeader": "Patient list",
   "patientLists": "Patient Lists",
   "patientListSearchResultHeader": "Search results",
-  "patientListTableTypeSystem": "system",
-  "patientListTableTypeUser": "user",
+  "patients": "patients",
   "phoneNumber": "Phone number",
   "save": "Save",
   "searchForAListToAddThisPatientTo": "Search for a list to add this patient to.",
-  "searchForList": "Search for a list"
+  "searchForList": "Search for a list",
+  "sex": "Sex",
+  "startDate": "Start Date"
 }
