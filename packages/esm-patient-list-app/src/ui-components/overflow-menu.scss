@@ -1,18 +1,15 @@
 @import '../style.scss';
 
 .overflowMenu {
-    width: auto;
-    height: auto;
-    margin-bottom: -$spacing-06;
-    margin-top: -$spacing-05;
+  width: auto;
+  height: auto;
+  margin-bottom: -$spacing-06;
+  margin-top: -$spacing-05;
 }
 
 .overflowMenuButton {
-  top: 3.125rem;
-  min-width: initial;
-  left: auto;
-  right: 0;
-  background-color: #f4f4f4;
-  margin-right: $spacing-02;
-  box-shadow: 0 6px 6px rgb(0 0 0 / 30%);
+  width: auto;
+  height: auto;
+  padding: $spacing-05;
+  color: $interactive-01;
 }
