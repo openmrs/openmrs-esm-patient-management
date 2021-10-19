@@ -123,12 +123,13 @@ export function usePatientListDetails(patientListUuid: string) {
 
 export function usePatientListMembers(
   patientListUuid: string,
+  searchQuery: string = '',
   startIndex: number = 0,
   pageSize: number = 10,
   v: string = 'full',
 ) {
   const swrResult = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
-    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}`,
+    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
     openmrsFetch,
   );
   return { ...swrResult, data: swrResult?.data?.data?.results };

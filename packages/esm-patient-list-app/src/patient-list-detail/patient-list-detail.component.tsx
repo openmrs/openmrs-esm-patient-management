@@ -40,28 +40,47 @@ interface PatientListDetailProps {
 
 const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetailProps>> = ({ match }) => {
   const patientListUuid = getPatientListUuidFromUrl();
-  const { data: patientListDetails } = usePatientListDetails(patientListUuid);
+  const { t } = useTranslation();
   const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);
+  const [searchString, setSearchString] = useState('');
+  const { data: patientListDetails } = usePatientListDetails(patientListUuid);
   const { data: patientListMembers } = usePatientListMembers(
     patientListUuid,
+    searchString,
     (currentPage - 1) * currentPageSize,
     currentPageSize,
   );
-  const { t } = useTranslation();
-  const [searchString, setSearchString] = useState('');
 
   const patients: PatientListMemberRow[] = useMemo(
     () =>
       patientListMembers
-        ? patientListMembers?.map((member) => ({
-            name: member?.patient?.person?.display,
-            identifier: member?.patient?.identifiers[0]?.identifier ?? null,
-            sex: member?.patient?.person?.gender,
-            startDate: formatDate(member?.startDate),
-            uuid: member?.patient?.uuid,
-          }))
-        : [],
+        ? patientListMembers?.length
+          ? patientListMembers?.map((member) => ({
+              name: member?.patient?.person?.display,
+              identifier: member?.patient?.identifiers[0]?.identifier ?? null,
+              sex: member?.patient?.person?.gender,
+              startDate: formatDate(member?.startDate),
+              uuid: member?.patient?.uuid,
+            }))
+          : [
+              {
+                name: 'No results found',
+                identifier: '',
+                sex: '',
+                startDate: '',
+                uuid: '',
+              },
+            ]
+        : [
+            {
+              name: 'Fetching...',
+              identifier: '',
+              sex: '',
+              startDate: '',
+              uuid: '',
+            },
+          ],
     [patientListMembers],
   );
 
@@ -71,7 +90,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
         key: 'name',
         header: t('name', 'Name'),
         link: {
-          getUrl: (patient) => `${window.spaBase}/patient/${patient?.uuid}`,
+          getUrl: (patient) => (patient?.uuid ? `${window.spaBase}/patient/${patient?.uuid}` : window?.location?.href),
         },
       },
       {
@@ -88,14 +107,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
       },
     ],
     [t],
-  );
-
-  const searchResults = useMemo(
-    () =>
-      patients.filter((patient) =>
-        Object.values(patient).some((value) => value?.toLowerCase().includes(searchString?.toLowerCase())),
-      ),
-    [patients, searchString],
   );
 
   const handleSearch = useCallback((str) => {
@@ -132,7 +143,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
       </div>
       <div className={styles.tableContainer}>
         <PatientListTable
-          patients={searchResults}
+          patients={patients}
           columns={headers}
           isLoading={!patientListMembers && !patients}
           search={{
@@ -149,8 +160,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             pageSize: 10,
             totalItems: patientListDetails?.size,
             pagesUnknown: true,
-            lastPage:
-              searchResults?.length < currentPageSize || currentPage * currentPageSize === patientListDetails?.size,
+            lastPage: patients?.length < currentPageSize || currentPage * currentPageSize === patientListDetails?.size,
           }}
         />
       </div>
