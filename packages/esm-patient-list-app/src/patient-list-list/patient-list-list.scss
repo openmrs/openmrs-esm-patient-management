@@ -70,10 +70,29 @@ title {
   padding: $spacing-05;
 }
 
+// Patient List Table
+
 .tableBody {
   background-color: $ui-01;
 }
 
 .tableCell, .interactiveText01 {
   color: $interactive-01;
+}
+
+// Search Overlay 
+
+.searchOverlay {
+  z-index: 1;
+  grid-row: 2 / 4;
+  grid-column: 1 / 2;
+  background-color: $ui-04;
+  opacity: 0.7;
+}
+
+.patientListResultsContainer {
+  z-index: 1;
+  grid-row: 2 / 4;
+  grid-column: 1 / 2;
+  background-color: $ui-01;
 }
