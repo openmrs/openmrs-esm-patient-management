@@ -1,3 +1,5 @@
+import { OpenmrsResource } from '@openmrs/esm-api';
+
 export enum PatientListType {
   SYSTEM,
   USER,
@@ -65,11 +67,10 @@ export interface OpenmrsCohortMember {
   attributes: Array<any>;
   description: string;
   endDate: string;
+  startDate: string;
   name: string;
   uuid: string;
-  patient: {
-    uuid: string;
-  };
+  patient: OpenmrsResource;
 }
 
 export interface CohortResponse<T> {

@@ -7,7 +7,9 @@ import {
   updateLocalOrRemotePatientList,
 } from './api';
 import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
-import { fetchCurrentPatient } from '@openmrs/esm-framework';
+import { fetchCurrentPatient, openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
+import { OpenmrsCohort, OpenmrsCohortMember, CohortResponse, cohortUrl } from '.';
+import useSWR from 'swr';
 
 /**
  * A hook for querying all local and remote patient lists belonging to a given user,
@@ -112,4 +114,23 @@ export function useRemovePatientsFromOfflinePatientListMutation() {
       await removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid);
     }
   });
+}
+
+export function usePatientListDetails(patientListUuid: string) {
+  const swrResult = useSWR<FetchResponse<OpenmrsCohort>, Error>(`${cohortUrl}/cohort/${patientListUuid}`, openmrsFetch);
+  return { ...swrResult, data: swrResult?.data?.data };
+}
+
+export function usePatientListMembers(
+  patientListUuid: string,
+  searchQuery: string = '',
+  startIndex: number = 0,
+  pageSize: number = 10,
+  v: string = 'full',
+) {
+  const swrResult = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
+    `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
+    openmrsFetch,
+  );
+  return { ...swrResult, data: swrResult?.data?.data?.results };
 }

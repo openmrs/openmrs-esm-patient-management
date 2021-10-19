@@ -19,7 +19,6 @@
 
 div.tableOverride  {
     background-color: $ui-01;
-    margin: -$carbon--spacing-05;
 }
 
 div.tableOverride > div {
@@ -38,10 +37,20 @@ div.tableOverride > div > div {
 .paginationOverride{
     background-color: $ui-background;
     border-bottom: solid 1px $ui-03 !important;
+    overflow-x: hidden;
 }
 
 .paginationOverride > div {
     background-color: $ui-background;
     border-bottom: 0px!important;
     border-top: 0px !important;
+}
+
+.link {
+    text-decoration: none;
+}
+
+.dataTableSkeleton {
+    background-color: transparent;
+    padding: 0rem;
 }

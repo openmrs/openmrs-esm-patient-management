@@ -1,9 +1,8 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { navigate } from '@openmrs/esm-framework';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
-  Link,
   Pagination,
   Search,
   Table,
@@ -34,6 +33,8 @@ interface PatientTableProps {
     onChange(props: any): any;
     pageSize: number;
     totalItems: number;
+    pagesUnknown?: boolean;
+    lastPage?: boolean;
   };
 }
 
@@ -56,13 +57,9 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
         columns.forEach((column) => {
           const value = column.getValue?.(patient) || patient[column.key];
           row[column.key] = column.link ? (
-            <Link
-              onClick={(e) => {
-                e.preventDefault();
-                navigate({ to: column.link.getUrl(patient) });
-              }}>
+            <ConfigurableLink className={styles.link} to={column.link.getUrl(patient)}>
               {value}
-            </Link>
+            </ConfigurableLink>
           ) : (
             value
           );
@@ -75,14 +72,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
 
   if (isLoading) {
-    return (
-      <DataTableSkeleton
-        style={{ backgroundColor: 'transparent', padding: '0rem', margin: '1rem' }}
-        rowCount={5}
-        columnCount={5}
-        zebra
-      />
-    );
+    return <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />;
   }
 
   return (
@@ -137,6 +127,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           totalItems={pagination.totalItems}
           onChange={pagination.onChange}
           className={styles.paginationOverride}
+          pagesUnknown={pagination?.pagesUnknown}
+          isLastPage={pagination.lastPage}
         />
       )}
     </div>
