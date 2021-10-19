@@ -1,10 +1,4 @@
-:global(.deactivate-tabs-content) {
-  display: none;
-}
-
-:global(.bx--data-table-container) {
-  padding: 1rem;
-}
+@import '../style.scss';
 
 title {
   width: 6.938rem;
@@ -19,13 +13,67 @@ title {
   letter-spacing: normal;
 }
 
-:global(.bx--skeleton):global(.bx--data-table-container) {
-  background-color: transparent;
-  padding: 0rem;
-  margin: 1rem;
-  overflow: hidden;
+.patientListListContainer {
+  display: grid;
+  height: 100vh;
+  box-sizing: border-box;
+  grid-template-rows: $spacing-09 auto 1fr;
+  align-content: baseline;
+}
 
-  tr {
-    height: 3rem;
-  }
+.breadcrumbsSlot {
+  grid-row: 1 / 2; 
+  grid-column: 1 / 2;
+}
+
+.searchContainer {
+  grid-row: 1 / 2;
+  grid-column: 1 / 2;
+  justify-self: end;
+}
+
+.search input {
+  background-color: $ui-02;
+  border-bottom-color: $ui-03;
+}
+
+.patientListList {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template: $spacing-06 auto / 1fr 1fr;
+  gap: $spacing-05;
+  padding: $spacing-05 $spacing-05 0rem $spacing-05;
+  background-color: $ui-02;
+}
+
+.newListButton {
+  width: fit-content; 
+  justify-self: end; 
+  align-self: center;
+}
+
+.tabs {
+  grid-column: 'span 2', 
+}
+
+.hiddenTabsContent, .tabs .hiddenTabsContent {
+  display: none;
+}
+
+.patientListTableContainer {
+  grid-row: 3 / 4; 
+  grid-column: 1 / 2; 
+  height: 100%;
+  padding: $spacing-05;
+}
+
+.tableBody {
+  background-color: $ui-01;
+}
+
+.tableCell, .interactiveText01 {
+  color: $interactive-01;
 }

@@ -15,7 +15,7 @@ import {
   PatientListType,
 } from '../api';
 import { SearchState, StateTypes, ViewState } from './types';
-import './patient-list-list.scss';
+import styles from './patient-list-list.scss';
 
 enum TabTypes {
   STARRED,
@@ -116,26 +116,18 @@ const PatientListList: React.FC = () => {
   }
 
   return (
-    <div
-      style={{
-        paddingTop: '48px',
-        display: 'grid',
-        height: '100vh',
-        boxSizing: 'border-box',
-        gridTemplateRows: '48px auto 1fr',
-        alignContent: 'baseline',
-      }}>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" style={{ gridRow: '1 / 2', gridColumn: '1 / 2' }} />
+    <main
+      className={`omrs-main-content ${styles.patientListListContainer}`}>
+      <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot}  />
       <div
+        className={styles.searchContainer}
         style={{
-          gridRow: '1 / 2',
-          gridColumn: '1 / 2',
-          justifySelf: 'end',
-          width: viewState.type === StateTypes.IDLE ? '30%' : '100%',
-        }}>
+          width: viewState.type === StateTypes.IDLE ? '30%' : '100%'
+        }}
+        >
         <Search
-          style={{ backgroundColor: 'white', borderBottomColor: '#e0e0e0' }}
-          labelText="search me"
+          className={styles.search}
+          labelText="Search"
           size="xl"
           onFocus={() => {
             if (viewState.type === StateTypes.IDLE) {
@@ -162,7 +154,7 @@ const PatientListList: React.FC = () => {
           }}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              setViewState(({ searchTerm }: SearchState) => ({
+              setViewState(({ searchTerm }) => ({
                 type: StateTypes.SEARCH_WITH_RESULTS,
                 searchTerm,
                 results: ['todo'],
@@ -174,28 +166,14 @@ const PatientListList: React.FC = () => {
           value={(viewState as SearchState)?.searchTerm || ''}
         />
       </div>
-      <div
-        style={{
-          gridRow: '2 / 3',
-          gridColumn: '1 / 2',
-          height: '100%',
-          width: '100%',
-          display: 'grid',
-          gridTemplate: '1.5rem auto / 1fr 1fr',
-          gap: '1rem',
-          padding: '1rem 1rem 0rem 1rem',
-          backgroundColor: 'white',
-        }}>
-        <p
-          style={{
-            height: '1.75rem',
-            fontSize: '1.25rem',
-            lineHeight: 1.4,
-          }}>
+      <div className={styles.patientListList}
+        >
+        <h2
+          className={styles.productiveHeading03}>
           {t('patientLists', 'Patient Lists')}
-        </p>
+        </h2>
         <Button
-          style={{ width: 'fit-content', justifySelf: 'end', alignSelf: 'center' }}
+          className={styles.newListButton}
           kind="ghost"
           renderIcon={Add16}
           iconDescription="Add"
@@ -203,16 +181,14 @@ const PatientListList: React.FC = () => {
           {t('newList', 'New List')}
         </Button>
         <Tabs
+          className={styles.tabs}
           type="container"
-          style={{
-            gridColumn: 'span 2',
-          }}
-          tabContentClassName="deactivate-tabs-content"
+          tabContentClassName={styles.hiddenTabsContent}
           onSelectionChange={setSelectedTab}>
           {createLabels()}
         </Tabs>
       </div>
-      <div style={{ gridRow: '3 / 4', gridColumn: '1 / 2', height: '100%' }}>
+      <div className={styles.patientListTableContainer}>
         <PatientListTable
           loading={patientListQuery.isFetching}
           headers={customHeaders}
@@ -233,7 +209,7 @@ const PatientListList: React.FC = () => {
           listUuid={routeState.listUuid}
         />
       )}
-    </div>
+    </main>
   );
 };
 
