@@ -6,6 +6,7 @@ import {
   Link,
   Pagination,
   Search,
+  SearchProps,
   Table,
   TableBody,
   TableCell,
@@ -27,7 +28,7 @@ interface PatientTableProps {
     onSearch(searchTerm: string): any;
     placeHolder: string;
     currentSearchTerm?: string;
-    otherSearchProps?: Record<string, any>;
+    otherSearchProps?: SearchProps;
   };
   pagination: {
     usePagination: boolean;
