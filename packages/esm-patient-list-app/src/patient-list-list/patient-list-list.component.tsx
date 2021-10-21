@@ -116,15 +116,13 @@ const PatientListList: React.FC = () => {
   }
 
   return (
-    <main
-      className={`omrs-main-content ${styles.patientListListContainer}`}>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot}  />
+    <main className={`omrs-main-content ${styles.patientListListContainer}`}>
+      <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
       <div
         className={styles.searchContainer}
         style={{
-          width: viewState.type === StateTypes.IDLE ? '30%' : '100%'
-        }}
-        >
+          width: viewState.type === StateTypes.IDLE ? '30%' : '100%',
+        }}>
         <Search
           className={styles.search}
           labelText="Search"
@@ -166,12 +164,8 @@ const PatientListList: React.FC = () => {
           value={(viewState as SearchState)?.searchTerm || ''}
         />
       </div>
-      <div className={styles.patientListList}
-        >
-        <h2
-          className={styles.productiveHeading03}>
-          {t('patientLists', 'Patient Lists')}
-        </h2>
+      <div className={styles.patientListList}>
+        <h2 className={styles.productiveHeading03}>{t('patientLists', 'Patient Lists')}</h2>
         <Button
           className={styles.newListButton}
           kind="ghost"

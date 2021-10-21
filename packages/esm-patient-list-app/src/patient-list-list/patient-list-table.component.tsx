@@ -64,7 +64,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
         getTableProps,
         getTableContainerProps,
       }: DataTableCustomRenderProps) => (
-        <TableContainer style={{ ...style, backgroundColor: 'transparent'}} {...getTableContainerProps()}>
+        <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
           <Table {...getTableProps()} isSortable useZebraStyles>
             <colgroup>
               <col span={1} style={{ width: '60%' }} />
@@ -100,7 +100,11 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                             key={cell.id}
                             style={{ cursor: 'pointer' }}
                             onClick={() => handleToggleStarred(row.id, !cell.value)}>
-                            {cell.value ? <StarFilled16 className={styles.interactiveText01} /> : <Star16 className={styles.interactiveText01} />}
+                            {cell.value ? (
+                              <StarFilled16 className={styles.interactiveText01} />
+                            ) : (
+                              <Star16 className={styles.interactiveText01} />
+                            )}
                           </TableCell>
                         );
 
