@@ -86,7 +86,9 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                       case 'display':
                         return (
                           <TableCell className={styles.tableCell} key={cell.id}>
-                            <ConfigurableLink to={`\${openmrsSpaBase}/patient-list/${patientLists[index].id}`}>
+                            <ConfigurableLink
+                              className={styles.link}
+                              to={`\${openmrsSpaBase}/patient-list/${patientLists[index].id}`}>
                               {cell.value}
                             </ConfigurableLink>
                           </TableCell>
