@@ -1,23 +1,18 @@
 import React from 'react';
 import ArrowLeft16 from '@carbon/icons-react/es/arrow--left/16';
 import { Button, Header } from 'carbon-components-react';
+import styles from './overlay.scss';
 
-const Overlay: React.FC<{ close: () => void; header: string }> = ({ close, children, header }) => {
+interface OverlayProps {
+  close: () => void;
+  header: string;
+}
+
+const Overlay: React.FC<OverlayProps> = ({ close, children, header }) => {
   return (
-    <div
-      style={{
-        height: '100vh',
-        width: '100vw',
-        position: 'absolute',
-        top: '0px',
-        left: '0px',
-        zIndex: 9001,
-        backgroundColor: '#ededed',
-        padding: '1rem 2rem',
-        marginTop: '48px',
-      }}>
+    <div className={styles.overlay}>
       <Header>
-        <Button style={{ backgroundColor: 'transparent', padding: '15px' }} onClick={close}>
+        <Button onClick={close} hasIconOnly>
           <ArrowLeft16 onClick={close} />
         </Button>
         <div>{header}</div>

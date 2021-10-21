@@ -1,0 +1,13 @@
+@import './style.scss';
+
+.overlay {
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 9001;
+  background-color: $ui-01;
+  padding: $spacing-05 $spacing-07;
+  margin-top: $spacing-09;
+}
