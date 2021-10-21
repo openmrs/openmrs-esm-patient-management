@@ -32,7 +32,6 @@ interface PatientListTableProps {
   loading?: boolean;
   headers?: Array<DataTableHeader<keyof PatientList>>;
   refetch(): void;
-  openPatientList: (uuid: string) => void;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
@@ -41,7 +40,6 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   loading = false,
   headers = defaultHeaders,
   refetch,
-  openPatientList,
 }) => {
   const { t } = useTranslation();
   const userId = useSessionUser()?.user.uuid;

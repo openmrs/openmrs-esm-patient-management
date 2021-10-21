@@ -13,9 +13,14 @@ title {
   letter-spacing: normal;
 }
 
+.patientListListPage {
+  display: flex;
+}
+
 .patientListListContainer {
   display: grid;
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
   box-sizing: border-box;
   grid-template-rows: $spacing-09 auto 1fr;
   align-content: baseline;
@@ -109,4 +114,21 @@ title {
 
 .patientListResultsTableContainer {
   margin: $spacing-03;
+}
+
+//Create new List
+
+.header {
+  @include carbon--type-style('productive-heading-02');
+  margin-bottom: $spacing-05;
+}
+
+.input {
+  margin-top: $spacing-07;
+}
+
+.buttonsGroup {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }

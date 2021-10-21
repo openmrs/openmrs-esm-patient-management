@@ -9,10 +9,9 @@ interface PatientListResultsProps {
   nameFilter?: string;
   style?: CSSProperties;
   enter: Object;
-  openPatientList: (uuid: string) => void;
 }
 
-const PatientListResults: React.FC<PatientListResultsProps> = ({ nameFilter, style, enter, openPatientList }) => {
+const PatientListResults: React.FC<PatientListResultsProps> = ({ nameFilter, style, enter }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<string>();
   const userId = useSessionUser()?.user.uuid;
@@ -28,12 +27,7 @@ const PatientListResults: React.FC<PatientListResultsProps> = ({ nameFilter, sty
       <h3 className={styles.productiveHeading03}>{t('patientListSearchResultHeader', 'Search results')}</h3>
       {data && <p className={styles.resultCount}>Found {data.length} lists</p>}
       <div className={styles.patientListResultsTableContainer}>
-        <PatientListTable
-          loading={isFetching}
-          patientLists={data}
-          refetch={refetch}
-          openPatientList={openPatientList}
-        />
+        <PatientListTable loading={isFetching} patientLists={data} refetch={refetch} />
       </div>
     </div>
   );
