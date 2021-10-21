@@ -90,7 +90,8 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
         key: 'name',
         header: t('name', 'Name'),
         link: {
-          getUrl: (patient) => (patient?.uuid ? `${window.spaBase}/patient/${patient?.uuid}` : window?.location?.href),
+          getUrl: (patient) =>
+            patient?.uuid ? `${window.spaBase}/patient/${patient?.uuid}/chart/` : window?.location?.href,
         },
       },
       {
