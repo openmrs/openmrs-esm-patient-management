@@ -56,7 +56,7 @@ title {
 }
 
 .tabs {
-  grid-column: 'span 2', 
+  grid-column: 'span 2';
 }
 
 .hiddenTabsContent, .tabs .hiddenTabsContent {
@@ -95,4 +95,18 @@ title {
   grid-row: 2 / 4;
   grid-column: 1 / 2;
   background-color: $ui-01;
+  padding: $spacing-05;
+}
+
+// Results Overlay
+
+.resultCount {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+  border-bottom: solid 1px #e0e0e0;
+  padding: $spacing-04 0;
+}
+
+.patientListResultsTableContainer {
+  margin: $spacing-03;
 }
