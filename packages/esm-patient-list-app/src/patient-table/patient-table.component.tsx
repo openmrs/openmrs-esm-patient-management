@@ -5,6 +5,7 @@ import {
   DataTableSkeleton,
   Pagination,
   Search,
+  SearchProps,
   Table,
   TableBody,
   TableCell,
@@ -26,6 +27,7 @@ interface PatientTableProps {
     onSearch(searchTerm: string): any;
     placeHolder: string;
     currentSearchTerm?: string;
+    otherSearchProps?: SearchProps;
   };
   pagination: {
     usePagination: boolean;
@@ -70,6 +72,7 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   );
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
+  const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
   if (isLoading) {
     return <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />;
@@ -84,9 +87,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           placeholder={search.placeHolder}
           onChange={(evnt) => handleSearch(evnt.target.value)}
           className={styles.searchOverrides}
-          value={search.currentSearchTerm}
+          defaultValue={search.currentSearchTerm}
           light
           size="sm"
+          {...otherSearchProps}
         />
       </div>
       <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>
