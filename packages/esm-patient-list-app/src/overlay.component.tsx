@@ -1,28 +1,37 @@
 import React from 'react';
-import ArrowLeft16 from '@carbon/icons-react/es/arrow--left/16';
+import { ArrowLeft16, Close16 } from '@carbon/icons-react';
 import { Button, Header } from 'carbon-components-react';
+import styles from './overlay.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
-const Overlay: React.FC<{ close: () => void; header: string }> = ({ close, children, header }) => {
+interface OverlayProps {
+  close: () => void;
+  header: string;
+  buttonsGroup?: React.ReactElement;
+}
+
+const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup }) => {
+  const isDesktop = useLayoutType() === 'desktop';
+
   return (
-    <div
-      style={{
-        height: '100vh',
-        width: '100vw',
-        position: 'absolute',
-        top: '0px',
-        left: '0px',
-        zIndex: 9001,
-        backgroundColor: '#ededed',
-        padding: '1rem 2rem',
-        marginTop: '48px',
-      }}>
-      <Header>
-        <Button style={{ backgroundColor: 'transparent', padding: '15px' }} onClick={close}>
-          <ArrowLeft16 onClick={close} />
-        </Button>
-        <div>{header}</div>
-      </Header>
-      {children}
+    <div className={isDesktop ? styles.desktopOverlay : styles.tabletOverlay}>
+      {isDesktop ? (
+        <div className={styles.desktopHeader}>
+          <div className={styles.headerContent}>{header}</div>
+          <Button className={styles.closeButton} onClick={close} kind="ghost" hasIconOnly>
+            <Close16 />
+          </Button>
+        </div>
+      ) : (
+        <Header className={styles.tabletOverlayHeader}>
+          <Button onClick={close} hasIconOnly>
+            <ArrowLeft16 onClick={close} />
+          </Button>
+          <div className={styles.headerContent}>{header}</div>
+        </Header>
+      )}
+      <div className={styles.overlayContent}>{children}</div>
+      <div className={styles.buttonsGroup}>{buttonsGroup}</div>
     </div>
   );
 };

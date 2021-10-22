@@ -3,7 +3,6 @@ import Add16 from '@carbon/icons-react/es/add/16';
 import { Button, DataTableHeader, Search, Tab, Tabs } from 'carbon-components-react';
 import PatientListTable from './patient-list-table.component';
 import CreateNewList from './create-new-list.component';
-import PatientListMembersOverlay from '../patient-list/patient-list-members-overlay.component';
 import SearchOverlay from './search-overlay.component';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
@@ -15,7 +14,7 @@ import {
   PatientListType,
 } from '../api';
 import { SearchState, StateTypes, ViewState } from './types';
-import './patient-list-list.scss';
+import styles from './patient-list-list.scss';
 
 enum TabTypes {
   STARRED,
@@ -67,7 +66,6 @@ function useAppropriateTableHeadersForSelectedTab(selectedTab: TabTypes) {
 
 enum RouteStateTypes {
   ALL_LISTS,
-  SINGLE_LIST,
   CREATE_NEW_LIST,
 }
 
@@ -79,12 +77,7 @@ interface CreateNewListState {
   type: RouteStateTypes.CREATE_NEW_LIST;
 }
 
-interface SingleListState {
-  type: RouteStateTypes.SINGLE_LIST;
-  listUuid: string;
-}
-
-type RouteState = AllListRouteState | CreateNewListState | SingleListState;
+type RouteState = AllListRouteState | CreateNewListState;
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
@@ -106,134 +99,95 @@ const PatientListList: React.FC = () => {
     [toggleStarredMutation, patientListQuery, userId],
   );
 
-  const handleOpenPatientList = useCallback((listUuid) => {
-    setRouteState({ type: RouteStateTypes.SINGLE_LIST, listUuid });
-  }, []);
-
   if (patientListQuery.error) {
     //TODO show toast with error
     return null;
   }
 
   return (
-    <div
-      style={{
-        paddingTop: '48px',
-        display: 'grid',
-        height: '100vh',
-        boxSizing: 'border-box',
-        gridTemplateRows: '48px auto 1fr',
-        alignContent: 'baseline',
-      }}>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" style={{ gridRow: '1 / 2', gridColumn: '1 / 2' }} />
-      <div
-        style={{
-          gridRow: '1 / 2',
-          gridColumn: '1 / 2',
-          justifySelf: 'end',
-          width: viewState.type === StateTypes.IDLE ? '30%' : '100%',
-        }}>
-        <Search
-          style={{ backgroundColor: 'white', borderBottomColor: '#e0e0e0' }}
-          labelText="search me"
-          size="xl"
-          onFocus={() => {
-            if (viewState.type === StateTypes.IDLE) {
-              setViewState({ type: StateTypes.SEARCH, searchTerm: '' });
-            }
-          }}
-          onBlur={() => {
-            if (
-              viewState.type === StateTypes.SEARCH ||
-              (viewState.type === StateTypes.SEARCH_WITH_RESULTS && viewState.searchTerm === '')
-            ) {
-              setViewState({ type: StateTypes.IDLE });
-            }
-          }}
-          onChange={({ target }) => {
-            if (target !== searchRef.current?.input) {
-              setTimeout(() => {
-                searchRef.current.input.blur();
-              }, 0);
-              setViewState({ type: StateTypes.IDLE });
-            } else {
-              setViewState((s) => ({ ...s, searchTerm: target.value }));
-            }
-          }}
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') {
-              setViewState(({ searchTerm }: SearchState) => ({
-                type: StateTypes.SEARCH_WITH_RESULTS,
-                searchTerm,
-                results: ['todo'],
-                enter: true,
-              }));
-            }
-          }}
-          ref={searchRef}
-          value={(viewState as SearchState)?.searchTerm || ''}
-        />
-      </div>
-      <div
-        style={{
-          gridRow: '2 / 3',
-          gridColumn: '1 / 2',
-          height: '100%',
-          width: '100%',
-          display: 'grid',
-          gridTemplate: '1.5rem auto / 1fr 1fr',
-          gap: '1rem',
-          padding: '1rem 1rem 0rem 1rem',
-          backgroundColor: 'white',
-        }}>
-        <p
+    <main className={`omrs-main-content ${styles.patientListListPage}`}>
+      <section className={styles.patientListListContainer}>
+        <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
+        <div
+          className={styles.searchContainer}
           style={{
-            height: '1.75rem',
-            fontSize: '1.25rem',
-            lineHeight: 1.4,
+            width: viewState.type === StateTypes.IDLE ? '30%' : '100%',
           }}>
-          {t('patientLists', 'Patient Lists')}
-        </p>
-        <Button
-          style={{ width: 'fit-content', justifySelf: 'end', alignSelf: 'center' }}
-          kind="ghost"
-          renderIcon={Add16}
-          iconDescription="Add"
-          onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
-          {t('newList', 'New List')}
-        </Button>
-        <Tabs
-          type="container"
-          style={{
-            gridColumn: 'span 2',
-          }}
-          tabContentClassName="deactivate-tabs-content"
-          onSelectionChange={setSelectedTab}>
-          {createLabels()}
-        </Tabs>
-      </div>
-      <div style={{ gridRow: '3 / 4', gridColumn: '1 / 2', height: '100%' }}>
-        <PatientListTable
-          loading={patientListQuery.isFetching}
-          headers={customHeaders}
-          patientLists={patientListQuery.data}
-          refetch={patientListQuery.refetch}
-          openPatientList={handleOpenPatientList}
-        />
-      </div>
-      <SearchOverlay viewState={viewState} openPatientList={handleOpenPatientList} setListStarred={handleListStarred} />
-      {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
-        <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
-      )}
-      {routeState.type === RouteStateTypes.SINGLE_LIST && (
-        <PatientListMembersOverlay
-          close={() => {
-            setRouteState({ type: RouteStateTypes.ALL_LISTS });
-          }}
-          listUuid={routeState.listUuid}
-        />
-      )}
-    </div>
+          <Search
+            className={styles.search}
+            labelText="Search"
+            size="xl"
+            onFocus={() => {
+              if (viewState.type === StateTypes.IDLE) {
+                setViewState({ type: StateTypes.SEARCH, searchTerm: '' });
+              }
+            }}
+            onBlur={() => {
+              if (
+                viewState.type === StateTypes.SEARCH ||
+                (viewState.type === StateTypes.SEARCH_WITH_RESULTS && viewState.searchTerm === '')
+              ) {
+                setViewState({ type: StateTypes.IDLE });
+              }
+            }}
+            onChange={({ target }) => {
+              if (target !== searchRef.current?.input) {
+                setTimeout(() => {
+                  searchRef.current.input.blur();
+                }, 0);
+                setViewState({ type: StateTypes.IDLE });
+              } else {
+                setViewState((s) => ({ ...s, searchTerm: target.value }));
+              }
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                setViewState(({ searchTerm }) => ({
+                  type: StateTypes.SEARCH_WITH_RESULTS,
+                  searchTerm,
+                  results: ['todo'],
+                  enter: true,
+                }));
+              }
+            }}
+            ref={searchRef}
+            value={(viewState as SearchState)?.searchTerm || ''}
+          />
+        </div>
+        <div className={styles.patientListList}>
+          <h2 className={styles.productiveHeading03}>{t('patientLists', 'Patient Lists')}</h2>
+          <Button
+            className={styles.newListButton}
+            kind="ghost"
+            renderIcon={Add16}
+            iconDescription="Add"
+            onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
+            {t('newList', 'New List')}
+          </Button>
+          <Tabs
+            className={styles.tabs}
+            type="container"
+            tabContentClassName={styles.hiddenTabsContent}
+            onSelectionChange={setSelectedTab}>
+            {createLabels()}
+          </Tabs>
+        </div>
+        <div className={styles.patientListTableContainer}>
+          <PatientListTable
+            loading={patientListQuery.isFetching}
+            headers={customHeaders}
+            patientLists={patientListQuery.data}
+            refetch={patientListQuery.refetch}
+          />
+        </div>
+        <SearchOverlay viewState={viewState} setListStarred={handleListStarred} />
+      </section>
+      <section>
+        {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
+          <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
+        )}
+      </section>
+    </main>
   );
 };
 

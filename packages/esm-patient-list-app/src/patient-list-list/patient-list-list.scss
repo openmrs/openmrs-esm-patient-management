@@ -1,10 +1,4 @@
-:global(.deactivate-tabs-content) {
-  display: none;
-}
-
-:global(.bx--data-table-container) {
-  padding: 1rem;
-}
+@import '../style.scss';
 
 title {
   width: 6.938rem;
@@ -19,13 +13,126 @@ title {
   letter-spacing: normal;
 }
 
-:global(.bx--skeleton):global(.bx--data-table-container) {
-  background-color: transparent;
-  padding: 0rem;
-  margin: 1rem;
-  overflow: hidden;
+.link {
+  text-decoration: none;
+}
 
-  tr {
-    height: 3rem;
-  }
+.patientListListPage {
+  display: flex;
+}
+
+.patientListListContainer {
+  display: grid;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-rows: $spacing-09 auto 1fr;
+  align-content: baseline;
+}
+
+.breadcrumbsSlot {
+  grid-row: 1 / 2; 
+  grid-column: 1 / 2;
+}
+
+.searchContainer {
+  grid-row: 1 / 2;
+  grid-column: 1 / 2;
+  justify-self: end;
+}
+
+.search input {
+  background-color: $ui-02;
+  border-bottom-color: $ui-03;
+}
+
+.patientListList {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template: $spacing-06 auto / 1fr 1fr;
+  gap: $spacing-05;
+  padding: $spacing-05 $spacing-05 0rem $spacing-05;
+  background-color: $ui-02;
+}
+
+.newListButton {
+  width: fit-content; 
+  justify-self: end; 
+  align-self: center;
+}
+
+.tabs {
+  grid-column: 'span 2';
+}
+
+.hiddenTabsContent, .tabs .hiddenTabsContent {
+  display: none;
+}
+
+.patientListTableContainer {
+  grid-row: 3 / 4; 
+  grid-column: 1 / 2; 
+  height: 100%;
+  padding: $spacing-05;
+}
+
+// Patient List Table
+
+.tableBody {
+  background-color: $ui-01;
+}
+
+.tableCell, .interactiveText01 {
+  color: $interactive-01;
+}
+
+// Search Overlay 
+
+.searchOverlay {
+  z-index: 1;
+  grid-row: 2 / 4;
+  grid-column: 1 / 2;
+  background-color: $ui-04;
+  opacity: 0.7;
+}
+
+.patientListResultsContainer {
+  z-index: 1;
+  grid-row: 2 / 4;
+  grid-column: 1 / 2;
+  background-color: $ui-01;
+  padding: $spacing-05;
+}
+
+// Results Overlay
+
+.resultCount {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+  border-bottom: solid 1px #e0e0e0;
+  padding: $spacing-04 0;
+}
+
+.patientListResultsTableContainer {
+  margin: $spacing-03;
+}
+
+//Create new List
+
+.header {
+  @include carbon--type-style('productive-heading-02');
+  margin-bottom: $spacing-05;
+}
+
+.input {
+  margin-top: $spacing-07;
+}
+
+.buttonsGroup {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }

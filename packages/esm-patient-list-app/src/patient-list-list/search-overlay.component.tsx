@@ -1,34 +1,22 @@
 import React from 'react';
 import PatientListResults from './patient-list-results.component';
 import { ViewState, StateTypes } from './types';
+import styles from './patient-list-list.scss';
 
 interface SearchOverlayProps {
   viewState: ViewState;
   setListStarred: (listUuid: string, star: boolean) => void;
-  openPatientList: (uuid: string) => void;
 }
 
-const SearchOverlay: React.FC<SearchOverlayProps> = ({ viewState, setListStarred, openPatientList }) => {
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ viewState, setListStarred }) => {
   switch (viewState.type) {
     case StateTypes.SEARCH:
-      return (
-        <div
-          style={{
-            zIndex: 1,
-            gridRow: '2 / 4',
-            gridColumn: '1 / 2',
-            backgroundColor: 'grey',
-            opacity: 0.7,
-          }}></div>
-      );
+      return <div className={styles.searchOverlay}></div>;
     case StateTypes.SEARCH_WITH_RESULTS:
       return (
-        <PatientListResults
-          style={{ zIndex: 1, gridRow: '2 / 4', gridColumn: '1 / 2', backgroundColor: '#ededed' }}
-          nameFilter={viewState.searchTerm}
-          enter={viewState.enter}
-          openPatientList={openPatientList}
-        />
+        <div className={styles.patientListResultsContainer}>
+          <PatientListResults nameFilter={viewState.searchTerm} enter={viewState.enter} />
+        </div>
       );
     case StateTypes.IDLE:
     default:

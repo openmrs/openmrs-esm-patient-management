@@ -19,4 +19,9 @@ export interface SearchStateWithResults extends Omit<SearchState, 'type'> {
   enter: Object;
 }
 
-export type ViewState = IdleState | SearchState | SearchStateWithResults;
+export type ViewState = {
+  type: StateTypes;
+  searchTerm?: string;
+  results?: Array<any>;
+  enter?: Object;
+}

@@ -15,8 +15,9 @@ import {
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { useTranslation } from 'react-i18next';
-import { useToggleStarredMutation, PatientList, PatientListType } from '../api';
+import { useToggleStarredMutation, PatientList } from '../api';
 import { useSessionUser, ConfigurableLink } from '@openmrs/esm-framework';
+import styles from './patient-list-list.scss';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -31,7 +32,6 @@ interface PatientListTableProps {
   loading?: boolean;
   headers?: Array<DataTableHeader<keyof PatientList>>;
   refetch(): void;
-  openPatientList: (uuid: string) => void;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
@@ -40,7 +40,6 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   loading = false,
   headers = defaultHeaders,
   refetch,
-  openPatientList,
 }) => {
   const { t } = useTranslation();
   const userId = useSessionUser()?.user.uuid;
@@ -79,15 +78,17 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody style={{ backgroundColor: '#f4f4f4' }}>
+            <TableBody className={styles.tableBody}>
               {rows.map((row, index) => (
                 <TableRow style={{ height: '3rem' }} key={row.id} {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     switch (cell.info.header) {
                       case 'display':
                         return (
-                          <TableCell style={{ color: '#0f62fe' }} key={cell.id}>
-                            <ConfigurableLink to={`\${openmrsSpaBase}/patient-list/${patientLists[index].id}`}>
+                          <TableCell className={styles.tableCell} key={cell.id}>
+                            <ConfigurableLink
+                              className={styles.link}
+                              to={`\${openmrsSpaBase}/patient-list/${patientLists[index].id}`}>
                               {cell.value}
                             </ConfigurableLink>
                           </TableCell>
@@ -99,7 +100,11 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                             key={cell.id}
                             style={{ cursor: 'pointer' }}
                             onClick={() => handleToggleStarred(row.id, !cell.value)}>
-                            {cell.value ? <StarFilled16 color="#0f62fe" /> : <Star16 color="#0f62fe" />}
+                            {cell.value ? (
+                              <StarFilled16 className={styles.interactiveText01} />
+                            ) : (
+                              <Star16 className={styles.interactiveText01} />
+                            )}
                           </TableCell>
                         );
 
