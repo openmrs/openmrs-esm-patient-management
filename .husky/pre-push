@@ -3,8 +3,6 @@
 
 set -e  # die on error
 
-npx pretty-quick --staged
-npx lerna run lint
-npx lerna run test
-npx lerna run typescript
-yarn run extract-translations
+npx lerna run lint --since main
+npx lerna run typescript --since main
+npx lerna run test --since main
