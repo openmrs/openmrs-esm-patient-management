@@ -16,7 +16,7 @@ import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { useTranslation } from 'react-i18next';
 import { useToggleStarredMutation, PatientList } from '../api';
-import { useSessionUser, ConfigurableLink } from '@openmrs/esm-framework';
+import { useSessionUser, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
@@ -44,6 +44,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   const { t } = useTranslation();
   const userId = useSessionUser()?.user.uuid;
   const toggleStarredMutation = useToggleStarredMutation();
+  const isDesktop = useLayoutType() === 'desktop';
 
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
@@ -72,7 +73,11 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
-                  <TableHeader key={header.key} {...getHeaderProps({ header })} isSortable>
+                  <TableHeader
+                    className={isDesktop ? styles.desktopHeader : styles.tabletHeader}
+                    key={header.key}
+                    {...getHeaderProps({ header })}
+                    isSortable>
                     {header.header}
                   </TableHeader>
                 ))}
@@ -80,7 +85,10 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
             </TableHead>
             <TableBody className={styles.tableBody}>
               {rows.map((row, index) => (
-                <TableRow style={{ height: '3rem' }} key={row.id} {...getRowProps({ row })}>
+                <TableRow
+                  className={isDesktop ? styles.desktopRow : styles.tabletRow}
+                  key={row.id}
+                  {...getRowProps({ row })}>
                   {row.cells.map((cell) => {
                     switch (cell.info.header) {
                       case 'display':

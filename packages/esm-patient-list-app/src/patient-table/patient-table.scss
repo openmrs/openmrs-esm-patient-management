@@ -2,19 +2,16 @@
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 @import "~@openmrs/esm-styleguide/src/vars";
 
+.searchContainer {
+    display: flex; 
+    flex-direction: row-reverse; 
+    margin-top: $spacing-05;
+}
+
 .searchOverrides {
     width: 100%;
     max-width: 250px;
-    padding-top: $carbon--spacing-05;
     border: 0px !important;
-}
-
-.searchOverrides > div:first-child {
-    top: $carbon--spacing-07;
-}
-
-.searchOverrides > button {
-    top: $carbon--spacing-04;
 }
 
 div.tableOverride  {
@@ -32,6 +29,14 @@ div#table-tool-bar {
 
 div.tableOverride > div > div {
     border: solid 1px $ui-03;
+}
+
+.desktopRow, .desktopHeader {
+    height: $spacing-07 !important;
+}
+
+.tabletRow, .tabletHeader {
+    height: $spacing-09 !important;
 }
 
 .paginationOverride{

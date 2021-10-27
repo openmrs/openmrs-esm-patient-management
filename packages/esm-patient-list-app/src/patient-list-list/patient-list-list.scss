@@ -89,6 +89,14 @@ title {
   color: $interactive-01;
 }
 
+.desktopRow, .desktopHeader {
+    height: $spacing-07 !important;
+}
+
+.tabletRow, .tabletHeader {
+    height: $spacing-09 !important;
+}
+
 // Search Overlay 
 
 .searchOverlay {

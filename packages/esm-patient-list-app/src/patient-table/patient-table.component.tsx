@@ -1,5 +1,5 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -50,6 +50,7 @@ interface PatientTableColumn {
 }
 
 const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, pagination, isLoading, autoFocus }) => {
+  const isDesktop = useLayoutType() === 'desktop';
   const rows: Array<any> = useMemo(
     () =>
       patients.map((patient, index) => {
@@ -80,21 +81,21 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
 
   return (
     <div className={styles.tableOverride}>
-      <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+      <div id="table-tool-bar" className={styles.searchContainer}>
         <Search
           id="patient-list-search"
-          labelText=""
           placeholder={search.placeHolder}
-          onChange={(evnt) => handleSearch(evnt.target.value)}
+          labelText=""
+          size={isDesktop ? 'sm' : 'xl'}
           className={styles.searchOverrides}
-          defaultValue={search.currentSearchTerm}
           light
-          size="sm"
+          onChange={(evnt) => handleSearch(evnt.target.value)}
+          defaultValue={search.currentSearchTerm}
           {...otherSearchProps}
         />
       </div>
-      <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
               <TableHead>
@@ -104,7 +105,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
-                      })}>
+                      })}
+                      className={isDesktop ? styles.desktopHeader : styles.tabletHeader}>
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
@@ -112,7 +114,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    {...getRowProps({ row })}
+                    className={isDesktop ? styles.desktopRow : styles.tabletRow}
+                    key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
