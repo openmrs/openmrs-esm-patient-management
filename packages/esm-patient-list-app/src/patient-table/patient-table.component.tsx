@@ -3,6 +3,7 @@ import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
   Pagination,
   Search,
   SearchProps,
@@ -23,6 +24,7 @@ interface PatientTableProps {
   style?: CSSProperties;
   autoFocus?: boolean;
   isLoading: boolean;
+  isFetching?: boolean;
   search: {
     onSearch(searchTerm: string): any;
     placeHolder: string;
@@ -49,7 +51,15 @@ interface PatientTableColumn {
   };
 }
 
-const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, pagination, isLoading, autoFocus }) => {
+const PatientTable: React.FC<PatientTableProps> = ({
+  patients,
+  columns,
+  search,
+  pagination,
+  isLoading,
+  autoFocus,
+  isFetching,
+}) => {
   const isDesktop = useLayoutType() === 'desktop';
   const rows: Array<any> = useMemo(
     () =>
@@ -82,17 +92,20 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
   return (
     <div className={styles.tableOverride}>
       <div id="table-tool-bar" className={styles.searchContainer}>
-        <Search
-          id="patient-list-search"
-          placeholder={search.placeHolder}
-          labelText=""
-          size={isDesktop ? 'sm' : 'xl'}
-          className={styles.searchOverrides}
-          light
-          onChange={(evnt) => handleSearch(evnt.target.value)}
-          defaultValue={search.currentSearchTerm}
-          {...otherSearchProps}
-        />
+        <div>{isFetching && <InlineLoading />}</div>
+        <div>
+          <Search
+            id="patient-list-search"
+            placeholder={search.placeHolder}
+            labelText=""
+            size={isDesktop ? 'sm' : 'xl'}
+            className={styles.searchOverrides}
+            light
+            onChange={(evnt) => handleSearch(evnt.target.value)}
+            defaultValue={search.currentSearchTerm}
+            {...otherSearchProps}
+          />
+        </div>
       </div>
       <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
@@ -138,6 +151,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           className={styles.paginationOverride}
           pagesUnknown={pagination?.pagesUnknown}
           isLastPage={pagination.lastPage}
+          backwardText=""
+          forwardText=""
         />
       )}
     </div>

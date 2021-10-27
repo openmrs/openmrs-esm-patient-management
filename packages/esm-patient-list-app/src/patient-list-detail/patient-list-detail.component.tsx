@@ -61,26 +61,10 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
               identifier: member?.patient?.identifiers[0]?.identifier ?? null,
               sex: member?.patient?.person?.gender,
               startDate: formatDate(member?.startDate),
-              uuid: member?.patient?.uuid,
+              uuid: `${member?.patient?.uuid}`,
             }))
-          : [
-              {
-                name: 'No results found',
-                identifier: '',
-                sex: '',
-                startDate: '',
-                uuid: '',
-              },
-            ]
-        : [
-            {
-              name: 'Fetching...',
-              identifier: '',
-              sex: '',
-              startDate: '',
-              uuid: '',
-            },
-          ],
+          : []
+        : [],
     [patientListMembers],
   );
 
@@ -147,6 +131,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
           patients={patients}
           columns={headers}
           isLoading={!patientListMembers && !patients}
+          isFetching={!patientListMembers}
           search={{
             onSearch: handleSearch,
             placeHolder: 'Search',

@@ -34,7 +34,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   const custom = 'custom:(uuid,name,description,display,size,attributes)';
   const query: Array<[string, string]> = [['v', custom]];
 
-  if (filter.name !== undefined) {
+  if (filter.name !== undefined && filter.name !== '') {
     query.push(['q', filter.name]);
   }
 
