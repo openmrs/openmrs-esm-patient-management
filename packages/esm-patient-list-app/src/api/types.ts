@@ -81,4 +81,5 @@ export interface CohortResponse<T> {
 export interface NewCohortData {
   name: string;
   description: string;
+  location?: string;
 }

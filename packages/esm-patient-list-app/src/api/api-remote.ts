@@ -1,4 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import {
   AddPatientData,
   CohortResponse,
@@ -17,6 +18,23 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
     method: 'POST',
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
+    body: JSON.stringify(data),
+  });
+  return response.data;
+}
+
+async function deleteData(url: string, data = {}, ac = new AbortController()) {
+  const response = await openmrsFetch(url, {
+    signal: ac.signal,
+    method: 'DELETE',
     mode: 'cors',
     cache: 'no-cache',
     credentials: 'same-origin',
@@ -110,13 +128,35 @@ export async function addPatientToList(data: AddPatientData, ac = new AbortContr
 
 export async function createPatientList(cohort: NewCohortData, ac = new AbortController()) {
   return postData(
-    `${cohortUrl}/cohort`,
+    `${cohortUrl}/cohort/`,
     {
       ...cohort,
-      cohortType: '6df786bf-f15a-49c2-8d2b-1832d961c270',
-      location: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
-      startDate: '2020-01-01',
+      cohortType: 'bf065c46-ed56-425a-a5fe-9d078389164d',
+      startDate: dayjs().format(),
+      groupCohort: false,
+      definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
+    },
+    ac,
+  );
+}
+
+export async function editPatientList(cohortUuid: string, cohort: NewCohortData, ac = new AbortController()) {
+  return postData(
+    `${cohortUrl}/cohort/${cohortUuid}`,
+    {
+      ...cohort,
       groupCohort: true,
+      definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
+    },
+    ac,
+  );
+}
+
+export async function deletePatientList(cohortUuid: string, ac = new AbortController()) {
+  return deleteData(
+    `${cohortUrl}/cohort/${cohortUuid}`,
+    {
+      voidReason: '',
     },
     ac,
   );

@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { Button, DataTableHeader, Tab, Tabs } from 'carbon-components-react';
 import PatientListTable from './patient-list-table.component';
-import CreateNewList from './create-new-list.component';
+import CreateNewList from '../ui-components/create-edit-patient-list/create-new-list.component';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import {
@@ -98,6 +98,10 @@ const PatientListList: React.FC = () => {
 
   const handleSearch = (str) => setSearchString(str);
 
+  const handleCreateListSuccess = useCallback(() => {
+    patientListQuery.refetch();
+  }, [patientListQuery]);
+
   if (patientListQuery.error) {
     //TODO show toast with error
     return null;
@@ -142,7 +146,10 @@ const PatientListList: React.FC = () => {
       </section>
       <section>
         {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
-          <CreateNewList close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })} />
+          <CreateNewList
+            close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}
+            onSuccess={handleCreateListSuccess}
+          />
         )}
       </section>
     </main>
