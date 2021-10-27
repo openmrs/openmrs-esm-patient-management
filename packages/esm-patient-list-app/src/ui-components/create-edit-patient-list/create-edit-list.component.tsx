@@ -35,7 +35,7 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
       })
         .then(() =>
           showToast({
-            title: t('successCreatedPatientList', 'Created Patient List'),
+            title: t('successCreatedPatientList', 'Created patient list'),
             description: `${t('successCreatedPatientListDescription', 'Successfully created patient list')} : ${
               nameInputRef.current.value
             }`,
@@ -47,7 +47,7 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .catch(() =>
           showToast({
             title: t('error', 'Error'),
-            description: `${t('errorCreatedPatientListDescription', "Couldn't create patient list")} : ${
+            description: `${t('errorCreatePatientListDescription', "Couldn't create patient list")} : ${
               nameInputRef.current.value
             }`,
             kind: 'error',
@@ -61,8 +61,8 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
       })
         .then(() =>
           showToast({
-            title: t('successEditedPatientList', 'Editted Patient List'),
-            description: t('successEditPatientListDescription', 'Successfully editted patient list'),
+            title: t('successUpdatePatientList', 'Updated patient list'),
+            description: t('successUpdatePatientListDescription', 'Successfully updated patient list'),
             kind: 'success',
           }),
         )
@@ -71,7 +71,7 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .catch(() =>
           showToast({
             title: t('error', 'Error'),
-            description: `${t('errorCreatedPatientListDescription', "Couldn't edit patient list")} : ${
+            description: `${t('errorUpdatePatientListDescription', "Couldn't update patient list")} : ${
               nameInputRef.current.value
             }`,
             kind: 'error',

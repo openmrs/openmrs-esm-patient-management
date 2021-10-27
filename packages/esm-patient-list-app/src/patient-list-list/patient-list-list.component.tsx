@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { Button, DataTableHeader, Tab, Tabs } from 'carbon-components-react';
 import PatientListTable from './patient-list-table.component';
-import CreateNewList from '../ui-components/create-edit-patient-list/create-new-list.component';
+import CreateNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import {

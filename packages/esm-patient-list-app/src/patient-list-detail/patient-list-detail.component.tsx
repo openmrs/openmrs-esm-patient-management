@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
 import dayjs from 'dayjs';
-import CreateEditNewList from '../ui-components/create-edit-patient-list/create-new-list.component';
+import CreateEditNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 
 interface PatientRow {
   name: string;
@@ -109,7 +109,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
       .then(() =>
         showToast({
           title: t('deleted', 'Deleted'),
-          description: `${t('deletedPatientList', 'Deleted Patient List')}: ${patientListDetails?.name}`,
+          description: `${t('deletedPatientList', 'Deleted patient list')}: ${patientListDetails?.name}`,
           kind: 'success',
         }),
       )
