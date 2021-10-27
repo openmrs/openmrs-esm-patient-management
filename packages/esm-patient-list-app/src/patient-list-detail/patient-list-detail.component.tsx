@@ -109,7 +109,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
       .then(() =>
         showToast({
           title: t('deleted', 'Deleted'),
-          description: t('deletedPatientList', `Deleted Patient List: ${patientListDetails?.name}`),
+          description: `${t('deletedPatientList', 'Deleted Patient List')}: ${patientListDetails?.name}`,
           kind: 'success',
         }),
       )
@@ -121,7 +121,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
           kind: 'error',
         }),
       );
-  }, [patientListUuid, patientListDetails]);
+  }, [patientListUuid, patientListDetails, t]);
 
   return (
     <main className={`omrs-main-content ${styles.patientListDetailsPage}`}>

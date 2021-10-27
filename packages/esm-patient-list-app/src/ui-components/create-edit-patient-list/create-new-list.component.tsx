@@ -36,10 +36,9 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .then(() =>
           showToast({
             title: t('successCreatedPatientList', 'Created Patient List'),
-            description: t(
-              'successCreatedPatientListDescription',
-              `Successfully created patient list : ${nameInputRef.current.value}`,
-            ),
+            description: `${t('successCreatedPatientListDescription', 'Successfully created patient list')} : ${
+              nameInputRef.current.value
+            }`,
             kind: 'success',
           }),
         )
@@ -48,10 +47,9 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .catch(() =>
           showToast({
             title: t('error', 'Error'),
-            description: t(
-              'errorCreatedPatientListDescription',
-              `Couldn't create patient list : ${nameInputRef.current.value}`,
-            ),
+            description: `${t('errorCreatedPatientListDescription', "Couldn't create patient list")} : ${
+              nameInputRef.current.value
+            }`,
             kind: 'error',
           }),
         );
@@ -64,7 +62,7 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .then(() =>
           showToast({
             title: t('successEditedPatientList', 'Editted Patient List'),
-            description: t('successEditPatientListDescription', `Successfully editted patient list`),
+            description: t('successEditPatientListDescription', 'Successfully editted patient list'),
             kind: 'success',
           }),
         )
@@ -73,10 +71,9 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
         .catch(() =>
           showToast({
             title: t('error', 'Error'),
-            description: t(
-              'errorCreatedPatientListDescription',
-              `Couldn't edit patient list : ${nameInputRef.current.value}`,
-            ),
+            description: `${t('errorCreatedPatientListDescription', "Couldn't edit patient list")} : ${
+              nameInputRef.current.value
+            }`,
             kind: 'error',
           }),
         );

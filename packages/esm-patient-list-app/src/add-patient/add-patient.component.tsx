@@ -67,20 +67,18 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             showToast({
               title: t('successfullyAdded', 'Successfully added'),
               kind: 'success',
-              description: t(
-                'successAddPatientToList',
-                `Patient added to ${patientListsObj[patientListUuid].name} list successfully.`,
-              ),
+              description: `${t('successAddPatientToList', 'Patient added to list')}: ${
+                patientListsObj[patientListUuid].name
+              }`,
             }),
           )
           .catch(() =>
             showToast({
               title: t('error', 'Error'),
               kind: 'error',
-              description: t(
-                'errorAddPatientToList',
-                `Patient not added to ${patientListsObj[patientListUuid].name} list.`,
-              ),
+              description: `${t('errorAddPatientToList', 'Patient not added to list')}: ${
+                patientListsObj[patientListUuid].name
+              }`,
             }),
           );
       }
