@@ -66,7 +66,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setSections(configuredSections);
       setFieldConfigs(config.fieldConfigurations);
     }
-  }, [t, config]);
+  }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
 
   useEffect(() => {
     for (const patientIdentifier of patientIdentifiers) {
