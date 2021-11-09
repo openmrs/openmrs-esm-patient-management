@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { Button, FilterableMultiSelect, TextArea, TextInput } from 'carbon-components-react';
+import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
+import { Button, Dropdown, OnChangeData, TextArea, TextInput } from 'carbon-components-react';
 import Overlay from '../../overlay.component';
 import { useTranslation } from 'react-i18next';
-import { createPatientList, OpenmrsCohort, OpenmrsCohortMember, editPatientList } from '../../api';
+import { createPatientList, OpenmrsCohort, editPatientList, useCohortTypes, NewCohortData } from '../../api';
 import styles from './create-edit-patient-list.scss';
 import { useLayoutType, showToast, useSessionUser } from '@openmrs/esm-framework';
 
@@ -20,24 +20,34 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
   onSuccess = () => {},
 }) => {
   const { t } = useTranslation();
-  const nameInputRef = useRef<HTMLInputElement>();
-  const decriptionInputRef = useRef<HTMLTextAreaElement>();
+  const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
+    name: '',
+    description: '',
+    cohortType: '',
+    location: '',
+  });
   const isDesktop = useLayoutType() === 'desktop';
   const user = useSessionUser();
+  const { data: cohortTypes } = useCohortTypes();
+
+  useEffect(() => {
+    setCohortDetails({
+      name: patientListDetails?.name || '',
+      description: patientListDetails?.description || '',
+      cohortType: patientListDetails?.cohortType?.uuid || '',
+      location: user?.sessionLocation?.uuid,
+    });
+  }, [user, patientListDetails]);
 
   const createPL = useCallback(() => {
     // set loading
     if (!edit) {
-      createPatientList({
-        name: nameInputRef.current.value,
-        description: decriptionInputRef.current.value,
-        location: user?.sessionLocation?.uuid,
-      })
+      createPatientList(cohortDetails)
         .then(() =>
           showToast({
             title: t('successCreatedPatientList', 'Created patient list'),
             description: `${t('successCreatedPatientListDescription', 'Successfully created patient list')} : ${
-              nameInputRef.current.value
+              cohortDetails?.name
             }`,
             kind: 'success',
           }),
@@ -48,17 +58,13 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
           showToast({
             title: t('error', 'Error'),
             description: `${t('errorCreatePatientListDescription', "Couldn't create patient list")} : ${
-              nameInputRef.current.value
+              cohortDetails?.name
             }`,
             kind: 'error',
           }),
         );
     } else {
-      editPatientList(patientListDetails.uuid, {
-        name: nameInputRef.current.value,
-        description: decriptionInputRef.current.value,
-        location: user?.sessionLocation?.uuid,
-      })
+      editPatientList(patientListDetails.uuid, cohortDetails)
         .then(() =>
           showToast({
             title: t('successUpdatePatientList', 'Updated patient list'),
@@ -72,30 +78,32 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
           showToast({
             title: t('error', 'Error'),
             description: `${t('errorUpdatePatientListDescription', "Couldn't update patient list")} : ${
-              nameInputRef.current.value
+              cohortDetails?.name
             }`,
             kind: 'error',
           }),
         );
     }
-  }, [close, user]);
+  }, [close, user, cohortDetails]);
 
-  const items = useMemo(
-    () => [
-      {
-        id: 'age',
-        text: t('age', 'Age'),
-      },
-      {
-        id: 'gender',
-        text: t('gender', 'Gender'),
-      },
-      {
-        id: 'phone-number',
-        text: t('phoneNumber', 'Phone number'),
-      },
-    ],
-    [t],
+  const handleChange = useCallback(
+    ({ currentTarget }: SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setCohortDetails((cohortDetails) => ({
+        ...cohortDetails,
+        [currentTarget?.name]: currentTarget?.value,
+      }));
+    },
+    [setCohortDetails],
+  );
+
+  const handleTypeChange = useCallback(
+    ({ selectedItem }: OnChangeData) => {
+      setCohortDetails((cohortDetails) => ({
+        ...cohortDetails,
+        cohortType: cohortTypes?.find((type) => type?.display === selectedItem)?.uuid,
+      }));
+    },
+    [setCohortDetails, cohortTypes],
   );
 
   return (
@@ -118,31 +126,36 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
           labelText={t('newPatientListNameLabel', 'List name')}
           placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
           id="list_name"
-          ref={nameInputRef}
+          name="name"
+          onChange={handleChange}
           light={!isDesktop}
-          defaultValue={edit ? patientListDetails?.name : ''}
+          value={cohortDetails?.name}
         />
       </div>
       <div className={styles.input}>
         <TextArea
+          name="description"
+          onChange={handleChange}
           placeholder={t(
             'listDescriptionPlaceholder',
             'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
           )}
-          ref={decriptionInputRef}
           labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
           light={!isDesktop}
-          defaultValue={edit ? patientListDetails?.description : ''}
+          value={cohortDetails?.description}
         />
       </div>
       <div className={styles.input}>
-        <FilterableMultiSelect
-          id="select"
-          placeholder={t('search', 'Search')}
-          titleText={t('newPatientListSeceltLabel', 'Choose which information to include in the list')}
-          items={items}
-          itemToString={(item) => (item ? item.text : '')}
-          onChange={() => {}}
+        <Dropdown
+          id="cohortType"
+          label={t('selectCohortType', 'Select patient list type')}
+          titleText={t('newPatientListCohortTypeLabel', 'Choose the type for the new patient list')}
+          items={cohortTypes?.map((type) => type?.display) || []}
+          selectedItem={
+            cohortTypes?.find((type) => type.uuid === cohortDetails?.cohortType)?.display ||
+            cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
+          }
+          onChange={handleTypeChange}
           light={!isDesktop}
         />
       </div>

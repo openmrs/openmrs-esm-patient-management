@@ -131,7 +131,6 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
     `${cohortUrl}/cohort/`,
     {
       ...cohort,
-      cohortType: 'bf065c46-ed56-425a-a5fe-9d078389164d',
       startDate: dayjs().format(),
       groupCohort: false,
       definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
@@ -141,15 +140,7 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
 }
 
 export async function editPatientList(cohortUuid: string, cohort: NewCohortData, ac = new AbortController()) {
-  return postData(
-    `${cohortUrl}/cohort/${cohortUuid}`,
-    {
-      ...cohort,
-      groupCohort: true,
-      definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
-    },
-    ac,
-  );
+  return postData(`${cohortUrl}/cohort/${cohortUuid}`, cohort, ac);
 }
 
 export async function deletePatientList(cohortUuid: string, ac = new AbortController()) {
