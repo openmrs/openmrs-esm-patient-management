@@ -115,7 +115,12 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
           <Button onClick={close} kind="secondary" size="lg">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button onClick={createPL} size="lg">
+          <Button
+            onClick={createPL}
+            size="lg"
+            disabled={Object.values(cohortDetails)?.some(
+              (value) => value === '' || value === undefined || value === null,
+            )}>
             {!edit ? t('createList', 'Create list') : t('editList', 'Edit list')}
           </Button>
         </div>
