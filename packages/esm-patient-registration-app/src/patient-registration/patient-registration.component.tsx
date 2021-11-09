@@ -117,6 +117,38 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [patient, config]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
+    const checkIfEdited = (obj1, obj2) => {
+      const objectKeys = Object.keys(obj1);
+
+      for (const objKey of objectKeys) {
+        const val1 = obj1[objKey];
+        const val2 = obj2[objKey];
+        const isAnObject = val1 != null && typeof val1 === 'object';
+        if (
+          (isAnObject && Object.keys(val1).length !== Object.keys(val2).length) ||
+          (isAnObject && !checkIfEdited(val1, val2)) ||
+          (!isAnObject && val1 !== val2)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    const obj1 = JSON.parse(JSON.stringify(initialFormValues));
+    const obj2 = JSON.parse(JSON.stringify(values));
+    const formNotEdited = checkIfEdited(obj1, obj2);
+
+    if (formNotEdited && inEditMode) {
+      const redirectUrl = interpolateUrl(
+        new URLSearchParams(search).get('afterUrl') ||
+          interpolateString(config.links.submitButton, { patientUuid: patientUuid }),
+      );
+
+      setTarget(redirectUrl);
+      return;
+    }
+
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
