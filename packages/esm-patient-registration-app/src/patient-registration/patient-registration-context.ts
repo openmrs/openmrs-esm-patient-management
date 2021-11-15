@@ -11,6 +11,7 @@ export interface PatientRegistrationContextProps {
   setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
+  showPatientIdentifierOverlay: () => void;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);

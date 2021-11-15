@@ -130,3 +130,12 @@ export interface AddressValidationSchemaType {
   regex: RegExp;
   regexFormat: string;
 }
+
+export interface PatientIdentifierTypesMap {
+  [uuid: string]: {
+    patientIdentifierType: PatientIdentifierType;
+    selectedSource: IdentifierSource;
+    isPrimary: boolean;
+    selected: boolean;
+  };
+}

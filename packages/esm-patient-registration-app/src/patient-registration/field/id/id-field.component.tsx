@@ -4,6 +4,8 @@ import { IdentifierSource } from '../../patient-registration-types';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Button } from 'carbon-components-react';
+import { ArrowRight16 } from '@carbon/icons-react';
 
 function containsSourceWithAnOption(sources: Array<IdentifierSource>): boolean {
   for (const source of sources) {
@@ -16,7 +18,7 @@ function containsSourceWithAnOption(sources: Array<IdentifierSource>): boolean {
 }
 
 export const IdField: React.FC = () => {
-  const { identifierTypes, inEditMode, values } = useContext(PatientRegistrationContext);
+  const { identifierTypes, inEditMode, values, showPatientIdentifierOverlay } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 
   const identifierInputs = identifierTypes
@@ -46,7 +48,14 @@ export const IdField: React.FC = () => {
     return (
       <div>
         <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
-        <div className={styles.grid}>{identifierInputs}</div>
+        <div className={styles.grid}>
+          {identifierInputs}
+          <div>
+            <Button kind="ghost" onClick={showPatientIdentifierOverlay}>
+              {t('setIDNumbers', 'Set ID numbers')} <ArrowRight16 />
+            </Button>
+          </div>
+        </div>
       </div>
     );
   } else {

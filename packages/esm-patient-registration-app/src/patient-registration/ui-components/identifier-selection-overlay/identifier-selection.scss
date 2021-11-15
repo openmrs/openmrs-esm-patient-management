@@ -1,0 +1,96 @@
+@import '../../patient-registration.scss';
+
+.overlay {
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  background-color: $ui-02;
+  padding-bottom: 3rem;
+}
+
+.desktopOverlay {
+  position: fixed;
+  top: 3rem;
+  width: 27rem;
+  border-left: 1px solid $ui-01;
+}
+
+.fullScreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.patientIdentifierOverlayHeaderDesktop {
+  background-color: $ui-03;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: $ui-05;
+  border-bottom: 1px solid $text-03;
+}
+
+.patientIdentifierOverlayHeaderDesktop h4 {
+  padding: $spacing-03 0 $spacing-03 1rem;
+  color: $ui-05;
+}
+
+.patientIdentifierOverlayHeaderDesktop button {
+  padding: $spacing-03 !important;
+  background-color: $ui-02 !important;
+}
+
+.patientIdentifierOverlayHeaderTablet {
+  background-color: $brand-01;
+  display: flex;
+  align-items: center;
+  color: $ui-02;
+  border-bottom: 1px solid black;
+}
+
+.patientIdentifierOverlayHeaderTablet h4 {
+  padding: $spacing-03 0 $spacing-03 1rem;
+  color: $ui-02;
+}
+
+.patientIdentifierOverlayHeaderTablet button {
+  padding: $spacing-03 !important;
+  color: $ui-02;
+}
+
+.overlayContent {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.revertButton {
+  @include carbon--type-style("label-01");
+  margin-top: $spacing-05;
+  cursor: pointer;
+}
+
+.overlayButtons {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.overlayButtons button {
+  max-width: unset;
+}
+
+.radioGroup {
+  background-color: $ui-01;
+  padding: $spacing-05;
+}
+
+.radio {
+  margin-top: $spacing-03;
+}
+
+.errorLabel {
+  color: #da1e28;
+}
