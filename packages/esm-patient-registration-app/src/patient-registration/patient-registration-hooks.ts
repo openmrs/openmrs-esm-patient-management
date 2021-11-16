@@ -33,7 +33,7 @@ const blankFormValues: FormValues = {
   isDead: false,
   deathDate: '',
   deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
+  relationships: [{ relatedPerson: '', relationship: '', relatedPersonBirthdate: null }],
 };
 
 export function useInitialFormValues(

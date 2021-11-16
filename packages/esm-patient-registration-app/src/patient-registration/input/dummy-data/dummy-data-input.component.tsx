@@ -30,7 +30,7 @@ export const dummyFormValues: FormValues = {
   isDead: false,
   deathDate: '',
   deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
+  relationships: [{ relatedPerson: '', relationship: '', relatedPersonBirthdate: new Date(2021, 1, 1) as any }],
 };
 
 export const DummyDataInput: React.FC<DummyDataInputProps> = ({ setValues }) => {

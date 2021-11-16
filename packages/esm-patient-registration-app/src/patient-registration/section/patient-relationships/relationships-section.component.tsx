@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
-import { Button, Select, SelectItem } from 'carbon-components-react';
-import { FieldArray } from 'formik';
+import { Button, DatePicker, DatePickerInput, Select, SelectItem, TextInput } from 'carbon-components-react';
+import { FieldArray, useField } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
-import { fetchPerson } from '../../patient-registration.resource';
+import { generateFormatting } from '../../date-util';
 
 interface RelationshipType {
   display: string;
@@ -24,6 +23,9 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
   const { t } = useTranslation();
+  const [field, meta] = useField('relatedPersonBirthdate');
+  const invalidText = meta.error && t(meta.error);
+  const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
 
   useEffect(() => {
     const tmp: RelationshipType[] = [];
@@ -50,14 +52,11 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
     setFieldValue(field, value);
   };
 
-  const handleSuggestionSelected = (field: string, selectedSuggestion: string) => {
-    setFieldValue(field, selectedSuggestion);
-  };
-
-  const searchPerson = async (query: string) => {
-    const abortController = new AbortController();
-    const searchResults = await fetchPerson(query, abortController);
-    return searchResults.data.results;
+  const handlePersonEntered = (event) => {
+    const { target } = event;
+    const field = target.name;
+    const value = target.value;
+    setFieldValue(field, value);
   };
 
   return (
@@ -77,14 +76,13 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
                   <br />
                   {relationships.map((_relationship: any, index: React.Key) => (
                     <div key={index} className={styles.relationship}>
-                      <div className={styles.searchBox} style={{ marginBottom: '1rem' }}>
-                        <Autosuggest
+                      <div className={styles.fullName} style={{ marginBottom: '1rem' }}>
+                        <TextInput
+                          id="fullName"
                           name={`relationships[${index}].relatedPerson`}
-                          placeholder="Find person"
-                          onSuggestionSelected={handleSuggestionSelected}
-                          getSearchResults={searchPerson}
-                          getDisplayValue={(item) => item.display}
-                          getFieldValue={(item) => item.uuid}
+                          onChange={handlePersonEntered}
+                          labelText={t('fullNameLabelText', 'Full name')}
+                          light
                         />
                       </div>
                       <div className={`${styles.selectRelationshipType}`} style={{ marginBottom: '1rem' }}>
@@ -109,6 +107,22 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
                             />
                           ))}
                         </Select>
+                        <DatePicker
+                          dateFormat={dateFormat}
+                          datePickerType="single"
+                          light
+                          onChange={(e) => setFieldValue(`relationships[${index}].relatedPersonBirthdate`, e)}>
+                          <DatePickerInput
+                            id="relatedPersonBirthdate"
+                            name={`relationships[${index}].relatedPersonBirthdate`}
+                            placeholder={placeHolder}
+                            labelText={t('relatedPersonDateOfBirthLabelText', 'Date of Birth(optional)')}
+                            invalid={!!(meta.touched && meta.error)}
+                            invalidText={invalidText}
+                            {...field}
+                            value={format(field.value)}
+                          />
+                        </DatePicker>
                       </div>
                       <div className={styles.actions}>
                         {relationships.length - 1 === index && (
