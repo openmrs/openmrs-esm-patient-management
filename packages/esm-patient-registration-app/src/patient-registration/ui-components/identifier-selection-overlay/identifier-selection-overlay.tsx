@@ -3,127 +3,73 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './identifier-selection.scss';
 import { Close24, ArrowLeft24 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup, RadioButton, Button, Checkbox, Search } from 'carbon-components-react';
-import { PatientIdentifierTypesMap } from '../../patient-registration-types';
+import { Button, Checkbox, Search } from 'carbon-components-react';
+import { CustomPatientIdentifierType } from '../../patient-registration-types';
 
 interface PatientIdentifierOverlayProps {
-  patientIdentifierMap: PatientIdentifierTypesMap;
+  patientIdentifiers: CustomPatientIdentifierType[];
   closeOverlay: () => void;
-  setPatientIdentifierMap: Dispatch<SetStateAction<PatientIdentifierTypesMap>>;
+  setPatientIdentifiers: Dispatch<SetStateAction<CustomPatientIdentifierType[]>>;
 }
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
-  patientIdentifierMap,
+  patientIdentifiers,
   closeOverlay,
-  setPatientIdentifierMap,
+  setPatientIdentifiers,
 }) => {
-  const [selectedIdentifierTypes, setIdentifierTypes] = useState<PatientIdentifierTypesMap>(patientIdentifierMap);
+  const [identifierTypes, setIdentifierTypes] = useState<CustomPatientIdentifierType[]>([]);
   const [error, setError] = useState<boolean>(false);
   const [searchString, setSearchString] = useState<string>('');
   const layout = useLayoutType();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (patientIdentifierMap && !selectedIdentifierTypes) {
-      setIdentifierTypes(patientIdentifierMap);
+    if (patientIdentifiers) {
+      setIdentifierTypes(patientIdentifiers);
     }
-  }, [patientIdentifierMap]);
+  }, [patientIdentifiers]);
 
   const handleSearch = useCallback((event) => setSearchString(event?.target?.value), []);
 
-  const patientIdentifierTypes = useMemo(
-    () =>
-      Object.values(patientIdentifierMap)
-        ?.map(({ patientIdentifierType }) => patientIdentifierType)
-        ?.filter((identifierType) => identifierType.name.toLowerCase().includes(searchString.toLowerCase())),
-    [patientIdentifierMap, searchString],
+  const filteredIdentifiers = useMemo(
+    () => identifierTypes?.filter((identifier) => identifier?.name?.toLowerCase().includes(searchString.toLowerCase())),
+    [identifierTypes, searchString],
   );
 
-  const handleChange = useCallback(
-    (uuid, selected) =>
-      setIdentifierTypes((identifiers) => ({
-        ...identifiers,
-        [uuid]: {
-          ...identifiers[uuid],
-          selected,
-          selectedSource: null,
-        },
-      })),
-    [],
-  );
-
-  const selectIdentifierSource = useCallback(
-    (identifierUuid: string, identifierSourceUuid: string) =>
-      setIdentifierTypes((identifiers) => ({
-        ...identifiers,
-        [identifierUuid]: {
-          ...identifiers[identifierUuid],
-          selectedSource: patientIdentifierMap[identifierUuid].patientIdentifierType.identifierSources.find(
-            (source) => source.uuid === identifierSourceUuid,
-          ),
-        },
-      })),
-    [],
-  );
+  const handleChange = useCallback((uuid: string, selected: boolean) => {
+    setIdentifierTypes((identifiers) =>
+      identifiers.map((identifier) =>
+        identifier.uuid === uuid
+          ? {
+              ...identifier,
+              selected,
+            }
+          : identifier,
+      ),
+    );
+  }, []);
 
   const identifierTypeCheckboxes = useMemo(
     () =>
-      patientIdentifierTypes.map((patientIdentifierType) => (
-        <div key={patientIdentifierType.uuid} className={styles.space05}>
+      filteredIdentifiers.map((patientIdentifier) => (
+        <div key={patientIdentifier.uuid} className={styles.space05}>
           <Checkbox
-            id={patientIdentifierType.uuid}
-            value={patientIdentifierType.uuid}
-            labelText={patientIdentifierType.name}
-            onChange={(selected) => handleChange(patientIdentifierType.uuid, selected)}
-            checked={selectedIdentifierTypes[patientIdentifierType.uuid].selected}
-            disabled={patientIdentifierType.isPrimary}
+            id={patientIdentifier.uuid}
+            value={patientIdentifier.uuid}
+            labelText={patientIdentifier.name}
+            onChange={(selected) => handleChange(patientIdentifier?.uuid, selected)}
+            checked={patientIdentifier?.selected || patientIdentifier?.isPrimary}
+            disabled={patientIdentifier.isPrimary}
           />
-          {selectedIdentifierTypes[patientIdentifierType.uuid]?.selected &&
-            patientIdentifierType?.identifierSources?.length && (
-              <div className={styles.radioGroup}>
-                <RadioButtonGroup
-                  legendText={t('source', 'Source')}
-                  name={`${patientIdentifierType.fieldName}-identifier-sources`}
-                  defaultSelected={patientIdentifierMap[patientIdentifierType.uuid]?.selectedSource?.uuid}
-                  onChange={(sourceUuid: string) => selectIdentifierSource(patientIdentifierType.uuid, sourceUuid)}
-                  orientation="vertical">
-                  {patientIdentifierType.identifierSources.map((source, ind) => (
-                    <RadioButton
-                      key={ind}
-                      labelText={source?.name}
-                      name={source?.uuid}
-                      value={source.uuid}
-                      className={styles.radio}
-                    />
-                  ))}
-                </RadioButtonGroup>
-                {error && !selectedIdentifierTypes[patientIdentifierType.uuid].selectedSource && (
-                  <span className={`${styles.errorLabel} ${styles.label01}`}>Select a source</span>
-                )}
-              </div>
-            )}
         </div>
       )),
-    [selectedIdentifierTypes, patientIdentifierTypes, error],
+    [filteredIdentifiers, error],
   );
 
   const handleAddIdentifier = useCallback(() => {
-    if (
-      Object.values(selectedIdentifierTypes).some(
-        ({ selected, patientIdentifierType, selectedSource }) =>
-          selected && patientIdentifierType.identifierSources.length && !selectedSource,
-      )
-    ) {
-      setError(true);
-      return;
-    }
-    setError(false);
-    setPatientIdentifierMap((identifierMap) => ({
-      ...identifierMap,
-      ...selectedIdentifierTypes,
-    }));
+    setPatientIdentifiers(identifierTypes);
     closeOverlay();
-  }, [selectedIdentifierTypes]);
+  }, [identifierTypes]);
 
   return (
     <div className={`${styles.overlay} ${layout === 'tablet' ? styles.fullScreenOverlay : styles.desktopOverlay}`}>
@@ -131,7 +77,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         {layout === 'desktop' ? (
           <div className={styles.patientIdentifierOverlayHeaderDesktop}>
             <h4 className={styles.productiveHeading02}>{t('addIDNumber', 'Add a new ID Number')}</h4>
-            <Button kind="ghost" iconDescription="" size="small" onClick={closeOverlay} hasIconOnly>
+            <Button kind="ghost" size="small" onClick={closeOverlay} hasIconOnly iconDescription="">
               <Close24 />
             </Button>
           </div>

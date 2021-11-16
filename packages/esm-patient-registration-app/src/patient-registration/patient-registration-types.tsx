@@ -131,11 +131,7 @@ export interface AddressValidationSchemaType {
   regexFormat: string;
 }
 
-export interface PatientIdentifierTypesMap {
-  [uuid: string]: {
-    patientIdentifierType: PatientIdentifierType;
-    selectedSource: IdentifierSource;
-    isPrimary: boolean;
-    selected: boolean;
-  };
+export interface CustomPatientIdentifierType extends PatientIdentifierType {
+  selectedSource: IdentifierSource;
+  selected: boolean;
 }

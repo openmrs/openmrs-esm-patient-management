@@ -15,7 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, PatientIdentifierTypesMap } from './patient-registration-types';
+import { FormValues, CapturePhotoProps, CustomPatientIdentifierType } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
@@ -52,7 +52,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
-  const [patientIdentifierMap, setPatientIdentifierMap] = useState<PatientIdentifierTypesMap>({});
+  const [customPatientIdentifiers, setCustomPatientIdentifiers] = useState<CustomPatientIdentifierType[]>([]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -121,16 +121,13 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   useEffect(() => {
     if (patientIdentifiers) {
-      let identifierTypes: PatientIdentifierTypesMap = {};
-      patientIdentifiers.forEach((identifier) => {
-        identifierTypes[identifier?.uuid] = {
-          patientIdentifierType: identifier,
-          selectedSource: null,
-          isPrimary: identifier?.isPrimary,
+      setCustomPatientIdentifiers(
+        patientIdentifiers?.map((identifier) => ({
+          ...identifier,
           selected: identifier?.isPrimary,
-        };
-      });
-      setPatientIdentifierMap(identifierTypes);
+          selectedSource: null,
+        })),
+      );
     }
   }, [patientIdentifiers]);
 
@@ -247,8 +244,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       {showIdentifierOverlay && (
         <IdentifierSelectionOverlay
           closeOverlay={() => setIdentifierOverlay(false)}
-          patientIdentifierMap={patientIdentifierMap}
-          setPatientIdentifierMap={setPatientIdentifierMap}
+          patientIdentifiers={customPatientIdentifiers}
+          setPatientIdentifiers={setCustomPatientIdentifiers}
         />
       )}
     </>
