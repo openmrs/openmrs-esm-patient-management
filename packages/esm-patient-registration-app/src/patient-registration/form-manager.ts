@@ -17,6 +17,7 @@ import {
   savePatientPhoto,
   saveRelationship,
 } from './patient-registration.resource';
+import isEqual from 'lodash-es/isEqual';
 
 export type SavePatientForm = (
   patientUuid: string | undefined,
@@ -188,25 +189,6 @@ export default class FormManager {
     return [];
   }
 
-  static checkIfEdited = (obj1, obj2) => {
-    const objectKeys = Object.keys(obj1);
-
-    for (const objKey of objectKeys) {
-      const val1 = obj1[objKey];
-      const val2 = obj2[objKey];
-      const isAnObject = val1 != null && typeof val1 === 'object';
-      if (
-        (isAnObject && Object.keys(val1).length !== Object.keys(val2).length) ||
-        (isAnObject && !FormManager.checkIfEdited(val1, val2)) ||
-        (!isAnObject && val1 !== val2)
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
   static getPatientToCreate(
     values: FormValues,
     personAttributeSections: any,
@@ -216,7 +198,7 @@ export default class FormManager {
   ): Patient {
     let address = FormManager.getPatientAddressField(values, initialAddressFieldValues);
 
-    if (FormManager.checkIfEdited(initialAddressFieldValues, address)) {
+    if (isEqual(initialAddressFieldValues, address)) {
       address = {};
     }
 
