@@ -135,13 +135,15 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
+    console.log(values);
+
     try {
       const createdPatientUuid = await savePatientForm(
         patientUuid,
         values,
         patientUuidMap,
         initialAddressFieldValues,
-        patientIdentifiers,
+        customPatientIdentifiers.filter((identifier) => identifier?.selected),
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
@@ -221,7 +223,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               <Grid className={styles.infoGrid}>
                 <PatientRegistrationContext.Provider
                   value={{
-                    identifierTypes: patientIdentifiers,
+                    identifierTypes: customPatientIdentifiers.filter((identifier) => identifier?.selected),
                     validationSchema,
                     setValidationSchema,
                     fieldConfigs,
@@ -231,6 +233,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     setCapturePhotoProps,
                     currentPhoto: capturePhotoProps?.imageData,
                     showPatientIdentifierOverlay: () => setIdentifierOverlay(true),
+                    setPatientIdentifiers: setCustomPatientIdentifiers,
                   }}>
                   {sections.map((section, index) => (
                     <div key={index}>{getSection(section, index)}</div>

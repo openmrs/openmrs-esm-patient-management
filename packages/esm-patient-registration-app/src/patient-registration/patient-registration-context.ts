@@ -1,8 +1,8 @@
-import { createContext, SetStateAction, useContext } from 'react';
-import { FormValues, CapturePhotoProps } from './patient-registration-types';
+import { createContext, SetStateAction, Dispatch, useContext } from 'react';
+import { FormValues, CapturePhotoProps, CustomPatientIdentifierType } from './patient-registration-types';
 
 export interface PatientRegistrationContextProps {
-  identifierTypes: Array<any>;
+  identifierTypes: Array<CustomPatientIdentifierType>;
   values: FormValues;
   validationSchema: any;
   setValidationSchema(value: any): void;
@@ -12,6 +12,7 @@ export interface PatientRegistrationContextProps {
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
   showPatientIdentifierOverlay: () => void;
+  setPatientIdentifiers: Dispatch<SetStateAction<CustomPatientIdentifierType[]>>;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);

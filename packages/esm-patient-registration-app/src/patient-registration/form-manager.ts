@@ -145,8 +145,9 @@ export default class FormManager {
   ): Promise<Array<PatientIdentifier>> {
     const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifierTypes.map(async (type) => {
       const idValue = values[type.fieldName];
-
+      console.log(idValue, type);
       if (idValue) {
+        console.log(idValue, 'in');
         return {
           uuid: patientUuidMap[type.fieldName] ? patientUuidMap[type.fieldName].uuid : undefined,
           identifier: idValue,
@@ -155,6 +156,7 @@ export default class FormManager {
           preferred: type.isPrimary,
         };
       } else if (type.autoGenerationSource) {
+        console.log(type.fieldName, '1');
         const generateIdentifierResponse = await generateIdentifier(type.autoGenerationSource.uuid, abortController);
         return {
           // is this undefined?
