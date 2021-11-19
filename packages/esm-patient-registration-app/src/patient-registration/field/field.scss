@@ -39,6 +39,18 @@
   margin-bottom: $spacing-05;
 }
 
+.alignEnd {
+  align-self: end;
+}
+
+.setIDNumberButton {
+  margin-left: -$spacing-05;
+}
+
+.setIDNumberButton > svg {
+  margin-left: $spacing-05;
+}
+
 :global(.omrs-breakpoint-lt-desktop){
   .grid {
     grid-template-columns: 1fr;
@@ -60,3 +72,4 @@
     justify-self: start;
   }
 }
+

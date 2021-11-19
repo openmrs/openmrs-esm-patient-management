@@ -135,8 +135,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
-    console.log(values);
-
     try {
       const createdPatientUuid = await savePatientForm(
         patientUuid,

@@ -59,7 +59,10 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
             labelText={patientIdentifier.name}
             onChange={(selected) => handleChange(patientIdentifier?.uuid, selected)}
             checked={patientIdentifier?.selected || patientIdentifier?.isPrimary}
-            disabled={patientIdentifier.isPrimary}
+            disabled={
+              patientIdentifier.isPrimary ||
+              patientIdentifiers.find((identifier) => identifier?.uuid === patientIdentifier?.uuid).selected
+            }
           />
         </div>
       )),
