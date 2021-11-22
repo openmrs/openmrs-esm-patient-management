@@ -3,7 +3,7 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './identifier-selection.scss';
 import { Close24, ArrowLeft24 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, Search } from 'carbon-components-react';
+import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
 import { CustomPatientIdentifierType } from '../../patient-registration-types';
 
 interface PatientIdentifierOverlayProps {
@@ -49,6 +49,19 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     );
   }, []);
 
+  const handleIdentifierSelect = useCallback((patientIdentifierUuid, sourceUuid) => {
+    setIdentifierTypes((identifiers) =>
+      identifiers?.map((identifier) =>
+        identifier?.uuid === patientIdentifierUuid
+          ? {
+              ...identifier,
+              selectedSource: identifier?.identifierSources?.find((source) => source?.uuid === sourceUuid),
+            }
+          : identifier,
+      ),
+    );
+  }, []);
+
   const identifierTypeCheckboxes = useMemo(
     () =>
       filteredIdentifiers.map((patientIdentifier) => (
@@ -64,6 +77,20 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               patientIdentifiers.find((identifier) => identifier?.uuid === patientIdentifier?.uuid).selected
             }
           />
+          {patientIdentifier?.selected && patientIdentifier?.identifierSources?.length > 0 && (
+            <div className={styles.radioGroup}>
+              <RadioButtonGroup
+                legendText={t('source', 'Source')}
+                name={`${patientIdentifier?.fieldName}-identifier-sources`}
+                defaultSelected={patientIdentifier?.selectedSource?.uuid}
+                onChange={(sourceUuid: string) => handleIdentifierSelect(patientIdentifier?.uuid, sourceUuid)}
+                orientation="vertical">
+                {patientIdentifier?.identifierSources.map((source, ind) => (
+                  <RadioButton key={ind} labelText={source?.name} name={source?.uuid} value={source.uuid} />
+                ))}
+              </RadioButtonGroup>
+            </div>
+          )}
         </div>
       )),
     [filteredIdentifiers, error],

@@ -49,7 +49,10 @@ export const IdField: React.FC = () => {
       <div>
         <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Id')}</h4>
         <div className={styles.grid}>
-          {identifierInputs}
+          {/* {identifierInputs} */}
+          {identifierTypes?.map((identifierType) => (
+            <IdentifierInput key={identifierType.fieldName} identifierType={identifierType} />
+          ))}
           <div className={styles.alignEnd}>
             <Button kind="ghost" className={styles.setIDNumberButton} onClick={showPatientIdentifierOverlay}>
               {t('setIDNumbers', 'Set ID numbers')} <ArrowRight16 />

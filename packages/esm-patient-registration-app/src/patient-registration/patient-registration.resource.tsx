@@ -1,4 +1,5 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { CapturePhotoProps, Patient, Relationship } from './patient-registration-types';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';

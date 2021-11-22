@@ -125,7 +125,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         patientIdentifiers?.map((identifier) => ({
           ...identifier,
           selected: identifier?.isPrimary,
-          selectedSource: null,
+          selectedSource: identifier?.isPrimary
+            ? identifier?.identifierSources?.length > 0
+              ? identifier?.identifierSources[0]
+              : null
+            : null,
         })),
       );
     }

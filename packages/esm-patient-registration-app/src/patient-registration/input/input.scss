@@ -1,4 +1,5 @@
 @import "~@openmrs/esm-styleguide/src/vars";
+@import "../../patient-registration/patient-registration.scss";
 
 .fieldRow {
   display: flex;
@@ -12,10 +13,12 @@
 }
 
 .label {
-  width: 150px;
-  text-align: right;
-  margin-right: 5px;
-  padding-top: 8px;
+  @include carbon--type-style("label-01");
+  color: $ui-04;
+}
+
+.textID {
+  margin-bottom: $spacing-05;
 }
 
 .requiredField {
@@ -84,7 +87,6 @@
 .IDInput {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: center;
 }
 
 .trashCan {
