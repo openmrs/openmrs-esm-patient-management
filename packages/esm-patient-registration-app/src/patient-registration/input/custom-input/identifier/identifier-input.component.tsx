@@ -1,12 +1,10 @@
 import * as Yup from 'yup';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import find from 'lodash-es/find';
+import React, { useState, useEffect, useCallback } from 'react';
 import styles from '../../input.scss';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { SelectInput } from '../../basic-input/select/select-input.component';
 import { Input } from '../../basic-input/input/input.component';
-import { CustomPatientIdentifierType, PatientIdentifierType } from '../../../patient-registration-types';
+import { CustomPatientIdentifierType } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { TrashCan16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
@@ -90,6 +88,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
   }, [source]);
 
   const handleDelete = useCallback(() => {
+    setFieldValue(name, '');
     setPatientIdentifiers((identifiers) =>
       identifiers.map((identifier) =>
         identifier?.uuid === identifierType?.uuid

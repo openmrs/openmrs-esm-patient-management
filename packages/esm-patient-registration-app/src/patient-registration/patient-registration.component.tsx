@@ -125,14 +125,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setCustomPatientIdentifiers(
         patientIdentifiers?.map((identifier) => ({
           ...identifier,
-          selected: identifier?.isPrimary,
+          selected:
+            identifier?.isPrimary || (inEditMode && !!initialFormValues?.identifiers[camelCase(identifier.name)]),
           selectedSource: identifier?.identifierSources?.length > 0 ? identifier?.identifierSources[0] : null,
-          defaultSelected:
-            inEditMode && initialFormValues
-              ? initialFormValues?.identifiers[camelCase(identifier.name)]
-                ? true
-                : false
-              : false,
+          defaultSelected: inEditMode && !!initialFormValues?.identifiers[camelCase(identifier.name)],
         })),
       );
     }
