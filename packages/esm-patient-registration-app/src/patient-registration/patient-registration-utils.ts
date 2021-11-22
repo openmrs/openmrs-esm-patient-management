@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
   FormValues,
-  PatientIdentifier,
+  CustomPatientIdentifier,
   PatientUuidMapType,
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
@@ -152,11 +152,10 @@ export function getPatientUuidMapFromFhirPatient(patient: fhir.Patient): Patient
   };
 }
 
-export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Array<PatientIdentifier> {
-  return patient.identifier.map((identifier) => {
-    return {
-      uuid: identifier.id,
-      identifier: identifier.value,
-    };
+export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): CustomPatientIdentifier {
+  let identifiers: CustomPatientIdentifier = {};
+  patient.identifier.forEach((identifier) => {
+    identifiers[camelCase(identifier.type.text)] = identifier.value;
   });
+  return identifiers;
 }

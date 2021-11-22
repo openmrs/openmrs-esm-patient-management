@@ -3,7 +3,7 @@ import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
-  PatientIdentifierType,
+  CustomPatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
   Patient,
@@ -23,7 +23,7 @@ export type SavePatientForm = (
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
-  identifierTypes: Array<PatientIdentifierType>,
+  identifierTypes: Array<CustomPatientIdentifierType>,
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
@@ -37,7 +37,7 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    identifierTypes: Array<PatientIdentifierType>,
+    identifierTypes: Array<CustomPatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
@@ -71,22 +71,20 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    identifierTypes: Array<PatientIdentifierType>,
+    identifierTypes: Array<CustomPatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
     personAttributeSections: any,
     abortController: AbortController,
   ): Promise<string> {
-    const patientIdentifiers =
-      values.identifiers ||
-      (await FormManager.getPatientIdentifiersToCreate(
-        values,
-        patientUuidMap,
-        identifierTypes,
-        currentLocation,
-        abortController,
-      ));
+    const patientIdentifiers = await FormManager.getPatientIdentifiersToCreate(
+      values,
+      patientUuidMap,
+      identifierTypes,
+      currentLocation,
+      abortController,
+    );
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
@@ -139,12 +137,12 @@ export default class FormManager {
   static getPatientIdentifiersToCreate(
     values: FormValues,
     patientUuidMap: object,
-    identifierTypes: Array<PatientIdentifierType>,
+    identifierTypes: Array<CustomPatientIdentifierType>,
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
     const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifierTypes.map(async (type) => {
-      const idValue = values[type.fieldName];
+      const idValue = values.identifiers[type.fieldName] ?? undefined;
       if (idValue) {
         return {
           uuid: patientUuidMap[type.fieldName] ? patientUuidMap[type.fieldName].uuid : undefined,
@@ -153,8 +151,8 @@ export default class FormManager {
           location: location,
           preferred: type.isPrimary,
         };
-      } else if (type.autoGenerationSource) {
-        const generateIdentifierResponse = await generateIdentifier(type.autoGenerationSource.uuid, abortController);
+      } else if (type.selectedSource) {
+        const generateIdentifierResponse = await generateIdentifier(type.selectedSource.uuid, abortController);
         return {
           // is this undefined?
           uuid: undefined,

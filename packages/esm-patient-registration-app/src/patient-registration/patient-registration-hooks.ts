@@ -34,6 +34,7 @@ const blankFormValues: FormValues = {
   deathDate: '',
   deathCause: '',
   relationships: [{ relatedPerson: '', relationship: '' }],
+  identifiers: {},
 };
 
 export function useInitialFormValues(
@@ -50,7 +51,7 @@ export function useInitialFormValues(
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
-          identifiers: [...getPatientIdentifiersFromFhirPatient(patient)],
+          identifiers: getPatientIdentifiersFromFhirPatient(patient),
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);

@@ -52,6 +52,10 @@ export interface PatientIdentifier {
   preferred?: boolean;
 }
 
+export interface CustomPatientIdentifier {
+  [identifierName: string]: string;
+}
+
 export type Relationship = {
   relationshipType: string;
   personA: string;
@@ -109,7 +113,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
-  identifiers?: Array<PatientIdentifier>;
+  identifiers?: CustomPatientIdentifier;
 }
 
 export interface PatientUuidMapType {
@@ -134,4 +138,6 @@ export interface AddressValidationSchemaType {
 export interface CustomPatientIdentifierType extends PatientIdentifierType {
   selectedSource: IdentifierSource;
   selected: boolean;
+  // defaultSelected keeps the track in the editMode, whether the identifier was previously added to the patient or not.
+  defaultSelected?: boolean;
 }

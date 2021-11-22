@@ -77,20 +77,22 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               patientIdentifiers.find((identifier) => identifier?.uuid === patientIdentifier?.uuid).selected
             }
           />
-          {patientIdentifier?.selected && patientIdentifier?.identifierSources?.length > 0 && (
-            <div className={styles.radioGroup}>
-              <RadioButtonGroup
-                legendText={t('source', 'Source')}
-                name={`${patientIdentifier?.fieldName}-identifier-sources`}
-                defaultSelected={patientIdentifier?.selectedSource?.uuid}
-                onChange={(sourceUuid: string) => handleIdentifierSelect(patientIdentifier?.uuid, sourceUuid)}
-                orientation="vertical">
-                {patientIdentifier?.identifierSources.map((source, ind) => (
-                  <RadioButton key={ind} labelText={source?.name} name={source?.uuid} value={source.uuid} />
-                ))}
-              </RadioButtonGroup>
-            </div>
-          )}
+          {patientIdentifier?.selected &&
+            !patientIdentifier?.defaultSelected &&
+            patientIdentifier?.identifierSources?.length > 0 && (
+              <div className={styles.radioGroup}>
+                <RadioButtonGroup
+                  legendText={t('source', 'Source')}
+                  name={`${patientIdentifier?.fieldName}-identifier-sources`}
+                  defaultSelected={patientIdentifier?.selectedSource?.uuid}
+                  onChange={(sourceUuid: string) => handleIdentifierSelect(patientIdentifier?.uuid, sourceUuid)}
+                  orientation="vertical">
+                  {patientIdentifier?.identifierSources.map((source, ind) => (
+                    <RadioButton key={ind} labelText={source?.name} name={source?.uuid} value={source.uuid} />
+                  ))}
+                </RadioButtonGroup>
+              </div>
+            )}
         </div>
       )),
     [filteredIdentifiers, error],
@@ -106,7 +108,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       <div>
         {layout === 'desktop' ? (
           <div className={styles.patientIdentifierOverlayHeaderDesktop}>
-            <h4 className={styles.productiveHeading02}>{t('addIDNumber', 'Add a new ID Number')}</h4>
+            <h4 className={styles.productiveHeading02}>{t('setIDNumbers', 'Set ID numbers')}</h4>
             <Button kind="ghost" size="small" onClick={closeOverlay} hasIconOnly iconDescription="">
               <Close24 />
             </Button>
@@ -116,7 +118,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
             <Button kind="ghost" iconDescription="" size="small" onClick={closeOverlay} hasIconOnly>
               <ArrowLeft24 />
             </Button>
-            <h4 className={styles.productiveHeading02}>{t('addIDNumber', 'Add a new ID Number')}</h4>
+            <h4 className={styles.productiveHeading02}>{t('setIDNumbers', 'Set ID numbers')}</h4>
           </div>
         )}
         <div className={styles.overlayContent}>
@@ -139,7 +141,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="primary" onClick={handleAddIdentifier}>
-          {t('addidentifier', 'Add Identifier')}
+          {t('setIDNumbers', 'Set ID numbers')}
         </Button>
       </div>
     </div>

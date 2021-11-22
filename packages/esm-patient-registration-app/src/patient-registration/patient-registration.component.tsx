@@ -25,6 +25,7 @@ import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './p
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import IdentifierSelectionOverlay from './ui-components/identifier-selection-overlay/identifier-selection-overlay';
+import camelCase from 'lodash-es/camelCase';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -125,20 +126,21 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         patientIdentifiers?.map((identifier) => ({
           ...identifier,
           selected: identifier?.isPrimary,
-          selectedSource: identifier?.isPrimary
-            ? identifier?.identifierSources?.length > 0
-              ? identifier?.identifierSources[0]
-              : null
-            : null,
+          selectedSource: identifier?.identifierSources?.length > 0 ? identifier?.identifierSources[0] : null,
+          defaultSelected:
+            inEditMode && initialFormValues
+              ? initialFormValues?.identifiers[camelCase(identifier.name)]
+                ? true
+                : false
+              : false,
         })),
       );
     }
-  }, [patientIdentifiers]);
+  }, [patientIdentifiers, inEditMode, initialFormValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
     helpers.setSubmitting(true);
-
     try {
       const createdPatientUuid = await savePatientForm(
         patientUuid,
