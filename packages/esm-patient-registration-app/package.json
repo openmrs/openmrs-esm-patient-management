@@ -36,7 +36,9 @@
   "dependencies": {
     "carbon-components-react": "^7.25.0",
     "formik": "^2.1.5",
+    "geopattern": "^1.2.3",
     "lodash-es": "^4.17.15",
+    "react-avatar": "^4.0.0",
     "uuid": "^8.3.2",
     "yup": "^0.29.1"
   },

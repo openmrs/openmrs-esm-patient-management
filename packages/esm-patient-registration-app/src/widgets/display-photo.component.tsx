@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import placeholder from '../assets/placeholder.svg';
-import { useConfig } from '@openmrs/esm-framework';
-import { fetchPatientPhotoUrl } from '../patient-registration/patient-registration.resource';
+import React from 'react';
+import Avatar from 'react-avatar';
+import GeoPattern from 'geopattern';
+import { usePatientPhoto } from '../patient-registration/patient-registration.resource';
 import styles from './display-photo.scss';
 
-export default function DisplayPatientPhoto(props: { patientUuid: string }) {
-  const [photo, setPhoto] = useState(placeholder);
-  const config = useConfig();
+interface DisplayPatientPhotoProps {
+  patientName: string;
+  patientUuid: string;
+}
 
-  useEffect(() => {
-    const ac = new AbortController();
-    if (props.patientUuid) {
-      fetchPatientPhotoUrl(props.patientUuid, config.concepts.patientPhotoUuid, ac)
-        .then((data) => data && setPhoto(data.imageData))
-        .catch((error) => error.code !== 20 && Promise.reject(error));
-    }
-    return () => ac.abort();
-  }, [props.patientUuid, config.concepts.patientPhotoUuid]);
+export default function DisplayPatientPhoto({ patientUuid, patientName }: DisplayPatientPhotoProps) {
+  const { data: photo } = usePatientPhoto(patientUuid);
+  const patternUrl: string = GeoPattern.generate(patientUuid).toDataUri();
 
   return (
     <div className={styles.photoFrame}>
-      <img src={photo} alt="Patient avatar" />
+      <Avatar
+        alt={`${patientName ? `${patientName}'s avatar` : 'Patient avatar'}`}
+        color="rgba(0,0,0,0)"
+        name={patientName}
+        src={photo?.imageSrc}
+        size="80"
+        style={{ backgroundImage: `url(${patternUrl})`, backgroundRepeat: 'round' }}
+      />
     </div>
   );
 }
