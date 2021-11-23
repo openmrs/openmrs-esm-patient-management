@@ -132,7 +132,11 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
         </div>
       )}
       {!identifierType?.isPrimary && (
-        <Button kind="ghost" onClick={handleDelete} iconDescription={t('deleteID', 'Delete ID')} hasIconOnly>
+        <Button
+          kind="ghost"
+          onClick={handleDelete}
+          iconDescription={t('deleteIdentifierTooltip', 'Delete')}
+          hasIconOnly>
           <TrashCan16 className={styles.trashCan} />
         </Button>
       )}

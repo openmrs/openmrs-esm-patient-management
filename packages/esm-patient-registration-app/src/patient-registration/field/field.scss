@@ -39,16 +39,16 @@
   margin-bottom: $spacing-05;
 }
 
-.alignEnd {
-  align-self: end;
+.identifierLabelText {
+  display: flex;
 }
 
-.setIDNumberButton {
-  margin-left: -$spacing-05;
+.identifierLabelText > h4 {
+  margin-top: $spacing-05;
 }
 
 .setIDNumberButton > svg {
-  margin-left: $spacing-05;
+  margin-left: $spacing-03;
 }
 
 :global(.omrs-breakpoint-lt-desktop){

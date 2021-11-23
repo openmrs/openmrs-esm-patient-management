@@ -14,6 +14,7 @@
 
 .label {
   @include carbon--type-style("label-01");
+  color: $text-02;
 }
 
 .textID {
@@ -86,6 +87,7 @@
 .IDInput {
   display: grid;
   grid-template-columns: 1fr auto;
+  align-items: center;
 }
 
 .trashCan {

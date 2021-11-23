@@ -108,7 +108,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       <div>
         {layout === 'desktop' ? (
           <div className={styles.patientIdentifierOverlayHeaderDesktop}>
-            <h4 className={styles.productiveHeading02}>{t('setIDNumbers', 'Set ID numbers')}</h4>
+            <h4 className={styles.productiveHeading02}>{t('configureIdentifiers', 'Configure identifiers')}</h4>
             <Button kind="ghost" size="small" onClick={closeOverlay} hasIconOnly iconDescription="">
               <Close24 />
             </Button>
@@ -118,21 +118,23 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
             <Button kind="ghost" iconDescription="" size="small" onClick={closeOverlay} hasIconOnly>
               <ArrowLeft24 />
             </Button>
-            <h4 className={styles.productiveHeading02}>{t('setIDNumbers', 'Set ID numbers')}</h4>
+            <h4 className={styles.productiveHeading02}>{t('configureIdentifiers', 'Configure identifiers')}</h4>
           </div>
         )}
         <div className={styles.overlayContent}>
           <p className={styles.bodyLong02}>
-            {t('IDInstructions', "Select the type of ID Number you'd like to add for this patient:")}
+            {t('IDInstructions', "Select the type of identifier you'd like to add for this patient:")}
           </p>
-          <div className={styles.space05}>
-            <Search
-              labelText={t('searchID', 'Search an ID Number')}
-              placeholder={t('searchID', 'Search an ID Number')}
-              onChange={handleSearch}
-              value={searchString}
-            />
-          </div>
+          {identifierTypes.length > 7 && (
+            <div className={styles.space05}>
+              <Search
+                labelText={t('searchID', 'Search an ID Number')}
+                placeholder={t('searchID', 'Search an ID Number')}
+                onChange={handleSearch}
+                value={searchString}
+              />
+            </div>
+          )}
           <fieldset>{identifierTypeCheckboxes}</fieldset>
         </div>
       </div>
@@ -141,7 +143,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="primary" onClick={handleAddIdentifier}>
-          {t('setIDNumbers', 'Set ID numbers')}
+          {t('configureIdentifiers', 'Configure identifiers')}
         </Button>
       </div>
     </div>
