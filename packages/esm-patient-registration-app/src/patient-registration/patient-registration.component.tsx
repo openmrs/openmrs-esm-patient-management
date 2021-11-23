@@ -18,7 +18,7 @@ import { validationSchema as initialSchema } from './validation/patient-registra
 import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
-import { fetchPatientPhotoUrl } from './patient-registration.resource';
+import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
@@ -42,7 +42,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const [loading, patient] = useCurrentPatient(patientUuid);
   const { t } = useTranslation();
-  const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
+  const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
@@ -50,6 +50,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
+  const { data: photo } = usePatientPhoto(patient?.id);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -105,16 +106,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
     }
   }, [inEditMode, addressTemplate]);
-
-  useEffect(() => {
-    if (patient) {
-      const abortController = new AbortController();
-
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then(setCapturePhotoProps);
-
-      return () => abortController.abort();
-    }
-  }, [patient, config]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
@@ -213,7 +204,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   inEditMode,
                   setFieldValue: props.setFieldValue,
                   setCapturePhotoProps,
-                  currentPhoto: capturePhotoProps?.imageData,
+                  currentPhoto: photo?.imageSrc,
                 }}>
                 {sections.map((section, index) => (
                   <div key={index}>{getSection(section, index)}</div>

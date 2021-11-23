@@ -132,27 +132,6 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
   };
 }
 
-export async function fetchPatientPhotoUrl(
-  patientUuid: string,
-  concept: string,
-  abortController: AbortController,
-): Promise<CapturePhotoProps> {
-  const { data } = await openmrsFetch(`/ws/rest/v1/obs?patient=${patientUuid}&concept=${concept}&v=full`, {
-    method: 'GET',
-    signal: abortController.signal,
-  });
-  const item = data.results[0];
-
-  if (item) {
-    return {
-      dateTime: item.obsDatetime,
-      imageData: item.value.links.uri,
-    };
-  } else {
-    return null;
-  }
-}
-
 export async function fetchPerson(query: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
     signal: abortController.signal,
