@@ -15,7 +15,7 @@ const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({
   const { t } = useTranslation();
   const handleClick = React.useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-    closePatientSearchResultsPanel();
+    closePatientSearchResultsPanel && closePatientSearchResultsPanel();
   }, [closePatientSearchResultsPanel, patientUuid]);
 
   return (
