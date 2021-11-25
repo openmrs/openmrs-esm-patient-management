@@ -148,7 +148,7 @@ const PatientListList: React.FC = () => {
         {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
           <CreateNewList
             close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}
-            onSuccess={handleCreateListSuccess}
+            onSuccess={() => patientListQuery.refetch()}
           />
         )}
       </section>

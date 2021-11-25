@@ -6,14 +6,14 @@ import { createPatientList, OpenmrsCohort, editPatientList, useCohortTypes, NewC
 import styles from './create-edit-patient-list.scss';
 import { useLayoutType, showToast, useSessionUser } from '@openmrs/esm-framework';
 
-interface CreateNewListProps {
+interface CreateEditPatientList {
   close: () => void;
   edit?: boolean;
   patientListDetails?: OpenmrsCohort;
   onSuccess?: () => void;
 }
 
-const CreateEditNewList: React.FC<CreateNewListProps> = ({
+const CreateEditPatientList: React.FC<CreateEditPatientList> = ({
   close,
   edit = false,
   patientListDetails = null,
@@ -168,4 +168,4 @@ const CreateEditNewList: React.FC<CreateNewListProps> = ({
   );
 };
 
-export default CreateEditNewList;
+export default CreateEditPatientList;

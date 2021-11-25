@@ -18,14 +18,9 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
     method: 'POST',
-    mode: 'cors',
-    cache: 'no-cache',
-    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
     },
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   });
   return response.data;
@@ -35,14 +30,9 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
     method: 'DELETE',
-    mode: 'cors',
-    cache: 'no-cache',
-    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
     },
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
     body: JSON.stringify(data),
   });
   return response.data;

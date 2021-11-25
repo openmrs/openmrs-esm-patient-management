@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
 import dayjs from 'dayjs';
-import CreateEditNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
+import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
 
 interface PatientRow {
   name: string;
@@ -45,17 +45,14 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
   const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);
   const [searchString, setSearchString] = useState('');
-  const { data: patientListDetails, mutate: patientListDetailsMutate } = usePatientListDetails(patientListUuid);
+  const { data: patientListDetails, mutate: mutatePatientListDetails } = usePatientListDetails(patientListUuid);
   const { data: patientListMembers } = usePatientListMembers(
     patientListUuid,
     searchString,
     (currentPage - 1) * currentPageSize,
     currentPageSize,
   );
-  const [editPatientListDetail, showOverlay] = useState(false);
-  const handleSuccessEdit = useCallback(() => {
-    patientListDetailsMutate();
-  }, [patientListDetailsMutate]);
+  const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
 
   const patients: PatientListMemberRow[] = useMemo(
     () =>
@@ -150,7 +147,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             }>
             <OverflowMenuItem
               itemText={t('editNameDescription', 'Edit Name/ Description')}
-              onClick={() => showOverlay(true)}
+              onClick={() => setEditPatientListDetailOverlay(true)}
             />
             <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={handleDelete} isDelete />
           </CustomOverflowMenuComponent>
@@ -182,12 +179,12 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
         </div>
       </section>
       <section>
-        {editPatientListDetail && (
-          <CreateEditNewList
-            close={() => showOverlay(false)}
+        {showEditPatientListDetailOverlay && (
+          <EditPatientListDetailsOverlay
+            close={() => setEditPatientListDetailOverlay(false)}
             edit
             patientListDetails={patientListDetails}
-            onSuccess={handleSuccessEdit}
+            onSuccess={mutatePatientListDetails}
           />
         )}
       </section>
