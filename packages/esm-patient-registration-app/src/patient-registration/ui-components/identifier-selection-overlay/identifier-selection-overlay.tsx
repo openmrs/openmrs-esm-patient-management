@@ -124,7 +124,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       }>
       <div>
         <p className={styles.bodyLong02}>
-          {t('IDInstructions', "Select the type of identifier you'd like to add for this patient:")}
+          {t('IDInstructions', "Select the identifiers you'd like to add for this patient:")}
         </p>
         {identifierTypes.length > 7 && (
           <div className={styles.space05}>

@@ -41,10 +41,11 @@
 
 .identifierLabelText {
   display: flex;
+  align-items: center;
 }
 
-.identifierLabelText > h4 {
-  margin-top: $spacing-05;
+.setIDNumberButton {
+  margin-bottom: $spacing-05;
 }
 
 .setIDNumberButton > svg {
