@@ -3,6 +3,7 @@ import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
+  CustomPatientIdentifier,
   CustomPatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
@@ -11,11 +12,14 @@ import {
   PatientIdentifier,
 } from './patient-registration-types';
 import {
+  addPatientIdentifier,
+  deletePatientIdentifier,
   deletePersonName,
   generateIdentifier,
   savePatient,
   savePatientPhoto,
   saveRelationship,
+  updatePatientIdentifier,
 } from './patient-registration.resource';
 
 export type SavePatientForm = (
@@ -23,6 +27,7 @@ export type SavePatientForm = (
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
+  initialIdentifiers: CustomPatientIdentifier,
   identifierTypes: Array<CustomPatientIdentifierType>,
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
@@ -37,6 +42,7 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
+    initialIdentifiers: CustomPatientIdentifier,
     identifierTypes: Array<CustomPatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
@@ -50,6 +56,7 @@ export default class FormManager {
         formValues: values,
         patientUuidMap,
         initialAddressFieldValues,
+        initialIdentifiers,
         identifierTypes,
         capturePhotoProps,
         patientPhotoConceptUuid,
@@ -71,6 +78,7 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
+    initialIdentifiers: CustomPatientIdentifier,
     identifierTypes: Array<CustomPatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
@@ -85,6 +93,10 @@ export default class FormManager {
       currentLocation,
       abortController,
     );
+
+    if (patientUuid) {
+      FormManager.updatePatientIdentifiers(patientUuid, initialIdentifiers, patientIdentifiers, patientUuidMap);
+    }
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
@@ -266,5 +278,40 @@ export default class FormManager {
       deathDate: isDead ? deathDate : undefined,
       causeOfDeath: isDead ? deathCause : undefined,
     };
+  }
+
+  static updatePatientIdentifiers(
+    patientUuid: string,
+    initialPatientIdentifiers: CustomPatientIdentifier,
+    patientIdentifiers: PatientIdentifier[],
+    patientUuidMap: PatientUuidMapType,
+  ) {
+    const abortController = new AbortController();
+    patientIdentifiers.forEach((identifier) => {
+      // Updating identifier value
+      if (identifier.uuid) {
+        updatePatientIdentifier(patientUuid, identifier, abortController).catch((err) => {
+          throw new Error(err);
+        });
+      } else {
+        // Adding new identifiers
+        addPatientIdentifier(patientUuid, identifier, abortController).catch((err) => {
+          throw new Error(err);
+        });
+      }
+    });
+
+    // Deleting an existing identifier
+    Object.values(initialPatientIdentifiers)
+      .filter((identifierFieldName) => {
+        const identifierUuid = patientUuidMap[identifierFieldName];
+        if (!identifierUuid) {
+          return false;
+        }
+        return !patientIdentifiers.some((identifier) => identifier.uuid === identifierUuid);
+      })
+      .forEach((identifierFieldName) => {
+        deletePatientIdentifier(patientUuid, patientUuidMap[identifierFieldName], abortController);
+      });
   }
 }
