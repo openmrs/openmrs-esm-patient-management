@@ -98,10 +98,6 @@ const PatientListList: React.FC = () => {
 
   const handleSearch = (str) => setSearchString(str);
 
-  const handleCreateListSuccess = useCallback(() => {
-    patientListQuery.refetch();
-  }, [patientListQuery]);
-
   if (patientListQuery.error) {
     //TODO show toast with error
     return null;
