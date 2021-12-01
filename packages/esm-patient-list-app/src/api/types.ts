@@ -57,6 +57,7 @@ export interface OpenmrsCohort {
   isStarred?: boolean;
   type?: string;
   size: number;
+  cohortType?: CohortType;
 }
 
 export interface OpenmrsCohortRef {
@@ -81,4 +82,11 @@ export interface CohortResponse<T> {
 export interface NewCohortData {
   name: string;
   description: string;
+  location: string;
+  cohortType: string;
+}
+
+export interface CohortType {
+  display: string;
+  uuid: string;
 }

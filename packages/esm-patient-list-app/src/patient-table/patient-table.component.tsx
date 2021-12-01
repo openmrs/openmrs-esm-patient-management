@@ -1,8 +1,9 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
   Pagination,
   Search,
   SearchProps,
@@ -23,6 +24,7 @@ interface PatientTableProps {
   style?: CSSProperties;
   autoFocus?: boolean;
   isLoading: boolean;
+  isFetching?: boolean;
   search: {
     onSearch(searchTerm: string): any;
     placeHolder: string;
@@ -49,7 +51,16 @@ interface PatientTableColumn {
   };
 }
 
-const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, pagination, isLoading, autoFocus }) => {
+const PatientTable: React.FC<PatientTableProps> = ({
+  patients,
+  columns,
+  search,
+  pagination,
+  isLoading,
+  autoFocus,
+  isFetching,
+}) => {
+  const isDesktop = useLayoutType() === 'desktop';
   const rows: Array<any> = useMemo(
     () =>
       patients.map((patient, index) => {
@@ -80,21 +91,24 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
 
   return (
     <div className={styles.tableOverride}>
-      <div id="table-tool-bar" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-        <Search
-          id="patient-list-search"
-          labelText=""
-          placeholder={search.placeHolder}
-          onChange={(evnt) => handleSearch(evnt.target.value)}
-          className={styles.searchOverrides}
-          defaultValue={search.currentSearchTerm}
-          light
-          size="sm"
-          {...otherSearchProps}
-        />
+      <div id="table-tool-bar" className={styles.searchContainer}>
+        <div>{isFetching && <InlineLoading />}</div>
+        <div>
+          <Search
+            id="patient-list-search"
+            placeholder={search.placeHolder}
+            labelText=""
+            size={isDesktop ? 'sm' : 'xl'}
+            className={styles.searchOverrides}
+            light
+            onChange={(evnt) => handleSearch(evnt.target.value)}
+            defaultValue={search.currentSearchTerm}
+            {...otherSearchProps}
+          />
+        </div>
       </div>
-      <DataTable rows={rows} headers={columns} isSortable={true} size="short" useZebraStyles={true}>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
               <TableHead>
@@ -104,7 +118,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
-                      })}>
+                      })}
+                      className={isDesktop ? styles.desktopHeader : styles.tabletHeader}>
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
@@ -112,7 +127,10 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    {...getRowProps({ row })}
+                    className={isDesktop ? styles.desktopRow : styles.tabletRow}
+                    key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
@@ -133,6 +151,8 @@ const PatientTable: React.FC<PatientTableProps> = ({ patients, columns, search, 
           className={styles.paginationOverride}
           pagesUnknown={pagination?.pagesUnknown}
           isLastPage={pagination.lastPage}
+          backwardText=""
+          forwardText=""
         />
       )}
     </div>

@@ -21,41 +21,22 @@ title {
   display: flex;
 }
 
-.patientListListContainer {
-  display: grid;
-  min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-  grid-template-rows: $spacing-09 auto 1fr;
-  align-content: baseline;
-}
-
 .breadcrumbsSlot {
   grid-row: 1 / 2; 
   grid-column: 1 / 2;
 }
 
-.searchContainer {
-  grid-row: 1 / 2;
-  grid-column: 1 / 2;
-  justify-self: end;
-}
-
-.search input {
-  background-color: $ui-02;
-  border-bottom-color: $ui-03;
-}
-
 .patientListList {
-  grid-row: 2 / 3;
-  grid-column: 1 / 2;
   height: 100%;
   width: 100%;
-  display: grid;
-  grid-template: $spacing-06 auto / 1fr 1fr;
-  gap: $spacing-05;
-  padding: $spacing-05 $spacing-05 0rem $spacing-05;
   background-color: $ui-02;
+}
+
+.patientListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-left: $spacing-05;
 }
 
 .newListButton {
@@ -66,6 +47,7 @@ title {
 
 .tabs {
   grid-column: 'span 2';
+  padding: 0 $spacing-05;
 }
 
 .hiddenTabsContent, .tabs .hiddenTabsContent {
@@ -77,9 +59,28 @@ title {
   grid-column: 1 / 2; 
   height: 100%;
   padding: $spacing-05;
+  background-color: $ui-01;
 }
 
 // Patient List Table
+
+.searchContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.searchContainer > div {
+  align-self: center;
+  justify-self: flex-end;
+}
+
+.search {
+  width: 100%;
+  max-width: 16rem;
+  background-color: $ui-02;
+  border-bottom-color: $ui-03;
+}
 
 .tableBody {
   background-color: $ui-01;
@@ -87,6 +88,14 @@ title {
 
 .tableCell, .interactiveText01 {
   color: $interactive-01;
+}
+
+.desktopRow, .desktopHeader {
+    height: $spacing-07 !important;
+}
+
+.tabletRow, .tabletHeader {
+    height: $spacing-09 !important;
 }
 
 // Search Overlay 
@@ -120,19 +129,3 @@ title {
   margin: $spacing-03;
 }
 
-//Create new List
-
-.header {
-  @include carbon--type-style('productive-heading-02');
-  margin-bottom: $spacing-05;
-}
-
-.input {
-  margin-top: $spacing-07;
-}
-
-.buttonsGroup {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}

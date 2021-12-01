@@ -61,7 +61,7 @@
     "jest-cli": "^26.4.2",
     "lerna": "^3.20.2",
     "openmrs": "next",
-    "prettier": "^2.2.1",
+    "prettier": "^2.4.1",
     "pretty-quick": "^2.0.2",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",

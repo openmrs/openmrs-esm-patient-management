@@ -8,7 +8,7 @@ import {
 } from './api';
 import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
 import { fetchCurrentPatient, openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
-import { OpenmrsCohort, OpenmrsCohortMember, CohortResponse, cohortUrl } from '.';
+import { OpenmrsCohort, OpenmrsCohortMember, CohortResponse, cohortUrl, CohortType } from '.';
 import useSWR from 'swr';
 
 /**
@@ -132,5 +132,10 @@ export function usePatientListMembers(
     `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
     openmrsFetch,
   );
+  return { ...swrResult, data: swrResult?.data?.data?.results };
+}
+
+export function useCohortTypes() {
+  const swrResult = useSWR<FetchResponse<CohortResponse<CohortType>>, Error>(`${cohortUrl}/cohorttype`, openmrsFetch);
   return { ...swrResult, data: swrResult?.data?.data?.results };
 }
