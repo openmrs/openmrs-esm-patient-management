@@ -4,19 +4,16 @@ import { useTranslation } from 'react-i18next';
 import styles from './edit-patient-details-button.scss';
 
 interface EditPatientDetailsButtonProps {
-  closePatientSearchResultsPanel?: () => void;
+  onTransition?: () => void;
   patientUuid: string;
 }
 
-const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({
-  patientUuid,
-  closePatientSearchResultsPanel,
-}) => {
+const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ patientUuid, onTransition }) => {
   const { t } = useTranslation();
   const handleClick = React.useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-    closePatientSearchResultsPanel && closePatientSearchResultsPanel();
-  }, [closePatientSearchResultsPanel, patientUuid]);
+    onTransition && onTransition();
+  }, [onTransition, patientUuid]);
 
   return (
     <li className="bx--overflow-menu-options__option">
@@ -25,10 +22,7 @@ const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({
         role="menuitem"
         title={t('editPatientDetails', 'Edit Patient Details')}
         data-floating-menu-primary-focus
-        onClick={handleClick}
-        style={{
-          maxWidth: '100vw',
-        }}>
+        onClick={handleClick}>
         <span className="bx--overflow-menu-options__option-content">
           {t('editPatientDetails', 'Edit patient details')}
         </span>
