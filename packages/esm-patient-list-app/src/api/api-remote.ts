@@ -1,4 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import {
   AddPatientData,
   CohortResponse,
@@ -17,14 +18,21 @@ async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
     signal: ac.signal,
     method: 'POST',
-    mode: 'cors',
-    cache: 'no-cache',
-    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
     },
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
+    body: JSON.stringify(data),
+  });
+  return response.data;
+}
+
+async function deleteData(url: string, data = {}, ac = new AbortController()) {
+  const response = await openmrsFetch(url, {
+    signal: ac.signal,
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify(data),
   });
   return response.data;
@@ -34,7 +42,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
   const custom = 'custom:(uuid,name,description,display,size,attributes)';
   const query: Array<[string, string]> = [['v', custom]];
 
-  if (filter.name !== undefined) {
+  if (filter.name !== undefined && filter.name !== '') {
     query.push(['q', filter.name]);
   }
 
@@ -110,13 +118,26 @@ export async function addPatientToList(data: AddPatientData, ac = new AbortContr
 
 export async function createPatientList(cohort: NewCohortData, ac = new AbortController()) {
   return postData(
-    `${cohortUrl}/cohort`,
+    `${cohortUrl}/cohort/`,
     {
       ...cohort,
-      cohortType: '6df786bf-f15a-49c2-8d2b-1832d961c270',
-      location: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
-      startDate: '2020-01-01',
-      groupCohort: true,
+      startDate: dayjs().format(),
+      groupCohort: false,
+      definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
+    },
+    ac,
+  );
+}
+
+export async function editPatientList(cohortUuid: string, cohort: NewCohortData, ac = new AbortController()) {
+  return postData(`${cohortUrl}/cohort/${cohortUuid}`, cohort, ac);
+}
+
+export async function deletePatientList(cohortUuid: string, ac = new AbortController()) {
+  return deleteData(
+    `${cohortUrl}/cohort/${cohortUuid}`,
+    {
+      voidReason: '',
     },
     ac,
   );

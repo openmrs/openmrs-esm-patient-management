@@ -21,6 +21,7 @@ import {
   saveRelationship,
   updatePatientIdentifier,
 } from './patient-registration.resource';
+import isEqual from 'lodash-es/isEqual';
 
 export type SavePatientForm = (
   patientUuid: string | undefined,
@@ -204,6 +205,12 @@ export default class FormManager {
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
   ): Patient {
+    let address = FormManager.getPatientAddressField(values, initialAddressFieldValues);
+
+    if (isEqual(initialAddressFieldValues, address)) {
+      address = {};
+    }
+
     return {
       uuid: patientUuidMap['patientUuid'],
       person: {
@@ -213,7 +220,7 @@ export default class FormManager {
         birthdate: values.birthdate,
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(values, personAttributeSections),
-        addresses: [FormManager.getPatientAddressField(values, initialAddressFieldValues)],
+        addresses: [address],
         ...FormManager.getPatientDeathInfo(values),
       },
       identifiers,

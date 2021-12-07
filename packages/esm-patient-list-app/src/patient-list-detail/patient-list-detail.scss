@@ -4,6 +4,11 @@
   display: flex;
 }
 
+.patientListDetailsPage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
 .cohortHeader {
   display: flex;
   justify-content: space-between;
