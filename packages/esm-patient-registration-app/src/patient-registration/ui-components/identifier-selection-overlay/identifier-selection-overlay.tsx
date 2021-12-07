@@ -2,13 +2,13 @@ import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAct
 import styles from './identifier-selection.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
-import { CustomPatientIdentifierType } from '../../patient-registration-types';
+import { PatientIdentifierType } from '../../patient-registration-types';
 import Overlay from '../overlay/overlay.component';
 
 interface PatientIdentifierOverlayProps {
-  patientIdentifiers: CustomPatientIdentifierType[];
+  patientIdentifiers: PatientIdentifierType[];
   closeOverlay: () => void;
-  setPatientIdentifiers: Dispatch<SetStateAction<CustomPatientIdentifierType[]>>;
+  setPatientIdentifiers: Dispatch<SetStateAction<PatientIdentifierType[]>>;
 }
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
@@ -16,7 +16,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   closeOverlay,
   setPatientIdentifiers,
 }) => {
-  const [identifierTypes, setIdentifierTypes] = useState<CustomPatientIdentifierType[]>([]);
+  const [identifierTypes, setIdentifierTypes] = useState<PatientIdentifierType[]>([]);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
 

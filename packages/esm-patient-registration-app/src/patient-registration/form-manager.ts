@@ -3,8 +3,8 @@ import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
-  CustomPatientIdentifier,
-  CustomPatientIdentifierType,
+  PatientIdentifiersValueType,
+  PatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
   Patient,
@@ -28,8 +28,8 @@ export type SavePatientForm = (
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
-  initialIdentifiers: CustomPatientIdentifier,
-  identifierTypes: Array<CustomPatientIdentifierType>,
+  initialIdentifiers: PatientIdentifiersValueType,
+  identifierTypes: Array<PatientIdentifierType>,
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
@@ -43,8 +43,8 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    initialIdentifiers: CustomPatientIdentifier,
-    identifierTypes: Array<CustomPatientIdentifierType>,
+    initialIdentifiers: PatientIdentifiersValueType,
+    identifierTypes: Array<PatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
@@ -79,8 +79,8 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    initialIdentifiers: CustomPatientIdentifier,
-    identifierTypes: Array<CustomPatientIdentifierType>,
+    initialIdentifiers: PatientIdentifiersValueType,
+    identifierTypes: Array<PatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
@@ -150,7 +150,7 @@ export default class FormManager {
   static getPatientIdentifiersToCreate(
     values: FormValues,
     patientUuidMap: object,
-    identifierTypes: Array<CustomPatientIdentifierType>,
+    identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
@@ -289,7 +289,7 @@ export default class FormManager {
 
   static updatePatientIdentifiers(
     patientUuid: string,
-    initialPatientIdentifiers: CustomPatientIdentifier,
+    initialPatientIdentifiers: PatientIdentifiersValueType,
     patientIdentifiers: PatientIdentifier[],
     patientUuidMap: PatientUuidMapType,
   ) {

@@ -29,7 +29,8 @@ export interface PatientRegistration {
   formValues: FormValues;
   patientUuidMap: PatientUuidMapType;
   initialAddressFieldValues: Record<string, any>;
-  identifierTypes: Array<PatientIdentifierType>;
+  initialIdentifiers: PatientIdentifiersValueType;
+  identifierTypes: PatientIdentifierType[];
   capturePhotoProps: CapturePhotoProps;
   patientPhotoConceptUuid: string;
   currentLocation: string;
@@ -42,6 +43,10 @@ export interface PatientRegistration {
 export interface PatientIdentifierType extends FetchedPatientIdentifierType {
   identifierSources: Array<IdentifierSource>;
   autoGenerationSource?: IdentifierSource;
+  selectedSource?: IdentifierSource;
+  selected?: boolean;
+  // defaultSelected keeps the track in the editMode, whether the identifier was previously added to the patient or not.
+  defaultSelected?: boolean;
 }
 
 export interface PatientIdentifier {
@@ -52,7 +57,7 @@ export interface PatientIdentifier {
   preferred?: boolean;
 }
 
-export interface CustomPatientIdentifier {
+export interface PatientIdentifiersValueType {
   [identifierName: string]: string;
 }
 
@@ -113,7 +118,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
-  identifiers?: CustomPatientIdentifier;
+  identifiers?: PatientIdentifiersValueType;
 }
 
 export interface PatientUuidMapType {
@@ -133,11 +138,4 @@ export interface AddressValidationSchemaType {
   label: string;
   regex: RegExp;
   regexFormat: string;
-}
-
-export interface CustomPatientIdentifierType extends PatientIdentifierType {
-  selectedSource: IdentifierSource;
-  selected: boolean;
-  // defaultSelected keeps the track in the editMode, whether the identifier was previously added to the patient or not.
-  defaultSelected?: boolean;
 }

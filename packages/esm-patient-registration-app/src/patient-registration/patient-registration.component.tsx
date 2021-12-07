@@ -15,7 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, CustomPatientIdentifierType } from './patient-registration-types';
+import { FormValues, CapturePhotoProps, PatientIdentifierType } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { fetchPatientPhotoUrl } from './patient-registration.resource';
@@ -53,7 +53,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
-  const [customPatientIdentifiers, setCustomPatientIdentifiers] = useState<CustomPatientIdentifierType[]>([]);
+  const [customPatientIdentifiers, setCustomPatientIdentifiers] = useState<PatientIdentifierType[]>([]);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -71,20 +71,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldConfigs(config.fieldConfigurations);
     }
   }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
-
-  useEffect(() => {
-    for (const patientIdentifier of patientIdentifiers) {
-      if (!initialFormValues[patientIdentifier.fieldName]) {
-        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
-      }
-
-      setInitialFormValues({
-        ...initialFormValues,
-        ['source-for-' + patientIdentifier.fieldName]:
-          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
-      });
-    }
-  }, [patientIdentifiers]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;

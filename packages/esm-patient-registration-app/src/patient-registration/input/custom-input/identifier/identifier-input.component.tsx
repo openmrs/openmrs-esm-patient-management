@@ -4,14 +4,14 @@ import styles from '../../input.scss';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
-import { CustomPatientIdentifierType } from '../../../patient-registration-types';
+import { PatientIdentifierType } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { TrashCan16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
 import camelCase from 'lodash-es/camelCase';
 
 interface IdentifierInputProps {
-  identifierType: CustomPatientIdentifierType;
+  identifierType: PatientIdentifierType;
 }
 
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType }) => {

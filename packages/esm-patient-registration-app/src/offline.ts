@@ -45,6 +45,7 @@ export async function syncPatientRegistration(
     queuedPatient.formValues,
     queuedPatient.patientUuidMap,
     queuedPatient.initialAddressFieldValues,
+    queuedPatient.initialIdentifiers,
     queuedPatient.identifierTypes,
     queuedPatient.capturePhotoProps,
     queuedPatient.patientPhotoConceptUuid,
