@@ -1,4 +1,5 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import useSWR from 'swr';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { CapturePhotoProps, Patient, Relationship } from './patient-registration-types';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
@@ -86,25 +87,49 @@ export async function savePatientPhoto(
   });
 }
 
-export async function fetchPatientPhotoUrl(
-  patientUuid: string,
-  concept: string,
-  abortController: AbortController,
-): Promise<CapturePhotoProps> {
-  const { data } = await openmrsFetch(`/ws/rest/v1/obs?patient=${patientUuid}&concept=${concept}&v=full`, {
-    method: 'GET',
-    signal: abortController.signal,
-  });
-  const item = data.results[0];
+interface ObsFetchResponse {
+  results: Array<PhotoObs>;
+}
 
-  if (item) {
-    return {
-      dateTime: item.obsDatetime,
-      imageData: item.value.links.uri,
+interface PhotoObs {
+  display: string;
+  obsDatetime: string;
+  uuid: string;
+  value: {
+    display: string;
+    links: {
+      rel: string;
+      uri: string;
     };
-  } else {
-    return null;
-  }
+  };
+}
+
+interface UsePatientPhotoResult {
+  data: { dateTime: string; imageSrc: string } | null;
+  isError: Error;
+  isLoading: boolean;
+}
+
+export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
+  const {
+    concepts: { patientPhotoUuid },
+  } = useConfig();
+  const url = `/ws/rest/v1/obs?patient=${patientUuid}&concept=${patientPhotoUuid}&v=full`;
+
+  const { data, error } = useSWR<{ data: ObsFetchResponse }, Error>(patientUuid ? url : null, openmrsFetch);
+
+  const item = data?.data?.results[0];
+
+  return {
+    data: item
+      ? {
+          dateTime: item?.obsDatetime,
+          imageSrc: item?.value?.links?.uri,
+        }
+      : null,
+    isError: error,
+    isLoading: !data && !error,
+  };
 }
 
 export async function fetchPerson(query: string, abortController: AbortController) {
