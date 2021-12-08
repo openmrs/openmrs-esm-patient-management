@@ -7,6 +7,7 @@ import {
   getFormValuesFromFhirPatient,
   getPatientIdentifiersFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
+  getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
 
 const blankFormValues: FormValues = {
@@ -50,6 +51,7 @@ export function useInitialFormValues(
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
+          ...getPhonePersonAttributeValueFromFhirPatient(patient),
           identifiers: [...getPatientIdentifiersFromFhirPatient(patient)],
         });
       } else if (!isLoadingPatient && patientUuid) {
