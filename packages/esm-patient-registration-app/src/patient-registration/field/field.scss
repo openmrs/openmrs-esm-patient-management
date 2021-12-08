@@ -72,5 +72,8 @@
     grid-row: 1;
     justify-self: start;
   }
+  .radioButton label {
+    height: $spacing-09 !important;
+  }
 }
 

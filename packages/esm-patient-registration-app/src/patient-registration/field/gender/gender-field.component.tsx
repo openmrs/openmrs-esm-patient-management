@@ -24,11 +24,25 @@ export const GenderBirthField: React.FC = () => {
           <EobField />
         </div>
         <div className={styles.sexField}>
-          <p className="bx--label">{t('genderLabelText', 'Sex')}</p>
-          <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
-            <RadioButton id="male" labelText={t('maleLabelText', 'Male')} value="Male" />
-            <RadioButton id="female" labelText={t('femaleLabelText', 'Female')} value="Female" />
-            <RadioButton id="other" labelText={t('otherLabelText', 'Other')} value="Other" />
+          <RadioButtonGroup
+            name="gender"
+            legendText={t('genderLabelText', 'Sex')}
+            orientation="vertical"
+            onChange={setGender}
+            valueSelected={field.value}>
+            <RadioButton className={styles.radioButton} id="male" labelText={t('maleLabelText', 'Male')} value="Male" />
+            <RadioButton
+              className={styles.radioButton}
+              id="female"
+              labelText={t('femaleLabelText', 'Female')}
+              value="Female"
+            />
+            <RadioButton
+              className={styles.radioButton}
+              id="other"
+              labelText={t('otherLabelText', 'Other')}
+              value="Other"
+            />
           </RadioButtonGroup>
           {meta.touched && meta.error && (
             <>

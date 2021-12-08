@@ -18,7 +18,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
   const { validationSchema, setValidationSchema, setFieldValue, setPatientIdentifiers } =
     React.useContext(PatientRegistrationContext);
   const source = identifierType.selectedSource;
-  const name = `identifiers.${camelCase(identifierType.name)}`;
+  const name = `identifiers.${identifierType.fieldName}`;
   const { t } = useTranslation();
   const [option, setAutoGenerationOption] = useState({
     manualEntryEnabled: source ? true : undefined,

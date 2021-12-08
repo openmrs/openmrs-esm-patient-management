@@ -40,6 +40,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           ? {
               ...identifier,
               selected,
+              selectedSource: identifier.identifierSources.length > 0 ? identifier.identifierSources[0] : null,
             }
           : identifier,
       ),
