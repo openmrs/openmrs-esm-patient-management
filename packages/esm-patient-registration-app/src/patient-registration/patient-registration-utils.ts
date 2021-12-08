@@ -160,3 +160,11 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Arr
     };
   });
 }
+
+export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient) {
+  const result = {};
+  if (patient.telecom) {
+    result['phone'] = patient.telecom[0].value;
+  }
+  return result;
+}
