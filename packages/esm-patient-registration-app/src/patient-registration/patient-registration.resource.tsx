@@ -121,6 +121,9 @@ export async function addPatientIdentifier(
 ) {
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     signal: abortController.signal,
     body: patientIdentifier,
   });
@@ -133,6 +136,9 @@ export async function updatePatientIdentifier(
 ) {
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifier.uuid}`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     signal: abortController.signal,
     body: patientIdentifier,
   });
@@ -143,8 +149,11 @@ export async function deletePatientIdentifier(
   patientIdentifierUuid: string,
   abortController: AbortController,
 ) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifierUuid}`, {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifierUuid}?purge`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     signal: abortController.signal,
   });
 }

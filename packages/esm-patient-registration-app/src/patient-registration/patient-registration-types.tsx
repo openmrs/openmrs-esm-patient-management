@@ -126,6 +126,12 @@ export interface PatientUuidMapType {
   patientUuid?: string;
   preferredNameUuid?: string;
   preferredAddressUuid?: string;
+  identifiers?: {
+    [identifierName: string]: {
+      uuid: string;
+      value: string;
+    };
+  };
 }
 
 export interface CapturePhotoProps {

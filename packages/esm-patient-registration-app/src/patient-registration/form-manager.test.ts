@@ -43,7 +43,7 @@ describe('FormManager', () => {
     it('uses the uuid of a field name if it exists', async () => {
       const result = await FormManager.getPatientIdentifiersToCreate(
         { ...formValues, givenName: 'foo' },
-        { givenName: { uuid: 'aUuid' } },
+        {},
         [
           {
             name: 'foo',

@@ -140,15 +140,19 @@ export function getPatientUuidMapFromFhirPatient(patient: fhir.Patient): Patient
   const additionalPatientName = patient.name[1];
   const address = patient.address?.[0];
 
+  let identifiers = {};
+
+  patient.identifier.forEach((identifier) => {
+    const key = camelCase(identifier.system || identifier.type.text);
+    identifiers[key] = { uuid: identifier.id, value: identifier.value };
+  });
+
   return {
     patientUuid: patient.id,
     preferredNameUuid: patientName?.id,
     additionalNameUuid: additionalPatientName?.id,
     preferredAddressUuid: address?.id,
-    ...patient.identifier.map((identifier) => {
-      const key = camelCase(identifier.system || identifier.type.text);
-      return { [key]: { uuid: identifier.id, value: identifier.value } };
-    }),
+    identifiers,
   };
 }
 

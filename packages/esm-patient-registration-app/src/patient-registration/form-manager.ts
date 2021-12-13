@@ -96,7 +96,9 @@ export default class FormManager {
     );
 
     if (patientUuid) {
-      FormManager.updatePatientIdentifiers(patientUuid, initialIdentifiers, patientIdentifiers, patientUuidMap);
+      await Promise.all(
+        FormManager.updatePatientIdentifiers(patientUuid, initialIdentifiers, patientIdentifiers, patientUuidMap),
+      );
     }
 
     const createdPatient = FormManager.getPatientToCreate(
@@ -149,7 +151,7 @@ export default class FormManager {
 
   static getPatientIdentifiersToCreate(
     values: FormValues,
-    patientUuidMap: object,
+    patientUuidMap: PatientUuidMapType,
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
@@ -158,7 +160,7 @@ export default class FormManager {
       const idValue = values.identifiers[type.fieldName] ?? undefined;
       if (idValue) {
         return {
-          uuid: patientUuidMap[type.fieldName] ? patientUuidMap[type.fieldName].uuid : undefined,
+          uuid: patientUuidMap?.identifiers[type.fieldName]?.uuid,
           identifier: idValue,
           identifierType: type.uuid,
           location: location,
@@ -294,31 +296,26 @@ export default class FormManager {
     patientUuidMap: PatientUuidMapType,
   ) {
     const abortController = new AbortController();
-    patientIdentifiers.forEach((identifier) => {
-      // Updating identifier value
-      if (identifier.uuid) {
-        updatePatientIdentifier(patientUuid, identifier, abortController).catch((err) => {
-          throw new Error(err);
-        });
-      } else {
-        // Adding new identifiers
-        addPatientIdentifier(patientUuid, identifier, abortController).catch((err) => {
-          throw new Error(err);
-        });
-      }
-    });
+    const identifiers = patientIdentifiers.map((patientidentifier) =>
+      patientidentifier.uuid
+        ? // Updating identifier value
+          updatePatientIdentifier(patientUuid, patientidentifier, abortController)
+        : // Adding new identifiers
+          addPatientIdentifier(patientUuid, patientidentifier, abortController),
+    );
 
     // Deleting an existing identifier
-    Object.values(initialPatientIdentifiers)
+    const deletedIdentifiers = Object.keys(initialPatientIdentifiers)
       .filter((identifierFieldName) => {
-        const identifierUuid = patientUuidMap[identifierFieldName];
+        const identifierUuid = patientUuidMap.identifiers[identifierFieldName]?.uuid;
         if (!identifierUuid) {
           return false;
         }
         return !patientIdentifiers.some((identifier) => identifier.uuid === identifierUuid);
       })
-      .forEach((identifierFieldName) => {
-        deletePatientIdentifier(patientUuid, patientUuidMap[identifierFieldName], abortController);
-      });
+      .map((identifierFieldName) =>
+        deletePatientIdentifier(patientUuid, patientUuidMap.identifiers[identifierFieldName]?.uuid, abortController),
+      );
+    return [...identifiers, ...deletedIdentifiers];
   }
 }
