@@ -18,7 +18,7 @@ import { validationSchema as initialSchema } from './validation/patient-registra
 import { FormValues, CapturePhotoProps, PatientIdentifierType } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
-import { fetchPatientPhotoUrl } from './patient-registration.resource';
+import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
@@ -44,7 +44,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const [loading, patient] = useCurrentPatient(patientUuid);
   const { t } = useTranslation();
-  const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps>(null);
+  const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
@@ -54,6 +54,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
   const [customPatientIdentifiers, setCustomPatientIdentifiers] = useState<PatientIdentifierType[]>([]);
+  const { data: photo } = usePatientPhoto(patient?.id);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -95,16 +96,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
     }
   }, [inEditMode, addressTemplate]);
-
-  useEffect(() => {
-    if (patient) {
-      const abortController = new AbortController();
-
-      fetchPatientPhotoUrl(patient.id, config.concepts.patientPhotoUuid, abortController).then(setCapturePhotoProps);
-
-      return () => abortController.abort();
-    }
-  }, [patient, config]);
 
   useEffect(() => {
     if (patientIdentifiers) {

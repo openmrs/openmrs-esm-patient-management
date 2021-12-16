@@ -163,3 +163,11 @@ export function getPatientIdentifiersFromFhirPatient(patient: fhir.Patient): Pat
   });
   return identifiers;
 }
+
+export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patient) {
+  const result = {};
+  if (patient.telecom) {
+    result['phone'] = patient.telecom[0].value;
+  }
+  return result;
+}

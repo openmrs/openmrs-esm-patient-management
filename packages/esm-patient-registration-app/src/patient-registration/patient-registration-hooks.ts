@@ -7,6 +7,7 @@ import {
   getFormValuesFromFhirPatient,
   getPatientIdentifiersFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
+  getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
 
 const blankFormValues: FormValues = {

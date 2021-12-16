@@ -87,4 +87,31 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
+  personAttributeSections: {
+    _type: Type.Array,
+    _default: [{ personAttributes: [{ name: 'phone', uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7' }] }],
+    _elements: {
+      _type: Type.Object,
+      personAttributes: {
+        _type: Type.Array,
+        _elements: {
+          _type: Type.Object,
+          uuid: {
+            _type: Type.UUID,
+            _description: 'Person attributetype uuid used to save the attribute',
+          },
+          name: {
+            _type: Type.String,
+            _default: '',
+          },
+          _default: {
+            phone: {
+              name: 'phone',
+              uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+            },
+          },
+        },
+      },
+    },
+  },
 };
