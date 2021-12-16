@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import styles from './visit-detail-overview.scss';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
+import { formatDatetime } from '@openmrs/esm-framework';
 
 interface VisitDetailComponentProps {
   visitUuid: string;
@@ -42,7 +43,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
           <h4 className={styles.productiveHeading02}>
             {visit?.visitType?.display}
             <br />
-            <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDateTime(visit?.startDatetime)}</p>
+            <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(visit?.startDatetime)}</p>
           </h4>
           <div className={styles.toggleButtons}>
             <Button
@@ -67,9 +68,5 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
     );
   }
 };
-
-function formatDateTime(date) {
-  return date ? dayjs(date).format('MMM DD, YYYY - hh:mm') : null;
-}
 
 export default VisitDetailComponent;
