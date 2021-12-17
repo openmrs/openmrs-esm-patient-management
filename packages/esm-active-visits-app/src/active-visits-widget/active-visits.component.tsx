@@ -18,7 +18,14 @@ import {
   TableExpandHeader,
   Tile,
 } from 'carbon-components-react';
-import { useLayoutType, useConfig, usePagination, ConfigurableLink, ExtensionSlot } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  useConfig,
+  usePagination,
+  ConfigurableLink,
+  ExtensionSlot,
+  formatDatetime,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
@@ -81,7 +88,7 @@ const ActiveVisitsTable = () => {
 
   const rowData = activeVisits.map((visit) => ({
     ...visit,
-    visitStartTime: formatDatetime(visit.visitStartTime),
+    visitStartTime: formatDatetime(parseDate(visit.visitStartTime)),
   }));
 
   const searchResults = useMemo(() => {
@@ -228,17 +235,8 @@ const ActiveVisitsTable = () => {
   );
 };
 
-function formatDatetime(startDatetime) {
-  const dateToday = dayjs();
-  const today =
-    dayjs(startDatetime).get('date') === dateToday.get('date') &&
-    dayjs(startDatetime).get('month') === dateToday.get('month') &&
-    dayjs(startDatetime).get('year') === dateToday.get('year');
-  if (today) {
-    return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
-  } else {
-    return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
-  }
+function parseDate(datestring: string) {
+  return dayjs(datestring).toDate();
 }
 
 export default ActiveVisitsTable;

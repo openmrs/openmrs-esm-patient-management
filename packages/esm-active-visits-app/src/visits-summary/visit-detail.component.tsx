@@ -43,7 +43,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
           <h4 className={styles.productiveHeading02}>
             {visit?.visitType?.display}
             <br />
-            <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(visit?.startDatetime)}</p>
+            <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(parseDate(visit?.startDatetime))}</p>
           </h4>
           <div className={styles.toggleButtons}>
             <Button
@@ -68,5 +68,13 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
     );
   }
 };
+
+/**
+ * This is allowed to take Date in order to accommodate an incorrect typing on the
+ * Visit object. https://github.com/openmrs/openmrs-esm-core/pull/249
+ */
+function parseDate(datestring: Date | string) {
+  return dayjs(datestring).toDate();
+}
 
 export default VisitDetailComponent;
