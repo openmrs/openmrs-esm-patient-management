@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ExtensionSlot, showToast, navigate, formatDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
 import { usePatientListDetails, usePatientListMembers, deletePatientList } from '../api';
@@ -8,7 +8,6 @@ import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
-import dayjs from 'dayjs';
 import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
 
 interface PatientRow {
@@ -187,9 +186,5 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     </main>
   );
 };
-
-function parseDate(datestring: string) {
-  return dayjs(datestring).toDate();
-}
 
 export default PatientListDetailComponent;

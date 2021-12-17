@@ -25,11 +25,11 @@ import {
   ConfigurableLink,
   ExtensionSlot,
   formatDatetime,
+  parseDate,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
-import dayjs from 'dayjs';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 
 interface PaginationData {
@@ -234,9 +234,5 @@ const ActiveVisitsTable = () => {
     </div>
   );
 };
-
-function parseDate(datestring: string) {
-  return dayjs(datestring).toDate();
-}
 
 export default ActiveVisitsTable;

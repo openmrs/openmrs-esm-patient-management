@@ -2,11 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { Encounter, useVisit } from './visit.resource';
-import dayjs from 'dayjs';
 import styles from './visit-detail-overview.scss';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
-import { formatDatetime } from '@openmrs/esm-framework';
+import { formatTime, formatDatetime, parseDate } from '@openmrs/esm-framework';
 
 interface VisitDetailComponentProps {
   visitUuid: string;
@@ -24,7 +23,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
       visit
         ? visit?.encounters?.map((encounter: Encounter) => ({
             id: encounter.uuid,
-            time: dayjs(encounter.encounterDateTime).format('hh:mm'),
+            time: formatTime(parseDate(encounter.encounterDateTime)),
             encounterType: encounter.encounterType.display,
             provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
             obs: encounter.obs,
@@ -68,13 +67,5 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
     );
   }
 };
-
-/**
- * This is allowed to take Date in order to accommodate an incorrect typing on the
- * Visit object. https://github.com/openmrs/openmrs-esm-core/pull/249
- */
-function parseDate(datestring: Date | string) {
-  return dayjs(datestring).toDate();
-}
 
 export default VisitDetailComponent;

@@ -1,13 +1,9 @@
 import React from 'react';
 import capitalize from 'lodash-es/capitalize';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { formatTime, parseDate } from '@openmrs/esm-framework';
 import { OrderItem, getDosage } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
-
-function formatTime(dateTime) {
-  return dayjs(dateTime).format('hh:mm');
-}
 
 interface MedicationSummaryProps {
   medications: Array<OrderItem>;
@@ -42,7 +38,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                   {medication.order.numRefills}
                 </p>
                 <p className={styles.caption01} style={{ color: '#525252' }}>
-                  {formatTime(medication.order.dateActivated)} &middot;{' '}
+                  {formatTime(parseDate(medication.order.dateActivated))} &middot;{' '}
                   {medication.provider && medication.provider.name} &middot;{' '}
                   {medication.provider && medication.provider.role}
                 </p>
