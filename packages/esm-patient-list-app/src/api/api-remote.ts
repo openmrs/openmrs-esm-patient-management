@@ -1,5 +1,4 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
 import {
   AddPatientData,
   CohortResponse,
@@ -121,7 +120,7 @@ export async function createPatientList(cohort: NewCohortData, ac = new AbortCon
     `${cohortUrl}/cohort/`,
     {
       ...cohort,
-      startDate: dayjs().format(),
+      startDate: new Date(),
       groupCohort: false,
       definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
     },

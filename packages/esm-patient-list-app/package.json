@@ -45,7 +45,6 @@
     "@openmrs/esm-framework": "3.x",
     "carbon-components": "10.x",
     "carbon-icons": "7.x",
-    "dayjs": "1.x",
     "react": "16.x",
     "react-i18next": "11.x",
     "react-router-dom": "5.x",

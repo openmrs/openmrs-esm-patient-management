@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, fireEvent, wait, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
-import dayjs from 'dayjs';
 import { validationSchema } from './patient-registration-validation';
 import { NameField } from '../field/name/name-field.component';
 import { PatientRegistrationContext } from '../patient-registration-context';
