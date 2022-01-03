@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 import { Button, Select, SelectItem } from 'carbon-components-react';
-import { FieldArray } from 'formik';
+import { FieldArray, useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
