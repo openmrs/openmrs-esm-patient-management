@@ -147,7 +147,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         setTarget(redirectUrl);
       }
     } catch (error) {
-      if (error?.responseBody && error?.responseBody?.error?.globalErrors) {
+      if (error.responseBody?.error?.globalErrors) {
         error.responseBody.error.globalErrors.forEach((error) => {
           showToast({ description: error.message });
         });
