@@ -108,7 +108,7 @@ export interface FormValues {
   isDead: boolean;
   deathDate: string;
   deathCause: string;
-  relationships: Array<{ relatedPerson: string; relationship: string }>;
+  relationships: Array<{ relatedPerson: string; relationship: string; relationshipType?: string }>;
   identifiers?: Array<PatientIdentifier>;
 }
 

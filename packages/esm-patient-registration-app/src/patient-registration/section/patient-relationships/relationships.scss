@@ -1,0 +1,16 @@
+@import "../../patient-registration.scss";
+
+.searchBox {
+  margin-bottom: $spacing-05;
+}
+
+.relationshipHeader {
+  display: flex;
+  align-items: center;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .relationshipHeader {
+    justify-content: space-between;
+  }
+}

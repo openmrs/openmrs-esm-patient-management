@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 interface AutosuggestProps {
   name: string;
+  labelText: string;
   placeholder: string;
   getDisplayValue: Function;
   getFieldValue: Function;
   getSearchResults: (query: string) => Promise<any>;
   onSuggestionSelected: (field: string, value: string) => void;
+  defaultValue?: string;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
@@ -19,6 +21,8 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   getFieldValue,
   getSearchResults,
   onSuggestionSelected,
+  defaultValue,
+  labelText,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const searchBox = useRef(null);
@@ -60,16 +64,18 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
   return (
     <div className={styles.autocomplete} ref={wrapper}>
+      <label className="bx--label">{labelText}</label>
       <Search
         name={name}
         id="autosuggest"
         placeholder={placeholder}
-        labelText={t('fullName', 'Full Name')}
+        labelText={labelText}
         onChange={handleChange}
         ref={searchBox}
         className={styles.autocompleteSearch}
         light
         size="xl"
+        defaultValue={defaultValue}
       />
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>

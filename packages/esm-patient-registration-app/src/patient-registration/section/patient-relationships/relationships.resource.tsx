@@ -7,22 +7,27 @@ const customRepresentation =
   'personB:(uuid,display,person:(age,display)),' +
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
-export function useRelationships(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: RelationshipsResponse }, Error>(
+export async function getPatientRelationships(patientUuid: string) {
+  const response = await openmrsFetch<RelationshipsResponse>(
     `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`,
-    openmrsFetch,
   );
-
-  const formattedRelationships = data?.data?.results?.length
-    ? extractRelationshipData(patientUuid, data.data.results)
-    : null;
-
-  return {
-    data: data ? formattedRelationships : null,
-    isError: error,
-    isLoading: !data && !error,
-    isValidating,
-  };
+  if (response.ok) {
+    const relationships = response?.data?.results;
+    return relationships.map((r) =>
+      r.personA.uuid === patientUuid
+        ? {
+            relatedPerson: r.personB.person.display,
+            relationshipType: r.relationshipType.bIsToA,
+            relationship: `${r.relationshipType.uuid}/bIsToA`,
+          }
+        : {
+            relatedPerson: r.personB.person.display,
+            relationshipType: r.relationshipType.aIsToB,
+            relationship: `${r.relationshipType.uuid}/aIsToB`,
+          },
+    );
+  }
+  return null;
 }
 
 function extractRelationshipData(
@@ -37,7 +42,8 @@ function extractRelationshipData(
         display: r.personB.person.display,
         relativeAge: r.personB.person.age,
         relativeUuid: r.personB.uuid,
-        relationshipType: r.relationshipType.bIsToA,
+        relationshipType: r.relationshipType,
+        direction: 'bIsToA',
       });
     } else {
       relationshipsData.push({
@@ -46,6 +52,7 @@ function extractRelationshipData(
         relativeAge: r.personA.person.age,
         relativeUuid: r.personA.uuid,
         relationshipType: r.relationshipType.aIsToB,
+        direction: 'aIsToB',
       });
     }
   }
@@ -86,5 +93,6 @@ interface ExtractedRelationship {
   display: string;
   relativeAge: number;
   relativeUuid: string;
-  relationshipType: string;
+  relationshipType: Relationship['relationshipType'];
+  direction?: string;
 }

@@ -1,4 +1,4 @@
-import { navigate, PatientUuid } from '@openmrs/esm-framework';
+import { navigate, openmrsFetch, PatientUuid } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
@@ -8,7 +8,6 @@ import {
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';
-import { useRelationships } from './section/patient-relationships/relationships.resource';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
@@ -107,7 +106,7 @@ export function getAddressFieldValuesFromFhirPatient(patient: fhir.Patient) {
   const address = patient.address?.[0];
 
   if (address) {
-    for (const [key, value] of Object.entries(address)) {
+    for (const [key] of Object.entries(address)) {
       switch (key) {
         case 'city':
           result['cityVillage'] = address[key];
@@ -168,12 +167,4 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
     result['phone'] = patient.telecom[0].value;
   }
   return result;
-}
-
-export function getPatientRelationships(patientUuid: PatientUuid) {
-  const { data: relationships } = useRelationships(patientUuid);
-  return relationships?.map((relationship) => ({
-    relatedPerson: relationship.display,
-    relationship: relationship.relationshipType,
-  }));
 }
