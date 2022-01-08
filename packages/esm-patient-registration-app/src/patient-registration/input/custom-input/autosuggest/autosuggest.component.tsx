@@ -1,33 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search } from 'carbon-components-react';
+import { Search, SearchProps } from 'carbon-components-react';
 import styles from './autosuggest.scss';
 import { useTranslation } from 'react-i18next';
 
-interface AutosuggestProps {
-  name: string;
-  labelText: string;
-  placeholder: string;
+interface AutosuggestProps extends SearchProps {
   getDisplayValue: Function;
   getFieldValue: Function;
   getSearchResults: (query: string) => Promise<any>;
   onSuggestionSelected: (field: string, value: string) => void;
-  defaultValue?: string;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
-  name,
-  placeholder,
   getDisplayValue,
   getFieldValue,
   getSearchResults,
   onSuggestionSelected,
-  defaultValue,
-  labelText,
+  ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const { t } = useTranslation();
+  const { name, labelText } = searchProps;
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutsideComponent);
@@ -66,16 +60,12 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="bx--label">{labelText}</label>
       <Search
-        name={name}
         id="autosuggest"
-        placeholder={placeholder}
-        labelText={labelText}
         onChange={handleChange}
         ref={searchBox}
         className={styles.autocompleteSearch}
         light
-        size="xl"
-        defaultValue={defaultValue}
+        {...searchProps}
       />
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>

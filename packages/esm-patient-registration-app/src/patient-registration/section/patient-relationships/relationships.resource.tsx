@@ -1,10 +1,9 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 
 const customRepresentation =
   'custom:(display,uuid,' +
-  'personA:(uuid,display,person:(age,display)),' +
-  'personB:(uuid,display,person:(age,display)),' +
+  'personA:(uuid,display,person:(age,display,birthdate)),' +
+  'personB:(uuid,display,person:(age,display,birthdate)),' +
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
 export async function getPatientRelationships(patientUuid: string) {
@@ -67,6 +66,7 @@ export interface Relationship {
     person: {
       age: number;
       display: string;
+      birthdate: string;
     };
   };
   personB: {
@@ -74,6 +74,7 @@ export interface Relationship {
     person: {
       age: number;
       display: string;
+      birthdate: string;
     };
   };
   relationshipType: {

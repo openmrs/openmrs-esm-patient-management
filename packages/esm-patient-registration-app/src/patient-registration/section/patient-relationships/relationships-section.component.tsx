@@ -2,16 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 import { Button, Select, SelectItem, OverflowMenu, OverflowMenuItem } from 'carbon-components-react';
-import { FieldArray, useField } from 'formik';
+import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
-import { PatientUuid } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
 import { FormValues } from '../../patient-registration-types';
-import { parse } from '@babel/core';
 
 interface RelationshipType {
   display: string;
@@ -84,7 +82,7 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
 };
 
 interface RelationshipViewProps {
-  relationship: { relatedPerson: string; relationship: string; relationshipType?: string };
+  relationship: FormValues['relationships'][0];
   index: number;
   displayRelationshipTypes: RelationshipType[];
   remove: <T>(index: number) => T;
@@ -98,6 +96,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const [editRelatedPersonName, setRelatedPersonName] = useState(!relationship.relatedPerson ? true : false);
 
   const handleRelationshipTypeChange = (event) => {
     const { target } = event;
@@ -116,6 +115,8 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     return searchResults.data.results;
   };
 
+  const toggleEditRelatedPersonName = () => setRelatedPersonName((editRelatedPersonName) => !editRelatedPersonName);
+
   return (
     <div className={styles.relationship}>
       <div className={styles.searchBox}>
@@ -124,29 +125,43 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
             {relationship?.relationshipType ?? t('relationshipPlaceholder', 'Relationship')}
           </h4>
           <OverflowMenu>
-            <OverflowMenuItem itemText="Stop app" />
-            <OverflowMenuItem itemText="Restart app" />
-            <OverflowMenuItem itemText="Rename app" />
-            <OverflowMenuItem itemText="Edit routes and access" requireTitle />
-            <OverflowMenuItem hasDivider isDelete itemText="Delete app" />
+            <OverflowMenuItem
+              onClick={() => remove(index)}
+              itemText={t('deleteRelationshipOverflowItemText', 'Delete Relationship')}
+              isDelete
+            />
           </OverflowMenu>
         </div>
-        <Autosuggest
-          name={`relationships[${index}].relatedPerson`}
-          labelText={t('relativeFullNameLabelText', 'Full name')}
-          placeholder={t('relativeNamePlaceholder', 'Firstname Familyname')}
-          defaultValue={relationship.relatedPerson}
-          onSuggestionSelected={handleSuggestionSelected}
-          getSearchResults={searchPerson}
-          getDisplayValue={(item) => item.display}
-          getFieldValue={(item) => item.uuid}
-        />
+        <div>
+          {!editRelatedPersonName ? (
+            <Input
+              labelText={t('relativeFullNameLabelText', 'Full name')}
+              id={`relatedPersonFullName${index}`}
+              name={`relationships[${index}].relatedPerson`}
+              value={relationship.relatedPerson}
+              onFocusCapture={toggleEditRelatedPersonName}
+              light
+            />
+          ) : (
+            <Autosuggest
+              name={`relationships[${index}].relatedPerson`}
+              labelText={t('relativeFullNameLabelText', 'Full name')}
+              placeholder={t('relativeNamePlaceholder', 'Firstname Familyname')}
+              defaultValue={relationship.relatedPerson}
+              onSuggestionSelected={handleSuggestionSelected}
+              getSearchResults={searchPerson}
+              getDisplayValue={(item) => item.display}
+              getFieldValue={(item) => item.uuid}
+              autoFocus
+            />
+          )}
+        </div>
       </div>
       <div className={`${styles.selectRelationshipType}`} style={{ marginBottom: '1rem' }}>
         <Select
           light={true}
           id="select"
-          defaultValue={relationship?.relationship ?? 'placeholder-item'}
+          value={relationship?.relationship ?? 'placeholder-item'}
           labelText={t('relationship', 'Relationship')}
           onChange={handleRelationshipTypeChange}
           name={`relationships[${index}].relationship`}>
@@ -160,11 +175,6 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
             <SelectItem text={type.display} value={`${type.uuid}/${type.direction}`} key={type.display} />
           ))}
         </Select>
-      </div>
-      <div className={styles.actions}>
-        <Button kind="ghost" onClick={() => remove(index)}>
-          {t('deleteRelationshipButtonText', 'Delete Relationship')}
-        </Button>
       </div>
     </div>
   );
