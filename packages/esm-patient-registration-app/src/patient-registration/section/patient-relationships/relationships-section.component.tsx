@@ -56,18 +56,20 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
         }) => (
           <div>
             {relationships && relationships.length > 0
-              ? relationships.map((relationship, index) => (
-                  <div key={index} className={sectionStyles.formSection}>
-                    <RelationshipView
-                      relationship={relationship}
-                      index={index}
-                      displayRelationshipTypes={displayRelationshipTypes}
-                      key={index}
-                      remove={remove}
-                    />
-                    <br />
-                  </div>
-                ))
+              ? relationships.map((relationship: FormValues['relationships'][0], index) =>
+                  relationship.action !== 'DELETE' ? (
+                    <div key={index} className={sectionStyles.formSection}>
+                      <RelationshipView
+                        relationship={relationship}
+                        index={index}
+                        displayRelationshipTypes={displayRelationshipTypes}
+                        key={index}
+                        remove={remove}
+                      />
+                      <br />
+                    </div>
+                  ) : null,
+                )
               : null}
             <div className={styles.actions}>
               <Button kind="ghost" onClick={() => push({})}>
@@ -96,7 +98,9 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
-  const [editRelatedPersonName, setRelatedPersonName] = useState(!relationship.relatedPerson ? true : false);
+  const [searchingRelatedPerson, setSearchingRelatedPersonName] = useState(
+    !relationship.relatedPersonName ? true : false,
+  );
 
   const handleRelationshipTypeChange = (event) => {
     const { target } = event;
@@ -115,39 +119,47 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     return searchResults.data.results;
   };
 
-  const toggleEditRelatedPersonName = () => setRelatedPersonName((editRelatedPersonName) => !editRelatedPersonName);
+  const toggleSearchingRelatedPerson = () =>
+    setSearchingRelatedPersonName((searchingRelatedPerson) => !searchingRelatedPerson);
+
+  const deleteRelationship = () =>
+    relationship.action === 'UPDATE'
+      ? setFieldValue(`relationships[${index}]`, {
+          ...relationship,
+          action: 'DELETE',
+        } as FormValues['relationships'][0])
+      : remove(index);
 
   return (
     <div className={styles.relationship}>
       <div className={styles.searchBox}>
         <div className={styles.relationshipHeader}>
-          <h4 className={styles.productiveHeading02}>
+          <h4 className={styles.productiveHeading}>
             {relationship?.relationshipType ?? t('relationshipPlaceholder', 'Relationship')}
           </h4>
           <OverflowMenu>
             <OverflowMenuItem
-              onClick={() => remove(index)}
+              onClick={deleteRelationship}
               itemText={t('deleteRelationshipOverflowItemText', 'Delete Relationship')}
               isDelete
             />
           </OverflowMenu>
         </div>
         <div>
-          {!editRelatedPersonName ? (
+          {!searchingRelatedPerson ? (
             <Input
               labelText={t('relativeFullNameLabelText', 'Full name')}
               id={`relatedPersonFullName${index}`}
-              name={`relationships[${index}].relatedPerson`}
-              value={relationship.relatedPerson}
-              onFocusCapture={toggleEditRelatedPersonName}
+              name={`relationships[${index}].relatedPersonName`}
+              onFocusCapture={toggleSearchingRelatedPerson}
               light
             />
           ) : (
             <Autosuggest
-              name={`relationships[${index}].relatedPerson`}
+              name={`relationships[${index}].relatedPersonUuid`}
               labelText={t('relativeFullNameLabelText', 'Full name')}
               placeholder={t('relativeNamePlaceholder', 'Firstname Familyname')}
-              defaultValue={relationship.relatedPerson}
+              defaultValue={relationship.relatedPersonName}
               onSuggestionSelected={handleSuggestionSelected}
               getSearchResults={searchPerson}
               getDisplayValue={(item) => item.display}

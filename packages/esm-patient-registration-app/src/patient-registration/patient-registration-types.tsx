@@ -109,9 +109,12 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{
-    relatedPerson: string;
+    relatedPersonName?: string;
+    relatedPersonUuid: string;
     relationship: string;
     relationshipType?: string;
+    action?: 'ADD' | 'UPDATE' | 'DELETE' | undefined;
+    uuid?: string;
   }>;
   identifiers?: Array<PatientIdentifier>;
 }

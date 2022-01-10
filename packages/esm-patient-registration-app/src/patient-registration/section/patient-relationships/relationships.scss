@@ -9,6 +9,11 @@
   align-items: center;
 }
 
+.productiveHeading {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
+
 :global(.omrs-breakpoint-lt-desktop) {
   .relationshipHeader {
     justify-content: space-between;

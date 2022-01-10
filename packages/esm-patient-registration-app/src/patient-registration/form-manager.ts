@@ -12,10 +12,12 @@ import {
 } from './patient-registration-types';
 import {
   deletePersonName,
+  deleteRelationship,
   generateIdentifier,
   savePatient,
   savePatientPhoto,
   saveRelationship,
+  updateRelationship,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 
@@ -107,7 +109,7 @@ export default class FormManager {
       await Promise.all(
         values.relationships
           .filter((m) => m.relationship)
-          .map(({ relatedPerson: relatedPersonUuid, relationship }) => {
+          .map(({ relatedPersonUuid, relationship, uuid: relationshipUuid, action }) => {
             const relationshipType = relationship.split('/')[0];
             const direction = relationship.split('/')[1];
             const thisPatientUuid = savePatientResponse.data.uuid;
@@ -118,7 +120,13 @@ export default class FormManager {
               relationshipType,
             };
 
-            return saveRelationship(abortController, relationshipToSave);
+            if (action === 'UPDATE') {
+              return updateRelationship(abortController, relationshipUuid, relationshipToSave);
+            } else if (action === 'DELETE') {
+              return deleteRelationship(abortController, relationshipUuid);
+            } else {
+              return saveRelationship(abortController, relationshipToSave);
+            }
           }),
       );
 

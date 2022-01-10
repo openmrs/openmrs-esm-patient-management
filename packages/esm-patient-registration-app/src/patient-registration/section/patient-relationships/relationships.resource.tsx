@@ -1,12 +1,13 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { FormValues } from '../../patient-registration-types';
 
 const customRepresentation =
   'custom:(display,uuid,' +
-  'personA:(uuid,display,person:(age,display,birthdate)),' +
-  'personB:(uuid,display,person:(age,display,birthdate)),' +
+  'personA:(uuid,display,person:(age,display,birthdate,uuid)),' +
+  'personB:(uuid,display,person:(age,display,birthdate,uuid)),' +
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
-export async function getPatientRelationships(patientUuid: string) {
+export async function getPatientRelationships(patientUuid: string): Promise<FormValues['relationships']> {
   const response = await openmrsFetch<RelationshipsResponse>(
     `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`,
   );
@@ -15,58 +16,36 @@ export async function getPatientRelationships(patientUuid: string) {
     return relationships.map((r) =>
       r.personA.uuid === patientUuid
         ? {
-            relatedPerson: r.personB.person.display,
+            relatedPersonName: r.personB.person.display,
+            relatedPersonUuid: r.personB.person.uuid,
             relationshipType: r.relationshipType.bIsToA,
             relationship: `${r.relationshipType.uuid}/bIsToA`,
+            action: 'UPDATE',
+            uuid: r.uuid,
           }
         : {
-            relatedPerson: r.personB.person.display,
+            relatedPersonName: r.personA.person.display,
+            relatedPersonUuid: r.personA.person.display,
             relationshipType: r.relationshipType.aIsToB,
             relationship: `${r.relationshipType.uuid}/aIsToB`,
+            action: 'UPDATE',
+            uuid: r.uuid,
           },
     );
   }
   return null;
 }
 
-function extractRelationshipData(
-  patientIdentifier: string,
-  relationships: Array<Relationship>,
-): Array<ExtractedRelationship> {
-  const relationshipsData = [];
-  for (const r of relationships) {
-    if (patientIdentifier === r.personA.uuid) {
-      relationshipsData.push({
-        uuid: r.uuid,
-        display: r.personB.person.display,
-        relativeAge: r.personB.person.age,
-        relativeUuid: r.personB.uuid,
-        relationshipType: r.relationshipType,
-        direction: 'bIsToA',
-      });
-    } else {
-      relationshipsData.push({
-        uuid: r.uuid,
-        display: r.personA.person.display,
-        relativeAge: r.personA.person.age,
-        relativeUuid: r.personA.uuid,
-        relationshipType: r.relationshipType.aIsToB,
-        direction: 'aIsToB',
-      });
-    }
-  }
-  return relationshipsData;
-}
-
 export interface Relationship {
   display: string;
-  uuid: number;
+  uuid: string;
   personA: {
     uuid: string;
     person: {
       age: number;
       display: string;
       birthdate: string;
+      uuid: string;
     };
   };
   personB: {
@@ -75,6 +54,7 @@ export interface Relationship {
       age: number;
       display: string;
       birthdate: string;
+      uuid: string;
     };
   };
   relationshipType: {
@@ -87,13 +67,4 @@ export interface Relationship {
 
 interface RelationshipsResponse {
   results: Array<Relationship>;
-}
-
-interface ExtractedRelationship {
-  uuid: string;
-  display: string;
-  relativeAge: number;
-  relativeUuid: string;
-  relationshipType: Relationship['relationshipType'];
-  direction?: string;
 }
