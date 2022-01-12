@@ -8,7 +8,6 @@ import { mockAutoGenerationOptionsResult } from '../__mocks__/autogenerationopti
 import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
-  isOffline: boolean;
   addressTemplate: any;
   currentSession: SessionUser;
   relationshipTypes: any;
