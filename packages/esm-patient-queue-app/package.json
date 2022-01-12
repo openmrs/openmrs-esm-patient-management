@@ -1,8 +1,8 @@
 {
-  "name": "@openmrs/esm-patient-registration-app",
+  "name": "@openmrs/esm-patient-queue-app",
   "version": "3.0.1",
-  "description": "Patient registration microfrontend for the OpenMRS SPA",
-  "browser": "dist/openmrs-esm-patient-registration-app.js",
+  "description": "Patient queue front-end for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-patient-queue-app.js",
   "main": "src/index.ts",
   "source": true,
   "license": "MPL-2.0",
@@ -34,19 +34,16 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
   },
   "dependencies": {
+    "@carbon/charts-react": "^0.41.14",
+    "@carbon/icons-react": "^10.18.0",
     "carbon-components-react": "^7.25.0",
-    "formik": "^2.1.5",
-    "geopattern": "^1.2.3",
-    "lodash-es": "^4.17.15",
-    "react-avatar": "^4.0.0",
-    "uuid": "^8.3.2",
-    "yup": "^0.29.1"
+    "d3": "^5.16.0",
+    "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
     "carbon-components": "10.x",
     "carbon-icons": "7.x",
-    "dayjs": "1.x",
     "react": "16.x",
     "react-i18next": "11.x",
     "react-router-dom": "5.x",

@@ -60,6 +60,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
                 patient,
                 patientUuid: patient.id,
                 onClick: onClickSearchResult,
+                onTransition: hidePanel,
               }}
             />
           </div>

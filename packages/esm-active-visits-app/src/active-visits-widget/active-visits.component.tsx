@@ -16,12 +16,21 @@ import {
   TableToolbarContent,
   TableExpandRow,
   TableExpandHeader,
+  Tile,
 } from 'carbon-components-react';
-import { useLayoutType, useConfig, usePagination, ConfigurableLink, ExtensionSlot } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  useConfig,
+  usePagination,
+  ConfigurableLink,
+  ExtensionSlot,
+  formatDatetime,
+  parseDate,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
-import dayjs from 'dayjs';
+import { EmptyDataIllustration } from './empty-data-illustration.component';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -79,7 +88,7 @@ const ActiveVisitsTable = () => {
 
   const rowData = activeVisits.map((visit) => ({
     ...visit,
-    visitStartTime: formatDatetime(visit.visitStartTime),
+    visitStartTime: formatDatetime(parseDate(visit.visitStartTime)),
   }));
 
   const searchResults = useMemo(() => {
@@ -211,19 +220,19 @@ const ActiveVisitsTable = () => {
       </div>
     );
   }
+  return (
+    <div className={styles.activeVisitsContainer}>
+      <Tile light className={styles.tile}>
+        <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
+          <h4>{t('activeVisits', 'Active Visits')}</h4>
+        </div>
+        <EmptyDataIllustration />
+        <p className={styles.content}>
+          {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
+        </p>
+      </Tile>
+    </div>
+  );
 };
-
-function formatDatetime(startDatetime) {
-  const dateToday = dayjs();
-  const today =
-    dayjs(startDatetime).get('date') === dateToday.get('date') &&
-    dayjs(startDatetime).get('month') === dateToday.get('month') &&
-    dayjs(startDatetime).get('year') === dateToday.get('year');
-  if (today) {
-    return `Today - ${dayjs(startDatetime).format('HH:mm')}`;
-  } else {
-    return dayjs(startDatetime).format("DD MMM 'YY - HH:mm");
-  }
-}
 
 export default ActiveVisitsTable;

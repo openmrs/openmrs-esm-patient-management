@@ -10,6 +10,7 @@
   "idNumber": "ID Number",
   "medications": "Medications",
   "name": "Name",
+  "noActiveVisitsForLocation": "There are no active visits to display for this location.",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "No encounters found",
   "noMedicationsFound": "No medications found",

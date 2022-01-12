@@ -3,7 +3,7 @@ import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext, useFieldConfig } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const containsNoNumbers = /^([^0-9]*)$/;
 
@@ -18,8 +18,6 @@ function checkNumber(value: string) {
 export const NameField = () => {
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto } = useContext(PatientRegistrationContext);
-  const layout = useLayoutType();
-  const desktop = layout === 'desktop';
 
   const onCapturePhoto = useCallback((dataUri: string, photoDateTime: string) => {
     if (setCapturePhotoProps) {

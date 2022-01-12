@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ExtensionSlot, showToast, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
 import { usePatientListDetails, usePatientListMembers, deletePatientList } from '../api';
@@ -8,7 +8,6 @@ import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
-import dayjs from 'dayjs';
 import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
 
 interface PatientRow {
@@ -16,10 +15,6 @@ interface PatientRow {
   identifier: string;
   sex: string;
   startDate: string;
-}
-
-function formatDate(date: string): string {
-  return dayjs(date).format('DD / MMM / YYYY');
 }
 
 function getPatientListUuidFromUrl(): string {
@@ -62,7 +57,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
               name: member?.patient?.person?.display,
               identifier: member?.patient?.identifiers[0]?.identifier ?? null,
               sex: member?.patient?.person?.gender,
-              startDate: formatDate(member?.startDate),
+              startDate: formatDate(parseDate(member?.startDate)),
               uuid: `${member?.patient?.uuid}`,
             }))
           : []
@@ -133,7 +128,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
                 <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
                   {patientListDetails?.size} {t('patients', 'patients')} &middot;{' '}
                   <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
-                  {formatDate(patientListDetails?.startDate ?? '')}
+                  {patientListDetails?.startDate ? formatDate(parseDate(patientListDetails.startDate)) : null}
                 </div>
               </>
             )}
