@@ -8,7 +8,7 @@
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
   "scripts": {
-    "start": "openmrs develop",
+    "start": "openmrs develop --port 9090",
     "serve": "webpack serve --mode=development",
     "debug": "npm run serve",
     "build": "webpack --mode production",
