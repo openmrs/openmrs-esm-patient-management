@@ -44,6 +44,8 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
+    patientUuidMap.patientUuid = patientUuid;
+
     await queueSynchronizationItem(
       patientRegistration,
       {
@@ -56,6 +58,13 @@ export default class FormManager {
         patientPhotoConceptUuid,
         currentLocation,
         personAttributeSections,
+        preliminaryPatient: FormManager.getPatientToCreate(
+          values,
+          personAttributeSections,
+          patientUuidMap,
+          initialAddressFieldValues,
+          [],
+        ),
       },
       {
         id: patientUuid,
