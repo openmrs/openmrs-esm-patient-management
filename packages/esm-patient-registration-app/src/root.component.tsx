@@ -16,12 +16,14 @@ export default function Root({
   relationshipTypes,
   patientIdentifiers,
   savePatientForm,
+  isOffline,
 }: RootProps) {
   const resources = {
     currentSession,
     addressTemplate,
     relationshipTypes,
     patientIdentifiers,
+    isOffline,
   };
 
   return (

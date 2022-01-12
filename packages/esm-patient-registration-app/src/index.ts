@@ -51,9 +51,11 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./root.component'), options),
         route: /^patient-registration/,
         online: {
+          isOffline: false,
           savePatientForm: FormManager.savePatientFormOnline,
         },
         offline: {
+          isOffline: true,
           savePatientForm: FormManager.savePatientFormOffline,
         },
         resources,
@@ -65,9 +67,11 @@ function setupOpenMRS() {
         }),
         route: /^patient\/([a-zA-Z0-9\-]+)\/edit/,
         online: {
+          isOffline: false,
           savePatientForm: FormManager.savePatientFormOnline,
         },
         offline: {
+          isOffline: true,
           savePatientForm: FormManager.savePatientFormOffline,
         },
         resources,
