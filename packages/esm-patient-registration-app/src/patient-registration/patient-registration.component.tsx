@@ -52,8 +52,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patient?.id);
 
-  console.log(initialFormValues);
-
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
@@ -70,20 +68,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       setFieldConfigs(config.fieldConfigurations);
     }
   }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
-
-  useEffect(() => {
-    for (const patientIdentifier of patientIdentifiers) {
-      if (!initialFormValues[patientIdentifier.fieldName]) {
-        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
-      }
-
-      setInitialFormValues({
-        ...initialFormValues,
-        ['source-for-' + patientIdentifier.fieldName]:
-          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
-      });
-    }
-  }, [patientIdentifiers]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
