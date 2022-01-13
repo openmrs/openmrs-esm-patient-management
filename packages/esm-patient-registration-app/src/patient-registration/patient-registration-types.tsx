@@ -59,11 +59,11 @@ export interface PatientIdentifierValueType {
   fieldName: string;
   value: string;
   source: IdentifierSource;
+  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
   // ADD -> add a new identifier
   // UPDATE -> update an existing identifier
   // DELETE -> delete an existing identifier
   // NONE -> No action to be taken on the identifier
-  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
   autoGenerationSource?: IdentifierSource;
   isPrimary: boolean;
   uuid?: string;

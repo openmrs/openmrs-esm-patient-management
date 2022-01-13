@@ -56,7 +56,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     [identifierTypes, searchString],
   );
 
-  const handleCheckingIdentifier = useCallback((uuid: string, checked: boolean) => {
+  const handleCheckingIdentifier = (uuid: string, checked: boolean) =>
     setIdentifierTypes((identifiers) =>
       identifiers.map((identifier) =>
         identifier.uuid === uuid
@@ -67,9 +67,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           : identifier,
       ),
     );
-  }, []);
 
-  const handleSelectingIdentifierSource = useCallback((identifierTypeUuid, sourceUuid) => {
+  const handleSelectingIdentifierSource = (identifierTypeUuid, sourceUuid) =>
     setIdentifierTypes((identifierTypes) =>
       identifierTypes?.map((identifierType) =>
         identifierType?.uuid === identifierTypeUuid
@@ -80,7 +79,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           : identifierType,
       ),
     );
-  }, []);
 
   const identifierTypeFields = useMemo(
     () =>

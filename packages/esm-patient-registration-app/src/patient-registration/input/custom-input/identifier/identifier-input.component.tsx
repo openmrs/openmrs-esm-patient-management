@@ -1,7 +1,6 @@
 import * as Yup from 'yup';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import styles from '../../input.scss';
-import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
 import { PatientIdentifierValueType } from '../../../patient-registration-types';
@@ -43,8 +42,8 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifier, in
     }
 
     const schemaBuilder = {};
-    schemaBuilder[identifierType.name] = validatorProps;
-    identifierValidationSchema[identifierType.name] = validatorProps;
+    schemaBuilder[identifierType.fieldName] = validatorProps;
+    identifierValidationSchema[identifierType.fieldName] = validatorProps;
     setIdentifierValidationSchema(Yup.object(schemaBuilder));
   }, []);
 
@@ -57,8 +56,8 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifier, in
           setFieldValue(`identifiers[${index}].autoGenerationSource`, source);
           setFieldValue(`identifiers[${index}].value`, '');
 
-          if (validationSchema.fields[identifierType.name]) {
-            validationSchema.fields[identifierType.name] = Yup.string();
+          if (validationSchema.fields[identifierType.fieldName]) {
+            validationSchema.fields[identifierType.fieldName] = Yup.string();
           }
         } else {
           setValidationSchema(validationSchema.concat(identifierValidationSchema));

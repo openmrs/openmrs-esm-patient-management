@@ -1,6 +1,5 @@
 import {
   fetchCurrentPatient,
-  OfflinePatientArgs,
   registerOfflinePatientHandler,
   setupOfflineSync,
   subscribePrecacheStaticDependencies,

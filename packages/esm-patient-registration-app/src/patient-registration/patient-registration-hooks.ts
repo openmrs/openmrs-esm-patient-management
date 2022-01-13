@@ -1,7 +1,7 @@
 import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
-import { FormValues, Patient, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
+import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,

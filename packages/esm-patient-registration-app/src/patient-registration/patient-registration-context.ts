@@ -1,5 +1,5 @@
-import { createContext, SetStateAction, Dispatch, useContext } from 'react';
-import { FormValues, CapturePhotoProps, PatientIdentifierType } from './patient-registration-types';
+import { createContext, SetStateAction, useContext } from 'react';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 
 export interface PatientRegistrationContextProps {
   values: FormValues;
