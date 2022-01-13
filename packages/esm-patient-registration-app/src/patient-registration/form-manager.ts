@@ -3,7 +3,7 @@ import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
-  PatientIdentifiersValueType,
+  PatientIdentifierValueType,
   PatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
@@ -28,8 +28,7 @@ export type SavePatientForm = (
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
-  initialIdentifiers: PatientIdentifiersValueType,
-  identifierTypes: Array<PatientIdentifierType>,
+  identifierTypes: PatientIdentifierType[],
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
@@ -43,8 +42,7 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    initialIdentifiers: PatientIdentifiersValueType,
-    identifierTypes: Array<PatientIdentifierType>,
+    identifierTypes: PatientIdentifierType[],
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
@@ -57,7 +55,6 @@ export default class FormManager {
         formValues: values,
         patientUuidMap,
         initialAddressFieldValues,
-        initialIdentifiers,
         identifierTypes,
         capturePhotoProps,
         patientPhotoConceptUuid,
@@ -79,7 +76,6 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    initialIdentifiers: PatientIdentifiersValueType,
     identifierTypes: Array<PatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
@@ -88,7 +84,7 @@ export default class FormManager {
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers = await FormManager.getPatientIdentifiersToCreate(
-      values,
+      values.identifiers,
       patientUuidMap,
       identifierTypes,
       currentLocation,
@@ -97,7 +93,13 @@ export default class FormManager {
 
     if (patientUuid) {
       await Promise.all(
-        FormManager.updatePatientIdentifiers(patientUuid, initialIdentifiers, patientIdentifiers, patientUuidMap),
+        FormManager.savePatientIdentifiers(
+          patientUuid,
+          patientIdentifiers,
+          patientUuidMap,
+          values.identifiers,
+          abortController,
+        ),
       );
     }
 
@@ -150,31 +152,41 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    values: FormValues,
+    identifiers: PatientIdentifierValueType[],
     patientUuidMap: PatientUuidMapType,
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifierTypes.map(async (type) => {
-      const idValue = values.identifiers[type.fieldName] ?? undefined;
-      if (idValue) {
+    const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifiers.map(async (identifier) => {
+      if (identifier.value) {
         return {
-          uuid: patientUuidMap?.identifiers[type.fieldName]?.uuid,
-          identifier: idValue,
-          identifierType: type.uuid,
+          uuid: patientUuidMap?.identifiers[identifier.fieldName]?.uuid,
+          identifier: identifier.value,
+          identifierType: identifierTypes.find((identifierType) => identifier.fieldName === identifierType.fieldName)
+            ?.uuid,
           location: location,
-          preferred: type.isPrimary,
+          preferred: identifier.isPrimary,
         };
-      } else if (type.selectedSource) {
-        const generateIdentifierResponse = await generateIdentifier(type.selectedSource.uuid, abortController);
+      } else if (identifier.source) {
+        const generateIdentifierResponse = await generateIdentifier(identifier.source.uuid, abortController);
         return {
           // is this undefined?
           uuid: undefined,
           identifier: generateIdentifierResponse.data.identifier,
-          identifierType: type.uuid,
+          identifierType: identifierTypes.find((identifierType) => identifier.fieldName === identifierType.fieldName)
+            ?.uuid,
           location: location,
-          preferred: type.isPrimary,
+          preferred: identifier.isPrimary,
+        };
+      } else if (identifier?.action === 'DELETE') {
+        // action DELETE means the identifier will be deleted and hence only UUID is of importance
+        return {
+          uuid: patientUuidMap?.identifiers[identifier.fieldName]?.uuid,
+          identifier: '',
+          identifierType: '',
+          location: '',
+          preferred: false,
         };
       } else {
         // This is a case that should not occur.
@@ -289,33 +301,21 @@ export default class FormManager {
     };
   }
 
-  static updatePatientIdentifiers(
+  static savePatientIdentifiers(
     patientUuid: string,
-    initialPatientIdentifiers: PatientIdentifiersValueType,
     patientIdentifiers: PatientIdentifier[],
     patientUuidMap: PatientUuidMapType,
+    identifiers: PatientIdentifierValueType[],
+    abortController: AbortController,
   ) {
-    const abortController = new AbortController();
-    const identifiers = patientIdentifiers.map((patientidentifier) =>
-      patientidentifier.uuid
-        ? // Updating identifier value
-          updatePatientIdentifier(patientUuid, patientidentifier, abortController)
-        : // Adding new identifiers
-          addPatientIdentifier(patientUuid, patientidentifier, abortController),
-    );
-
-    // Deleting an existing identifier
-    const deletedIdentifiers = Object.keys(initialPatientIdentifiers)
-      .filter((identifierFieldName) => {
-        const identifierUuid = patientUuidMap.identifiers[identifierFieldName]?.uuid;
-        if (!identifierUuid) {
-          return false;
-        }
-        return !patientIdentifiers.some((identifier) => identifier.uuid === identifierUuid);
-      })
-      .map((identifierFieldName) =>
-        deletePatientIdentifier(patientUuid, patientUuidMap.identifiers[identifierFieldName]?.uuid, abortController),
-      );
-    return [...identifiers, ...deletedIdentifiers];
+    return identifiers.map((identifier, index) => {
+      if (identifier.action === 'ADD') {
+        return addPatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
+      } else if (identifier.action === 'UPDATE') {
+        return updatePatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
+      } else if (identifier.action === 'DELETE') {
+        deletePatientIdentifier(patientUuid, patientIdentifiers[index].uuid, abortController);
+      }
+    });
   }
 }

@@ -11,6 +11,7 @@
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  z-index: 999;
 }
 
 .tabletOverlay {

@@ -15,7 +15,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, PatientIdentifierType } from './patient-registration-types';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
@@ -24,8 +24,6 @@ import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
-import IdentifierSelectionOverlay from './ui-components/identifier-selection-overlay/identifier-selection-overlay';
-import camelCase from 'lodash-es/camelCase';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -52,8 +50,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const location = currentSession.sessionLocation?.uuid;
   const inEditMode = loading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
-  const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
-  const [customPatientIdentifiers, setCustomPatientIdentifiers] = useState<PatientIdentifierType[]>([]);
   const { data: photo } = usePatientPhoto(patient?.id);
 
   useEffect(() => {
@@ -97,20 +93,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   }, [inEditMode, addressTemplate]);
 
-  useEffect(() => {
-    if (patientIdentifiers) {
-      setCustomPatientIdentifiers(
-        patientIdentifiers?.map((identifier) => ({
-          ...identifier,
-          selected:
-            identifier?.isPrimary || (inEditMode && !!initialFormValues?.identifiers[camelCase(identifier.name)]),
-          selectedSource: identifier?.identifierSources?.length > 0 ? identifier?.identifierSources[0] : null,
-          defaultSelected: inEditMode && !!initialFormValues?.identifiers[camelCase(identifier.name)],
-        })),
-      );
-    }
-  }, [patientIdentifiers, inEditMode, initialFormValues]);
-
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
     helpers.setSubmitting(true);
@@ -120,8 +102,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         values,
         patientUuidMap,
         initialAddressFieldValues,
-        initialFormValues.identifiers,
-        customPatientIdentifiers.filter((identifier) => identifier?.selected),
+        patientIdentifiers,
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
@@ -201,7 +182,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               <Grid className={styles.infoGrid}>
                 <PatientRegistrationContext.Provider
                   value={{
-                    identifierTypes: customPatientIdentifiers.filter((identifier) => identifier?.selected),
                     validationSchema,
                     setValidationSchema,
                     fieldConfigs,
@@ -209,9 +189,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     inEditMode,
                     setFieldValue: props.setFieldValue,
                     setCapturePhotoProps,
-                    currentPhoto: capturePhotoProps?.imageData,
-                    showPatientIdentifierOverlay: () => setIdentifierOverlay(true),
-                    setPatientIdentifiers: setCustomPatientIdentifiers,
+                    currentPhoto: photo?.imageSrc,
                   }}>
                   {sections.map((section, index) => (
                     <div key={index}>{getSection(section, index)}</div>
@@ -222,13 +200,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           </Form>
         )}
       </Formik>
-      {showIdentifierOverlay && (
-        <IdentifierSelectionOverlay
-          closeOverlay={() => setIdentifierOverlay(false)}
-          patientIdentifiers={customPatientIdentifiers}
-          setPatientIdentifiers={setCustomPatientIdentifiers}
-        />
-      )}
     </>
   );
 };

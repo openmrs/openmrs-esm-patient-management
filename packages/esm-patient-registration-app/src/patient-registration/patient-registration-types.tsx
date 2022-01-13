@@ -29,7 +29,6 @@ export interface PatientRegistration {
   formValues: FormValues;
   patientUuidMap: PatientUuidMapType;
   initialAddressFieldValues: Record<string, any>;
-  initialIdentifiers: PatientIdentifiersValueType;
   identifierTypes: PatientIdentifierType[];
   capturePhotoProps: CapturePhotoProps;
   patientPhotoConceptUuid: string;
@@ -43,10 +42,8 @@ export interface PatientRegistration {
 export interface PatientIdentifierType extends FetchedPatientIdentifierType {
   identifierSources: Array<IdentifierSource>;
   autoGenerationSource?: IdentifierSource;
-  selectedSource?: IdentifierSource;
-  selected?: boolean;
-  // defaultSelected keeps the track in the editMode, whether the identifier was previously added to the patient or not.
-  defaultSelected?: boolean;
+  source?: IdentifierSource;
+  checked?: boolean;
 }
 
 export interface PatientIdentifier {
@@ -57,8 +54,19 @@ export interface PatientIdentifier {
   preferred?: boolean;
 }
 
-export interface PatientIdentifiersValueType {
-  [identifierName: string]: string;
+export interface PatientIdentifierValueType {
+  name: string;
+  fieldName: string;
+  value: string;
+  source: IdentifierSource;
+  // ADD -> add a new identifier
+  // UPDATE -> update an existing identifier
+  // DELETE -> delete an existing identifier
+  // NONE -> No action to be taken on the identifier
+  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
+  autoGenerationSource?: IdentifierSource;
+  isPrimary: boolean;
+  uuid?: string;
 }
 
 export type Relationship = {
@@ -118,7 +126,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
-  identifiers?: PatientIdentifiersValueType;
+  identifiers?: PatientIdentifierValueType[];
 }
 
 export interface PatientUuidMapType {
