@@ -24,9 +24,9 @@ export interface FetchedPatientIdentifierType {
 }
 
 export interface PatientIdentifierValue {
-  uuid: string;
+  uuid?: string;
   identifier: string;
-  identifierType: FetchedPatientIdentifierType;
+  identifierType?: FetchedPatientIdentifierType;
   source: IdentifierSource;
   action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
   // ADD -> add a new identifier
@@ -54,6 +54,8 @@ export interface PatientRegistration {
 export interface PatientIdentifierType extends FetchedPatientIdentifierType {
   identifierSources: Array<IdentifierSource>;
   autoGenerationSource?: IdentifierSource;
+  checked?: boolean;
+  source?: IdentifierSource;
 }
 
 export interface PatientIdentifier {

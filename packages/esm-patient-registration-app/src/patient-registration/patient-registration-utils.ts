@@ -2,6 +2,7 @@ import { navigate } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
+  FetchedPatientIdentifierType,
   FormValues,
   PatientIdentifier,
   PatientUuidMapType,
@@ -167,4 +168,15 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
     result['phone'] = patient.telecom[0].value;
   }
   return result;
+}
+
+export function mapIdentifierType(identifierType): FetchedPatientIdentifierType {
+  return {
+    name: identifierType.name,
+    fieldName: camelCase(identifierType.name),
+    uuid: identifierType.uuid,
+    required: identifierType.required,
+    format: identifierType.format,
+    isPrimary: identifierType.required,
+  };
 }

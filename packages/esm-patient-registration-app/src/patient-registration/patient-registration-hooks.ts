@@ -16,6 +16,7 @@ import {
   getPatientIdentifiersFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
+  mapIdentifierType,
 } from './patient-registration-utils';
 
 const blankFormValues: FormValues = {
@@ -133,19 +134,11 @@ function usePatientIdentifiers(patientUuid: string): [boolean, PatientIdentifier
   const [patientIdentifiers, setPatientIdentifiers] = useState<PatientIdentifierValue[]>(null);
   useEffect(() => {
     openmrsFetch<{ results: any[] }>(`/ws/rest/v1/patient/${patientUuid}/identifier?v=full`).then((res) => {
-      console.log(res);
       setPatientIdentifiers(
         res.data.results.map((patientIdentifier) => ({
           uuid: patientIdentifier.uuid,
           identifier: patientIdentifier.identifier,
-          identifierType: {
-            name: patientIdentifier.identifierType.name,
-            fieldName: camelCase(patientIdentifier.identifierType.name),
-            uuid: patientIdentifier.identifierType.uuid,
-            required: patientIdentifier.identifierType.required,
-            format: patientIdentifier.identifierType.format,
-            isPrimary: patientIdentifier.identifierType.required,
-          },
+          identifierType: mapIdentifierType(patientIdentifier.identifierType),
           action: 'NONE',
           source: null,
         })),

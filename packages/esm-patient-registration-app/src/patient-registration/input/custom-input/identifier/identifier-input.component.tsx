@@ -1,47 +1,48 @@
 import * as Yup from 'yup';
-import React, { useState, useEffect } from 'react';
-import find from 'lodash-es/find';
-import { useField } from 'formik';
-import { Row, Column } from 'carbon-components-react';
+import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import styles from '../../input.scss';
 import { useTranslation } from 'react-i18next';
-import { SelectInput } from '../../basic-input/select/select-input.component';
 import { Input } from '../../basic-input/input/input.component';
-import { PatientIdentifierType } from '../../../patient-registration-types';
+import { PatientIdentifierValue } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
+import { TrashCan16 } from '@carbon/icons-react';
+import { Button } from 'carbon-components-react';
+import { ResourcesContext } from '../../../../offline.resources';
 
 interface IdentifierInputProps {
-  identifierType: PatientIdentifierType;
+  patientIdentifier: PatientIdentifierValue;
+  index: number;
+  remove: <T>(index: number) => T;
 }
 
-export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType }) => {
-  const { validationSchema, setValidationSchema, setFieldValue } = React.useContext(PatientRegistrationContext);
-  const sources = identifierType.identifierSources;
-  const name = identifierType.fieldName;
+export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, index, remove }) => {
+  const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
+  const identifierType = useMemo(
+    () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierType.uuid),
+    [patientIdentifier],
+  );
+  const { validationSchema, setValidationSchema, setFieldValue, values } = React.useContext(PatientRegistrationContext);
+  const { source, action, identifier } = patientIdentifier;
+  const identifierName = identifierType.name;
+  const fieldName = `identifiers[${index}].identifier`;
   const { t } = useTranslation();
   const [option, setAutoGenerationOption] = useState({
-    manualEntryEnabled: sources.length == 0 ? true : undefined,
+    manualEntryEnabled: source ? true : undefined,
     automaticGenerationEnabled: undefined,
   });
-  const sourceName = `source-for-${name}`;
-  const [selectSourceField] = useField(sourceName);
   const [identifierValidationSchema, setIdentifierValidationSchema] = useState(Yup.object({}));
 
-  useEffect(() => {
-    if (
-      sources.length === 1 &&
-      sources[0].autoGenerationOption &&
-      sources[0].autoGenerationOption.automaticGenerationEnabled
-    ) {
-      identifierType.autoGenerationSource = sources[0];
-    }
-  }, []);
+  console.log(values);
+
+  // useEffect(() => {
+  //   if (source && source.autoGenerationOption && source.autoGenerationOption.automaticGenerationEnabled) {
+  //     identifier.identifierType.autoGenerationSource = source;
+  //   }
+  // }, [source]);
 
   useEffect(() => {
     let validatorProps = Yup.string();
-
-    if (identifierType.required) {
-      validatorProps = validatorProps.required("Identifier can't be blank!");
-    }
+    validatorProps = validatorProps.required("Identifier can't be blank!");
 
     if (identifierType.format) {
       validatorProps = validatorProps.matches(new RegExp(identifierType.format), 'Invalid identifier format!');
@@ -54,15 +55,13 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
   }, []);
 
   useEffect(() => {
-    if (selectSourceField.value) {
-      const selectedSource = find(sources, { name: selectSourceField.value });
+    if (source) {
+      if (source.autoGenerationOption) {
+        setAutoGenerationOption(source.autoGenerationOption);
 
-      if (selectedSource && selectedSource.autoGenerationOption) {
-        setAutoGenerationOption(selectedSource.autoGenerationOption);
-
-        if (selectedSource.autoGenerationOption.automaticGenerationEnabled) {
-          identifierType.autoGenerationSource = selectedSource;
-          setFieldValue(name, '');
+        if (source.autoGenerationOption.automaticGenerationEnabled) {
+          setFieldValue(`identifiers[${index}].autoGenerationSource`, source);
+          setFieldValue(`identifiers[${index}].value`, '');
 
           if (validationSchema.fields[identifierType.fieldName]) {
             validationSchema.fields[identifierType.fieldName] = Yup.string();
@@ -77,30 +76,61 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ identifierType
           automaticGenerationEnabled: false,
         });
       }
+    } else {
+      setValidationSchema(validationSchema.concat(identifierValidationSchema));
+      setAutoGenerationOption({
+        manualEntryEnabled: true,
+        automaticGenerationEnabled: false,
+      });
     }
-  }, [selectSourceField.value]);
+  }, [source]);
+
+  const handleDelete = useCallback(() => {
+    if (action === 'ADD') {
+      remove(index);
+    } else {
+      setFieldValue(`identifiers[${index}]`, {
+        ...patientIdentifier,
+        action: 'DELETE',
+        value: '',
+      });
+    }
+  }, [patientIdentifier]);
+
+  const autoGenerated = !option.manualEntryEnabled || (option.manualEntryEnabled && option.automaticGenerationEnabled);
 
   return (
-    <>
-      {sources.length > 1 && (
-        <>
-          <SelectInput name={sourceName} options={sources.map((source) => source.name)} label={identifierType.name} />
-          <Input
-            id={name}
-            light
-            placeholder={
-              !option.manualEntryEnabled
-                ? `${t('autoGeneratedPlaceholderText', 'Auto-generated')}`
-                : option.manualEntryEnabled && option.automaticGenerationEnabled
-                ? `${t('autoGeneratedPlaceholderText', 'Auto-generated')}`
-                : `${t('enterIdentifierPlaceholderText', 'Enter Identifier')}`
-            }
-            labelText={identifierType?.name}
-            name={name}
-            disabled={!option.manualEntryEnabled}
-          />
-        </>
+    <div className={styles.IDInput}>
+      {option.manualEntryEnabled && (action === 'ADD' || action === 'UPDATE') ? (
+        <Input
+          id={identifierName}
+          light
+          placeholder={
+            autoGenerated
+              ? `${t('autoGeneratedPlaceholderText', 'Auto generated')}`
+              : `${t('enterIdentifierPlaceholderText', 'Enter Identifier')}`
+          }
+          labelText={identifierName}
+          name={fieldName}
+          disabled={!option.manualEntryEnabled}
+        />
+      ) : (
+        <div className={styles.textID}>
+          <p className={styles.label}>{identifierName}</p>
+          <p className={styles.bodyShort02}>
+            {identifier ? identifier : t('autoGeneratedPlaceholderText', 'Auto generated')}
+          </p>
+        </div>
       )}
-    </>
+      {!identifierType?.isPrimary && (
+        <Button
+          kind="ghost"
+          onClick={handleDelete}
+          iconDescription={t('deleteIdentifierTooltip', 'Delete')}
+          hasIconOnly>
+          <TrashCan16 className={styles.trashCan} />
+        </Button>
+      )}
+    </div>
   );
 };

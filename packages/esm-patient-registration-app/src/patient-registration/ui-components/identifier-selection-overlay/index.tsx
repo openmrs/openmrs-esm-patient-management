@@ -2,16 +2,17 @@ import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAct
 import styles from './identifier-selection.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
-import { PatientIdentifierType, PatientIdentifierValueType } from '../../patient-registration-types';
-import Overlay from '../overlay/overlay.component';
+import { PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
+import Overlay from '../overlay';
 import { ResourcesContext } from '../../../offline.resources';
+import { mapIdentifierType } from '../../patient-registration-utils';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, any) => void;
   closeOverlay: () => void;
   push: (obj: any) => void;
   remove: <T>(index: number) => T;
-  identifiers: PatientIdentifierValueType[];
+  identifiers: PatientIdentifierValue[];
 }
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
@@ -26,7 +27,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
   const getIdentifierByFieldName = useCallback(
-    (identifierFieldName: string) => identifiers.find((identifier) => identifier.fieldName === identifierFieldName),
+    (identifierFieldName: string) =>
+      identifiers.find((identifier) => identifier.identifierType.fieldName === identifierFieldName),
     [identifiers],
   );
 
@@ -123,13 +125,15 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
   const handleConfiguringIdentifiers = useCallback(() => {
     identifierTypes.forEach((identifierType) => {
-      const index = identifiers.findIndex((identifier) => identifier.fieldName === identifierType.fieldName);
+      const index = identifiers.findIndex(
+        (identifier) => identifier.identifierType.fieldName === identifierType.fieldName,
+      );
       const identifier = identifiers[index];
       if (index >= 0) {
         if (!identifierType.checked && identifiers[index].action === 'ADD') {
           remove(index);
         } else {
-          let action: PatientIdentifierValueType['action'];
+          let action: PatientIdentifierValue['action'];
 
           if (identifierType.checked) {
             if (identifier.action === 'ADD') {
@@ -149,17 +153,15 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
             ...identifiers[index],
             action: action,
             source: action === 'ADD' || action === 'UPDATE' ? identifierType.source : null,
-          } as PatientIdentifierValueType);
+          } as PatientIdentifierValue);
         }
       } else if (identifierType.checked) {
         push({
-          name: identifierType.name,
-          fieldName: identifierType.fieldName,
-          value: '',
+          identifier: '',
           action: 'ADD',
           source: identifierType.source,
-          isPrimary: identifierType.isPrimary,
-        } as PatientIdentifierValueType);
+          identifierType: mapIdentifierType(identifierType),
+        } as PatientIdentifierValue);
       }
     });
     closeOverlay();

@@ -1,3 +1,5 @@
+@import "../../patient-registration/patient-registration.scss";
+
 .fieldRow {
   display: flex;
   flex-direction: row;
@@ -10,10 +12,12 @@
 }
 
 .label {
-  width: 150px;
-  text-align: right;
-  margin-right: 5px;
-  padding-top: 8px;
+  @include carbon--type-style("label-01");
+  color: $text-02;
+}
+
+.textID {
+  margin-bottom: $spacing-05;
 }
 
 .requiredField {
@@ -79,6 +83,12 @@
   margin-left: 5px;
 }
 
-.identifierInput {
-  height: 80px !important;
+.IDInput {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.trashCan {
+  color: $danger;
 }
