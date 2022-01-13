@@ -18,6 +18,8 @@ export const IdField: React.FC = () => {
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
 
+  console.log(values.identifiers);
+
   useEffect(() => {
     if (!inEditMode) {
       setFieldValue(

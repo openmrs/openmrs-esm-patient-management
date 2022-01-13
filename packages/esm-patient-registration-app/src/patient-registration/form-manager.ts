@@ -152,25 +152,32 @@ export default class FormManager {
   ): Promise<Array<PatientIdentifier>> {
     const identifierTypeRequests: Array<Promise<PatientIdentifier>> = patientIdentifiers.map(
       async (patientIdentifier) => {
-        const { identifierType, identifier, uuid } = patientIdentifier;
-        const { isPrimary } = identifierTypes.find((identifierType) => identifierType.uuid === uuid);
+        const { identifierType: identifierTypeUuid, identifier, uuid, action, source } = patientIdentifier;
+        const identifierType = identifierTypes.find((identifierType) => identifierType.uuid === identifierTypeUuid);
         if (identifier) {
           return {
             uuid,
             identifier,
-            identifierType,
+            identifierType: identifierTypeUuid,
             location: location,
-            preferred: isPrimary,
+            preferred: identifierType?.isPrimary,
           };
-        } else if (patientIdentifier.autoGeneration) {
+        } else if (source && patientIdentifier?.autoGeneration) {
           const generateIdentifierResponse = await generateIdentifier(patientIdentifier.source.uuid, abortController);
           return {
             // is this undefined?
-            uuid: patientIdentifier?.uuid,
+            uuid,
             identifier: generateIdentifierResponse.data.identifier,
-            identifierType: patientIdentifier.uuid,
+            identifierType: identifierTypeUuid,
             location: location,
-            preferred: isPrimary,
+            preferred: identifierType?.isPrimary,
+          };
+        } else if (action === 'DELETE') {
+          return {
+            uuid,
+            identifier: identifierTypeUuid,
+            location,
+            preferred: identifierType.isPrimary,
           };
         } else {
           // This is a case that should not occur.
@@ -298,7 +305,7 @@ export default class FormManager {
       } else if (identifier.action === 'UPDATE') {
         return updatePatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
       } else if (identifier.action === 'DELETE') {
-        deletePatientIdentifier(patientUuid, patientIdentifiers[index].uuid, abortController);
+        deletePatientIdentifier(patientUuid, patientIdentifiers[index]?.uuid, abortController);
       }
     });
   }

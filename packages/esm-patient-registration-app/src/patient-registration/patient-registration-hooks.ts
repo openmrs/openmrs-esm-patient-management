@@ -10,6 +10,7 @@ import {
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
+  getPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
@@ -47,7 +48,6 @@ export function useInitialFormValues(
   fallback = blankFormValues,
 ): [FormValues, Dispatch<FormValues>] {
   const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
-  const [isLoadingIdentifiers, identifiers] = usePatientIdentifiers(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>(fallback);
 
   useEffect(() => {
@@ -58,6 +58,7 @@ export function useInitialFormValues(
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
           ...getPhonePersonAttributeValueFromFhirPatient(patient),
+          identifiers: await getPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
@@ -65,15 +66,6 @@ export function useInitialFormValues(
       }
     })();
   }, [isLoadingPatient, patient, patientUuid]);
-
-  useEffect(() => {
-    if (identifiers) {
-      setInitialFormValues((initialFormValues) => ({
-        ...initialFormValues,
-        identifiers,
-      }));
-    }
-  }, [isLoadingIdentifiers, identifiers]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -123,27 +115,4 @@ export function usePatientUuidMap(
 async function getPatientRegistration(patientUuid: string) {
   const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
   return items.find((item) => item.patientUuid === patientUuid);
-}
-
-function usePatientIdentifiers(patientUuid: string): [boolean, PatientIdentifierValue[] | null] {
-  const [patientIdentifiers, setPatientIdentifiers] = useState<PatientIdentifierValue[]>(null);
-  useEffect(() => {
-    openmrsFetch<{ results: any[] }>(`/ws/rest/v1/patient/${patientUuid}/identifier?v=full`).then((res) => {
-      setPatientIdentifiers(
-        res.data.results.map((patientIdentifier) => ({
-          uuid: patientIdentifier.uuid,
-          identifier: patientIdentifier.identifier,
-          identifierType: patientIdentifier.identifierType.uuid,
-          action: 'NONE',
-          source: null,
-        })),
-      );
-    });
-  }, [patientUuid]);
-
-  if (!patientUuid) {
-    return [false, []];
-  }
-
-  return [!!patientIdentifiers, patientIdentifiers];
 }

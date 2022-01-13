@@ -37,12 +37,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           const identifier = getIdentifierByTypeUuid(identifierType.uuid);
           return {
             ...identifierType,
-            checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary,
-            source: identifier
-              ? identifier.source
-              : identifierType.identifierSources.length > 0
-              ? identifierType.identifierSources[0]
-              : null,
+            checked: identifier?.action !== 'DELETE' ?? (identifierType.isPrimary || identifierType.required),
+            source:
+              identifier?.source ?? identifierType.identifierSources.length > 0
+                ? identifierType.identifierSources[0]
+                : null,
           };
         }),
       );
@@ -62,7 +61,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         identifier.uuid === uuid
           ? {
               ...identifier,
-              checked: identifier.isPrimary || checked,
+              checked: identifier.isPrimary || identifier.required || checked,
             }
           : identifier,
       ),
@@ -84,7 +83,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     () =>
       filteredIdentifiers.map((identifierType) => {
         const identifier = getIdentifierByTypeUuid(identifierType.uuid);
-        const disabled = identifier ? identifier.action === 'NONE' : false;
+        const disabled = !!(identifier?.action === 'NONE');
         return (
           <div key={identifierType.uuid} className={styles.space05}>
             <Checkbox
@@ -93,7 +92,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               labelText={identifierType.name}
               onChange={(checked) => handleCheckingIdentifier(identifierType?.uuid, checked)}
               checked={identifierType.checked}
-              disabled={disabled}
             />
             {!disabled && identifierType.checked && identifierType?.identifierSources?.length > 0 && (
               <div className={styles.radioGroup}>
@@ -124,8 +122,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const handleConfiguringIdentifiers = useCallback(() => {
     identifierTypes.forEach((identifierType) => {
       const index = identifiers.findIndex((identifier) => identifier.identifierType === identifierType.uuid);
-      const identifier = identifiers[index];
       if (index >= 0) {
+        const identifier = identifiers[index];
         if (!identifierType.checked && identifiers[index].action === 'ADD') {
           remove(index);
         } else {

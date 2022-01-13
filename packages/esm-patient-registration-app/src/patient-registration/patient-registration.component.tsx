@@ -52,6 +52,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patient?.id);
 
+  console.log(initialFormValues);
+
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
