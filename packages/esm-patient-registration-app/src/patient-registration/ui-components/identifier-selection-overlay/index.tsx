@@ -37,7 +37,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           const identifier = getIdentifierByTypeUuid(identifierType.uuid);
           return {
             ...identifierType,
-            checked: identifier?.action !== 'DELETE' ?? (identifierType.isPrimary || identifierType.required),
+            checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required,
             source:
               identifier?.source ?? identifierType.identifierSources.length > 0
                 ? identifierType.identifierSources[0]

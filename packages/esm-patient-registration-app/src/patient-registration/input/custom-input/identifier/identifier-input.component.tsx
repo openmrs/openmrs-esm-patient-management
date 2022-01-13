@@ -41,20 +41,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
   }, [source]);
 
   useEffect(() => {
-    let validatorProps = Yup.string();
-    validatorProps = validatorProps.required("Identifier can't be blank!");
-
-    if (identifierType.format) {
-      validatorProps = validatorProps.matches(new RegExp(identifierType.format), 'Invalid identifier format!');
-    }
-
-    const schemaBuilder = {};
-    schemaBuilder[identifierType.fieldName] = validatorProps;
-    identifierValidationSchema[identifierType.fieldName] = validatorProps;
-    setIdentifierValidationSchema(Yup.object(schemaBuilder));
-  }, []);
-
-  useEffect(() => {
     if (source) {
       if (source.autoGenerationOption) {
         setAutoGenerationOption(source.autoGenerationOption);
@@ -62,15 +48,8 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         if (source.autoGenerationOption.automaticGenerationEnabled) {
           setFieldValue(`identifiers[${index}].autoGeneration`, true);
           setFieldValue(`identifiers[${index}].identifier`, '');
-
-          if (validationSchema.fields[identifierType.fieldName]) {
-            validationSchema.fields[identifierType.fieldName] = Yup.string();
-          }
-        } else {
-          setValidationSchema(validationSchema.concat(identifierValidationSchema));
         }
       } else {
-        setValidationSchema(validationSchema.concat(identifierValidationSchema));
         setAutoGenerationOption({
           manualEntryEnabled: true,
           automaticGenerationEnabled: false,
@@ -78,7 +57,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         setFieldValue(`identifiers[${index}].autoGeneration`, false);
       }
     } else {
-      setValidationSchema(validationSchema.concat(identifierValidationSchema));
       setAutoGenerationOption({
         manualEntryEnabled: true,
         automaticGenerationEnabled: false,
