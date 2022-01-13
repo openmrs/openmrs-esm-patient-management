@@ -26,7 +26,7 @@ export interface FetchedPatientIdentifierType {
 export interface PatientIdentifierValue {
   uuid?: string;
   identifier: string;
-  identifierType?: FetchedPatientIdentifierType;
+  identifierType?: string;
   source: IdentifierSource;
   action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
   // ADD -> add a new identifier

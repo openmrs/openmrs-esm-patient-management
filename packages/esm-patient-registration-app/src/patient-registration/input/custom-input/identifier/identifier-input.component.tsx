@@ -18,7 +18,7 @@ interface IdentifierInputProps {
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, index, remove }) => {
   const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
   const identifierType = useMemo(
-    () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierType.uuid),
+    () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierType),
     [patientIdentifier],
   );
   const { validationSchema, setValidationSchema, setFieldValue, values } = React.useContext(PatientRegistrationContext);

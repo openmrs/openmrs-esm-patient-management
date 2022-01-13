@@ -10,10 +10,9 @@ import { PatientIdentifierValue } from '../../patient-registration-types';
 import IdentifierSelectionOverlay from '../../ui-components/identifier-selection-overlay';
 import { FieldArray, useField } from 'formik';
 import { ResourcesContext } from '../../../offline.resources';
-import { mapIdentifierType } from '../../patient-registration-utils';
 
 export const IdField: React.FC = () => {
-  const { patientIdentifiers } = useContext(ResourcesContext);
+  const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
   const { setFieldValue, inEditMode, values } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
@@ -21,21 +20,22 @@ export const IdField: React.FC = () => {
 
   useEffect(() => {
     if (!inEditMode) {
-      const identifiers = patientIdentifiers.filter((identifier) => identifier.isPrimary);
       setFieldValue(
         'identifiers',
-        identifiers.map(
-          (identifier) =>
-            ({
-              action: 'ADD',
-              identifier: '',
-              identifierType: mapIdentifierType(identifier),
-              source: identifier.identifierSources.length > 0 ? identifier.identifierSources[0] : null,
-            } as PatientIdentifierValue),
-        ),
+        identifierTypes
+          .filter((identifierType) => identifierType.isPrimary || identifierType.required)
+          .map(
+            (identifierType) =>
+              ({
+                action: 'ADD',
+                identifier: '',
+                identifierType: identifierType.uuid,
+                source: identifierType.identifierSources.length > 0 ? identifierType.identifierSources[0] : null,
+              } as PatientIdentifierValue),
+          ),
       );
     }
-  }, [patientIdentifiers, inEditMode]);
+  }, [identifierTypes, inEditMode]);
 
   return (
     <div>

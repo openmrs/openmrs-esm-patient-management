@@ -5,7 +5,6 @@ import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-
 import { PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
 import Overlay from '../overlay';
 import { ResourcesContext } from '../../../offline.resources';
-import { mapIdentifierType } from '../../patient-registration-utils';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, any) => void;
@@ -26,9 +25,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const [identifierTypes, setIdentifierTypes] = useState<PatientIdentifierType[]>([]);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
-  const getIdentifierByFieldName = useCallback(
-    (identifierFieldName: string) =>
-      identifiers.find((identifier) => identifier.identifierType.fieldName === identifierFieldName),
+  const getIdentifierByTypeUuid = useCallback(
+    (identifierTypeUuid: string) => identifiers.find((identifier) => identifier.identifierType === identifierTypeUuid),
     [identifiers],
   );
 
@@ -36,7 +34,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     if (patientIdentifiers) {
       setIdentifierTypes(
         patientIdentifiers.map((identifierType) => {
-          const identifier = getIdentifierByFieldName(identifierType.fieldName);
+          const identifier = getIdentifierByTypeUuid(identifierType.uuid);
           return {
             ...identifierType,
             checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary,
@@ -85,7 +83,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const identifierTypeFields = useMemo(
     () =>
       filteredIdentifiers.map((identifierType) => {
-        const identifier = getIdentifierByFieldName(identifierType.fieldName);
+        const identifier = getIdentifierByTypeUuid(identifierType.uuid);
         const disabled = identifier ? identifier.action === 'NONE' : false;
         return (
           <div key={identifierType.uuid} className={styles.space05}>
@@ -125,9 +123,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
   const handleConfiguringIdentifiers = useCallback(() => {
     identifierTypes.forEach((identifierType) => {
-      const index = identifiers.findIndex(
-        (identifier) => identifier.identifierType.fieldName === identifierType.fieldName,
-      );
+      const index = identifiers.findIndex((identifier) => identifier.identifierType === identifierType.uuid);
       const identifier = identifiers[index];
       if (index >= 0) {
         if (!identifierType.checked && identifiers[index].action === 'ADD') {
@@ -160,7 +156,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           identifier: '',
           action: 'ADD',
           source: identifierType.source,
-          identifierType: mapIdentifierType(identifierType),
+          identifierType: identifierType.uuid,
         } as PatientIdentifierValue);
       }
     });

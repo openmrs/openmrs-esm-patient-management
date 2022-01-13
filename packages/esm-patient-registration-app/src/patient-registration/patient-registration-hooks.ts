@@ -1,11 +1,8 @@
 import { getSynchronizationItems, openmrsFetch, useCurrentPatient } from '@openmrs/esm-framework';
-import { camelCase } from 'lodash-es';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
-  Patient,
-  PatientIdentifier,
   PatientIdentifierValue,
   PatientRegistration,
   PatientUuidMapType,
@@ -13,10 +10,8 @@ import {
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
-  getPatientIdentifiersFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
-  mapIdentifierType,
 } from './patient-registration-utils';
 
 const blankFormValues: FormValues = {
@@ -138,7 +133,7 @@ function usePatientIdentifiers(patientUuid: string): [boolean, PatientIdentifier
         res.data.results.map((patientIdentifier) => ({
           uuid: patientIdentifier.uuid,
           identifier: patientIdentifier.identifier,
-          identifierType: mapIdentifierType(patientIdentifier.identifierType),
+          identifierType: patientIdentifier.identifierType.uuid,
           action: 'NONE',
           source: null,
         })),
