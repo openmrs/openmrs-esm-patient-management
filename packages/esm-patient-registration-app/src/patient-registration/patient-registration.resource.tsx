@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { Patient, Relationship } from './patient-registration-types';
+import { Patient, Relationship, PatientIdentifier } from './patient-registration-types';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
@@ -134,6 +134,50 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
 
 export async function fetchPerson(query: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
+    signal: abortController.signal,
+  });
+}
+
+export async function addPatientIdentifier(
+  patientUuid: string,
+  patientIdentifier: PatientIdentifier,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: patientIdentifier,
+  });
+}
+
+export async function updatePatientIdentifier(
+  patientUuid: string,
+  patientIdentifier: PatientIdentifier,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifier.uuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: patientIdentifier,
+  });
+}
+
+export async function deletePatientIdentifier(
+  patientUuid: string,
+  patientIdentifierUuid: string,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifierUuid}?purge`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     signal: abortController.signal,
   });
 }

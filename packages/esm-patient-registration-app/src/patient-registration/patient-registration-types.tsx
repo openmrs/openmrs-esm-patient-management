@@ -28,6 +28,7 @@ export interface PatientIdentifierValue {
   identifier: string;
   identifierType?: string;
   source: IdentifierSource;
+  autoGeneration?: boolean;
   action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
   // ADD -> add a new identifier
   // UPDATE -> update an existing identifier
