@@ -1,7 +1,15 @@
-import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, openmrsFetch, useCurrentPatient } from '@openmrs/esm-framework';
+import { camelCase } from 'lodash-es';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
-import { FormValues, Patient, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
+import {
+  FormValues,
+  Patient,
+  PatientIdentifier,
+  PatientIdentifierValue,
+  PatientRegistration,
+  PatientUuidMapType,
+} from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
@@ -35,6 +43,7 @@ const blankFormValues: FormValues = {
   deathDate: '',
   deathCause: '',
   relationships: [{ relatedPerson: '', relationship: '' }],
+  identifiers: [],
 };
 
 export function useInitialFormValues(
@@ -42,6 +51,7 @@ export function useInitialFormValues(
   fallback = blankFormValues,
 ): [FormValues, Dispatch<FormValues>] {
   const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
+  const [isLoadingIdentifiers, identifiers] = usePatientIdentifiers(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>(fallback);
 
   useEffect(() => {
@@ -52,7 +62,6 @@ export function useInitialFormValues(
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
           ...getPhonePersonAttributeValueFromFhirPatient(patient),
-          identifiers: [...getPatientIdentifiersFromFhirPatient(patient)],
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
@@ -60,6 +69,15 @@ export function useInitialFormValues(
       }
     })();
   }, [isLoadingPatient, patient, patientUuid]);
+
+  useEffect(() => {
+    if (identifiers) {
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        identifiers,
+      }));
+    }
+  }, [isLoadingIdentifiers, identifiers]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -109,4 +127,35 @@ export function usePatientUuidMap(
 async function getPatientRegistration(patientUuid: string) {
   const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
   return items.find((item) => item.patientUuid === patientUuid);
+}
+
+function usePatientIdentifiers(patientUuid: string): [boolean, PatientIdentifierValue[] | null] {
+  const [patientIdentifiers, setPatientIdentifiers] = useState<PatientIdentifierValue[]>(null);
+  useEffect(() => {
+    openmrsFetch<{ results: any[] }>(`/ws/rest/v1/patient/${patientUuid}/identifier?v=full`).then((res) => {
+      console.log(res);
+      setPatientIdentifiers(
+        res.data.results.map((patientIdentifier) => ({
+          uuid: patientIdentifier.uuid,
+          identifier: patientIdentifier.identifier,
+          identifierType: {
+            name: patientIdentifier.identifierType.name,
+            fieldName: camelCase(patientIdentifier.identifierType.name),
+            uuid: patientIdentifier.identifierType.uuid,
+            required: patientIdentifier.identifierType.required,
+            format: patientIdentifier.identifierType.format,
+            isPrimary: patientIdentifier.identifierType.required,
+          },
+          action: 'NONE',
+          source: null,
+        })),
+      );
+    });
+  }, [patientUuid]);
+
+  if (!patientUuid) {
+    return [false, []];
+  }
+
+  return [!!patientIdentifiers, patientIdentifiers];
 }

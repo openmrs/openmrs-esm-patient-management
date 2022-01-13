@@ -27,6 +27,7 @@ const formValues = {
   deathDate: 'string',
   deathCause: 'string',
   relationships: [],
+  identifiers: [],
 };
 
 const identifierSource = {

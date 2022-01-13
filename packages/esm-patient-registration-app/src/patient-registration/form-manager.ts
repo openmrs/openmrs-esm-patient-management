@@ -79,15 +79,13 @@ export default class FormManager {
     personAttributeSections: any,
     abortController: AbortController,
   ): Promise<string> {
-    const patientIdentifiers =
-      values.identifiers ||
-      (await FormManager.getPatientIdentifiersToCreate(
-        values,
-        patientUuidMap,
-        identifierTypes,
-        currentLocation,
-        abortController,
-      ));
+    const patientIdentifiers: PatientIdentifier[] = await FormManager.getPatientIdentifiersToCreate(
+      values,
+      patientUuidMap,
+      identifierTypes,
+      currentLocation,
+      abortController,
+    );
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
