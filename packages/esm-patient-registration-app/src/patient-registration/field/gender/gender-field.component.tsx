@@ -28,8 +28,8 @@ export const GenderBirthField: React.FC = () => {
           <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
             <RadioButton id="male" labelText={t('maleLabelText', 'Male')} value="Male" />
             <RadioButton id="female" labelText={t('femaleLabelText', 'Female')} value="Female" />
-            <RadioButton id="unknown" labelText={t('unknownLabelText', 'Unknown')} value="Unknown" />
             <RadioButton id="other" labelText={t('otherLabelText', 'Other')} value="Other" />
+            <RadioButton id="unknown" labelText={t('unknownLabelText', 'Unknown')} value="Unknown" />
           </RadioButtonGroup>
           {meta.touched && meta.error && (
             <>
