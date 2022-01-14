@@ -13,7 +13,7 @@ import { ResourcesContext } from '../../../offline.resources';
 
 export const IdField: React.FC = () => {
   const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
-  const { setFieldValue, inEditMode, values } = useContext(PatientRegistrationContext);
+  const { setFieldValue, inEditMode } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export const IdField: React.FC = () => {
           {t('configure', 'Configure')} <ArrowRight16 />
         </Button>
       </div>
-      <div className={styles.grid}>
+      <div>
         <FieldArray name="identifiers">
           {({
             push,
@@ -59,11 +59,9 @@ export const IdField: React.FC = () => {
             },
           }) => (
             <>
-              {identifiers
-                .filter((identifier) => identifier.action !== 'DELETE')
-                .map((identifier: PatientIdentifierValue, index) => (
-                  <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
-                ))}
+              {identifiers.map((identifier: PatientIdentifierValue, index) => (
+                <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
+              ))}
               {showIdentifierOverlay && (
                 <IdentifierSelectionOverlay
                   setFieldValue={setFieldValue}

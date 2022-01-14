@@ -145,7 +145,7 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    patientIdentifiers: PatientIdentifierValue[],
+    patientIdentifiers: PatientIdentifierValue[], // values.identifiers
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,

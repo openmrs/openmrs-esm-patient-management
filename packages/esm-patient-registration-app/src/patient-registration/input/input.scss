@@ -87,8 +87,16 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
+  max-width: 27rem;
 }
 
 .trashCan {
   color: $danger;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .IDInput {
+    max-width: unset;
+    width: 100%;
+  }
 }

@@ -48,7 +48,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     }
   }, [patientIdentifiers, identifiers]);
 
-  const handleSearch = useCallback((event) => setSearchString(event?.target?.value), []);
+  const handleSearch = useCallback((event) => setSearchString(event?.target?.value ?? ''), []);
 
   const filteredIdentifiers = useMemo(
     () => identifierTypes?.filter((identifier) => identifier?.name?.toLowerCase().includes(searchString.toLowerCase())),
@@ -83,7 +83,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     () =>
       filteredIdentifiers.map((identifierType) => {
         const identifier = getIdentifierByTypeUuid(identifierType.uuid);
-        const disabled = !!(identifier?.action === 'NONE');
+        const showIdentifierSources = !(identifier?.action === 'NONE');
         return (
           <div key={identifierType.uuid} className={styles.space05}>
             <Checkbox
@@ -92,8 +92,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               labelText={identifierType.name}
               onChange={(checked) => handleCheckingIdentifier(identifierType?.uuid, checked)}
               checked={identifierType.checked}
+              disabled={
+                identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required
+              }
             />
-            {!disabled && identifierType.checked && identifierType?.identifierSources?.length > 0 && (
+            {showIdentifierSources && identifierType.checked && identifierType?.identifierSources?.length > 0 && (
               <div className={styles.radioGroup}>
                 <RadioButtonGroup
                   legendText={t('source', 'Source')}
@@ -130,9 +133,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           let action: PatientIdentifierValue['action'];
 
           if (identifierType.checked) {
-            if (identifier.action === 'ADD') {
-              action = 'ADD';
-            } else if (identifier.action === 'DELETE') {
+            if (identifier.action === 'DELETE') {
               action = 'UPDATE';
             } else {
               action = identifier.action;

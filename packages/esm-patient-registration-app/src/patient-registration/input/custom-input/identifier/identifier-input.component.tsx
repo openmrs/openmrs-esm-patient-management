@@ -78,11 +78,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     if (action === 'ADD') {
       remove(index);
     } else {
-      setFieldValue(`identifiers[${index}]`, {
-        ...patientIdentifier,
-        action: 'DELETE',
-        identifier: '',
-      });
+      setFieldValue(`identifiers[${index}].action`, 'DELETE');
     }
   }, [patientIdentifier]);
 
