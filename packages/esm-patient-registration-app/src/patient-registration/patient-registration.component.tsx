@@ -70,20 +70,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
 
   useEffect(() => {
-    for (const patientIdentifier of patientIdentifiers) {
-      if (!initialFormValues[patientIdentifier.fieldName]) {
-        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
-      }
-
-      setInitialFormValues({
-        ...initialFormValues,
-        ['source-for-' + patientIdentifier.fieldName]:
-          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
-      });
-    }
-  }, [patientIdentifiers]);
-
-  useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
 
     if (!addressTemplateXml) {
