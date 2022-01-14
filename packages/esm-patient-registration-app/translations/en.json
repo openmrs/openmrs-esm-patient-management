@@ -46,6 +46,7 @@
   "negativeYears": "Years cannot be less than 0",
   "numberInNameDubious": "Name should not contain numbers",
   "otherLabelText": "Other",
+  "unknownLabelText": "Unknown",
   "patient": "Patient",
   "phoneEmailLabelText": "Phone & Email",
   "phoneNumberInputLabelText": "Phone number(optional)",
