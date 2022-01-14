@@ -1,9 +1,12 @@
+:wave:	*New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher:	
+
+
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/workflows/Node.js%20CI/badge.svg)
 
 
 # OpenMRS Patient Management
 
-This is a [Lerna](https://lerna.js.org/) project containing patient management. This package handles the following
+This is a [Lerna](https://lerna.js.org/) project containing patient management frontend modules which deal with creating, searching, and listing patients. This package handles the following:
 
 -  [@openmrs/esm-patient-search-app](packages/esm-patient-search-app)
 -  [@openmrs/esm-patient-registration-app](packages/esm-patient-registration-app)
