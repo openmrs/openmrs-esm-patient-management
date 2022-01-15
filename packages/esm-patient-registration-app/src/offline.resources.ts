@@ -10,7 +10,7 @@ export interface Resources {
   addressTemplate: any;
   currentSession: SessionUser;
   relationshipTypes: any;
-  patientIdentifiers: Array<PatientIdentifierType>;
+  identifierTypes: Array<PatientIdentifierType>;
 }
 
 export const ResourcesContext = React.createContext<Resources>(null);

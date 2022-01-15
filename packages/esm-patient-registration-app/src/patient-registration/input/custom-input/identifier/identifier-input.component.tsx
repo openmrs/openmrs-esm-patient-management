@@ -16,7 +16,7 @@ interface IdentifierInputProps {
 }
 
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, index, remove }) => {
-  const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
+  const { identifierTypes } = useContext(ResourcesContext);
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierType),
     [patientIdentifier],
@@ -70,7 +70,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     setFieldValue(`identifiers[${index}]`, {
       ...patientIdentifier,
       action: 'UPDATE',
-      source: identifierType.identifierSources.length > 0 ? identifierType.identifierSources[0] : null,
+      source: identifierType.identifierSources?.[0],
     } as PatientIdentifierValue);
   }, [patientIdentifier]);
 
@@ -107,6 +107,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           labelText={identifierName}
           name={fieldName}
           disabled={!option.manualEntryEnabled}
+          required
         />
       ) : (
         <div className={styles.textID}>

@@ -29,11 +29,13 @@ export interface PatientIdentifierValue {
   identifierType?: string;
   source: IdentifierSource;
   autoGeneration?: boolean;
+  /**
+   * @kind ADD -> add a new identifier to a patient
+   * @kind UPDATE -> update an existing patient identifier
+   * @kind DELETE -> delete an existing patient identifier
+   * @kind NONE -> No action to be taken on the patient identifier
+   */
   action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
-  // ADD -> add a new identifier
-  // UPDATE -> update an existing identifier
-  // DELETE -> delete an existing identifier
-  // NONE -> No action to be taken on the identifier
 }
 
 export interface PatientRegistration {
@@ -124,7 +126,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<{ relatedPerson: string; relationship: string }>;
-  identifiers: PatientIdentifierValue[];
+  identifiers: Array<PatientIdentifierValue>;
 }
 
 export interface PatientUuidMapType {

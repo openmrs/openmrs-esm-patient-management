@@ -83,7 +83,7 @@ export default class FormManager {
     personAttributeSections: any,
     abortController: AbortController,
   ): Promise<string> {
-    const patientIdentifiers: PatientIdentifier[] = await FormManager.getPatientIdentifiersToCreate(
+    const patientIdentifiers: Array<PatientIdentifier> = await FormManager.getPatientIdentifiersToCreate(
       values.identifiers,
       identifierTypes,
       currentLocation,
@@ -145,7 +145,7 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    patientIdentifiers: PatientIdentifierValue[], // values.identifiers
+    patientIdentifiers: Array<PatientIdentifierValue>, // values.identifiers
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
@@ -295,8 +295,8 @@ export default class FormManager {
 
   static savePatientIdentifiers(
     patientUuid: string,
-    patientIdentifiers: PatientIdentifier[],
-    identifiers: PatientIdentifierValue[],
+    patientIdentifiers: Array<PatientIdentifier>,
+    identifiers: Array<PatientIdentifierValue>,
     abortController: AbortController,
   ) {
     return identifiers.map((identifier, index) => {

@@ -7,19 +7,19 @@ import { Button } from 'carbon-components-react';
 import { ArrowRight16 } from '@carbon/icons-react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { PatientIdentifierValue } from '../../patient-registration-types';
-import IdentifierSelectionOverlay from '../../ui-components/identifier-selection-overlay';
-import { FieldArray, useField } from 'formik';
+import IdentifierSelectionOverlay from './identifier-selection-overlay';
+import { FieldArray } from 'formik';
 import { ResourcesContext } from '../../../offline.resources';
 
 export const IdField: React.FC = () => {
-  const { patientIdentifiers: identifierTypes } = useContext(ResourcesContext);
+  const { identifierTypes } = useContext(ResourcesContext);
   const { setFieldValue, inEditMode } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
-  const [showIdentifierOverlay, setIdentifierOverlay] = useState<boolean>(false);
+  const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
 
   useEffect(() => {
-    if (!inEditMode) {
+    if (!inEditMode && identifierTypes) {
       setFieldValue(
         'identifiers',
         identifierTypes
@@ -30,7 +30,7 @@ export const IdField: React.FC = () => {
                 action: 'ADD',
                 identifier: '',
                 identifierType: identifierType.uuid,
-                source: identifierType.identifierSources.length > 0 ? identifierType.identifierSources[0] : null,
+                source: identifierType.identifierSources?.[0],
               } as PatientIdentifierValue),
           ),
       );
@@ -44,7 +44,7 @@ export const IdField: React.FC = () => {
         <Button
           kind="ghost"
           className={styles.setIDNumberButton}
-          onClick={() => setIdentifierOverlay(true)}
+          onClick={() => setShowIdentifierOverlay(true)}
           size={desktop ? 'sm' : 'md'}>
           {t('configure', 'Configure')} <ArrowRight16 />
         </Button>
@@ -65,7 +65,7 @@ export const IdField: React.FC = () => {
               {showIdentifierOverlay && (
                 <IdentifierSelectionOverlay
                   setFieldValue={setFieldValue}
-                  closeOverlay={() => setIdentifierOverlay(false)}
+                  closeOverlay={() => setShowIdentifierOverlay(false)}
                   push={push}
                   identifiers={identifiers}
                   remove={remove}

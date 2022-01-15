@@ -24,7 +24,7 @@ const resources = {
   currentSession: fetchCurrentSession,
   addressTemplate: fetchAddressTemplate,
   relationshipTypes: fetchAllRelationshipTypes,
-  patientIdentifiers: fetchPatientIdentifierTypesWithSources,
+  identifierTypes: fetchPatientIdentifierTypesWithSources,
 };
 
 function setupOpenMRS() {
