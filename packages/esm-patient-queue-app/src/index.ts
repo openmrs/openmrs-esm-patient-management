@@ -31,6 +31,22 @@ function setupOpenMRS() {
         online: true,
         order: 0,
       },
+      {
+        id: 'patient-queue-metrics-header',
+        slot: 'homepage-widgets-slot',
+        load: getAsyncLifecycle(() => import('./patient-queue-metrics/metrics-header.component'), options),
+        offline: true,
+        online: true,
+        order: 1,
+      },
+      {
+        id: 'metrics-card',
+        slot: 'homepage-widgets-slot',
+        load: getAsyncLifecycle(() => import('./patient-queue-metrics/clinic-metrics.component'), options),
+        offline: true,
+        online: true,
+        order: 2,
+      },
     ],
   };
 }
