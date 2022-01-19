@@ -1,30 +1,24 @@
 import React, { useCallback } from 'react';
-import styles from './identifier-modal.scss';
+import styles from './delete-identifier-modal.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 
 interface DeleteIdentifierConfirmationModalProps {
-  closeModal: () => void;
-  deleteIdentifier: () => void;
+  deleteIdentifier: (x: boolean) => void;
   identifierName: string;
   identifierValue: string;
 }
 
 const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationModalProps> = ({
-  closeModal,
   deleteIdentifier,
   identifierName,
   identifierValue,
 }) => {
   const { t } = useTranslation();
-  const handleDeleteIdentifier = useCallback(() => {
-    deleteIdentifier();
-    closeModal();
-  }, []);
 
   return (
     <div className={styles.modalContent}>
-      <h1 className={styles.productiveHeading03}>{t('deleteIdentifierModalHeading', 'Remove identifier?')}</h1>
+      <h1 className={styles.productiveHeading}>{t('deleteIdentifierModalHeading', 'Remove identifier?')}</h1>
       <h3 className={styles.modalBody}>
         {identifierName}
         {t(
@@ -34,10 +28,10 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
         {identifierValue}
       </h3>
       <div className={styles.buttonSet}>
-        <Button kind="secondary" size="lg" onClick={closeModal}>
+        <Button kind="secondary" size="lg" onClick={() => deleteIdentifier(false)}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" size="lg" onClick={handleDeleteIdentifier}>
+        <Button kind="danger" size="lg" onClick={() => deleteIdentifier(true)}>
           {t('removeIdentifierButton', 'Remove Identifier')}
         </Button>
       </div>

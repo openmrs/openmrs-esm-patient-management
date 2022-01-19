@@ -1,7 +1,7 @@
 @import '../patient-registration/patient-registration.scss';
 
-.productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
+.productiveHeading {
+  @include carbon--type-style("productive-heading-02");
 }
 
 .modalContent {
