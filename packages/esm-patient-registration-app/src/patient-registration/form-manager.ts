@@ -138,57 +138,39 @@ export default class FormManager {
     return savePatientResponse.data.uuid;
   }
 
-  static savePatientIdentifiers(
+  static async savePatientIdentifiers(
     patientUuid: string,
     patientIdentifiers: Array<PatientIdentifierValue>, // values.identifiers
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    let patientIdentifiersToCreate = [];
-    if (patientUuid) {
-      patientIdentifiers.forEach((patientIdentifier) => {
-        const { identifierTypeUuid: identifierType, identifier, uuid, action, preferred } = patientIdentifier;
-        switch (action) {
-          case 'ADD':
-            addPatientIdentifier(
-              patientUuid,
-              {
-                identifier,
-                identifierType,
-                location,
-                preferred,
-              },
-              abortController,
-            );
-            break;
-          case 'UPDATE':
-            updatePatientIdentifier(patientUuid, uuid, identifier, abortController);
-            break;
-          case 'DELETE':
-            deletePatientIdentifier(patientUuid, uuid, abortController);
-            break;
-        }
-      });
-    } else {
-      patientIdentifiersToCreate = patientIdentifiers.map(async (patientIdentifier) => {
-        const { identifierTypeUuid: identifierType, identifier, uuid, source, preferred } = patientIdentifier;
-        if (identifier) {
-          return {
+    let identifierTypeRequests = patientIdentifiers
+      .filter((identifier) => identifier.action !== 'DELETE' && identifier.action !== 'NONE')
+      .map(async (patientIdentifier) => {
+        const { identifierTypeUuid, identifier, uuid, action, source, preferred, autoGeneration } = patientIdentifier;
+        if (identifier || (source && autoGeneration)) {
+          const identifierValue = identifier
+            ? identifier
+            : await (
+                await generateIdentifier(patientIdentifier.source.uuid, abortController)
+              ).data.identifier;
+          const identifierToCreate = {
             uuid,
-            identifier,
-            identifierType,
+            identifier: identifierValue,
+            identifierType: identifierTypeUuid,
             location,
             preferred,
           };
-        } else if (source && patientIdentifier?.autoGeneration) {
-          const generateIdentifierResponse = await generateIdentifier(patientIdentifier.source.uuid, abortController);
-          return {
-            uuid,
-            identifier: generateIdentifierResponse.data.identifier,
-            identifierType,
-            location,
-            preferred,
-          };
+
+          if (patientUuid) {
+            if (action === 'ADD') {
+              await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
+            } else if (action === 'UPDATE') {
+              await updatePatientIdentifier(patientUuid, uuid, identifierToCreate.identifier, abortController);
+            }
+          }
+
+          return identifierToCreate;
         } else {
           // This is a case that should not occur.
           // If it did, the subsequent network request (when creating the patient) would fail with
@@ -197,8 +179,17 @@ export default class FormManager {
           throw new Error('No approach for generating a patient identifier could be found.');
         }
       });
+
+    if (patientUuid) {
+      patientIdentifiers
+        .filter((patientIdentifier) => patientIdentifier.action === 'DELETE')
+        .forEach(
+          async (patientIdentifier) =>
+            await deletePatientIdentifier(patientUuid, patientIdentifier.uuid, abortController),
+        );
     }
-    return Promise.all(patientIdentifiersToCreate);
+
+    return Promise.all(identifierTypeRequests);
   }
 
   static getDeletedNames(patientUuidMap: PatientUuidMapType) {
