@@ -101,6 +101,15 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        id: 'delete-identifier-confirmation-modal',
+        load: getAsyncLifecycle(
+          () => import('./patient-registration/input/custom-input/identifier/delete-identifier-confirmation-modal'),
+          options,
+        ),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

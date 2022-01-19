@@ -1,0 +1,24 @@
+@import '../../../patient-registration.scss';
+
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+}
+
+.modalContent {
+  width: 100%;
+  background-color: $ui-01;
+  padding: $spacing-05 $spacing-05 0 $spacing-05;
+}
+
+.modalBody {
+  @include carbon--type-style("body-long-01");
+  margin: $spacing-05 0;
+}
+
+.buttonSet {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin: 0 $spacing-05;
+}

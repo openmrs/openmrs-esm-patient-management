@@ -29,7 +29,7 @@ export const IdField: React.FC = () => {
               ({
                 action: 'ADD',
                 identifier: '',
-                identifierType: identifierType.uuid,
+                identifierTypeUuid: identifierType.uuid,
                 source: identifierType.identifierSources?.[0],
               } as PatientIdentifierValue),
           ),

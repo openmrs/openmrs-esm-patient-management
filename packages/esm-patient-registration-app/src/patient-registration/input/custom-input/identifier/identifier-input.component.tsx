@@ -8,6 +8,7 @@ import { PatientRegistrationContext } from '../../../patient-registration-contex
 import { TrashCan16, Edit16, Undo16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
 import { ResourcesContext } from '../../../../offline.resources';
+import { showModal } from '@openmrs/esm-framework';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -18,12 +19,18 @@ interface IdentifierInputProps {
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, index, remove }) => {
   const { identifierTypes } = useContext(ResourcesContext);
   const identifierType = useMemo(
-    () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
-    [patientIdentifier],
+    () =>
+      identifierTypes.find((identifierType) => {
+        console.log(identifierType, patientIdentifier.identifierTypeUuid);
+        return identifierType.uuid === patientIdentifier.identifierTypeUuid;
+      }),
+    [patientIdentifier, identifierTypes],
   );
+
+  console.log(identifierType);
   const { validationSchema, setValidationSchema, setFieldValue, values } = React.useContext(PatientRegistrationContext);
   const { source, action, identifier } = patientIdentifier;
-  const identifierName = identifierType.name;
+  const identifierName = identifierType?.name;
   const fieldName = `identifiers[${index}].identifier`;
   const { t } = useTranslation();
   const [option, setAutoGenerationOption] = useState({
@@ -31,8 +38,20 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     automaticGenerationEnabled: undefined,
   });
   const [identifierValidationSchema, setIdentifierValidationSchema] = useState(Yup.object({}));
-  // This will save the value, if value is to be restored is needed
-  const [restoredValue, setRestoredValue] = useState(patientIdentifier.identifier);
+
+  // This will keep the old value saved, to restore the value
+  const [restoredValue, setRestoredValue] = useState(identifier);
+
+  const [deleteIdentifierAction, setDeleteIdentifierAction] = useState(false);
+  useEffect(() => {
+    if (deleteIdentifierAction) {
+      if (action === 'ADD') {
+        remove(index);
+      } else {
+        setFieldValue(`identifiers[${index}].action`, 'DELETE');
+      }
+    }
+  }, [deleteIdentifierAction]);
 
   useEffect(() => {
     if (source && source.autoGenerationOption && source.autoGenerationOption.automaticGenerationEnabled) {
@@ -70,16 +89,17 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     setFieldValue(`identifiers[${index}]`, {
       ...patientIdentifier,
       action: 'UPDATE',
-      source: identifierType.identifierSources?.[0],
+      source: identifierType?.identifierSources?.[0],
     } as PatientIdentifierValue);
   }, [patientIdentifier]);
 
   const handleDelete = useCallback(() => {
-    if (action === 'ADD') {
-      remove(index);
-    } else {
-      setFieldValue(`identifiers[${index}].action`, 'DELETE');
-    }
+    const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
+      closeModal: () => confirmDeleteIdentifierModal(),
+      deleteIdentifier: () => setDeleteIdentifierAction(true),
+      identifierName,
+      identifierValue: identifier,
+    });
   }, [patientIdentifier]);
 
   const handleUndo = useCallback(() => {
