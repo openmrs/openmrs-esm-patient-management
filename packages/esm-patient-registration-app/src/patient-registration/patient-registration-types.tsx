@@ -26,7 +26,7 @@ export interface FetchedPatientIdentifierType {
 export interface PatientIdentifierValue {
   uuid?: string;
   identifier: string;
-  identifierType?: string;
+  identifierTypeUuid?: string;
   source: IdentifierSource;
   autoGeneration?: boolean;
   /**

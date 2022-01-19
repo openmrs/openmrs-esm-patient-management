@@ -26,7 +26,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
   const getIdentifierByTypeUuid = useCallback(
-    (identifierTypeUuid: string) => identifiers.find((identifier) => identifier.identifierType === identifierTypeUuid),
+    (identifierTypeUuid: string) =>
+      identifiers.find((identifier) => identifier.identifierTypeUuid === identifierTypeUuid),
     [identifiers],
   );
 
@@ -124,7 +125,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
   const handleConfiguringIdentifiers = useCallback(() => {
     localIdentifierTypes.forEach((identifierType) => {
-      const index = identifiers.findIndex((identifier) => identifier.identifierType === identifierType.uuid);
+      const index = identifiers.findIndex((identifier) => identifier.identifierTypeUuid === identifierType.uuid);
       if (index >= 0) {
         const identifier = identifiers[index];
         if (!identifierType.checked && identifiers[index].action === 'ADD') {
@@ -155,7 +156,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           identifier: '',
           action: 'ADD',
           source: identifierType.source,
-          identifierType: identifierType.uuid,
+          identifierTypeUuid: identifierType.uuid,
         });
       }
     });
