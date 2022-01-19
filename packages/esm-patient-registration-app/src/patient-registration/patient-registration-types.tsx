@@ -29,6 +29,7 @@ export interface PatientIdentifierValue {
   identifierTypeUuid?: string;
   source: IdentifierSource;
   autoGeneration?: boolean;
+  preferred: boolean;
   /**
    * @kind ADD -> add a new identifier to a patient
    * @kind UPDATE -> update an existing patient identifier
@@ -62,7 +63,7 @@ export interface PatientIdentifierType extends FetchedPatientIdentifierType {
 }
 
 export interface PatientIdentifier {
-  uuid: string;
+  uuid?: string;
   identifier: string;
   identifierType?: string;
   location?: string;

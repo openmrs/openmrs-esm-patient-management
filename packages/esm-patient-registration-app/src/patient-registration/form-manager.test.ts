@@ -1,8 +1,9 @@
 import FormManager from './form-manager';
+import { FormValues } from './patient-registration-types';
 
 jest.mock('./patient-registration.resource');
 
-const formValues = {
+const formValues: FormValues = {
   givenName: '',
   middleName: '',
   familyName: '',
@@ -42,20 +43,9 @@ const identifierSource = {
 describe('FormManager', () => {
   describe('createIdentifiers', () => {
     it('uses the uuid of a field name if it exists', async () => {
-      const result = await FormManager.getPatientIdentifiersToCreate(
+      const result = await FormManager.savePatientIdentifiers(
+        undefined,
         formValues.identifiers,
-        [
-          {
-            name: 'foo',
-            required: false,
-            isPrimary: true,
-            fieldName: 'givenName',
-            uuid: 'identifierType',
-            format: 'n/a',
-            autoGenerationSource: identifierSource,
-            identifierSources: [],
-          },
-        ],
         'Nyc',
         new AbortController(),
       );

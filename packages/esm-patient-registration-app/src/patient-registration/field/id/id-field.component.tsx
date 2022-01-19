@@ -31,6 +31,7 @@ export const IdField: React.FC = () => {
                 identifier: '',
                 identifierTypeUuid: identifierType.uuid,
                 source: identifierType.identifierSources?.[0],
+                preferred: identifierType.isPrimary,
               } as PatientIdentifierValue),
           ),
       );
@@ -59,9 +60,11 @@ export const IdField: React.FC = () => {
             },
           }) => (
             <>
-              {identifiers.map((identifier: PatientIdentifierValue, index) => (
-                <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
-              ))}
+              {identifiers
+                .filter((identifier) => identifier.action !== 'DELETE')
+                .map((identifier: PatientIdentifierValue, index) => (
+                  <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
+                ))}
               {showIdentifierOverlay && (
                 <IdentifierSelectionOverlay
                   setFieldValue={setFieldValue}

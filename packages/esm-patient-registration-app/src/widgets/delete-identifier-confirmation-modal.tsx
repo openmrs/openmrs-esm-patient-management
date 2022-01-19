@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import styles from './identifier-modal.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
@@ -34,10 +34,10 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
         {identifierValue}
       </h3>
       <div className={styles.buttonSet}>
-        <Button kind="secondary" size="xl" onClick={closeModal}>
+        <Button kind="secondary" size="lg" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" size="xl" onClick={handleDeleteIdentifier}>
+        <Button kind="danger" size="lg" onClick={handleDeleteIdentifier}>
           {t('removeIdentifierButton', 'Remove Identifier')}
         </Button>
       </div>

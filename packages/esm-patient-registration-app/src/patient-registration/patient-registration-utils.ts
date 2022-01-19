@@ -178,5 +178,6 @@ export async function getInitialPatientIdentifiers(patientUuid: string): Promise
     identifierTypeUuid: patientIdentifier.identifierType.uuid,
     action: 'NONE',
     source: null,
+    preferred: patientIdentifier.identifierType.isPrimary,
   }));
 }

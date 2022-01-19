@@ -83,18 +83,12 @@ export default class FormManager {
     personAttributeSections: any,
     abortController: AbortController,
   ): Promise<string> {
-    const patientIdentifiers: Array<PatientIdentifier> = await FormManager.getPatientIdentifiersToCreate(
+    const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
+      patientUuid,
       values.identifiers,
-      identifierTypes,
       currentLocation,
       abortController,
     );
-
-    if (patientUuid) {
-      await Promise.all(
-        FormManager.savePatientIdentifiers(patientUuid, patientIdentifiers, values.identifiers, abortController),
-      );
-    }
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
@@ -144,39 +138,56 @@ export default class FormManager {
     return savePatientResponse.data.uuid;
   }
 
-  static getPatientIdentifiersToCreate(
+  static savePatientIdentifiers(
+    patientUuid: string,
     patientIdentifiers: Array<PatientIdentifierValue>, // values.identifiers
-    identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    const identifierTypeRequests: Array<Promise<PatientIdentifier>> = patientIdentifiers.map(
-      async (patientIdentifier) => {
-        const { identifierTypeUuid, identifier, uuid, action, source } = patientIdentifier;
-        const identifierType = identifierTypes.find((identifierType) => identifierType.uuid === identifierTypeUuid);
+    let patientIdentifiersToCreate = [];
+    if (patientUuid) {
+      patientIdentifiers.forEach((patientIdentifier) => {
+        const { identifierTypeUuid: identifierType, identifier, uuid, action, preferred } = patientIdentifier;
+        switch (action) {
+          case 'ADD':
+            addPatientIdentifier(
+              patientUuid,
+              {
+                identifier,
+                identifierType,
+                location,
+                preferred,
+              },
+              abortController,
+            );
+            break;
+          case 'UPDATE':
+            updatePatientIdentifier(patientUuid, uuid, identifier, abortController);
+            break;
+          case 'DELETE':
+            deletePatientIdentifier(patientUuid, uuid, abortController);
+            break;
+        }
+      });
+    } else {
+      patientIdentifiersToCreate = patientIdentifiers.map(async (patientIdentifier) => {
+        const { identifierTypeUuid: identifierType, identifier, uuid, source, preferred } = patientIdentifier;
         if (identifier) {
           return {
             uuid,
             identifier,
-            identifierType: identifierTypeUuid,
-            location: location,
-            preferred: identifierType?.isPrimary,
+            identifierType,
+            location,
+            preferred,
           };
         } else if (source && patientIdentifier?.autoGeneration) {
           const generateIdentifierResponse = await generateIdentifier(patientIdentifier.source.uuid, abortController);
           return {
             uuid,
             identifier: generateIdentifierResponse.data.identifier,
-            identifierType: identifierTypeUuid,
-            location: location,
-            preferred: identifierType?.isPrimary,
-          };
-        } else if (action === 'DELETE') {
-          return {
-            uuid,
-            identifier: identifierTypeUuid,
+            identifierType,
             location,
-            preferred: identifierType.isPrimary,
+            preferred,
           };
         } else {
           // This is a case that should not occur.
@@ -185,10 +196,9 @@ export default class FormManager {
           // Better stop early.
           throw new Error('No approach for generating a patient identifier could be found.');
         }
-      },
-    );
-
-    return Promise.all(identifierTypeRequests);
+      });
+    }
+    return Promise.all(patientIdentifiersToCreate);
   }
 
   static getDeletedNames(patientUuidMap: PatientUuidMapType) {
@@ -290,22 +300,5 @@ export default class FormManager {
       deathDate: isDead ? deathDate : undefined,
       causeOfDeath: isDead ? deathCause : undefined,
     };
-  }
-
-  static savePatientIdentifiers(
-    patientUuid: string,
-    patientIdentifiers: Array<PatientIdentifier>,
-    identifiers: Array<PatientIdentifierValue>,
-    abortController: AbortController,
-  ) {
-    return identifiers.map((identifier, index) => {
-      if (identifier.action === 'ADD') {
-        return addPatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
-      } else if (identifier.action === 'UPDATE') {
-        return updatePatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
-      } else if (identifier.action === 'DELETE') {
-        deletePatientIdentifier(patientUuid, patientIdentifiers[index]?.uuid, abortController);
-      }
-    });
   }
 }
