@@ -152,7 +152,7 @@ export default class FormManager {
   ): Promise<Array<PatientIdentifier>> {
     const identifierTypeRequests: Array<Promise<PatientIdentifier>> = patientIdentifiers.map(
       async (patientIdentifier) => {
-        const { identifierType: identifierTypeUuid, identifier, uuid, action, source } = patientIdentifier;
+        const { identifierTypeUuid, identifier, uuid, action, source } = patientIdentifier;
         const identifierType = identifierTypes.find((identifierType) => identifierType.uuid === identifierTypeUuid);
         if (identifier) {
           return {
@@ -165,7 +165,6 @@ export default class FormManager {
         } else if (source && patientIdentifier?.autoGeneration) {
           const generateIdentifierResponse = await generateIdentifier(patientIdentifier.source.uuid, abortController);
           return {
-            // is this undefined?
             uuid,
             identifier: generateIdentifierResponse.data.identifier,
             identifierType: identifierTypeUuid,

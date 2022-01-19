@@ -10,7 +10,7 @@ import {
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
-  getPatientIdentifiers,
+  getInitialPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
@@ -58,7 +58,7 @@ export function useInitialFormValues(
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
           ...getPhonePersonAttributeValueFromFhirPatient(patient),
-          identifiers: await getPatientIdentifiers(patientUuid),
+          identifiers: await getInitialPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
