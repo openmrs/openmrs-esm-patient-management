@@ -1,11 +1,16 @@
-import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, openmrsFetch, useCurrentPatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
-import { FormValues, Patient, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
+import {
+  FormValues,
+  PatientIdentifierValue,
+  PatientRegistration,
+  PatientUuidMapType,
+} from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
-  getPatientIdentifiersFromFhirPatient,
+  getPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
@@ -35,6 +40,7 @@ const blankFormValues: FormValues = {
   deathDate: '',
   deathCause: '',
   relationships: [{ relatedPerson: '', relationship: '' }],
+  identifiers: [],
 };
 
 export function useInitialFormValues(
@@ -52,7 +58,7 @@ export function useInitialFormValues(
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
           ...getPhonePersonAttributeValueFromFhirPatient(patient),
-          identifiers: [...getPatientIdentifiersFromFhirPatient(patient)],
+          identifiers: await getPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);

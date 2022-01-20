@@ -1,10 +1,11 @@
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, openmrsFetch } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
   FormValues,
   PatientIdentifier,
   PatientUuidMapType,
+  PatientIdentifierValue,
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';
@@ -167,4 +168,15 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
     result['phone'] = patient.telecom[0].value;
   }
   return result;
+}
+
+export async function getPatientIdentifiers(patientUuid: string): Promise<PatientIdentifierValue[]> {
+  const identifiers = await openmrsFetch<{ results: any[] }>(`/ws/rest/v1/patient/${patientUuid}/identifier?v=full`);
+  return identifiers.data.results.map((patientIdentifier) => ({
+    uuid: patientIdentifier.uuid,
+    identifier: patientIdentifier.identifier,
+    identifierType: patientIdentifier.identifierType.uuid,
+    action: 'NONE',
+    source: null,
+  }));
 }

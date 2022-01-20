@@ -39,6 +39,19 @@
   margin-bottom: $spacing-05;
 }
 
+.identifierLabelText {
+  display: flex;
+  align-items: center;
+}
+
+.setIDNumberButton {
+  margin-bottom: $spacing-05;
+}
+
+.setIDNumberButton > svg {
+  margin-left: $spacing-03;
+}
+
 :global(.omrs-breakpoint-lt-desktop){
   .grid {
     grid-template-columns: 1fr;
@@ -58,5 +71,8 @@
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
+  }
+  .radioButton label {
+    height: $spacing-09 !important;
   }
 }
