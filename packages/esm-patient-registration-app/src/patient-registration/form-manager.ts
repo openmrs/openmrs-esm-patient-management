@@ -24,7 +24,7 @@ import {
 import isEqual from 'lodash-es/isEqual';
 
 export type SavePatientForm = (
-  patientUuid: string | undefined,
+  isNewPatient: boolean,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
@@ -38,7 +38,7 @@ export type SavePatientForm = (
 
 export default class FormManager {
   static async savePatientFormOffline(
-    patientUuid = v4(),
+    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -48,12 +48,10 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
-    patientUuidMap.patientUuid = patientUuid;
-
     await queueSynchronizationItem(
       patientRegistration,
       {
-        patientUuid,
+        isNewPatient,
         formValues: values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -71,7 +69,7 @@ export default class FormManager {
         ),
       },
       {
-        id: patientUuid,
+        id: values.patientUuid,
         displayName: 'Patient registration',
         dependencies: [],
       },
@@ -81,7 +79,7 @@ export default class FormManager {
   }
 
   static async savePatientFormOnline(
-    patientUuid: string | undefined,
+    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -99,9 +97,9 @@ export default class FormManager {
       abortController,
     );
 
-    if (patientUuid) {
+    if (!isNewPatient) {
       await Promise.all(
-        FormManager.savePatientIdentifiers(patientUuid, patientIdentifiers, values.identifiers, abortController),
+        FormManager.savePatientIdentifiers(values.patientUuid, patientIdentifiers, values.identifiers, abortController),
       );
     }
 
@@ -113,11 +111,15 @@ export default class FormManager {
       patientIdentifiers,
     );
 
-    FormManager.getDeletedNames(patientUuidMap).forEach(async (name) => {
+    FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
       await deletePersonName(name.nameUuid, name.personUuid, abortController);
     });
 
-    const savePatientResponse = await savePatient(abortController, createdPatient, patientUuidMap.patientUuid);
+    const savePatientResponse = await savePatient(
+      abortController,
+      createdPatient,
+      isNewPatient ? undefined : values.patientUuid,
+    );
 
     if (savePatientResponse.ok) {
       await Promise.all(
@@ -154,7 +156,7 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    patientIdentifiers: PatientIdentifierValue[], // values.identifiers
+    patientIdentifiers: PatientIdentifierValue[],
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
@@ -201,12 +203,12 @@ export default class FormManager {
     return Promise.all(identifierTypeRequests);
   }
 
-  static getDeletedNames(patientUuidMap: PatientUuidMapType) {
+  static getDeletedNames(patientUuid: string, patientUuidMap: PatientUuidMapType) {
     if (patientUuidMap?.additionalNameUuid) {
       return [
         {
           nameUuid: patientUuidMap.additionalNameUuid,
-          personUuid: patientUuidMap.patientUuid,
+          personUuid: patientUuid,
         },
       ];
     }
@@ -227,9 +229,9 @@ export default class FormManager {
     }
 
     return {
-      uuid: patientUuidMap['patientUuid'],
+      uuid: values.patientUuid,
       person: {
-        uuid: patientUuidMap['patientUuid'],
+        uuid: values.patientUuid,
         names: FormManager.getNames(values, patientUuidMap),
         gender: values.gender.charAt(0),
         birthdate: values.birthdate,

@@ -1,12 +1,8 @@
 import { getSynchronizationItems, openmrsFetch, useCurrentPatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
+import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
-import {
-  FormValues,
-  PatientIdentifierValue,
-  PatientRegistration,
-  PatientUuidMapType,
-} from './patient-registration-types';
+import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
@@ -15,57 +11,61 @@ import {
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
 
-const blankFormValues: FormValues = {
-  givenName: '',
-  middleName: '',
-  familyName: '',
-  unidentifiedPatient: false,
-  additionalGivenName: '',
-  additionalMiddleName: '',
-  additionalFamilyName: '',
-  addNameInLocalLanguage: false,
-  gender: '',
-  birthdate: null,
-  yearsEstimated: 0,
-  monthsEstimated: 0,
-  birthdateEstimated: false,
-  telephoneNumber: '',
-  address1: '',
-  address2: '',
-  cityVillage: '',
-  stateProvince: '',
-  country: '',
-  postalCode: '',
-  isDead: false,
-  deathDate: '',
-  deathCause: '',
-  relationships: [{ relatedPerson: '', relationship: '' }],
-  identifiers: [],
-};
-
-export function useInitialFormValues(
-  patientUuid: string,
-  fallback = blankFormValues,
-): [FormValues, Dispatch<FormValues>] {
-  const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
-  const [initialFormValues, setInitialFormValues] = useState<FormValues>(fallback);
+export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
+  const [isLoadingPatientToEdit, patientToEdit] = useCurrentPatient(patientUuid);
+  const [initialFormValues, setInitialFormValues] = useState<FormValues>({
+    patientUuid: v4(),
+    givenName: '',
+    middleName: '',
+    familyName: '',
+    unidentifiedPatient: false,
+    additionalGivenName: '',
+    additionalMiddleName: '',
+    additionalFamilyName: '',
+    addNameInLocalLanguage: false,
+    gender: '',
+    birthdate: null,
+    yearsEstimated: 0,
+    monthsEstimated: 0,
+    birthdateEstimated: false,
+    telephoneNumber: '',
+    address1: '',
+    address2: '',
+    cityVillage: '',
+    stateProvince: '',
+    country: '',
+    postalCode: '',
+    isDead: false,
+    deathDate: '',
+    deathCause: '',
+    relationships: [{ relatedPerson: '', relationship: '' }],
+    identifiers: [],
+  });
 
   useEffect(() => {
     (async () => {
-      if (patient) {
+      if (patientToEdit) {
         setInitialFormValues({
           ...initialFormValues,
-          ...getFormValuesFromFhirPatient(patient),
-          ...getAddressFieldValuesFromFhirPatient(patient),
-          ...getPhonePersonAttributeValueFromFhirPatient(patient),
+          ...getFormValuesFromFhirPatient(patientToEdit),
+          ...getAddressFieldValuesFromFhirPatient(patientToEdit),
+          ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
           identifiers: await getPatientIdentifiers(patientUuid),
         });
-      } else if (!isLoadingPatient && patientUuid) {
+      } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
-        setInitialFormValues(registration?.formValues ?? fallback);
+
+        if (!registration.formValues) {
+          console.error(
+            `Found a queued offline patient registration for patient ${patientUuid}, but without form values. Not using these values.`,
+          );
+          return;
+        }
+
+        setInitialFormValues(registration.formValues);
       }
     })();
-  }, [isLoadingPatient, patient, patientUuid]);
+  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -93,20 +93,19 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
 
 export function usePatientUuidMap(
   patientUuid: string,
-  fallback = {},
+  fallback: PatientUuidMapType = {},
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
   const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
   const [patientUuidMap, setPatientUuidMap] = useState(fallback);
 
   useEffect(() => {
-    (async () => {
-      if (patient) {
-        setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
-      } else if (!isLoadingPatient && patientUuid) {
-        const registration = await getPatientRegistration(patientUuid);
-        setPatientUuidMap(registration?.initialAddressFieldValues ?? fallback);
-      }
-    })();
+    if (patient) {
+      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
+    } else if (!isLoadingPatient && patientUuid) {
+      getPatientRegistration(patientUuid).then((registration) =>
+        setPatientUuidMap(registration?.initialAddressFieldValues ?? fallback),
+      );
+    }
   }, [isLoadingPatient, patient, patientUuid]);
 
   return [patientUuidMap, setPatientUuidMap];
@@ -114,5 +113,5 @@ export function usePatientUuidMap(
 
 async function getPatientRegistration(patientUuid: string) {
   const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
-  return items.find((item) => item.patientUuid === patientUuid);
+  return items.find((item) => item.formValues.patientUuid === patientUuid);
 }

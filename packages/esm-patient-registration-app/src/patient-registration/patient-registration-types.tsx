@@ -38,7 +38,7 @@ export interface PatientIdentifierValue {
 
 export interface PatientRegistration {
   id?: number;
-  patientUuid: string;
+  isNewPatient: boolean;
   formValues: FormValues;
   patientUuidMap: PatientUuidMapType;
   initialAddressFieldValues: Record<string, any>;
@@ -100,6 +100,7 @@ export interface IdentifierSource {
 }
 
 export interface FormValues {
+  patientUuid: string;
   givenName: string;
   middleName: string;
   familyName: string;
@@ -129,7 +130,6 @@ export interface FormValues {
 
 export interface PatientUuidMapType {
   additionalNameUuid?: string;
-  patientUuid?: string;
   preferredNameUuid?: string;
   preferredAddressUuid?: string;
 }

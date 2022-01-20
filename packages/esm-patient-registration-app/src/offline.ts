@@ -41,7 +41,7 @@ export async function syncPatientRegistration(
   options: SyncProcessOptions<PatientRegistration>,
 ) {
   await FormManager.savePatientFormOnline(
-    undefined,
+    queuedPatient.isNewPatient,
     queuedPatient.formValues,
     queuedPatient.patientUuidMap,
     queuedPatient.initialAddressFieldValues,
