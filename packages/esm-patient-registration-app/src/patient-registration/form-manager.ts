@@ -108,16 +108,15 @@ export default class FormManager {
     if (savePatientResponse.ok) {
       await Promise.all(
         values.relationships
-          .filter((m) => m.relationship)
-          .map(({ relatedPersonUuid, relationship, uuid: relationshipUuid, action }) => {
-            const relationshipType = relationship.split('/')[0];
-            const direction = relationship.split('/')[1];
+          .filter((m) => m.relationshipType)
+          .map(({ relatedPersonUuid, relationshipType, uuid: relationshipUuid, action }) => {
+            const [type, direction] = relationshipType.split('/');
             const thisPatientUuid = savePatientResponse.data.uuid;
             const isAToB = direction === 'aIsToB';
             const relationshipToSave = {
               personA: isAToB ? relatedPersonUuid : thisPatientUuid,
               personB: isAToB ? thisPatientUuid : relatedPersonUuid,
-              relationshipType,
+              relationshipType: type,
             };
 
             if (action === 'UPDATE') {

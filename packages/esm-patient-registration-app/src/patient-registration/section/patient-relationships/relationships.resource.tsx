@@ -18,16 +18,16 @@ export async function getPatientRelationships(patientUuid: string): Promise<Form
         ? {
             relatedPersonName: r.personB.person.display,
             relatedPersonUuid: r.personB.person.uuid,
-            relationshipType: r.relationshipType.bIsToA,
-            relationship: `${r.relationshipType.uuid}/bIsToA`,
+            relation: r.relationshipType.bIsToA,
+            relationshipType: `${r.relationshipType.uuid}/bIsToA`,
             action: 'UPDATE',
             uuid: r.uuid,
           }
         : {
             relatedPersonName: r.personA.person.display,
             relatedPersonUuid: r.personA.person.display,
-            relationshipType: r.relationshipType.aIsToB,
-            relationship: `${r.relationshipType.uuid}/aIsToB`,
+            relation: r.relationshipType.aIsToB,
+            relationshipType: `${r.relationshipType.uuid}/aIsToB`,
             action: 'UPDATE',
             uuid: r.uuid,
           },

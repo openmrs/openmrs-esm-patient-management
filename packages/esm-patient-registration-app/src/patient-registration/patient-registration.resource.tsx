@@ -69,7 +69,7 @@ export function updateRelationship(
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: relationship,
+    body: { relationshipType: relationship.relationshipType },
     signal: abortController.signal,
   });
 }

@@ -84,6 +84,15 @@ export interface IdentifierSource {
   };
 }
 
+export interface RelationshipValue {
+  relatedPersonName?: string;
+  relatedPersonUuid: string;
+  relation?: string;
+  relationshipType: string;
+  action?: 'ADD' | 'UPDATE' | 'DELETE';
+  uuid?: string;
+}
+
 export interface FormValues {
   givenName: string;
   middleName: string;
@@ -108,14 +117,7 @@ export interface FormValues {
   isDead: boolean;
   deathDate: string;
   deathCause: string;
-  relationships: Array<{
-    relatedPersonName?: string;
-    relatedPersonUuid: string;
-    relationship: string;
-    relationshipType?: string;
-    action?: 'ADD' | 'UPDATE' | 'DELETE' | undefined;
-    uuid?: string;
-  }>;
+  relationships: Array<RelationshipValue>;
   identifiers?: Array<PatientIdentifier>;
 }
 

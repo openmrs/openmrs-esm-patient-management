@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
-import { Button, Select, SelectItem, OverflowMenu, OverflowMenuItem } from 'carbon-components-react';
+import { Button, Select, SelectItem, InlineNotification, NotificationActionButton } from 'carbon-components-react';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
-import { Input } from '../../input/basic-input/input/input.component';
-import { FormValues } from '../../patient-registration-types';
+import { RelationshipValue } from '../../patient-registration-types';
+import { TrashCan16 } from '@carbon/icons-react';
 
 interface RelationshipType {
   display: string;
@@ -56,23 +56,27 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
         }) => (
           <div>
             {relationships && relationships.length > 0
-              ? relationships.map((relationship: FormValues['relationships'][0], index) =>
-                  relationship.action !== 'DELETE' ? (
-                    <div key={index} className={sectionStyles.formSection}>
-                      <RelationshipView
-                        relationship={relationship}
-                        index={index}
-                        displayRelationshipTypes={displayRelationshipTypes}
-                        key={index}
-                        remove={remove}
-                      />
-                      <br />
-                    </div>
-                  ) : null,
-                )
+              ? relationships.map((relationship: RelationshipValue, index) => (
+                  <div key={index} className={sectionStyles.formSection}>
+                    <RelationshipView
+                      relationship={relationship}
+                      index={index}
+                      displayRelationshipTypes={displayRelationshipTypes}
+                      key={index}
+                      remove={remove}
+                    />
+                  </div>
+                ))
               : null}
             <div className={styles.actions}>
-              <Button kind="ghost" onClick={() => push({})}>
+              <Button
+                kind="ghost"
+                onClick={() =>
+                  push({
+                    relatedPersonUuid: '',
+                    action: 'ADD',
+                  })
+                }>
                 {t('addRelationshipButtonText', 'Add Relationship')}
               </Button>
             </div>
@@ -84,7 +88,7 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
 };
 
 interface RelationshipViewProps {
-  relationship: FormValues['relationships'][0];
+  relationship: RelationshipValue;
   index: number;
   displayRelationshipTypes: RelationshipType[];
   remove: <T>(index: number) => T;
@@ -98,20 +102,19 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
-  const [searchingRelatedPerson, setSearchingRelatedPersonName] = useState(
-    !relationship.relatedPersonName ? true : false,
-  );
 
-  const handleRelationshipTypeChange = (event) => {
+  const newRelationship = !relationship.uuid;
+
+  const handleRelationshipTypeChange = useCallback((event) => {
     const { target } = event;
     const field = target.name;
     const value = target.options[target.selectedIndex].value;
     setFieldValue(field, value);
-  };
+  }, []);
 
-  const handleSuggestionSelected = (field: string, selectedSuggestion: string) => {
+  const handleSuggestionSelected = useCallback((field: string, selectedSuggestion: string) => {
     setFieldValue(field, selectedSuggestion);
-  };
+  }, []);
 
   const searchPerson = async (query: string) => {
     const abortController = new AbortController();
@@ -119,42 +122,35 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     return searchResults.data.results;
   };
 
-  const toggleSearchingRelatedPerson = () =>
-    setSearchingRelatedPersonName((searchingRelatedPerson) => !searchingRelatedPerson);
+  const deleteRelationship = useCallback(() => {
+    if (relationship.action === 'UPDATE') {
+      setFieldValue(`relationships[${index}].action`, 'DELETE');
+    } else {
+      remove(index);
+    }
+  }, [relationship, index]);
 
-  const deleteRelationship = () =>
-    relationship.action === 'UPDATE'
-      ? setFieldValue(`relationships[${index}]`, {
-          ...relationship,
-          action: 'DELETE',
-        } as FormValues['relationships'][0])
-      : remove(index);
+  const restoreRelationship = useCallback(() => {
+    setFieldValue(`relationships[${index}].action`, 'UPDATE');
+  }, [index]);
 
-  return (
+  return relationship.action !== 'DELETE' ? (
     <div className={styles.relationship}>
       <div className={styles.searchBox}>
         <div className={styles.relationshipHeader}>
           <h4 className={styles.productiveHeading}>
-            {relationship?.relationshipType ?? t('relationshipPlaceholder', 'Relationship')}
+            {relationship?.relation ?? t('relationshipPlaceholder', 'Relationship')}
           </h4>
-          <OverflowMenu>
-            <OverflowMenuItem
-              onClick={deleteRelationship}
-              itemText={t('deleteRelationshipOverflowItemText', 'Delete Relationship')}
-              isDelete
-            />
-          </OverflowMenu>
+          <Button
+            kind="ghost"
+            iconDescription={t('deleteRelationshipTooltipText', 'Delete')}
+            hasIconOnly
+            onClick={deleteRelationship}>
+            <TrashCan16 className={styles.trashCan} />
+          </Button>
         </div>
         <div>
-          {!searchingRelatedPerson ? (
-            <Input
-              labelText={t('relativeFullNameLabelText', 'Full name')}
-              id={`relatedPersonFullName${index}`}
-              name={`relationships[${index}].relatedPersonName`}
-              onFocusCapture={toggleSearchingRelatedPerson}
-              light
-            />
-          ) : (
+          {newRelationship ? (
             <Autosuggest
               name={`relationships[${index}].relatedPersonUuid`}
               labelText={t('relativeFullNameLabelText', 'Full name')}
@@ -164,8 +160,13 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
               getSearchResults={searchPerson}
               getDisplayValue={(item) => item.display}
               getFieldValue={(item) => item.uuid}
-              autoFocus
+              required
             />
+          ) : (
+            <>
+              <span className={styles.labelText}>{t('relativeFullNameLabelText', 'Full name')}</span>
+              <p className={styles.bodyShort02}>{relationship.relatedPersonName}</p>
+            </>
           )}
         </div>
       </div>
@@ -173,10 +174,10 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
         <Select
           light={true}
           id="select"
-          value={relationship?.relationship ?? 'placeholder-item'}
           labelText={t('relationship', 'Relationship')}
           onChange={handleRelationshipTypeChange}
-          name={`relationships[${index}].relationship`}>
+          name={`relationships[${index}].relationshipType`}
+          defaultValue="placeholder-item">
           <SelectItem
             disabled
             hidden
@@ -189,5 +190,15 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
         </Select>
       </div>
     </div>
+  ) : (
+    <InlineNotification
+      kind="info"
+      title={t('relationshipRemovedText', 'Relationship removed')}
+      actions={
+        <NotificationActionButton onClick={restoreRelationship}>
+          {t('restoreRelationshipActionButton', 'Undo')}
+        </NotificationActionButton>
+      }
+    />
   );
 };
