@@ -70,20 +70,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
 
   useEffect(() => {
-    for (const patientIdentifier of patientIdentifiers) {
-      if (!initialFormValues[patientIdentifier.fieldName]) {
-        setInitialFormValues({ ...initialFormValues, [patientIdentifier.fieldName]: '' });
-      }
-
-      setInitialFormValues({
-        ...initialFormValues,
-        ['source-for-' + patientIdentifier.fieldName]:
-          patientIdentifier.identifierSources.length > 0 ? patientIdentifier.identifierSources[0].name : '',
-      });
-    }
-  }, [patientIdentifiers]);
-
-  useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
 
     if (!addressTemplateXml) {
@@ -147,11 +133,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         setTarget(redirectUrl);
       }
     } catch (error) {
-      if (error.responseBody && error.responseBody.error.globalErrors) {
+      if (error.responseBody?.error?.globalErrors) {
         error.responseBody.error.globalErrors.forEach((error) => {
           showToast({ description: error.message });
         });
-      } else if (error.responseBody && error.responseBody.error.message) {
+      } else if (error.responseBody?.error?.message) {
         showToast({ description: error.responseBody.error.message });
       } else {
         createErrorHandler()(error);
