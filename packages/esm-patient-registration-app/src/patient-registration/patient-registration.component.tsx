@@ -40,7 +40,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [sections, setSections] = useState([]);
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
-  const [loading, patient] = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = useCurrentPatient(patientUuid);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
@@ -48,7 +48,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
   const [patientUuidMap] = usePatientUuidMap(patientUuid);
   const location = currentSession.sessionLocation?.uuid;
-  const inEditMode = loading ? undefined : !!(patientUuid && patient);
+  const inEditMode = isLoading ? undefined : !!(patientUuid && patient);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patient?.id);
 
