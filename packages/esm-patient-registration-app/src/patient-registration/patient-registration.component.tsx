@@ -5,14 +5,7 @@ import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 import { useLocation } from 'react-router-dom';
 import { Formik, Form, FormikHelpers } from 'formik';
-import {
-  createErrorHandler,
-  showToast,
-  useCurrentPatient,
-  useConfig,
-  interpolateString,
-  interpolateUrl,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useConfig, interpolateString, interpolateUrl } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
 import { FormValues, CapturePhotoProps } from './patient-registration-types';
@@ -40,7 +33,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [sections, setSections] = useState([]);
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
-  const { isLoading, patient } = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});

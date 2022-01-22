@@ -189,7 +189,7 @@ describe('form submit', () => {
 
   it.skip('edits patient demographics', async () => {
     spyOn(backendController, 'savePatient').and.returnValue(Promise.resolve({}));
-    spyOn(mockOpenmrsFramework, 'useCurrentPatient').and.returnValue({
+    spyOn(mockOpenmrsFramework, 'usePatient').and.returnValue({
       isLoading: false,
       patient: mockPatient,
       patientUuid: mockPatient.id,

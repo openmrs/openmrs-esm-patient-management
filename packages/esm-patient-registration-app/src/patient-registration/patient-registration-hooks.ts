@@ -1,4 +1,4 @@
-import { getSynchronizationItems, useCurrentPatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, usePatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { patientRegistration } from '../constants';
 import {
@@ -47,7 +47,7 @@ export function useInitialFormValues(
   patientUuid: string,
   fallback = blankFormValues,
 ): [FormValues, Dispatch<FormValues>] {
-  const { isLoading, patient } = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>(fallback);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function useInitialFormValues(
 }
 
 export function useInitialAddressFieldValues(patientUuid: string, fallback = {}): [object, Dispatch<object>] {
-  const { isLoading, patient } = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<object>(fallback);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export function usePatientUuidMap(
   patientUuid: string,
   fallback = {},
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
-  const { isLoading, patient } = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const [patientUuidMap, setPatientUuidMap] = useState(fallback);
 
   useEffect(() => {
