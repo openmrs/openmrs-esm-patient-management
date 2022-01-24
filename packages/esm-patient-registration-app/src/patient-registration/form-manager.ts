@@ -9,8 +9,11 @@ import {
   Patient,
   CapturePhotoProps,
   PatientIdentifier,
+  PatientIdentifierValue,
 } from './patient-registration-types';
 import {
+  addPatientIdentifier,
+  deletePatientIdentifier,
   deletePersonName,
   deleteRelationship,
   generateIdentifier,
@@ -18,6 +21,7 @@ import {
   savePatientPhoto,
   saveRelationship,
   updateRelationship,
+  updatePatientIdentifier,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 
@@ -81,15 +85,18 @@ export default class FormManager {
     personAttributeSections: any,
     abortController: AbortController,
   ): Promise<string> {
-    const patientIdentifiers =
-      values.identifiers ||
-      (await FormManager.getPatientIdentifiersToCreate(
-        values,
-        patientUuidMap,
-        identifierTypes,
-        currentLocation,
-        abortController,
-      ));
+    const patientIdentifiers: PatientIdentifier[] = await FormManager.getPatientIdentifiersToCreate(
+      values.identifiers,
+      identifierTypes,
+      currentLocation,
+      abortController,
+    );
+
+    if (patientUuid) {
+      await Promise.all(
+        FormManager.savePatientIdentifiers(patientUuid, patientIdentifiers, values.identifiers, abortController),
+      );
+    }
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
@@ -145,41 +152,49 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    values: FormValues,
-    patientUuidMap: object,
+    patientIdentifiers: PatientIdentifierValue[], // values.identifiers
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    const identifierTypeRequests: Array<Promise<PatientIdentifier>> = identifierTypes.map(async (type) => {
-      const idValue = values[type.fieldName];
-
-      if (idValue) {
-        return {
-          uuid: patientUuidMap[type.fieldName] ? patientUuidMap[type.fieldName].uuid : undefined,
-          identifier: idValue,
-          identifierType: type.uuid,
-          location: location,
-          preferred: type.isPrimary,
-        };
-      } else if (type.autoGenerationSource) {
-        const generateIdentifierResponse = await generateIdentifier(type.autoGenerationSource.uuid, abortController);
-        return {
-          // is this undefined?
-          uuid: undefined,
-          identifier: generateIdentifierResponse.data.identifier,
-          identifierType: type.uuid,
-          location: location,
-          preferred: type.isPrimary,
-        };
-      } else {
-        // This is a case that should not occur.
-        // If it did, the subsequent network request (when creating the patient) would fail with
-        // BadRequest since the (returned) identifier type is undefined.
-        // Better stop early.
-        throw new Error('No approach for generating a patient identifier could be found.');
-      }
-    });
+    const identifierTypeRequests: Array<Promise<PatientIdentifier>> = patientIdentifiers.map(
+      async (patientIdentifier) => {
+        const { identifierType: identifierTypeUuid, identifier, uuid, action, source } = patientIdentifier;
+        const identifierType = identifierTypes.find((identifierType) => identifierType.uuid === identifierTypeUuid);
+        if (identifier) {
+          return {
+            uuid,
+            identifier,
+            identifierType: identifierTypeUuid,
+            location: location,
+            preferred: identifierType?.isPrimary,
+          };
+        } else if (source && patientIdentifier?.autoGeneration) {
+          const generateIdentifierResponse = await generateIdentifier(patientIdentifier.source.uuid, abortController);
+          return {
+            // is this undefined?
+            uuid,
+            identifier: generateIdentifierResponse.data.identifier,
+            identifierType: identifierTypeUuid,
+            location: location,
+            preferred: identifierType?.isPrimary,
+          };
+        } else if (action === 'DELETE') {
+          return {
+            uuid,
+            identifier: identifierTypeUuid,
+            location,
+            preferred: identifierType.isPrimary,
+          };
+        } else {
+          // This is a case that should not occur.
+          // If it did, the subsequent network request (when creating the patient) would fail with
+          // BadRequest since the (returned) identifier type is undefined.
+          // Better stop early.
+          throw new Error('No approach for generating a patient identifier could be found.');
+        }
+      },
+    );
 
     return Promise.all(identifierTypeRequests);
   }
@@ -283,5 +298,22 @@ export default class FormManager {
       deathDate: isDead ? deathDate : undefined,
       causeOfDeath: isDead ? deathCause : undefined,
     };
+  }
+
+  static savePatientIdentifiers(
+    patientUuid: string,
+    patientIdentifiers: PatientIdentifier[],
+    identifiers: PatientIdentifierValue[],
+    abortController: AbortController,
+  ) {
+    return identifiers.map((identifier, index) => {
+      if (identifier.action === 'ADD') {
+        return addPatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
+      } else if (identifier.action === 'UPDATE') {
+        return updatePatientIdentifier(patientUuid, patientIdentifiers[index], abortController);
+      } else if (identifier.action === 'DELETE') {
+        deletePatientIdentifier(patientUuid, patientIdentifiers[index]?.uuid, abortController);
+      }
+    });
   }
 }

@@ -23,6 +23,19 @@ export interface FetchedPatientIdentifierType {
   isPrimary: boolean;
 }
 
+export interface PatientIdentifierValue {
+  uuid?: string;
+  identifier: string;
+  identifierType?: string;
+  source: IdentifierSource;
+  autoGeneration?: boolean;
+  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
+  // ADD -> add a new identifier
+  // UPDATE -> update an existing identifier
+  // DELETE -> delete an existing identifier
+  // NONE -> No action to be taken on the identifier
+}
+
 export interface PatientRegistration {
   id?: number;
   patientUuid: string;
@@ -42,6 +55,8 @@ export interface PatientRegistration {
 export interface PatientIdentifierType extends FetchedPatientIdentifierType {
   identifierSources: Array<IdentifierSource>;
   autoGenerationSource?: IdentifierSource;
+  checked?: boolean;
+  source?: IdentifierSource;
 }
 
 export interface PatientIdentifier {
@@ -118,7 +133,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<RelationshipValue>;
-  identifiers?: Array<PatientIdentifier>;
+  identifiers: PatientIdentifierValue[];
 }
 
 export interface PatientUuidMapType {

@@ -1,0 +1,14 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.productiveHeading01 {
+  @include carbon--type-style("productive-heading-01");
+}
+
+.productiveHeading02 {
+  @include carbon--type-style("productive-heading-02");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
