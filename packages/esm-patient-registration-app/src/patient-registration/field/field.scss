@@ -15,7 +15,11 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 1rem;
+  column-gap: $spacing-05;
+}
+
+.halfWidthInDesktopView {
+  width: calc(50% - $spacing-05);
 }
 
 .patientPhoto {
@@ -57,12 +61,6 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
   }
-  .sexField {
-    grid-row: 1;
-  }
-  .ageField {
-    grid-row: 2;
-  }
   .nameField {
     grid-row: 2;
     grid-column: 1;
@@ -74,5 +72,8 @@
   }
   .radioButton label {
     height: $spacing-09 !important;
+  }
+  .halfWidthInDesktopView {
+    width: 100%;
   }
 }
