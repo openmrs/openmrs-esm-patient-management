@@ -5,7 +5,7 @@ import { Button, HeaderGlobalAction, Search } from 'carbon-components-react';
 import PatientSearch from '../patient-search/patient-search.component';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { performPatientSearch } from '../patient-search/patient-search.resource';
 import isEmpty from 'lodash-es/isEmpty';
 import { SearchedPatient } from '../types';
@@ -59,10 +59,11 @@ const searchTimeout = 300;
 const customRepresentation =
   'custom:(patientId,uuid,identifiers,display,' +
   'patientIdentifier:(uuid,identifier),' +
-  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display),' +
+  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
   'attributes:(value,attributeType:(name)))';
 
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
+  const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [open, setOpen] = useState<boolean>(false);
@@ -77,7 +78,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   useEffect(() => {
     if (searchTerm && status === 'searching') {
       const ac = new AbortController();
-      performPatientSearch(searchTerm, customRepresentation, ac).then(
+      performPatientSearch(searchTerm, customRepresentation, ac, config.includeDead).then(
         ({ data }) => {
           const results: Array<SearchedPatient> = data.results.map((res, i) => ({
             ...res,
@@ -91,7 +92,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       );
       return () => ac.abort();
     }
-  }, [searchTerm, status]);
+  }, [config.includeDead, searchTerm, status]);
 
   const handleEnterKeyPressed = (event: React.KeyboardEvent<HTMLInputElement>) =>
     event.key.toLowerCase() === 'enter' && performSearch();
