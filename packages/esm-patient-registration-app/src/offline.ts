@@ -41,15 +41,15 @@ export async function syncPatientRegistration(
   options: SyncProcessOptions<PatientRegistration>,
 ) {
   await FormManager.savePatientFormOnline(
-    queuedPatient.isNewPatient,
-    queuedPatient.formValues,
-    queuedPatient.patientUuidMap,
-    queuedPatient.initialAddressFieldValues,
-    queuedPatient.identifierTypes,
-    queuedPatient.capturePhotoProps,
-    queuedPatient.patientPhotoConceptUuid,
-    queuedPatient.currentLocation,
-    queuedPatient.personAttributeSections,
+    queuedPatient._patientRegistrationData.isNewPatient,
+    queuedPatient._patientRegistrationData.formValues,
+    queuedPatient._patientRegistrationData.patientUuidMap,
+    queuedPatient._patientRegistrationData.initialAddressFieldValues,
+    queuedPatient._patientRegistrationData.identifierTypes,
+    queuedPatient._patientRegistrationData.capturePhotoProps,
+    queuedPatient._patientRegistrationData.patientPhotoConceptUuid,
+    queuedPatient._patientRegistrationData.currentLocation,
+    queuedPatient._patientRegistrationData.personAttributeSections,
     options.abort,
   );
 }

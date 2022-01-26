@@ -10,6 +10,7 @@ import {
   CapturePhotoProps,
   PatientIdentifier,
   PatientIdentifierValue,
+  PatientRegistration,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -48,9 +49,11 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
-    await queueSynchronizationItem(
-      patientRegistration,
-      {
+    const syncItem: PatientRegistration = {
+      fhirPatient: FormManager.mapPatientToFhirPatient(
+        FormManager.getPatientToCreate(values, personAttributeSections, patientUuidMap, initialAddressFieldValues, []),
+      ),
+      _patientRegistrationData: {
         isNewPatient,
         formValues: values,
         patientUuidMap,
@@ -60,29 +63,14 @@ export default class FormManager {
         patientPhotoConceptUuid,
         currentLocation,
         personAttributeSections,
-        preliminaryPatient: FormManager.getPatientToCreate(
-          values,
-          personAttributeSections,
-          patientUuidMap,
-          initialAddressFieldValues,
-          [],
-        ),
-        fhirPatient: FormManager.mapPatientToFhirPatient(
-          FormManager.getPatientToCreate(
-            values,
-            personAttributeSections,
-            patientUuidMap,
-            initialAddressFieldValues,
-            [],
-          ),
-        ),
       },
-      {
-        id: values.patientUuid,
-        displayName: 'Patient registration',
-        dependencies: [],
-      },
-    );
+    };
+
+    await queueSynchronizationItem(patientRegistration, syncItem, {
+      id: values.patientUuid,
+      displayName: 'Patient registration',
+      dependencies: [],
+    });
 
     return null;
   }

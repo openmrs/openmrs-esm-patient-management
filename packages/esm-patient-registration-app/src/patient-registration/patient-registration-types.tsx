@@ -42,15 +42,21 @@ export interface PatientRegistration {
    * The preliminary patient in the FHIR format.
    */
   fhirPatient: fhir.Patient;
-  isNewPatient: boolean;
-  formValues: FormValues;
-  patientUuidMap: PatientUuidMapType;
-  initialAddressFieldValues: Record<string, any>;
-  identifierTypes: Array<PatientIdentifierType>;
-  capturePhotoProps: CapturePhotoProps;
-  patientPhotoConceptUuid: string;
-  currentLocation: string;
-  personAttributeSections: any;
+  /**
+   * Internal data collected by patient-registration. Required for later syncing and editing.
+   * Not supposed to be used outside of this module.
+   */
+  _patientRegistrationData: {
+    isNewPatient: boolean;
+    formValues: FormValues;
+    patientUuidMap: PatientUuidMapType;
+    initialAddressFieldValues: Record<string, any>;
+    identifierTypes: Array<PatientIdentifierType>;
+    capturePhotoProps: CapturePhotoProps;
+    patientPhotoConceptUuid: string;
+    currentLocation: string;
+    personAttributeSections: any;
+  };
 }
 
 /**

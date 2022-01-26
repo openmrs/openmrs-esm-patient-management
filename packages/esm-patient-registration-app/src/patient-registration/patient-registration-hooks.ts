@@ -55,14 +55,14 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
 
-        if (!registration.formValues) {
+        if (!registration._patientRegistrationData.formValues) {
           console.error(
             `Found a queued offline patient registration for patient ${patientUuid}, but without form values. Not using these values.`,
           );
           return;
         }
 
-        setInitialFormValues(registration.formValues);
+        setInitialFormValues(registration._patientRegistrationData.formValues);
       }
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
@@ -83,7 +83,7 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
         });
       } else if (!isLoadingPatient && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
-        setInitialAddressFieldValues(registration?.initialAddressFieldValues ?? fallback);
+        setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
       }
     })();
   }, [isLoadingPatient, patient, patientUuid]);
@@ -103,7 +103,7 @@ export function usePatientUuidMap(
       setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
     } else if (!isLoadingPatient && patientUuid) {
       getPatientRegistration(patientUuid).then((registration) =>
-        setPatientUuidMap(registration?.initialAddressFieldValues ?? fallback),
+        setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback),
       );
     }
   }, [isLoadingPatient, patient, patientUuid]);
@@ -113,5 +113,5 @@ export function usePatientUuidMap(
 
 async function getPatientRegistration(patientUuid: string) {
   const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
-  return items.find((item) => item.formValues.patientUuid === patientUuid);
+  return items.find((item) => item._patientRegistrationData.formValues.patientUuid === patientUuid);
 }
