@@ -38,6 +38,10 @@ export interface PatientIdentifierValue {
 
 export interface PatientRegistration {
   id?: number;
+  /**
+   * The preliminary patient in the FHIR format.
+   */
+  fhirPatient: fhir.Patient;
   isNewPatient: boolean;
   formValues: FormValues;
   patientUuidMap: PatientUuidMapType;
