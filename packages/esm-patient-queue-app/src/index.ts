@@ -30,7 +30,15 @@ function setupOpenMRS() {
         offline: true,
       },
     ],
-    extensions: [],
+    extensions: [
+      {
+        id: 'outpatient-link',
+        slot: 'app-menu-slot',
+        load: getAsyncLifecycle(() => import('./patient-queue-link'), options),
+        online: true,
+        offline: false,
+      },
+    ],
   };
 }
 
