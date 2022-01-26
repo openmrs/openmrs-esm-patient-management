@@ -5,7 +5,6 @@
 .patient-header-container {
   height: $spacing-12;
   background-color: $ui-02;
-  margin: $spacing-02 0;
 }
 
 .header-left {
@@ -22,5 +21,5 @@
 .productiveHeading04 {
   @include carbon--type-style("productive-heading-04");
   color: $ui-05;
-  padding: $spacing-01 0;
+  padding: $spacing-03 0 0 0;
 }
