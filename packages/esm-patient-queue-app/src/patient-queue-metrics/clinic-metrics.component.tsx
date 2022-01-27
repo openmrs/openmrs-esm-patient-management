@@ -22,7 +22,7 @@ const ClinicMetrics: React.FC = () => {
     },
     {
       id: 'option-3',
-      text: 'Pharamacy',
+      text: 'Pharmacy',
     },
   ];
   if (isLoading) {
@@ -34,19 +34,19 @@ const ClinicMetrics: React.FC = () => {
       <MetricsHeader />
       <div className={styles.clinicMetricsContainer}>
         <MetricsCard
-          totalsLabel={t('patients', 'Patients')}
-          totalsValue={metrics ? metrics.scheduled_appointments : 0}
-          headerLabel={t('scheduledAppointment', 'Scheduled appts. today')}
+          label={t('patients', 'Patients')}
+          value={metrics ? metrics.scheduled_appointments : 0}
+          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
         />
         <MetricsCard
-          totalsLabel={t('patients', 'Patients')}
-          totalsValue={metrics ? metrics.patients_waiting_for_service : 0}
+          label={t('patients', 'Patients')}
+          value={metrics ? metrics.patients_waiting_for_service : 0}
           headerLabel={t('waitingFor', 'Waiting for:')}
           childComponent={
             <Dropdown
               style={{ marginTop: '1.5rem' }}
               id="inline"
-              label="Triage"
+              label={t('triage', 'Triage')}
               type="inline"
               items={items}
               itemToString={(item) => (item ? item.text : '')}
@@ -54,8 +54,8 @@ const ClinicMetrics: React.FC = () => {
           }
         />
         <MetricsCard
-          totalsLabel={t('minutes', 'Minutes')}
-          totalsValue={metrics ? metrics.avarage_wait_time : 0}
+          label={t('minutes', 'Minutes')}
+          value={metrics ? metrics.avarage_wait_time : 0}
           headerLabel={t('avarageWaitTime', 'Average wait time today')}
         />
       </div>

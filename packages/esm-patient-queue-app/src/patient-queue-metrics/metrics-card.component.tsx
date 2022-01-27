@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 
 interface MetricsCardProps {
-  totalsLabel: string;
-  totalsValue: number;
+  label: string;
+  value: number;
   headerLabel: string;
   childComponent?: React.ReactNode;
 }
 
-const MetricsCard: React.FC<MetricsCardProps> = ({ totalsLabel, totalsValue, headerLabel, childComponent }) => {
+const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, childComponent }) => {
   const { t } = useTranslation();
 
   return (
@@ -27,8 +27,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ totalsLabel, totalsValue, hea
         </Button>
       </div>
       <div>
-        <label className={styles.totalsLabel}>{totalsLabel}</label>
-        <p className={styles.totalsValue}>{totalsValue}</p>
+        <label className={styles.totalsLabel}>{label}</label>
+        <p className={styles.totalsValue}>{value}</p>
       </div>
     </Tile>
   );
