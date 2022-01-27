@@ -1,4 +1,11 @@
 {
+  "avarageWaitTime": "Average wait time today",
+  "clinicMetrics": "Clinic metrics",
   "home": "Home",
-  "patients": "Patients"
+  "minutes": "Minutes",
+  "moreMetrics": "See more metrics",
+  "patientList": "Patient list",
+  "patients": "Patients",
+  "scheduledAppointment": "Scheduled appts. today",
+  "waitingFor": "Waiting for:"
 }
