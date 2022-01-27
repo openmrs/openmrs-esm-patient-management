@@ -4,7 +4,7 @@ const PatientQueueIllustration: React.FC = () => {
   return (
     <svg width="92" height="94" viewBox="0 0 92 94" xmlns="http://www.w3.org/2000/svg">
       <title>Patient queue illustration</title>
-      <g fill="none" fill-rule="evenodd">
+      <g fill="none" fillRule="evenodd">
         <path fill="#FFF" d="M0 0h92v94H0z" />
         <path
           d="M40 32c.84-.602 1.12-1.797 1-3 .12-5.005-3.96-9-9-9s-9.12 3.995-9 9c-.12 3.572 2.1 6.706 5 8-6.76 1.741-12 7.91-12 15v15h28V32h-4zM76 67V52c0-7.09-5.24-13.278-12-15 2.9-1.294 5.12-4.428 5-8 .12-5.005-3.96-9-9-9s-9.12 3.995-9 9c-.12 1.203.14 2.398 1 3h-4v35h28z"

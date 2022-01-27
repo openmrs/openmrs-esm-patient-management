@@ -1,4 +1,4 @@
-import { getSynchronizationItems, openmrsFetch, useCurrentPatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, usePatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
@@ -12,7 +12,7 @@ import {
 } from './patient-registration-utils';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const [isLoadingPatientToEdit, patientToEdit] = useCurrentPatient(patientUuid);
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
     patientUuid: v4(),
     givenName: '',
@@ -71,7 +71,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
 }
 
 export function useInitialAddressFieldValues(patientUuid: string, fallback = {}): [object, Dispatch<object>] {
-  const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const [initialAddressFieldValues, setInitialAddressFieldValues] = useState<object>(fallback);
 
   useEffect(() => {
@@ -81,12 +81,12 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
           ...initialAddressFieldValues,
           ...getAddressFieldValuesFromFhirPatient(patient),
         });
-      } else if (!isLoadingPatient && patientUuid) {
+      } else if (!isLoading && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
         setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
       }
     })();
-  }, [isLoadingPatient, patient, patientUuid]);
+  }, [isLoading, patient, patientUuid]);
 
   return [initialAddressFieldValues, setInitialAddressFieldValues];
 }
@@ -95,18 +95,18 @@ export function usePatientUuidMap(
   patientUuid: string,
   fallback: PatientUuidMapType = {},
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
-  const [isLoadingPatient, patient] = useCurrentPatient(patientUuid);
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
   const [patientUuidMap, setPatientUuidMap] = useState(fallback);
 
   useEffect(() => {
-    if (patient) {
-      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patient) });
-    } else if (!isLoadingPatient && patientUuid) {
+    if (patientToEdit) {
+      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patientToEdit) });
+    } else if (!isLoadingPatientToEdit && patientUuid) {
       getPatientRegistration(patientUuid).then((registration) =>
         setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback),
       );
     }
-  }, [isLoadingPatient, patient, patientUuid]);
+  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   return [patientUuidMap, setPatientUuidMap];
 }

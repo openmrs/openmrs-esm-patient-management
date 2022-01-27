@@ -9,6 +9,8 @@ export interface SearchedPatient {
     birthdate: string;
     display: string;
     gender: string;
+    death: boolean;
+    deathDate: string;
     personName: {
       givenName: string;
       familyName: string;

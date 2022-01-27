@@ -7,4 +7,9 @@ export const configSchema = {
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
   },
+  includeDead: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to include dead patients in search results',
+  },
 };

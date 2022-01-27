@@ -22,14 +22,21 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, configSchema);
 
   return {
+    pages: [
+      {
+        route: 'outpatient',
+        load: getAsyncLifecycle(() => import('./root.component'), options),
+        online: true,
+        offline: true,
+      },
+    ],
     extensions: [
       {
-        id: 'patient-queue-header',
-        slot: 'homepage-widgets-slot',
-        load: getAsyncLifecycle(() => import('./patient-queue-header/patient-queue-header.component'), options),
-        offline: true,
+        id: 'outpatient-link',
+        slot: 'app-menu-slot',
+        load: getAsyncLifecycle(() => import('./patient-queue-link'), options),
         online: true,
-        order: 0,
+        offline: false,
       },
     ],
   };
