@@ -36,21 +36,21 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { currentSession, addressTemplate, patientIdentifiers } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig();
-  const { patientUuid } = match.params;
   const [sections, setSections] = useState([]);
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
-  const { isLoading, patient } = usePatient(patientUuid);
+  const { patientUuid: uuidOfPatientToEdit } = match.params;
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
   const [fieldConfigs, setFieldConfigs] = useState({});
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientUuid);
-  const [initialAddressFieldValues] = useInitialAddressFieldValues(patientUuid);
-  const [patientUuidMap] = usePatientUuidMap(patientUuid);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
+  const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
   const location = currentSession.sessionLocation?.uuid;
-  const inEditMode = isLoading ? undefined : !!(patientUuid && patient);
+  const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
-  const { data: photo } = usePatientPhoto(patient?.id);
+  const { data: photo } = usePatientPhoto(patientToEdit?.id);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -98,8 +98,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     helpers.setSubmitting(true);
 
     try {
-      const createdPatientUuid = await savePatientForm(
-        patientUuid,
+      await savePatientForm(
+        !inEditMode,
         values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -124,14 +124,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         kind: 'success',
       });
 
-      if (createdPatientUuid) {
-        const redirectUrl = interpolateUrl(
-          new URLSearchParams(search).get('afterUrl') ||
-            interpolateString(config.links.submitButton, { patientUuid: createdPatientUuid }),
-        );
+      const redirectUrl = interpolateUrl(
+        new URLSearchParams(search).get('afterUrl') ||
+          interpolateString(config.links.submitButton, { patientUuid: values.patientUuid }),
+      );
 
-        setTarget(redirectUrl);
-      }
+      setTarget(redirectUrl);
     } catch (error) {
       if (error.responseBody?.error?.globalErrors) {
         error.responseBody.error.globalErrors.forEach((error) => {
