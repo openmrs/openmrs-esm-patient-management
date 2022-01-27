@@ -28,6 +28,8 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         ],
         gender: patient.person.gender,
         birthDate: patient.person.birthdate,
+        deceasedDateTime: patient.person.deathDate,
+        deceasedBoolean: patient.person.death,
         identifier: [
           {
             value: patient.patientIdentifier.identifier,
