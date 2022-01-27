@@ -328,10 +328,10 @@ export default class FormManager {
 
     // Gender in the original object only uses a single letter. fhir.Patient expects a full string.
     const genderMap = {
-      ['M']: 'male',
-      ['F']: 'female',
-      ['O']: 'other',
-      ['U']: 'unknown',
+      M: 'male',
+      F: 'female',
+      O: 'other',
+      U: 'unknown',
     };
 
     // Mapping inspired by:
