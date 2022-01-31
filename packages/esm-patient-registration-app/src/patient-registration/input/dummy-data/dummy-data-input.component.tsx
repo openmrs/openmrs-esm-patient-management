@@ -1,4 +1,5 @@
 import React from 'react';
+import { v4 } from 'uuid';
 import { FormValues } from '../../patient-registration-types';
 import styles from './../input.scss';
 
@@ -7,6 +8,7 @@ interface DummyDataInputProps {
 }
 
 export const dummyFormValues: FormValues = {
+  patientUuid: v4(),
   givenName: 'John',
   middleName: '',
   familyName: 'Smith',

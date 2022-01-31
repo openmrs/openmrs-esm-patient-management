@@ -41,15 +41,15 @@ $inverse-02:#393939;
 }
 
 .searchIconButton {
-  background-color: $brand-01;
+  background-color: var(--brand-01);
 }
 
 .activeSearchIconButton {
-  background-color: $brand-02;
+  background-color: var(--brand-02);
 }
 
 .closeButton {
-  background-color: $brand-02;
+  background-color: var(--brand-02);
 }
 
 .searchButton {
