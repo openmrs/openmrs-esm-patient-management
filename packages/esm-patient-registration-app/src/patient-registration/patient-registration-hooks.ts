@@ -50,7 +50,6 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
           ...getFormValuesFromFhirPatient(patientToEdit),
           ...getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
-          identifiers: await getInitialPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
@@ -66,6 +65,17 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       }
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+
+  useEffect(() => {
+    if (patientUuid) {
+      getInitialPatientIdentifiers(patientUuid).then((identifiers) =>
+        setInitialFormValues((initialFormValues) => ({
+          ...initialFormValues,
+          identifiers,
+        })),
+      );
+    }
+  }, [patientUuid]);
 
   return [initialFormValues, setInitialFormValues];
 }

@@ -4,6 +4,7 @@ import { FormValues } from './patient-registration-types';
 jest.mock('./patient-registration.resource');
 
 const formValues: FormValues = {
+  patientUuid: '',
   givenName: '',
   middleName: '',
   familyName: '',
