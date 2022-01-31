@@ -30,7 +30,7 @@ export const dummyFormValues: FormValues = {
   isDead: false,
   deathDate: '',
   deathCause: '',
-  relationships: [{ relatedPersonUuid: '', relationshipType: '' }],
+  relationships: [],
   identifiers: [],
 };
 

@@ -1,5 +1,5 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { FormValues } from '../../patient-registration-types';
+import { RelationshipValue } from '../../patient-registration-types';
 
 const customRepresentation =
   'custom:(display,uuid,' +
@@ -7,7 +7,7 @@ const customRepresentation =
   'personB:(uuid,display,person:(age,display,birthdate,uuid)),' +
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
-export async function getPatientRelationships(patientUuid: string): Promise<FormValues['relationships']> {
+export async function getInitialPatientRelationships(patientUuid: string): Promise<Array<RelationshipValue>> {
   const response = await openmrsFetch<RelationshipsResponse>(
     `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`,
   );
@@ -20,7 +20,10 @@ export async function getPatientRelationships(patientUuid: string): Promise<Form
             relatedPersonUuid: r.personB.person.uuid,
             relation: r.relationshipType.bIsToA,
             relationshipType: `${r.relationshipType.uuid}/bIsToA`,
-            action: 'UPDATE',
+            /**
+             * Value kept for restoring initial value
+             */
+            initialrelationshipTypeValue: `${r.relationshipType.uuid}/bIsToA`,
             uuid: r.uuid,
           }
         : {
@@ -28,12 +31,15 @@ export async function getPatientRelationships(patientUuid: string): Promise<Form
             relatedPersonUuid: r.personA.person.display,
             relation: r.relationshipType.aIsToB,
             relationshipType: `${r.relationshipType.uuid}/aIsToB`,
-            action: 'UPDATE',
+            /**
+             * Value kept for restoring initial value
+             */
+            initialrelationshipTypeValue: `${r.relationshipType.uuid}/aIsToB`,
             uuid: r.uuid,
           },
     );
   }
-  return null;
+  return [];
 }
 
 export interface Relationship {

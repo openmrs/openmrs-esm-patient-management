@@ -107,7 +107,7 @@ export function getAddressFieldValuesFromFhirPatient(patient: fhir.Patient) {
   const address = patient.address?.[0];
 
   if (address) {
-    for (const [key] of Object.entries(address)) {
+    for (const key of Object.keys(address)) {
       switch (key) {
         case 'city':
           result['cityVillage'] = address[key];

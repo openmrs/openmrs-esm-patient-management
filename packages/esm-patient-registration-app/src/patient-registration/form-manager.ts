@@ -116,6 +116,7 @@ export default class FormManager {
       await Promise.all(
         values.relationships
           .filter((m) => m.relationshipType)
+          .filter((relationship) => !!relationship.action)
           .map(({ relatedPersonUuid, relationshipType, uuid: relationshipUuid, action }) => {
             const [type, direction] = relationshipType.split('/');
             const thisPatientUuid = savePatientResponse.data.uuid;
@@ -126,12 +127,13 @@ export default class FormManager {
               relationshipType: type,
             };
 
-            if (action === 'UPDATE') {
-              return updateRelationship(abortController, relationshipUuid, relationshipToSave);
-            } else if (action === 'DELETE') {
-              return deleteRelationship(abortController, relationshipUuid);
-            } else {
-              return saveRelationship(abortController, relationshipToSave);
+            switch (action) {
+              case 'ADD':
+                return saveRelationship(abortController, relationshipToSave);
+              case 'UPDATE':
+                return updateRelationship(abortController, relationshipUuid, relationshipToSave);
+              case 'DELETE':
+                return deleteRelationship(abortController, relationshipUuid);
             }
           }),
       );

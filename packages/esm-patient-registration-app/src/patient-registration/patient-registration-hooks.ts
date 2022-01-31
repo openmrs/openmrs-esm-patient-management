@@ -14,7 +14,7 @@ import {
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
-import { getPatientRelationships } from './section/patient-relationships/relationships.resource';
+import { getInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 
 const blankFormValues: FormValues = {
   givenName: '',
@@ -59,7 +59,6 @@ export function useInitialFormValues(
           ...getFormValuesFromFhirPatient(patient),
           ...getAddressFieldValuesFromFhirPatient(patient),
           ...getPhonePersonAttributeValueFromFhirPatient(patient),
-          relationships: await getPatientRelationships(patientUuid),
           identifiers: await getPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatient && patientUuid) {
@@ -68,6 +67,17 @@ export function useInitialFormValues(
       }
     })();
   }, [isLoadingPatient, patient, patientUuid]);
+
+  useEffect(() => {
+    if (patientUuid) {
+      getInitialPatientRelationships(patientUuid).then((relationships) =>
+        setInitialFormValues((initialFormValues) => ({
+          ...initialFormValues,
+          relationships,
+        })),
+      );
+    }
+  }, [patientUuid]);
 
   return [initialFormValues, setInitialFormValues];
 }

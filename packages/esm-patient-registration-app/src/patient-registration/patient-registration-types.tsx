@@ -104,7 +104,18 @@ export interface RelationshipValue {
   relatedPersonUuid: string;
   relation?: string;
   relationshipType: string;
+  /**
+   * Defines the action to be taken on the existing relationship
+   * @kind ADD -> adds a new relationship
+   * @kind UPDATE -> updates an existing relationship
+   * @kind DELETE -> deletes an existing relationship
+   * @kind undefined -> no operation on the existing relationship
+   */
   action?: 'ADD' | 'UPDATE' | 'DELETE';
+  /**
+   * Value kept for restoring initial relationshipType value
+   */
+  initialrelationshipTypeValue?: string;
   uuid?: string;
 }
 

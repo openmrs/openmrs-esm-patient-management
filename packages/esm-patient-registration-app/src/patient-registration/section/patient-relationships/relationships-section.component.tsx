@@ -110,6 +110,9 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     const field = target.name;
     const value = target.options[target.selectedIndex].value;
     setFieldValue(field, value);
+    if (!relationship?.action) {
+      setFieldValue(`relationships[${index}].action`, 'UPDATE');
+    }
   }, []);
 
   const handleSuggestionSelected = useCallback((field: string, selectedSuggestion: string) => {
@@ -123,15 +126,19 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   };
 
   const deleteRelationship = useCallback(() => {
-    if (relationship.action === 'UPDATE') {
-      setFieldValue(`relationships[${index}].action`, 'DELETE');
-    } else {
+    if (relationship.action === 'ADD') {
       remove(index);
+    } else {
+      setFieldValue(`relationships[${index}].action`, 'DELETE');
     }
   }, [relationship, index]);
 
   const restoreRelationship = useCallback(() => {
-    setFieldValue(`relationships[${index}].action`, 'UPDATE');
+    setFieldValue(`relationships[${index}]`, {
+      ...relationship,
+      action: undefined,
+      relationshipType: relationship.initialrelationshipTypeValue,
+    });
   }, [index]);
 
   return relationship.action !== 'DELETE' ? (
@@ -177,7 +184,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
           labelText={t('relationship', 'Relationship')}
           onChange={handleRelationshipTypeChange}
           name={`relationships[${index}].relationshipType`}
-          defaultValue="placeholder-item">
+          defaultValue={relationship?.relationshipType ?? 'placeholder-item'}>
           <SelectItem
             disabled
             hidden
