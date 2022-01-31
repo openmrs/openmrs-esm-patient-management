@@ -73,6 +73,7 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   const patientName = patient.name[0];
   const additionalPatientName = patient.name[1];
 
+  result.patientUuid = patient.id;
   result.givenName = patientName?.given[0];
   result.middleName = patientName?.given[1];
   result.familyName = patientName?.family;
@@ -142,7 +143,6 @@ export function getPatientUuidMapFromFhirPatient(patient: fhir.Patient): Patient
   const address = patient.address?.[0];
 
   return {
-    patientUuid: patient.id,
     preferredNameUuid: patientName?.id,
     additionalNameUuid: additionalPatientName?.id,
     preferredAddressUuid: address?.id,

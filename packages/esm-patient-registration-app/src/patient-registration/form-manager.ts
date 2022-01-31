@@ -10,6 +10,7 @@ import {
   CapturePhotoProps,
   PatientIdentifier,
   PatientIdentifierValue,
+  PatientRegistration,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -26,7 +27,7 @@ import {
 import isEqual from 'lodash-es/isEqual';
 
 export type SavePatientForm = (
-  patientUuid: string | undefined,
+  isNewPatient: boolean,
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
@@ -40,7 +41,7 @@ export type SavePatientForm = (
 
 export default class FormManager {
   static async savePatientFormOffline(
-    patientUuid = v4(),
+    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -50,10 +51,12 @@ export default class FormManager {
     currentLocation: string,
     personAttributeSections: any,
   ): Promise<null> {
-    await queueSynchronizationItem(
-      patientRegistration,
-      {
-        patientUuid,
+    const syncItem: PatientRegistration = {
+      fhirPatient: FormManager.mapPatientToFhirPatient(
+        FormManager.getPatientToCreate(values, personAttributeSections, patientUuidMap, initialAddressFieldValues, []),
+      ),
+      _patientRegistrationData: {
+        isNewPatient,
         formValues: values,
         patientUuidMap,
         initialAddressFieldValues,
@@ -63,18 +66,19 @@ export default class FormManager {
         currentLocation,
         personAttributeSections,
       },
-      {
-        id: patientUuid,
-        displayName: 'Patient registration',
-        dependencies: [],
-      },
-    );
+    };
+
+    await queueSynchronizationItem(patientRegistration, syncItem, {
+      id: values.patientUuid,
+      displayName: 'Patient registration',
+      dependencies: [],
+    });
 
     return null;
   }
 
   static async savePatientFormOnline(
-    patientUuid: string | undefined,
+    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -92,9 +96,9 @@ export default class FormManager {
       abortController,
     );
 
-    if (patientUuid) {
+    if (!isNewPatient) {
       await Promise.all(
-        FormManager.savePatientIdentifiers(patientUuid, patientIdentifiers, values.identifiers, abortController),
+        FormManager.savePatientIdentifiers(values.patientUuid, patientIdentifiers, values.identifiers, abortController),
       );
     }
 
@@ -106,11 +110,15 @@ export default class FormManager {
       patientIdentifiers,
     );
 
-    FormManager.getDeletedNames(patientUuidMap).forEach(async (name) => {
+    FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
       await deletePersonName(name.nameUuid, name.personUuid, abortController);
     });
 
-    const savePatientResponse = await savePatient(abortController, createdPatient, patientUuidMap.patientUuid);
+    const savePatientResponse = await savePatient(
+      abortController,
+      createdPatient,
+      isNewPatient ? undefined : values.patientUuid,
+    );
 
     if (savePatientResponse.ok) {
       await Promise.all(
@@ -154,7 +162,7 @@ export default class FormManager {
   }
 
   static getPatientIdentifiersToCreate(
-    patientIdentifiers: PatientIdentifierValue[], // values.identifiers
+    patientIdentifiers: PatientIdentifierValue[],
     identifierTypes: Array<PatientIdentifierType>,
     location: string,
     abortController: AbortController,
@@ -201,12 +209,12 @@ export default class FormManager {
     return Promise.all(identifierTypeRequests);
   }
 
-  static getDeletedNames(patientUuidMap: PatientUuidMapType) {
+  static getDeletedNames(patientUuid: string, patientUuidMap: PatientUuidMapType) {
     if (patientUuidMap?.additionalNameUuid) {
       return [
         {
           nameUuid: patientUuidMap.additionalNameUuid,
-          personUuid: patientUuidMap.patientUuid,
+          personUuid: patientUuid,
         },
       ];
     }
@@ -227,9 +235,9 @@ export default class FormManager {
     }
 
     return {
-      uuid: patientUuidMap['patientUuid'],
+      uuid: values.patientUuid,
       person: {
-        uuid: patientUuidMap['patientUuid'],
+        uuid: values.patientUuid,
         names: FormManager.getNames(values, patientUuidMap),
         gender: values.gender.charAt(0),
         birthdate: values.birthdate,
@@ -317,5 +325,46 @@ export default class FormManager {
         deletePatientIdentifier(patientUuid, patientIdentifiers[index]?.uuid, abortController);
       }
     });
+  }
+
+  static mapPatientToFhirPatient(patient: Partial<Patient>): fhir.Patient {
+    // Important:
+    // When changing this code, ideally assume that `patient` can be missing any attribute.
+    // The `fhir.Patient` provides us with the benefit that all properties are nullable and thus
+    // not required (technically, at least). -> Even if we cannot map some props here, we still
+    // provide a valid fhir.Patient object. The various patient chart modules should be able to handle
+    // such missing props correctly (and should be updated if they don't).
+
+    // Gender in the original object only uses a single letter. fhir.Patient expects a full string.
+    const genderMap = {
+      M: 'male',
+      F: 'female',
+      O: 'other',
+      U: 'unknown',
+    };
+
+    // Mapping inspired by:
+    // https://github.com/openmrs/openmrs-module-fhir/blob/669b3c52220bb9abc622f815f4dc0d8523687a57/api/src/main/java/org/openmrs/module/fhir/api/util/FHIRPatientUtil.java#L36
+    // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
+    // Update as required.
+    return {
+      id: patient.uuid,
+      gender: genderMap[patient.person?.gender],
+      birthDate: patient.person?.birthdate,
+      deceasedBoolean: patient.person.dead,
+      deceasedDateTime: patient.person.deathDate,
+      name: patient.person?.names?.map((name) => ({
+        given: [name.givenName, name.middleName].filter(Boolean),
+        family: name.familyName,
+      })),
+      address: patient.person?.addresses.map((address) => ({
+        city: address.cityVillage,
+        country: address.country,
+        postalCode: address.postalCode,
+        state: address.stateProvince,
+        use: 'home',
+      })),
+      telecom: patient.person.attributes?.filter((attribute) => attribute.attributeType === 'Telephone Number'),
+    };
   }
 }

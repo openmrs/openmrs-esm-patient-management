@@ -17,6 +17,12 @@ interface RelationshipType {
   direction: string;
 }
 
+async function searchPerson(query: string) {
+  const abortController = new AbortController();
+  const searchResults = await fetchPerson(query, abortController);
+  return searchResults.data.results;
+}
+
 export interface RelationshipsSectionProps {
   id: 'relationships';
 }

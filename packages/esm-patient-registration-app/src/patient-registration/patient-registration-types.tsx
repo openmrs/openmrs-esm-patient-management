@@ -38,15 +38,25 @@ export interface PatientIdentifierValue {
 
 export interface PatientRegistration {
   id?: number;
-  patientUuid: string;
-  formValues: FormValues;
-  patientUuidMap: PatientUuidMapType;
-  initialAddressFieldValues: Record<string, any>;
-  identifierTypes: Array<PatientIdentifierType>;
-  capturePhotoProps: CapturePhotoProps;
-  patientPhotoConceptUuid: string;
-  currentLocation: string;
-  personAttributeSections: any;
+  /**
+   * The preliminary patient in the FHIR format.
+   */
+  fhirPatient: fhir.Patient;
+  /**
+   * Internal data collected by patient-registration. Required for later syncing and editing.
+   * Not supposed to be used outside of this module.
+   */
+  _patientRegistrationData: {
+    isNewPatient: boolean;
+    formValues: FormValues;
+    patientUuidMap: PatientUuidMapType;
+    initialAddressFieldValues: Record<string, any>;
+    identifierTypes: Array<PatientIdentifierType>;
+    capturePhotoProps: CapturePhotoProps;
+    patientPhotoConceptUuid: string;
+    currentLocation: string;
+    personAttributeSections: any;
+  };
 }
 
 /**
@@ -120,6 +130,7 @@ export interface RelationshipValue {
 }
 
 export interface FormValues {
+  patientUuid: string;
   givenName: string;
   middleName: string;
   familyName: string;
@@ -149,7 +160,6 @@ export interface FormValues {
 
 export interface PatientUuidMapType {
   additionalNameUuid?: string;
-  patientUuid?: string;
   preferredNameUuid?: string;
   preferredAddressUuid?: string;
 }

@@ -1,0 +1,11 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.clinicMetricsContainer {
+    background-color: $ui-02 ;
+    display: flex;
+    justify-content: space-between;
+    padding:0 $spacing-05 $spacing-10 $spacing-03;
+
+}
