@@ -7,15 +7,11 @@ const backendDependencies = {
   'webservices.rest': '^2.2.0',
 };
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
 function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-queue-app';
+  const moduleName = '@openmrs/esm-outpatient-app';
 
   const options = {
-    featureName: 'patient-queue',
+    featureName: 'outpatient',
     moduleName,
   };
 
@@ -34,7 +30,7 @@ function setupOpenMRS() {
       {
         id: 'outpatient-link',
         slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./patient-queue-link'), options),
+        load: getAsyncLifecycle(() => import('./outpatient-link'), options),
         online: true,
         offline: false,
       },
@@ -42,4 +38,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };
