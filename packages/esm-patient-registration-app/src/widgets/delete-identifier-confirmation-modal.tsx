@@ -19,14 +19,13 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
   return (
     <div className={styles.modalContent}>
       <h1 className={styles.productiveHeading}>{t('deleteIdentifierModalHeading', 'Remove identifier?')}</h1>
-      <h3 className={styles.modalBody}>
+      <h3 className={styles.modalSubtitle}>
         {identifierName}
-        {t(
-          'deleteIdentifierModalText',
-          ' identifier for this patient already contains the following information: ',
-        )}{' '}
-        {identifierValue}
+        {t('deleteIdentifierModalText', ' identifier already has a value of ')} {identifierValue}
       </h3>
+      <p className={styles.modalBody}>
+        {t('confirmIdentifierDeletionText', 'Are you sure you want to remove this identifier?')}
+      </p>
       <div className={styles.buttonSet}>
         <Button kind="secondary" size="lg" onClick={() => deleteIdentifier(false)}>
           {t('cancel', 'Cancel')}

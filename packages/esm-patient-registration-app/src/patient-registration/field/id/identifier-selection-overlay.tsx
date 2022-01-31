@@ -25,11 +25,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const [localIdentifierTypes, setLocalIdentifierTypes] = useState<Array<PatientIdentifierType>>([]);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
-  const getIdentifierByTypeUuid = useCallback(
-    (identifierTypeUuid: string) =>
-      identifiers.find((identifier) => identifier.identifierTypeUuid === identifierTypeUuid),
-    [identifiers],
-  );
+  const getIdentifierByTypeUuid = (identifierTypeUuid: string) =>
+    identifiers.find((identifier) => identifier.identifierTypeUuid === identifierTypeUuid);
 
   useEffect(() => {
     if (identifierTypes) {
