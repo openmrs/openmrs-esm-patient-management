@@ -29,7 +29,7 @@
     "@babel/preset-react": "^7.10.4",
     "@babel/preset-typescript": "^7.10.4",
     "@babel/runtime": "^7.12.13",
-    "@jsenv/file-size-impact": "^12.1.1",
+    "@jsenv/file-size-impact": "12.1.1",
     "@openmrs/esm-framework": "next",
     "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^5.11.0",

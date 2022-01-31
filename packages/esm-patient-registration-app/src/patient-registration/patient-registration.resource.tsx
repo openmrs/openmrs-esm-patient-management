@@ -19,8 +19,8 @@ function dataURItoFile(dataURI: string) {
   return new File([blob], 'patient-photo.png');
 }
 
-export function savePatient(abortController: AbortController, patient: Patient, patientUuid: string) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid || ''}`, {
+export function savePatient(abortController: AbortController, patient: Patient, updatePatientUuid?: string) {
+  return openmrsFetch(`/ws/rest/v1/patient/${updatePatientUuid || ''}`, {
     headers: {
       'Content-Type': 'application/json',
     },

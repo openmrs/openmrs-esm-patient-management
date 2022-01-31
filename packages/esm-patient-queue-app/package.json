@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-queue-app",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Patient queue front-end for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-queue-app.js",
   "main": "src/index.ts",

@@ -15,6 +15,12 @@ interface RelationshipType {
   direction: string;
 }
 
+async function searchPerson(query: string) {
+  const abortController = new AbortController();
+  const searchResults = await fetchPerson(query, abortController);
+  return searchResults.data.results;
+}
+
 export interface RelationshipsSectionProps {
   id: 'relationships';
 }
@@ -52,12 +58,6 @@ export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
 
   const handleSuggestionSelected = (field: string, selectedSuggestion: string) => {
     setFieldValue(field, selectedSuggestion);
-  };
-
-  const searchPerson = async (query: string) => {
-    const abortController = new AbortController();
-    const searchResults = await fetchPerson(query, abortController);
-    return searchResults.data.results;
   };
 
   return (
