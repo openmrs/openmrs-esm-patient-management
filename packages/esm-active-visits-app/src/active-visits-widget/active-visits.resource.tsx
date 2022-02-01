@@ -19,12 +19,15 @@ export function useActiveVisits() {
   const { data: currentUserSession } = useCurrentSession();
   const startDate = dayjs().format('YYYY-MM-DD');
   const sessionLocation = currentUserSession?.data?.sessionLocation?.uuid;
+
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
-    'stopDatetime)&fromStartDate=';
-  const url =
-    `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}` + startDate + '&location=' + sessionLocation;
+    'stopDatetime)&fromStartDate=' +
+    startDate +
+    '&location=' +
+    sessionLocation;
+  const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(url, openmrsFetch);
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => ({
