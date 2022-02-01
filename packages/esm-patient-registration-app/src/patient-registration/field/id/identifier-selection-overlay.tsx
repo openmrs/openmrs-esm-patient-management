@@ -22,7 +22,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   remove,
 }) => {
   const { identifierTypes } = useContext(ResourcesContext);
-  const [localIdentifierTypes, setLocalIdentifierTypes] = useState<Array<PatientIdentifierType>>([]);
+  const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<Array<PatientIdentifierType>>([]);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
   const getIdentifierByTypeUuid = (identifierTypeUuid: string) =>
@@ -30,7 +30,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
   useEffect(() => {
     if (identifierTypes) {
-      setLocalIdentifierTypes(
+      setUnsavedIdentifierTypes(
         identifierTypes.map((identifierType) => {
           const identifier = getIdentifierByTypeUuid(identifierType.uuid);
           return {
@@ -47,14 +47,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
   const filteredIdentifiers = useMemo(
     () =>
-      localIdentifierTypes?.filter((identifier) =>
+      unsavedIdentifierTypes?.filter((identifier) =>
         identifier?.name?.toLowerCase().includes(searchString.toLowerCase()),
       ),
-    [localIdentifierTypes, searchString],
+    [unsavedIdentifierTypes, searchString],
   );
 
   const handleCheckingIdentifier = (uuid: string, checked: boolean) =>
-    setLocalIdentifierTypes((identifiers) =>
+    setUnsavedIdentifierTypes((identifiers) =>
       identifiers.map((identifier) =>
         identifier.uuid === uuid
           ? {
@@ -66,8 +66,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
     );
 
   const handleSelectingIdentifierSource = (identifierTypeUuid, sourceUuid) =>
-    setLocalIdentifierTypes((localIdentifierTypes) =>
-      localIdentifierTypes?.map((identifierType) =>
+    setUnsavedIdentifierTypes((unsavedIdentifierTypes) =>
+      unsavedIdentifierTypes?.map((identifierType) =>
         identifierType?.uuid === identifierTypeUuid
           ? {
               ...identifierType,
@@ -121,7 +121,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   );
 
   const handleConfiguringIdentifiers = useCallback(() => {
-    localIdentifierTypes.forEach((identifierType) => {
+    unsavedIdentifierTypes.forEach((identifierType) => {
       const index = identifiers.findIndex((identifier) => identifier.identifierTypeUuid === identifierType.uuid);
       if (index >= 0) {
         const identifier = identifiers[index];
@@ -159,7 +159,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       }
     });
     closeOverlay();
-  }, [localIdentifierTypes, identifiers]);
+  }, [unsavedIdentifierTypes, identifiers]);
 
   return (
     <Overlay
@@ -179,7 +179,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         <p className={styles.bodyLong02}>
           {t('IDInstructions', "Select the identifiers you'd like to add for this patient:")}
         </p>
-        {localIdentifierTypes.length > 7 && (
+        {unsavedIdentifierTypes.length > 7 && (
           <div className={styles.space05}>
             <Search
               labelText={t('searchIdentifierPlaceholder', 'Search identifier')}

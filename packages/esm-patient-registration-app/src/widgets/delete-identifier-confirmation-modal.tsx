@@ -21,7 +21,7 @@ const DeleteIdentifierConfirmationModal: React.FC<DeleteIdentifierConfirmationMo
       <h1 className={styles.productiveHeading}>{t('deleteIdentifierModalHeading', 'Remove identifier?')}</h1>
       <h3 className={styles.modalSubtitle}>
         {identifierName}
-        {t('deleteIdentifierModalText', ' identifier already has a value of ')} {identifierValue}
+        {t('deleteIdentifierModalText', ' has a value of ')} {identifierValue}
       </h3>
       <p className={styles.modalBody}>
         {t('confirmIdentifierDeletionText', 'Are you sure you want to remove this identifier?')}
