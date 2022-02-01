@@ -4,12 +4,6 @@ import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
 interface InputProps extends TextInputProps {
-  id: string;
-  name: string;
-  labelText: string;
-  light: boolean;
-  disabled?: boolean;
-  placeholder?: string;
   checkWarning?(value: string): string;
 }
 

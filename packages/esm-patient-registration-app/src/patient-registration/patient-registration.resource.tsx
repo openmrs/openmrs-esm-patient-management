@@ -180,16 +180,17 @@ export async function addPatientIdentifier(
 
 export async function updatePatientIdentifier(
   patientUuid: string,
-  patientIdentifier: PatientIdentifier,
+  identifierUuid: string,
+  identifier: string,
   abortController: AbortController,
 ) {
-  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifier.uuid}`, {
+  return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${identifierUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     signal: abortController.signal,
-    body: patientIdentifier,
+    body: { identifier },
   });
 }
 
