@@ -28,9 +28,9 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { ActiveVisit, useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -42,11 +42,9 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-
   const { data: activeVisits, isError, isLoading, isValidating } = useActiveVisits();
-
   const desktopView = layout === 'desktop';
-  const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 50];
+  const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
 

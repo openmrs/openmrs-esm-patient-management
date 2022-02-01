@@ -146,7 +146,7 @@ export function useVisit(visitUuid: string) {
   );
 
   return {
-    data: data ? data.data : null,
+    visit: data ? data.data : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
