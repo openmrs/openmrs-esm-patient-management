@@ -14,14 +14,14 @@ export default function Root({
   currentSession,
   addressTemplate,
   relationshipTypes,
-  patientIdentifiers,
+  identifierTypes,
   savePatientForm,
 }: RootProps) {
   const resources = {
     currentSession,
     addressTemplate,
     relationshipTypes,
-    patientIdentifiers,
+    identifierTypes,
   };
 
   return (
