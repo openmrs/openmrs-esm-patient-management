@@ -1,13 +1,26 @@
 {
+  "activeVisits": "Active Visits",
+  "addPatientList": "Add patient to list",
+  "addPatientToList": "Add patient to list",
   "avarageWaitTime": "Average wait time today",
   "clinicMetrics": "Clinic metrics",
+  "default": "Default",
+  "endVisit": "End visit",
   "home": "Home",
+  "large": "Large",
   "minutes": "Minutes",
   "moreMetrics": "See more metrics",
+  "name": "Name",
+  "noPatientsToDisplay": "No patients to display",
   "outpatients": "Outpatients",
   "patientList": "Patient list",
   "patients": "Patients",
+  "priority": "Priority",
+  "resetWaitTime": "Reset wait time",
   "scheduledAppointments": "Scheduled appts. today",
+  "status": "Status",
   "triage": "Triage",
-  "waitingFor": "Waiting for:"
+  "view": "View:",
+  "waitingFor": "Waiting for:",
+  "waitTime": "Wait time (mins)"
 }
