@@ -33,7 +33,7 @@ export interface PatientRegistrationProps {
 }
 
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match }) => {
-  const { currentSession, addressTemplate, patientIdentifiers } = useContext(ResourcesContext);
+  const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig();
   const [sections, setSections] = useState([]);
@@ -103,7 +103,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         values,
         patientUuidMap,
         initialAddressFieldValues,
-        patientIdentifiers,
+        identifierTypes,
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
@@ -180,7 +180,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             <Grid className={styles.infoGrid}>
               <PatientRegistrationContext.Provider
                 value={{
-                  identifierTypes: patientIdentifiers,
+                  identifierTypes: identifierTypes,
                   validationSchema,
                   setValidationSchema,
                   fieldConfigs,

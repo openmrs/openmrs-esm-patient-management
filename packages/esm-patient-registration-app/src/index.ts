@@ -24,7 +24,7 @@ const resources = {
   currentSession: fetchCurrentSession,
   addressTemplate: fetchAddressTemplate,
   relationshipTypes: fetchAllRelationshipTypes,
-  patientIdentifiers: fetchPatientIdentifierTypesWithSources,
+  identifierTypes: fetchPatientIdentifierTypesWithSources,
 };
 
 function setupOpenMRS() {
@@ -98,6 +98,12 @@ function setupOpenMRS() {
         id: 'edit-patient-details-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./widgets/edit-patient-details-button.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'delete-identifier-confirmation-modal',
+        load: getAsyncLifecycle(() => import('./widgets/delete-identifier-confirmation-modal'), options),
         online: true,
         offline: true,
       },

@@ -1,15 +1,9 @@
 import React, { useMemo } from 'react';
-import { TextInput } from 'carbon-components-react';
+import { TextInput, TextInputProps } from 'carbon-components-react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
-interface InputProps {
-  id: string;
-  name: string;
-  labelText: string;
-  light: boolean;
-  disabled?: boolean;
-  placeholder?: string;
+interface InputProps extends TextInputProps {
   checkWarning?(value: string): string;
 }
 

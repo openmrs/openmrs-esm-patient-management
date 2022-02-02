@@ -6,6 +6,7 @@
   "moreMetrics": "See more metrics",
   "patientList": "Patient list",
   "patients": "Patients",
-  "scheduledAppointment": "Scheduled appts. today",
+  "scheduledAppointments": "Scheduled appts. today",
+  "triage": "Triage",
   "waitingFor": "Waiting for:"
 }

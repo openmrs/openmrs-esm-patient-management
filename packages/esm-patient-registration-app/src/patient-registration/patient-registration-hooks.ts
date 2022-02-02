@@ -6,7 +6,7 @@ import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-r
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
-  getPatientIdentifiers,
+  getInitialPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
@@ -50,7 +50,6 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
           ...getFormValuesFromFhirPatient(patientToEdit),
           ...getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
-          identifiers: await getPatientIdentifiers(patientUuid),
         });
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
@@ -66,6 +65,17 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       }
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+
+  useEffect(() => {
+    if (patientUuid) {
+      getInitialPatientIdentifiers(patientUuid).then((identifiers) =>
+        setInitialFormValues((initialFormValues) => ({
+          ...initialFormValues,
+          identifiers,
+        })),
+      );
+    }
+  }, [patientUuid]);
 
   return [initialFormValues, setInitialFormValues];
 }
