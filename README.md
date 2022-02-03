@@ -11,6 +11,7 @@ This is a [Lerna](https://lerna.js.org/) project containing patient management f
 -  [@openmrs/esm-patient-search-app](packages/esm-patient-search-app)
 -  [@openmrs/esm-patient-registration-app](packages/esm-patient-registration-app)
 -  [@openmrs/esm-patient-list-app](packages/esm-patient-list-app)
+-  [@openmrs/esm-outpatient-app](packages/esm-outpatient-app)
 
 ## Repository Development
 
