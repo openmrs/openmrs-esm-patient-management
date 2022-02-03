@@ -6,6 +6,7 @@ import { PatientIdentifierType, PatientIdentifierValue } from '../../patient-reg
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { shouldBlockPatientIdentifierInOfflineMode } from '../../input/custom-input/identifier/utils';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, PatientIdentifierValue) => void;
@@ -87,15 +88,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         const isDisabled = identifier
           ? identifier.action !== 'DELETE'
           : identifierType.isPrimary || identifierType.required;
-
-        // Patient Identifiers which are unique and can be manually entered are prohibited while offline because
-        // of the chance of generating conflicts when syncing later.
-        const isDisabledOffline =
-          identifierType.uniquenessBehavior === 'UNIQUE' &&
-          !identifierType.identifierSources.some(
-            (source) =>
-              !source.autoGenerationOption.manualEntryEnabled && source.autoGenerationOption.automaticGenerationEnabled,
-          );
+        const isDisabledOffline = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
         return (
           <div key={identifierType.uuid} className={styles.space05}>
