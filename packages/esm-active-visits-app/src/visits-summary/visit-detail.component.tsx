@@ -15,8 +15,7 @@ interface VisitDetailComponentProps {
 const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, patientUuid }) => {
   const { t } = useTranslation();
   const [listView, setView] = useState(true);
-
-  const { data: visit, isError, isLoading, isValidating } = useVisit(visitUuid);
+  const { visit, isError, isLoading, isValidating } = useVisit(visitUuid);
 
   const encounters = useMemo(
     () =>
@@ -65,6 +64,8 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
         {!listView && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
       </div>
     );
+  } else {
+    return null;
   }
 };
 
