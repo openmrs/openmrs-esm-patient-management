@@ -115,13 +115,13 @@ jobs:
           data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
-  deploy_patient_queue_app:
+  deploy_outpatient_app:
     runs-on: ubuntu-latest
 
     env:
-      DIR_NAME: "esm-patient-queue-app"
-      ESM_NAME: "@openmrs/esm-patient-queue-app"
-      JS_NAME: "openmrs-esm-patient-queue-app.js"
+      DIR_NAME: "esm-outpatient-app"
+      ESM_NAME: "@openmrs/esm-outpatient-app"
+      JS_NAME: "openmrs-esm-outpatient-app.js"
 
     needs: build
 
