@@ -36,10 +36,12 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
 
   // Patient Identifiers which are unique and can be manually entered are prohibited while offline because
   // of the chance of generating conflicts when syncing later.
-  const isDisabled =
-    isOffline &&
+  const isDisabledOffline =
     identifierType.uniquenessBehavior === 'UNIQUE' &&
-    (!identifierType.source || identifierType.source.autoGenerationOption.manualEntryEnabled);
+    !identifierType.identifierSources.some(
+      (source) =>
+        !source.autoGenerationOption.manualEntryEnabled && source.autoGenerationOption.automaticGenerationEnabled,
+    );
 
   useEffect(() => {
     if (source && source.autoGenerationOption && source.autoGenerationOption.automaticGenerationEnabled) {
