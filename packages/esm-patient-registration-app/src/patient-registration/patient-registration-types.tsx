@@ -21,6 +21,7 @@ export interface FetchedPatientIdentifierType {
   fieldName: string;
   format: string;
   isPrimary: boolean;
+  uniquenessBehavior: undefined | null | 'UNIQUE';
 }
 
 export interface PatientIdentifierValue {
@@ -37,6 +38,33 @@ export interface PatientIdentifierValue {
    * @kind NONE -> No action to be taken on the patient identifier
    */
   action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
+}
+
+/**
+ * Extends the `FetchedPatientIdentifierType` with aggregated data.
+ */
+export interface PatientIdentifierType extends FetchedPatientIdentifierType {
+  identifierSources: Array<IdentifierSource>;
+  autoGenerationSource?: IdentifierSource;
+  checked?: boolean;
+  source?: IdentifierSource;
+}
+
+export interface IdentifierSource {
+  uuid: string;
+  name: string;
+  autoGenerationOption: {
+    manualEntryEnabled: boolean;
+    automaticGenerationEnabled: boolean;
+  };
+}
+
+export interface PatientIdentifier {
+  uuid?: string;
+  identifier: string;
+  identifierType?: string;
+  location?: string;
+  preferred?: boolean;
 }
 
 export interface PatientRegistration {
@@ -62,24 +90,6 @@ export interface PatientRegistration {
   };
 }
 
-/**
- * Extends the `FetchedPatientIdentifierType` with aggregated data.
- */
-export interface PatientIdentifierType extends FetchedPatientIdentifierType {
-  identifierSources: Array<IdentifierSource>;
-  autoGenerationSource?: IdentifierSource;
-  checked?: boolean;
-  source?: IdentifierSource;
-}
-
-export interface PatientIdentifier {
-  uuid?: string;
-  identifier: string;
-  identifierType?: string;
-  location?: string;
-  preferred?: boolean;
-}
-
 export type Relationship = {
   relationshipType: string;
   personA: string;
@@ -102,15 +112,6 @@ export type Patient = {
     causeOfDeath?: string;
   };
 };
-
-export interface IdentifierSource {
-  uuid: string;
-  name: string;
-  autoGenerationOption: {
-    manualEntryEnabled: boolean;
-    automaticGenerationEnabled: boolean;
-  };
-}
 
 export interface FormValues {
   patientUuid: string;
