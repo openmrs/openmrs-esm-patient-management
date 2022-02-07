@@ -19,15 +19,17 @@
 }
 
 .submitButton {
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-05;
   width: 11.688rem;
   display: block;
 }
 
 .infoGrid {
   width: 100%;
+  padding-left: $spacing-07;
   margin-bottom: 40vh;
-  margin-top: 1rem;
+  margin-top: $spacing-05;
+  max-width: 50rem;
 }
 
 .label01 {
@@ -54,7 +56,7 @@
 
 .stickyColumn {
   position: sticky;
-  margin-top: 1rem;
+  margin-top: $spacing-05;
   // 3rem for the nav height and 1rem for top margin
   top: 4rem;
 }
@@ -66,7 +68,7 @@
 .linkName {
   color: $color-gray-70;
   line-height: 1.38;
-  font-size: 1rem;
+  font-size: $spacing-05;
   font-weight: 600;
 
   &:active {
@@ -85,3 +87,8 @@
   background-color: white;
 }
 
+:global(.omrs-breakpoint-lt-desktop){
+  .infoGrid {
+    max-width: unset;
+  }
+}

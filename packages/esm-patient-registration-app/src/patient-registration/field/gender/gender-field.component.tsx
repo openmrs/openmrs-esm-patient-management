@@ -16,13 +16,9 @@ export const GenderBirthField: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className={styles.halfWidthInDesktopView}>
       <h4 className={styles.productiveHeading02Light}>{t('sexAndBirthLabel', 'Sex & Birth')}</h4>
-      <div className={styles.grid}>
-        <div className={styles.ageField}>
-          <DobField />
-          <EobField />
-        </div>
+      <div>
         <div className={styles.sexField}>
           <p className="bx--label">{t('genderLabelText', 'Sex')}</p>
           <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
@@ -37,6 +33,10 @@ export const GenderBirthField: React.FC = () => {
               <div className="bx--form-requirement">{t(meta.error)}</div>
             </>
           )}
+        </div>
+        <div className={styles.ageField}>
+          <DobField />
+          <EobField />
         </div>
       </div>
     </div>

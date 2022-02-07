@@ -177,7 +177,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 </Button>
               </div>
             </div>
-            <Grid className={styles.infoGrid}>
+            <div className={styles.infoGrid}>
               <PatientRegistrationContext.Provider
                 value={{
                   identifierTypes: identifierTypes,
@@ -194,7 +194,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   <div key={index}>{getSection(section, index)}</div>
                 ))}
               </PatientRegistrationContext.Provider>
-            </Grid>
+            </div>
           </div>
         </Form>
       )}
