@@ -16,10 +16,12 @@ import {
   addPatientIdentifier,
   deletePatientIdentifier,
   deletePersonName,
+  deleteRelationship,
   generateIdentifier,
   savePatient,
   savePatientPhoto,
   saveRelationship,
+  updateRelationship,
   updatePatientIdentifier,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
@@ -115,19 +117,26 @@ export default class FormManager {
     if (savePatientResponse.ok) {
       await Promise.all(
         values.relationships
-          .filter((m) => m.relationship)
-          .map(({ relatedPerson: relatedPersonUuid, relationship }) => {
-            const relationshipType = relationship.split('/')[0];
-            const direction = relationship.split('/')[1];
+          .filter((m) => m.relationshipType)
+          .filter((relationship) => !!relationship.action)
+          .map(({ relatedPersonUuid, relationshipType, uuid: relationshipUuid, action }) => {
+            const [type, direction] = relationshipType.split('/');
             const thisPatientUuid = savePatientResponse.data.uuid;
             const isAToB = direction === 'aIsToB';
             const relationshipToSave = {
               personA: isAToB ? relatedPersonUuid : thisPatientUuid,
               personB: isAToB ? thisPatientUuid : relatedPersonUuid,
-              relationshipType,
+              relationshipType: type,
             };
 
-            return saveRelationship(abortController, relationshipToSave);
+            switch (action) {
+              case 'ADD':
+                return saveRelationship(abortController, relationshipToSave);
+              case 'UPDATE':
+                return updateRelationship(abortController, relationshipUuid, relationshipToSave);
+              case 'DELETE':
+                return deleteRelationship(abortController, relationshipUuid);
+            }
           }),
       );
 

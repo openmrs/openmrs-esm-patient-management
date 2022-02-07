@@ -112,6 +112,26 @@ export interface IdentifierSource {
   };
 }
 
+export interface RelationshipValue {
+  relatedPersonName?: string;
+  relatedPersonUuid: string;
+  relation?: string;
+  relationshipType: string;
+  /**
+   * Defines the action to be taken on the existing relationship
+   * @kind ADD -> adds a new relationship
+   * @kind UPDATE -> updates an existing relationship
+   * @kind DELETE -> deletes an existing relationship
+   * @kind undefined -> no operation on the existing relationship
+   */
+  action?: 'ADD' | 'UPDATE' | 'DELETE';
+  /**
+   * Value kept for restoring initial relationshipType value
+   */
+  initialrelationshipTypeValue?: string;
+  uuid?: string;
+}
+
 export interface FormValues {
   patientUuid: string;
   givenName: string;
@@ -137,7 +157,7 @@ export interface FormValues {
   isDead: boolean;
   deathDate: string;
   deathCause: string;
-  relationships: Array<{ relatedPerson: string; relationship: string }>;
+  relationships: Array<RelationshipValue>;
   identifiers: Array<PatientIdentifierValue>;
 }
 

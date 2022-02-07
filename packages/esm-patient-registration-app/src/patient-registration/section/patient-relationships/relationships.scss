@@ -1,0 +1,33 @@
+@import "../../patient-registration.scss";
+
+.labelText {
+  @include carbon--type-style("label-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.searchBox {
+  margin-bottom: $spacing-05;
+}
+
+.relationshipHeader {
+  display: flex;
+  align-items: center;
+}
+
+.productiveHeading {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
+
+.trashCan {
+  color: $danger !important;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .relationshipHeader {
+    justify-content: space-between;
+  }
+}
