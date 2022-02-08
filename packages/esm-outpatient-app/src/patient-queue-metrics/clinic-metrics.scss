@@ -3,9 +3,10 @@
 @import "~carbon-components/src/globals/scss/mixins";
 
 .clinicMetricsContainer {
-    background-color: $ui-02 ;
-    display: flex;
-    justify-content: space-between;
-    padding:0 $spacing-05 $spacing-10 $spacing-03;
-
+  background-color: $ui-02 ;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 $spacing-05 $spacing-10 $spacing-03; 
+  flex-flow: row wrap;
+  margin-top: -$spacing-03;
 }

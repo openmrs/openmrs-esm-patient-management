@@ -10,7 +10,7 @@ const PatientQueueHeader: React.FC = () => {
       <div className={styles['header-left']}>
         <PatientQueueIllustration />
         <div>
-          <p className={styles['bodyShort02']}>{t('patients', 'Patients')}</p>
+          <p className={styles['bodyShort02']}>{t('outpatients', 'Outpatients')}</p>
           <p className={styles['productiveHeading04']}>{t('home', 'Home')}</p>
         </div>
       </div>

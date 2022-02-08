@@ -1,17 +1,17 @@
 import React from 'react';
-import { Tile, Button } from 'carbon-components-react';
-import styles from './metrics-card.scss';
 import { useTranslation } from 'react-i18next';
+import { Tile, Button } from 'carbon-components-react';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
   label: string;
   value: number;
   headerLabel: string;
-  childComponent?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, childComponent }) => {
+const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, children }) => {
   const { t } = useTranslation();
 
   return (
@@ -19,9 +19,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
       <div className={styles.tileHeader}>
         <div className={styles.headerLabelContainer}>
           <label className={styles.headerLabel}>{headerLabel}</label>
-          {childComponent}
+          {children}
         </div>
-
         <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('patientList', 'Patient list')}>
           {t('patientList', 'Patient list')}
         </Button>
