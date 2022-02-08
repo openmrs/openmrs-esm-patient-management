@@ -4,7 +4,6 @@ import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
 import { FetchResponse, messageOmrsServiceWorker, openmrsFetch, SessionUser } from '@openmrs/esm-framework';
 import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-registration/patient-registration-types';
-import { mockAutoGenerationOptionsResult } from '../__mocks__/autogenerationoptions.mock';
 import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
@@ -50,11 +49,11 @@ export async function fetchPatientIdentifierTypesWithSources(
   for (const identifierType of identifierTypes) {
     const [identifierSources, autoGenOptions] = await Promise.all([
       fetchIdentifierSources(identifierType.uuid, abortController),
-      fetchAutoGenerationOptions(identifierType.uuid, abortController),
+      fetchAutoGenerationOptions(abortController),
     ]);
 
     identifierType.identifierSources = identifierSources.data.results.map((source) => {
-      const option = find(autoGenOptions.results, { source: { uuid: source.uuid } });
+      const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
       source.autoGenerationOption = option;
       return source;
     });
@@ -130,12 +129,8 @@ async function fetchIdentifierSources(identifierType: string, abortController?: 
   );
 }
 
-function fetchAutoGenerationOptions(identifierType: string, abortController?: AbortController) {
-  // return openmrsFetch('/ws/rest/v1/idgen/autogenerationoption?v=full&identifierType=' + identifierType, {
-  //   signal: abortController.signal,
-  //   headers: cacheForOfflineHeaders,
-  // });‚
-  return Promise.resolve(mockAutoGenerationOptionsResult);
+async function fetchAutoGenerationOptions(abortController?: AbortController) {
+  return await cacheAndFetch(`/ws/rest/v1/idgen/autogenerationoption?v=full`, abortController);
 }
 
 async function cacheAndFetch(url: string, abortController?: AbortController) {
