@@ -45,6 +45,7 @@ describe('FormManager', () => {
   describe('createIdentifiers', () => {
     it('uses the uuid of a field name if it exists', async () => {
       const result = await FormManager.savePatientIdentifiers(
+        true,
         undefined,
         formValues.identifiers,
         'Nyc',

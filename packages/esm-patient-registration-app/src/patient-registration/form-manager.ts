@@ -90,6 +90,7 @@ export default class FormManager {
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
+      isNewPatient,
       values.patientUuid,
       values.identifiers,
       currentLocation,
@@ -156,6 +157,7 @@ export default class FormManager {
   }
 
   static async savePatientIdentifiers(
+    isNewPatient: boolean,
     patientUuid: string,
     patientIdentifiers: Array<PatientIdentifierValue>, // values.identifiers
     location: string,
@@ -179,7 +181,7 @@ export default class FormManager {
             preferred,
           };
 
-          if (patientUuid) {
+          if (!isNewPatient) {
             if (action === 'ADD') {
               await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
             } else if (action === 'UPDATE') {

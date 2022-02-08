@@ -55,13 +55,7 @@ export const esmPatientRegistrationSchema = {
         },
       },
     },
-    _default: {
-      phone: {
-        label: 'Telephone Number',
-        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-        validation: { required: true, matches: '^[0-9]*$' },
-      },
-    },
+    _default: {},
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
@@ -89,7 +83,7 @@ export const esmPatientRegistrationSchema = {
   },
   personAttributeSections: {
     _type: Type.Array,
-    _default: [{ personAttributes: [{ name: 'phone', uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7' }] }],
+    _default: [{ personAttributes: [] }],
     _elements: {
       _type: Type.Object,
       personAttributes: {
@@ -104,12 +98,7 @@ export const esmPatientRegistrationSchema = {
             _type: Type.String,
             _default: '',
           },
-          _default: {
-            phone: {
-              name: 'phone',
-              uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-            },
-          },
+          _default: {},
         },
       },
     },
