@@ -6,7 +6,10 @@ import { PatientIdentifierType, PatientIdentifierValue } from '../../patient-reg
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { shouldBlockPatientIdentifierInOfflineMode } from '../../input/custom-input/identifier/utils';
+import {
+  isUniqueIdentifierTypeForOffline,
+  shouldBlockPatientIdentifierInOfflineMode,
+} from '../../input/custom-input/identifier/utils';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, PatientIdentifierValue) => void;
@@ -36,10 +39,20 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       setUnsavedIdentifierTypes(
         identifierTypes.map((identifierType) => {
           const identifier = getIdentifierByTypeUuid(identifierType.uuid);
+          const alreadySelectedSource = identifier?.source;
+          const defaultSelectedSource =
+            isOffline && isUniqueIdentifierTypeForOffline(identifierType)
+              ? identifierType.identifierSources?.find(
+                  (identifierSource) =>
+                    !identifierSource.autoGenerationOption?.manualEntryEnabled &&
+                    identifierSource.autoGenerationOption?.automaticGenerationEnabled,
+                )
+              : identifierType.identifierSources?.[0];
+
           return {
             ...identifierType,
             checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required,
-            source: identifier?.source ?? identifierType.identifierSources?.[0],
+            source: alreadySelectedSource ?? defaultSelectedSource,
           };
         }),
       );
@@ -117,7 +130,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
                       className={styles.radioButton}
                       disabled={
                         isOffline &&
-                        identifierType.uniquenessBehavior === 'UNIQUE' &&
+                        isUniqueIdentifierTypeForOffline(identifierType) &&
                         source.autoGenerationOption?.manualEntryEnabled
                       }
                     />

@@ -21,7 +21,8 @@ export interface FetchedPatientIdentifierType {
   fieldName: string;
   format: string;
   isPrimary: boolean;
-  uniquenessBehavior: undefined | null | 'UNIQUE';
+  /** See: https://github.com/openmrs/openmrs-core/blob/e3fb1ac0a052aeff0f957a150731757dd319693b/api/src/main/java/org/openmrs/PatientIdentifierType.java#L41 */
+  uniquenessBehavior: undefined | null | 'UNIQUE' | 'NON_UNIQUE' | 'LOCATION';
 }
 
 export interface PatientIdentifierValue {
