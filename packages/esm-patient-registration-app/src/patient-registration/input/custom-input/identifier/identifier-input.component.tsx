@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useContext, useMemo } from 're
 import styles from '../../input.scss';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
-import { PatientIdentifierValue } from '../../../patient-registration-types';
+import { IdentifierSourceAutoGenerationOption, PatientIdentifierValue } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { TrashCan16, Edit16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
@@ -29,7 +29,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
   const identifierName = identifierType?.name;
   const fieldName = `identifiers[${index}].identifier`;
   const { t } = useTranslation();
-  const [option, setAutoGenerationOption] = useState({
+  const [option, setAutoGenerationOption] = useState<Partial<IdentifierSourceAutoGenerationOption>>({
     manualEntryEnabled: source ? true : undefined,
     automaticGenerationEnabled: undefined,
   });
@@ -37,7 +37,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
   const isDisabled = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
   useEffect(() => {
-    if (source && source.autoGenerationOption && source.autoGenerationOption.automaticGenerationEnabled) {
+    if (source?.autoGenerationOption?.automaticGenerationEnabled) {
       setFieldValue(`identifiers[${index}].autoGeneration`, true);
     }
   }, [source]);

@@ -53,10 +53,12 @@ export interface PatientIdentifierType extends FetchedPatientIdentifierType {
 export interface IdentifierSource {
   uuid: string;
   name: string;
-  autoGenerationOption: {
-    manualEntryEnabled: boolean;
-    automaticGenerationEnabled: boolean;
-  };
+  autoGenerationOption?: IdentifierSourceAutoGenerationOption;
+}
+
+export interface IdentifierSourceAutoGenerationOption {
+  manualEntryEnabled: boolean;
+  automaticGenerationEnabled: boolean;
 }
 
 export interface PatientIdentifier {

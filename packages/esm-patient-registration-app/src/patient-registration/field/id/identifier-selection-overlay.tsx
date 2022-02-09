@@ -118,7 +118,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
                       disabled={
                         isOffline &&
                         identifierType.uniquenessBehavior === 'UNIQUE' &&
-                        source.autoGenerationOption.manualEntryEnabled
+                        source.autoGenerationOption?.manualEntryEnabled
                       }
                     />
                   ))}

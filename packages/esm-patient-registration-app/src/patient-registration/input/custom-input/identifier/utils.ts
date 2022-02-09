@@ -7,7 +7,7 @@ export function shouldBlockPatientIdentifierInOfflineMode(identifierType: Patien
     identifierType.uniquenessBehavior === 'UNIQUE' &&
     !identifierType.identifierSources.some(
       (source) =>
-        !source.autoGenerationOption.manualEntryEnabled && source.autoGenerationOption.automaticGenerationEnabled,
+        !source.autoGenerationOption?.manualEntryEnabled && source.autoGenerationOption?.automaticGenerationEnabled,
     )
   );
 }
