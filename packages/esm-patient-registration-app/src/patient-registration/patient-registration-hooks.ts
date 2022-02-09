@@ -10,6 +10,7 @@ import {
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
+import { getInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
@@ -38,7 +39,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     isDead: false,
     deathDate: '',
     deathCause: '',
-    relationships: [{ relatedPerson: '', relationship: '' }],
+    relationships: [],
     identifiers: [],
   });
 
@@ -68,6 +69,12 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
 
   useEffect(() => {
     if (patientUuid) {
+      getInitialPatientRelationships(patientUuid).then((relationships) =>
+        setInitialFormValues((initialFormValues) => ({
+          ...initialFormValues,
+          relationships,
+        })),
+      );
       getInitialPatientIdentifiers(patientUuid).then((identifiers) =>
         setInitialFormValues((initialFormValues) => ({
           ...initialFormValues,

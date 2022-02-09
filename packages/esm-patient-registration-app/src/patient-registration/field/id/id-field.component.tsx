@@ -39,7 +39,7 @@ export const IdField: React.FC = () => {
   }, [identifierTypes, inEditMode]);
 
   return (
-    <div>
+    <div className={styles.halfWidthInDesktopView}>
       <div className={styles.identifierLabelText}>
         <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
         <Button

@@ -21,7 +21,7 @@
 }
 
 .requiredField {
-  color: var(--omrs-color-danger);
+  color: $danger;
 }
 
 .input {
@@ -69,12 +69,12 @@
 }
 
 .errorInput {
-  border: 2px solid var(--omrs-color-danger) !important;
+  border: 2px solid $danger !important;
   padding-left: 0.875rem !important;
 }
 
 .errorMessage {
-  color: var(--omrs-color-danger);
+  color: $danger;
   align-self: center;
 }
 

@@ -44,7 +44,7 @@ export const NameField = () => {
           <Input
             id="givenName"
             name="givenName"
-            labelText={t('givenNameLabelText', 'Given Name')}
+            labelText={t('givenNameLabelText', 'First Name')}
             light
             checkWarning={checkNumber}
           />
@@ -52,7 +52,7 @@ export const NameField = () => {
             <Input
               id="middleName"
               name="middleName"
-              labelText={t('middleNameLabelText', 'Middle Name')}
+              labelText={t('middleNameLabelText', 'Middle Name (optional)')}
               light
               checkWarning={checkNumber}
             />

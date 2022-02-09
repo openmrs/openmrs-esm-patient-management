@@ -6,7 +6,7 @@ export function useMetrics() {
   const { data, error } = useSWR<{ data: { results: {} } }, Error>(`/ws/rest/v1/queue?`, openmrsFetch);
 
   return {
-    data: metrics ? metrics : null,
+    metrics: data ? metrics : null,
     isError: error,
     isLoading: !data && !error,
   };

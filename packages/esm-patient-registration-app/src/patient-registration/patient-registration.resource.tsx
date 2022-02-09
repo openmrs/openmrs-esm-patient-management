@@ -59,6 +59,31 @@ export function saveRelationship(abortController: AbortController, relationship:
   });
 }
 
+export function updateRelationship(
+  abortController: AbortController,
+  relationshipUuid,
+  relationship: { relationshipType: string },
+) {
+  return openmrsFetch(`/ws/rest/v1/relationship/${relationshipUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: { relationshipType: relationship.relationshipType },
+    signal: abortController.signal,
+  });
+}
+
+export function deleteRelationship(abortController: AbortController, relationshipUuid) {
+  return openmrsFetch(`/ws/rest/v1/relationship/${relationshipUuid}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'DELETE',
+    signal: abortController.signal,
+  });
+}
+
 export async function savePatientPhoto(
   patientUuid: string,
   content: string,

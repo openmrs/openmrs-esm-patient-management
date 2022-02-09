@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 
-interface MetricsHeaderProps {}
-const MetricsHeader: React.FC<MetricsHeaderProps> = () => {
+const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
 
   return (
