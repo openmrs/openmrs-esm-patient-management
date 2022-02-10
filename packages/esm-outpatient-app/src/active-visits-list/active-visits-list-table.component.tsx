@@ -22,7 +22,6 @@ import {
   Tile,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
-
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
@@ -38,6 +37,7 @@ const ActiveVisitsListTable: React.FC = () => {
   const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const [tableSize, setTableSize] = useState<DataTableSize>('sm');
+  const isDesktop = useLayoutType() === 'desktop';
 
   useEffect(() => {
     if (contentSwitcherValue === tableSizes.DEFAULT) {
@@ -125,7 +125,7 @@ const ActiveVisitsListTable: React.FC = () => {
               {t('addPatientList', 'Add patient to list')}
             </Button>
           </div>
-          <DataTable rows={tableRows} headers={headerData} isSortable overflowMenuOnHover={false}>
+          <DataTable rows={tableRows} headers={headerData} isSortable overflowMenuOnHover={isDesktop ? true : false}>
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer className={styles.tableContainer}>
                 <Table {...getTableProps()} className={styles.activeVisitsTable} size={tableSize}>
@@ -195,7 +195,7 @@ function ActionsMenu() {
   const { t } = useTranslation();
 
   return (
-    <OverflowMenu selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
       <OverflowMenuItem
         className={styles.menuItem}
         id="#editPatientDetails"
