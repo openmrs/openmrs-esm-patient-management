@@ -1,37 +1,51 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  DataTable,
-  DataTableSkeleton,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  TableExpandRow,
-  TableExpandHeader,
-  ContentSwitcher,
-  Switch,
   Button,
-  Tag,
-  Tile,
+  ContentSwitcher,
+  DataTable,
+  DataTableSize,
+  DataTableSkeleton,
   OverflowMenu,
   OverflowMenuItem,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tag,
+  Tile,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { ActiveVisit, useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
+import { useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
 import styles from './active-visits-list-table.scss';
+
+enum tableSizes {
+  DEFAULT = 0,
+  LARGE = 1,
+}
 
 const ActiveVisitsListTable: React.FC = () => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
   const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
-  const desktopView = layout === 'desktop';
+  const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
+  const [tableSize, setTableSize] = useState<DataTableSize>('sm');
+
+  useEffect(() => {
+    if (contentSwitcherValue === tableSizes.DEFAULT) {
+      setTableSize('compact');
+    } else if (contentSwitcherValue === tableSizes.LARGE) {
+      setTableSize('normal');
+    }
+  }, [contentSwitcherValue]);
 
   const headerData = useMemo(
     () => [
@@ -58,6 +72,7 @@ const ActiveVisitsListTable: React.FC = () => {
     ],
     [t],
   );
+
   const getTagType = (priority: string) => {
     switch (priority) {
       case 'Emergency':
@@ -80,7 +95,8 @@ const ActiveVisitsListTable: React.FC = () => {
         ),
       },
       name: {
-        content: <ConfigurableLink to={`\${openmrsSpaBase}/patient/chart`}>{visit.name}</ConfigurableLink>,
+        // TODO: Interpolate patient uuid into URL
+        content: <ConfigurableLink to={`\${openmrsSpaBase}/patient/${visit.id}/chart`}>{visit.name}</ConfigurableLink>,
       },
     }));
   }, [activeVisits]);
@@ -90,67 +106,62 @@ const ActiveVisitsListTable: React.FC = () => {
   }
   if (activeVisits?.length) {
     return (
-      <div className={styles.activeVisitsListContainer}>
-        <div className={styles.activeVisitsListHeaderContainer}>
-          <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
-          <div className={styles.switcherContainer}>
-            <label className={styles.contentSwitcherLabel}>{t('view', 'View:')} </label>
-            <ContentSwitcher onChange={() => {}} style={{ marginLeft: '1rem' }}>
-              <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
-              <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
-            </ContentSwitcher>
+      <div className={styles.container} data-floating-menu-container>
+        <div className={styles.activeVisitsListContainer}>
+          <div className={styles.activeVisitsListHeaderContainer}>
+            <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
+            <div className={styles.switcherContainer}>
+              <label className={styles.contentSwitcherLabel}>{t('view', 'View:')} </label>
+              <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index)}>
+                <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
+                <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
+              </ContentSwitcher>
+            </div>
+            <Button
+              size="small"
+              kind="secondary"
+              renderIcon={Add16}
+              iconDescription={t('addPatientList', 'Add patient to list')}>
+              {t('addPatientList', 'Add patient to list')}
+            </Button>
           </div>
-          <Button
-            size="small"
-            kind="secondary"
-            renderIcon={Add16}
-            iconDescription={t('addPatientList', 'Add patient to list')}>
-            {t('addPatientList', 'Add patient to list')}
-          </Button>
-        </div>
-        <DataTable rows={tableRows} headers={headerData} isSortable>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-            <TableContainer title="" className={styles.tableContainer}>
-              <Table className={styles.activeVisitsTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader />
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+          <DataTable rows={tableRows} headers={headerData} isSortable overflowMenuOnHover={false}>
+            {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+              <TableContainer className={styles.tableContainer}>
+                <Table {...getTableProps()} className={styles.activeVisitsTable} size={tableSize}>
+                  <TableHead>
+                    <TableRow>
+                      <TableExpandHeader />
+                      {headers.map((header) => (
+                        <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      ))}
+                      <TableExpandHeader />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, index) => (
+                      <React.Fragment key={index}>
+                        <TableExpandRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          ))}
+                          <TableCell className="bx--table-column-menu">
+                            <ActionsMenu />
+                          </TableCell>
+                        </TableExpandRow>
+                        {row.isExpanded ? (
+                          <TableExpandedRow
+                            className={styles.expandedActiveVisitRow}
+                            colSpan={headers.length + 2}></TableExpandedRow>
+                        ) : null}
+                      </React.Fragment>
                     ))}
-                    <TableExpandHeader />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => (
-                    <React.Fragment key={index}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                        <TableCell className="bx--table-column-menu">
-                          <OverflowMenu size="sm" flipped>
-                            <OverflowMenuItem itemText={t('endVisit', 'End visit')}>
-                              {t('endVisit', 'End visit')}
-                            </OverflowMenuItem>
-                            <OverflowMenuItem hasDivider isDelete itemText={t('resetWaitTime', 'Reset wait time')}>
-                              {t('resetWaitTime', 'Reset wait time')}
-                            </OverflowMenuItem>
-                          </OverflowMenu>
-                        </TableCell>
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow
-                          className={styles.expandedActiveVisitRow}
-                          colSpan={headers.length + 2}></TableExpandedRow>
-                      ) : null}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        </div>
       </div>
     );
   }
@@ -179,3 +190,32 @@ const ActiveVisitsListTable: React.FC = () => {
 };
 
 export default ActiveVisitsListTable;
+
+function ActionsMenu() {
+  const { t } = useTranslation();
+
+  return (
+    <OverflowMenu selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#editPatientDetails"
+        itemText={t('editPatientDetails', 'Edit patient details')}>
+        {t('editPatientDetails', 'Edit patient details')}
+      </OverflowMenuItem>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#setWaitTimeManually"
+        itemText={t('setWaitTimeManually', 'Set wait time manually')}>
+        {t('setWaitTimeManually', 'Set wait time manually')}
+      </OverflowMenuItem>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#endVisit"
+        hasDivider
+        isDelete
+        itemText={t('endVisit', 'End visit')}>
+        {t('endVisit', 'End Visit')}
+      </OverflowMenuItem>
+    </OverflowMenu>
+  );
+}
