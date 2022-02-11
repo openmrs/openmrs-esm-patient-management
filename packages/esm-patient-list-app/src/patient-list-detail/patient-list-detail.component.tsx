@@ -9,7 +9,7 @@ import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
 import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { deletePatientList } from '../api/api-remote';
-import { usePatientListDetails, usePatientListMembers } from '../api/queries';
+import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 
 function getPatientListUuidFromUrl(): string {
   const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);

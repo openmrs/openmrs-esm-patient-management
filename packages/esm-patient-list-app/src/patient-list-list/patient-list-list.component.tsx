@@ -6,7 +6,7 @@ import CreateNewList from '../ui-components/create-edit-patient-list/create-edit
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
-import { useAllPatientLists } from '../api/queries';
+import { useAllPatientLists } from '../api/hooks';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
 
 enum TabTypes {

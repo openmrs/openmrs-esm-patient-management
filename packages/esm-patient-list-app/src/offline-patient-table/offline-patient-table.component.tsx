@@ -33,7 +33,7 @@ import styles from './offline-patient-table.scss';
 import PatientNameTableCell from './patient-name-table-cell.component';
 import Renew32 from '@carbon/icons-react/es/renew/32';
 import { removePatientFromLocalPatientList, offlinePatientListId } from '../api/api-local';
-import { useAllPatientsFromOfflinePatientList } from '../api/queries';
+import { useAllPatientsFromOfflinePatientList } from '../api/hooks';
 
 export interface OfflinePatientTableProps {
   isInteractive: boolean;

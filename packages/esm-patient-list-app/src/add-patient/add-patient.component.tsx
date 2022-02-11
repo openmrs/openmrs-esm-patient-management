@@ -4,7 +4,7 @@ import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@open
 import { Button, Checkbox, Pagination, Search, SkeletonText } from 'carbon-components-react';
 import styles from './add-patient.scss';
 import { addPatientToLocalOrRemotePatientList } from '../api/api';
-import { useAllPatientListsWhichDoNotIncludeGivenPatient } from '../api/queries';
+import { useAllPatientListsWhichDoNotIncludeGivenPatient } from '../api/hooks';
 
 interface AddPatientProps {
   closeModal: () => void;
