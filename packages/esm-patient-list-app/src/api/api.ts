@@ -75,15 +75,10 @@ export function addPatientToLocalOrRemotePatientList(
   }
 }
 
-export function updateLocalOrRemotePatientList(
-  userId: string,
-  patientListId: string,
-  update: PatientListUpdate,
-  abortController?: AbortController,
-) {
+export function updateLocalOrRemotePatientList(userId: string, patientListId: string, update: PatientListUpdate) {
   if (isOfflineUuid(patientListId)) {
     return updateLocalPatientList(userId, patientListId, update);
   } else {
-    //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    // TODO: Update the remote patient list. At the moment it seems like this is not supported by the API?
   }
 }

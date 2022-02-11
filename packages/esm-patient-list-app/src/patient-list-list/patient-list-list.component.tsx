@@ -5,14 +5,9 @@ import PatientListTable from './patient-list-table.component';
 import CreateNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
-import {
-  usePatientListDataQuery,
-  useToggleStarredMutation,
-  PatientList,
-  PatientListFilter,
-  PatientListType,
-} from '../api';
 import styles from './patient-list-list.scss';
+import { usePatientListDataQuery } from '../api/queries';
+import { PatientList, PatientListFilter, PatientListType } from '../api/types';
 
 enum TabTypes {
   STARRED,
@@ -86,15 +81,6 @@ const PatientListList: React.FC = () => {
   const userId = useSessionUser()?.user.uuid;
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
   const patientListQuery = usePatientListDataQuery(userId, patientListFilter);
-  const toggleStarredMutation = useToggleStarredMutation();
-
-  const handleListStarred = useCallback(
-    async (listUuid: string, isStarred: boolean) => {
-      await toggleStarredMutation.refetch({ userId, patientListId: listUuid, isStarred });
-      await patientListQuery.refetch();
-    },
-    [toggleStarredMutation, patientListQuery, userId],
-  );
 
   const handleSearch = (str) => setSearchString(str);
 
@@ -127,11 +113,11 @@ const PatientListList: React.FC = () => {
         </Tabs>
         <div className={styles.patientListTableContainer}>
           <PatientListTable
-            loading={!patientListQuery?.data}
-            fetching={patientListQuery?.isFetching}
+            loading={!patientListQuery.data}
+            fetching={patientListQuery.isValidating}
             headers={customHeaders}
             patientLists={patientListQuery.data}
-            refetch={patientListQuery.refetch}
+            refetch={patientListQuery.mutate}
             search={{
               onSearch: handleSearch,
               placeHolder: t('search', 'Search'),
@@ -144,7 +130,7 @@ const PatientListList: React.FC = () => {
         {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
           <CreateNewList
             close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}
-            onSuccess={() => patientListQuery.refetch()}
+            onSuccess={() => patientListQuery.mutate()}
           />
         )}
       </section>

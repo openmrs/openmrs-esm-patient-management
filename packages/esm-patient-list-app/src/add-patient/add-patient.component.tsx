@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
-import { addPatientToLocalOrRemotePatientList, useGetAllPatientListsWithoutPatientQuery } from '../api';
 import { Button, Checkbox, Pagination, Search, SkeletonText } from 'carbon-components-react';
 import styles from './add-patient.scss';
+import { addPatientToLocalOrRemotePatientList } from '../api/api';
+import { useGetAllPatientListsWithoutPatientQuery } from '../api/queries';
 
 interface AddPatientProps {
   closeModal: () => void;
@@ -22,7 +23,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const userId = useSessionUser()?.user.uuid;
-  const { data, isFetching } = useGetAllPatientListsWithoutPatientQuery(userId, patientUuid);
+  const { data, isValidating } = useGetAllPatientListsWithoutPatientQuery(userId, patientUuid);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 
   useEffect(() => {
@@ -131,7 +132,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="bx--fieldset">
           <p className="bx--label">Patient Lists</p>
-          {!isFetching && patientListsObj && results ? (
+          {!isValidating && patientListsObj && results ? (
             results.length > 0 ? (
               results.map((patientList, ind) => (
                 <div key={ind} className={styles.checkbox}>
