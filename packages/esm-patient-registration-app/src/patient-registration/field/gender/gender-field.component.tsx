@@ -16,7 +16,7 @@ const GenderField: React.FC = () => {
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <h4 className={styles.productiveHeading02Light}>{t('sexFieldLabelText', 'Sex & Birth')}</h4>
+      <h4 className={styles.productiveHeading02Light}>{t('sexFieldLabelText', 'Sex')}</h4>
       <div className={styles.sexField}>
         <p className="bx--label">{t('genderLabelText', 'Sex')}</p>
         <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>

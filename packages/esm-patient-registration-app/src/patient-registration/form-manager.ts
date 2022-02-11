@@ -231,7 +231,14 @@ export default class FormManager {
     identifiers: Array<PatientIdentifier>,
   ): Patient {
     let address = FormManager.getPatientAddressField(values, initialAddressFieldValues);
-
+    let birthdate;
+    if (values.birthdate instanceof Date) {
+      birthdate = [values.birthdate.getFullYear(), values.birthdate.getMonth() + 1, values.birthdate.getDate()].join(
+        '-',
+      );
+    } else {
+      birthdate = values.birthdate;
+    }
     if (isEqual(initialAddressFieldValues, address)) {
       address = {};
     }
@@ -242,7 +249,7 @@ export default class FormManager {
         uuid: values.patientUuid,
         names: FormManager.getNames(values, patientUuidMap),
         gender: values.gender.charAt(0),
-        birthdate: values.birthdate,
+        birthdate,
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(values, personAttributeSections),
         addresses: [address],
