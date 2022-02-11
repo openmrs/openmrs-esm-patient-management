@@ -6,7 +6,7 @@ import CreateNewList from '../ui-components/create-edit-patient-list/create-edit
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
-import { usePatientListDataQuery } from '../api/queries';
+import { useAllPatientLists } from '../api/queries';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
 
 enum TabTypes {
@@ -80,7 +80,7 @@ const PatientListList: React.FC = () => {
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
   const userId = useSessionUser()?.user.uuid;
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
-  const patientListQuery = usePatientListDataQuery(userId, patientListFilter);
+  const patientListQuery = useAllPatientLists(userId, patientListFilter);
 
   const handleSearch = (str) => setSearchString(str);
 

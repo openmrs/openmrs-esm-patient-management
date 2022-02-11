@@ -33,7 +33,7 @@ import styles from './offline-patient-table.scss';
 import PatientNameTableCell from './patient-name-table-cell.component';
 import Renew32 from '@carbon/icons-react/es/renew/32';
 import { removePatientFromLocalPatientList, offlinePatientListId } from '../api/api-local';
-import { useGetAllPatientsFromOfflineListQuery } from '../api/queries';
+import { useAllPatientsFromOfflinePatientList } from '../api/queries';
 
 export interface OfflinePatientTableProps {
   isInteractive: boolean;
@@ -45,7 +45,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
   const store = useStore(getOfflinePatientDataStore());
   const userId = useSessionUser()?.user.uuid;
   const layout = useLayoutType();
-  const { isValidating, data: patients, mutate } = useGetAllPatientsFromOfflineListQuery(userId);
+  const { isValidating, data: patients, mutate } = useAllPatientsFromOfflinePatientList(userId);
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
 
   const headers = [

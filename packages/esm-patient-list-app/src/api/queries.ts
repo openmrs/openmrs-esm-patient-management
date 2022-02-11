@@ -21,7 +21,7 @@ import { cohortUrl } from './api-remote';
  * A hook for querying all local and remote patient lists belonging to a given user,
  * optionally filtered by the specified {@link filter}.
  */
-export function usePatientListDataQuery(userId?: string, filter?: PatientListFilter) {
+export function useAllPatientLists(userId?: string, filter?: PatientListFilter) {
   return useSWR(['patientList', userId, filter], () => {
     if (!userId) {
       return Promise.resolve<Array<PatientList>>([]);
@@ -34,7 +34,7 @@ export function usePatientListDataQuery(userId?: string, filter?: PatientListFil
 /**
  * A hook for querying all members of a given local or remote patient list.
  */
-export function useGetAllPatientListMembersQuery(userId?: string, patientListId?: string) {
+export function useAllPatientListMembers(userId?: string, patientListId?: string) {
   return useSWR(['patientListMembers', userId, patientListId], () => {
     if (!userId || !patientListId) {
       return Promise.resolve<Array<PatientListMember>>([]);
@@ -50,7 +50,7 @@ export function useGetAllPatientListMembersQuery(userId?: string, patientListId?
  *
  * This is intended for displaying all lists to which a given patient can still be added.
  */
-export function useGetAllPatientListsWithoutPatientQuery(userId?: string, patientUuid?: string) {
+export function useAllPatientListsWhichDoNotIncludeGivenPatient(userId?: string, patientUuid?: string) {
   return useSWR(['patientListWithoutPatient', userId, patientUuid], async () => {
     if (!userId || !patientUuid) {
       return [];
@@ -66,7 +66,7 @@ export function useGetAllPatientListsWithoutPatientQuery(userId?: string, patien
   });
 }
 
-export function useGetAllPatientsFromOfflineListQuery(userId?: string) {
+export function useAllPatientsFromOfflinePatientList(userId?: string) {
   return useSWR<Array<fhir.Patient>>(['offlinePatientListPatients', userId], async () => {
     if (!userId) {
       return [];
