@@ -8,6 +8,7 @@ import { PatientRegistration, PatientRegistrationProps } from './patient-registr
 
 export interface RootProps extends PatientRegistrationProps, Resources {
   savePatientForm: SavePatientForm;
+  isOffline: boolean;
 }
 
 export default function Root({
@@ -16,6 +17,7 @@ export default function Root({
   relationshipTypes,
   identifierTypes,
   savePatientForm,
+  isOffline,
 }: RootProps) {
   const resources = {
     currentSession,
@@ -35,12 +37,16 @@ export default function Root({
             <Route
               exact
               path="/patient-registration"
-              render={(props) => <PatientRegistration savePatientForm={savePatientForm} {...props} />}
+              render={(props) => (
+                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
+              )}
             />
             <Route
               exact
               path="/patient/:patientUuid/edit"
-              render={(props) => <PatientRegistration savePatientForm={savePatientForm} {...props} />}
+              render={(props) => (
+                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
+              )}
             />
           </Grid>
         </main>

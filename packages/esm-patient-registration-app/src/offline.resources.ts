@@ -68,18 +68,19 @@ async function fetchPrimaryIdentifierType(abortController: AbortController): Pro
     abortController,
   );
 
-  const { data: metadata } = await cacheAndFetch(
+  const { data } = await cacheAndFetch<FetchedPatientIdentifierType>(
     `/ws/rest/v1/patientidentifiertype/${primaryIdentifierTypeResponse.data.results[0].metadataUuid}`,
     abortController,
   );
 
   return {
-    name: metadata.name,
-    fieldName: camelCase(metadata.name),
-    required: metadata.required,
-    uuid: metadata.uuid,
-    format: metadata.format,
+    name: data.name,
+    fieldName: camelCase(data.name),
+    required: data.required,
+    uuid: data.uuid,
+    format: data.format,
     isPrimary: true,
+    uniquenessBehavior: data.uniquenessBehavior,
   };
 }
 
@@ -101,7 +102,7 @@ async function fetchSecondaryIdentifierTypes(
     if (metadataResponse.data.results) {
       return await Promise.all(
         metadataResponse.data.results.map(async (setMember) => {
-          const type = await cacheAndFetch(
+          const type = await cacheAndFetch<FetchedPatientIdentifierType>(
             `/ws/rest/v1/patientidentifiertype/${setMember.metadataUuid}`,
             abortController,
           );
@@ -113,6 +114,7 @@ async function fetchSecondaryIdentifierTypes(
             uuid: type.data.uuid,
             format: secondaryIdentifierTypeResponse.data.format,
             isPrimary: false,
+            uniquenessBehavior: type.data.uniquenessBehavior,
           };
         }),
       );
@@ -133,11 +135,11 @@ async function fetchAutoGenerationOptions(abortController?: AbortController) {
   return await cacheAndFetch(`/ws/rest/v1/idgen/autogenerationoption?v=full`, abortController);
 }
 
-async function cacheAndFetch(url: string, abortController?: AbortController) {
+async function cacheAndFetch<T = any>(url: string, abortController?: AbortController) {
   await messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
     pattern: escapeRegExp(url),
   });
 
-  return await openmrsFetch(url, { headers: cacheForOfflineHeaders, signal: abortController?.signal });
+  return await openmrsFetch<T>(url, { headers: cacheForOfflineHeaders, signal: abortController?.signal });
 }
