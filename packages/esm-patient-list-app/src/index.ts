@@ -1,6 +1,5 @@
 import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { setupOffline } from './offline';
-import './global-store';
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
