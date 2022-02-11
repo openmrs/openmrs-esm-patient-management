@@ -108,7 +108,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
-        config?.personAttributeSections,
+        config?.personAttributes,
         abortController,
       );
 

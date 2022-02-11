@@ -89,7 +89,7 @@ export interface PatientRegistration {
     capturePhotoProps: CapturePhotoProps;
     patientPhotoConceptUuid: string;
     currentLocation: string;
-    personAttributeSections: any;
+    personAttributes: any;
   };
 }
 
@@ -163,6 +163,9 @@ export interface FormValues {
   deathCause: string;
   relationships: Array<RelationshipValue>;
   identifiers: Array<PatientIdentifierValue>;
+  attributes?: {
+    [attributeUuid: string]: string;
+  };
 }
 
 export interface PatientUuidMapType {

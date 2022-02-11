@@ -25,6 +25,7 @@ import {
   updatePatientIdentifier,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
+import camelCase from 'lodash-es/camelCase';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -35,7 +36,7 @@ export type SavePatientForm = (
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
-  personAttributeSections: any,
+  personAttributes: any,
   abortController?: AbortController,
 ) => Promise<string | null>;
 
@@ -49,11 +50,11 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributeSections: any,
+    personAttributes: any,
   ): Promise<null> {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(values, personAttributeSections, patientUuidMap, initialAddressFieldValues, []),
+        FormManager.getPatientToCreate(values, personAttributes, patientUuidMap, initialAddressFieldValues, []),
       ),
       _patientRegistrationData: {
         isNewPatient,
@@ -64,7 +65,7 @@ export default class FormManager {
         capturePhotoProps,
         patientPhotoConceptUuid,
         currentLocation,
-        personAttributeSections,
+        personAttributes,
       },
     };
 
@@ -87,7 +88,7 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributeSections: any,
+    personAttributes: any,
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
@@ -100,7 +101,7 @@ export default class FormManager {
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
-      personAttributeSections,
+      personAttributes,
       patientUuidMap,
       initialAddressFieldValues,
       patientIdentifiers,
@@ -226,7 +227,7 @@ export default class FormManager {
 
   static getPatientToCreate(
     values: FormValues,
-    personAttributeSections: any,
+    personAttributes: any,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
@@ -245,7 +246,7 @@ export default class FormManager {
         gender: values.gender.charAt(0),
         birthdate: values.birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(values, personAttributeSections),
+        attributes: FormManager.getPatientAttributes(values, personAttributes),
         addresses: [address],
         ...FormManager.getPatientDeathInfo(values),
       },
@@ -277,17 +278,15 @@ export default class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues, personAttributeSections?: any) {
+  static getPatientAttributes(values: FormValues, personAttributes?: any) {
     const attributes: Array<AttributeValue> = [];
 
-    if (personAttributeSections) {
-      for (const section of personAttributeSections) {
-        for (const attr of section.personAttributes) {
-          attributes.push({
-            attributeType: attr.uuid,
-            value: values[attr.name],
-          });
-        }
+    if (personAttributes) {
+      for (const attr of personAttributes) {
+        attributes.push({
+          attributeType: attr.uuid,
+          value: values.attributes[camelCase(attr.name)],
+        });
       }
     }
 

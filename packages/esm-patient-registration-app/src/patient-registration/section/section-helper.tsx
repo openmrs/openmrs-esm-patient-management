@@ -12,6 +12,7 @@ import { PhoneEmailField } from '../field/email/email-field.component';
 import { NameField } from '../field/name/name-field.component';
 import { GenderBirthField } from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
+import { ExtraInformationSection, ExtraInformationSectionProps } from './extra-information/extra-information.component';
 
 export function getField(fieldName: string) {
   switch (fieldName) {
@@ -40,6 +41,8 @@ function renderSection(sectionProps: SectionProps) {
       return <DeathInfoSection {...sectionProps} />;
     case 'relationships':
       return <RelationshipsSection {...sectionProps} />;
+    case 'extraInformation':
+      return <ExtraInformationSection {...sectionProps} />;
     default:
       return <div>Unknown Section {sectionProps.id}</div>;
   }
@@ -54,6 +57,7 @@ export type SectionProps =
   | ContactInfoSectionProps
   | DeathInfoSectionProps
   | RelationshipsSectionProps
+  | ExtraInformationSectionProps
   | DefaultSectionProps;
 
 export function getSection(sectionProps: SectionProps & { name: string }, index: number) {

@@ -3,7 +3,7 @@ const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships'],
+    _default: ['demographics', 'contact', 'relationships', 'extraInformation'],
     _description: "An array of strings which are the keys from 'sectionDefinitions'",
     _elements: {
       _type: Type.String,
@@ -31,6 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
+      extraInformation: { name: 'Extra Information' },
     },
   },
   fieldDefinitions: {
@@ -81,25 +82,34 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  personAttributeSections: {
+  personAttributes: {
     _type: Type.Array,
-    _default: [{ personAttributes: [] }],
+    _default: [
+      {
+        name: 'Birthplace',
+        uuid: '8d8718c2-c2cc-11de-8d13-0010c6dffd0f',
+        type: 'coded',
+        concept: null,
+      },
+    ],
     _elements: {
       _type: Type.Object,
-      personAttributes: {
-        _type: Type.Array,
-        _elements: {
-          _type: Type.Object,
-          uuid: {
-            _type: Type.UUID,
-            _description: 'Person attributetype uuid used to save the attribute',
-          },
-          name: {
-            _type: Type.String,
-            _default: '',
-          },
-          _default: {},
-        },
+      name: {
+        _type: Type.String,
+        _description: 'Name of the person attribute type',
+      },
+      uuid: {
+        // @ts-ignore
+        _type: Type.PersonAttributeTypeUuid,
+        _description: 'Person attributetype uuid used to save the attribute',
+      },
+      type: {
+        _type: Type.String,
+        _default: 'coded',
+      },
+      concept: {
+        _type: Type.ConceptUuid,
+        _description: 'Concept uuid of the attribute, if any',
       },
     },
   },
