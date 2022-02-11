@@ -71,6 +71,7 @@ export default class FormManager {
     await queueSynchronizationItem(patientRegistration, syncItem, {
       id: values.patientUuid,
       displayName: 'Patient registration',
+      patientUuid: syncItem.fhirPatient.id,
       dependencies: [],
     });
 
