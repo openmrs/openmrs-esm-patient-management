@@ -7,14 +7,7 @@ import {
   updateLocalPatientList,
 } from './api-local';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
-import {
-  AddPatientData,
-  OpenmrsCohort,
-  PatientList,
-  PatientListFilter,
-  PatientListType,
-  PatientListUpdate,
-} from './types';
+import { AddPatientData, OpenmrsCohort, PatientList, PatientListFilter, PatientListUpdate } from './types';
 
 export async function getLocalAndRemotePatientLists(
   userId: string,
@@ -25,7 +18,7 @@ export async function getLocalAndRemotePatientLists(
   const remotePromise = getAllPatientLists(filter, abortController).then((cohorts) =>
     cohorts.map(mapCohortToPatientList),
   );
-  return awaitAllAndMerge(localPromise, remotePromise);
+  return awaitAllAndMergeFulfilledResults(localPromise, remotePromise);
 }
 
 function mapCohortToPatientList(cohort: OpenmrsCohort): PatientList {
@@ -46,11 +39,25 @@ export async function getLocalAndRemotePatientListsForPatient(
 ) {
   const localPromise = getLocalPatientListIdsForPatient(userId, patientId);
   const remotePromise = getPatientListIdsForPatient(patientId, abortController);
-  return awaitAllAndMerge(localPromise, remotePromise);
+  return awaitAllAndMergeFulfilledResults(localPromise, remotePromise);
 }
 
-function awaitAllAndMerge<T>(...promises: Array<Promise<Array<T>>>): Promise<Array<T>> {
-  return Promise.all(promises).then((lists) => [].concat.apply([], lists));
+/**
+ * Awaits the given promises resolving to arrays and merges these arrays into one once all promises are settled.
+ * This ignores all promises which throw errors and only returns the results of those that succeeded.
+ * The reason for that is that
+ * a) we don't have any error designs for patient lists at the time of writing this (i.e. all errors are swallowed
+ *    anyway from the perspective of the UI)
+ * b) it would be an issue if we would fail (and thus displaying nothing) if only one of multiple promises fails.
+ *    This would mean that e.g. no patient list is displayed in a table even if some lists could be loaded.
+ *    See https://issues.openmrs.org/browse/O3-1092 for a ticket which addressed this issue.
+ */
+async function awaitAllAndMergeFulfilledResults<T>(...promises: Array<Promise<Array<T>>>): Promise<Array<T>> {
+  const results = await Promise.allSettled(promises);
+  const data = results
+    .filter((result) => result.status === 'fulfilled')
+    .map((result) => (result as unknown as PromiseFulfilledResult<T>).value);
+  return [].concat.apply([], data);
 }
 
 export function getLocalAndRemotePatientListMembers(
@@ -75,15 +82,10 @@ export function addPatientToLocalOrRemotePatientList(
   }
 }
 
-export function updateLocalOrRemotePatientList(
-  userId: string,
-  patientListId: string,
-  update: PatientListUpdate,
-  abortController?: AbortController,
-) {
+export function updateLocalOrRemotePatientList(userId: string, patientListId: string, update: PatientListUpdate) {
   if (isOfflineUuid(patientListId)) {
     return updateLocalPatientList(userId, patientListId, update);
   } else {
-    //updatePatientListDetails(listUuid, { isStarred: star }).then(() => setChanged((c) => !c));
+    // TODO: Update the remote patient list. At the moment it seems like this is not supported by the API?
   }
 }

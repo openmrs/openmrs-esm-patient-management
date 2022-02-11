@@ -2,20 +2,14 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './patient-list-detail.scss';
-import { usePatientListDetails, usePatientListMembers, deletePatientList } from '../api';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu/overflow-menu.component';
 import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
 import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
-
-interface PatientRow {
-  name: string;
-  identifier: string;
-  sex: string;
-  startDate: string;
-}
+import { deletePatientList } from '../api/api-remote';
+import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 
 function getPatientListUuidFromUrl(): string {
   const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);

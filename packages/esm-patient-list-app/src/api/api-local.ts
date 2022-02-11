@@ -2,7 +2,6 @@ import { isOfflineUuid, offlineUuidPrefix, syncOfflinePatientData } from '@openm
 import Dexie, { Table } from 'dexie';
 import { PatientList, PatientListMember, PatientListUpdate, PatientListType, PatientListFilter } from './types';
 import uniqBy from 'lodash-es/uniqBy';
-import { notifyOnPatientAdded } from '../global-store';
 
 export const offlinePatientListId = `${offlineUuidPrefix}l0c4l000-5240-4b9b-b5d6-000000000001`;
 
