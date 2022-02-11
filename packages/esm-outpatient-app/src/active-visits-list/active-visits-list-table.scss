@@ -3,18 +3,26 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.activeVisitsListContainer {
+.container {
+  padding-bottom: 2rem;
   background-color: $ui-01;
-  border: 1px solid #e0e0e0;
+}
+
+.activeVisitsListContainer {
   width: 100%;
-  margin-right: 0; 
+  height: 100%;
 }
 
 .activeVisitsListHeaderContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1rem;
+  padding: 1rem;
+}
+
+.heading {
+  @include carbon--type-style('productive-heading-03');
+  color: $text-01;
 }
 
 .switcherContainer {
@@ -24,6 +32,7 @@
 
 .switcherContainer :global(.bx--content-switcher) {
   align-items: center;
+  margin-left: 0.5rem;
 }
 
 .switch {
@@ -41,11 +50,6 @@
   @include carbon--type-style("label-01");
 }
 
-.tableOverflowmenu {
-   display: flex;
-   justify-content: space-between;
-}
-
 .backgroundDataFetchingIndicator {
   align-items: center;
   display: flex;
@@ -60,6 +64,8 @@
 
 .tableContainer {
   margin: 0 1rem;
+  padding: 0;
+  border: 1px solid $ui-03;
 }
 
 .tableContainer a {
@@ -73,11 +79,17 @@
 }
 
 .activeVisitsTable tr[data-parent-row]:nth-child(odd) td {
-  background-color: #ffffff;
+  background-color: $ui-02;
 }
 
-.activeVisitsTable tbody tr[data-parent-row]:nth-child(even)  td {
-  background-color: #f4f4f4;
+.activeVisitsTable tbody tr[data-parent-row]:nth-child(even) td {
+  background-color: $ui-01;
+}
+
+.activeVisitsTable tr:last-of-type {
+  td {
+    border-bottom: none;
+  }
 }
 
 .expandedActiveVisitRow > td > div {
@@ -107,6 +119,10 @@
 .tile {
   margin: auto;
   width: fit-content;
+}
+
+.menuItem {
+  max-width: none;
 }
 
 .desktopHeading {

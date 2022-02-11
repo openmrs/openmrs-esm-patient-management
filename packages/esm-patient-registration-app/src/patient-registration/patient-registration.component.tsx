@@ -30,9 +30,10 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
   match: any;
+  isOffline: boolean;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match, isOffline }) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig();
@@ -189,6 +190,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   setFieldValue: props.setFieldValue,
                   setCapturePhotoProps,
                   currentPhoto: photo?.imageSrc,
+                  isOffline,
                 }}>
                 {sections.map((section, index) => (
                   <div key={index}>{getSection(section, index)}</div>

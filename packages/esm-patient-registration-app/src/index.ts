@@ -52,9 +52,11 @@ function setupOpenMRS() {
         route: /^patient-registration/,
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
+          isOffline: false,
         },
         offline: {
           savePatientForm: FormManager.savePatientFormOffline,
+          isOffline: true,
         },
         resources,
       },

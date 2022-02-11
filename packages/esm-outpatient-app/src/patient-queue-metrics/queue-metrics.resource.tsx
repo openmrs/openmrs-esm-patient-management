@@ -3,7 +3,7 @@ import { openmrsFetch, Visit, SessionUser } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 export function useMetrics() {
-  const metrics = { scheduled_appointments: 100, avarage_wait_time: 28, patients_waiting_for_service: 182 };
+  const metrics = { scheduled_appointments: 100, average_wait_time: 28, patients_waiting_for_service: 182 };
   const { data, error } = useSWR<{ data: { results: {} } }, Error>(`/ws/rest/v1/queue?`, openmrsFetch);
 
   return {

@@ -5,6 +5,11 @@ import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-
 import { PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import {
+  isUniqueIdentifierTypeForOffline,
+  shouldBlockPatientIdentifierInOfflineMode,
+} from '../../input/custom-input/identifier/utils';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, PatientIdentifierValue) => void;
@@ -22,6 +27,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   remove,
 }) => {
   const { identifierTypes } = useContext(ResourcesContext);
+  const { isOffline } = useContext(PatientRegistrationContext);
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<Array<PatientIdentifierType>>([]);
   const [searchString, setSearchString] = useState<string>('');
   const { t } = useTranslation();
@@ -33,10 +39,20 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       setUnsavedIdentifierTypes(
         identifierTypes.map((identifierType) => {
           const identifier = getIdentifierByTypeUuid(identifierType.uuid);
+          const alreadySelectedSource = identifier?.source;
+          const defaultSelectedSource =
+            isOffline && isUniqueIdentifierTypeForOffline(identifierType)
+              ? identifierType.identifierSources?.find(
+                  (identifierSource) =>
+                    !identifierSource.autoGenerationOption?.manualEntryEnabled &&
+                    identifierSource.autoGenerationOption?.automaticGenerationEnabled,
+                )
+              : identifierType.identifierSources?.[0];
+
           return {
             ...identifierType,
             checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required,
-            source: identifier?.source ?? identifierType.identifierSources?.[0],
+            source: alreadySelectedSource ?? defaultSelectedSource,
           };
         }),
       );
@@ -82,6 +98,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
       filteredIdentifiers.map((identifierType) => {
         const identifier = getIdentifierByTypeUuid(identifierType.uuid);
         const showIdentifierSources = !(identifier?.action === 'NONE');
+        const isDisabled = identifier
+          ? identifier.action !== 'DELETE'
+          : identifierType.isPrimary || identifierType.required;
+        const isDisabledOffline = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
+
         return (
           <div key={identifierType.uuid} className={styles.space05}>
             <Checkbox
@@ -90,9 +111,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
               labelText={identifierType.name}
               onChange={(checked) => handleCheckingIdentifier(identifierType?.uuid, checked)}
               checked={identifierType.checked}
-              disabled={
-                identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required
-              }
+              disabled={isDisabled || (isOffline && isDisabledOffline)}
             />
             {showIdentifierSources && identifierType.checked && identifierType?.identifierSources?.length > 0 && (
               <div className={styles.radioGroup}>
@@ -102,13 +121,18 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
                   defaultSelected={identifier?.source?.uuid}
                   onChange={(sourceUuid: string) => handleSelectingIdentifierSource(identifierType?.uuid, sourceUuid)}
                   orientation="vertical">
-                  {identifierType?.identifierSources.map((source, ind) => (
+                  {identifierType?.identifierSources.map((source) => (
                     <RadioButton
-                      key={ind}
-                      labelText={source?.name}
-                      name={source?.uuid}
+                      key={source.uuid}
+                      labelText={source.name}
+                      name={source.uuid}
                       value={source.uuid}
                       className={styles.radioButton}
+                      disabled={
+                        isOffline &&
+                        isUniqueIdentifierTypeForOffline(identifierType) &&
+                        source.autoGenerationOption?.manualEntryEnabled
+                      }
                     />
                   ))}
                 </RadioButtonGroup>

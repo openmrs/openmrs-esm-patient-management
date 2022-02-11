@@ -32,7 +32,7 @@ const ClinicMetrics: React.FC = () => {
   return (
     <>
       <MetricsHeader />
-      <div className={styles.clinicMetricsContainer}>
+      <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
           value={metrics ? metrics.scheduled_appointments : 0}
@@ -53,8 +53,8 @@ const ClinicMetrics: React.FC = () => {
         </MetricsCard>
         <MetricsCard
           label={t('minutes', 'Minutes')}
-          value={metrics ? metrics.avarage_wait_time : 0}
-          headerLabel={t('avarageWaitTime', 'Average wait time today')}
+          value={metrics ? metrics.average_wait_time : 0}
+          headerLabel={t('averageWaitTime', 'Average wait time today')}
         />
       </div>
     </>
