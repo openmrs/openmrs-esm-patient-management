@@ -1,0 +1,50 @@
+@import '../root.scss';
+
+.backButton {
+  fill: #0f62fe;
+  color: #0f62fe;
+  margin-top: 1rem;
+}
+
+.formStyle {
+  margin: $spacing-04;
+}
+
+.searchFormStyle {
+  margin-bottom: $spacing-04;
+}
+
+.searchFormTitle {
+  display: flex;
+  align-items: center;
+  height: $spacing-09;
+  margin: 0 $spacing-06 0;
+}
+
+.searchPatient {
+  font-weight: bold;
+  @include carbon--type-style("productive-heading-02");
+  margin-bottom: $spacing-02;
+}
+
+.searchFormTitle span {
+  font-weight: bold;
+  color: $text-02
+}
+
+.backButtonSet {
+  width : 40%;
+  display: flex;
+  margin: 0 $spacing-06 0;
+}
+
+.searchSwitch {
+  width : 40%;
+  margin: 0 $spacing-03 0;
+}
+
+.buttonsGroup {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

@@ -1,0 +1,116 @@
+@import '../root.scss';
+
+.patientSearchIconWrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: $spacing-03 0 $spacing-03;
+}
+
+.patientSearchInput {
+  margin: 0;
+  outline: 1px solid $text-02;
+}
+
+.patientSearchInput input:focus {
+  outline: none;
+}
+
+// desktop mode styling
+:global(.omrs-breakpoint-gt-tablet) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 54vw;
+  outline: 1px solid $text-02;
+  margin : 0;
+}
+
+// tablet mode styling
+:global(.omrs-breakpoint-lt-desktop) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 100vw;
+  border: $spacing-01 solid var(--omrs-color-brand-orange);
+  margin-right: $spacing-01;
+  position: fixed;
+  top: $spacing-09;
+  right: 0;
+  left: 0;
+}
+
+.activeSearchIconButton {
+  background-color: $brand-02;
+}
+
+.searchButton {
+  background-color: $inverse-02;
+}
+
+.searchText {
+  width: 80%;
+  margin: 0 auto;
+  justify-content: center;
+  text-align: center;
+}
+
+.searchContent {
+  text-align: center;
+  margin: $spacing-08 0 $spacing-06 ;
+}
+
+.search {
+	position: relative;
+	width: 5.625rem;
+	margin: 0 auto;
+	padding: 0.625rem 0;
+	text-align: center;
+
+	&__circle {
+		width: 4.875rem;
+		height: 4.75rem;
+    background-color:#cee6e5;
+		border: 0.375rem solid #cee6e5;
+		border-radius: 6.25rem;
+	}
+
+	&__rectangle {
+		position: absolute;
+		right: 0;
+    bottom: 0.313rem;
+		width: $spacing-08;
+		transform: rotate(45deg);
+		border: 0.188rem solid #9acbca;
+		border-top-right-radius: $spacing-04;
+		border-bottom-right-radius: $spacing-04;
+	}
+}
+
+.userIcon {
+  width: 4.375rem;
+  height: 4.375rem;
+  color: #9acbca;
+}
+
+.searchPatient {
+  font-weight: bold;
+  @include carbon--type-style("productive-heading-02");
+  margin: $spacing-04 0 $spacing-04;
+}
+
+.h5 {
+  color: #a8a8a8;
+  width: 80%; 
+  text-align: center; 
+  border-bottom: 0.063rem solid #a8a8a8; 
+  line-height: 0.1em;
+  margin: $spacing-06; 
+} 
+
+.span { 
+  background:#f4f4f4; 
+  padding: 0 $spacing-08; 
+}

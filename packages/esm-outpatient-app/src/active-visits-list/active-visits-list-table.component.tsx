@@ -26,6 +26,7 @@ import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
 import styles from './active-visits-list-table.scss';
+import PatientSearchLaunch from '../patient-search/patient-search.component';
 
 enum tableSizes {
   DEFAULT = 0,
@@ -38,6 +39,7 @@ const ActiveVisitsListTable: React.FC = () => {
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const [tableSize, setTableSize] = useState<DataTableSize>('sm');
   const isDesktop = useLayoutType() === 'desktop';
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     if (contentSwitcherValue === tableSizes.DEFAULT) {
@@ -121,6 +123,7 @@ const ActiveVisitsListTable: React.FC = () => {
               size="small"
               kind="secondary"
               renderIcon={Add16}
+              onClick={() => setShowOverlay(true)}
               iconDescription={t('addPatientList', 'Add patient to list')}>
               {t('addPatientList', 'Add patient to list')}
             </Button>
@@ -161,6 +164,7 @@ const ActiveVisitsListTable: React.FC = () => {
               </TableContainer>
             )}
           </DataTable>
+          {showOverlay && <PatientSearchLaunch close={() => setShowOverlay(false)} />}
         </div>
       </div>
     );
@@ -180,7 +184,7 @@ const ActiveVisitsListTable: React.FC = () => {
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-          <Button kind="ghost" size="small" renderIcon={Add16}>
+          <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
             {t('addPatientToList', 'Add patient to list')}
           </Button>
         </Tile>
