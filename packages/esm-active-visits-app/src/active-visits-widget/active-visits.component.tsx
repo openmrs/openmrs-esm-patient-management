@@ -42,7 +42,7 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const { data: activeVisits, isError, isLoading, isValidating } = useActiveVisits();
+  const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
   const desktopView = layout === 'desktop';
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
@@ -126,14 +126,20 @@ const ActiveVisitsTable = () => {
     return (
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
-          <h4 className={styles.productiveHeading02}>{t('activeVisits', 'Active Visits')}</h4>
+          <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('activeVisits', 'Active Visits')}</h4>
+          </div>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
         </div>
-        <DataTable rows={paginatedActiveVisits} headers={headerData} isSortable>
+        <DataTable
+          rows={paginatedActiveVisits}
+          headers={headerData}
+          size={desktopView ? 'compact' : 'normal'}
+          useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
-            <TableContainer title="" className={styles.tableContainer}>
+            <TableContainer className={styles.tableContainer}>
               <TableToolbar>
                 <TableToolbarContent>
                   <Search
@@ -144,7 +150,7 @@ const ActiveVisitsTable = () => {
                   />
                 </TableToolbarContent>
               </TableToolbar>
-              <Table className={styles.activeVisitsTable} {...getTableProps()} size={desktopView ? 'short' : 'normal'}>
+              <Table className={styles.activeVisitsTable} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader />
@@ -170,7 +176,7 @@ const ActiveVisitsTable = () => {
                           </TableCell>
                         ))}
                       </TableExpandRow>
-                      {row.isExpanded && (
+                      {row.isExpanded ? (
                         <TableRow className={styles.expandedActiveVisitRow}>
                           <th colSpan={headers.length + 2}>
                             <ExtensionSlot
@@ -183,6 +189,8 @@ const ActiveVisitsTable = () => {
                             />
                           </th>
                         </TableRow>
+                      ) : (
+                        <div />
                       )}
                     </React.Fragment>
                   ))}
