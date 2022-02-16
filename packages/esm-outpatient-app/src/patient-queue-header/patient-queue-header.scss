@@ -22,7 +22,9 @@
 
 .locationDateContainer {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
+  margin-right: 1rem;
 }
 
 .calendar {
@@ -43,7 +45,7 @@
 .dateLabel {
   @include carbon--type-style('body-short-02');
   color: $text-02;
-  margin: 0 1rem 0 0.3rem;
+  margin: 0 0 0 0.3rem;
 }
 
 .dotMark {

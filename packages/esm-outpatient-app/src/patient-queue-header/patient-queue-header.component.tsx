@@ -3,25 +3,25 @@ import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
 import Location16 from '@carbon/icons-react/es/location/16';
 import { Dropdown } from 'carbon-components-react';
-import dayjs from 'dayjs';
-import { useSessionUser } from '@openmrs/esm-framework';
+import { formatDate, useSessionUser } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC = () => {
   const { t } = useTranslation();
+  const userSession = useSessionUser();
   const items = [
     {
       id: 'option-1',
-      text: 'NCD Care',
+      text: t('ncdCare', 'NCD Care'),
     },
     {
       id: 'option-2',
-      text: 'HIV care',
+      text: t('hivCare', 'HIV care'),
     },
     {
       id: 'option-3',
-      text: 'TB Care',
+      text: t('tbCare', 'TB Care'),
     },
   ];
 
@@ -37,9 +37,10 @@ const PatientQueueHeader: React.FC = () => {
       <div className={styles.headerRightContainer}>
         <div className={styles.locationDateContainer}>
           <Location16 />
-          <SessionLoction />
+          <span className={styles.locationLabel}>{userSession?.sessionLocation?.display}</span>
           <span className={styles.dotMark}>.</span>
-          <Calendar16 className={styles.calendar} /> <TodayDate />
+          <Calendar16 className={styles.calendar} />
+          <span className={styles.dateLabel}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
         <div className={styles.dropDownContainer}>
           <label className={styles.viewLabel}>{t('view', 'View:')} </label>
@@ -57,17 +58,3 @@ const PatientQueueHeader: React.FC = () => {
 };
 
 export default PatientQueueHeader;
-
-function TodayDate() {
-  const today = dayjs(new Date());
-  return <span className={styles.dateLabel}>{today.format('DD  MMMM  YYYY')}</span>;
-}
-
-function SessionLoction() {
-  const userSession = useSessionUser();
-  return userSession ? (
-    <span className={styles.locationLabel}>{userSession.sessionLocation.display}</span>
-  ) : (
-    <span></span>
-  );
-}
