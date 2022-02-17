@@ -1,0 +1,26 @@
+@import "../../patient-registration.scss";
+
+.contentSwitcher {
+  display: flex;
+}
+
+.leftTab {
+  border: 1px solid $ui-04;
+  border-radius: $spacing-02 0 0 $spacing-02;
+  color: $text-02;
+  background-color: $ui-02;
+
+}
+
+.rightTab {
+  border: 1px solid $ui-04;
+  border-radius: 0 $spacing-02 $spacing-02 0;
+  color: $text-02;
+  background-color: $ui-02;
+}
+
+.activeTab {
+  background-color: $color-blue-10;
+  border-color: $color-blue-60-2;
+  color: $color-blue-60-2;
+}

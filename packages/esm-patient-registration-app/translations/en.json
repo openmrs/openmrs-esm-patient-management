@@ -21,7 +21,7 @@
   "discard": "Discard",
   "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
   "discardModalHeader": "Confirm Discard Changes",
-  "dobToggleLabelText": "Date of Birth Known",
+  "dobToggleLabelText": "Date of Birth Known?",
   "edit": "Edit",
   "editIdentifierTooltip": "Edit",
   "editPatientDetails": "Edit patient details",
