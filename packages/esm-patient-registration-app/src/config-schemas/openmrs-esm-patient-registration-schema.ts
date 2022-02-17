@@ -101,7 +101,7 @@ export const esmPatientRegistrationSchema = {
       uuid: {
         // @ts-ignore
         _type: Type.PersonAttributeTypeUuid,
-        _description: 'Person attributetype uuid used to save the attribute',
+        _description: 'The uuid of the person attribute type used to save the attribute',
       },
       type: {
         _type: Type.String,
