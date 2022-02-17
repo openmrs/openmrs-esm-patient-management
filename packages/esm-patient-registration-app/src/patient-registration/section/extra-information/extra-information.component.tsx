@@ -1,12 +1,14 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from './../section.scss';
 import { useField } from 'formik';
-import { getField } from '../section-helper';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
+import { PersonAttribute } from '../../patient-registration-types';
+import { getConceptByUuid } from '../../patient-registration-utils';
+import { Select, SelectItem } from 'carbon-components-react';
 
 export interface ExtraInformationSectionProps {
   id: 'extraInformation';
@@ -17,7 +19,6 @@ export const ExtraInformationSection: React.FC<ExtraInformationSectionProps> = (
   const [field, meta] = useField('attributes');
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const { personAttributes } = useConfig();
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (!field.value && meta.touched) {
@@ -32,16 +33,53 @@ export const ExtraInformationSection: React.FC<ExtraInformationSectionProps> = (
       {personAttributes
         ?.filter((personAttribute) => personAttribute.type === 'coded')
         .map((personAttribute, ind) => (
-          <div key={ind} style={{ marginBottom: '1rem' }}>
-            <Input
-              id={`person-attribute-${personAttribute.uuid}`}
-              labelText={t(personAttribute.name)}
-              placeholder={t(personAttribute.name)}
-              name={`attributes.${camelCase(personAttribute.name)}`}
-              light
-            />
-          </div>
+          <PersonAttributeField key={ind} index={ind} personAttribute={personAttribute} />
         ))}
     </section>
   ) : null;
+};
+
+interface PersonAttributeFieldProps {
+  index: number;
+  personAttribute: PersonAttribute;
+}
+
+const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, personAttribute }) => {
+  const [answers, setAnswers] = useState(null);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (personAttribute?.concept) {
+      getConceptByUuid(personAttribute.concept, abortController).then((concept) => setAnswers(concept.data.answers));
+    } else {
+      setAnswers(null);
+    }
+
+    return () => abortController.abort();
+  }, [index, personAttribute]);
+
+  return (
+    <div style={{ marginBottom: '1rem' }}>
+      {answers && answers.length ? (
+        <Select
+          id={`person-attribute-${personAttribute.uuid}`}
+          name={`attributes.${camelCase(personAttribute.name)}`}
+          labelText={t(personAttribute.name)}
+          light>
+          {answers.map((answer) => (
+            <SelectItem value={answer.uuid} text={answer.display} />
+          ))}
+        </Select>
+      ) : (
+        <Input
+          id={`person-attribute-${personAttribute.uuid}`}
+          labelText={t(personAttribute.name)}
+          placeholder={t(personAttribute.name)}
+          name={`attributes.${camelCase(personAttribute.name)}`}
+          light
+        />
+      )}
+    </div>
+  );
 };

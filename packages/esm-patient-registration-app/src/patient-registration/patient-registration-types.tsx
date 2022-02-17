@@ -185,3 +185,10 @@ export interface AddressValidationSchemaType {
   regex: RegExp;
   regexFormat: string;
 }
+
+export interface PersonAttribute {
+  uuid: string;
+  type: string;
+  name: string;
+  concept: string;
+}

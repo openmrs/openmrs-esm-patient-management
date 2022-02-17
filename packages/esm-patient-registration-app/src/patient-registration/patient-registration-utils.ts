@@ -181,3 +181,9 @@ export async function getInitialPatientIdentifiers(patientUuid: string): Promise
     preferred: patientIdentifier.identifierType.isPrimary,
   }));
 }
+
+export async function getConceptByUuid(conceptUuid, abortController: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/concept/${conceptUuid}`, {
+    signal: abortController.signal,
+  });
+}
