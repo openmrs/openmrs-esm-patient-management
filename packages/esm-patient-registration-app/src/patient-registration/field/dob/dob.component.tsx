@@ -29,7 +29,7 @@ export const DobField: React.FC = () => {
   const onEstimatedAgeChange = (ev) => {
     const years = +ev.target.value;
 
-    if (!isNaN(years) && years < 1000 && years >= 0) {
+    if (!isNaN(years) && years < 140 && years >= 0) {
       setFieldValue('birthdate', new Date(today.getFullYear() - years, 0, 1));
     }
   };

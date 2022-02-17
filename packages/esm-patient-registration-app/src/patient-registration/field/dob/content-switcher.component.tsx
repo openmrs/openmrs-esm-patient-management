@@ -18,16 +18,16 @@ const ContentSwitcher: React.FC<ContentSwitcherProps> = ({ onToggle }) => {
       <Button
         kind="ghost"
         size="sm"
-        className={`${styles.leftTab} ${dobKnown && styles.activeTab}`}
+        className={`${styles.leftSwitch} ${dobKnown && styles.activeSwitch}`}
         onClick={() => onToggle(true)}>
-        {t('yesContentSwitchText', 'Yes')}
+        {t('dobKnownSwitchText', 'Yes')}
       </Button>
       <Button
         kind="ghost"
         size="sm"
-        className={`${styles.rightTab} ${!dobKnown && styles.activeTab}`}
+        className={`${styles.rightSwitch} ${!dobKnown && styles.activeSwitch}`}
         onClick={() => onToggle(false)}>
-        {t('noContentSwitchText', 'No')}
+        {t('dobNotKnownSwitchText', 'No')}
       </Button>
     </div>
   );

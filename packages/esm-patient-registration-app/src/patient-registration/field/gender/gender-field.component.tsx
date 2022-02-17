@@ -27,7 +27,6 @@ const GenderField: React.FC = () => {
         </RadioButtonGroup>
         {meta.touched && meta.error && (
           <>
-            <input type="hidden" data-invalid="true" />
             <div className="bx--form-requirement">{t(meta.error)}</div>
           </>
         )}
