@@ -109,7 +109,7 @@ export const esmPatientRegistrationSchema = {
       },
       concept: {
         _type: Type.ConceptUuid,
-        _description: 'Concept uuid of the attribute, if any',
+        _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
     },
   },
