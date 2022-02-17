@@ -105,7 +105,7 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _default: 'coded',
+        _default: '',
       },
       concept: {
         _type: Type.ConceptUuid,
