@@ -26,7 +26,7 @@ import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
 import styles from './active-visits-list-table.scss';
-import PatientSearchLaunch from '../patient-search/patient-search.component';
+import PatientSearch from '../patient-search/patient-search.component';
 
 enum tableSizes {
   DEFAULT = 0,
@@ -164,7 +164,7 @@ const ActiveVisitsListTable: React.FC = () => {
               </TableContainer>
             )}
           </DataTable>
-          {showOverlay && <PatientSearchLaunch close={() => setShowOverlay(false)} />}
+          {showOverlay && <PatientSearch close={() => setShowOverlay(false)} />}
         </div>
       </div>
     );
