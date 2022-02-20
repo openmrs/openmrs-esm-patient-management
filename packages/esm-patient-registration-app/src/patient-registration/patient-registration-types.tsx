@@ -147,7 +147,7 @@ export interface FormValues {
   additionalFamilyName: string;
   addNameInLocalLanguage: boolean;
   gender: string;
-  birthdate: string;
+  birthdate: Date | string;
   yearsEstimated: number;
   monthsEstimated: number;
   birthdateEstimated: boolean;

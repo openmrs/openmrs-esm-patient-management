@@ -17,11 +17,11 @@ import {
 } from 'carbon-components-react';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { useTranslation } from 'react-i18next';
-import { useToggleStarredMutation, PatientList } from '../api';
 import { useSessionUser, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
+import { updateLocalOrRemotePatientList } from '../api/api';
+import { PatientList } from '../api/types';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -54,15 +54,13 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   refetch,
   search,
 }) => {
-  const { t } = useTranslation();
   const userId = useSessionUser()?.user.uuid;
-  const toggleStarredMutation = useToggleStarredMutation();
   const isDesktop = useLayoutType() === 'desktop';
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
-      await toggleStarredMutation.refetch({ userId, patientListId, isStarred });
+      await updateLocalOrRemotePatientList(userId, patientListId, { isStarred });
       refetch();
     }
   };

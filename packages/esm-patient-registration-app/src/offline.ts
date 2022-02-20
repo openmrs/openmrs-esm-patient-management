@@ -1,6 +1,6 @@
 import {
   fetchCurrentPatient,
-  OfflinePatientArgs,
+  navigate,
   registerOfflinePatientHandler,
   setupOfflineSync,
   subscribePrecacheStaticDependencies,
@@ -17,8 +17,14 @@ import FormManager from './patient-registration/form-manager';
 import { PatientRegistration } from './patient-registration/patient-registration-types';
 
 export function setupOffline() {
-  setupOfflineSync(patientRegistration, [], syncPatientRegistration);
+  setupOfflineSync(patientRegistration, [], syncPatientRegistration, {
+    onBeginEditSyncItem(syncItem) {
+      navigate({ to: `\${openmrsSpaBase}/patient/${syncItem.content.fhirPatient.id}/edit` });
+    },
+  });
+
   subscribePrecacheStaticDependencies(precacheStaticAssets);
+
   registerOfflinePatientHandler('esm-patient-registration-app', {
     displayName: 'Patient registration',
     async onOfflinePatientAdded({ patientUuid }) {

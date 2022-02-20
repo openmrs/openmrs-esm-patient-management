@@ -12,6 +12,10 @@
   color: #525252;
 }
 
+.label01 {
+  @include carbon--type-style("label-01");
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -39,8 +43,12 @@
   justify-self: center;
 }
 
-.sexField {
+.sexField, .dobField {
   margin-bottom: $spacing-05;
+}
+
+.dobContentSwitcherLabel {
+  margin-bottom: $spacing-03;
 }
 
 .identifierLabelText {

@@ -10,9 +10,10 @@ import { SectionWrapper } from './section-wrapper.component';
 import { AddressField } from '../field/address/address-field.component';
 import { PhoneEmailField } from '../field/email/email-field.component';
 import { NameField } from '../field/name/name-field.component';
-import { GenderBirthField } from '../field/gender/gender-field.component';
+import GenderField from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
 import { ExtraInformationSection, ExtraInformationSectionProps } from './extra-information/extra-information.component';
+import { DobField } from '../field/dob/dob.component';
 
 export function getField(fieldName: string) {
   switch (fieldName) {
@@ -22,8 +23,10 @@ export function getField(fieldName: string) {
       return <PhoneEmailField />;
     case 'name':
       return <NameField />;
-    case 'gender & dob':
-      return <GenderBirthField />;
+    case 'gender':
+      return <GenderField />;
+    case 'dob':
+      return <DobField />;
     case 'id':
       return <IdField />;
     default:

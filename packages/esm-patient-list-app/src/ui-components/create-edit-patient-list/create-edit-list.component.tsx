@@ -2,9 +2,11 @@ import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
 import { Button, Dropdown, OnChangeData, TextArea, TextInput } from 'carbon-components-react';
 import Overlay from '../../overlay.component';
 import { useTranslation } from 'react-i18next';
-import { createPatientList, OpenmrsCohort, editPatientList, useCohortTypes, NewCohortData } from '../../api';
 import styles from './create-edit-patient-list.scss';
 import { useLayoutType, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { createPatientList, editPatientList } from '../../api/api-remote';
+import { useCohortTypes } from '../../api/hooks';
+import { OpenmrsCohort, NewCohortData } from '../../api/types';
 
 interface CreateEditPatientListProps {
   close: () => void;

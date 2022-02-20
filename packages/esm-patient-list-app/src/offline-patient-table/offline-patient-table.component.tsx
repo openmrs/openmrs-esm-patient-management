@@ -27,13 +27,13 @@ import {
   showModal,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useGetAllPatientsFromOfflineListQuery, useRemovePatientsFromOfflinePatientListMutation } from '../api';
 import capitalize from 'lodash-es/capitalize';
 import LastUpdatedTableCell from './last-updated-table-cell.component';
 import styles from './offline-patient-table.scss';
 import PatientNameTableCell from './patient-name-table-cell.component';
 import Renew32 from '@carbon/icons-react/es/renew/32';
-import { useAsync } from '../utils/use-async.hook';
+import { removePatientFromLocalPatientList, offlinePatientListId } from '../api/api-local';
+import { useAllPatientsFromOfflinePatientList } from '../api/hooks';
 
 export interface OfflinePatientTableProps {
   isInteractive: boolean;
@@ -45,9 +45,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
   const store = useStore(getOfflinePatientDataStore());
   const userId = useSessionUser()?.user.uuid;
   const layout = useLayoutType();
-  const { isFetching, data: patients, refetch } = useGetAllPatientsFromOfflineListQuery(userId);
-  const syncPatientsMutation = useSyncPatientsMutation();
-  const removePatientsFromOfflinePatientListMutation = useRemovePatientsFromOfflinePatientListMutation();
+  const { isValidating, data: patients, mutate } = useAllPatientsFromOfflinePatientList(userId);
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
 
   const headers = [
@@ -82,8 +80,9 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
       };
     }) ?? [];
 
-  const handleUpdateSelectedPatientsClick = (selectedRows: Array<{ id: string }>) => {
-    return syncPatientsMutation.refetch(selectedRows.map((row) => row.id));
+  const handleUpdateSelectedPatientsClick = async (selectedRows: Array<{ id: string }>) => {
+    const patientUuids = selectedRows.map((row) => row.id);
+    return await syncOfflinePatientDataOfAllGivenPatients(patientUuids);
   };
 
   const handleRemovePatientsFromOfflineListClick = async (selectedRows: Array<{ id: string }>) => {
@@ -97,16 +96,17 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
       cancelText: t('offlinePatientsTableDeleteConfirmationModalCancel', 'Cancel'),
       closeModal: () => closeModal(),
       onConfirm: async () => {
-        await removePatientsFromOfflinePatientListMutation.refetch({
-          userId,
-          patientUuids: selectedRows.map((row) => row.id),
-        });
-        refetch();
+        const patientUuids = selectedRows.map((row) => row.id);
+        for (const patientUuid of patientUuids) {
+          await removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid);
+        }
+
+        mutate();
       },
     });
   };
 
-  if (isFetching) {
+  if (isValidating) {
     return <TableSkeleton showHeader={showHeader} />;
   }
 
@@ -146,7 +146,6 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                     kind="ghost"
                     size={toolbarItemSize}
                     renderIcon={Renew32}
-                    disabled={syncPatientsMutation.isFetching}
                     onClick={() => handleUpdateSelectedPatientsClick(selectedRows)}>
                     {selectedRows.length === 1
                       ? t('offlinePatientsTableUpdatePatient', 'Update patient')
@@ -156,7 +155,6 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                     className={styles.tablePrimaryAction}
                     kind="danger"
                     size={toolbarItemSize}
-                    disabled={removePatientsFromOfflinePatientListMutation.isFetching}
                     onClick={() => handleRemovePatientsFromOfflineListClick(selectedRows)}>
                     {t('offlinePatientsTableRemoveFromOfflineList', 'Remove from list')}
                   </Button>
@@ -231,10 +229,8 @@ function filterTableRows({
   );
 }
 
-function useSyncPatientsMutation() {
-  return useAsync((patientUuids: Array<string>) => {
-    return Promise.all(patientUuids.map((patientUuid) => syncOfflinePatientData(patientUuid)));
-  });
+function syncOfflinePatientDataOfAllGivenPatients(patientUuids: Array<string>) {
+  return Promise.all(patientUuids.map((patientUuid) => syncOfflinePatientData(patientUuid)));
 }
 
 export default OfflinePatientTable;

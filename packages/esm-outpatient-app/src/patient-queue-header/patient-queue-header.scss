@@ -5,7 +5,9 @@
 .patient-header-container {
   height: $spacing-12;
   background-color: $ui-02;
-  border: 1px solid $ui-03; 
+  border: 1px solid $ui-03;
+  display: flex;
+  justify-content: space-between;
 }
 
 .header-left {
@@ -14,9 +16,42 @@
   align-items: center;
 }
 
+.headerRightContainer {
+  padding: 1rem 0 0 0;
+}
+
+.locationDateContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.calendar {
+  margin-left: 0
+}
+
 .bodyShort02 {
   @include carbon--type-style('body-short-02');
   color: $text-02;
+}
+
+.locationLabel {
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  margin-left: 0.3rem
+}
+
+.dateLabel {
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  margin: 0 0 0 0.3rem;
+}
+
+.dotMark {
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  padding: 0 0.8rem 0.4rem 0.8rem;
 }
 
 .productiveHeading04 {
@@ -29,3 +64,21 @@
     margin-bottom: 0.25rem;
   }
 }
+
+.viewLabel {
+  @include carbon--type-style("label-01");
+  color: $text-02;
+}
+
+.dropDownContainer {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 11rem;
+  margin-top: 0.25rem;
+}
+
+.dropDownContainer :global(.bx--dropdown__wrapper--inline) {
+  align-items: center;
+  display: flex
+}
+
