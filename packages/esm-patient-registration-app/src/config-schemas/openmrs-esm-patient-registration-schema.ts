@@ -101,15 +101,15 @@ export const esmPatientRegistrationSchema = {
       uuid: {
         // @ts-ignore
         _type: Type.PersonAttributeTypeUuid,
-        _description: 'Person attributetype uuid used to save the attribute',
+        _description: 'The uuid of the person attribute type used to save the attribute',
       },
       type: {
         _type: Type.String,
-        _default: 'coded',
+        _default: '',
       },
       concept: {
         _type: Type.ConceptUuid,
-        _description: 'Concept uuid of the attribute, if any',
+        _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
     },
   },
