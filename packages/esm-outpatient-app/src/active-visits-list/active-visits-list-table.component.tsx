@@ -128,10 +128,15 @@ const ActiveVisitsListTable: React.FC = () => {
               {t('addPatientList', 'Add patient to list')}
             </Button>
           </div>
-          <DataTable rows={tableRows} headers={headerData} isSortable overflowMenuOnHover={isDesktop ? true : false}>
+          <DataTable
+            rows={tableRows}
+            headers={headerData}
+            size={tableSize}
+            overflowMenuOnHover={isDesktop ? true : false}
+            useZebraStyles>
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer className={styles.tableContainer}>
-                <Table {...getTableProps()} className={styles.activeVisitsTable} size={tableSize}>
+                <Table {...getTableProps()} className={styles.activeVisitsTable}>
                   <TableHead>
                     <TableRow>
                       <TableExpandHeader />
@@ -142,8 +147,8 @@ const ActiveVisitsListTable: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row, index) => (
-                      <React.Fragment key={index}>
+                    {rows.map((row, i) => (
+                      <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
@@ -156,7 +161,9 @@ const ActiveVisitsListTable: React.FC = () => {
                           <TableExpandedRow
                             className={styles.expandedActiveVisitRow}
                             colSpan={headers.length + 2}></TableExpandedRow>
-                        ) : null}
+                        ) : (
+                          <div />
+                        )}
                       </React.Fragment>
                     ))}
                   </TableBody>
