@@ -11,6 +11,7 @@ import {
   PatientIdentifier,
   PatientIdentifierValue,
   PatientRegistration,
+  PersonAttribute,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -227,7 +228,7 @@ export default class FormManager {
 
   static getPatientToCreate(
     values: FormValues,
-    personAttributes: any,
+    personAttributes: Array<PersonAttribute>,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
@@ -285,14 +286,14 @@ export default class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues, personAttributes?: any) {
+  static getPatientAttributes(values: FormValues, personAttributes?: Array<PersonAttribute>) {
     const attributes: Array<AttributeValue> = [];
 
     if (personAttributes) {
       for (const attr of personAttributes) {
         attributes.push({
           attributeType: attr.uuid,
-          value: values.attributes[camelCase(attr.name)],
+          value: values.attributes[attr.uuid],
         });
       }
     }

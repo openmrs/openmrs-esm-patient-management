@@ -1,7 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './../section.scss';
-import { useField } from 'formik';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
@@ -14,18 +12,8 @@ export interface ExtraInformationSectionProps {
   fields: Array<any>;
 }
 
-export const ExtraInformationSection: React.FC<ExtraInformationSectionProps> = ({ fields }) => {
-  const [field, meta] = useField('attributes');
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+export const ExtraInformationSection: React.FC<ExtraInformationSectionProps> = () => {
   const { personAttributes } = useConfig();
-
-  useEffect(() => {
-    if (!field.value && meta.touched) {
-      setFieldValue('additionalGivenName', '');
-      setFieldValue('additionalMiddleName', '');
-      setFieldValue('additionalFamilyName', '');
-    }
-  }, [field.value, meta.touched]);
 
   return personAttributes?.length ? (
     <section className={styles.formSection} aria-label="Extra Information Section">
@@ -67,7 +55,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, pers
           labelText={t(personAttribute.name)}
           light>
           {answers.map((answer) => (
-            <SelectItem value={answer.uuid} text={answer.display} />
+            <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
           ))}
         </Select>
       ) : (
