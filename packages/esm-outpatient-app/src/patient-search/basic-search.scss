@@ -1,0 +1,89 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.searchboxContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-08;
+}
+
+.searchInput {
+  input:focus {
+    outline: none;
+    border: $spacing-01 solid var(--omrs-color-brand-orange);
+  }
+}
+
+.tileContainer {
+  :global(.omrs-breakpoint-gt-tablet) & {
+    margin: 0 1.5rem 0;
+  }
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 50%;
+    margin: auto;
+  }
+}
+
+.tile {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0 1.5rem;
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.helperText {
+  margin-top: 1.25rem;
+  color: $text-02;
+
+  .primaryText {
+    @include carbon--type-style('productive-heading-01');
+  }
+
+  .secondaryText {
+    margin-top: 0.25rem;
+    @include carbon--type-style('body-long-01');
+  }
+}
+
+.separator {
+  margin: 3rem auto 0;
+
+  hr {
+    width: 25%;
+    @include carbon--type-style('productive-heading-03');
+    color: $text-02;
+    line-height: 1;
+    border: 0;
+    border-top: 1px solid $text-03;
+    text-align: center;
+    
+    &::after {
+      content: 'or';
+      display: inline-block;
+      position: relative;
+      top: -0.7em;
+      padding: 0 1rem;
+      background: $ui-01;
+    }
+  }
+}
+
+.buttonContainer {
+  margin-top: $spacing-06;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultsContainer {
+  height: 100vh;
+}
+
+.lightBackground {
+  @extend .resultsContainer;
+  background-color: white;
+}

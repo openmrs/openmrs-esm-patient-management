@@ -1,28 +1,30 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overlay from '../overlay.component';
-import PatientAdvancedSearch from './patient-advanced-search.component';
-import { SearchMode } from '../types';
-import PatientSimpleSearch from './patient-simple-search.component';
+import BasicSearch from './basic-search.component';
+import AdvancedSearch from './advanced-search.component';
+import { SearchTypes } from '../types';
 
 interface PatientSearchProps {
-  close: () => void;
+  closePanel: () => void;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ close }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
   const { t } = useTranslation();
-  const [searchMode, setSearchMode] = useState<SearchMode>(SearchMode.simple);
-  const toggleSearchMode = (searchMode: SearchMode) => {
-    setSearchMode(searchMode);
+  const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
+
+  const toggleSearchType = (searchType: SearchTypes) => {
+    setSearchType(searchType);
   };
+
   return (
     <>
-      <Overlay header={t('addPatientToListHeader', 'Add patient to list')} close={close}>
+      <Overlay header={t('addPatientToList', 'Add patient to list')} closePanel={closePanel}>
         <div className="omrs-main-content">
-          {searchMode === SearchMode.simple ? (
-            <PatientSimpleSearch handleAdvanceSearch={toggleSearchMode} />
+          {searchType === SearchTypes.BASIC ? (
+            <BasicSearch toggleSearchType={toggleSearchType} />
           ) : (
-            <PatientAdvancedSearch handleSimpleSearch={toggleSearchMode} />
+            <AdvancedSearch toggleSearchType={toggleSearchType} />
           )}
         </div>
       </Overlay>
