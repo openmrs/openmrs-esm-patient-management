@@ -125,6 +125,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               className={styles.patientSearchInput}
               placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
               labelText=""
+              closeButtonLabelText={t('clearSearch', 'Clear')}
               onKeyUp={handleEnterKeyPressed}
               onChange={(event) => handleChange(event.target.value)}
               autoFocus={true}

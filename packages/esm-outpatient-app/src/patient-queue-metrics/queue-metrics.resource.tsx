@@ -59,6 +59,7 @@ export function useActiveVisits() {
     {
       name: 'John Test Otieno',
       priority: 'Emergency',
+      notes: 'Patient is convulsing and unconscious',
       status: 'Triage',
       waitTime: '20',
       id: '1',

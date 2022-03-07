@@ -20,6 +20,7 @@ import {
   TableRow,
   Tag,
   Tile,
+  TooltipDefinition,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
@@ -91,9 +92,15 @@ const ActiveVisitsListTable: React.FC = () => {
       ...visit,
       priority: {
         content: (
-          <Tag className={visit.priority === 'Priority' && styles.priorityTag} type={getTagType(visit?.priority)}>
-            {visit.priority}
-          </Tag>
+          <TooltipDefinition
+            align="start"
+            direction="bottom"
+            className={styles.priorityTooltip}
+            tooltipText={<div className={styles.priorityTooltip}>{visit?.notes}</div>}>
+            <Tag className={visit.priority === 'Priority' && styles.priorityTag} type={getTagType(visit?.priority)}>
+              {visit.priority}
+            </Tag>
+          </TooltipDefinition>
         ),
       },
       name: {

@@ -144,3 +144,12 @@
   }
 }
 
+.priorityTooltip {
+  @include carbon--type-style("body-short-02");
+  padding: 0.25rem; 
+}
+
+:global(.bx--tooltip--definition .bx--tooltip__trigger){
+  border-bottom: none;
+}
+
