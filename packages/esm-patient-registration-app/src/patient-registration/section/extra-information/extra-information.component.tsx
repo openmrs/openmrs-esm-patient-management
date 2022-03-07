@@ -5,7 +5,6 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
-import camelCase from 'lodash-es/camelCase';
 import { PersonAttribute } from '../../patient-registration-types';
 import { getConceptByUuid } from '../../patient-registration-utils';
 import { Select, SelectItem } from 'carbon-components-react';
@@ -51,7 +50,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, pers
   useEffect(() => {
     const abortController = new AbortController();
     if (personAttribute?.concept) {
-      getConceptByUuid(personAttribute.concept, abortController).then((concept) => setAnswers(concept.data.answers));
+      getConceptByUuid(personAttribute.concept, abortController).then((res) => setAnswers(res.data.answers));
     } else {
       setAnswers(null);
     }
@@ -60,11 +59,11 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, pers
   }, [index, personAttribute]);
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
+    <div className={styles.attributeField}>
       {answers && answers.length ? (
         <Select
           id={`person-attribute-${personAttribute.uuid}`}
-          name={`attributes.${camelCase(personAttribute.name)}`}
+          name={`attributes.${personAttribute.uuid}`}
           labelText={t(personAttribute.name)}
           light>
           {answers.map((answer) => (
@@ -76,7 +75,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, pers
           id={`person-attribute-${personAttribute.uuid}`}
           labelText={t(personAttribute.name)}
           placeholder={t(personAttribute.name)}
-          name={`attributes.${camelCase(personAttribute.name)}`}
+          name={`attributes.${personAttribute.uuid}`}
           light
         />
       )}
