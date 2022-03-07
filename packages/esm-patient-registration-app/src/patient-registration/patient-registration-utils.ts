@@ -187,3 +187,7 @@ export async function getConceptByUuid(conceptUuid, abortController: AbortContro
     signal: abortController.signal,
   });
 }
+
+export async function getInitialPatientAttributes(personUuid) {
+  return openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute`);
+}

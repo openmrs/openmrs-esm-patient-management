@@ -6,6 +6,7 @@ import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-r
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
+  getInitialPatientAttributes,
   getInitialPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
@@ -81,6 +82,18 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
           identifiers,
         })),
       );
+      getInitialPatientAttributes(patientUuid).then((res) => {
+        if (res?.data?.results) {
+          let attributes = {};
+          res.data.results.forEach((attribute) => {
+            attributes[attribute.attributeType.uuid] = attribute.value;
+          });
+          setInitialFormValues((initialFormValues) => ({
+            ...initialFormValues,
+            attributes,
+          }));
+        }
+      });
     }
   }, [patientUuid]);
 
