@@ -97,7 +97,7 @@ const ActiveVisitsListTable: React.FC = () => {
             direction="bottom"
             className={styles.priorityTooltip}
             tooltipText={<div className={styles.priorityTooltip}>{visit?.notes}</div>}>
-            <Tag className={visit.priority === 'Priority' && styles.priorityTag} type={getTagType(visit?.priority)}>
+            <Tag className={visit.priority === 'Priority' ? styles.priorityTag : ''} type={getTagType(visit?.priority)}>
               {visit.priority}
             </Tag>
           </TooltipDefinition>
@@ -178,7 +178,7 @@ const ActiveVisitsListTable: React.FC = () => {
               </TableContainer>
             )}
           </DataTable>
-          {showOverlay && <PatientSearch close={() => setShowOverlay(false)} />}
+          {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
         </div>
       </div>
     );

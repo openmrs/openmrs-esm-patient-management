@@ -1,4 +1,4 @@
-export enum SearchMode {
-  simple,
-  advance,
+export enum SearchTypes {
+  BASIC = 'basic',
+  ADVANCED = 'advanced',
 }
