@@ -4,7 +4,6 @@ $inverse-02:#393939;
 
 .patientSearchIconWrapper {
   display: flex;
-  width: 50vw;
   justify-content: flex-end;
   align-items: center;
 }
@@ -23,6 +22,7 @@ $inverse-02:#393939;
   border: $spacing-01 solid var(--omrs-color-brand-orange);
   height: calc($spacing-08 - 0.25rem);
   margin-right: $spacing-01;
+  width: 50vw;
 }
 
 // tablet mode styling

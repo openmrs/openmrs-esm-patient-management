@@ -5,11 +5,11 @@ import styles from './overlay.scss';
 import { useLayoutType } from '@openmrs/esm-framework';
 
 interface OverlayProps {
-  close: () => void;
+  closePanel: () => void;
   header: string;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, header }) => {
+const Overlay: React.FC<OverlayProps> = ({ closePanel, children, header }) => {
   const isDesktop = useLayoutType() === 'desktop';
 
   return (
@@ -17,14 +17,14 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header }) => {
       {isDesktop ? (
         <div className={styles.desktopHeader}>
           <div className={styles.headerContent}>{header}</div>
-          <Button className={styles.closeButton} onClick={close} kind="ghost" hasIconOnly>
+          <Button className={styles.closePanelButton} onClick={closePanel} kind="ghost" hasIconOnly>
             <Close16 />
           </Button>
         </div>
       ) : (
         <Header className={styles.tabletOverlayHeader}>
-          <Button onClick={close} hasIconOnly>
-            <ArrowLeft16 onClick={close} />
+          <Button onClick={closePanel} hasIconOnly>
+            <ArrowLeft16 onClick={closePanel} />
           </Button>
           <div className={styles.headerContent}>{header}</div>
         </Header>
