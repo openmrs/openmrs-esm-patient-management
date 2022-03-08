@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   ContentSwitcher,
@@ -24,21 +25,20 @@ import {
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { useActiveVisits } from '../patient-queue-metrics/queue-metrics.resource';
-import styles from './active-visits-list-table.scss';
 import PatientSearch from '../patient-search/patient-search.component';
+import { useActiveVisits } from './active-visits-table.resource';
+import styles from './active-visits-table.scss';
 
 enum tableSizes {
   DEFAULT = 0,
   LARGE = 1,
 }
 
-const ActiveVisitsListTable: React.FC = () => {
+const ActiveVisitsTable: React.FC = () => {
   const { t } = useTranslation();
-  const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
+  const { activeVisits, isLoading } = useActiveVisits();
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
-  const [tableSize, setTableSize] = useState<DataTableSize>('sm');
+  const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const isDesktop = useLayoutType() === 'desktop';
   const [showOverlay, setShowOverlay] = useState(false);
 
@@ -90,22 +90,37 @@ const ActiveVisitsListTable: React.FC = () => {
   const tableRows = useMemo(() => {
     return activeVisits?.map((visit) => ({
       ...visit,
+      id: visit.uuid,
       priority: {
         content: (
-          <TooltipDefinition
-            align="start"
-            direction="bottom"
-            className={styles.priorityTooltip}
-            tooltipText={<div className={styles.priorityTooltip}>{visit?.notes}</div>}>
-            <Tag className={visit.priority === 'Priority' ? styles.priorityTag : ''} type={getTagType(visit?.priority)}>
-              {visit.priority}
-            </Tag>
-          </TooltipDefinition>
+          <>
+            {visit?.priorityComment ? (
+              <TooltipDefinition
+                className={styles.tooltip}
+                align="start"
+                direction="bottom"
+                tooltipText={visit.priorityComment}>
+                <Tag
+                  className={visit.priority === 'Priority' ? styles.priorityTag : ''}
+                  type={getTagType(visit?.priority)}>
+                  {visit.priority}
+                </Tag>
+              </TooltipDefinition>
+            ) : (
+              <Tag
+                className={visit.priority === 'Priority' ? styles.priorityTag : ''}
+                type={getTagType(visit?.priority)}>
+                {visit.priority}
+              </Tag>
+            )}
+          </>
         ),
       },
       name: {
         // TODO: Interpolate patient uuid into URL
-        content: <ConfigurableLink to={`\${openmrsSpaBase}/patient/${visit.id}/chart`}>{visit.name}</ConfigurableLink>,
+        content: (
+          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${visit.uuid}/chart`}>{visit.name}</ConfigurableLink>
+        ),
       },
     }));
   }, [activeVisits]);
@@ -113,11 +128,12 @@ const ActiveVisitsListTable: React.FC = () => {
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
+
   if (activeVisits?.length) {
     return (
       <div className={styles.container} data-floating-menu-container>
-        <div className={styles.activeVisitsListContainer}>
-          <div className={styles.activeVisitsListHeaderContainer}>
+        <div className={styles.activeVisitsTableContainer}>
+          <div className={styles.activeVisitsTableHeaderContainer}>
             <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
             <div className={styles.switcherContainer}>
               <label className={styles.contentSwitcherLabel}>{t('view', 'View:')} </label>
@@ -183,9 +199,10 @@ const ActiveVisitsListTable: React.FC = () => {
       </div>
     );
   }
+
   return (
-    <div className={styles.activeVisitsListContainer}>
-      <div className={styles.activeVisitsListHeaderContainer}>
+    <div className={styles.activeVisitsTableContainer}>
+      <div className={styles.activeVisitsTableHeaderContainer}>
         <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
         <Button
           size="small"
@@ -207,7 +224,7 @@ const ActiveVisitsListTable: React.FC = () => {
   );
 };
 
-export default ActiveVisitsListTable;
+export default ActiveVisitsTable;
 
 function ActionsMenu() {
   const { t } = useTranslation();

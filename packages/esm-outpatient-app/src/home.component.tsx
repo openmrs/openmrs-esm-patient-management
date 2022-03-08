@@ -1,5 +1,5 @@
 import React from 'react';
-import ActiveVisitsListTable from './active-visits-list/active-visits-list-table.component';
+import ActiveVisitsTable from './active-visits/active-visits-table.component';
 import PatientQueueHeader from './patient-queue-header/patient-queue-header.component';
 import ClinicMetrics from './patient-queue-metrics/clinic-metrics.component';
 
@@ -10,7 +10,7 @@ const Home: React.FC<HomeProps> = () => {
     <div>
       <PatientQueueHeader />
       <ClinicMetrics />
-      <ActiveVisitsListTable />
+      <ActiveVisitsTable />
     </div>
   );
 };
