@@ -192,3 +192,10 @@ export interface PersonAttribute {
   name: string;
   concept: string;
 }
+
+export interface PersonAttributeTypeResponse {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+}
