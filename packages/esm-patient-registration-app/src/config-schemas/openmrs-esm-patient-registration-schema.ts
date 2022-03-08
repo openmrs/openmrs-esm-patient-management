@@ -31,7 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
-      extraInformation: { name: 'Extra Information' },
+      extraInformation: { name: 'Additional Information' },
     },
   },
   fieldDefinitions: {
@@ -86,7 +86,6 @@ export const esmPatientRegistrationSchema = {
     _type: Type.Array,
     _default: [
       {
-        name: 'Birthplace',
         uuid: '8d8718c2-c2cc-11de-8d13-0010c6dffd0f',
         type: 'coded',
         concept: null,
@@ -94,10 +93,6 @@ export const esmPatientRegistrationSchema = {
     ],
     _elements: {
       _type: Type.Object,
-      name: {
-        _type: Type.String,
-        _description: 'Name of the person attribute type',
-      },
       uuid: {
         _type: Type.PersonAttributeTypeUuid,
         _description: 'The uuid of the person attribute type used to save the attribute',

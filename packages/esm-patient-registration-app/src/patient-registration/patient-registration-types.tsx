@@ -199,3 +199,14 @@ export interface PersonAttributeTypeResponse {
   name: string;
   description: string;
 }
+
+export interface ConceptResponse {
+  uuid: string;
+  display: string;
+  answers: Array<ConceptAnswers>;
+}
+
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
+}

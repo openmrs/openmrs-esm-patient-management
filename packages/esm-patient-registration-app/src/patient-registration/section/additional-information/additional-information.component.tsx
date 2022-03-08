@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from './../section.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { PersonAttribute } from '../../patient-registration-types';
-import { getConceptByUuid } from '../../patient-registration-utils';
 import { Select, SelectItem } from 'carbon-components-react';
-import { usePersonAttributeType } from './extra-information.resource';
-export interface ExtraInformationSectionProps {
+import { useConceptAnswers, usePersonAttributeType } from './additional-information.resource';
+
+export interface AdditionalInformationSectionProps {
   id: 'extraInformation';
   fields: Array<any>;
 }
 
-export const ExtraInformationSection: React.FC<ExtraInformationSectionProps> = () => {
+export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps> = () => {
   const { personAttributes } = useConfig();
 
   return personAttributes?.length ? (
-    <section className={styles.formSection} aria-label="Extra Information Section">
+    <section className={styles.formSection} aria-label="Additional Information Section">
       {personAttributes
         ?.filter((personAttribute) => personAttribute.type === 'coded')
         .map((personAttribute: PersonAttribute, ind) => (
@@ -38,30 +37,18 @@ interface PersonAttributeFieldProps {
 }
 
 const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, personAttributeTypeUuid, conceptUuid }) => {
-  const { data: personAttributeType, isLoading } = usePersonAttributeType(personAttributeTypeUuid);
-  const [answers, setAnswers] = useState(null);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    if (conceptUuid) {
-      getConceptByUuid(conceptUuid, abortController).then((res) => setAnswers(res.data.answers));
-    } else {
-      setAnswers(null);
-    }
-
-    return () => abortController.abort();
-  }, [index, conceptUuid]);
+  const [personAttributeType, isLoading] = usePersonAttributeType(personAttributeTypeUuid);
+  const [conceptAnswers, isLoadingConceptAnswers] = useConceptAnswers(conceptUuid);
 
   return !isLoading ? (
     <div className={styles.attributeField}>
-      {answers && answers.length ? (
+      {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeTypeUuid}`}
           name={`attributes.${personAttributeTypeUuid}`}
           labelText={personAttributeType?.name}
           light>
-          {answers.map((answer) => (
+          {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
           ))}
         </Select>
