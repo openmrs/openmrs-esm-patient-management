@@ -84,6 +84,7 @@ export const esmPatientRegistrationSchema = {
   },
   personAttributeTypes: {
     _type: Type.Array,
+    _default: [],
     _elements: {
       _type: Type.Object,
       uuid: {
