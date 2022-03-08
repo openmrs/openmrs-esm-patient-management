@@ -182,12 +182,6 @@ export async function getInitialPatientIdentifiers(patientUuid: string): Promise
   }));
 }
 
-export async function getConceptByUuid(conceptUuid, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/concept/${conceptUuid}`, {
-    signal: abortController.signal,
-  });
-}
-
 export async function getInitialPatientAttributes(personUuid) {
   return openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute`);
 }

@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
@@ -11,7 +10,7 @@ import {
   PatientIdentifier,
   PatientIdentifierValue,
   PatientRegistration,
-  PersonAttribute,
+  PersonAttributeTypeConfig,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -26,7 +25,6 @@ import {
   updatePatientIdentifier,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
-import camelCase from 'lodash-es/camelCase';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -37,7 +35,7 @@ export type SavePatientForm = (
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
-  personAttributes: any,
+  personAttributeTypes: PersonAttributeTypeConfig,
   abortController?: AbortController,
 ) => Promise<string | null>;
 
@@ -51,11 +49,11 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributes: any,
+    personAttributeTypes: Array<PersonAttributeTypeConfig>,
   ): Promise<null> {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(values, personAttributes, patientUuidMap, initialAddressFieldValues, []),
+        FormManager.getPatientToCreate(values, personAttributeTypes, patientUuidMap, initialAddressFieldValues, []),
       ),
       _patientRegistrationData: {
         isNewPatient,
@@ -66,7 +64,7 @@ export default class FormManager {
         capturePhotoProps,
         patientPhotoConceptUuid,
         currentLocation,
-        personAttributes,
+        personAttributeTypes,
       },
     };
 
@@ -89,7 +87,7 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributes: any,
+    personAttributeTypes: Array<PersonAttributeTypeConfig>,
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
@@ -102,7 +100,7 @@ export default class FormManager {
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
-      personAttributes,
+      personAttributeTypes,
       patientUuidMap,
       initialAddressFieldValues,
       patientIdentifiers,
@@ -228,7 +226,7 @@ export default class FormManager {
 
   static getPatientToCreate(
     values: FormValues,
-    personAttributes: Array<PersonAttribute>,
+    personAttributeTypes: Array<PersonAttributeTypeConfig>,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
@@ -254,7 +252,7 @@ export default class FormManager {
         gender: values.gender.charAt(0),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(values, personAttributes),
+        attributes: FormManager.getPatientAttributes(values, personAttributeTypes),
         addresses: [address],
         ...FormManager.getPatientDeathInfo(values),
       },
@@ -286,11 +284,11 @@ export default class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues, personAttributes?: Array<PersonAttribute>) {
+  static getPatientAttributes(values: FormValues, personAttributeTypes?: Array<PersonAttributeTypeConfig>) {
     const attributes: Array<AttributeValue> = [];
 
-    if (personAttributes) {
-      for (const attr of personAttributes) {
+    if (personAttributeTypes) {
+      for (const attr of personAttributeTypes) {
         attributes.push({
           attributeType: attr.uuid,
           value: values.attributes[attr.uuid],

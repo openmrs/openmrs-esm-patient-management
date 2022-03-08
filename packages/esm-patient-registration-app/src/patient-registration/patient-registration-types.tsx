@@ -89,7 +89,7 @@ export interface PatientRegistration {
     capturePhotoProps: CapturePhotoProps;
     patientPhotoConceptUuid: string;
     currentLocation: string;
-    personAttributes: any;
+    personAttributeTypes: Array<PersonAttributeTypeConfig>;
   };
 }
 
@@ -164,7 +164,7 @@ export interface FormValues {
   relationships: Array<RelationshipValue>;
   identifiers: Array<PatientIdentifierValue>;
   attributes?: {
-    [attributeUuid: string]: string;
+    [attributeTypeUuid: string]: string;
   };
 }
 
@@ -186,7 +186,7 @@ export interface AddressValidationSchemaType {
   regexFormat: string;
 }
 
-export interface PersonAttribute {
+export interface PersonAttributeTypeConfig {
   uuid: string;
   type: string;
   name: string;

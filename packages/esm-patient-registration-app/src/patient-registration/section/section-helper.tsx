@@ -47,7 +47,7 @@ function renderSection(sectionProps: SectionProps) {
       return <DeathInfoSection {...sectionProps} />;
     case 'relationships':
       return <RelationshipsSection {...sectionProps} />;
-    case 'extraInformation':
+    case 'additionalInformation':
       return <AdditionalInformationSection {...sectionProps} />;
     default:
       return <div>Unknown Section {sectionProps.id}</div>;

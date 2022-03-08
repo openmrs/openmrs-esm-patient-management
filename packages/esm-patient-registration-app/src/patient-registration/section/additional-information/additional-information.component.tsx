@@ -2,28 +2,27 @@ import React from 'react';
 import styles from './../section.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { PersonAttribute } from '../../patient-registration-types';
+import { PersonAttributeTypeConfig } from '../../patient-registration-types';
 import { Select, SelectItem } from 'carbon-components-react';
 import { useConceptAnswers, usePersonAttributeType } from './additional-information.resource';
 
 export interface AdditionalInformationSectionProps {
-  id: 'extraInformation';
+  id: 'additionalInformation';
   fields: Array<any>;
 }
 
 export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps> = () => {
-  const { personAttributes } = useConfig();
+  const { personAttributeTypes } = useConfig();
 
-  return personAttributes?.length ? (
+  return personAttributeTypes?.length ? (
     <section className={styles.formSection} aria-label="Additional Information Section">
-      {personAttributes
-        ?.filter((personAttribute) => personAttribute.type === 'coded')
-        .map((personAttribute: PersonAttribute, ind) => (
+      {personAttributeTypes
+        ?.filter((personAttributeType) => personAttributeType.type === 'coded')
+        .map((personAttributeType: PersonAttributeTypeConfig, ind) => (
           <PersonAttributeField
             key={ind}
-            index={ind}
-            personAttributeTypeUuid={personAttribute.uuid}
-            conceptUuid={personAttribute.concept}
+            personAttributeTypeUuid={personAttributeType.uuid}
+            conceptUuid={personAttributeType.concept}
           />
         ))}
     </section>
@@ -31,12 +30,11 @@ export const AdditionalInformationSection: React.FC<AdditionalInformationSection
 };
 
 interface PersonAttributeFieldProps {
-  index: number;
   personAttributeTypeUuid: string;
   conceptUuid: string;
 }
 
-const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ index, personAttributeTypeUuid, conceptUuid }) => {
+const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttributeTypeUuid, conceptUuid }) => {
   const [personAttributeType, isLoading] = usePersonAttributeType(personAttributeTypeUuid);
   const [conceptAnswers, isLoadingConceptAnswers] = useConceptAnswers(conceptUuid);
 

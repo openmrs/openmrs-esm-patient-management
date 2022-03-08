@@ -3,7 +3,7 @@ const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships', 'extraInformation'],
+    _default: ['demographics', 'contact', 'relationships', 'additionalInformation'],
     _description: "An array of strings which are the keys from 'sectionDefinitions'",
     _elements: {
       _type: Type.String,
@@ -31,7 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
-      extraInformation: { name: 'Additional Information' },
+      additionalInformation: { name: 'Additional Information' },
     },
   },
   fieldDefinitions: {
@@ -82,15 +82,8 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  personAttributes: {
+  personAttributeTypes: {
     _type: Type.Array,
-    _default: [
-      {
-        uuid: '8d8718c2-c2cc-11de-8d13-0010c6dffd0f',
-        type: 'coded',
-        concept: null,
-      },
-    ],
     _elements: {
       _type: Type.Object,
       uuid: {
@@ -99,7 +92,7 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _default: '',
+        _default: 'coded',
       },
       concept: {
         _type: Type.ConceptUuid,
