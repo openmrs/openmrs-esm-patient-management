@@ -7,6 +7,7 @@ export interface ActiveVisit {
   name: string;
   patientUuid: string;
   priority: string;
+  priorityComment?: string;
   status: string;
   uuid: string;
   visitType: string;
@@ -37,6 +38,7 @@ export function useActiveVisits() {
     name: visit?.patient?.person?.display,
     patientUuid: visit?.patient?.uuid,
     priority: '',
+    priorityComment: '',
     status: '',
     uuid: visit.uuid,
     visitType: visit?.visitType?.display,
@@ -49,7 +51,7 @@ export function useActiveVisits() {
     {
       name: 'John Test Otieno',
       priority: 'Emergency',
-      note: 'Patient is convulsing and unconscious',
+      priorityComment: 'Patient is convulsing and unconscious',
       status: 'Attending triage',
       waitTime: '10',
       uuid: '1',
