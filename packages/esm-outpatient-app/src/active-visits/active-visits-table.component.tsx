@@ -24,9 +24,11 @@ import {
   TooltipDefinition,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
+import InProgress16 from '@carbon/icons-react/es/in-progress/16';
+import Group16 from '@carbon/icons-react/es/group/16';
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import PatientSearch from '../patient-search/patient-search.component';
-import { useActiveVisits } from './active-visits-table.resource';
+import { useVisitQueueEntries } from './active-visits-table.resource';
 import styles from './active-visits-table.scss';
 
 enum tableSizes {
@@ -34,9 +36,17 @@ enum tableSizes {
   LARGE = 1,
 }
 
+enum queueStatus {
+  CLINICAL_CONSULTATION = 'Clinical consultation',
+  FINISHED_SERVICE = 'Finished Service',
+  IN_SERVICE = 'In Service',
+  TRIAGE = 'Triage',
+  WAITING = 'Waiting',
+}
+
 const ActiveVisitsTable: React.FC = () => {
   const { t } = useTranslation();
-  const { activeVisits, isLoading } = useActiveVisits();
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const isDesktop = useLayoutType() === 'desktop';
@@ -80,61 +90,69 @@ const ActiveVisitsTable: React.FC = () => {
     switch (priority) {
       case 'Emergency':
         return 'red';
-      case 'Not urgent':
+      case 'Not Urgent':
         return 'green';
+      case 'Urgent':
+        return 'magenta';
       default:
         return 'gray';
     }
   };
 
   const tableRows = useMemo(() => {
-    return activeVisits?.map((visit) => ({
-      ...visit,
-      id: visit.uuid,
+    return visitQueueEntries?.map((entry) => ({
+      ...entry,
+      name: {
+        content: (
+          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
+        ),
+      },
       priority: {
         content: (
           <>
-            {visit?.priorityComment ? (
+            {entry?.priorityComment ? (
               <TooltipDefinition
                 className={styles.tooltip}
                 align="start"
                 direction="bottom"
-                tooltipText={visit.priorityComment}>
+                tooltipText={entry.priorityComment}>
                 <Tag
-                  className={visit.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                  type={getTagType(visit?.priority)}>
-                  {visit.priority}
+                  className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                  type={getTagType(entry?.priority)}>
+                  {entry.priority}
                 </Tag>
               </TooltipDefinition>
             ) : (
               <Tag
-                className={visit.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                type={getTagType(visit?.priority)}>
-                {visit.priority}
+                className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                type={getTagType(entry?.priority)}>
+                {entry.priority}
               </Tag>
             )}
           </>
         ),
       },
-      name: {
-        // TODO: Interpolate patient uuid into URL
+      status: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${visit.uuid}/chart`}>{visit.name}</ConfigurableLink>
+          <span className={styles.statusContainer}>
+            <StatusIcon status={entry.status} />
+            <span>{entry.status}</span>
+          </span>
         ),
       },
     }));
-  }, [activeVisits]);
+  }, [visitQueueEntries]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (activeVisits?.length) {
+  if (visitQueueEntries?.length) {
     return (
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.activeVisitsTableContainer}>
           <div className={styles.activeVisitsTableHeaderContainer}>
-            <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
+            <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
             <div className={styles.switcherContainer}>
               <label className={styles.contentSwitcherLabel}>{t('view', 'View:')} </label>
               <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index)}>
@@ -152,10 +170,10 @@ const ActiveVisitsTable: React.FC = () => {
             </Button>
           </div>
           <DataTable
-            rows={tableRows}
             headers={headerData}
-            size={tableSize}
             overflowMenuOnHover={isDesktop ? true : false}
+            rows={tableRows}
+            size={tableSize}
             useZebraStyles>
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer className={styles.tableContainer}>
@@ -170,7 +188,7 @@ const ActiveVisitsTable: React.FC = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row, i) => (
+                    {rows.map((row) => (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
@@ -203,10 +221,10 @@ const ActiveVisitsTable: React.FC = () => {
       <div className={styles.activeVisitsTableHeaderContainer}>
         <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
         <Button
-          size="small"
+          iconDescription={t('addPatientToList', 'Add patient to list')}
           kind="secondary"
           renderIcon={Add16}
-          iconDescription={t('addPatientToList', 'Add patient to list')}>
+          size="small">
           {t('addPatientList', 'Add patient to list')}
         </Button>
       </div>
@@ -251,4 +269,15 @@ function ActionsMenu() {
       </OverflowMenuItem>
     </OverflowMenu>
   );
+}
+
+function StatusIcon({ status }) {
+  switch (status) {
+    case queueStatus.WAITING:
+      return <InProgress16 />;
+    case queueStatus.IN_SERVICE:
+      return <Group16 />;
+    default:
+      return null;
+  }
 }
