@@ -193,11 +193,29 @@ export interface PersonAttributeTypeConfig {
   concept: string;
 }
 
+export interface PatientIdentifierResponse {
+  uuid: string;
+  identifier: string;
+  identifierType: {
+    uuid: string;
+    isPrimary: boolean;
+  };
+}
 export interface PersonAttributeTypeResponse {
   uuid: string;
   display: string;
   name: string;
   description: string;
+}
+
+export interface PersonAttributeResponse {
+  display: string;
+  uuid: string;
+  value: string;
+  attributeType: {
+    display: string;
+    uuid: string;
+  };
 }
 
 export interface ConceptResponse {
