@@ -35,8 +35,8 @@ interface PersonAttributeFieldProps {
 }
 
 const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttributeTypeUuid, conceptUuid }) => {
-  const [personAttributeType, isLoading] = usePersonAttributeType(personAttributeTypeUuid);
-  const [conceptAnswers, isLoadingConceptAnswers] = useConceptAnswers(conceptUuid);
+  const { data: personAttributeType, isLoading } = usePersonAttributeType(personAttributeTypeUuid);
+  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
 
   return !isLoading ? (
     <div className={styles.attributeField}>

@@ -1,20 +1,40 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { ConceptAnswers, ConceptResponse, PersonAttributeTypeResponse } from '../../patient-registration-types';
 
-export function usePersonAttributeType(personAttributeTypeUuid: string): [PersonAttributeTypeResponse, boolean] {
+export function usePersonAttributeType(personAttributeTypeUuid: string): {
+  data: PersonAttributeTypeResponse;
+  isLoading: boolean;
+} {
   const { data, error } = useSWR<FetchResponse<PersonAttributeTypeResponse>>(
     `/ws/rest/v1/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );
-  return [data?.data, !data && !error];
+  if (error) {
+    showToast({
+      title: error.name,
+      description: error.message,
+      kind: 'error',
+    });
+  }
+  return {
+    data: data?.data,
+    isLoading: !data && !error,
+  };
 }
 
-export function useConceptAnswers(conceptUuid: string): [Array<ConceptAnswers>, boolean] {
+export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAnswers>; isLoading: boolean } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
-  const { data, error } = useSWR<FetchResponse<ConceptResponse>>(
+  const { data, error } = useSWR<FetchResponse<ConceptResponse>, Error>(
     shouldFetch ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
-  return [data?.data?.answers, !data && !error];
+  if (error) {
+    showToast({
+      title: error.name,
+      description: error.message,
+      kind: 'error',
+    });
+  }
+  return { data: data?.data?.answers, isLoading: !data && !error };
 }

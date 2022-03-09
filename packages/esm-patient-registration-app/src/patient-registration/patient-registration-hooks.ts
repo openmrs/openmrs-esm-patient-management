@@ -1,4 +1,4 @@
-import { getSynchronizationItems, usePatient } from '@openmrs/esm-framework';
+import { getSynchronizationItems, showToast, usePatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
@@ -82,18 +82,26 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
           identifiers,
         })),
       );
-      getInitialPatientAttributes(patientUuid).then((res) => {
-        if (res?.data?.results) {
-          let attributes = {};
-          res.data.results.forEach((attribute) => {
-            attributes[attribute.attributeType.uuid] = attribute.value;
+      getInitialPatientAttributes(patientUuid)
+        .then((res) => {
+          if (res.ok) {
+            let attributes = {};
+            res.data.results.forEach((attribute) => {
+              attributes[attribute.attributeType.uuid] = attribute.value;
+            });
+            setInitialFormValues((initialFormValues) => ({
+              ...initialFormValues,
+              attributes,
+            }));
+          }
+        })
+        .catch((err: Error) => {
+          showToast({
+            title: err.name,
+            description: err.message,
+            kind: 'error',
           });
-          setInitialFormValues((initialFormValues) => ({
-            ...initialFormValues,
-            attributes,
-          }));
-        }
-      });
+        });
     }
   }, [patientUuid]);
 
