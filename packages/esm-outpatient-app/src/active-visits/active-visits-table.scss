@@ -47,6 +47,13 @@
   margin: 0.25rem 0;
 }
 
+.priorityTag {
+  @extend .tag;
+  @include carbon--type-style("label-01");
+  color: #943d00;
+  background-color: #ffc9a3;
+}
+
 .backgroundDataFetchingIndicator {
   align-items: center;
   display: flex;

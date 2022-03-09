@@ -100,12 +100,16 @@ const ActiveVisitsTable: React.FC = () => {
                 align="start"
                 direction="bottom"
                 tooltipText={visit.priorityComment}>
-                <Tag className={styles.tag} type={getTagType(visit?.priority)}>
+                <Tag
+                  className={visit.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                  type={getTagType(visit?.priority)}>
                   {visit.priority}
                 </Tag>
               </TooltipDefinition>
             ) : (
-              <Tag className={styles.tag} type={getTagType(visit?.priority)}>
+              <Tag
+                className={visit.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                type={getTagType(visit?.priority)}>
                 {visit.priority}
               </Tag>
             )}
