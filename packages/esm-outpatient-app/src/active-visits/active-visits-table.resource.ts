@@ -1,104 +1,89 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { Visit, openmrsFetch, SessionUser } from '@openmrs/esm-framework';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
 
-export interface ActiveVisit {
-  location: string;
+interface VisitQueueEntry {
+  queueEntry: QueueEntry;
+  uuid: string;
+  visit: Visit;
+}
+
+interface QueueEntry {
+  display: string;
+  endedAt: null;
+  locationWaitingFor: string | null;
+  patient: {
+    uuid: string;
+  };
+  priority: {
+    display: string;
+  };
+  priorityComment: string | null;
+  providerWaitingFor: null;
+  queue: {
+    description: string;
+    display: string;
+    name: string;
+    service: {
+      display: string;
+    };
+    uuid: string;
+  };
+  startedAt: string;
+  status: {
+    display: string;
+  };
+  uuid: string;
+}
+
+interface MappedQueueEntry {
+  id: string;
   name: string;
   patientUuid: string;
   priority: string;
-  priorityComment?: string;
+  priorityComment: string;
+  service: string;
   status: string;
-  uuid: string;
-  visitType: string;
-  visitUuid: string;
   waitTime: string;
 }
 
-export function useActiveVisits() {
-  const { data: currentUserSession } = useCurrentSession();
-  const sessionLocation = currentUserSession?.data?.sessionLocation?.uuid;
-  const startDate = dayjs().format('YYYY-MM-DD');
+interface UseVisitQueueEntries {
+  visitQueueEntries: Array<MappedQueueEntry> | null;
+  isLoading: boolean;
+  isError: Error;
+  isValidating?: boolean;
+}
 
-  const customRepresentation =
-    'custom:(uuid,patient:(uuid,person:(age,display,gender,uuid)),' +
-    'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
-    'stopDatetime)&fromStartDate=' +
-    startDate +
-    '&location=' +
-    sessionLocation;
+enum queuePriotity {
+  EMERGENCY = 'Emergency',
+  NOT_URGENT = 'Not Urgent',
+  URGENT = 'Urgent',
+}
 
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`,
+export function useVisitQueueEntries(): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+    apiUrl,
     openmrsFetch,
   );
 
-  const mapVisitProperties = (visit: Visit): ActiveVisit => ({
-    location: visit?.location?.uuid,
-    name: visit?.patient?.person?.display,
-    patientUuid: visit?.patient?.uuid,
-    priority: '',
-    priorityComment: '',
-    status: '',
-    uuid: visit.uuid,
-    visitType: visit?.visitType?.display,
-    visitUuid: visit.uuid,
-    waitTime: '',
+  const mapQueueEntryProperties = (queueEntry: QueueEntry): MappedQueueEntry => ({
+    id: queueEntry.uuid,
+    name: queueEntry.display,
+    patientUuid: queueEntry.patient.uuid,
+    priority: queueEntry.priority.display === queuePriotity.URGENT ? 'Priority' : queueEntry.priority.display,
+    priorityComment: queueEntry.priorityComment,
+    service: queueEntry.queue.service.display,
+    status: queueEntry.status.display,
+    waitTime: queueEntry.startedAt ? `${Math.abs(dayjs().diff(dayjs(queueEntry.startedAt), 'minutes'))}` : '--',
   });
 
-  // Mock data
-  const activeVisitLists = [
-    {
-      name: 'John Test Otieno',
-      priority: 'Emergency',
-      priorityComment: 'Patient is convulsing and unconscious',
-      status: 'Attending triage',
-      waitTime: '10',
-      uuid: '1',
-    },
-    {
-      name: 'Kennedy Test Kennedy',
-      priority: 'Not urgent',
-      status: 'Waiting for clinical consultation',
-      waitTime: '30',
-      uuid: '2',
-    },
-    {
-      name: 'Mose Test Test',
-      priority: 'Not urgent',
-      status: 'Waiting for triage',
-      waitTime: '25',
-      uuid: '3',
-    },
-    {
-      name: 'Joo Joo',
-      priority: 'Not urgent',
-      status: 'Waiting for pharmacy',
-      waitTime: '11',
-      uuid: '4',
-    },
-    {
-      name: 'Alex Berezinsky Test',
-      priority: 'Not urgent',
-      status: 'Waiting for triage',
-      waitTime: '--',
-      uuid: '5',
-    },
-  ];
+  const mappedQueueEntries = data?.data?.results?.map((result) => result.queueEntry ?? {}).map(mapQueueEntryProperties);
 
   return {
-    activeVisits: activeVisitLists,
+    visitQueueEntries: mappedQueueEntries ? mappedQueueEntries : null,
     isLoading: !data && !error,
     isError: error,
     isValidating,
-  };
-}
-
-export function useCurrentSession() {
-  const { data, error } = useSWR<{ data: SessionUser }, Error>(`/ws/rest/v1/session`, openmrsFetch);
-
-  return {
-    data: data ? data : null,
-    isError: error,
   };
 }
