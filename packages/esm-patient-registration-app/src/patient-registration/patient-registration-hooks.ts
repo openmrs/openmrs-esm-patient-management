@@ -1,20 +1,29 @@
-import { getSynchronizationItems, showToast, usePatient } from '@openmrs/esm-framework';
-import { Dispatch, useEffect, useState } from 'react';
+import { FetchResponse, getSynchronizationItems, openmrsFetch, usePatient } from '@openmrs/esm-framework';
+import { Dispatch, useEffect, useMemo, useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
-import { FormValues, PatientRegistration, PatientUuidMapType } from './patient-registration-types';
+import {
+  FormValues,
+  PatientRegistration,
+  PatientUuidMapType,
+  PersonAttributeResponse,
+  PatientIdentifierValue,
+  PatientIdentifierResponse,
+} from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
-  getInitialPatientAttributes,
-  getInitialPatientIdentifiers,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
-import { getInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
+import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
+  const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
+  const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
+  const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
     patientUuid: v4(),
     givenName: '',
@@ -68,42 +77,39 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
+  // Set initial patient relationships
   useEffect(() => {
-    if (patientUuid) {
-      getInitialPatientRelationships(patientUuid).then((relationships) =>
-        setInitialFormValues((initialFormValues) => ({
-          ...initialFormValues,
-          relationships,
-        })),
-      );
-      getInitialPatientIdentifiers(patientUuid).then((identifiers) =>
-        setInitialFormValues((initialFormValues) => ({
-          ...initialFormValues,
-          identifiers,
-        })),
-      );
-      getInitialPatientAttributes(patientUuid)
-        .then((res) => {
-          if (res.ok) {
-            let attributes = {};
-            res.data.results.forEach((attribute) => {
-              attributes[attribute.attributeType.uuid] = attribute.value;
-            });
-            setInitialFormValues((initialFormValues) => ({
-              ...initialFormValues,
-              attributes,
-            }));
-          }
-        })
-        .catch((err: Error) => {
-          showToast({
-            title: err.name,
-            description: err.message,
-            kind: 'error',
-          });
-        });
+    if (!isLoadingRelationships && relationships) {
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        relationships,
+      }));
     }
-  }, [patientUuid]);
+  }, [isLoadingRelationships, relationships, setInitialFormValues]);
+
+  // Set Initial patient identifiers
+  useEffect(() => {
+    if (!isLoadingIdentifiers && identifiers) {
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        identifiers,
+      }));
+    }
+  }, [isLoadingIdentifiers, identifiers, setInitialFormValues]);
+
+  // Set Initial person attributes
+  useEffect(() => {
+    if (!isLoadingAttributes && attributes) {
+      let personAttributes = {};
+      attributes.forEach((attribute) => {
+        personAttributes[attribute.attributeType.uuid] = attribute.value;
+      });
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        attributes: personAttributes,
+      }));
+    }
+  }, [attributes, setInitialFormValues, isLoadingAttributes]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -152,4 +158,51 @@ export function usePatientUuidMap(
 async function getPatientRegistration(patientUuid: string) {
   const items = await getSynchronizationItems<PatientRegistration>(patientRegistration);
   return items.find((item) => item._patientRegistrationData.formValues.patientUuid === patientUuid);
+}
+
+export function useInitialPatientIdentifiers(patientUuid: string): {
+  data: Array<PatientIdentifierValue>;
+  isLoading: boolean;
+} {
+  const shouldFetch = !!patientUuid;
+
+  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
+    shouldFetch ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=full` : null,
+    openmrsFetch,
+  );
+
+  const result: {
+    data: Array<PatientIdentifierValue>;
+    isLoading: boolean;
+  } = useMemo(
+    () => ({
+      data: data?.data?.results?.map((patientIdentifier) => ({
+        uuid: patientIdentifier.uuid,
+        identifier: patientIdentifier.identifier,
+        identifierTypeUuid: patientIdentifier.identifierType.uuid,
+        action: 'NONE',
+        source: null,
+        preferred: patientIdentifier.identifierType.isPrimary,
+      })),
+      isLoading: !data && !error,
+    }),
+    [data, error],
+  );
+
+  return result;
+}
+
+function useInitialPersonAttributes(personUuid: string) {
+  const shouldFetch = !!personUuid;
+  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
+    shouldFetch ? `/ws/rest/v1/person/${personUuid}/attribute` : null,
+    openmrsFetch,
+  );
+  const result = useMemo(() => {
+    return {
+      data: data?.data?.results,
+      isLoading: !data && !error,
+    };
+  }, [data, error]);
+  return result;
 }

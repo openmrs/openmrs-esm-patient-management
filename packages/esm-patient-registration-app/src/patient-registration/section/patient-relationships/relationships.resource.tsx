@@ -1,23 +1,37 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
 import { RelationshipValue } from '../../patient-registration-types';
+import useSWRImmutable from 'swr/immutable';
+import { useMemo } from 'react';
 
 const customRepresentation =
   'custom:(display,uuid,' +
-  'personA:(uuid,display,person:(age,display,birthdate,uuid)),' +
-  'personB:(uuid,display,person:(age,display,birthdate,uuid)),' +
+  'personA:(age,display,birthdate,uuid),' +
+  'personB:(age,display,birthdate,uuid),' +
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
-export async function getInitialPatientRelationships(patientUuid: string): Promise<Array<RelationshipValue>> {
-  const response = await openmrsFetch<RelationshipsResponse>(
-    `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`,
+export function useInitialPatientRelationships(patientUuid: string): {
+  data: Array<RelationshipValue>;
+  isLoading: boolean;
+} {
+  const shouldFetch = !!patientUuid;
+  const { data, error } = useSWRImmutable<FetchResponse<RelationshipsResponse>, Error>(
+    shouldFetch ? `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}` : null,
+    openmrsFetch,
   );
-  if (response.ok) {
-    const relationships = response?.data?.results;
-    return relationships.map((r) =>
+  if (error) {
+    showToast({
+      title: error.name,
+      description: error.message,
+      kind: 'error',
+    });
+  }
+
+  const result = useMemo(() => {
+    const relationships: Array<RelationshipValue> | undefined = data?.data?.results.map((r) =>
       r.personA.uuid === patientUuid
         ? {
-            relatedPersonName: r.personB.person.display,
-            relatedPersonUuid: r.personB.person.uuid,
+            relatedPersonName: r.personB.display,
+            relatedPersonUuid: r.personB.uuid,
             relation: r.relationshipType.bIsToA,
             relationshipType: `${r.relationshipType.uuid}/bIsToA`,
             /**
@@ -27,8 +41,8 @@ export async function getInitialPatientRelationships(patientUuid: string): Promi
             uuid: r.uuid,
           }
         : {
-            relatedPersonName: r.personA.person.display,
-            relatedPersonUuid: r.personA.person.display,
+            relatedPersonName: r.personA.display,
+            relatedPersonUuid: r.personA.uuid,
             relation: r.relationshipType.aIsToB,
             relationshipType: `${r.relationshipType.uuid}/aIsToB`,
             /**
@@ -38,30 +52,29 @@ export async function getInitialPatientRelationships(patientUuid: string): Promi
             uuid: r.uuid,
           },
     );
-  }
-  return [];
+    return {
+      data: relationships,
+      isLoading: !data && !error,
+    };
+  }, [data, error]);
+
+  return result;
 }
 
 export interface Relationship {
   display: string;
   uuid: string;
   personA: {
+    age: number;
+    display: string;
+    birthdate: string;
     uuid: string;
-    person: {
-      age: number;
-      display: string;
-      birthdate: string;
-      uuid: string;
-    };
   };
   personB: {
+    age: number;
+    display: string;
+    birthdate: string;
     uuid: string;
-    person: {
-      age: number;
-      display: string;
-      birthdate: string;
-      uuid: string;
-    };
   };
   relationshipType: {
     uuid: string;
