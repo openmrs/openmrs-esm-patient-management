@@ -100,16 +100,12 @@ const ActiveVisitsTable: React.FC = () => {
                 align="start"
                 direction="bottom"
                 tooltipText={visit.priorityComment}>
-                <Tag
-                  className={visit.priority === 'Priority' ? styles.priorityTag : ''}
-                  type={getTagType(visit?.priority)}>
+                <Tag className={styles.tag} type={getTagType(visit?.priority)}>
                   {visit.priority}
                 </Tag>
               </TooltipDefinition>
             ) : (
-              <Tag
-                className={visit.priority === 'Priority' ? styles.priorityTag : ''}
-                type={getTagType(visit?.priority)}>
+              <Tag className={styles.tag} type={getTagType(visit?.priority)}>
                 {visit.priority}
               </Tag>
             )}
@@ -181,11 +177,9 @@ const ActiveVisitsTable: React.FC = () => {
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
-                          <TableExpandedRow
-                            className={styles.expandedActiveVisitRow}
-                            colSpan={headers.length + 2}></TableExpandedRow>
+                          <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2} />
                         ) : (
-                          <div />
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </React.Fragment>
                     ))}

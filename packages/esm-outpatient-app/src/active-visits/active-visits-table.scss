@@ -43,14 +43,8 @@
   border-bottom: none;
 }
 
-.priorityTag {
-  @include carbon--type-style("label-01");
-   color: #943d00;
-   background-color: #ffc9a3;
-}
-
 .tag {
-  @include carbon--type-style("label-01");
+  margin: 0.25rem 0;
 }
 
 .backgroundDataFetchingIndicator {
@@ -97,6 +91,10 @@
 
 .expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
   padding: 0 1rem;
+}
+
+.hiddenRow {
+  display: none;
 }
 
 .content {
