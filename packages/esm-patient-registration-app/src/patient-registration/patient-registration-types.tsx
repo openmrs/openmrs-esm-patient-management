@@ -89,7 +89,7 @@ export interface PatientRegistration {
     capturePhotoProps: CapturePhotoProps;
     patientPhotoConceptUuid: string;
     currentLocation: string;
-    personAttributeSections: any;
+    personAttributeTypes: Array<PersonAttributeTypeConfig>;
   };
 }
 
@@ -163,6 +163,9 @@ export interface FormValues {
   deathCause: string;
   relationships: Array<RelationshipValue>;
   identifiers: Array<PatientIdentifierValue>;
+  attributes?: {
+    [attributeTypeUuid: string]: string;
+  };
 }
 
 export interface PatientUuidMapType {
@@ -181,4 +184,47 @@ export interface AddressValidationSchemaType {
   label: string;
   regex: RegExp;
   regexFormat: string;
+}
+
+export interface PersonAttributeTypeConfig {
+  uuid: string;
+  type: string;
+  name: string;
+  concept: string;
+}
+
+export interface PatientIdentifierResponse {
+  uuid: string;
+  identifier: string;
+  identifierType: {
+    uuid: string;
+    isPrimary: boolean;
+  };
+}
+export interface PersonAttributeTypeResponse {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+}
+
+export interface PersonAttributeResponse {
+  display: string;
+  uuid: string;
+  value: string;
+  attributeType: {
+    display: string;
+    uuid: string;
+  };
+}
+
+export interface ConceptResponse {
+  uuid: string;
+  display: string;
+  answers: Array<ConceptAnswers>;
+}
+
+export interface ConceptAnswers {
+  display: string;
+  uuid: string;
 }

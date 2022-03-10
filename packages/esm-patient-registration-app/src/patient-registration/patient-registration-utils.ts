@@ -169,15 +169,3 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
   }
   return result;
 }
-
-export async function getInitialPatientIdentifiers(patientUuid: string): Promise<Array<PatientIdentifierValue>> {
-  const identifiers = await openmrsFetch<{ results: any[] }>(`/ws/rest/v1/patient/${patientUuid}/identifier?v=full`);
-  return identifiers.data.results.map((patientIdentifier) => ({
-    uuid: patientIdentifier.uuid,
-    identifier: patientIdentifier.identifier,
-    identifierTypeUuid: patientIdentifier.identifierType.uuid,
-    action: 'NONE',
-    source: null,
-    preferred: patientIdentifier.identifierType.isPrimary,
-  }));
-}

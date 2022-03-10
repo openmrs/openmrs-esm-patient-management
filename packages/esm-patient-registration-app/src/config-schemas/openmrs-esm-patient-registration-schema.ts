@@ -3,7 +3,7 @@ const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships'],
+    _default: ['demographics', 'contact', 'relationships', 'additionalInformation'],
     _description: "An array of strings which are the keys from 'sectionDefinitions'",
     _elements: {
       _type: Type.String,
@@ -31,6 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
+      additionalInformation: { name: 'Additional Information' },
     },
   },
   fieldDefinitions: {
@@ -81,25 +82,22 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  personAttributeSections: {
+  personAttributeTypes: {
     _type: Type.Array,
-    _default: [{ personAttributes: [] }],
+    _default: [],
     _elements: {
       _type: Type.Object,
-      personAttributes: {
-        _type: Type.Array,
-        _elements: {
-          _type: Type.Object,
-          uuid: {
-            _type: Type.UUID,
-            _description: 'Person attributetype uuid used to save the attribute',
-          },
-          name: {
-            _type: Type.String,
-            _default: '',
-          },
-          _default: {},
-        },
+      uuid: {
+        _type: Type.PersonAttributeTypeUuid,
+        _description: 'The uuid of the person attribute type used to save the attribute',
+      },
+      type: {
+        _type: Type.String,
+        _default: 'coded',
+      },
+      concept: {
+        _type: Type.ConceptUuid,
+        _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
     },
   },
