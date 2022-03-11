@@ -1,0 +1,15 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.patientListActionMenuContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  &>span {
+    margin-top: $spacing-02;
+    @include carbon--type-style("body-short-01");
+    color: $text-02;
+  }
+}
