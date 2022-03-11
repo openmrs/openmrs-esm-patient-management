@@ -43,7 +43,9 @@ export function useActiveVisits() {
     visitUuid: visit.uuid,
   });
 
-  const formattedActiveVisits = data?.data?.results.length ? data.data.results.map(mapVisitProperties) : [];
+  const formattedActiveVisits = data?.data?.results.length
+    ? data.data.results.map(mapVisitProperties).filter(({ visitStartTime }) => dayjs(visitStartTime).isToday())
+    : [];
 
   return {
     activeVisits: formattedActiveVisits,
