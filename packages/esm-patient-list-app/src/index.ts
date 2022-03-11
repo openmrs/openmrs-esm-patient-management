@@ -61,7 +61,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'patient-list-action-menu-item',
+        name: 'patient-list-action-menu',
         slot: 'action-menu-items-slot',
         load: getAsyncLifecycle(() => import('./patient-list-action-menu.component'), {
           featureName: 'patient-list-action-menu-item',

@@ -2,14 +2,62 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.patientListActionMenuContainer {
+.container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  &>span {
+  height: 100%;
+  width: 100%;
+  color: $ui-05;
+  max-width: none;
+
+  &:hover {
+    color: $text-02;
+  }
+
+  & > span {
     margin-top: $spacing-02;
     @include carbon--type-style("body-short-01");
     color: $text-02;
+  }
+
+  & svg {
+    transform: scale(1.25);
+  }
+}
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .active {
+    border: $spacing-02 solid;
+    @include brand-03(border-color);
+    border-radius: 50%;
+    background-color: $ui-02;
+
+    &:focus {
+      border-color: var(--brand-03) !important;
+    }
+  }
+  .container {
+    & svg {
+      transform: scale(1.25);
+    }
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .active {
+    background-color: $color-blue-10;
+    color: $interactive-01;
+
+    &:hover {
+      color: $interactive-01;
+    }
+
+    & > span {
+      color: $interactive-01;
+      @include carbon--type-style("productive-heading-01");
+    }
   }
 }
