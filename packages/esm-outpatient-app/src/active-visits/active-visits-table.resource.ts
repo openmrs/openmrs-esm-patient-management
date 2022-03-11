@@ -1,12 +1,18 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import { FetchResponse, openmrsFetch, Visit } from '@openmrs/esm-framework';
 
 interface VisitQueueEntry {
   queueEntry: QueueEntry;
   uuid: string;
   visit: Visit;
 }
+
+export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
+export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
+export type QueueService = 'Clinical consultation' | 'Triage';
+export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 
 interface QueueEntry {
   display: string;
@@ -16,7 +22,7 @@ interface QueueEntry {
     uuid: string;
   };
   priority: {
-    display: string;
+    display: QueuePriority;
   };
   priorityComment: string | null;
   providerWaitingFor: null;
@@ -25,25 +31,25 @@ interface QueueEntry {
     display: string;
     name: string;
     service: {
-      display: string;
+      display: QueueService;
     };
     uuid: string;
   };
   startedAt: string;
   status: {
-    display: string;
+    display: QueueStatus;
   };
   uuid: string;
 }
 
-interface MappedQueueEntry {
+export interface MappedQueueEntry {
   id: string;
   name: string;
   patientUuid: string;
-  priority: string;
+  priority: MappedQueuePriority;
   priorityComment: string;
-  service: string;
-  status: string;
+  service: QueueService;
+  status: QueueStatus;
   waitTime: string;
 }
 
@@ -54,10 +60,15 @@ interface UseVisitQueueEntries {
   isValidating?: boolean;
 }
 
-enum queuePriotity {
-  EMERGENCY = 'Emergency',
-  NOT_URGENT = 'Not Urgent',
-  URGENT = 'Urgent',
+export function useServices() {
+  const serviceConceptSetUuid = '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a';
+  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
+
+  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
+  };
 }
 
 export function useVisitQueueEntries(): UseVisitQueueEntries {
@@ -71,7 +82,9 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     id: queueEntry.uuid,
     name: queueEntry.display,
     patientUuid: queueEntry.patient.uuid,
-    priority: queueEntry.priority.display === queuePriotity.URGENT ? 'Priority' : queueEntry.priority.display,
+    // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
+    // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
+    priority: queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display,
     priorityComment: queueEntry.priorityComment,
     service: queueEntry.queue.service.display,
     status: queueEntry.status.display,

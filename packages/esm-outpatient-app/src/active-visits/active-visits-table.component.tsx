@@ -4,8 +4,10 @@ import {
   Button,
   ContentSwitcher,
   DataTable,
+  DataTableHeader,
   DataTableSize,
   DataTableSkeleton,
+  Dropdown,
   OverflowMenu,
   OverflowMenuItem,
   Switch,
@@ -19,48 +21,105 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
   Tag,
   Tile,
   TooltipDefinition,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import InProgress16 from '@carbon/icons-react/es/in-progress/16';
 import Group16 from '@carbon/icons-react/es/group/16';
+import InProgress16 from '@carbon/icons-react/es/in-progress/16';
 import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
+import {
+  useVisitQueueEntries,
+  useServices,
+  QueueService,
+  QueueStatus,
+  MappedQueueEntry,
+  MappedQueuePriority,
+} from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
-import { useVisitQueueEntries } from './active-visits-table.resource';
 import styles from './active-visits-table.scss';
 
-enum tableSizes {
-  DEFAULT = 0,
-  LARGE = 1,
-}
+type TableSize = 0 | 1;
 
-enum queueStatus {
-  CLINICAL_CONSULTATION = 'Clinical consultation',
-  FINISHED_SERVICE = 'Finished Service',
-  IN_SERVICE = 'In Service',
-  TRIAGE = 'Triage',
-  WAITING = 'Waiting',
-}
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
 
-const ActiveVisitsTable: React.FC = () => {
+function ActionsMenu() {
   const { t } = useTranslation();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-  const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
-  const [tableSize, setTableSize] = useState<DataTableSize>('compact');
+
+  return (
+    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#editPatientDetails"
+        itemText={t('editPatientDetails', 'Edit patient details')}>
+        {t('editPatientDetails', 'Edit patient details')}
+      </OverflowMenuItem>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#setWaitTimeManually"
+        itemText={t('setWaitTimeManually', 'Set wait time manually')}>
+        {t('setWaitTimeManually', 'Set wait time manually')}
+      </OverflowMenuItem>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#endVisit"
+        hasDivider
+        isDelete
+        itemText={t('endVisit', 'End visit')}>
+        {t('endVisit', 'End Visit')}
+      </OverflowMenuItem>
+    </OverflowMenu>
+  );
+}
+
+function StatusIcon({ status }) {
+  switch (status as QueueStatus) {
+    case 'Waiting':
+      return <InProgress16 />;
+    case 'In Service':
+      return <Group16 />;
+    default:
+      return null;
+  }
+}
+
+function ActiveVisitsTable() {
+  const { t } = useTranslation();
   const isDesktop = useLayoutType() === 'desktop';
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
+  const { services } = useServices();
+  const [contentSwitcherValue, setContentSwitcherValue] = useState<TableSize>(0);
+  const [filteredRows, setFilteredRows] = useState<Array<MappedQueueEntry>>([]);
+  const [filter, setFilter] = useState('');
+  const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
-    if (contentSwitcherValue === tableSizes.DEFAULT) {
+    if (contentSwitcherValue === 0) {
       setTableSize('compact');
-    } else if (contentSwitcherValue === tableSizes.LARGE) {
+    } else if (contentSwitcherValue === 1) {
       setTableSize('normal');
     }
   }, [contentSwitcherValue]);
 
-  const headerData = useMemo(
+  useEffect(() => {
+    if (filter) {
+      setFilteredRows(visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)));
+      setFilter('');
+    }
+  }, [filter, filteredRows, visitQueueEntries]);
+
+  const tableHeaders = useMemo(
     () => [
       {
         id: 0,
@@ -87,20 +146,30 @@ const ActiveVisitsTable: React.FC = () => {
   );
 
   const getTagType = (priority: string) => {
-    switch (priority) {
+    switch (priority as MappedQueuePriority) {
       case 'Emergency':
         return 'red';
       case 'Not Urgent':
         return 'green';
-      case 'Urgent':
-        return 'magenta';
       default:
         return 'gray';
     }
   };
 
+  const buildStatusString = (status: QueueStatus, service: QueueService) => {
+    if (!status || !service) {
+      return '';
+    }
+
+    if (status === 'Waiting') {
+      return `${status} for ${service}`;
+    } else if (status === 'In Service') {
+      return `Attending ${service}`;
+    }
+  };
+
   const tableRows = useMemo(() => {
-    return visitQueueEntries?.map((entry) => ({
+    return (filteredRows.length ? filteredRows : visitQueueEntries)?.map((entry) => ({
       ...entry,
       name: {
         content: (
@@ -118,14 +187,14 @@ const ActiveVisitsTable: React.FC = () => {
                 tooltipText={entry.priorityComment}>
                 <Tag
                   className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                  type={getTagType(entry?.priority)}>
+                  type={getTagType(entry.priority as string)}>
                   {entry.priority}
                 </Tag>
               </TooltipDefinition>
             ) : (
               <Tag
                 className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                type={getTagType(entry?.priority)}>
+                type={getTagType(entry.priority as string)}>
                 {entry.priority}
               </Tag>
             )}
@@ -136,12 +205,31 @@ const ActiveVisitsTable: React.FC = () => {
         content: (
           <span className={styles.statusContainer}>
             <StatusIcon status={entry.status} />
-            <span>{entry.status}</span>
+            <span>{buildStatusString(entry.status, entry.service)}</span>
           </span>
         ),
       },
     }));
-  }, [visitQueueEntries]);
+  }, [filteredRows, visitQueueEntries]);
+
+  const handleServiceChange = ({ selectedItem }) => {
+    setFilter(selectedItem);
+  };
+
+  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
+    return rowIds.filter((rowId) =>
+      headers.some(({ key }) => {
+        const id = getCellId(rowId, key);
+        if (typeof cellsById[id].value === 'boolean') {
+          return false;
+        }
+        if (cellsById[id].value.hasOwnProperty('content')) {
+          return ('' + cellsById[id].value.content.props.children).toLowerCase().includes(inputValue.toLowerCase());
+        }
+        return ('' + cellsById[id].value).toLowerCase().includes(inputValue.toLowerCase());
+      }),
+    );
+  };
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -154,8 +242,8 @@ const ActiveVisitsTable: React.FC = () => {
           <div className={styles.activeVisitsTableHeaderContainer}>
             <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
             <div className={styles.switcherContainer}>
-              <label className={styles.contentSwitcherLabel}>{t('view', 'View:')} </label>
-              <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index)}>
+              <label className={styles.contentSwitcherLabel}>{t('view', 'View')}: </label>
+              <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index as TableSize)}>
                 <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
                 <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
               </ContentSwitcher>
@@ -170,13 +258,38 @@ const ActiveVisitsTable: React.FC = () => {
             </Button>
           </div>
           <DataTable
-            headers={headerData}
+            filterRows={handleFilter}
+            headers={tableHeaders}
             overflowMenuOnHover={isDesktop ? true : false}
             rows={tableRows}
             size={tableSize}
             useZebraStyles>
-            {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+            {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
               <TableContainer className={styles.tableContainer}>
+                <TableToolbar>
+                  <TableToolbarContent>
+                    <div className={styles.filterContainer}>
+                      <Dropdown
+                        id="serviceFilter"
+                        initialSelectedItem={'All'}
+                        label=""
+                        titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+                        type="inline"
+                        items={['All', ...services]}
+                        onChange={handleServiceChange}
+                        size="sm"
+                      />
+                    </div>
+                    <TableToolbarSearch
+                      className={styles.search}
+                      expanded
+                      light
+                      onChange={onInputChange}
+                      placeholder={t('searchThisList', 'Search this list')}
+                      size="sm"
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
                 <Table {...getTableProps()} className={styles.activeVisitsTable}>
                   <TableHead>
                     <TableRow>
@@ -238,46 +351,6 @@ const ActiveVisitsTable: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ActiveVisitsTable;
-
-function ActionsMenu() {
-  const { t } = useTranslation();
-
-  return (
-    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#editPatientDetails"
-        itemText={t('editPatientDetails', 'Edit patient details')}>
-        {t('editPatientDetails', 'Edit patient details')}
-      </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#setWaitTimeManually"
-        itemText={t('setWaitTimeManually', 'Set wait time manually')}>
-        {t('setWaitTimeManually', 'Set wait time manually')}
-      </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#endVisit"
-        hasDivider
-        isDelete
-        itemText={t('endVisit', 'End visit')}>
-        {t('endVisit', 'End Visit')}
-      </OverflowMenuItem>
-    </OverflowMenu>
-  );
-}
-
-function StatusIcon({ status }) {
-  switch (status) {
-    case queueStatus.WAITING:
-      return <InProgress16 />;
-    case queueStatus.IN_SERVICE:
-      return <Group16 />;
-    default:
-      return null;
-  }
-}

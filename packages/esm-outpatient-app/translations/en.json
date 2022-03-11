@@ -41,13 +41,15 @@
   "scheduledAppointments": "Scheduled appts. today",
   "search": "Search",
   "searchboxPlaceholder": "Search for a patient name or ID number",
+  "searchThisList": "Search this list",
   "secondaryHelperText": "Type the patient's name or unique ID number",
   "setWaitTimeManually": "Set wait time manually",
   "sex": "Sex",
+  "showPatientsWaitingFor": "Show patients waiting for",
   "status": "Status",
   "tbCare": "TB Care",
   "triage": "Triage",
-  "view": "View:",
+  "view": "View",
   "waitingFor": "Waiting for:",
   "waitTime": "Wait time (mins)"
 }
