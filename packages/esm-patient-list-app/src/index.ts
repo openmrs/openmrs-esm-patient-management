@@ -63,7 +63,7 @@ function setupOpenMRS() {
       {
         name: 'patient-list-action-menu',
         slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-action-menu.component'), {
+        load: getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
           featureName: 'patient-list-action-menu-item',
           moduleName,
         }),

@@ -1,11 +1,11 @@
 import React from 'react';
 import ListBulleted20 from '@carbon/icons-react/es/list--bulleted/20';
-import styles from './patient-list-action-menu.scss';
+import styles from './patient-list-action-button.scss';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { Button } from 'carbon-components-react';
 
-const PatientNoteActionMenu: React.FC = () => {
+const PatientListActionButton: React.FC = () => {
   const navigateToPatientList = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-list' }), []);
 
   const { t } = useTranslation();
@@ -33,4 +33,4 @@ const PatientNoteActionMenu: React.FC = () => {
   );
 };
 
-export default PatientNoteActionMenu;
+export default PatientListActionButton;
