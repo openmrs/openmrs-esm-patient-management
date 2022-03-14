@@ -60,6 +60,7 @@
     border: 0;
     border-top: 1px solid $text-03;
     text-align: center;
+    overflow: visible;
     
     &::after {
       content: 'or';
