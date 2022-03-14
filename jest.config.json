@@ -1,34 +1,34 @@
 {
-    "transform": {
-        "^.+\\.tsx?$": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-        "/node_modules/(?!@openmrs)"
-    ],
-    "moduleNameMapper": {
-        "\\.(s?css)$": "identity-obj-proxy",
-        "^@carbon/icons-react/es/(.*)$": "@carbon/icons-react/lib/$1",
-        "^@carbon/charts": "identity-obj-proxy",
-        "^carbon-components-react/es/(.*)$": "carbon-components-react/lib/$1",
-        "@openmrs/esm-framework": "@openmrs/esm-framework/mock",
-        "lodash-es": "lodash"
-    },
-    "collectCoverageFrom": [
-        "**/src/**/*.tsx",
-        "!**/node_modules/**",
-        "!**/vendor/**",
-        "!**/src/**/*.test.*",
-        "!**/src/declarations.d.tsx"
-    ],
-    "coverageThreshold": {
-        "global": {
-            "statements": 8,
-            "branches": 5,
-            "functions": 7,
-            "lines": 8
-        }
-    },
-    "setupFilesAfterEnv": [
-        "<rootDir>/tools/setupTests.ts"
-    ]
+  "transform": {
+    "^.+\\.tsx?$": "babel-jest"
+  },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!@openmrs)"
+  ],
+  "moduleNameMapper": {
+    "\\.(s?css)$": "identity-obj-proxy",
+    "^@carbon/icons-react/es/(.*)$": "@carbon/icons-react/lib/$1",
+    "^@carbon/charts": "identity-obj-proxy",
+    "^carbon-components-react/es/(.*)$": "carbon-components-react/lib/$1",
+    "@openmrs/esm-framework": "@openmrs/esm-framework/mock",
+    "lodash-es": "lodash"
+  },
+  "collectCoverageFrom": [
+    "**/src/**/*.tsx",
+    "!**/node_modules/**",
+    "!**/vendor/**",
+    "!**/src/**/*.test.*",
+    "!**/src/declarations.d.tsx"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "statements": 8,
+      "branches": 5,
+      "functions": 7,
+      "lines": 8
+    }
+  },
+  "setupFilesAfterEnv": [
+    "<rootDir>/tools/setupTests.ts"
+  ]
 }
