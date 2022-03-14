@@ -27,14 +27,14 @@
       margin: 0;
     }
 
-    :global(.bx--date-picker__input) {
-      min-width: fit-content;
+    :global(.bx--date-picker.bx--date-picker--single .bx--date-picker__input) {
+      width: 10rem;
     }
   }
 }
 
 .heading {
-  @include carbon--type-style('productive-heading-02');
+  @include carbon--type-style("productive-heading-02");
   color: $text-01;
   margin-bottom: 0.5rem;
 }
@@ -48,17 +48,18 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: 0.5rem 0rem;
+  margin: $spacing-03 0 $spacing-03 0rem;
   padding: 0;
+  @include carbon--type-style('body-short-01');
 
   button {
     display: flex;
-    
+
     svg {
       order: 1;
       margin-right: 0.5rem;
       margin-left: 0rem !important;
-    }  
+    }
 
     span {
       order: 2;
@@ -73,14 +74,13 @@
     margin: 0;
   }
 
-  &>button {
+  & > button {
     padding-left: 0;
   }
 }
 
-
 .label01 {
-  @include carbon--type-style('label-01');
+  @include carbon--type-style("label-01");
   color: $text-02;
   margin: $spacing-03 0;
 }
@@ -93,10 +93,11 @@
   display: flex;
   align-items: center;
   height: $spacing-09;
+  margin-bottom: $spacing-05;
 
   & > span {
     @include carbon--type-style("productive-heading-01");
-    color: $text-02
+    color: $text-02;
   }
 }
 
@@ -131,6 +132,7 @@
 
 .desktop {
   padding: 0rem;
+  margin-top: $spacing-05;
 }
 
 /* Desktop */
@@ -145,4 +147,8 @@
   .form {
     height: calc(100vh - 3rem);
   }
+}
+
+.input {
+  width: 13.5rem;
 }

@@ -55,7 +55,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
   };
 
   return (
-    <Form className={styles.form} onSubmit={handleSearch}>
+    <Form onSubmit={handleSearch}>
       <Grid className={styles.grid}>
         <div className={styles.backButton}>
           <Button
@@ -117,6 +117,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
             <h3 className={styles.heading}>{t('personalDetails', 'Personal details')}</h3>
             <FormGroup legendText={t('sex', 'Sex')}>
               <ContentSwitcher
+                size="sm"
                 className={styles.genderSwitcher}
                 onChange={({ index }) => setGenderSwitcherValue(index)}>
                 <Switch name={genders.ANY} text={t('any', 'Any')} />
@@ -124,7 +125,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
                 <Switch name={genders.FEMALE} text={t('female', 'Female')} />
               </ContentSwitcher>
             </FormGroup>
-            <DatePicker datePickerType="simple" light>
+            <DatePicker datePickerType="single" light>
               <DatePickerInput
                 id="dateOfBirth"
                 placeholder="mm/dd/yyyy"
@@ -155,13 +156,14 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
         <Row className={styles.row}>
           <Column>
             <h3 className={styles.heading}>{t('lastVisit', 'Last visit')}</h3>
-            <DatePicker datePickerType="simple" light>
+            <DatePicker datePickerType="single" light>
               <DatePickerInput
                 id="lastVisitDate"
                 placeholder="mm/dd/yyyy"
                 labelText={t('lastVisitDate', 'Date')}
                 onChange={(event) => setLastVisitDate(event.target.value)}
                 type="date"
+                width={'120px'}
               />
             </DatePicker>
           </Column>
