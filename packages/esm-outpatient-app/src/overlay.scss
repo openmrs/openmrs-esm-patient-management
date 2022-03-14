@@ -3,18 +3,11 @@
 .desktopOverlay {
   position: absolute;
   top: $spacing-09;
-  height: calc(100vh - 6rem);
   width: 37rem;
   right: 0;
   bottom: 0;
   border-left: 1px solid $text-03;
   background-color: $ui-01;
-  height: 100vh;
-}
-
-.desktopOverlay::after {
-  height: 100%;
-  border-left: 1px solid $text-03;
 }
 
 .tabletOverlay {
@@ -61,7 +54,3 @@
   fill: $ui-05;
 }
 
-.overlayContent {
-  padding: 0 0 $spacing-05 0;
-  overflow-y: auto;
-}
