@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { debounce } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
 import { Search, Button, Tile } from 'carbon-components-react';
 import Search16 from '@carbon/icons-react/es/search/16';
 import SearchIllustration from './search-illustration.component';
@@ -53,18 +53,14 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
           labelText="Search for a patient"
           placeholder={t('searchboxPlaceholder', 'Search for a patient name or ID number')}
           onChange={(event) => handleSearch(event.target.value)}
-          onClear={() => {
-            setSearchResults([]);
-          }}
+          onClear={() => setSearchResults([])}
         />
         <Button iconDescription="Basic search" size="field" kind="secondary">
           {t('search', 'Search')}
         </Button>
       </div>
       {searchResults?.length ? (
-        <div className={styles.resultsContainer}>
-          <SearchResults patients={searchResults} />
-        </div>
+        <div className={styles.resultsContainer}>{<SearchResults patients={searchResults} />}</div>
       ) : (
         <div>
           <div className={styles.tileContainer}>
