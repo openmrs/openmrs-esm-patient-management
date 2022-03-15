@@ -11,6 +11,7 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   Switch,
+  Tab,
   Table,
   TableBody,
   TableCell,
@@ -24,6 +25,7 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  Tabs,
   Tag,
   Tile,
   TooltipDefinition,
@@ -37,7 +39,7 @@ import {
   useServices,
   QueueService,
   QueueStatus,
-  MappedQueueEntry,
+  MappedVisitQueueEntry,
   MappedQueuePriority,
 } from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
@@ -99,7 +101,7 @@ function ActiveVisitsTable() {
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const { services } = useServices();
   const [contentSwitcherValue, setContentSwitcherValue] = useState<TableSize>(0);
-  const [filteredRows, setFilteredRows] = useState<Array<MappedQueueEntry>>([]);
+  const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
   const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const [showOverlay, setShowOverlay] = useState(false);
@@ -238,70 +240,70 @@ function ActiveVisitsTable() {
   if (visitQueueEntries?.length) {
     return (
       <div className={styles.container} data-floating-menu-container>
-        <div className={styles.activeVisitsTableContainer}>
-          <div className={styles.activeVisitsTableHeaderContainer}>
-            <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
-            <div className={styles.switcherContainer}>
-              <label className={styles.contentSwitcherLabel}>{t('view', 'View')}: </label>
-              <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index as TableSize)}>
-                <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
-                <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
-              </ContentSwitcher>
-            </div>
-            <Button
-              size="small"
-              kind="secondary"
-              renderIcon={Add16}
-              onClick={() => setShowOverlay(true)}
-              iconDescription={t('addPatientList', 'Add patient to list')}>
-              {t('addPatientList', 'Add patient to list')}
-            </Button>
+        <div className={styles.headerContainer}>
+          <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
+          <div className={styles.switcherContainer}>
+            <label className={styles.contentSwitcherLabel}>{t('view', 'View')}: </label>
+            <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index as TableSize)}>
+              <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
+              <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
+            </ContentSwitcher>
           </div>
-          <DataTable
-            filterRows={handleFilter}
-            headers={tableHeaders}
-            overflowMenuOnHover={isDesktop ? true : false}
-            rows={tableRows}
-            size={tableSize}
-            useZebraStyles>
-            {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
-              <TableContainer className={styles.tableContainer}>
-                <TableToolbar>
-                  <TableToolbarContent>
-                    <div className={styles.filterContainer}>
-                      <Dropdown
-                        id="serviceFilter"
-                        initialSelectedItem={'All'}
-                        label=""
-                        titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-                        type="inline"
-                        items={['All', ...services]}
-                        onChange={handleServiceChange}
-                        size="sm"
-                      />
-                    </div>
-                    <TableToolbarSearch
-                      className={styles.search}
-                      expanded
-                      light
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
+          <Button
+            size="small"
+            kind="secondary"
+            renderIcon={Add16}
+            onClick={() => setShowOverlay(true)}
+            iconDescription={t('addPatientList', 'Add patient to list')}>
+            {t('addPatientList', 'Add patient to list')}
+          </Button>
+        </div>
+        <DataTable
+          filterRows={handleFilter}
+          headers={tableHeaders}
+          overflowMenuOnHover={isDesktop ? true : false}
+          rows={tableRows}
+          size={tableSize}
+          useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
+            <TableContainer className={styles.tableContainer}>
+              <TableToolbar>
+                <TableToolbarContent>
+                  <div className={styles.filterContainer}>
+                    <Dropdown
+                      id="serviceFilter"
+                      initialSelectedItem={'All'}
+                      label=""
+                      titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+                      type="inline"
+                      items={['All', ...services]}
+                      onChange={handleServiceChange}
                       size="sm"
                     />
-                  </TableToolbarContent>
-                </TableToolbar>
-                <Table {...getTableProps()} className={styles.activeVisitsTable}>
-                  <TableHead>
-                    <TableRow>
-                      <TableExpandHeader />
-                      {headers.map((header) => (
-                        <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                      ))}
-                      <TableExpandHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
+                  </div>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    expanded
+                    light
+                    onChange={onInputChange}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table {...getTableProps()} className={styles.activeVisitsTable}>
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader />
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                    ))}
+                    <TableExpandHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => {
+                    return (
                       <React.Fragment key={row.id}>
                         <TableExpandRow {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
@@ -312,19 +314,35 @@ function ActiveVisitsTable() {
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2} />
+                          <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
+                            <React.Fragment>
+                              <Tabs>
+                                <Tab label={t('currentVisit', 'Current visit')}>
+                                  <React.Fragment>
+                                    <span className={styles.visitType}>{tableRows?.[index]?.visitType}</span>
+                                    <p style={{ marginTop: '0.5rem' }}>--</p>
+                                  </React.Fragment>
+                                </Tab>
+                                <Tab label={t('previousVisit', 'Previous visit')}>
+                                  <React.Fragment>
+                                    <p style={{ marginTop: '0.5rem' }}>--</p>
+                                  </React.Fragment>
+                                </Tab>
+                              </Tabs>
+                            </React.Fragment>
+                          </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </React.Fragment>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-          {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
-        </div>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
       </div>
     );
   }
