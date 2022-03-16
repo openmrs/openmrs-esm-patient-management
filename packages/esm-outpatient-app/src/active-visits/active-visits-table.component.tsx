@@ -315,21 +315,21 @@ function ActiveVisitsTable() {
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
-                            <React.Fragment>
+                            <>
                               <Tabs>
                                 <Tab label={t('currentVisit', 'Current visit')}>
-                                  <React.Fragment>
+                                  <>
                                     <span className={styles.visitType}>{tableRows?.[index]?.visitType}</span>
                                     <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </React.Fragment>
+                                  </>
                                 </Tab>
                                 <Tab label={t('previousVisit', 'Previous visit')}>
-                                  <React.Fragment>
+                                  <>
                                     <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </React.Fragment>
+                                  </>
                                 </Tab>
                               </Tabs>
-                            </React.Fragment>
+                            </>
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
