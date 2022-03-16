@@ -7,12 +7,7 @@
   background-color: $ui-01;
 }
 
-.activeVisitsTableContainer {
-  width: 100%;
-  height: 100%;
-}
-
-.activeVisitsTableHeaderContainer {
+.headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -134,16 +129,22 @@
   }
 }
 
-.expandedActiveVisitRow > td > div {
-  max-height: max-content !important;
-}
+.expandedActiveVisitRow {
+  :global(.bx--tab-content) {
+    padding: 0.5rem 0;
+  }
 
-.expandedActiveVisitRow td {
-  padding: 0 2rem;
-}
+  td {
+    padding: 0.5rem;
 
-.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
-  padding: 0 1rem;
+    > div {
+      max-height: max-content !important;
+    }
+  }
+
+  th[colspan] td[colspan] > div:first-child {
+    padding: 0 1rem;
+  }
 }
 
 .hiddenRow {
@@ -206,4 +207,9 @@
   svg {
     margin-right: 0.5rem;
   }
+}
+
+.visitType {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-01;
 }
