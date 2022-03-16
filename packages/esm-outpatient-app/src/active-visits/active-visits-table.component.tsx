@@ -367,6 +367,7 @@ function ActiveVisitsTable() {
           </Button>
         </Tile>
       </div>
+      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 }

@@ -74,9 +74,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
               </div>
             </Tile>
           </div>
-          <div className={styles.separator}>
-            <hr />
-          </div>
+          <div className={styles['text-divider']}>{t('or', 'Or')}</div>
           <div className={styles.buttonContainer}>
             <Button
               kind="ghost"

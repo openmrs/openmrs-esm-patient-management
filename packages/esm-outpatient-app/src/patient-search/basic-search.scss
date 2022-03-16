@@ -40,41 +40,40 @@
   color: $text-02;
 
   .primaryText {
-    @include carbon--type-style('productive-heading-01');
+    @include carbon--type-style("productive-heading-01");
   }
 
   .secondaryText {
     margin-top: 0.25rem;
-    @include carbon--type-style('body-long-01');
+    @include carbon--type-style("body-long-01");
   }
 }
 
-.separator {
-  margin: 3rem auto 0;
+.text-divider {
+  display: flex;
+  align-items: center;
+  margin: $spacing-10 25%;
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
 
-  hr {
-    width: 25%;
-    @include carbon--type-style('productive-heading-03');
-    color: $text-02;
-    line-height: 1;
-    border: 0;
-    border-top: 1px solid $text-03;
-    text-align: center;
-    overflow: visible;
-    
-    &::after {
-      content: 'or';
-      display: inline-block;
-      position: relative;
-      top: -0.7em;
-      padding: 0 1rem;
-      background: $ui-01;
-    }
-  }
+.text-divider::before,
+.text-divider::after {
+  content: "";
+  height: 1px;
+  background-color: $text-03;
+  flex-grow: 1;
+}
+
+.text-divider::before {
+  margin-right: $spacing-05;
+}
+
+.text-divider::after {
+  margin-left: $spacing-05;
 }
 
 .buttonContainer {
-  margin-top: $spacing-06;
   display: flex;
   align-items: center;
   justify-content: center;
