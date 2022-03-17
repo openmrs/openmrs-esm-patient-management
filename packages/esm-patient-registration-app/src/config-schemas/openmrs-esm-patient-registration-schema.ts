@@ -31,7 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
-      additionalInformation: { name: 'Additional Information' },
+      additionalInformation: { name: 'Additional Information', fields: ['codedAttributes', 'textBasedAttributes'] },
     },
   },
   fieldDefinitions: {
@@ -100,5 +100,20 @@ export const esmPatientRegistrationSchema = {
         _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
     },
+  },
+  textBasedAttributes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      uuid: {
+        _type: Type.PersonAttributeTypeUuid,
+        _description: 'The uuid of the person attribute type used to save the attribute',
+      },
+      validationRegex: {
+        _type: Type.String,
+        _description: 'Regular expression to validate the user input.',
+      },
+    },
+    _default: [],
   },
 };

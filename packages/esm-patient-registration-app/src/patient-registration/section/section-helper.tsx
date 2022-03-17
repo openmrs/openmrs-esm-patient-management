@@ -17,6 +17,8 @@ import {
   AdditionalInformationSectionProps,
 } from './additional-information/additional-information.component';
 import { DobField } from '../field/dob/dob.component';
+import { CodedAttributesField } from '../field/person-attributes/coded-attributes.component';
+import { TextBasedAttributesField } from '../field/person-attributes/text-based-attributes-field.component';
 
 export function getField(fieldName: string) {
   switch (fieldName) {
@@ -32,6 +34,10 @@ export function getField(fieldName: string) {
       return <DobField />;
     case 'id':
       return <IdField />;
+    case 'codedAttributes':
+      return <CodedAttributesField />;
+    case 'textBasedAttributes':
+      return <TextBasedAttributesField />;
     default:
       return <div>Unknown Field {fieldName} </div>;
   }
