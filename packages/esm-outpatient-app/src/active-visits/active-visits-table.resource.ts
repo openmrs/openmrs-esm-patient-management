@@ -136,7 +136,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     service: visitQueueEntry.queueEntry.queue.service.display,
     status: visitQueueEntry.queueEntry.status.display,
     waitTime: visitQueueEntry.queueEntry.startedAt
-      ? `${Math.abs(dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes'))}`
+      ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
       : '--',
     visitStartDateTime: visitQueueEntry.visit.visitStartDateTime,
     visitType: visitQueueEntry.visit.visitType.display,
