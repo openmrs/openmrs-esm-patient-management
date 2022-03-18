@@ -348,12 +348,13 @@ function ActiveVisitsTable() {
   }
 
   return (
-    <div className={styles.activeVisitsTableContainer}>
-      <div className={styles.activeVisitsTableHeaderContainer}>
+    <div className={styles.container}>
+      <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
         <Button
           iconDescription={t('addPatientToList', 'Add patient to list')}
           kind="secondary"
+          onClick={() => setShowOverlay(true)}
           renderIcon={Add16}
           size="small">
           {t('addPatientList', 'Add patient to list')}
