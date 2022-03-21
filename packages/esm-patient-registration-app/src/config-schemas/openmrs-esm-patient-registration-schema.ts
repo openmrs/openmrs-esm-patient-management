@@ -82,20 +82,16 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  personAttributeTypes: {
+  codedPersonAttributes: {
     _type: Type.Array,
     _default: [],
     _elements: {
       _type: Type.Object,
-      uuid: {
+      personAttributeUuid: {
         _type: Type.PersonAttributeTypeUuid,
         _description: 'The uuid of the person attribute type used to save the attribute',
       },
-      type: {
-        _type: Type.String,
-        _default: 'coded',
-      },
-      concept: {
+      conceptUuid: {
         _type: Type.ConceptUuid,
         _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
@@ -105,7 +101,7 @@ export const esmPatientRegistrationSchema = {
     _type: Type.Array,
     _elements: {
       _type: Type.Object,
-      uuid: {
+      personAttributeUuid: {
         _type: Type.PersonAttributeTypeUuid,
         _description: 'The uuid of the person attribute type used to save the attribute',
       },

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { PersonAttributeTypeConfig } from '../../patient-registration-types';
+import { TextBasedPersonAttributeConfig } from '../../patient-registration-types';
 import { Select, SelectItem } from 'carbon-components-react';
 import { useConceptAnswers, usePersonAttributeType } from './person-attributes.resource';
 import { Field } from 'formik';
@@ -15,10 +15,10 @@ export const TextBasedAttributesField: React.FC<TextBasedAttributesFieldProps> =
 
   return textBasedAttributes?.length ? (
     <div>
-      {textBasedAttributes.map((personAttributeType, ind) => (
+      {textBasedAttributes.map((personAttributeType: TextBasedPersonAttributeConfig, ind) => (
         <PersonAttributeField
           key={ind}
-          personAttributeTypeUuid={personAttributeType.uuid}
+          personAttributeTypeUuid={personAttributeType.personAttributeUuid}
           validationRegex={personAttributeType.validationRegex}
         />
       ))}
@@ -37,7 +37,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
 
   const validateInput = (value) => {
     let error;
-    if (!validationRegex || typeof validationRegex !== 'string' || validationRegex === '' || value === '') {
+    if (!value || !validationRegex || validationRegex === '' || typeof validationRegex !== 'string' || value === '') {
       return error;
     }
     const regex = new RegExp(validationRegex);

@@ -2,26 +2,24 @@ import React from 'react';
 import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { PersonAttributeTypeConfig } from '../../patient-registration-types';
+import { CodedPersonAttributeConfig } from '../../patient-registration-types';
 import { Select, SelectItem } from 'carbon-components-react';
 import { useConceptAnswers, usePersonAttributeType } from './person-attributes.resource';
 
 export interface CodedAttributesFieldProps {}
 
 export const CodedAttributesField: React.FC<CodedAttributesFieldProps> = () => {
-  const { personAttributeTypes } = useConfig();
+  const { codedPersonAttributes } = useConfig();
 
-  return personAttributeTypes?.length ? (
+  return codedPersonAttributes?.length ? (
     <div>
-      {personAttributeTypes
-        ?.filter((personAttributeType) => personAttributeType.type === 'coded')
-        .map((personAttributeType: PersonAttributeTypeConfig, ind) => (
-          <PersonAttributeField
-            key={ind}
-            personAttributeTypeUuid={personAttributeType.uuid}
-            conceptUuid={personAttributeType.concept}
-          />
-        ))}
+      {codedPersonAttributes.map((personAttributeType: CodedPersonAttributeConfig, ind) => (
+        <PersonAttributeField
+          key={ind}
+          personAttributeTypeUuid={personAttributeType.personAttributeUuid}
+          conceptUuid={personAttributeType.conceptUuid}
+        />
+      ))}
     </div>
   ) : null;
 };
