@@ -1,4 +1,5 @@
 {
+  "add": "Add",
   "addRelationshipButtonText": "Add Relationship",
   "address1": "Address Line 1",
   "addressHeader": "Address",
@@ -16,6 +17,7 @@
   "dateOfBirthLabelText": "Date of Birth",
   "deathDateInputLabel": "Date of Death",
   "deathdayNotInTheFuture": "Date of Death cannot be in the future",
+  "delete": "Delete",
   "deleteIdentifierTooltip": "Delete",
   "deleteRelationshipTooltipText": "Delete",
   "discard": "Discard",
@@ -50,6 +52,7 @@
   "negativeMonths": "Months cannot be less than 0",
   "negativeYears": "Years cannot be less than 0",
   "numberInNameDubious": "Name should not contain numbers",
+  "optional": "optional",
   "otherLabelText": "Other",
   "patient": "Patient",
   "phoneEmailLabelText": "Phone, Email, etc.",
