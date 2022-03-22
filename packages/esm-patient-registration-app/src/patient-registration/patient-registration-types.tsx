@@ -163,8 +163,14 @@ export interface FormValues {
   deathCause: string;
   relationships: Array<RelationshipValue>;
   identifiers: Array<PatientIdentifierValue>;
-  attributes?: {
-    [attributeTypeUuid: string]: string;
+  attributes?: PersonAttributeValue;
+}
+
+export interface PersonAttributeValue {
+  [attributeTypeUuid: string]: {
+    uuid?: string;
+    action?: 'UPDATE' | 'DELETE';
+    value: string;
   };
 }
 

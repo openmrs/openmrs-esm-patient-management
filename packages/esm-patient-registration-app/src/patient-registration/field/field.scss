@@ -1,5 +1,6 @@
 @import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import "@openmrs/esm-styleguide/src/vars";
 
 .productiveHeading02 {
   @include carbon--type-style("productive-heading-02");
@@ -9,7 +10,7 @@
 .productiveHeading02Light {
   @include carbon--type-style("productive-heading-02");
   margin-bottom: 1rem;
-  color: #525252;
+  color: $text-02
 }
 
 .label01 {
@@ -43,7 +44,7 @@
   justify-self: center;
 }
 
-.sexField, .dobField {
+.sexField, .dobField, .attributeText {
   margin-bottom: $spacing-05;
 }
 
@@ -65,7 +66,9 @@
 }
 
 .attributeField {
-  margin-bottom: $spacing-05;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
 }
 
 :global(.omrs-breakpoint-lt-desktop){

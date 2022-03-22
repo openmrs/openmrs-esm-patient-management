@@ -1,12 +1,11 @@
 import React from 'react';
-import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { TextBasedPersonAttributeConfig } from '../../patient-registration-types';
-import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers, usePersonAttributeType } from './person-attributes.resource';
+import { usePersonAttributeType } from './person-attributes.resource';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { PersonAttributeField } from './person-attribute-field.component';
 
 export interface TextBasedAttributesFieldProps {}
 
@@ -16,7 +15,7 @@ export const TextBasedAttributesField: React.FC<TextBasedAttributesFieldProps> =
   return textBasedAttributes?.length ? (
     <div>
       {textBasedAttributes.map((personAttributeType: TextBasedPersonAttributeConfig, ind) => (
-        <PersonAttributeField
+        <TextBasedPersonAttributeField
           key={ind}
           personAttributeTypeUuid={personAttributeType.personAttributeUuid}
           validationRegex={personAttributeType.validationRegex}
@@ -26,48 +25,58 @@ export const TextBasedAttributesField: React.FC<TextBasedAttributesFieldProps> =
   ) : null;
 };
 
-interface PersonAttributeFieldProps {
+interface TextBasedPersonAttributeFieldProps {
   personAttributeTypeUuid: string;
   validationRegex: string;
 }
 
-const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttributeTypeUuid, validationRegex }) => {
+export const TextBasedPersonAttributeField: React.FC<TextBasedPersonAttributeFieldProps> = ({
+  personAttributeTypeUuid,
+  validationRegex,
+}) => {
   const { data: personAttributeType, isLoading } = usePersonAttributeType(personAttributeTypeUuid);
   const { t } = useTranslation();
 
   const validateInput = (value) => {
-    let error;
-    if (!value || !validationRegex || validationRegex === '' || typeof validationRegex !== 'string' || value === '') {
-      return error;
+    if (!value || !validationRegex || validationRegex === '' || value === '') {
+      return null;
     }
     const regex = new RegExp(validationRegex);
     if (regex.test(value)) {
-      return error;
+      return null;
     } else {
-      error = t('invalidInput', 'Invalid Input');
+      return t('invalidInput', 'Invalid Input');
     }
-
-    return error;
   };
 
-  return !isLoading ? (
-    <div className={styles.attributeField}>
-      <Field name={`attributes.${personAttributeTypeUuid}`} validate={validateInput}>
-        {({ field, form: { touched, errors }, meta }) => {
-          return (
+  const inputField = (
+    <Field name={`attributes.${personAttributeTypeUuid}.value`} validate={validateInput}>
+      {({ field, form: { touched, errors } }) => {
+        return (
+          <>
             <Input
               id={`person-attribute-${personAttributeTypeUuid}`}
-              labelText={personAttributeType?.name}
-              placeholder={personAttributeType?.name}
+              labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
+              placeholder={''}
               light
               invalid={
-                errors[`attributes.${personAttributeTypeUuid}`] && touched[`attributes.${personAttributeTypeUuid}`]
+                errors[`attributes.${personAttributeTypeUuid}.value`] &&
+                touched[`attributes.${personAttributeTypeUuid}.value`]
               }
               {...field}
             />
-          );
-        }}
-      </Field>
-    </div>
-  ) : null;
+          </>
+        );
+      }}
+    </Field>
+  );
+
+  return (
+    <PersonAttributeField
+      isLoadingPersonAttributeTypeDetails={isLoading}
+      personAttributeTypeUuid={personAttributeTypeUuid}
+      personAttributeTypeName={personAttributeType?.name}
+      inputField={inputField}
+    />
+  );
 };

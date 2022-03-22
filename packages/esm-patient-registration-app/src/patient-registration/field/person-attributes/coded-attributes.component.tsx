@@ -1,10 +1,11 @@
 import React from 'react';
-import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { CodedPersonAttributeConfig } from '../../patient-registration-types';
 import { Select, SelectItem } from 'carbon-components-react';
 import { useConceptAnswers, usePersonAttributeType } from './person-attributes.resource';
+import { useTranslation } from 'react-i18next';
+import { PersonAttributeField } from './person-attribute-field.component';
 
 export interface CodedAttributesFieldProps {}
 
@@ -14,7 +15,7 @@ export const CodedAttributesField: React.FC<CodedAttributesFieldProps> = () => {
   return codedPersonAttributes?.length ? (
     <div>
       {codedPersonAttributes.map((personAttributeType: CodedPersonAttributeConfig, ind) => (
-        <PersonAttributeField
+        <CodedPersonAttributeField
           key={ind}
           personAttributeTypeUuid={personAttributeType.personAttributeUuid}
           conceptUuid={personAttributeType.conceptUuid}
@@ -24,23 +25,26 @@ export const CodedAttributesField: React.FC<CodedAttributesFieldProps> = () => {
   ) : null;
 };
 
-interface PersonAttributeFieldProps {
+interface CodedPersonAttributeFieldProps {
   personAttributeTypeUuid: string;
   conceptUuid: string;
 }
 
-const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttributeTypeUuid, conceptUuid }) => {
+export const CodedPersonAttributeField: React.FC<CodedPersonAttributeFieldProps> = ({
+  personAttributeTypeUuid,
+  conceptUuid,
+}) => {
   const { data: personAttributeType, isLoading } = usePersonAttributeType(personAttributeTypeUuid);
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
-
-  return !isLoading ? (
-    <div className={styles.attributeField}>
+  const { t } = useTranslation();
+  const inputField = (
+    <>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeTypeUuid}`}
-          name={`attributes.${personAttributeTypeUuid}`}
-          labelText={personAttributeType?.name}
-          light>
+          labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
+          light
+          name={`attributes.${personAttributeTypeUuid}.value`}>
           {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
           ))}
@@ -48,12 +52,21 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
       ) : (
         <Input
           id={`person-attribute-${personAttributeTypeUuid}`}
-          labelText={personAttributeType?.name}
-          placeholder={personAttributeType?.name}
-          name={`attributes.${personAttributeTypeUuid}`}
+          labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
+          placeholder={''}
           light
+          name={`attributes.${personAttributeTypeUuid}.value`}
         />
       )}
-    </div>
-  ) : null;
+    </>
+  );
+
+  return (
+    <PersonAttributeField
+      isLoadingPersonAttributeTypeDetails={isLoading}
+      personAttributeTypeUuid={personAttributeTypeUuid}
+      personAttributeTypeName={personAttributeType?.name}
+      inputField={inputField}
+    />
+  );
 };
