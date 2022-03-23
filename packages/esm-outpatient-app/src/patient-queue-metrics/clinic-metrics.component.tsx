@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from 'carbon-components-react';
-import { useMetrics } from './queue-metrics.resource';
+import { useMetrics, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
@@ -9,21 +9,7 @@ import styles from './clinic-metrics.scss';
 const ClinicMetrics: React.FC = () => {
   const { t } = useTranslation();
   const { metrics, isError, isLoading } = useMetrics();
-
-  const items = [
-    {
-      id: 'option-1',
-      text: 'Triage',
-    },
-    {
-      id: 'option-2',
-      text: 'Adult return',
-    },
-    {
-      id: 'option-3',
-      text: 'Pharmacy',
-    },
-  ];
+  const { services } = useServices();
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -45,10 +31,10 @@ const ClinicMetrics: React.FC = () => {
           <Dropdown
             style={{ marginTop: '1.5rem' }}
             id="inline"
-            label={t('triage', 'Triage')}
+            initialSelectedItem={t('triage', 'Triage')}
+            label=""
             type="inline"
-            items={items}
-            itemToString={(item) => (item ? item.text : '')}
+            items={[...services]}
           />
         </MetricsCard>
         <MetricsCard
