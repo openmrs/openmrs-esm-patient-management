@@ -31,7 +31,7 @@ npx lerna bootstrap
 To develop on a specific package e.g [@openmrs/esm-patient-search-app](packages/esm-patient-search-app)
 
 ```sh
-npx openmrs develop --sources 'packages/apps/esm-patient-search-app'
+npx openmrs develop --sources 'packages/esm-patient-search-app'
 ```
 
 You can always use regex
