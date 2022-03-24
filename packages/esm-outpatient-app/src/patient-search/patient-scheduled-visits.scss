@@ -17,16 +17,18 @@
 .visitTile {
     margin: $spacing-05;
 
-    &:global(.bx--tile--selectable:focus) {
+    &:global(.bx--tile--is-selected:focus) {
         background-color: $color-blue-10;
         color: $color-blue-10;
         border: 1px solid $color-blue-60-2;
+        outline: none;
     }
 
-    &:global(.bx--tile--selectable:hover) {
+    &:global(.bx--tile--is-selected:hover) {
         background-color: $color-blue-10;
         color: $color-blue-10;
         border: 1px solid $color-blue-60-2;
+        outline: none;
     }
 
 
