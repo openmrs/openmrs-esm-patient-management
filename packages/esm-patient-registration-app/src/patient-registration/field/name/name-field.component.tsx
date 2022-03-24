@@ -3,7 +3,7 @@ import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext, useFieldConfig } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from 'carbon-components-react';
 
 const containsNoNumbers = /^([^0-9]*)$/;
@@ -19,6 +19,7 @@ function checkNumber(value: string) {
 export const NameField = () => {
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto } = useContext(PatientRegistrationContext);
+  const { fieldConfigurations } = useConfig();
   const [nameKnown, setNameKnown] = useState(true);
 
   const onCapturePhoto = useCallback((dataUri: string, photoDateTime: string) => {
@@ -54,7 +55,7 @@ export const NameField = () => {
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>
           <div style={{ minHeight: '1rem' }}></div>
-          {nameKnown && (
+          {nameKnown ? (
             <>
               <Input
                 id="givenName"
@@ -80,7 +81,23 @@ export const NameField = () => {
                 checkWarning={checkNumber}
               />
             </>
+          ) : (
+            <>
+              <input
+                name="givenName"
+                value={fieldConfigurations?.defaultUnknownGivenName ?? 'UNKNOWN'}
+                hidden
+                readOnly
+              />
+              <input
+                name="familyName"
+                value={fieldConfigurations?.defaultUnknownFamilyName ?? 'UNKNOWN'}
+                hidden
+                readOnly
+              />
+            </>
           )}
+          <input name="unknownPatient" onChange={() => {}} value={`${!nameKnown}`} hidden />
         </div>
       </div>
     </div>
