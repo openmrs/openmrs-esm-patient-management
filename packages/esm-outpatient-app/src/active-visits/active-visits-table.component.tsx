@@ -44,6 +44,7 @@ import {
 } from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './active-visits-table.scss';
+import PastVisit from '../past-visit/past-visit.component';
 
 type TableSize = 0 | 1;
 
@@ -324,9 +325,7 @@ function ActiveVisitsTable() {
                                   </>
                                 </Tab>
                                 <Tab label={t('previousVisit', 'Previous visit')}>
-                                  <>
-                                    <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </>
+                                  <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />
                                 </Tab>
                               </Tabs>
                             </>
