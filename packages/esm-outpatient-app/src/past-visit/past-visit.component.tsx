@@ -12,7 +12,7 @@ interface PastVisitProps {
 const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
-  const [tabSelected, setSelectedTab] = useState(0);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   return (
     <div>
       <div className={styles.visitType}>
@@ -23,27 +23,27 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
         <Tabs
           className={`${styles.verticalTabs} ${useLayoutType() === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
           <Tab
-            className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
+            className={`${styles.tab} ${styles.bodyLong01} ${selectedTabIndex === 0 && styles.selectedTab}`}
             id="vitals-tab"
-            onClick={() => setSelectedTab(0)}
+            onClick={() => setSelectedTabIndex(0)}
             label={t('vitals', 'Vitals')}></Tab>
 
           <Tab
-            className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
+            className={`${styles.tab} ${selectedTabIndex === 1 && styles.selectedTab}`}
             id="notes-tab"
-            onClick={() => setSelectedTab(1)}
+            onClick={() => setSelectedTabIndex(1)}
             label={t('notes', 'Notes')}></Tab>
 
           <Tab
-            className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
+            className={`${styles.tab} ${selectedTabIndex === 2 && styles.selectedTab}`}
             id="medications-tab"
-            onClick={() => setSelectedTab(2)}
+            onClick={() => setSelectedTabIndex(2)}
             label={t('medications', 'Medications')}></Tab>
 
           <Tab
-            className={`${styles.tab} ${tabSelected === 3 && styles.selectedTab}`}
+            className={`${styles.tab} ${selectedTabIndex === 3 && styles.selectedTab}`}
             id="encounters-tab"
-            onClick={() => setSelectedTab(3)}
+            onClick={() => setSelectedTabIndex(3)}
             label={t('encounters', 'Encounters')}></Tab>
         </Tabs>
       </div>
