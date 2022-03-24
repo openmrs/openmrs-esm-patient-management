@@ -48,9 +48,11 @@
   "months": "Months",
   "negativeMonths": "Months cannot be less than 0",
   "negativeYears": "Years cannot be less than 0",
+  "no": "No",
   "numberInNameDubious": "Name should not contain numbers",
   "otherLabelText": "Other",
   "patient": "Patient",
+  "patientNameKnown": "Patient's Name is Known?",
   "phoneEmailLabelText": "Phone, Email, etc.",
   "phoneNumberInputLabelText": "Phone number (optional)",
   "postalCode": "Post Code",
@@ -73,5 +75,6 @@
   "updatePatient": "Update Patient",
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
-  "years": "Years"
+  "years": "Years",
+  "yes": "Yes"
 }
