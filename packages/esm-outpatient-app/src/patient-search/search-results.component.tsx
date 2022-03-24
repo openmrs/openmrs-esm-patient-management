@@ -1,13 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './search-results.scss';
+import { SearchTypes } from '../types';
+import PatientScheduledVisits from './patient-scheduled-visits.component';
 
 interface SearchResultsProps {
   patients: Array<any>;
   hidePanel?: any;
+  toggleSearchType: (searchMode: SearchTypes) => void;
 }
 
-function SearchResults({ patients }: SearchResultsProps) {
+const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const fhirPatients = useMemo(() => {
     return patients.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -43,6 +46,7 @@ function SearchResults({ patients }: SearchResultsProps) {
       };
     });
   }, [patients]);
+  const onClickSearchResult = () => toggleSearchType(SearchTypes.SCHEDULED_VISITS);
 
   return (
     <>
@@ -54,7 +58,7 @@ function SearchResults({ patients }: SearchResultsProps) {
               state={{
                 patient,
                 patientUuid: patient.id,
-                // onClick: onClickSearchResult,
+                onClick: onClickSearchResult,
                 // onTransition: hidePanel,
               }}
             />
@@ -63,6 +67,6 @@ function SearchResults({ patients }: SearchResultsProps) {
       ))}
     </>
   );
-}
+};
 
 export default SearchResults;
