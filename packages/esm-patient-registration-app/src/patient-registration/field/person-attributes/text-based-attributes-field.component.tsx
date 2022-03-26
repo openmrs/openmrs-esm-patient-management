@@ -3,8 +3,7 @@ import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { TextBasedPersonAttributeConfig } from '../../patient-registration-types';
-import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers, usePersonAttributeType } from './person-attributes.resource';
+import { usePersonAttributeType } from './person-attributes.resource';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 
@@ -51,14 +50,13 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
   };
 
   return !isLoading ? (
-    <div className={styles.attributeField}>
+    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
       <Field name={`attributes.${personAttributeTypeUuid}`} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input
               id={`person-attribute-${personAttributeTypeUuid}`}
               labelText={personAttributeType?.name}
-              placeholder={personAttributeType?.name}
               light
               invalid={
                 errors[`attributes.${personAttributeTypeUuid}`] && touched[`attributes.${personAttributeTypeUuid}`]

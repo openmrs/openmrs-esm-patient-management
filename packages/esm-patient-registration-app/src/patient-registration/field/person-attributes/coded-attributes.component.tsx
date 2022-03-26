@@ -34,7 +34,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
 
   return !isLoading ? (
-    <div className={styles.attributeField}>
+    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeTypeUuid}`}
@@ -49,7 +49,6 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
         <Input
           id={`person-attribute-${personAttributeTypeUuid}`}
           labelText={personAttributeType?.name}
-          placeholder={personAttributeType?.name}
           name={`attributes.${personAttributeTypeUuid}`}
           light
         />
