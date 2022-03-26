@@ -207,12 +207,3 @@ export async function deletePatientIdentifier(
     signal: abortController.signal,
   });
 }
-
-export function deletePatientAttribute(personUuid: string, personAttributeValue: string) {
-  return openmrsFetch(`/ws/rest/v1/person/${personUuid}/attribute/${personAttributeValue}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-}

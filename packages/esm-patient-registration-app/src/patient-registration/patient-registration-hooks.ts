@@ -100,13 +100,9 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   // Set Initial person attributes
   useEffect(() => {
     if (!isLoadingAttributes && attributes) {
-      let personAttributes: FormValues['attributes'] = {};
+      let personAttributes = {};
       attributes.forEach((attribute) => {
-        personAttributes[attribute.attributeType.uuid] = {
-          uuid: attribute.uuid,
-          action: 'UPDATE',
-          value: attribute.value,
-        };
+        personAttributes[attribute.attributeType.uuid] = attribute.value;
       });
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,

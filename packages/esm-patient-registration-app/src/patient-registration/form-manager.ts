@@ -1,4 +1,4 @@
-import { queueSynchronizationItem, showNotification } from '@openmrs/esm-framework';
+import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -21,7 +21,6 @@ import {
   saveRelationship,
   updateRelationship,
   updatePatientIdentifier,
-  deletePatientAttribute,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 
@@ -278,16 +277,10 @@ export default class FormManager {
 
     if (values.attributes) {
       for (const [key, value] of Object.entries(values.attributes)) {
-        if (value?.action !== 'DELETE' && value.value && value.value !== '') {
-          attributes.push({
-            attributeType: key,
-            value: value.value,
-          });
-        } else if (value?.action === 'DELETE') {
-          deletePatientAttribute(values.patientUuid, value.uuid).catch((error) => {
-            throw new Error(error);
-          });
-        }
+        attributes.push({
+          attributeType: key,
+          value,
+        });
       }
     }
 
