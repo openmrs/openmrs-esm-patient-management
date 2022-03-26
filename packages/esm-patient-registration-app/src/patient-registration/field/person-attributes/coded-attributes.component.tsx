@@ -36,12 +36,13 @@ export const CodedPersonAttributeField: React.FC<CodedPersonAttributeFieldProps>
 }) => {
   const { data: personAttributeType, isLoading } = usePersonAttributeType(personAttributeTypeUuid);
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
+  const { t } = useTranslation();
   const inputField = (
     <>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeTypeUuid}`}
-          hideLabel
+          labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
           light
           name={`attributes.${personAttributeTypeUuid}.value`}>
           {conceptAnswers.map((answer) => (
@@ -51,8 +52,8 @@ export const CodedPersonAttributeField: React.FC<CodedPersonAttributeFieldProps>
       ) : (
         <Input
           id={`person-attribute-${personAttributeTypeUuid}`}
-          hideLabel
-          labelText={''}
+          labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
+          placeholder={''}
           light
           name={`attributes.${personAttributeTypeUuid}.value`}
         />

@@ -44,7 +44,6 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
         warn={!!warnText}
         warnText={warnText}
         value={value}
-        size="lg"
       />
     </div>
   );

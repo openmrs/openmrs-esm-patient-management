@@ -56,8 +56,8 @@ export const TextBasedPersonAttributeField: React.FC<TextBasedPersonAttributeFie
           <>
             <Input
               id={`person-attribute-${personAttributeTypeUuid}`}
-              labelText={''}
-              hideLabel
+              labelText={`${personAttributeType?.name} (${t('optional', 'optional')})`}
+              placeholder={''}
               light
               invalid={
                 errors[`attributes.${personAttributeTypeUuid}.value`] &&
