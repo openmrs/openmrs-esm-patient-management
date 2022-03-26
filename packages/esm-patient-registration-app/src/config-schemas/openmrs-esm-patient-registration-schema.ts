@@ -101,4 +101,7 @@ export const esmPatientRegistrationSchema = {
       },
     },
   },
+  defaultPatientIdentifierTypes: {
+    _type: 'PatientIdentifierTypeUuidArray',
+  },
 };
