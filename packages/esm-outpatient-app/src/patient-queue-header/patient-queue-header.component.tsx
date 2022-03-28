@@ -10,7 +10,8 @@ import styles from './patient-queue-header.scss';
 const PatientQueueHeader: React.FC = () => {
   const { t } = useTranslation();
   const userSession = useSessionUser();
-  const items = [
+  const userLocation = userSession?.sessionLocation?.display;
+  const careTypes = [
     {
       id: 'option-1',
       text: t('ncdCare', 'NCD Care'),
@@ -26,30 +27,31 @@ const PatientQueueHeader: React.FC = () => {
   ];
 
   return (
-    <div className={styles['patient-header-container']}>
-      <div className={styles['header-left']}>
+    <div className={styles.header}>
+      <div className={styles['left-justified-items']}>
         <PatientQueueIllustration />
-        <div className={styles.labels}>
-          <p className={styles['bodyShort02']}>{t('outpatients', 'Outpatients')}</p>
-          <p className={styles['productiveHeading04']}>{t('home', 'Home')}</p>
+        <div className={styles['page-labels']}>
+          <p>{t('outpatients', 'Outpatients')}</p>
+          <p className={styles['page-name']}>{t('home', 'Home')}</p>
         </div>
       </div>
-      <div className={styles.headerRightContainer}>
-        <div className={styles.locationDateContainer}>
+      <div className={styles['right-justified-items']}>
+        <div className={styles['date-and-location']}>
           <Location16 />
-          <span className={styles.locationLabel}>{userSession?.sessionLocation?.display}</span>
-          <span className={styles.dotMark}>.</span>
+          <span className={styles.value}>{userLocation}</span>
+          <span className={styles.middot}>&middot;</span>
           <Calendar16 className={styles.calendar} />
-          <span className={styles.dateLabel}>{formatDate(new Date(), { mode: 'standard' })}</span>
+          <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
-        <div className={styles.dropDownContainer}>
-          <label className={styles.viewLabel}>{t('view', 'View:')} </label>
+        <div className={styles.dropdown}>
+          <label className={styles.view}>{t('view', 'View')}:</label>
           <Dropdown
             id="typeOfCare"
-            label={t('ncdCare', 'NCD Care')}
-            type="inline"
-            items={items}
+            label={t('careType', 'Type of Care')}
+            initialSelectedItem={careTypes[0]}
+            items={careTypes}
             itemToString={(item) => (item ? item.text : '')}
+            type="inline"
           />
         </div>
       </div>
