@@ -123,7 +123,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
 
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
-    encounters: visitQueueEntry.visit.encounters.map(mapEncounterProperties),
+    encounters: visitQueueEntry.visit.encounters?.map(mapEncounterProperties),
     name: visitQueueEntry.queueEntry.display,
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
@@ -138,9 +138,9 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     waitTime: visitQueueEntry.queueEntry.startedAt
       ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
       : '--',
-    visitStartDateTime: visitQueueEntry.visit.visitStartDateTime,
-    visitType: visitQueueEntry.visit.visitType.display,
-    visitUuid: visitQueueEntry.visit.uuid,
+    visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
+    visitType: visitQueueEntry.visit?.visitType?.display,
+    visitUuid: visitQueueEntry.visit?.uuid,
   });
 
   const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);

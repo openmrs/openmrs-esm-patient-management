@@ -152,9 +152,40 @@
 }
 
 .content {
-  @include carbon--type-style("productive-heading-01");
+  @include carbon--type-style("productive-heading-02");
   color: $text-02;
   margin-bottom: 0.5rem;
+}
+
+.helper {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}
+
+.separator {
+  display: block;
+  margin: 3rem auto;
+
+  hr {
+    @include carbon--type-style('body-short-02');
+    color: $text-02;
+    width: 80%;
+    line-height: 1;
+    border: 0;
+    border-top: 1px solid $text-03;
+    text-align: center;
+    overflow: visible;
+    margin-bottom: -1rem;
+    
+    &::after {
+      content: 'or';
+      display: inline-block;
+      position: relative;
+      top: -0.7em;
+      padding: 0 1rem;
+      background: $ui-01;
+    }
+  }
 }
 
 .tileContainer {
@@ -166,6 +197,12 @@
 .tile {
   margin: auto;
   width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .menuItem {
