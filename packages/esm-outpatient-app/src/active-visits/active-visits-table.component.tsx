@@ -43,8 +43,8 @@ import {
   MappedQueuePriority,
 } from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
-import styles from './active-visits-table.scss';
 import PastVisit from '../past-visit/past-visit.component';
+import styles from './active-visits-table.scss';
 
 type TableSize = 0 | 1;
 
@@ -227,6 +227,16 @@ function ActiveVisitsTable() {
           return false;
         }
         if (cellsById[id].value.hasOwnProperty('content')) {
+          if (Array.isArray(cellsById[id].value.content.props.children)) {
+            return ('' + cellsById[id].value.content.props.children[1].props.children)
+              .toLowerCase()
+              .includes(inputValue.toLowerCase());
+          }
+          if (typeof cellsById[id].value.content.props.children === 'object') {
+            return ('' + cellsById[id].value.content.props.children.props.children.props.children)
+              .toLowerCase()
+              .includes(inputValue.toLowerCase());
+          }
           return ('' + cellsById[id].value.content.props.children).toLowerCase().includes(inputValue.toLowerCase());
         }
         return ('' + cellsById[id].value).toLowerCase().includes(inputValue.toLowerCase());
