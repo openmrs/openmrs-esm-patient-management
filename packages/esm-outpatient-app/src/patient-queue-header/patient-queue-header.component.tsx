@@ -18,7 +18,7 @@ const PatientQueueHeader: React.FC = () => {
     },
     {
       id: 'option-2',
-      text: t('hivCare', 'HIV care'),
+      text: t('hivCare', 'HIV Care'),
     },
     {
       id: 'option-3',
@@ -40,7 +40,7 @@ const PatientQueueHeader: React.FC = () => {
           <Location16 />
           <span className={styles.value}>{userLocation}</span>
           <span className={styles.middot}>&middot;</span>
-          <Calendar16 className={styles.calendar} />
+          <Calendar16 />
           <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
         <div className={styles.dropdown}>
