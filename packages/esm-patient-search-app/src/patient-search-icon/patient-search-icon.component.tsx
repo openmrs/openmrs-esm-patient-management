@@ -5,7 +5,7 @@ import { Button, HeaderGlobalAction, Search } from 'carbon-components-react';
 import PatientSearch from '../patient-search/patient-search.component';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
 import { performPatientSearch } from '../patient-search/patient-search.resource';
 import isEmpty from 'lodash-es/isEmpty';
 import { SearchedPatient } from '../types';
@@ -66,13 +66,16 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const [open, setOpen] = useState<boolean>(false);
+  const [showSearchInput, setShowSearchInput] = useState<boolean>(false);
+  const [showResultsPanel, setShowResultsPanel] = useState<boolean>(false);
+  const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>();
   const initialState: PatientSearch = { status: 'idle', searchResults: [] };
   const [{ searchResults, status, error }, dispatch] = useReducer(reducer, initialState);
 
   const performSearch = useCallback(() => {
     !isEmpty(searchTerm) && dispatch({ type: ActionTypes.searching, payload: [] });
+    setShowResultsPanel(true);
   }, [searchTerm]);
 
   useEffect(() => {
@@ -99,15 +102,27 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
 
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
 
-  const handleCloseSearchPanel = useCallback(() => {
-    setOpen(false);
+  const handleCloseSearchInput = useCallback(() => {
+    setShowSearchInput(false);
   }, []);
 
+  const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
+
   useEffect(() => {
-    if (!open) {
+    if (!showSearchInput) {
       setSearchTerm('');
     }
-  }, [open]);
+  }, [showSearchInput]);
+
+  useEffect(() => {
+    showSearchInput ? setCanClickOutside(true) : setCanClickOutside(false);
+  }, [showSearchInput]);
+
+  useEffect(() => {
+    if (isEmpty(searchTerm)) {
+      setShowResultsPanel(false);
+    }
+  }, [searchTerm]);
 
   useEffect(() => {
     if (isEmpty(searchTerm)) {
@@ -117,8 +132,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
 
   return (
     <>
-      <div className={styles.patientSearchIconWrapper}>
-        {open && (
+      <div className={styles.patientSearchIconWrapper} ref={ref}>
+        {showSearchInput && (
           <div className={styles.searchArea}>
             <Search
               size={layout === 'desktop' ? 'sm' : 'xl'}
@@ -140,19 +155,19 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           </div>
         )}
 
-        <div className={`${open && styles.closeButton}`}>
+        <div className={`${showSearchInput && styles.closeButton}`}>
           <HeaderGlobalAction
-            className={`${open ? styles.activeSearchIconButton : styles.searchIconButton}`}
-            onClick={() => setOpen((prevState) => !prevState)}
+            className={`${showSearchInput ? styles.activeSearchIconButton : styles.searchIconButton}`}
+            onClick={() => setShowSearchInput((prevState) => !prevState)}
             aria-label="Search Patient"
             aria-labelledby="Search Patient"
             name="SearchPatientIcon">
-            {open ? <Close20 /> : <Search20 />}
+            {showSearchInput ? <Close20 /> : <Search20 />}
           </HeaderGlobalAction>
         </div>
       </div>
-      {open && (
-        <PatientSearch hidePanel={handleCloseSearchPanel} searchResults={searchResults} status={status} error={error} />
+      {showResultsPanel && (
+        <PatientSearch hidePanel={handleCloseSearchInput} searchResults={searchResults} status={status} error={error} />
       )}
     </>
   );
