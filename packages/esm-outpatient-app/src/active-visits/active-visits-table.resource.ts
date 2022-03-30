@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -94,8 +94,11 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
 }
 
 export function useServices() {
-  // TODO: Move to config file
-  const serviceConceptSetUuid = '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a';
+  const config = useConfig();
+  const {
+    concepts: { serviceConceptSetUuid },
+  } = config;
+
   const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
   const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
@@ -123,7 +126,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
 
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
-    encounters: visitQueueEntry.visit.encounters?.map(mapEncounterProperties),
+    encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
     name: visitQueueEntry.queueEntry.display,
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     // Map `Urgent` to `Priority` because it's easier to distinguish between tags named

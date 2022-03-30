@@ -98,14 +98,14 @@ function StatusIcon({ status }) {
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
-  const isDesktop = useLayoutType() === 'desktop';
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const { services } = useServices();
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [contentSwitcherValue, setContentSwitcherValue] = useState<TableSize>(0);
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
   const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const [showOverlay, setShowOverlay] = useState(false);
+  const isDesktop = useLayoutType() === 'desktop';
 
   useEffect(() => {
     if (contentSwitcherValue === 0) {
