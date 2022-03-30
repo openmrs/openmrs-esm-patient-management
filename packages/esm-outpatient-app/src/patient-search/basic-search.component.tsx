@@ -60,7 +60,9 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
         </Button>
       </div>
       {searchResults?.length ? (
-        <div className={styles.resultsContainer}>{<SearchResults patients={searchResults} />}</div>
+        <div className={styles.resultsContainer}>
+          {<SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />}
+        </div>
       ) : (
         <div>
           <div className={styles.tileContainer}>
