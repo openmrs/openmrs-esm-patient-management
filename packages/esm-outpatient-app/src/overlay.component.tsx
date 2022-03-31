@@ -1,8 +1,8 @@
 import React from 'react';
 import { ArrowLeft16, Close16 } from '@carbon/icons-react';
 import { Button, Header } from 'carbon-components-react';
-import styles from './overlay.scss';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './overlay.scss';
 
 interface OverlayProps {
   closePanel: () => void;
@@ -22,7 +22,7 @@ const Overlay: React.FC<OverlayProps> = ({ closePanel, children, header }) => {
           </Button>
         </div>
       ) : (
-        <Header className={styles.tabletOverlayHeader}>
+        <Header aria-label="Tablet overlay" className={styles.tabletOverlayHeader}>
           <Button onClick={closePanel} hasIconOnly>
             <ArrowLeft16 onClick={closePanel} />
           </Button>
