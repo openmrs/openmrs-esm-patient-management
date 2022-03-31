@@ -52,16 +52,6 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const defaultViewButton = screen.getByRole('tab', { name: /default/i });
-    const largeViewButton = screen.getByRole('tab', { name: /large/i });
-
-    expect(defaultViewButton).toBeInTheDocument();
-    expect(largeViewButton).toBeInTheDocument();
-    expect(defaultViewButton).toHaveAttribute('aria-selected', 'true');
-
-    userEvent.click(largeViewButton);
-    expect(largeViewButton).toHaveAttribute('aria-selected', 'true');
-
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
     expect(screen.getByRole('tooltip', { name: /needs triage/i })).toBeInTheDocument();

@@ -19,11 +19,6 @@
   color: $text-01;
 }
 
-.switcherContainer {
-  display: flex;
-  align-items: center;
-}
-
 .filterContainer {
   :global(.bx--dropdown__wrapper--inline) {
     gap: 0;
@@ -32,16 +27,6 @@
   :global(.bx--list-box__menu-icon) {
     height: 1rem;
   }
-}
-
-.switcherContainer :global(.bx--content-switcher) {
-  align-items: center;
-  margin-left: 0.5rem;
-}
-
-.switch {
-   width: 7.875rem;
-   height: 2rem;
 }
 
 .tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
@@ -64,11 +49,6 @@
   display: flex;
   flex: 1 1 0%;
   justify-content: center;
-}
-
-.contentSwitcherLabel {
-  @include carbon--type-style("label-01");
-  color: $text-02;
 }
 
 .tableContainer {
