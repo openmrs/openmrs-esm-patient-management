@@ -7,9 +7,9 @@ import {
   StructuredListWrapper,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { formatDatetime, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import styles from './past-visit.scss';
+import { formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { FormattedEncounter } from './past-visit.component';
+import styles from './past-visit.scss';
 
 interface EncounterListProps {
   encounters: Array<FormattedEncounter>;

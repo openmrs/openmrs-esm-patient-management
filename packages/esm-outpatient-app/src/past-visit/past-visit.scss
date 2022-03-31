@@ -2,6 +2,9 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.wrapper {
+  margin-top: 0.5rem;
+}
 
 .bodyShort02 {
   @include carbon--type-style("body-short-02");
@@ -14,6 +17,7 @@
 .date {
   @include carbon--type-style('label-01');
   color: $text-02;
+  margin: 0.5rem 0rem 0.25rem; 
 }
 
 .visitType {
@@ -45,7 +49,6 @@
   background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
-  padding: $spacing-05 0rem;
 }
 
 .flexSections {
@@ -53,7 +56,7 @@
 }
 
 .verticalTabs {
-  margin: $spacing-05 0;
+  margin: $spacing-04 0;
 
   &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
     margin-left: 0rem;

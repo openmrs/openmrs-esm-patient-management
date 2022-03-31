@@ -95,6 +95,10 @@
     height: 2rem;
     margin-bottom: 0.25rem;
   }
+
+  :global(.bx--data-table--zebra tbody tr[data-child-row]:hover td) {
+    background-color: $ui-02;
+  }
 }
 
 .emptyRow {

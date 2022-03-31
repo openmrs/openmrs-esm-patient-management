@@ -1,14 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import styles from './past-visit.scss';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from 'carbon-components-react';
+import { StructuredListSkeleton, Tab, Tabs } from 'carbon-components-react';
 import { formatDate, OpenmrsResource, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { Observation, usePastVisits } from './past-visit.resource';
 import EncounterList from './encounter-list.component';
+import styles from './past-visit.scss';
 
 interface PastVisitProps {
   patientUuid: string;
 }
+
 export interface FormattedEncounter {
   id: string;
   datetime: string;
@@ -24,13 +25,17 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const layout = useLayoutType();
+  const isTablet = useLayoutType() === 'tablet';
+
+  if (isLoading) {
+    return <StructuredListSkeleton role="progressbar" />;
+  }
 
   if (pastVisits?.length) {
     const encounters = mapEncounters(pastVisits[0]);
 
     return (
-      <div>
+      <div className={styles.wrapper}>
         <div className={styles.visitType}>
           <span> {pastVisits?.length ? pastVisits[0]?.visitType.display : '--'}</span>
           <p className={styles.date}>
@@ -38,7 +43,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
           </p>
         </div>
         <div className={styles.visitContainer}>
-          <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
+          <Tabs className={`${styles.verticalTabs} ${isTablet ? styles.tabletTabs : styles.desktopTabs}`}>
             <Tab
               className={`${styles.tab} ${styles.bodyLong01} ${selectedTabIndex === 0 && styles.selectedTab}`}
               id="vitals-tab"
