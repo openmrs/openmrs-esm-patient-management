@@ -92,6 +92,15 @@ describe('ActiveVisitsTable: ', () => {
 
     expect(screen.getByText(/eric test ric/i)).toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
+
+    userEvent.clear(searchbox);
+    userEvent.type(searchbox, 'gibberish');
+
+    expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+    expect(screen.getByRole('separator')).toBeInTheDocument();
   });
 });
 
