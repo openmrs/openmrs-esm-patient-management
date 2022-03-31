@@ -98,7 +98,6 @@ function ActiveVisitsTable() {
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
-  const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
 
