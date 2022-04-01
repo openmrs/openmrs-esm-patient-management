@@ -64,6 +64,10 @@
   margin-left: $spacing-03;
 }
 
+.attributeField {
+  margin-bottom: $spacing-05;
+}
+
 :global(.omrs-breakpoint-lt-desktop){
   .grid {
     grid-template-columns: 1fr;
