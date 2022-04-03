@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { RadioButton, RadioButtonGroup } from 'carbon-components-react';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,18 @@ const GenderField: React.FC = () => {
   const setGender = (gender: string) => {
     setFieldValue('gender', gender);
   };
+
+  useEffect(() => {
+    document.addEventListener('keyup', (e) => {
+      e.preventDefault();
+      const { name, value, type } = e.target as HTMLInputElement;
+      if ((e.code == 'Enter' || e.code == 'Space') && name == 'gender') {
+        if (type == 'radio') {
+          setGender(value);
+        }
+      }
+    });
+  }, []);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
