@@ -1,5 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { createDashboardLink } from './createDashboardLink';
+import { homeDashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -33,6 +35,28 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./outpatient-link'), options),
         online: true,
         offline: false,
+      },
+      {
+        id: 'outpatient-side-nav-ext',
+        slot: 'outpatient-sidebar-slot',
+        load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'home-db-link',
+        slot: 'outpatient-dashboard-slot',
+        load: getSyncLifecycle(createDashboardLink(homeDashboardMeta), options),
+        meta: homeDashboardMeta,
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'home-dashboard',
+        slot: 'home-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./home.component'), options),
+        online: true,
+        offline: true,
       },
     ],
   };
