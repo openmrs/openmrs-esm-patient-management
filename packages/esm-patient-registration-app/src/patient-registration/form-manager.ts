@@ -2,7 +2,6 @@ import { queueSynchronizationItem } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
-  PatientIdentifierType,
   AttributeValue,
   PatientUuidMapType,
   Patient,
@@ -10,7 +9,6 @@ import {
   PatientIdentifier,
   PatientIdentifierValue,
   PatientRegistration,
-  PersonAttributeTypeConfig,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -31,11 +29,9 @@ export type SavePatientForm = (
   values: FormValues,
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
-  identifierTypes: Array<PatientIdentifierType>,
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
-  personAttributeTypes: PersonAttributeTypeConfig,
   abortController?: AbortController,
 ) => Promise<string | null>;
 
@@ -45,26 +41,22 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    identifierTypes: Array<PatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributeTypes: Array<PersonAttributeTypeConfig>,
   ): Promise<null> {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(values, personAttributeTypes, patientUuidMap, initialAddressFieldValues, []),
+        FormManager.getPatientToCreate(values, patientUuidMap, initialAddressFieldValues, []),
       ),
       _patientRegistrationData: {
         isNewPatient,
         formValues: values,
         patientUuidMap,
         initialAddressFieldValues,
-        identifierTypes,
         capturePhotoProps,
         patientPhotoConceptUuid,
         currentLocation,
-        personAttributeTypes,
       },
     };
 
@@ -83,11 +75,9 @@ export default class FormManager {
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
-    identifierTypes: Array<PatientIdentifierType>,
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
-    personAttributeTypes: Array<PersonAttributeTypeConfig>,
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
@@ -100,7 +90,6 @@ export default class FormManager {
 
     const createdPatient = FormManager.getPatientToCreate(
       values,
-      personAttributeTypes,
       patientUuidMap,
       initialAddressFieldValues,
       patientIdentifiers,
@@ -226,7 +215,6 @@ export default class FormManager {
 
   static getPatientToCreate(
     values: FormValues,
-    personAttributeTypes: Array<PersonAttributeTypeConfig>,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
@@ -252,7 +240,7 @@ export default class FormManager {
         gender: values.gender.charAt(0),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(values, personAttributeTypes),
+        attributes: FormManager.getPatientAttributes(values),
         addresses: [address],
         ...FormManager.getPatientDeathInfo(values),
       },
@@ -284,14 +272,14 @@ export default class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues, personAttributeTypes?: Array<PersonAttributeTypeConfig>) {
+  static getPatientAttributes(values: FormValues) {
     const attributes: Array<AttributeValue> = [];
 
-    if (personAttributeTypes) {
-      for (const attr of personAttributeTypes) {
+    if (values.attributes) {
+      for (const [key, value] of Object.entries(values.attributes)) {
         attributes.push({
-          attributeType: attr.uuid,
-          value: values.attributes[attr.uuid],
+          attributeType: key,
+          value,
         });
       }
     }

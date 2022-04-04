@@ -1,3 +1,5 @@
+import { string } from 'yup';
+
 interface NameValue {
   uuid: string;
   preferred: boolean;
@@ -85,11 +87,9 @@ export interface PatientRegistration {
     formValues: FormValues;
     patientUuidMap: PatientUuidMapType;
     initialAddressFieldValues: Record<string, any>;
-    identifierTypes: Array<PatientIdentifierType>;
     capturePhotoProps: CapturePhotoProps;
     patientPhotoConceptUuid: string;
     currentLocation: string;
-    personAttributeTypes: Array<PersonAttributeTypeConfig>;
   };
 }
 
@@ -186,13 +186,15 @@ export interface AddressValidationSchemaType {
   regexFormat: string;
 }
 
-export interface PersonAttributeTypeConfig {
-  uuid: string;
-  type: string;
-  name: string;
-  concept: string;
+export interface CodedPersonAttributeConfig {
+  personAttributeUuid: string;
+  conceptUuid: string;
 }
 
+export interface TextBasedPersonAttributeConfig {
+  personAttributeUuid: string;
+  validationRegex: string;
+}
 export interface PatientIdentifierResponse {
   uuid: string;
   identifier: string;
