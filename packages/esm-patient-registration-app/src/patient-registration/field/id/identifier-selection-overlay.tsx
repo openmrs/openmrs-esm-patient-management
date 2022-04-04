@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, useState, Dispatch, SetStateAction, useContext } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, useContext } from 'react';
 import styles from './identifier-selection.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
@@ -10,6 +10,7 @@ import {
   isUniqueIdentifierTypeForOffline,
   shouldBlockPatientIdentifierInOfflineMode,
 } from '../../input/custom-input/identifier/utils';
+import { useConfig } from '@openmrs/esm-framework';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, PatientIdentifierValue) => void;
@@ -33,6 +34,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
   const { t } = useTranslation();
   const getIdentifierByTypeUuid = (identifierTypeUuid: string) =>
     identifiers.find((identifier) => identifier.identifierTypeUuid === identifierTypeUuid);
+  const { defaultPatientIdentifierTypes } = useConfig();
+  const defaultPatientIdentifierTypesMap = useMemo(() => {
+    const map = {};
+    defaultPatientIdentifierTypes?.forEach((typeUuid) => {
+      map[typeUuid] = true;
+    });
+    return map;
+  }, [defaultPatientIdentifierTypes]);
 
   useEffect(() => {
     if (identifierTypes) {
@@ -51,7 +60,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
 
           return {
             ...identifierType,
-            checked: identifier ? identifier.action !== 'DELETE' : identifierType.isPrimary || identifierType.required,
+            checked: identifier
+              ? identifier.action !== 'DELETE'
+              : identifierType.isPrimary ||
+                identifierType.required ||
+                defaultPatientIdentifierTypesMap[identifierType.uuid],
             source: alreadySelectedSource ?? defaultSelectedSource,
           };
         }),
@@ -75,7 +88,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         identifier.uuid === uuid
           ? {
               ...identifier,
-              checked: identifier.isPrimary || identifier.required || checked,
+              checked:
+                identifier.isPrimary ||
+                identifier.required ||
+                defaultPatientIdentifierTypesMap[identifier.uuid] ||
+                checked,
             }
           : identifier,
       ),
@@ -100,7 +117,9 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
         const showIdentifierSources = !(identifier?.action === 'NONE');
         const isDisabled = identifier
           ? identifier.action !== 'DELETE'
-          : identifierType.isPrimary || identifierType.required;
+          : identifierType.isPrimary ||
+            identifierType.required ||
+            defaultPatientIdentifierTypesMap[identifierType.uuid];
         const isDisabledOffline = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
 
         return (

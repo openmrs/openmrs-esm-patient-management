@@ -57,28 +57,6 @@ export async function fetchPatientIdentifierTypesWithSources(
   return identifierTypes;
 }
 
-// async function fetchPrimaryIdentifierType(abortController: AbortController): Promise<FetchedPatientIdentifierType> {
-//   const primaryIdentifierTypeResponse = await cacheAndFetch(
-//     '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
-//     abortController,
-//   );
-
-//   const { data } = await cacheAndFetch<FetchedPatientIdentifierType>(
-//     `/ws/rest/v1/patientidentifiertype/${primaryIdentifierTypeResponse.data.results[0].metadataUuid}`,
-//     abortController,
-//   );
-
-//   return {
-//     name: data.name,
-//     fieldName: camelCase(data.name),
-//     required: data.required,
-//     uuid: data.uuid,
-//     format: data.format,
-//     isPrimary: true,
-//     uniquenessBehavior: data.uniquenessBehavior,
-//   };
-// }
-
 async function fetchPatientIdentifierTypes(
   abortController?: AbortController,
 ): Promise<Array<FetchedPatientIdentifierType>> {
@@ -87,16 +65,32 @@ async function fetchPatientIdentifierTypes(
     abortController,
   );
 
+  const primaryIdentifierTypeResponse = await cacheAndFetch(
+    '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
+    abortController,
+  );
+
   if (patientIdentifierTypesResponse.ok) {
-    return patientIdentifierTypesResponse.data.results.map((type) => ({
-      name: type.display,
-      fieldName: camelCase(type.display),
-      required: type.required,
-      uuid: type.uuid,
-      format: type.format,
-      isPrimary: type.required,
-      uniquenessBehavior: type.uniquenessBehavior,
-    }));
+    // Primary identifier type is to be kept at the top of the list.
+    const patientIdentifierTypes = patientIdentifierTypesResponse?.data?.results;
+
+    const primaryIdentifierTypeUuid = primaryIdentifierTypeResponse?.data?.results?.[0]?.metadataUuid;
+
+    let identifierTypes = primaryIdentifierTypeResponse?.ok
+      ? [
+          mapPatientIdentifierType(
+            patientIdentifierTypes?.find((type) => type.uuid === primaryIdentifierTypeUuid),
+            true,
+          ),
+        ]
+      : [];
+
+    patientIdentifierTypes.forEach((type) => {
+      if (type.uuid !== primaryIdentifierTypeUuid) {
+        identifierTypes.push(mapPatientIdentifierType(type, false));
+      }
+    });
+    return identifierTypes;
   }
 
   return [];
@@ -120,4 +114,16 @@ async function cacheAndFetch<T = any>(url: string, abortController?: AbortContro
   });
 
   return await openmrsFetch<T>(url, { headers: cacheForOfflineHeaders, signal: abortController?.signal });
+}
+
+function mapPatientIdentifierType(patientIdentifierType, isPrimary) {
+  return {
+    name: patientIdentifierType.display,
+    fieldName: camelCase(patientIdentifierType.display),
+    required: patientIdentifierType.required,
+    uuid: patientIdentifierType.uuid,
+    format: patientIdentifierType.format,
+    isPrimary,
+    uniquenessBehavior: patientIdentifierType.uniquenessBehavior,
+  };
 }

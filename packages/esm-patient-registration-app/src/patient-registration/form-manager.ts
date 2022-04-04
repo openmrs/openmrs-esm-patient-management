@@ -169,7 +169,7 @@ export default class FormManager {
       .map(async (patientIdentifier) => {
         const { identifierTypeUuid, identifier, uuid, action, source, preferred, autoGeneration } = patientIdentifier;
         if (identifier || (source && autoGeneration)) {
-          const identifierValue = identifier
+          const identifierValue = !(autoGeneration && source)
             ? identifier
             : await (
                 await generateIdentifier(patientIdentifier.source.uuid, abortController)
