@@ -28,7 +28,7 @@ const PatientListActionButton: React.FC = () => {
       hasIconOnly
       iconDescription={t('patientList', 'Patient list')}
       tooltipAlignment="end"
-      tooltipPosition="bottom"
+      tooltipPosition="left"
     />
   );
 };
