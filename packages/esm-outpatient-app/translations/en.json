@@ -63,5 +63,7 @@
   "view": "View",
   "vitals": "Vitals",
   "waitingFor": "Waiting for:",
-  "waitTime": "Wait time (mins)"
+  "waitTime": "Wait time (mins)",
+  "futureScheduledVisits": " {count, plural, one{{count} visit} other{{count} visits}} scheduled for dates in the future",
+  "recentScheduledVisits": "{count, plural, one{{count} visit} other{{count} visits}} scheduled for +/- 7 days"
 }

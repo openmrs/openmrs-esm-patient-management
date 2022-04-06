@@ -19,7 +19,7 @@ enum priority {
 const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const [show_recent_priority, setShowRecentPriority] = useState(false);
+  const [showRecentPriority, setShowRecentPriority] = useState(false);
   const [futurePrioritySwitcherValue, setFuturePrioritySwitcherValue] = useState(0);
   const [futureVisitsIndex, setFutureVisitsIndex] = useState(0);
 
@@ -71,13 +71,13 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       </div>
 
       <div className={styles.row}>
-        <p className={styles.heading}> {recentVisits.length} visits scheduled for +/- 7 days </p>
+        <p className={styles.heading}>{t('recentScheduledVisits', { count: recentVisits.length })} </p>
         <TileGroup name="tile-group" defaultSelected="forever" className="trigger-tile">
           {recentVisits.map((visit, index) => (
             <RadioTile
               id={visit.id}
               value={visit.id}
-              key={index}
+              key={visit.id}
               className={styles.visitTile}
               onClick={() => {
                 setShowRecentPriority(true);
@@ -89,7 +89,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
                   {' '}
                   {formatDatetime(parseDate(visit?.visit_date))} · {visit.clinic}{' '}
                 </p>
-                {show_recent_priority && index == recentVisitsIndex ? (
+                {showRecentPriority && index == recentVisitsIndex ? (
                   <ContentSwitcher
                     size="sm"
                     className={styles.prioritySwitcher}
@@ -120,12 +120,12 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       </div>
 
       <div className={styles.row}>
-        <p className={styles.heading}> {futureVisits.length} visits scheduled for dates in the future </p>
+        <p className={styles.heading}>{t('futureScheduledVisits', { count: futureVisits.length })} </p>
         <TileGroup name="tile-group" defaultSelected="default-selected">
           {futureVisits.map((visit, ind) => (
             <RadioTile
               value={visit.id}
-              key={ind}
+              key={visit.id}
               className={styles.visitTile}
               onClick={() => {
                 setShowFuturePriority(true);
