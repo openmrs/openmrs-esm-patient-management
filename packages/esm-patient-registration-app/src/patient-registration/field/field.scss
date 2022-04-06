@@ -37,10 +37,16 @@
 }
 
 .nameField > :global(.bx--content-switcher) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: max-content;
   justify-content: flex-start;
-  & > button {
-    width: max-content;
-  }
+}
+.dobField > :global(.bx--content-switcher) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: max-content;
+  justify-content: flex-start;
 }
 
 .photoExtension {

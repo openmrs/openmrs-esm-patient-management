@@ -5,6 +5,7 @@ import { PatientRegistrationContext, useFieldConfig } from '../../patient-regist
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from 'carbon-components-react';
+import { useField } from 'formik';
 
 const containsNoNumbers = /^([^0-9]*)$/;
 
@@ -20,29 +21,34 @@ export const NameField = () => {
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
   const { fieldConfigurations } = useConfig();
-  const [nameKnown, setNameKnown] = useState(true);
+  const [{ value: unidentified }] = useField('unidentifiedPatient');
+  const nameKnown = !unidentified;
 
-  const onCapturePhoto = useCallback((dataUri: string, photoDateTime: string) => {
-    if (setCapturePhotoProps) {
-      setCapturePhotoProps({
-        imageData: dataUri,
-        dateTime: photoDateTime,
-      });
-    }
-  }, []);
+  const onCapturePhoto = useCallback(
+    (dataUri: string, photoDateTime: string) => {
+      if (setCapturePhotoProps) {
+        setCapturePhotoProps({
+          imageData: dataUri,
+          dateTime: photoDateTime,
+        });
+      }
+    },
+    [setCapturePhotoProps],
+  );
 
-  useEffect(() => {
-    if (!nameKnown) {
-      setFieldValue('givenName', 'unknown');
-      setFieldValue('familyName', 'unknown');
-      setFieldValue('unknownPatient', `${!nameKnown}}`);
+  const toggleNameKnown = (e) => {
+    if (e.name === 'known') {
+      setFieldValue('givenName', '');
+      setFieldValue('familyName', '');
+      setFieldValue('unidentifiedPatient', false);
+    } else {
+      setFieldValue('givenName', fieldConfigs.defaultUnknownGivenName);
+      setFieldValue('familyName', fieldConfigs.defaultUnknownFamilyName);
+      setFieldValue('unidentifiedPatient', true);
     }
-  }, [nameKnown, setFieldValue]);
+  };
 
   const fieldConfigs = useFieldConfig('name');
-  const toggleNameKnown = (e) => {
-    setNameKnown(e.name === 'known');
-  };
 
   return (
     <div>

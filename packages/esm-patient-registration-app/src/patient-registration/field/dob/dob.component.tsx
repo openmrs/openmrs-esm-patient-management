@@ -1,10 +1,9 @@
-import React, { useContext, useRef, useState } from 'react';
-import { DatePicker, DatePickerInput, TextInput, Toggle } from 'carbon-components-react';
+import React, { useContext } from 'react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { generateFormatting } from '../../date-util';
-import ContentSwitcher from './content-switcher.component';
 import styles from '../field.scss';
 
 export const DobField: React.FC = () => {
@@ -17,8 +16,8 @@ export const DobField: React.FC = () => {
   const today = new Date();
   const dobKnown = !dobEstimated.value;
 
-  const onToggle = (dobKnown: boolean) => {
-    setFieldValue('birthdateEstimated', !dobKnown);
+  const onToggle = (e) => {
+    setFieldValue('birthdateEstimated', e.name === 'unknown');
     setFieldValue('birthdate', '');
   };
 
@@ -41,7 +40,10 @@ export const DobField: React.FC = () => {
         <div className={styles.dobContentSwitcherLabel}>
           <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
         </div>
-        <ContentSwitcher onToggle={onToggle} />
+        <ContentSwitcher onChange={onToggle}>
+          <Switch name="known" text={t('yes', 'Yes')} />
+          <Switch name="unknown" text={t('no', 'No')} />
+        </ContentSwitcher>
       </div>
       {dobKnown ? (
         <div className={styles.dobField}>
