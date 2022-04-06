@@ -20,7 +20,7 @@
   }
 
   :global(.omrs-breakpoint-lt-desktop) & {
-    width: 50%;
+    width: 60%;
     margin: auto;
   }
 }
@@ -50,30 +50,32 @@
   }
 }
 
-
 .separator {
-  display: block;
+  @include carbon--type-style('productive-heading-03');
+  color: $text-02;
+  width: 12rem;
   margin: 3rem auto;
+  overflow: hidden;
+  text-align: center;
 
-  hr {
-    @include carbon--type-style('body-short-02');
-    color: $text-02;
-    width: 12rem;
-    line-height: 1;
-    border: 0;
-    border-top: 1px solid $text-03;
-    text-align: center;
-    overflow: visible;
-    margin-bottom: -1rem;
-    
-    &::after {
-      content: 'or';
-      display: inline-block;
-      position: relative;
-      top: -0.7em;
-      padding: 0 1rem;
-      background: $ui-01;
-    }
+  &::before, &::after {
+    background-color: $text-03;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: 1rem;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: 1rem;
+    margin-right: -50%;
   }
 }
 
