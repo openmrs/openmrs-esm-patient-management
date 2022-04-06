@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext, useFieldConfig } from '../../patient-registration-context';
@@ -18,7 +18,7 @@ function checkNumber(value: string) {
 
 export const NameField = () => {
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto } = useContext(PatientRegistrationContext);
+  const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
   const { fieldConfigurations } = useConfig();
   const [nameKnown, setNameKnown] = useState(true);
 
@@ -30,6 +30,14 @@ export const NameField = () => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!nameKnown) {
+      setFieldValue('givenName', 'unknown');
+      setFieldValue('familyName', 'unknown');
+      setFieldValue('unknownPatient', `${!nameKnown}}`);
+    }
+  }, [nameKnown, setFieldValue]);
 
   const fieldConfigs = useFieldConfig('name');
   const toggleNameKnown = (e) => {
