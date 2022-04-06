@@ -63,6 +63,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
                 patientUuid: patient.id,
                 onClick: onClickSearchResult,
                 onTransition: hidePanel,
+                hideActionsOverflow: config.search.hideActionsOverflow,
               }}
             />
           </div>
