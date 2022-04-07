@@ -334,9 +334,7 @@ function ActiveVisitsTable() {
                       <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
                       <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
-                    <span className={styles.separator}>
-                      <hr />
-                    </span>
+                    <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
                       {t('addPatientToList', 'Add patient to list')}
                     </Button>
