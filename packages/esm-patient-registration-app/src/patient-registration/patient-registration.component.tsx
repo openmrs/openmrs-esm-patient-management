@@ -92,7 +92,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
     }
-  }, [inEditMode, addressTemplate]);
+  }, [inEditMode, addressTemplate, initialAddressFieldValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
