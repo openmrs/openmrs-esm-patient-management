@@ -51,7 +51,7 @@
   "numberInNameDubious": "Name should not contain numbers",
   "otherLabelText": "Other",
   "patient": "Patient",
-  "patientNameKnown": "Patient's Name is Known?",
+  "patientNameKnown": "Is Patient's Name Known?",
   "phoneEmailLabelText": "Phone, Email, etc.",
   "phoneNumberInputLabelText": "Phone number (optional)",
   "postalCode": "Post Code",
