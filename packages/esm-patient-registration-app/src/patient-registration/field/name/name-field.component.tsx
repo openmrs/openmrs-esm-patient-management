@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { PatientRegistrationContext, useFieldConfig } from '../../patient-registration-context';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from 'carbon-components-react';
@@ -21,6 +21,7 @@ export const NameField = () => {
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
   const { fieldConfigurations } = useConfig();
+  const fieldConfigs = fieldConfigurations?.name;
   const [{ value: unidentified }] = useField('unidentifiedPatient');
   const nameKnown = !unidentified;
 
@@ -48,8 +49,6 @@ export const NameField = () => {
     }
   };
 
-  const fieldConfigs = useFieldConfig('name');
-
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
@@ -64,12 +63,11 @@ export const NameField = () => {
           <div className={styles.dobContentSwitcherLabel}>
             <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
           </div>
-          <ContentSwitcher onChange={toggleNameKnown}>
+          <ContentSwitcher className={styles.contentSwitcher} onChange={toggleNameKnown}>
             <Switch name="known" text={t('yes', 'Yes')} />
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>
-          <div style={{ minHeight: '1rem' }}></div>
-          {nameKnown ? (
+          {nameKnown && (
             <>
               <Input
                 id="givenName"
@@ -95,23 +93,7 @@ export const NameField = () => {
                 checkWarning={checkNumber}
               />
             </>
-          ) : (
-            <>
-              <input
-                name="givenName"
-                value={fieldConfigurations?.defaultUnknownGivenName ?? 'UNKNOWN'}
-                hidden
-                readOnly
-              />
-              <input
-                name="familyName"
-                value={fieldConfigurations?.defaultUnknownFamilyName ?? 'UNKNOWN'}
-                hidden
-                readOnly
-              />
-            </>
           )}
-          <input name="unknownPatient" onChange={() => {}} value={`${!nameKnown}`} hidden />
         </div>
       </div>
     </div>

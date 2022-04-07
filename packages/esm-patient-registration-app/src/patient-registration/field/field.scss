@@ -36,12 +36,19 @@
   grid-column: 1;
 }
 
+
+
 .nameField > :global(.bx--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
   justify-content: flex-start;
 }
+
+.contentSwitcher {
+  margin-bottom: 1rem;
+}
+
 .dobField > :global(.bx--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
