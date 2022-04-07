@@ -18,7 +18,7 @@ const GenderField: React.FC = () => {
     document.addEventListener('keyup', (e) => {
       e.preventDefault();
       const { name, value, type } = e.target as HTMLInputElement;
-      if ((e.code == 'Enter' || e.code == 'Space') && name == 'gender') {
+      if ((e.code == 'Enter' || e.code == 'Space' ) && name == 'gender') {
         if (type == 'radio') {
           setGender(value);
         }
