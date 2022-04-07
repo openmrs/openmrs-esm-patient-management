@@ -19,11 +19,6 @@
   color: $text-01;
 }
 
-.switcherContainer {
-  display: flex;
-  align-items: center;
-}
-
 .filterContainer {
   :global(.bx--dropdown__wrapper--inline) {
     gap: 0;
@@ -32,16 +27,6 @@
   :global(.bx--list-box__menu-icon) {
     height: 1rem;
   }
-}
-
-.switcherContainer :global(.bx--content-switcher) {
-  align-items: center;
-  margin-left: 0.5rem;
-}
-
-.switch {
-   width: 7.875rem;
-   height: 2rem;
 }
 
 .tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
@@ -64,11 +49,6 @@
   display: flex;
   flex: 1 1 0%;
   justify-content: center;
-}
-
-.contentSwitcherLabel {
-  @include carbon--type-style("label-01");
-  color: $text-02;
 }
 
 .tableContainer {
@@ -115,6 +95,10 @@
     height: 2rem;
     margin-bottom: 0.25rem;
   }
+
+  :global(.bx--data-table--zebra tbody tr[data-child-row]:hover td) {
+    background-color: $ui-02;
+  }
 }
 
 .emptyRow {
@@ -152,9 +136,43 @@
 }
 
 .content {
-  @include carbon--type-style("productive-heading-01");
+  @include carbon--type-style("productive-heading-02");
   color: $text-02;
   margin-bottom: 0.5rem;
+}
+
+.helper {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}
+
+.separator {
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  width: 80%;
+  margin: 1.5rem auto;
+  overflow: hidden;
+  text-align: center;
+
+  &::before, &::after {
+    background-color: $text-03;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: 0.5rem;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: 0.5rem;
+    margin-right: -50%;
+  }
 }
 
 .tileContainer {
@@ -166,6 +184,12 @@
 .tile {
   margin: auto;
   width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .menuItem {

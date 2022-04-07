@@ -1,8 +1,8 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route } from 'react-router-dom';
-import Home from './home.component';
 import { spaBasePath } from './constants';
+import { OutpatientDashboard } from './dashboard/outpatient-dashboard.component';
 
 const swrConfiguration = {
   // Maximum number of retries when the backend returns an error
@@ -14,8 +14,7 @@ const Root: React.FC = () => {
     <main>
       <SWRConfig value={swrConfiguration}>
         <BrowserRouter basename={spaBasePath}>
-          {/** Side Menu goes here */}
-          <Route path="/" component={Home} />
+          <Route path="/:view?" component={OutpatientDashboard} />
         </BrowserRouter>
       </SWRConfig>
     </main>

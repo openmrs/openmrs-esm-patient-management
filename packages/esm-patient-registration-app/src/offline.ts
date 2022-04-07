@@ -51,11 +51,9 @@ export async function syncPatientRegistration(
     queuedPatient._patientRegistrationData.formValues,
     queuedPatient._patientRegistrationData.patientUuidMap,
     queuedPatient._patientRegistrationData.initialAddressFieldValues,
-    queuedPatient._patientRegistrationData.identifierTypes,
     queuedPatient._patientRegistrationData.capturePhotoProps,
     queuedPatient._patientRegistrationData.patientPhotoConceptUuid,
     queuedPatient._patientRegistrationData.currentLocation,
-    queuedPatient._patientRegistrationData.personAttributeTypes,
     options.abort,
   );
 }
