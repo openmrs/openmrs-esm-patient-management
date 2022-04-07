@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext } from 'react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
