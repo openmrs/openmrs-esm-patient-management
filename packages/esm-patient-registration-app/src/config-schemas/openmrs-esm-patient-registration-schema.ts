@@ -66,6 +66,8 @@ export const esmPatientRegistrationSchema = {
       name: {
         displayMiddleName: true,
         unidentifiedPatient: true,
+        defaultUnknownGivenName: 'UNKNOWN',
+        defaultUnknownFamilyName: 'UNKNOWN',
       },
     },
   },
@@ -84,7 +86,12 @@ export const esmPatientRegistrationSchema = {
   },
   codedPersonAttributes: {
     _type: Type.Array,
-    _default: [],
+    _default: [
+      {
+        uuid: '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47',
+        type: Type.ConceptUuid,
+      },
+    ],
     _elements: {
       _type: Type.Object,
       personAttributeUuid: {
