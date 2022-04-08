@@ -101,10 +101,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     try {
       await savePatientForm(
         !inEditMode,
-        {
-          ...values,
-          attributes: { ...values.attributes, '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47': `${values.unidentifiedPatient}` },
-        },
+        values,
         patientUuidMap,
         initialAddressFieldValues,
         capturePhotoProps,
