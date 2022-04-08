@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
-  ContentSwitcher,
   DataTable,
   DataTableHeader,
   DataTableSize,
@@ -10,7 +9,6 @@ import {
   Dropdown,
   OverflowMenu,
   OverflowMenuItem,
-  Switch,
   Tab,
   Table,
   TableBody,
@@ -45,8 +43,6 @@ import {
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
-
-type TableSize = 0 | 1;
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -100,20 +96,10 @@ function ActiveVisitsTable() {
   const { t } = useTranslation();
   const { services } = useServices();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-  const [contentSwitcherValue, setContentSwitcherValue] = useState<TableSize>(0);
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
-  const [tableSize, setTableSize] = useState<DataTableSize>('compact');
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
-
-  useEffect(() => {
-    if (contentSwitcherValue === 0) {
-      setTableSize('compact');
-    } else if (contentSwitcherValue === 1) {
-      setTableSize('normal');
-    }
-  }, [contentSwitcherValue]);
 
   useEffect(() => {
     if (filter) {
@@ -253,13 +239,6 @@ function ActiveVisitsTable() {
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
-          <div className={styles.switcherContainer}>
-            <label className={styles.contentSwitcherLabel}>{t('view', 'View')}: </label>
-            <ContentSwitcher onChange={({ index }) => setContentSwitcherValue(index as TableSize)}>
-              <Switch className={styles.switch} name={'first'} text={t('default', 'Default')} />
-              <Switch className={styles.switch} name={'second'} text={t('large', 'Large')} />
-            </ContentSwitcher>
-          </div>
           <Button
             size="small"
             kind="secondary"
@@ -274,7 +253,7 @@ function ActiveVisitsTable() {
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop ? true : false}
           rows={tableRows}
-          size={tableSize}
+          size="compact"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
@@ -348,6 +327,20 @@ function ActiveVisitsTable() {
                   })}
                 </TableBody>
               </Table>
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                    <p className={styles.separator}>{t('or', 'or')}</p>
+                    <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
+                      {t('addPatientToList', 'Add patient to list')}
+                    </Button>
+                  </Tile>
+                </div>
+              ) : null}
             </TableContainer>
           )}
         </DataTable>

@@ -52,16 +52,6 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const defaultViewButton = screen.getByRole('tab', { name: /default/i });
-    const largeViewButton = screen.getByRole('tab', { name: /large/i });
-
-    expect(defaultViewButton).toBeInTheDocument();
-    expect(largeViewButton).toBeInTheDocument();
-    expect(defaultViewButton).toHaveAttribute('aria-selected', 'true');
-
-    userEvent.click(largeViewButton);
-    expect(largeViewButton).toHaveAttribute('aria-selected', 'true');
-
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
     expect(screen.getByRole('tooltip', { name: /needs triage/i })).toBeInTheDocument();
@@ -102,6 +92,15 @@ describe('ActiveVisitsTable: ', () => {
 
     expect(screen.getByText(/eric test ric/i)).toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
+
+    userEvent.clear(searchbox);
+    userEvent.type(searchbox, 'gibberish');
+
+    expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+    expect(screen.getByRole('separator')).toBeInTheDocument();
   });
 });
 

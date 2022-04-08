@@ -7,7 +7,7 @@ import { formatDate, useSessionUser } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
 
-const PatientQueueHeader: React.FC = () => {
+const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSessionUser();
   const userLocation = userSession?.sessionLocation?.display;
@@ -32,7 +32,7 @@ const PatientQueueHeader: React.FC = () => {
         <PatientQueueIllustration />
         <div className={styles['page-labels']}>
           <p>{t('outpatients', 'Outpatients')}</p>
-          <p className={styles['page-name']}>{t('home', 'Home')}</p>
+          <p className={styles['page-name']}>{title}</p>
         </div>
       </div>
       <div className={styles['right-justified-items']}>

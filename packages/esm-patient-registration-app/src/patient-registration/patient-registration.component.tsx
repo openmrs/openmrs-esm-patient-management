@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
-import { Button, Grid, Link } from 'carbon-components-react';
+import { Button, Link } from 'carbon-components-react';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
 import { useLocation } from 'react-router-dom';
@@ -92,7 +92,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
     }
-  }, [inEditMode, addressTemplate]);
+  }, [inEditMode, addressTemplate, initialAddressFieldValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
@@ -101,14 +101,15 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     try {
       await savePatientForm(
         !inEditMode,
-        values,
+        {
+          ...values,
+          attributes: { ...values.attributes, '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47': `${values.unidentifiedPatient}` },
+        },
         patientUuidMap,
         initialAddressFieldValues,
-        identifierTypes,
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
-        config?.personAttributeTypes,
         abortController,
       );
 

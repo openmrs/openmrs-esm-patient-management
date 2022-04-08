@@ -31,7 +31,7 @@ export const esmPatientRegistrationSchema = {
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
-      additionalInformation: { name: 'Additional Information' },
+      additionalInformation: { name: 'Additional Information', fields: ['codedAttributes', 'textBasedAttributes'] },
     },
   },
   fieldDefinitions: {
@@ -66,6 +66,8 @@ export const esmPatientRegistrationSchema = {
       name: {
         displayMiddleName: true,
         unidentifiedPatient: true,
+        defaultUnknownGivenName: 'UNKNOWN',
+        defaultUnknownFamilyName: 'UNKNOWN',
       },
     },
   },
@@ -82,23 +84,39 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  personAttributeTypes: {
+  codedPersonAttributes: {
     _type: Type.Array,
-    _default: [],
+    _default: [
+      {
+        uuid: '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47',
+        type: Type.ConceptUuid,
+      },
+    ],
     _elements: {
       _type: Type.Object,
-      uuid: {
+      personAttributeUuid: {
         _type: Type.PersonAttributeTypeUuid,
         _description: 'The uuid of the person attribute type used to save the attribute',
       },
-      type: {
-        _type: Type.String,
-        _default: 'coded',
-      },
-      concept: {
+      conceptUuid: {
         _type: Type.ConceptUuid,
         _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
       },
     },
+  },
+  textBasedAttributes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      personAttributeUuid: {
+        _type: Type.PersonAttributeTypeUuid,
+        _description: 'The uuid of the person attribute type used to save the attribute',
+      },
+      validationRegex: {
+        _type: Type.String,
+        _description: 'Regular expression to validate the user input.',
+      },
+    },
+    _default: [],
   },
 };
