@@ -274,7 +274,6 @@ export default class FormManager {
 
   static getPatientAttributes(values: FormValues) {
     const attributes: Array<AttributeValue> = [];
-
     if (values.attributes) {
       for (const [key, value] of Object.entries(values.attributes)) {
         attributes.push({
@@ -282,6 +281,13 @@ export default class FormManager {
           value,
         });
       }
+    }
+    if (values.unidentifiedPatient) {
+      attributes.push({
+        // The UUID of the 'Unknown Patient' attribute-type will always be static across all implementations of OpenMRS
+        attributeType: '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47',
+        value: 'true',
+      });
     }
 
     return attributes;

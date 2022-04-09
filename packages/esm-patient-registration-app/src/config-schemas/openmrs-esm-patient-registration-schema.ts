@@ -66,6 +66,8 @@ export const esmPatientRegistrationSchema = {
       name: {
         displayMiddleName: true,
         unidentifiedPatient: true,
+        defaultUnknownGivenName: 'UNKNOWN',
+        defaultUnknownFamilyName: 'UNKNOWN',
       },
     },
   },

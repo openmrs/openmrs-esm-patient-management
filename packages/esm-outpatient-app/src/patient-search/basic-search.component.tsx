@@ -60,7 +60,9 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
         </Button>
       </div>
       {searchResults?.length ? (
-        <div className={styles.resultsContainer}>{<SearchResults patients={searchResults} />}</div>
+        <div className={styles.resultsContainer}>
+          {<SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />}
+        </div>
       ) : (
         <div>
           <div className={styles.tileContainer}>
@@ -74,7 +76,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
               </div>
             </Tile>
           </div>
-          <div className={styles['text-divider']}>{t('or', 'Or')}</div>
+          <p className={styles.separator}>{t('or', 'or')}</p>
           <div className={styles.buttonContainer}>
             <Button
               kind="ghost"

@@ -26,9 +26,7 @@ const GenderField: React.FC = () => {
           <RadioButton id="unknown" labelText={t('unknownLabelText', 'Unknown')} value="Unknown" />
         </RadioButtonGroup>
         {meta.touched && meta.error && (
-          <>
-            <div className="bx--form-requirement">{t(meta.error)}</div>
-          </>
+          <div className={styles.radioFieldError}>{t(meta.error, 'Gender is required')}</div>
         )}
       </div>
     </div>
