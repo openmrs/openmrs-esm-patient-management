@@ -58,7 +58,8 @@
   overflow: hidden;
   text-align: center;
 
-  &::before, &::after {
+  &::before,
+  &::after {
     background-color: $text-03;
     content: "";
     display: inline-block;
@@ -92,4 +93,15 @@
 .lightBackground {
   @extend .resultsContainer;
   background-color: white;
+}
+
+.loadingContainer {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &>div {
+    width: fit-content !important
+  }
 }
