@@ -1,0 +1,8 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.heading {
+    @include carbon--type-style("productive-heading-01");
+    color: $text-02;
+}
