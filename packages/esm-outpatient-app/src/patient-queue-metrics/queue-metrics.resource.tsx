@@ -22,3 +22,13 @@ export function useServices() {
     services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
   };
 }
+
+export function useServiceMetricsCount(service: string) {
+  const status = 'Waiting';
+  const apiUrl = `/ws/rest/v1/queue-entry-metrics?service=${service}&status=${status}`;
+  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    serviceCount: data ? data?.data?.count : 0,
+  };
+}
