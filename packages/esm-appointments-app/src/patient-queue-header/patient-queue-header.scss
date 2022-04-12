@@ -1,0 +1,73 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.header {  
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  height: $spacing-12;
+  background-color: $ui-02;
+  border: 1px solid $ui-03;
+  border-left: 0px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-justified-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.right-justified-items {
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  padding-top: 1rem;
+}
+
+.page-name {
+  @include carbon--type-style("productive-heading-04");
+  color: $text-01;
+}
+
+.page-labels {
+  p:first-of-type {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.date-and-location {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.value {
+  margin-left: 0.25rem
+}
+
+.middot {
+  margin: 0 0.5rem;
+}
+
+.view {
+  @include carbon--type-style("label-01");
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+
+  :global(.bx--dropdown__wrapper--inline) {
+    align-items: center;
+    display: flex
+  }
+
+  :global(.bx--list-box__menu) {
+    left: -10.15rem;
+  }
+}
+
