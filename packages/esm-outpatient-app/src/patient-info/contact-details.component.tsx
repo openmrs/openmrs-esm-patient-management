@@ -10,13 +10,13 @@ interface ContactDetailsProps {
   contact: Array<fhir.ContactPoint>;
 }
 
-const PlaceOfResidence: React.FC<{ address?: fhir.Address }> = ({ address }) => {
+const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
 
   return (
     <>
-      <p className={styles.heading}>{t('address', 'Address')}</p>
-      <ul>
+      <p className={styles.heading}>{t('placeOfResidence', 'Place Of Residence')}</p>
+      <ul className={styles.listMargin}>
         {address ? (
           <>
             <li>{address.postalCode}</li>
@@ -41,7 +41,7 @@ const Contact: React.FC<{ contact: Array<fhir.ContactPoint>; patientUuid: string
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      <ul>
+      <ul className={styles.listMargin}>
         <li>{value}</li>
         {isLoading ? (
           <InlineLoading description={t('loading', 'Loading...')} />
@@ -62,9 +62,9 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ patientId, address, con
 
   return (
     <Grid>
-      <Row>
-        <Column>
-          <PlaceOfResidence address={currentAddress} />
+      <Row className={styles.row}>
+        <Column className={styles.columnBorder}>
+          <Address address={currentAddress} />
         </Column>
 
         <Column>
