@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './search-results.scss';
 import { SearchTypes } from '../types';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
 import PatientInfo from '../patient-info/patient-info.component';
+import { SortCriteria, usePatientResultsSort } from './usePatientSort';
+import { useTranslation } from 'react-i18next';
+import { Dropdown } from 'carbon-components-react';
 
 interface SearchResultsProps {
   patients: Array<any>;
@@ -12,6 +13,8 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
+  const { t } = useTranslation();
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>('firstName');
   const fhirPatients = useMemo(() => {
     return patients.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -48,10 +51,31 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
     });
   }, [patients]);
   const onClickSearchResult = () => toggleSearchType(SearchTypes.SCHEDULED_VISITS);
+  const sortedPatient = usePatientResultsSort(fhirPatients, sortCriteria);
+
+  const sortByCriteria = [
+    { id: 'firstName', label: t('sortFirstName', 'First name (a -z)') },
+    { id: 'firstName', label: t('sortLasttName', 'Last name (a -z)') },
+    { id: 'oldest', label: t('oldest', 'Oldest first') },
+    { id: 'youngest', label: t('youngest', 'Youngest first') },
+  ];
 
   return (
     <>
-      {fhirPatients.map((patient) => (
+      <div className={styles.sortCriteria}>
+        <Dropdown
+          ariaLabel="sortBy"
+          id="sortCriteria"
+          items={sortByCriteria}
+          initialSelectedItem={sortByCriteria[0]}
+          label={t('sortBy', 'Sort by :')}
+          titleText={t('sortBy', 'Sort by')}
+          type="inline"
+          size="sm"
+          onChange={({ selectedItem }) => setSortCriteria(selectedItem.label as SortCriteria)}
+        />
+      </div>
+      {sortedPatient.map((patient) => (
         <div key={patient.id} className={styles.patientChart}>
           <div className={styles.container}>
             <PatientInfo patient={patient} />

@@ -4,11 +4,13 @@
 .patientChart {
   text-decoration: none;
 }
+
 :global(.omrs-breakpoint-gt-tablet) .patientChart {
   background-color: $ui-02;
 }
 
 .container {
+
   // border-bottom: 0.063rem solid $ui-03;
   & .patientBanner {
     background-color: red !important;
@@ -57,4 +59,12 @@
 .actionsContainer {
   padding-top: 0.5rem;
   margin-top: 1rem;
+}
+
+.sortCriteria {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  @include carbon--type-style("body-short-02");
+  width: 100%
 }
