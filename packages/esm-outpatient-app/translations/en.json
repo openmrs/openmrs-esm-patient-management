@@ -30,6 +30,7 @@
   "lastName": "Last name",
   "lastVisit": "Last Visit",
   "lastVisitDate": "Date",
+  "loading": "Loading...",
   "male": "Male",
   "match": "Match",
   "medications": "Medications",
