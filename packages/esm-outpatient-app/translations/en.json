@@ -25,11 +25,13 @@
   "female": "Female",
   "fields": "of the following fields",
   "firstName": "First name",
+  "firstNameSort": "First name (a -z)",
   "futureScheduledVisits": " {count, plural, one{{count} visit} other{{count} visits}} scheduled for dates in the future",
   "futureScheduledVisits_plural": "",
   "hivCare": "HIV care",
   "large": "Large",
   "lastName": "Last name",
+  "lastNameSort": "Last name (a -z)",
   "lastVisit": "Last Visit",
   "lastVisitDate": "Date",
   "loading": "Loading...",
@@ -46,6 +48,7 @@
   "noPreviousVisitFound": "No previous visit found",
   "notes": "Notes",
   "notUrgent": "Not Urgent",
+  "oldest": "Oldest first",
   "or": "or",
   "outpatients": "Outpatients",
   "patientList": "Patient list",
@@ -70,6 +73,7 @@
   "showAllDetails": "Show all details",
   "showLess": "Show less",
   "showPatientsWaitingFor": "Show patients waiting for",
+  "sortBy": "Sort by",
   "status": "Status",
   "tbCare": "TB Care",
   "triage": "Triage",
@@ -77,5 +81,6 @@
   "view": "View",
   "vitals": "Vitals",
   "waitingFor": "Waiting for:",
-  "waitTime": "Wait time (mins)"
+  "waitTime": "Wait time (mins)",
+  "youngest": "Youngest first"
 }

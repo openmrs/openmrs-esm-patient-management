@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import styles from './search-results.scss';
 import { SearchTypes } from '../types';
 import PatientInfo from '../patient-info/patient-info.component';
-import { SortCriteria, usePatientResultsSort } from './usePatientSort';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from 'carbon-components-react';
 
@@ -12,9 +11,11 @@ interface SearchResultsProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
 }
 
+type SortCriteria = 'firstNameFirst' | 'lastNameFirst' | 'oldest' | 'youngest';
+
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const { t } = useTranslation();
-  const [sortCriteria, setSortCriteria] = useState<SortCriteria>('firstName');
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>('firstNameFirst');
   const fhirPatients = useMemo(() => {
     return patients.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -26,6 +27,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
             family: patient.person.personName.familyName,
           },
         ],
+        person: patient.person,
         gender: patient.person.gender,
         birthDate: patient.person.birthdate,
         deceasedDateTime: patient.person.deathDate,
@@ -50,12 +52,27 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
       };
     });
   }, [patients]);
-  const onClickSearchResult = () => toggleSearchType(SearchTypes.SCHEDULED_VISITS);
-  const sortedPatient = usePatientResultsSort(fhirPatients, sortCriteria);
+
+  const sortedPatient = useMemo(() => {
+    return fhirPatients.sort((patientA, patientB) => {
+      if (sortCriteria === 'oldest') {
+        return new Date(patientA.birthDate).getTime() - new Date(patientB.birthDate).getTime();
+      }
+      if (sortCriteria === 'youngest') {
+        return new Date(patientB.birthDate).getTime() - new Date(patientA.birthDate).getTime();
+      }
+      if (sortCriteria === 'firstNameFirst') {
+        return patientA.person.personName.givenName < patientB.person.personName.givenName ? -1 : 0;
+      }
+      if (sortCriteria === 'lastNameFirst') {
+        return patientA.person.personName.familyName < patientB.person.personName.familyName ? -1 : 0;
+      }
+    });
+  }, [fhirPatients, sortCriteria]);
 
   const sortByCriteria = [
-    { id: 'firstName', label: t('sortFirstName', 'First name (a -z)') },
-    { id: 'firstName', label: t('sortLasttName', 'Last name (a -z)') },
+    { id: 'firstNameFirst', label: t('firstNameSort', 'First name (a -z)') },
+    { id: 'lastNameFirst', label: t('lastNameSort', 'Last name (a -z)') },
     { id: 'oldest', label: t('oldest', 'Oldest first') },
     { id: 'youngest', label: t('youngest', 'Youngest first') },
   ];
@@ -72,7 +89,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
           titleText={t('sortBy', 'Sort by')}
           type="inline"
           size="sm"
-          onChange={({ selectedItem }) => setSortCriteria(selectedItem.label as SortCriteria)}
+          onChange={({ selectedItem }) => setSortCriteria(selectedItem.id as SortCriteria)}
         />
       </div>
       {sortedPatient.map((patient) => (
