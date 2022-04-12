@@ -1,0 +1,95 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.searchboxContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-08;
+}
+
+.searchInput {
+  input:focus {
+    outline: none;
+    border: $spacing-01 solid var(--omrs-color-brand-orange);
+  }
+}
+
+.tileContainer {
+  :global(.omrs-breakpoint-gt-tablet) & {
+    margin: 0 1.5rem 0;
+  }
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 60%;
+    margin: auto;
+  }
+}
+
+.tile {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0 1.5rem;
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.helperText {
+  margin-top: 1.25rem;
+  color: $text-02;
+
+  .primaryText {
+    @include carbon--type-style("productive-heading-01");
+  }
+
+  .secondaryText {
+    width: 12rem;
+    margin-top: 0.25rem;
+    @include carbon--type-style("body-long-01");
+  }
+}
+
+.separator {
+  @include carbon--type-style('productive-heading-03');
+  color: $text-02;
+  width: 12rem;
+  margin: 3rem auto;
+  overflow: hidden;
+  text-align: center;
+
+  &::before, &::after {
+    background-color: $text-03;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: 1rem;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: 1rem;
+    margin-right: -50%;
+  }
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultsContainer {
+  height: 100vh;
+}
+
+.lightBackground {
+  @extend .resultsContainer;
+  background-color: white;
+}
