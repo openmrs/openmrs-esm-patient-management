@@ -75,8 +75,8 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
                 size="sm"
                 className={styles.fieldRangeSwitcher}
                 onChange={({ index }) => setFieldMatcherRangeSwitcherValue(index)}>
-                <Switch name={fieldMatcherRange.ANY} text={t('any', 'Any')} />
-                <Switch name={fieldMatcherRange.ALL} text={t('all', 'All')} />
+                <Switch name={fieldMatcherRange.ANY} text={t('large', 'Large')} />
+                <Switch name={fieldMatcherRange.ALL} text={t('compact', 'Compact')} />
               </ContentSwitcher>
               <span>{t('fields', 'of the following fields')}:</span>
             </div>

@@ -1,0 +1,22 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.heading {
+    @include carbon--type-style("productive-heading-01");
+    color: $text-02;
+}
+
+.columnBorder {
+    border-right: 1px solid $color-blue-60-2;
+}
+
+.row {
+    background-color: $color-blue-10;
+    padding: $spacing-05;
+}
+
+.listMargin li {
+    margin: 0.5rem 0;
+}
+  
