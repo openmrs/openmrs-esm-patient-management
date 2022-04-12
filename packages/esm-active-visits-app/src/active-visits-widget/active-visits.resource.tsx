@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
-import { openmrsFetch, Visit, SessionUser } from '@openmrs/esm-framework';
+import { openmrsFetch, Visit, useSession } from '@openmrs/esm-framework';
 
 export interface ActiveVisit {
   age: string;
@@ -16,9 +16,9 @@ export interface ActiveVisit {
 }
 
 export function useActiveVisits() {
-  const { data: currentUserSession } = useCurrentSession();
+  const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
-  const sessionLocation = currentUserSession?.data?.sessionLocation?.uuid;
+  const sessionLocation = currentUserSession.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
@@ -52,14 +52,5 @@ export function useActiveVisits() {
     isLoading: !data && !error,
     isError: error,
     isValidating,
-  };
-}
-
-export function useCurrentSession() {
-  const { data, error } = useSWR<{ data: SessionUser }, Error>(`/ws/rest/v1/session`, openmrsFetch);
-
-  return {
-    data: data ? data : null,
-    isError: error,
   };
 }
