@@ -29,6 +29,8 @@
   padding-top: $spacing-09;
   display: grid;
   grid-template-rows: 1fr auto;
+  overflow-y: auto;
+  height: 100vh;
 }
 
 .tabletOverlayHeader {
