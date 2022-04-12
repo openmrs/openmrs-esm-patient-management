@@ -14,8 +14,16 @@ export const validationSchema = Yup.object({
     otherwise: Yup.string().notRequired(),
   }),
   gender: Yup.string().oneOf(['Male', 'Female', 'Other', 'Unknown'], 'genderUnspecified').required('genderRequired'),
-  birthdate: Yup.date().required('birthdayRequired').max(Date(), 'birthdayNotInTheFuture').nullable(),
-  ageEstimate: Yup.number().required('ageEstimateRequired').min(0, 'negativeYears').nullable(),
+  birthdate: Yup.date().when('birthdateEstimated', {
+    is: false,
+    then: Yup.date().required('birthdayRequired').max(Date(), 'birthdayNotInTheFuture').nullable(),
+    otherwise: Yup.date().nullable(),
+  }),
+  ageEstimate: Yup.number().when('birthdateEstimated', {
+    is: true,
+    then: Yup.number().required('ageEstimateRequired').min(0, 'negativeYears'),
+    otherwise: Yup.number().nullable(),
+  }),
   yearsEstimated: Yup.number().min(0, 'negativeYears'),
   monthsEstimated: Yup.number().min(0, 'negativeMonths'),
   deathDate: Yup.date().max(Date(), 'deathdayNotInTheFuture').nullable(),

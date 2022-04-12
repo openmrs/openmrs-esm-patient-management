@@ -10,11 +10,10 @@ export const DobField: React.FC = () => {
   const { t } = useTranslation();
   const [dobUnknown] = useField('birthdateEstimated');
   const dobKnown = !dobUnknown.value;
-  const [field, meta] = useField('birthdate');
+  const [birthdate, birthdateMeta] = useField('birthdate');
   const [ageEstimate, ageEstimateMeta] = useField('ageEstimate');
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
-  const invalidText = meta.error && t(meta.error);
   const today = new Date();
 
   const onToggle = (e) => {
@@ -58,12 +57,12 @@ export const DobField: React.FC = () => {
             maxDate={format(today)}>
             <DatePickerInput
               id="birthdate"
-              {...field}
+              {...birthdate}
               placeholder={placeHolder}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(meta.touched && meta.error)}
-              invalidText={invalidText}
-              value={format(field.value)}
+              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+              value={format(birthdate.value)}
             />
           </DatePicker>
         </div>
