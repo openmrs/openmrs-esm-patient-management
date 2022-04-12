@@ -3,6 +3,7 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './search-results.scss';
 import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
+import PatientInfo from '../patient-info/patient-info.component';
 
 interface SearchResultsProps {
   patients: Array<any>;
@@ -53,15 +54,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
       {fhirPatients.map((patient) => (
         <div key={patient.id} className={styles.patientChart}>
           <div className={styles.container}>
-            <ExtensionSlot
-              extensionSlotName="patient-header-slot"
-              state={{
-                patient,
-                patientUuid: patient.id,
-                onClick: onClickSearchResult,
-                // onTransition: hidePanel,
-              }}
-            />
+            <PatientInfo patient={patient} />
           </div>
         </div>
       ))}
