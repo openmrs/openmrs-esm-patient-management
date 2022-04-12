@@ -2,20 +2,20 @@ import React from 'react';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { FetchResponse, messageOmrsServiceWorker, openmrsFetch, SessionUser } from '@openmrs/esm-framework';
+import { FetchResponse, messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
 import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-registration/patient-registration-types';
 import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
   addressTemplate: any;
-  currentSession: SessionUser;
+  currentSession: Session;
   relationshipTypes: any;
   identifierTypes: Array<PatientIdentifierType>;
 }
 
 export const ResourcesContext = React.createContext<Resources>(null);
 
-export async function fetchCurrentSession(abortController?: AbortController): Promise<FetchResponse<SessionUser>> {
+export async function fetchCurrentSession(abortController?: AbortController): Promise<FetchResponse<Session>> {
   const { data } = await cacheAndFetch('/ws/rest/v1/session', abortController);
   return data;
 }
