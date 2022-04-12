@@ -1,0 +1,15 @@
+@import '../../style.scss';
+
+.overflowMenu {
+  width: auto;
+  height: auto;
+  margin-bottom: -$spacing-06;
+  margin-top: -$spacing-05;
+}
+
+.overflowMenuButton {
+  width: auto;
+  height: auto;
+  padding: $spacing-05;
+  color: $interactive-01;
+}
