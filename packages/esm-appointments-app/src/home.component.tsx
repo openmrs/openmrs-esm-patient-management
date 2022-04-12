@@ -1,5 +1,5 @@
 import React from 'react';
-import ActiveVisitsTable from './active-visits/active-visits-table.component';
+import ActiveVisitsTable from './appointment-tabs/booked/active-visits-table.component';
 import ClinicMetrics from './patient-queue-metrics/clinic-metrics.component';
 
 interface HomeProps {}

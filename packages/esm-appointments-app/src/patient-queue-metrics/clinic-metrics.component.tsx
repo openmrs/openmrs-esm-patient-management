@@ -20,27 +20,19 @@ const ClinicMetrics: React.FC = () => {
       <MetricsHeader />
       <div className={styles.cardContainer}>
         <MetricsCard
+          label={t('minutes', 'Minutes')}
+          value={metrics ? metrics.average_wait_time : 0}
+          headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
+        />
+        <MetricsCard
           label={t('patients', 'Patients')}
           value={metrics ? metrics.scheduled_appointments : 0}
-          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          headerLabel={t('missedAppointments', 'Missed appts. today')}
         />
         <MetricsCard
           label={t('patients', 'Patients')}
           value={metrics ? metrics.patients_waiting_for_service : 0}
-          headerLabel={t('waitingFor', 'Waiting for:')}>
-          <Dropdown
-            style={{ marginTop: '1.5rem' }}
-            id="inline"
-            initialSelectedItem={t('triage', 'Triage')}
-            label=""
-            type="inline"
-            items={[...services]}
-          />
-        </MetricsCard>
-        <MetricsCard
-          label={t('minutes', 'Minutes')}
-          value={metrics ? metrics.average_wait_time : 0}
-          headerLabel={t('averageWaitTime', 'Average wait time today')}
+          headerLabel={t('providersAvailableToday', 'Providers available today')}
         />
       </div>
     </>

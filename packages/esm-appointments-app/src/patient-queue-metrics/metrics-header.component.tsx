@@ -9,7 +9,7 @@ const MetricsHeader: React.FC = () => {
 
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}>{t('clinicMetrics', 'Clinic metrics')}</span>
+      <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('moreMetrics', 'See more metrics')}>
         {t('moreMetrics', 'See more metrics')}
       </Button>

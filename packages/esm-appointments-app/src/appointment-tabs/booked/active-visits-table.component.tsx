@@ -40,8 +40,8 @@ import {
   MappedVisitQueueEntry,
   MappedQueuePriority,
 } from './active-visits-table.resource';
-import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
+import PatientSearch from '../../patient-search/patient-search.component';
+import PastVisit from '../../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
 
 type FilterProps = {
@@ -238,14 +238,14 @@ function ActiveVisitsTable() {
     return (
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.headerContainer}>
-          <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
+          <span className={styles.heading}>{t('appointments', 'Appointments')}</span>
           <Button
             size="small"
             kind="secondary"
             renderIcon={Add16}
             onClick={() => setShowOverlay(true)}
-            iconDescription={t('addPatientList', 'Add patient to list')}>
-            {t('addPatientList', 'Add patient to list')}
+            iconDescription={t('addNewAppointment', 'Add New Appointment')}>
+            {t('addNewAppointment', 'Add New Appointment')}
           </Button>
         </div>
         <DataTable

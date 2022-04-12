@@ -11,20 +11,6 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSessionUser();
   const userLocation = userSession?.sessionLocation?.display;
-  const careTypes = [
-    {
-      id: 'option-1',
-      text: t('ncdCare', 'NCD Care'),
-    },
-    {
-      id: 'option-2',
-      text: t('hivCare', 'HIV Care'),
-    },
-    {
-      id: 'option-3',
-      text: t('tbCare', 'TB Care'),
-    },
-  ];
 
   return (
     <div className={styles.header}>
@@ -42,17 +28,6 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
           <span className={styles.middot}>&middot;</span>
           <Calendar16 />
           <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
-        </div>
-        <div className={styles.dropdown}>
-          <label className={styles.view}>{t('view', 'View')}:</label>
-          <Dropdown
-            id="typeOfCare"
-            label={t('careType', 'Type of Care')}
-            initialSelectedItem={careTypes[0]}
-            items={careTypes}
-            itemToString={(item) => (item ? item.text : '')}
-            type="inline"
-          />
         </div>
       </div>
     </div>
