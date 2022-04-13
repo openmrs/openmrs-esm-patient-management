@@ -5,6 +5,7 @@ import styles from './patient-info.scss';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import { useTranslation } from 'react-i18next';
+import ContactDetails from './contact-details.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -30,32 +31,37 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
 
   return (
-    <div className={styles.patientInfoContainer}>
-      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
-      <div className={styles.patientInfoContent}>
-        <div className={styles.patientInfoRow}>
-          <span className={styles.patientName}>{patientName}</span>
-        </div>
-        <div className={styles.patientInfoRow}>
-          <div className={styles.demographics}>
-            <span>{patientGender()} &middot; </span>
-            <span>{age(patient.birthDate)} &middot; </span>
-            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
+    <div className={styles.container}>
+      <div className={styles.patientInfoContainer}>
+        <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+        <div className={styles.patientInfoContent}>
+          <div className={styles.patientInfoRow}>
+            <span className={styles.patientName}>{patientName}</span>
+          </div>
+          <div className={styles.patientInfoRow}>
+            <div className={styles.demographics}>
+              <span>{patientGender()} &middot; </span>
+              <span>{age(patient.birthDate)} &middot; </span>
+              <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
+            </div>
+          </div>
+          <div className={styles.patientInfoRow}>
+            <span className={styles.identifier}>
+              {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
+            </span>
+            <Button
+              kind="ghost"
+              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
+              iconDescription="Toggle contact details"
+              onClick={() => setShowContactDetails((prevState) => !prevState)}>
+              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+            </Button>
           </div>
         </div>
-        <div className={styles.patientInfoRow}>
-          <span className={styles.identifier}>
-            {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
-          </span>
-          <Button
-            kind="ghost"
-            renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
-            iconDescription="Toggle contact details"
-            onClick={() => setShowContactDetails((prevState) => !prevState)}>
-            {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
-          </Button>
-        </div>
       </div>
+      {showContactDetails && (
+        <ContactDetails patientId={patient.id} address={patient.address ?? []} contact={patient.contact} />
+      )}
     </div>
   );
 };
