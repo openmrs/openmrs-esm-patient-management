@@ -54,7 +54,6 @@
   "match": "Match",
   "medications": "Medications",
   "middleName": "Middle name",
-  "minutes": "Minutes",
   "missedAppointments": "Missed appts. today",
   "moreMetrics": "See more metrics",
   "name": "Name",
@@ -101,6 +100,7 @@
   "primaryHelperText": "Search for a patient",
   "priority": "Priority",
   "provider": "Provider",
+  "providers": "Providers",
   "providersAvailableToday": "Providers available today",
   "recentScheduledVisits": "{count, plural, one{{count} visit} other{{count} visits}} scheduled for +/- 7 days",
   "recentScheduledVisits_plural": "",
@@ -124,5 +124,6 @@
   "successUpdatePatientList": "Updated patient list",
   "successUpdatePatientListDescription": "Successfully updated patient list",
   "vitals": "Vitals",
+  "view": "View",
   "waitTime": "Wait time (mins)"
 }

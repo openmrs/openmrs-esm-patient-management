@@ -94,7 +94,7 @@ const PatientListList: React.FC = () => {
       <section className={styles.patientListList}>
         <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
-          <h2 className={styles.productiveHeading03}>{t('patientLists', 'Patient Lists')}</h2>
+          <h2 className={styles.productiveHeading03}>{t('appointments', 'Appointments')}</h2>
           <Button
             className={styles.newListButton}
             kind="ghost"
