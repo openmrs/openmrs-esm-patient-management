@@ -18,7 +18,7 @@ export interface ActiveVisit {
 export function useActiveVisits() {
   const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
-  const sessionLocation = currentUserSession.sessionLocation?.uuid;
+  const sessionLocation = currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
