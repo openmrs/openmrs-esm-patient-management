@@ -71,7 +71,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
             <div className={styles.loadingContainer}>
               <InlineLoading description={t('loading', 'Loading...')} />
             </div>
-          ) : searchResults.length > 1 ? (
+          ) : searchTerm.length > 0 && searchResults.length > 0 ? (
             <SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />
           ) : (
             <div>
