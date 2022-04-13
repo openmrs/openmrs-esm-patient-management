@@ -37,7 +37,6 @@
   "givenNameLabelText": "First Name",
   "givenNameRequired": "Given name is required",
   "idFieldLabelText": "Identifiers",
-  "identifierRequired": "Identifier value is required",
   "invalidEmail": "A valid email has to be given",
   "invalidInput": "Invalid Input",
   "isDeadInputLabel": "Is Dead",
