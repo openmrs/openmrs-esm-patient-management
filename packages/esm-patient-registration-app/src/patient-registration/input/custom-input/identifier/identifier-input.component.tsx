@@ -9,6 +9,7 @@ import { Button } from 'carbon-components-react';
 import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
+import { useField } from 'formik';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -23,11 +24,11 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
   );
-
+  const fieldName = `identifiers[${index}].identifier`;
+  const [identifierField, identifierFieldMeta] = useField(fieldName);
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
   const { source, action, identifier } = patientIdentifier;
   const identifierName = identifierType?.name;
-  const fieldName = `identifiers[${index}].identifier`;
   const { t } = useTranslation();
   const [option, setAutoGenerationOption] = useState<Partial<IdentifierSourceAutoGenerationOption>>({
     manualEntryEnabled: source ? true : undefined,
@@ -111,6 +112,9 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           labelText={identifierName}
           name={fieldName}
           disabled={!option.manualEntryEnabled || disabled}
+          invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
+          invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
+          {...identifierField}
         />
       ) : (
         <div className={styles.textID}>
