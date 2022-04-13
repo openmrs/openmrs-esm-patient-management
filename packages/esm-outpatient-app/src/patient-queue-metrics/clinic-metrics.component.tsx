@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from 'carbon-components-react';
-import { useMetrics, useServices } from './queue-metrics.resource';
+import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
@@ -10,10 +10,15 @@ const ClinicMetrics: React.FC = () => {
   const { t } = useTranslation();
   const { metrics, isError, isLoading } = useMetrics();
   const { services } = useServices();
+  const [selectedService, setSelectedService] = useState('Triage');
+  const { serviceCount } = useServiceMetricsCount(selectedService);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
+  const handleServiceCountChange = ({ selectedItem }) => {
+    setSelectedService(selectedItem);
+  };
 
   return (
     <>
@@ -26,7 +31,7 @@ const ClinicMetrics: React.FC = () => {
         />
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={metrics ? metrics.patients_waiting_for_service : 0}
+          value={serviceCount}
           headerLabel={t('waitingFor', 'Waiting for:')}>
           <Dropdown
             style={{ marginTop: '1.5rem' }}
@@ -35,6 +40,7 @@ const ClinicMetrics: React.FC = () => {
             label=""
             type="inline"
             items={[...services]}
+            onChange={handleServiceCountChange}
           />
         </MetricsCard>
         <MetricsCard
