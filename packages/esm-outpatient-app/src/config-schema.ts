@@ -26,3 +26,9 @@ export interface ConfigObject {
   };
   contactAttributeType: Array<string>;
 }
+
+export interface OutpatientConfig {
+  offlineVisitTypeUuid: string;
+  visitTypeResourceUrl: string;
+  showRecommendedVisitTypeTab: boolean;
+}

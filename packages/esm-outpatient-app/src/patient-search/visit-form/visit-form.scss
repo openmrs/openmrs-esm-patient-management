@@ -1,0 +1,99 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.container {
+  margin: $spacing-05;
+
+  & section {
+    margin: $spacing-02 $spacing-05 0;
+  }
+}
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: $spacing-05;
+}
+.sectionTitle {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+  margin: 0 0 $spacing-03 0;
+}
+
+.dateTimeSection {
+  display: flex;
+}
+
+.radioButton {
+  margin: $spacing-05 0;
+}
+
+.contentSwitcher {
+  height: $spacing-09;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
+}
+
+.form {
+  background-color: $ui-background;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+@media screen and (max-width: 600px) {
+  .dateTimeSection {
+    flex-direction: column;
+  }
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0;
+  @include carbon--type-style('body-short-01');
+
+  button {
+    display: flex;
+
+    svg {
+      order: 1;
+      margin-right: 0.5rem;
+      margin-left: 0rem !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}

@@ -9,9 +9,10 @@ import ContactDetails from './contact-details.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
+  handleClick: () => void;
 }
 
-const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
+const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handleClick }) => {
   const { t } = useTranslation();
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
@@ -31,31 +32,17 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.patientInfoContainer}>
-        <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
-        <div className={styles.patientInfoContent}>
-          <div className={styles.patientInfoRow}>
-            <span className={styles.patientName}>{patientName}</span>
-          </div>
-          <div className={styles.patientInfoRow}>
-            <div className={styles.demographics}>
-              <span>{patientGender()} &middot; </span>
-              <span>{age(patient.birthDate)} &middot; </span>
-              <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
-            </div>
-          </div>
-          <div className={styles.patientInfoRow}>
-            <span className={styles.identifier}>
-              {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
-            </span>
-            <Button
-              kind="ghost"
-              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
-              iconDescription="Toggle contact details"
-              onClick={() => setShowContactDetails((prevState) => !prevState)}>
-              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
-            </Button>
+    <div className={styles.patientInfoContainer} onClick={handleClick} role="button" tabIndex={0}>
+      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+      <div className={styles.patientInfoContent}>
+        <div className={styles.patientInfoRow}>
+          <span className={styles.patientName}>{patientName}</span>
+        </div>
+        <div className={styles.patientInfoRow}>
+          <div className={styles.demographics}>
+            <span>{patientGender()} &middot; </span>
+            <span>{age(patient.birthDate)} &middot; </span>
+            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
         </div>
       </div>
