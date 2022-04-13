@@ -44,7 +44,7 @@ export const IdField: React.FC = () => {
           ),
       );
     }
-  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes]);
+  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes, setFieldValue]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
