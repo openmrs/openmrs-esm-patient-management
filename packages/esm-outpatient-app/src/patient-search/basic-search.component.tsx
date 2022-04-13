@@ -8,6 +8,7 @@ import SearchResults from './search-results.component';
 import { findPatients } from './search.resource';
 import { SearchTypes } from '../types';
 import styles from './basic-search.scss';
+import EmptyDataIllustration from './empty-data-illustration.component';
 
 interface BasicSearchProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -64,14 +65,29 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
           {t('search', 'Search')}
         </Button>
       </div>
-      {searchResults?.length || isLoading ? (
+      {searchResults || isLoading ? (
         <div className={styles.resultsContainer}>
           {isLoading ? (
             <div className={styles.loadingContainer}>
               <InlineLoading description={t('loading', 'Loading...')} />
             </div>
-          ) : (
+          ) : searchResults.length > 1 ? (
             <SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />
+          ) : (
+            <div>
+              <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
+              <Tile className={styles.emptySearchResultsTile}>
+                <EmptyDataIllustration />
+                <p className={styles.emptyResultText}>
+                  {t('noPatientFoundMessage', 'Sorry, no patient has been found')}
+                </p>
+                <p className={styles.actionText}>
+                  <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
+                  <br />
+                  <span>{t('orPatientName', "OR the patient's name(s)")}</span>
+                </p>
+              </Tile>
+            </div>
           )}
         </div>
       ) : (
