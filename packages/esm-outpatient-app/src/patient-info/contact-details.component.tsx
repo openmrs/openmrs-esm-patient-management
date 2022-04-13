@@ -14,9 +14,9 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
 
   return (
-    <>
+    <div>
       <p className={styles.heading}>{t('placeOfResidence', 'Place Of Residence')}</p>
-      <ul className={styles.listMargin}>
+      <ul>
         {address ? (
           <>
             <li>{address.postalCode}</li>
@@ -28,7 +28,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
           '--'
         )}
       </ul>
-    </>
+    </div>
   );
 };
 
@@ -39,9 +39,9 @@ const Contact: React.FC<{ contact: Array<fhir.ContactPoint>; patientUuid: string
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
 
   return (
-    <>
+    <div>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      <ul className={styles.listMargin}>
+      <ul>
         <li>{value}</li>
         {isLoading ? (
           <InlineLoading description={t('loading', 'Loading...')} />
@@ -53,7 +53,7 @@ const Contact: React.FC<{ contact: Array<fhir.ContactPoint>; patientUuid: string
           ))
         )}
       </ul>
-    </>
+    </div>
   );
 };
 
@@ -61,17 +61,10 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ patientId, address, con
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
   return (
-    <Grid>
-      <Row className={styles.row}>
-        <Column className={styles.columnBorder}>
-          <Address address={currentAddress} />
-        </Column>
-
-        <Column>
-          <Contact contact={contact} patientUuid={patientId} />
-        </Column>
-      </Row>
-    </Grid>
+    <div className={styles.container}>
+      <Address address={currentAddress} />
+      <Contact contact={contact} patientUuid={patientId} />
+    </div>
   );
 };
 

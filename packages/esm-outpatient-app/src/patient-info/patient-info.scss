@@ -2,9 +2,12 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.container {
+    border-bottom: 0.0125rem solid $color-gray-30;
+}
+
 .patientInfoContainer {
     background-color: $ui-02;
-    border-bottom: 0.0125rem solid $color-gray-30;
     padding: 0 0 0 $spacing-05;
     display: flex;
     align-items: center;
