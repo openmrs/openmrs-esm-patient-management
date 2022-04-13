@@ -10,7 +10,7 @@
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
-    "verify": "lerna run lint && lerna run test && lerna run typescript",
+    "verify": "turbo run lint && turbo run test && turbo run typescript",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "test": "jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "jest --watch --config jest.config.json",
@@ -23,13 +23,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.11.5",
-    "@babel/preset-react": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4",
-    "@babel/runtime": "^7.12.13",
     "@jsenv/file-size-impact": "12.1.1",
     "@openmrs/esm-framework": "next",
+    "@swc/core": "^1.2.165",
+    "@swc/jest": "^0.2.20",
     "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^5.11.0",
     "@testing-library/react": "^10.4.3",
@@ -45,8 +42,6 @@
     "@types/yup": "^0.29.11",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.3.0",
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^5.3.0",
     "dayjs": "^1.8.36",
@@ -71,6 +66,7 @@
     "rxjs": "^6.6.3",
     "sass": "^1.29.0",
     "sass-loader": "^10.1.0",
+    "turbo": "^1.2.2",
     "typescript": "^4.0.3"
   }
 }

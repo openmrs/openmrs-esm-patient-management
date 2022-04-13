@@ -39,7 +39,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
         <Select
           id={`person-attribute-${personAttributeTypeUuid}`}
           name={`attributes.${personAttributeTypeUuid}`}
-          labelText={personAttributeType?.name}
+          labelText={personAttributeType?.display}
           light>
           {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
@@ -48,7 +48,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
       ) : (
         <Input
           id={`person-attribute-${personAttributeTypeUuid}`}
-          labelText={personAttributeType?.name}
+          labelText={personAttributeType?.display}
           name={`attributes.${personAttributeTypeUuid}`}
           light
         />

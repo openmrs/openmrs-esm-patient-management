@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Overlay from '../overlay.component';
 import BasicSearch from './basic-search.component';
 import AdvancedSearch from './advanced-search.component';
+import PatientScheduledVisits from './patient-scheduled-visits.component';
+import SearchResults from './search-results.component';
 import { SearchTypes } from '../types';
 
 interface PatientSearchProps {
@@ -23,9 +25,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
         <div className="omrs-main-content">
           {searchType === SearchTypes.BASIC ? (
             <BasicSearch toggleSearchType={toggleSearchType} />
-          ) : (
+          ) : searchType === SearchTypes.ADVANCED ? (
             <AdvancedSearch toggleSearchType={toggleSearchType} />
-          )}
+          ) : searchType === SearchTypes.SEARCH_RESULTS ? (
+            <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
+          ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
+            <PatientScheduledVisits toggleSearchType={toggleSearchType} />
+          ) : null}
         </div>
       </Overlay>
     </>

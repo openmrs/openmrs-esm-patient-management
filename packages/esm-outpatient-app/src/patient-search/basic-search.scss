@@ -20,7 +20,7 @@
   }
 
   :global(.omrs-breakpoint-lt-desktop) & {
-    width: 50%;
+    width: 60%;
     margin: auto;
   }
 }
@@ -44,33 +44,40 @@
   }
 
   .secondaryText {
+    width: 12rem;
     margin-top: 0.25rem;
     @include carbon--type-style("body-long-01");
   }
 }
 
-.text-divider {
-  display: flex;
-  align-items: center;
-  margin: $spacing-10 25%;
-  @include carbon--type-style("productive-heading-02");
+.separator {
+  @include carbon--type-style('productive-heading-03');
   color: $text-02;
-}
+  width: 12rem;
+  margin: 3rem auto;
+  overflow: hidden;
+  text-align: center;
 
-.text-divider::before,
-.text-divider::after {
-  content: "";
-  height: 1px;
-  background-color: $text-03;
-  flex-grow: 1;
-}
+  &::before,
+  &::after {
+    background-color: $text-03;
+    content: "";
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
 
-.text-divider::before {
-  margin-right: $spacing-05;
-}
+  &::before {
+    right: 1rem;
+    margin-left: -50%;
+  }
 
-.text-divider::after {
-  margin-left: $spacing-05;
+  &::after {
+    left: 1rem;
+    margin-right: -50%;
+  }
 }
 
 .buttonContainer {
@@ -86,4 +93,15 @@
 .lightBackground {
   @extend .resultsContainer;
   background-color: white;
+}
+
+.loadingContainer {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &>div {
+    width: fit-content !important
+  }
 }

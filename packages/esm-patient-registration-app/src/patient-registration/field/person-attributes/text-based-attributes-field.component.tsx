@@ -56,7 +56,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
           return (
             <Input
               id={`person-attribute-${personAttributeTypeUuid}`}
-              labelText={personAttributeType?.name}
+              labelText={personAttributeType?.display}
               light
               invalid={
                 errors[`attributes.${personAttributeTypeUuid}`] && touched[`attributes.${personAttributeTypeUuid}`]

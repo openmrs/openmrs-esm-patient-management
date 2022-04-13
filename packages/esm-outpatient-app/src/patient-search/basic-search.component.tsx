@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import { Search, Button, Tile } from 'carbon-components-react';
+import { Search, Button, Tile, InlineLoading, Loading } from 'carbon-components-react';
 import Search16 from '@carbon/icons-react/es/search/16';
 import SearchIllustration from './search-illustration.component';
 import SearchResults from './search-results.component';
@@ -17,6 +17,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const searchTimeoutInMs = 300;
   const customRepresentation =
     'custom:(patientId,uuid,identifiers,display,' +
@@ -26,22 +27,26 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
 
   const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeoutInMs), []);
 
-  useEffect(() => {
-    if (searchTerm?.length) {
+  const performSearch = () => {
+    if (searchTerm.length) {
+      setIsLoading(true);
       const controller = new AbortController();
-      findPatients(searchTerm, customRepresentation, controller, false)
-        .then(({ data }) => {
-          const results = data.results.map((res, i) => ({
-            ...res,
-            index: i + 1,
-          }));
-          setSearchResults(results);
-        })
-        .finally(() => {
-          controller.abort();
-        });
+      if (searchTerm.length) {
+        findPatients(searchTerm, customRepresentation, controller, false)
+          .then(({ data }) => {
+            const results = data.results.map((res, i) => ({
+              ...res,
+              index: i + 1,
+            }));
+            setSearchResults(results);
+            setIsLoading(false);
+          })
+          .finally(() => {
+            controller.abort();
+          });
+      }
     }
-  }, [customRepresentation, searchTerm]);
+  };
 
   return (
     <div className={searchResults?.length ? styles.lightBackground : styles.resultsContainer}>
@@ -55,12 +60,20 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
           onChange={(event) => handleSearch(event.target.value)}
           onClear={() => setSearchResults([])}
         />
-        <Button iconDescription="Basic search" size="field" kind="secondary">
+        <Button onClick={performSearch} iconDescription="Basic search" size="field" kind="secondary">
           {t('search', 'Search')}
         </Button>
       </div>
-      {searchResults?.length ? (
-        <div className={styles.resultsContainer}>{<SearchResults patients={searchResults} />}</div>
+      {searchResults?.length || isLoading ? (
+        <div className={styles.resultsContainer}>
+          {isLoading ? (
+            <div className={styles.loadingContainer}>
+              <InlineLoading description={t('loading', 'Loading...')} />
+            </div>
+          ) : (
+            <SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />
+          )}
+        </div>
       ) : (
         <div>
           <div className={styles.tileContainer}>
@@ -74,7 +87,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
               </div>
             </Tile>
           </div>
-          <div className={styles['text-divider']}>{t('or', 'Or')}</div>
+          <p className={styles.separator}>{t('or', 'or')}</p>
           <div className={styles.buttonContainer}>
             <Button
               kind="ghost"
