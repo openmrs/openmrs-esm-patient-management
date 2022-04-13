@@ -73,7 +73,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
           <div className={styles.container}>
             <PatientInfo
               patient={patient}
-              handleClick={() => {
+              handlePatientInfoClick={() => {
                 toggleSearchType(SearchTypes.VISIT_FORM, patient.id);
               }}
             />

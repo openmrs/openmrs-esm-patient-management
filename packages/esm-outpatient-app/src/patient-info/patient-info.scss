@@ -4,10 +4,10 @@
 
 .container {
     border-bottom: 0.0125rem solid $color-gray-30;
+    background-color: $ui-02;
 }
 
 .patientInfoContainer {
-    background-color: $ui-02;
     padding: 0 0 0 $spacing-05;
     display: flex;
     align-items: center;
