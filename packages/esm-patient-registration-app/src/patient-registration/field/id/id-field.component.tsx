@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Button } from 'carbon-components-react';
 import { ArrowRight16 } from '@carbon/icons-react';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, useConfig } from '@openmrs/esm-framework';
 import { PatientIdentifierValue } from '../../patient-registration-types';
 import IdentifierSelectionOverlay from './identifier-selection-overlay';
 import { FieldArray } from 'formik';
@@ -17,13 +17,21 @@ export const IdField: React.FC = () => {
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
+  const config = useConfig();
+  const { defaultPatientIdentifierTypes } = config;
 
   useEffect(() => {
     if (!inEditMode && identifierTypes) {
+      const defaultPatientIdentifierTypesMap = {};
+      if (defaultPatientIdentifierTypes?.length) {
+        defaultPatientIdentifierTypes.forEach((typeUuid) => {
+          defaultPatientIdentifierTypesMap[typeUuid] = true;
+        });
+      }
       setFieldValue(
         'identifiers',
         identifierTypes
-          .filter((identifierType) => identifierType.isPrimary || identifierType.required)
+          .filter((identifierType) => identifierType.required || defaultPatientIdentifierTypesMap[identifierType.uuid])
           .map(
             (identifierType) =>
               ({
@@ -36,7 +44,7 @@ export const IdField: React.FC = () => {
           ),
       );
     }
-  }, [identifierTypes, inEditMode]);
+  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes, setFieldValue]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>

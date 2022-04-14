@@ -36,15 +36,10 @@ export async function fetchAllRelationshipTypes(abortController?: AbortControlle
 export async function fetchPatientIdentifierTypesWithSources(
   abortController?: AbortController,
 ): Promise<Array<PatientIdentifierType>> {
-  const [primaryIdentifierType, secondaryIdentifierTypes] = await Promise.all([
-    fetchPrimaryIdentifierType(abortController),
-    fetchSecondaryIdentifierTypes(abortController),
-  ]);
+  const patientIdentifierTypes = await fetchPatientIdentifierTypes(abortController);
 
   // @ts-ignore Reason: The required props of the type are generated below.
-  const identifierTypes: Array<PatientIdentifierType> = [primaryIdentifierType, ...secondaryIdentifierTypes].filter(
-    Boolean,
-  );
+  const identifierTypes: Array<PatientIdentifierType> = patientIdentifierTypes.filter(Boolean);
 
   for (const identifierType of identifierTypes) {
     const [identifierSources, autoGenOptions] = await Promise.all([
@@ -62,63 +57,40 @@ export async function fetchPatientIdentifierTypesWithSources(
   return identifierTypes;
 }
 
-async function fetchPrimaryIdentifierType(abortController: AbortController): Promise<FetchedPatientIdentifierType> {
+async function fetchPatientIdentifierTypes(
+  abortController?: AbortController,
+): Promise<Array<FetchedPatientIdentifierType>> {
+  const patientIdentifierTypesResponse = await cacheAndFetch(
+    '/ws/rest/v1/patientidentifiertype?v=full',
+    abortController,
+  );
+
   const primaryIdentifierTypeResponse = await cacheAndFetch(
     '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
     abortController,
   );
 
-  const { data } = await cacheAndFetch<FetchedPatientIdentifierType>(
-    `/ws/rest/v1/patientidentifiertype/${primaryIdentifierTypeResponse.data.results[0].metadataUuid}`,
-    abortController,
-  );
+  if (patientIdentifierTypesResponse.ok) {
+    // Primary identifier type is to be kept at the top of the list.
+    const patientIdentifierTypes = patientIdentifierTypesResponse?.data?.results;
 
-  return {
-    name: data.name,
-    fieldName: camelCase(data.name),
-    required: data.required,
-    uuid: data.uuid,
-    format: data.format,
-    isPrimary: true,
-    uniquenessBehavior: data.uniquenessBehavior,
-  };
-}
+    const primaryIdentifierTypeUuid = primaryIdentifierTypeResponse?.data?.results?.[0]?.metadataUuid;
 
-async function fetchSecondaryIdentifierTypes(
-  abortController?: AbortController,
-): Promise<Array<FetchedPatientIdentifierType>> {
-  const secondaryIdentifierTypeResponse = await cacheAndFetch(
-    '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.extraPatientIdentifierTypes',
-    abortController,
-  );
+    let identifierTypes = primaryIdentifierTypeResponse?.ok
+      ? [
+          mapPatientIdentifierType(
+            patientIdentifierTypes?.find((type) => type.uuid === primaryIdentifierTypeUuid),
+            true,
+          ),
+        ]
+      : [];
 
-  if (secondaryIdentifierTypeResponse.data.results) {
-    const extraIdentifierTypesSetUuid = secondaryIdentifierTypeResponse.data.results[0].metadataUuid;
-    const metadataResponse = await cacheAndFetch(
-      `/ws/rest/v1/metadatamapping/metadataset/${extraIdentifierTypesSetUuid}/members`,
-      abortController,
-    );
-
-    if (metadataResponse.data.results) {
-      return await Promise.all(
-        metadataResponse.data.results.map(async (setMember) => {
-          const type = await cacheAndFetch<FetchedPatientIdentifierType>(
-            `/ws/rest/v1/patientidentifiertype/${setMember.metadataUuid}`,
-            abortController,
-          );
-
-          return {
-            name: type.data.name,
-            fieldName: camelCase(type.data.name),
-            required: type.data.required,
-            uuid: type.data.uuid,
-            format: secondaryIdentifierTypeResponse.data.format,
-            isPrimary: false,
-            uniquenessBehavior: type.data.uniquenessBehavior,
-          };
-        }),
-      );
-    }
+    patientIdentifierTypes.forEach((type) => {
+      if (type.uuid !== primaryIdentifierTypeUuid) {
+        identifierTypes.push(mapPatientIdentifierType(type, false));
+      }
+    });
+    return identifierTypes;
   }
 
   return [];
@@ -126,7 +98,7 @@ async function fetchSecondaryIdentifierTypes(
 
 async function fetchIdentifierSources(identifierType: string, abortController?: AbortController) {
   return await cacheAndFetch(
-    `/ws/rest/v1/idgen/identifiersource?v=full&identifierType=${identifierType}`,
+    `/ws/rest/v1/idgen/identifiersource?v=default&identifierType=${identifierType}`,
     abortController,
   );
 }
@@ -142,4 +114,16 @@ async function cacheAndFetch<T = any>(url: string, abortController?: AbortContro
   });
 
   return await openmrsFetch<T>(url, { headers: cacheForOfflineHeaders, signal: abortController?.signal });
+}
+
+function mapPatientIdentifierType(patientIdentifierType, isPrimary) {
+  return {
+    name: patientIdentifierType.display,
+    fieldName: camelCase(patientIdentifierType.display),
+    required: patientIdentifierType.required,
+    uuid: patientIdentifierType.uuid,
+    format: patientIdentifierType.format,
+    isPrimary,
+    uniquenessBehavior: patientIdentifierType.uniquenessBehavior,
+  };
 }
