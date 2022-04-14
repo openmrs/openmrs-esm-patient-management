@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
-import styles from './patient-list-detail.scss';
+import styles from './appointment-detail.scss';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu/overflow-menu.component';
 import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -70,16 +70,20 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
         },
       },
       {
-        key: 'identifier',
-        header: t('identifier', 'Identifier'),
+        key: 'dateTime',
+        header: t('dateTime', 'Date & Time'),
       },
       {
-        key: 'sex',
-        header: t('sex', 'Sex'),
+        key: 'serviceType',
+        header: t('serviceType', 'Service Type'),
       },
       {
-        key: 'startDate',
-        header: t('startDate', 'Start Date'),
+        key: 'provider',
+        header: t('provider', 'Provider'),
+      },
+      {
+        key: 'location',
+        header: t('location', 'Location'),
       },
     ],
     [t],
@@ -89,25 +93,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     setPageCount(1);
     setSearchString(str);
   }, []);
-
-  const handleDelete = useCallback(() => {
-    deletePatientList(patientListUuid)
-      .then(() =>
-        showToast({
-          title: t('deleted', 'Deleted'),
-          description: `${t('deletedPatientList', 'Deleted patient list')}: ${patientListDetails?.name}`,
-          kind: 'success',
-        }),
-      )
-      .then(() => navigate({ to: `${window.spaBase}/patient-list/` }))
-      .catch(() =>
-        showToast({
-          title: t('error', 'Error'),
-          description: t('errorDeleteList', "Couldn't delete patient list"),
-          kind: 'error',
-        }),
-      );
-  }, [patientListUuid, patientListDetails, t]);
 
   return (
     <main className={`omrs-main-content ${styles.patientListDetailsPage}`}>
@@ -138,7 +123,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
               itemText={t('editNameDescription', 'Edit Name/ Description')}
               onClick={() => setEditPatientListDetailOverlay(true)}
             />
-            <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={handleDelete} isDelete />
           </CustomOverflowMenuComponent>
         </div>
         <div className={styles.tableContainer}>

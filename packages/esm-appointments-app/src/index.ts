@@ -59,24 +59,16 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'add-patient-to-patient-list-button',
-        slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./appointment-list/add-patient-to-patient-list-menu-item.component'), {
-          featureName: 'patient-actions-slot',
-          moduleName,
-        }),
-      },
-      {
         name: 'patient-list-action-menu',
         slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./appointment-list/patient-list-action-button.component'), {
+        load: getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
           featureName: 'patient-list-action-menu-item',
           moduleName,
         }),
       },
       {
         id: 'patient-table',
-        load: getAsyncLifecycle(() => import('./appointment-list/patient-table/patient-table.component'), {
+        load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
           featureName: 'patient-table',
           moduleName,
         }),

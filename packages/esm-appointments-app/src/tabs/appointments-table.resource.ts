@@ -1,0 +1,292 @@
+import dayjs from 'dayjs';
+import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
+import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
+import { Timestamp } from 'rxjs/internal/operators/timestamp';
+import { patientRegistration } from '../../../esm-patient-registration-app/src/constants';
+
+export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
+export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
+export type QueueService = 'Clinical consultation' | 'Triage';
+export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+
+interface VisitQueueEntry {
+  queueEntry: VisitQueueEntry;
+  uuid: string;
+  visit: Visit;
+}
+
+interface VisitQueueEntry {
+  display: string;
+  endedAt: null;
+  locationWaitingFor: string | null;
+  patient: {
+    uuid: string;
+  };
+  priority: {
+    display: QueuePriority;
+  };
+  priorityComment: string | null;
+  providerWaitingFor: null;
+  queue: {
+    description: string;
+    display: string;
+    name: string;
+    service: {
+      display: QueueService;
+    };
+    uuid: string;
+  };
+  startedAt: string;
+  status: {
+    display: QueueStatus;
+  };
+  uuid: string;
+  visit: Visit;
+}
+
+export interface MappedVisitQueueEntry {
+  id: string;
+  encounters: Array<MappedEncounter>;
+  name: string;
+  patientUuid: string;
+  priority: MappedQueuePriority;
+  priorityComment: string;
+  service: QueueService;
+  status: QueueStatus;
+  visitStartDateTime: string;
+  visitType: string;
+  visitUuid: string;
+  waitTime: string;
+}
+
+interface UseVisitQueueEntries {
+  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+  isLoading: boolean;
+  isError: Error;
+  isValidating?: boolean;
+}
+
+interface ObsData {
+  concept: {
+    display: string;
+    uuid: string;
+  };
+  value?: string | any;
+  groupMembers?: Array<{
+    concept: { uuid: string; display: string };
+    value?: string | any;
+  }>;
+  obsDatetime: string;
+}
+
+interface Encounter {
+  diagnoses: Array<any>;
+  encounterDatetime: string;
+  encounterProviders?: Array<{ provider: { person: { display: string } } }>;
+  encounterType: { display: string; uuid: string };
+  obs: Array<ObsData>;
+  uuid: string;
+  voided: boolean;
+}
+
+interface Appointment {
+  diagnoses: Array<any>;
+  encounterDatetime: string;
+  encounterProviders?: Array<{ provider: { person: { display: string } } }>;
+  encounterType: { display: string; uuid: string };
+  obs: Array<ObsData>;
+  voided: boolean;
+
+  // uuid: string;
+  // appointmentNumber: string,
+  // patient: Object,
+  // service: Object,
+  // serviceType": string,
+  // provider: string,
+  // location: Object,
+  // startDateTime: Timestamp,
+  // endDateTime: Timestamp,
+  // appointmentKind: string,
+  // status: string,
+  // comments: null,
+  // additionalInfo: null,
+  // teleconsultation: null,
+  // providers: [],
+  // voided: false,
+  // extensions: Object,
+  // "teleconsultationLink": null,
+  // "recurring": false
+}
+
+interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> {
+  encounterType: string;
+  provider: string;
+}
+
+export function useServices() {
+  const config = useConfig();
+  const {
+    concepts: { serviceConceptSetUuid },
+  } = config;
+
+  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
+  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
+  };
+}
+
+export function useVisitQueueEntries(): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
+    diagnoses: encounter.diagnoses,
+    encounterDatetime: encounter.encounterDatetime,
+    encounterType: encounter.encounterType.display,
+    obs: encounter.obs,
+    provider: encounter.encounterProviders[0]?.provider?.person?.display,
+    uuid: encounter.uuid,
+    voided: encounter.voided,
+  });
+
+  const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
+    id: visitQueueEntry.queueEntry.uuid,
+    encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
+    name: visitQueueEntry.queueEntry.display,
+    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
+    priority:
+      visitQueueEntry.queueEntry.priority.display === 'Urgent'
+        ? 'Priority'
+        : visitQueueEntry.queueEntry.priority.display,
+    priorityComment: visitQueueEntry.queueEntry.priorityComment,
+    service: visitQueueEntry.queueEntry.queue.service.display,
+    status: visitQueueEntry.queueEntry.status.display,
+    waitTime: visitQueueEntry.queueEntry.startedAt
+      ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
+      : '--',
+    visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
+    visitType: visitQueueEntry.visit?.visitType?.display,
+    visitUuid: visitQueueEntry.visit?.uuid,
+  });
+
+  const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+
+  return {
+    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
+}
+
+export function useAppointmentEntries(): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/appointments?v=full`;
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  // const mapAppointmentProperties = (appointment: Appointment): MappedEncounter => ({
+  const mapAppointmentProperties = (appointment) => ({
+    name: appointment.patient.name,
+    dateTime: appointment.startDateTime,
+    serviceType: appointment.serviceType ? appointment.serviceType.display : '--',
+    provider: appointment.provider ? appointment.provider.display : '--',
+    location: appointment.location ? appointment.location.name : '--',
+  });
+
+  console.log(data);
+  console.log('Mapped: ', mapAppointmentProperties);
+
+  // {
+  //   "uuid": "342b960d-9620-4615-88f6-1024756bf9d2",
+  //   "appointmentNumber": "0000",
+  //   "patient": {
+  //       "identifier": "105AH5",
+  //       "name": "Josh Wilson",
+  //       "uuid": "a820604d-6ed5-4ecd-ae67-63995d323453"
+  //   },
+  //   "service": {
+  //       "appointmentServiceId": 1,
+  //       "name": "Outpatient",
+  //       "description": null,
+  //       "speciality": {},
+  //       "startTime": "",
+  //       "endTime": "",
+  //       "maxAppointmentsLimit": null,
+  //       "durationMins": null,
+  //       "location": {},
+  //       "uuid": "e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90",
+  //       "color": "#006400",
+  //       "initialAppointmentStatus": "Scheduled",
+  //       "creatorName": null
+  //   },
+  //   "serviceType": null,
+  //   "provider": null,
+  //   "location": {
+  //       "name": "Mosoriot Pharmacy",
+  //       "uuid": "f76c0c8e-2c3a-443c-b26d-96a9f3847764"
+  //   },
+  //   "startDateTime": 1650358800000,
+  //   "endDateTime": 1650360600000,
+  //   "appointmentKind": "Scheduled",
+  //   "status": "Scheduled",
+  //   "comments": null,
+  //   "additionalInfo": null,
+  //   "teleconsultation": null,
+  //   "providers": [],
+  //   "voided": false,
+  //   "extensions": {
+  //       "patientEmailDefined": false
+  //   },
+  //   "teleconsultationLink": null,
+  //   "recurring": false
+  // }
+
+  const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
+    diagnoses: encounter.diagnoses,
+    encounterDatetime: encounter.encounterDatetime,
+    encounterType: encounter.encounterType.display,
+    obs: encounter.obs,
+    provider: encounter.encounterProviders[0]?.provider?.person?.display,
+    uuid: encounter.uuid,
+    voided: encounter.voided,
+  });
+
+  const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
+    id: visitQueueEntry.queueEntry.uuid,
+    encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
+    name: visitQueueEntry.queueEntry.display,
+    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
+    // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
+    // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
+    priority:
+      visitQueueEntry.queueEntry.priority.display === 'Urgent'
+        ? 'Priority'
+        : visitQueueEntry.queueEntry.priority.display,
+    priorityComment: visitQueueEntry.queueEntry.priorityComment,
+    service: visitQueueEntry.queueEntry.queue.service.display,
+    status: visitQueueEntry.queueEntry.status.display,
+    waitTime: visitQueueEntry.queueEntry.startedAt
+      ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
+      : '--',
+    visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
+    visitType: visitQueueEntry.visit?.visitType?.display,
+    visitUuid: visitQueueEntry.visit?.uuid,
+  });
+
+  const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+
+  return {
+    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
+}
