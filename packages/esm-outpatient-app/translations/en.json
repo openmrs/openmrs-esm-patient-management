@@ -83,11 +83,8 @@
   "showAllDetails": "Show all details",
   "showLess": "Show less",
   "showPatientsWaitingFor": "Show patients waiting for",
-<<<<<<< HEAD
   "sortBy": "Sort by",
-=======
   "startVisit": "Start visit",
->>>>>>> 80e7de7 (added start visit form)
   "status": "Status",
   "tbCare": "TB Care",
   "time": "Time",

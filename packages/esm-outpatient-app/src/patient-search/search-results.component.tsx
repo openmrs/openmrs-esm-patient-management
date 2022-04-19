@@ -53,6 +53,30 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
     });
   }, [patients]);
 
+  const sortedPatient = useMemo(() => {
+    return fhirPatients.sort((patientA, patientB) => {
+      if (sortCriteria === 'oldest') {
+        return new Date(patientA.birthDate).getTime() - new Date(patientB.birthDate).getTime();
+      }
+      if (sortCriteria === 'youngest') {
+        return new Date(patientB.birthDate).getTime() - new Date(patientA.birthDate).getTime();
+      }
+      if (sortCriteria === 'firstNameFirst') {
+        return patientA.person.personName.givenName < patientB.person.personName.givenName ? -1 : 0;
+      }
+      if (sortCriteria === 'lastNameFirst') {
+        return patientA.person.personName.familyName < patientB.person.personName.familyName ? -1 : 0;
+      }
+    });
+  }, [fhirPatients, sortCriteria]);
+
+  const sortByCriteria = [
+    { id: 'firstNameFirst', label: t('firstNameSort', 'First name (a -z)') },
+    { id: 'lastNameFirst', label: t('lastNameSort', 'Last name (a -z)') },
+    { id: 'oldest', label: t('oldest', 'Oldest first') },
+    { id: 'youngest', label: t('youngest', 'Youngest first') },
+  ];
+
   return (
     <>
       <div className={styles.sortCriteria}>
