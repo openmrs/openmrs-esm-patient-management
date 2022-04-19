@@ -1,5 +1,5 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "carbon-components/scss/globals/scss/typography.scss";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import 'carbon-components/scss/globals/scss/typography.scss';
 
 .searchboxContainer {
   display: flex;
@@ -40,13 +40,13 @@
   color: $text-02;
 
   .primaryText {
-    @include carbon--type-style("productive-heading-01");
+    @include carbon--type-style('productive-heading-01');
   }
 
   .secondaryText {
     width: 12rem;
     margin-top: 0.25rem;
-    @include carbon--type-style("body-long-01");
+    @include carbon--type-style('body-long-01');
   }
 }
 
@@ -61,7 +61,7 @@
   &::before,
   &::after {
     background-color: $text-03;
-    content: "";
+    content: '';
     display: inline-block;
     height: 1px;
     position: relative;
@@ -101,8 +101,8 @@
   justify-content: center;
   align-items: center;
 
-  &>div {
-    width: fit-content !important
+  & > div {
+    width: fit-content !important;
   }
 }
 

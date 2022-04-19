@@ -1,4 +1,4 @@
-@import "../root.scss";
+@import '../root.scss';
 
 .activeVisitsContainer {
   background-color: $ui-background;
@@ -23,7 +23,7 @@
   justify-content: center;
 }
 
-.tableContainer section{
+.tableContainer section {
   position: relative;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .content {
-  @include carbon--type-style("productive-heading-01");
+  @include carbon--type-style('productive-heading-01');
   color: $text-02;
   margin-top: $spacing-05;
   margin-bottom: $spacing-03;
@@ -84,13 +84,14 @@
   }
 }
 
-.desktopHeading, .tabletHeading {
+.desktopHeading,
+.tabletHeading {
   text-align: left;
   text-transform: capitalize;
   margin-bottom: $spacing-05;
-  
+
   h4:after {
-    content: "";
+    content: '';
     display: block;
     width: 2rem;
     padding-top: 3px;

@@ -1,4 +1,4 @@
-@import "./root.scss";
+@import './root.scss';
 
 .desktopOverlay {
   position: fixed;
@@ -53,11 +53,11 @@
   position: -webkit-sticky;
   width: 100%;
   z-index: 1000;
-  top: 0
+  top: 0;
 }
 
 .headerContent {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   padding: 0 $spacing-05;
   color: $ui-05;
 }
