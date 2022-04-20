@@ -20,7 +20,7 @@ import {
 import {
   useStore,
   getOfflinePatientDataStore,
-  useSessionUser,
+  useSession,
   age,
   useLayoutType,
   syncOfflinePatientData,
@@ -43,7 +43,7 @@ export interface OfflinePatientTableProps {
 const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive, showHeader }) => {
   const { t } = useTranslation();
   const store = useStore(getOfflinePatientDataStore());
-  const userId = useSessionUser()?.user.uuid;
+  const userId = useSession()?.user.uuid;
   const layout = useLayoutType();
   const { isValidating, data: patients, mutate } = useAllPatientsFromOfflinePatientList(userId);
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
