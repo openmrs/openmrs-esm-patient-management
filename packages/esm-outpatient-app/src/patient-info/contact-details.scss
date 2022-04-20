@@ -15,15 +15,20 @@ $color-blue-20: #d0e2ff;
     grid-template-columns: 1fr 1fr;
     border-top: 1px solid $color-blue-20;
     margin-top: $spacing-01;
-
+    background-color: $color-blue-10;
 
     &>div {
         margin-left: $spacing-05;
-        padding-top: $spacing-01;
+        padding: $spacing-01;
     }
 
     &>div:first-child {
         border-right: 1px solid $color-blue-20;
+        padding: $spacing-03;
+    }
+
+    &>div:nth-child(2) {
+        padding: $spacing-03;
     }
 
     & ul>li {
