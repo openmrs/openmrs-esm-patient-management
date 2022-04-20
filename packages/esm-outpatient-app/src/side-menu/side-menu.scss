@@ -1,25 +1,24 @@
-@import "../root.scss";
+@import '../root.scss';
 
 .sideMenuContainer {
-    width: 16rem;
-    min-height: 8rem;
-    overscroll-behavior: contain;
-    margin: 48px 13px 15px 0;
-    border-right: 1px #e0e0e0;
+  width: 16rem;
+  min-height: 8rem;
+  overscroll-behavior: contain;
+  margin: 48px 13px 15px 0;
+  border-right: 1px #e0e0e0;
 }
 
 .sideMenuContainer :global(ul.bx--side-nav__items) {
-    border-style: solid !important;
-    border-right: 1px #e0e0e0;
+  border-style: solid !important;
+  border-right: 1px #e0e0e0;
+}
+
+@media (max-width: 1200px) {
+  .sideMenuContainer :global(.bx--side-nav) {
+    z-index: -100 !important;
   }
-  
-  @media (max-width: 1200px) {
-    .sideMenuContainer :global(.bx--side-nav) {
-      z-index: -100 !important;
-    }
-  
-    .sideMenuContainer :global(.bx--side-nav__items) {
-      padding: 0 !important;
-    }
+
+  .sideMenuContainer :global(.bx--side-nav__items) {
+    padding: 0 !important;
   }
-  
+}

@@ -1,9 +1,9 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
-@import "../root.scss";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+@import '../root.scss';
 
-.container  {
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +32,7 @@
 }
 
 .visitsDetailHeaderContainer > h4:after {
-  content: "";
+  content: '';
   display: block;
   width: 2rem;
   padding-top: 0.188rem;
@@ -44,28 +44,30 @@
   height: 2.5rem;
 }
 
-.toggle{
-  border: 1px solid #A6C8FF;
+.toggle {
+  border: 1px solid #a6c8ff;
 }
 
 .toggle:hover {
-  background-color: #EDF5FF;
+  background-color: #edf5ff;
 }
 
-.toggle:active, .toggle:focus {
+.toggle:active,
+.toggle:focus {
   box-shadow: none;
-  background-color: #EDF5FF;
+  background-color: #edf5ff;
 }
 
-.toggleActive{
-  background-color: #EDF5FF;
+.toggleActive {
+  background-color: #edf5ff;
   border: 1px solid $link-01;
 }
 
-.toggleActive:active, .toggleActive:focus {
+.toggleActive:active,
+.toggleActive:focus {
   box-shadow: none;
   border: 1px solid $link-01;
-  background-color: #EDF5FF;
+  background-color: #edf5ff;
 }
 
 .toggle:first-of-type {
@@ -80,17 +82,17 @@
   background-color: #fff;
 }
 
-.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
+.customTable tbody tr[data-parent-row]:nth-child(even) td {
   background-color: #f4f4f4;
 }
 
 .encounterEmptyState {
   text-align: center;
-  margin: 0 1rem 1rem 1rem; 
+  margin: 0 1rem 1rem 1rem;
 }
 
 .expandedRow > td {
-  padding: inherit !important
+  padding: inherit !important;
 }
 
 .expandedRow > td > div {
@@ -135,7 +137,9 @@
   border-left: 3px solid #e0e0e0 !important;
 }
 
-.tab > button, .tab > button:focus, .tab > button:active {
+.tab > button,
+.tab > button:focus,
+.tab > button:active {
   outline: 0 !important;
   outline-offset: 0 !important;
 }
@@ -186,10 +190,10 @@
 
 .secondaryDiagnose {
   background-color: #ffd7d9;
-  color:#a2191f;
+  color: #a2191f;
 }
 
 .testSummaryExtension p {
-  @include carbon--type-style("body-long-01");
-  color: #525252
+  @include carbon--type-style('body-long-01');
+  color: #525252;
 }
