@@ -3,7 +3,7 @@ import { Button, Dropdown, OnChangeData, TextArea, TextInput } from 'carbon-comp
 import Overlay from '../../overlay.component';
 import { useTranslation } from 'react-i18next';
 import styles from './create-edit-patient-list.scss';
-import { useLayoutType, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { useLayoutType, showToast, useSession } from '@openmrs/esm-framework';
 import { createPatientList, editPatientList } from '../../api/api-remote';
 import { useCohortTypes } from '../../api/hooks';
 import { OpenmrsCohort, NewCohortData } from '../../api/types';
@@ -29,7 +29,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     location: '',
   });
   const isDesktop = useLayoutType() === 'desktop';
-  const user = useSessionUser();
+  const user = useSession();
   const { data: cohortTypes } = useCohortTypes();
 
   useEffect(() => {
