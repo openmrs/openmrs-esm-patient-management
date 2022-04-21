@@ -19,16 +19,11 @@ $color-blue-20: #d0e2ff;
 
     &>div {
         margin-left: $spacing-05;
-        padding: $spacing-01;
+        padding: $spacing-03;
     }
 
     &>div:first-child {
         border-right: 1px solid $color-blue-20;
-        padding: $spacing-03;
-    }
-
-    &>div:nth-child(2) {
-        padding: $spacing-03;
     }
 
     & ul>li {
