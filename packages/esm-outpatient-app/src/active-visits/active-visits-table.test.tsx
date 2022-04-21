@@ -99,8 +99,8 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/^or$/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
-    expect(screen.getByRole('separator')).toBeInTheDocument();
   });
 });
 
