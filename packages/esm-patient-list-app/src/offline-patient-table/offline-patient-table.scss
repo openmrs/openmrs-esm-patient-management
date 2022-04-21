@@ -1,4 +1,4 @@
-@import "../style.scss";
+@import '../style.scss';
 
 .tableContainer {
   background-color: transparent;
@@ -10,7 +10,7 @@
   grid-template-columns: 1fr 1fr auto auto;
 
   .tableHeader {
-    @include carbon--type-style("productive-heading-03");
+    @include carbon--type-style('productive-heading-03');
     color: $text-02;
     padding: $spacing-04 0 $spacing-04 $spacing-04;
     grid-row: 1;

@@ -4,7 +4,6 @@ import {
   Button,
   DataTable,
   DataTableHeader,
-  DataTableSize,
   DataTableSkeleton,
   Dropdown,
   OverflowMenu,
@@ -208,24 +207,25 @@ function ActiveVisitsTable() {
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
       headers.some(({ key }) => {
-        const id = getCellId(rowId, key);
-        if (typeof cellsById[id].value === 'boolean') {
+        const cellId = getCellId(rowId, key);
+        const filterableValue = cellsById[cellId].value;
+        const filterTerm = inputValue.toLowerCase();
+
+        if (typeof filterableValue === 'boolean') {
           return false;
         }
-        if (cellsById[id].value.hasOwnProperty('content')) {
-          if (Array.isArray(cellsById[id].value.content.props.children)) {
-            return ('' + cellsById[id].value.content.props.children[1].props.children)
-              .toLowerCase()
-              .includes(inputValue.toLowerCase());
+        if (filterableValue.hasOwnProperty('content')) {
+          if (Array.isArray(filterableValue.content.props.children)) {
+            return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
           }
-          if (typeof cellsById[id].value.content.props.children === 'object') {
-            return ('' + cellsById[id].value.content.props.children.props.children.props.children)
+          if (typeof filterableValue.content.props.children === 'object') {
+            return ('' + filterableValue.content.props.children.props.children.props.children)
               .toLowerCase()
-              .includes(inputValue.toLowerCase());
+              .includes(filterTerm);
           }
-          return ('' + cellsById[id].value.content.props.children).toLowerCase().includes(inputValue.toLowerCase());
+          return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
         }
-        return ('' + cellsById[id].value).toLowerCase().includes(inputValue.toLowerCase());
+        return ('' + filterableValue).toLowerCase().includes(filterTerm);
       }),
     );
   };
@@ -236,7 +236,7 @@ function ActiveVisitsTable() {
 
   if (visitQueueEntries?.length) {
     return (
-      <div className={styles.container} data-floating-menu-container>
+      <div className={styles.container}>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
           <Button
@@ -249,6 +249,7 @@ function ActiveVisitsTable() {
           </Button>
         </div>
         <DataTable
+          data-floating-menu-container
           filterRows={handleFilter}
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop ? true : false}

@@ -1,63 +1,65 @@
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
+@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .searchContainer {
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    margin-top: $spacing-05;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: $spacing-05;
 }
 
 .searchContainer > div {
-    align-self: center;
-    justify-self: end;
+  align-self: center;
+  justify-self: end;
 }
 
 .searchOverrides {
-    width: 100%;
-    max-width: 250px;
-    border: 0px !important;
+  width: 100%;
+  max-width: 250px;
+  border: 0px !important;
 }
 
-div.tableOverride  {
-    background-color: $ui-01;
+div.tableOverride {
+  background-color: $ui-01;
 }
 
 div.tableOverride > div {
-    white-space:nowrap;
-    padding: 0px !important;
+  white-space: nowrap;
+  padding: 0px !important;
 }
 
 div#table-tool-bar {
-    margin-top: $carbon--spacing-09;
+  margin-top: $carbon--spacing-09;
 }
 
-.desktopRow, .desktopHeader {
-    height: $spacing-07 !important;
+.desktopRow,
+.desktopHeader {
+  height: $spacing-07 !important;
 }
 
-.tabletRow, .tabletHeader {
-    height: $spacing-09 !important;
+.tabletRow,
+.tabletHeader {
+  height: $spacing-09 !important;
 }
 
-.paginationOverride{
-    background-color: $ui-background;
-    border-top: 1px solid $ui-03 !important;
-    border-bottom: 1px solid $ui-03 !important;
-    overflow-x: hidden;
+.paginationOverride {
+  background-color: $ui-background;
+  border-top: 1px solid $ui-03 !important;
+  border-bottom: 1px solid $ui-03 !important;
+  overflow-x: hidden;
 }
 
 .paginationOverride > div {
-    background-color: $ui-background;
-    border-bottom: 0px!important;
-    border-top: 0px !important;
+  background-color: $ui-background;
+  border-bottom: 0px !important;
+  border-top: 0px !important;
 }
 
 .link {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .dataTableSkeleton {
-    background-color: transparent;
-    padding: 0rem;
+  background-color: transparent;
+  padding: 0rem;
 }

@@ -1,53 +1,53 @@
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
+@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .label01 {
-  @include carbon--type-style("label-01");
+  @include carbon--type-style('label-01');
 }
 
 .suggestions {
-    position: relative;
-    border-top-width: 0;
-    list-style: none;
-    margin-top: 0;
-    max-height: 143px;
-    overflow-y: auto;
-    padding-left: 0;
-    width: 100%;
-    position: absolute;
-    left: 0;
-    background-color: #fff;
-    margin-bottom: 20px;
-    z-index: 99;
+  position: relative;
+  border-top-width: 0;
+  list-style: none;
+  margin-top: 0;
+  max-height: 143px;
+  overflow-y: auto;
+  padding-left: 0;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  background-color: #fff;
+  margin-bottom: 20px;
+  z-index: 99;
 }
 
 .suggestions li {
-    padding: $spacing-05;
-    line-height: 1.29;
-    color: #525252;
-    border-bottom: 1px solid #8d8d8d;
+  padding: $spacing-05;
+  line-height: 1.29;
+  color: #525252;
+  border-bottom: 1px solid #8d8d8d;
 }
 
 .suggestions li:hover {
-    background-color: #e5e5e5;
-    color: #161616;
-    cursor: pointer;
+  background-color: #e5e5e5;
+  color: #161616;
+  cursor: pointer;
 }
 
 .suggestions li:not(:last-of-type) {
-    border-bottom: 1px solid #999;
+  border-bottom: 1px solid #999;
 }
 
 .autocomplete {
-    position: relative;
+  position: relative;
 }
 
 .autocompleteSearch {
-    width: 100%;
+  width: 100%;
 }
 
 .suggestions a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }

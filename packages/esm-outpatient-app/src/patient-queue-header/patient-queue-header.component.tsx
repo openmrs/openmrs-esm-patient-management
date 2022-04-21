@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
 import Location16 from '@carbon/icons-react/es/location/16';
 import { Dropdown } from 'carbon-components-react';
-import { formatDate, useSessionUser } from '@openmrs/esm-framework';
+import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
-  const userSession = useSessionUser();
+  const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const careTypes = [
     {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toOmrsIsoString, showToast, usePagination, useSessionUser } from '@openmrs/esm-framework';
+import { toOmrsIsoString, showToast, usePagination, useSession } from '@openmrs/esm-framework';
 import { Button, Checkbox, Pagination, Search, SkeletonText } from 'carbon-components-react';
 import styles from './add-patient.scss';
 import { addPatientToLocalOrRemotePatientList } from '../api/api';
@@ -22,7 +22,7 @@ type PatientListObj = Record<string, PatientListProp>;
 const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const userId = useSessionUser()?.user.uuid;
+  const userId = useSession()?.user.uuid;
   const { data, isValidating } = useAllPatientListsWhichDoNotIncludeGivenPatient(userId, patientUuid);
   const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
 

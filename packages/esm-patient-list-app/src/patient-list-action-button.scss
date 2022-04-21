@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   display: flex;
@@ -18,7 +18,7 @@
 
   & > span {
     margin-top: $spacing-02;
-    @include carbon--type-style("body-short-01");
+    @include carbon--type-style('body-short-01');
     color: $text-02;
   }
 
@@ -57,7 +57,7 @@
 
     & > span {
       color: $interactive-01;
-      @include carbon--type-style("productive-heading-01");
+      @include carbon--type-style('productive-heading-01');
     }
   }
 }

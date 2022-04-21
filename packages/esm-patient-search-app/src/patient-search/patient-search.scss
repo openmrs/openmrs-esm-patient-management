@@ -1,7 +1,7 @@
-@import "../root.scss";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import '../root.scss';
+@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
-:global(.bx--side-nav){
+:global(.bx--side-nav) {
   z-index: 0;
 }
 
@@ -13,18 +13,18 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color:$ui-02;
+  background-color: $ui-02;
   padding: 0rem $spacing-05;
   overflow-y: auto;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .searchResultsContainer{
-  top: 6.25rem
+:global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
+  top: 6.25rem;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
   padding: 0;
-  background-color:var(--omrs-color-bg-low-contrast);
+  background-color: var(--omrs-color-bg-low-contrast);
   top: $spacing-09;
 }
 
@@ -38,24 +38,21 @@
 }
 
 .searchTerm {
-  @include carbon--type-style("productive-heading-03");
+  @include carbon--type-style('productive-heading-03');
   color: $text-01;
   margin-top: 0.375rem;
 }
 
 .resultsText {
-  @include carbon--type-style("label-01");
+  @include carbon--type-style('label-01');
   color: $text-02;
   border-bottom: 0.063rem solid $ui-03;
   padding: $spacing-03 0rem;
-
 }
 
 :global(.omrs-breakpoint-gt-tablet) .resultsText {
   margin: $spacing-05;
 }
-
-
 
 .helperText {
   color: var(--omrs-color-ink-medium-contrast);
@@ -63,14 +60,14 @@
 }
 
 .emptyResultText {
-  @include carbon--type-style("productive-heading-01");
+  @include carbon--type-style('productive-heading-01');
   color: $text-02;
   margin-top: $spacing-05;
   margin-bottom: 0.313rem;
 }
 
 .actionText {
-  @include carbon--type-style("body-long-01");
+  @include carbon--type-style('body-long-01');
   color: $text-02;
 }
 
@@ -92,7 +89,7 @@
 }
 
 .errorMessage {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   color: $text-01;
   margin-top: 2.25rem;
   margin-bottom: $spacing-03;
@@ -100,6 +97,6 @@
 
 .errorCopy {
   margin-bottom: $spacing-03;
-  @include carbon--type-style("body-long-01");
+  @include carbon--type-style('body-long-01');
   color: $text-02;
 }
