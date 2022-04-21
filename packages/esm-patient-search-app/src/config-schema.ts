@@ -6,10 +6,10 @@ export const configSchema = {
       _description: 'Where clicking a patient result takes the user. Accepts template parameter ${patientUuid}',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
-    hideActionsOverflow: {
+    showActionsMenu: {
       _type: Type.Boolean,
-      _default: false,
-      _description: 'Whether to hide the action overflow in patients search results',
+      _default: true,
+      _description: 'show or hide actions menu in search result patient banner',
     },
   },
   includeDead: {

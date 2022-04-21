@@ -30,5 +30,9 @@
   },
   "setupFilesAfterEnv": [
     "<rootDir>/tools/setupTests.ts"
+  ],
+  "watchPlugins": [
+    "jest-watch-typeahead/filename",
+    "jest-watch-typeahead/testname"
   ]
 }

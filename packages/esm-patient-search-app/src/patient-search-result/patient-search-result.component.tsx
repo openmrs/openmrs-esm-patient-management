@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
-import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
+import { useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
+import { PatientBanner } from '@openmrs/esm-patient-banner-app';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
@@ -56,14 +57,13 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
       {fhirPatients.map((patient) => (
         <div key={patient.id} className={styles.patientChart}>
           <div className={styles.container}>
-            <ExtensionSlot
-              extensionSlotName="patient-header-slot"
-              state={{
+            <PatientBanner
+              {...{
                 patient,
                 patientUuid: patient.id,
                 onClick: onClickSearchResult,
                 onTransition: hidePanel,
-                hideActionsOverflow: config.search.hideActionsOverflow,
+                showActionsMenu: config.search.showActionsMenu,
               }}
             />
           </div>
