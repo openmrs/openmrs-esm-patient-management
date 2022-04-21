@@ -4,7 +4,6 @@ import {
   Button,
   DataTable,
   DataTableHeader,
-  DataTableSize,
   DataTableSkeleton,
   Dropdown,
   OverflowMenu,
@@ -237,7 +236,7 @@ function ActiveVisitsTable() {
 
   if (visitQueueEntries?.length) {
     return (
-      <div className={styles.container} data-floating-menu-container>
+      <div className={styles.container}>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
           <Button
@@ -250,6 +249,7 @@ function ActiveVisitsTable() {
           </Button>
         </div>
         <DataTable
+          data-floating-menu-container
           filterRows={handleFilter}
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop ? true : false}
