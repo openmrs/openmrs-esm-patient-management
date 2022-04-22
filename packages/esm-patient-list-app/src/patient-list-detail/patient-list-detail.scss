@@ -22,7 +22,7 @@
 }
 
 .actionsButtonText {
-  @include carbon--type-style("body-short-01");
+  @include carbon--type-style('body-short-01');
   color: $interactive-01;
 }
 

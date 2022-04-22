@@ -44,7 +44,7 @@
 }
 
 .headerContent {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   padding: 0 $spacing-05;
   color: $ui-05;
 }
@@ -65,7 +65,6 @@
 .buttonsGroup button {
   max-width: unset !important;
 }
-
 
 :global(.omrs-breakpoint-lt-desktop) .buttonsGroup {
   padding: $spacing-06 $spacing-05;

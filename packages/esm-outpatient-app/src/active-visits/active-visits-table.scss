@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   padding-bottom: 2rem;
@@ -39,7 +39,7 @@
 
 .priorityTag {
   @extend .tag;
-  @include carbon--type-style("label-01");
+  @include carbon--type-style('label-01');
   color: #943d00;
   background-color: #ffc9a3;
 }
@@ -58,7 +58,7 @@
 
 .search {
   max-width: 16rem;
-  
+
   input {
     background-color: $ui-02 !important;
   }
@@ -66,19 +66,19 @@
 
 .tableContainer {
   background-color: $ui-01;
-  
+
   a {
     text-decoration: none;
   }
-  
+
   th {
     color: $text-02;
   }
-  
+
   :global(.bx--data-table-content) {
     border: 1px solid $ui-03;
     overflow: visible;
-  } 
+  }
 
   :global(.bx--data-table-header) {
     padding: 0;
@@ -91,7 +91,8 @@
     background-color: $ui-01;
   }
 
-  :global(.bx--toolbar-content), :global(.bx--toolbar-search-container-expandable) {
+  :global(.bx--toolbar-content),
+  :global(.bx--toolbar-search-container-expandable) {
     height: 2rem;
     margin-bottom: 0.25rem;
   }
@@ -136,7 +137,7 @@
 }
 
 .content {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   color: $text-02;
   margin-bottom: 0.5rem;
 }
@@ -154,9 +155,10 @@
   overflow: hidden;
   text-align: center;
 
-  &::before, &::after {
+  &::before,
+  &::after {
     background-color: $text-03;
-    content: "";
+    content: '';
     display: inline-block;
     height: 1px;
     position: relative;
@@ -210,13 +212,14 @@
   }
 }
 
-.desktopHeading, .tabletHeading {
+.desktopHeading,
+.tabletHeading {
   text-align: left;
   text-transform: capitalize;
   margin-bottom: $spacing-05;
-  
+
   h4:after {
-    content: "";
+    content: '';
     display: block;
     width: 2rem;
     padding-top: 3px;

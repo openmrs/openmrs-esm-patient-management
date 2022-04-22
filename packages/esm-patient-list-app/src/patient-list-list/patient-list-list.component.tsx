@@ -4,7 +4,7 @@ import { Button, DataTableHeader, Tab, Tabs } from 'carbon-components-react';
 import PatientListTable from './patient-list-table.component';
 import CreateNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
+import { ExtensionSlot, useSession } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
@@ -78,7 +78,7 @@ const PatientListList: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(TabTypes.STARRED);
   const [searchString, setSearchString] = useState<string>('');
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
-  const userId = useSessionUser()?.user.uuid;
+  const userId = useSession()?.user.uuid;
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
   const patientListQuery = useAllPatientLists(userId, patientListFilter);
 

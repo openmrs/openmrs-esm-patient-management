@@ -1,23 +1,23 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .wrapper {
   margin-top: 0.5rem;
 }
 
 .bodyShort02 {
-  @include carbon--type-style("body-short-02");
+  @include carbon--type-style('body-short-02');
 }
 
 .bodyLong01 {
-  @include carbon--type-style("body-long-01");
+  @include carbon--type-style('body-long-01');
 }
 
 .date {
   @include carbon--type-style('label-01');
   color: $text-02;
-  margin: 0.5rem 0rem 0.25rem; 
+  margin: 0.5rem 0rem 0.25rem;
 }
 
 .visitType {
@@ -38,7 +38,7 @@
 }
 
 .header::after {
-  content: "";
+  content: '';
   display: block;
   width: $spacing-07;
   padding-top: 0.188rem;
@@ -58,7 +58,7 @@
 .verticalTabs {
   margin: $spacing-04 0;
 
-  &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
+  &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item + .bx--tabs--scrollable__nav-item) {
     margin-left: 0rem;
   }
 }
@@ -84,7 +84,9 @@
   border-left: 3px solid $ui-03 !important;
 }
 
-.tab > button, .tab > button:focus, .tab > button:active {
+.tab > button,
+.tab > button:focus,
+.tab > button:active {
   outline: 0 !important;
   outline-offset: 0 !important;
 }
@@ -100,6 +102,6 @@
   padding: $spacing-05 0;
   width: 70%;
 }
-.textColor{
+.textColor {
   color: $color-blue-60-2;
 }

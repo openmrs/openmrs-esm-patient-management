@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .tileContainer {
   border: 0.0625rem solid $ui-03;
@@ -14,21 +14,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-03;  
+  margin-bottom: $spacing-03;
 }
 
 .headerLabel {
-  @include carbon--type-style("productive-heading-01");
+  @include carbon--type-style('productive-heading-01');
   color: $text-02;
 }
 
 .totalsLabel {
-  @include carbon--type-style("label-01");
+  @include carbon--type-style('label-01');
   color: $text-02;
 }
 
 .totalsValue {
-  @include carbon--type-style("productive-heading-04");
+  @include carbon--type-style('productive-heading-04');
   color: $ui-05;
 }
 

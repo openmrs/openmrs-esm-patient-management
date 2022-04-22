@@ -3,7 +3,7 @@ const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships', 'additionalInformation'],
+    _default: ['demographics', 'contact', 'relationships'],
     _description: "An array of strings which are the keys from 'sectionDefinitions'",
     _elements: {
       _type: Type.String,
@@ -27,11 +27,13 @@ export const esmPatientRegistrationSchema = {
       },
     },
     _default: {
-      demographics: { name: 'Basic Info', fields: ['name', 'gender', 'dob', 'id'] },
+      demographics: {
+        name: 'Basic Info',
+        fields: ['name', 'gender', 'dob', 'id', 'codedAttributes', 'textBasedAttributes'],
+      },
       contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
       death: { name: 'Death Info', fields: ['death'] },
       relationships: { name: 'Relationships' },
-      additionalInformation: { name: 'Additional Information', fields: ['codedAttributes', 'textBasedAttributes'] },
     },
   },
   fieldDefinitions: {
@@ -99,6 +101,7 @@ export const esmPatientRegistrationSchema = {
       },
     },
   },
+
   textBasedAttributes: {
     _type: Type.Array,
     _elements: {
@@ -111,6 +114,15 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _description: 'Regular expression to validate the user input.',
       },
+    },
+    _default: [],
+  },
+
+  defaultPatientIdentifierTypes: {
+    _type: Type.Array,
+    _elements: {
+      // @ts-ignore
+      _type: Type.PatientIdentifierTypeUuid,
     },
     _default: [],
   },

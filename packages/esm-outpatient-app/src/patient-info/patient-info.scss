@@ -1,45 +1,45 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
-    border-bottom: 0.0125rem solid $color-gray-30;
+  border-bottom: 0.0125rem solid $color-gray-30;
 }
 
 .patientInfoContainer {
-    background-color: $ui-02;
-    padding: 0 0 0 $spacing-05;
-    display: flex;
-    align-items: center;
-    min-height: 7rem;
+  background-color: $ui-02;
+  padding: 0 0 0 $spacing-05;
+  display: flex;
+  align-items: center;
+  min-height: 7rem;
 }
 
 .patientName {
-    @include carbon--type-style("productive-heading-03");
+  @include carbon--type-style('productive-heading-03');
 }
 
 .patientInfoContent {
-    margin: $spacing-05 0 0 $spacing-05;
-    width: 100%;
+  margin: $spacing-05 0 0 $spacing-05;
+  width: 100%;
 }
 
 .demographics {
-    @include carbon--type-style("body-short-02");
-    color: $text-02;
-    margin-top: $spacing-02;
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
+  margin-top: $spacing-02;
 }
 
 .identifier {
-    @include carbon--type-style("body-short-02");
-    color: $ui-04;
+  @include carbon--type-style('body-short-02');
+  color: $ui-04;
 }
 
 .patientInfoRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    &>button {
-        min-height: 2rem;
-    }
+  & > button {
+    min-height: 2rem;
+  }
 }

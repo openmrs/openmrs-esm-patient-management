@@ -1,6 +1,6 @@
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
+@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .title {
   color: var(--omrs-color-brand-teal);
@@ -33,14 +33,14 @@
 }
 
 .label01 {
-  @include carbon--type-style("label-01");
+  @include carbon--type-style('label-01');
   margin-top: $spacing-05;
   margin-bottom: $spacing-05;
   color: $ui-04;
 }
 
 .productiveHeading02 {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   color: $ui-04;
   cursor: pointer;
 }
@@ -87,7 +87,7 @@
   background-color: white;
 }
 
-:global(.omrs-breakpoint-lt-desktop){
+:global(.omrs-breakpoint-lt-desktop) {
   .infoGrid {
     max-width: unset;
   }
