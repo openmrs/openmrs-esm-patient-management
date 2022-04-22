@@ -8,12 +8,8 @@ const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
-  formatDate: jest.fn(),
-  parseDate: jest.fn(),
-  useVisit: jest.fn(),
+  //TODO add this into esm-framework > mock.tsx
   age: jest.fn(),
-  useConfig: jest.fn(),
-  ExtensionSlot: jest.fn().mockImplementation(() => 'ExtensionSlot Component'),
 }));
 
 describe('PatientSearchResults: ', () => {
