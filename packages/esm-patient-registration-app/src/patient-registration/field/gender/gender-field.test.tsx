@@ -7,10 +7,15 @@ import { Formik, Form } from 'formik';
 import { GenderField } from './gender-field.component';
 
 jest.mock('react', () => ({
-  ...jest.requireActual('react'),
+  ...(jest.requireActual('react') as any),
   useContext: jest.fn(() => ({
     setFieldValue: jest.fn(),
   })),
+}));
+
+jest.mock('formik', () => ({
+  ...(jest.requireActual('formik') as any),
+  useField: jest.fn(() => [{}, {}]),
 }));
 
 describe('GenderField', () => {

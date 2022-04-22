@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useField } from 'formik';
 
-const GenderField: React.FC = () => {
+export const GenderField: React.FC = () => {
   const { t } = useTranslation();
   const [field, meta] = useField('gender');
   const { setFieldValue } = useContext(PatientRegistrationContext);
@@ -32,5 +32,3 @@ const GenderField: React.FC = () => {
     </div>
   );
 };
-
-export default GenderField;

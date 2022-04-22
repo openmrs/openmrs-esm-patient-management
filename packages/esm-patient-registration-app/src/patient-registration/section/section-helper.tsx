@@ -10,7 +10,7 @@ import { SectionWrapper } from './section-wrapper.component';
 import { AddressField } from '../field/address/address-field.component';
 import { PhoneEmailField } from '../field/email/email-field.component';
 import { NameField } from '../field/name/name-field.component';
-import GenderField from '../field/gender/gender-field.component';
+import { GenderField } from '../field/gender/gender-field.component';
 import { IdField } from '../field/id/id-field.component';
 import {
   AdditionalInformationSection,

@@ -5,4 +5,4 @@ set -e  # die on error
 
 npx lerna run lint --since main
 npx lerna run typescript --since main
-npx lerna run test --since main
+yarn run test

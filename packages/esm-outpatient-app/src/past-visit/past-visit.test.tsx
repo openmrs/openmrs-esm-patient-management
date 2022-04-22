@@ -4,7 +4,7 @@ import PastVisit from './past-visit.component';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../__mocks__/patient.mock';
 import { mockPastVisit } from '../../__mocks__/visits.mock';
-import { swrRender } from '../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import * as mockPastVisitResource from './past-visit.resource';
 
 describe('PastVisit: ', () => {
@@ -30,5 +30,5 @@ describe('PastVisit: ', () => {
 });
 
 function renderPastVisitTabs() {
-  swrRender(<PastVisit patientUuid={mockPatient.id} />);
+  renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
 }

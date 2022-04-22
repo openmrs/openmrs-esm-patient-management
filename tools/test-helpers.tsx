@@ -14,7 +14,7 @@ const swrWrapper = ({ children }) => {
   );
 };
 
-export const swrRender = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
+export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
 
 export function waitForLoadingToFinish() {
   return waitForElementToBeRemoved(() => [...screen.queryAllByRole(/progressbar/i)], {

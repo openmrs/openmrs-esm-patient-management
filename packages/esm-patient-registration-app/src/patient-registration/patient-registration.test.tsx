@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { render, wait, screen, fireEvent } from '@testing-library/react';
+import { render, wait, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as backendController from './patient-registration.resource';
 import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
@@ -9,10 +9,9 @@ import { mockPatient } from '../../__mocks__/patient.mock';
 import { match } from 'react-router-dom';
 import FormManager from './form-manager';
 import { Resources, ResourcesContext } from '../offline.resources';
-import { SessionUser } from '@openmrs/esm-framework';
 
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+  ...(jest.requireActual('react-router-dom') as any),
   useLocation: () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
@@ -28,26 +27,10 @@ const predefinedAddressTemplate = {
 };
 
 const mockResourcesContextValue = {
-  currentSession: { sessionLocation: '' },
   addressTemplate: predefinedAddressTemplate,
-  patientIdentifiers: [
-    {
-      name: 'OpenMRS Id',
-      fieldName: 'openMrsId',
-      required: true,
-      isPrimary: true,
-      uuid: 'e5af9a9c-ff9d-486d-900c-5fbf66a5ba3c',
-      identifierSources: [],
-    },
-    {
-      name: 'Old Identification Number',
-      fieldName: 'oldIdentificationNumber',
-      required: false,
-      isPrimary: false,
-      uuid: '3ff0063c-dd45-4d98-8af4-0c094f26166c',
-      identifierSources: [],
-    },
-  ],
+  currentSession: { authenticated: true, sessionId: 'JSESSION' },
+  relationshipTypes: [],
+  identifierTypes: [],
 } as Resources;
 
 let mockOpenmrsConfig = {
@@ -85,14 +68,20 @@ const sampleMatchProp: match<{ patientUuid: string }> = {
   params: { patientUuid: '1' },
 };
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    useConfig: jest.fn().mockImplementation(() => mockOpenmrsConfig),
+  };
+});
+
 describe('patient registration', () => {
   it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(
+    render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration match={sampleMatchProp} savePatientForm={jest.fn()} />
+        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
       </ResourcesContext.Provider>,
-      div,
     );
   });
 });
@@ -102,7 +91,7 @@ describe('patient registration sections', () => {
     it(labelText + ' exists', async () => {
       render(
         <ResourcesContext.Provider value={mockResourcesContextValue}>
-          <PatientRegistration match={sampleMatchProp} savePatientForm={jest.fn()} />
+          <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
         </ResourcesContext.Provider>,
       );
       await wait();
@@ -119,7 +108,7 @@ describe('patient registration sections', () => {
 });
 
 describe('form submit', () => {
-  const fillRequiredFields = async (getByLabelText) => {
+  const fillRequiredFields = (getByLabelText) => {
     const givenNameInput = getByLabelText('givenNameLabelText') as HTMLInputElement;
     const familyNameInput = getByLabelText('familyNameLabelText') as HTMLInputElement;
     const dateOfBirthInput = getByLabelText('dateOfBirthLabelText') as HTMLInputElement;
@@ -129,8 +118,6 @@ describe('form submit', () => {
     userEvent.type(familyNameInput, 'Gaihre');
     userEvent.type(dateOfBirthInput, '1993-08-02');
     fireEvent.click(genderInput);
-
-    await wait();
   };
 
   beforeAll(() => {
@@ -140,49 +127,47 @@ describe('form submit', () => {
   it.skip('saves the patient without extra info', async () => {
     spyOn(backendController, 'savePatient').and.returnValue(Promise.resolve({}));
 
-    render(<PatientRegistration match={sampleMatchProp} savePatientForm={jest.fn()} />);
-    await wait();
+    render(<PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />);
 
-    await fillRequiredFields(screen.getByLabelText);
+    fillRequiredFields(screen.getByLabelText);
+    userEvent.click(await screen.findByText('Register Patient'));
 
-    userEvent.click(screen.getByText('Register Patient'));
-    await wait();
-
-    expect(backendController.savePatient).toHaveBeenCalledWith(
-      expect.anything(),
-      {
-        identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }
-        // identifiers: [{ identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }],
-        person: {
-          addresses: [{ address1: '', address2: '', cityVillage: '', country: '', postalCode: '', stateProvince: '' }],
-          attributes: [],
-          birthdate: '1993-08-02',
-          birthdateEstimated: false,
-          gender: 'M',
-          names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true }],
-          dead: false,
+    waitFor(() => {
+      expect(backendController.savePatient).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }
+          // identifiers: [{ identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }],
+          person: {
+            addresses: [
+              { address1: '', address2: '', cityVillage: '', country: '', postalCode: '', stateProvince: '' },
+            ],
+            attributes: [],
+            birthdate: '1993-08-02',
+            birthdateEstimated: false,
+            gender: 'M',
+            names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true }],
+            dead: false,
+          },
         },
-      },
-      undefined,
-    );
+        undefined,
+      );
+    });
   });
 
   it('should not save the patient if validation fails', async () => {
     spyOn(backendController, 'savePatient').and.returnValue(Promise.resolve({}));
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration match={sampleMatchProp} savePatientForm={jest.fn()} />
+        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
       </ResourcesContext.Provider>,
     );
-    await wait();
 
-    const givenNameInput = screen.getByLabelText('Given Name') as HTMLInputElement;
+    const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
     userEvent.type(givenNameInput, '');
-    await wait();
 
     userEvent.click(screen.getByText('Register Patient'));
-    await wait();
 
     expect(backendController.savePatient).not.toHaveBeenCalled();
   });
@@ -197,7 +182,11 @@ describe('form submit', () => {
     });
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration match={sampleMatchProp} savePatientForm={FormManager.savePatientFormOnline} />
+        <PatientRegistration
+          isOffline={false}
+          match={sampleMatchProp}
+          savePatientForm={FormManager.savePatientFormOnline}
+        />
       </ResourcesContext.Provider>,
     );
     await wait();

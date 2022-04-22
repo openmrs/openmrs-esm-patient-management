@@ -29,16 +29,20 @@ const formValues: FormValues = {
   deathDate: 'string',
   deathCause: 'string',
   relationships: [],
-  identifiers: [],
-};
-
-const identifierSource = {
-  uuid: 'uuid',
-  name: 'name',
-  autoGenerationOption: {
-    manualEntryEnabled: false,
-    automaticGenerationEnabled: false,
-  },
+  identifiers: [
+    {
+      uuid: 'aUuid',
+      identifier: 'foo',
+      identifierTypeUuid: 'identifierType',
+      preferred: true,
+      source: {
+        uuid: 'some-uuid',
+        name: 'unique',
+        autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: false },
+      },
+      action: 'ADD',
+    },
+  ],
 };
 
 describe('FormManager', () => {
