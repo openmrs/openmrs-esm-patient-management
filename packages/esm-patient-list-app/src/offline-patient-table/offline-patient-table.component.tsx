@@ -16,6 +16,8 @@ import {
   FilterRowsData,
   TableSelectAll,
   TableSelectRow,
+  DataTableCustomRenderProps,
+  DenormalizedRow,
 } from 'carbon-components-react';
 import {
   useStore,
@@ -26,6 +28,8 @@ import {
   syncOfflinePatientData,
   showModal,
   getSynchronizationItems,
+  deleteSynchronizationItem,
+  getFullSynchronizationItems,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -105,26 +109,52 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
     return result;
   }, [offlinePatientsSwr.data, offlineRegisteredPatientsSwr.data, store.offlinePatientDataSyncState]);
 
-  const handleUpdateSelectedPatientsClick = async (selectedRows: Array<{ id: string }>) => {
-    const patientUuids = selectedRows.map((row) => row.id);
-    return await syncOfflinePatientDataOfAllGivenPatients(patientUuids);
+  const handleUpdateSelectedPatientsClick = async (selectedRows: ReadonlyArray<DenormalizedRow>) => {
+    const offlinePatientUuidsToSync = selectedRows
+      .map((row) => row.id)
+      .filter((id) => offlinePatientsSwr.data.some((offlinePatient) => offlinePatient.id === id));
+    return await Promise.all(offlinePatientUuidsToSync.map((patientUuid) => syncOfflinePatientData(patientUuid)));
   };
 
-  const handleRemovePatientsFromOfflineListClick = async (selectedRows: Array<{ id: string }>) => {
+  const handleRemovePatientsFromOfflineListClick = async (selectedRows: ReadonlyArray<DenormalizedRow>) => {
     const closeModal = showModal('offline-tools-confirmation-modal', {
       title: t('offlinePatientsTableDeleteConfirmationModalTitle', 'Remove offline patients'),
       children: t(
         'offlinePatientsTableDeleteConfirmationModalContent',
-        'Are you sure that you want to remove all selected patients from the offline list? The charts will no longer be available in offline mode.',
+        'Are you sure that you want to remove all selected patients from the offline list? Their charts will no longer be available in offline mode and any newly registered patient will be permanently deleted.',
       ),
       confirmText: t('offlinePatientsTableDeleteConfirmationModalConfirm', 'Remove patients'),
       cancelText: t('offlinePatientsTableDeleteConfirmationModalCancel', 'Cancel'),
       closeModal: () => closeModal(),
       onConfirm: async () => {
-        const patientUuids = selectedRows.map((row) => row.id);
-        for (const patientUuid of patientUuids) {
-          await removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid);
-        }
+        const offlineRegisteredPatients = await getFullSynchronizationItems<{ fhirPatient: fhir.Patient }>(
+          'patient-registration',
+        );
+        const allPatientUuidsToBeDeleted = selectedRows.map((row) => row.id);
+        const offlinePatientUuidsToBeDeleted = allPatientUuidsToBeDeleted.filter((id) =>
+          offlinePatientsSwr.data.some((patient) => patient.id === id),
+        );
+        const offlineRegisteredPatientUuidsToBeDeleted = allPatientUuidsToBeDeleted.filter((id) =>
+          offlineRegisteredPatientsSwr.data.some((patient) => patient.id === id),
+        );
+
+        await Promise.all(
+          offlinePatientUuidsToBeDeleted.map((patientUuid) =>
+            removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid),
+          ),
+        );
+
+        await Promise.all(
+          offlineRegisteredPatientUuidsToBeDeleted.map(async (patientUuid) => {
+            const offlineRegisteredPatient = offlineRegisteredPatients.find(
+              (syncItem) => syncItem.content.fhirPatient.id === patientUuid,
+            );
+
+            if (offlineRegisteredPatient) {
+              await deleteSynchronizationItem(offlineRegisteredPatient.id);
+            }
+          }),
+        );
 
         offlinePatientsSwr.mutate();
       },
@@ -148,7 +178,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
           getSelectionProps,
           onInputChange,
           selectedRows,
-        }) => (
+        }: DataTableCustomRenderProps) => (
           <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
             <div className={styles.tableHeaderContainer}>
               {showHeader && (
@@ -186,7 +216,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                 </>
               )}
             </div>
-            <Table {...getTableProps()} isSortable useZebraStyles>
+            <Table {...getTableProps()} useZebraStyles>
               <TableHead>
                 <TableRow>
                   {isInteractive && <TableSelectAll {...getSelectionProps()} />}
@@ -243,10 +273,6 @@ function filterTableRows({
       return filterableValue.replace(/\s/g, '').toLowerCase().includes(inputValue.replace(/\s/g, '').toLowerCase());
     }),
   );
-}
-
-function syncOfflinePatientDataOfAllGivenPatients(patientUuids: Array<string>) {
-  return Promise.all(patientUuids.map((patientUuid) => syncOfflinePatientData(patientUuid)));
 }
 
 function useOfflineRegisteredPatients() {
