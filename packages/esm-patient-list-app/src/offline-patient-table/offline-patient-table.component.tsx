@@ -157,6 +157,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
         );
 
         offlinePatientsSwr.mutate();
+        offlineRegisteredPatientsSwr.mutate();
       },
     });
   };
