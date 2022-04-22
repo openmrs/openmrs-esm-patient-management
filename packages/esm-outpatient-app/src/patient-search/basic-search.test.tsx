@@ -12,7 +12,7 @@ describe('BasicSearch: ', () => {
     expect(searchButton).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/search for a patient name or id number/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /advanced search/i })).toBeInTheDocument();
-    expect(screen.getByRole('separator')).toBeInTheDocument();
+    expect(screen.getByText('or')).toBeInTheDocument();
     expect(screen.getByText(/type the patient's name or unique id number/i)).toBeInTheDocument();
   });
 });

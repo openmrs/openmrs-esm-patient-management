@@ -2,20 +2,14 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import PastVisit from './past-visit.component';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from '../../__mocks__/patient.mock';
+import { mockPastVisit } from '../../__mocks__/visits.mock';
 import { swrRender } from '../../../../tools/test-helpers';
-
-jest.mock('./past-visit.resource.ts', () => {
-  const originalModule = jest.requireActual('./past-visit.resource.ts');
-
-  return {
-    ...originalModule,
-  };
-});
+import * as mockPastVisitResource from './past-visit.resource';
 
 describe('PastVisit: ', () => {
   it('renders an empty state for notes, encounters, medications, and vitals', () => {
+    spyOn(mockPastVisitResource, 'usePastVisits').and.returnValue({ data: mockPastVisit.data.results });
     renderPastVisitTabs();
 
     expect(screen.getByText(/vitals/i)).toBeInTheDocument();
