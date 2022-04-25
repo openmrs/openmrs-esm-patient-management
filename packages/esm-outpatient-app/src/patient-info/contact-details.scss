@@ -11,6 +11,7 @@ $color-blue-20: #d0e2ff;
 }
 
 .container {
+  background-color: $color-blue-10;
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid $color-blue-20;
