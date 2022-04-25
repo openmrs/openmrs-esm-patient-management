@@ -1,4 +1,4 @@
-import { age, ExtensionSlot, formatDate, parseDate } from '@openmrs/esm-framework';
+import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { Button } from 'carbon-components-react';
 import React, { useState } from 'react';
 import styles from './patient-info.scss';
@@ -6,6 +6,7 @@ import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import { useTranslation } from 'react-i18next';
 import ContactDetails from './contact-details.component';
+import Edit16 from '@carbon/icons-react/es/edit/16';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -32,11 +33,17 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.patientInfoContainer}>
+      <div className={`${showContactDetails ? styles.activePatientInfoContainer : styles.patientInfoContainer}`}>
         <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
         <div className={styles.patientInfoContent}>
           <div className={styles.patientInfoRow}>
             <span className={styles.patientName}>{patientName}</span>
+            <ConfigurableLink
+              to={`\${openmrsSpaBase}/patient/${patient.id}/edit`}
+              className={styles.patientEditBtn}
+              title={t('editPatientDetails', 'Edit Patient Details')}>
+              <Edit16 />
+            </ConfigurableLink>
           </div>
           <div className={styles.patientInfoRow}>
             <div className={styles.demographics}>
