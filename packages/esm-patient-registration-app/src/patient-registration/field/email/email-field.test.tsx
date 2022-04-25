@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
-import { EmailField } from './email-field.component';
+import { PhoneEmailField } from './email-field.component';
 import { Formik, Form } from 'formik';
 
 describe('email field', () => {
@@ -10,7 +10,7 @@ describe('email field', () => {
     const { findByLabelText } = render(
       <Formik initialValues={{}} onSubmit={null}>
         <Form>
-          <EmailField />
+          <PhoneEmailField />
         </Form>
       </Formik>,
     );

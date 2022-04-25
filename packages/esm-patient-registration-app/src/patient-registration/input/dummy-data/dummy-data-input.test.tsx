@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, wait, screen } from '@testing-library/react';
+import { render, fireEvent, wait, screen, waitFor } from '@testing-library/react';
 import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { FormValues } from '../../patient-registration-types';
@@ -27,8 +27,8 @@ describe('dummy data input', () => {
     const input = await setupInput();
 
     fireEvent.click(input);
-    await wait();
-
-    expect(formValues).toEqual(dummyFormValues);
+    waitFor(() => {
+      expect(formValues).toEqual(dummyFormValues);
+    });
   });
 });

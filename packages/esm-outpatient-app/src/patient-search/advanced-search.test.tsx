@@ -9,7 +9,7 @@ describe('AdvancedSearch: ', () => {
     expect(screen.getByRole('button', { name: /back to simple search/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^search$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /any/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^male$/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^female$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();

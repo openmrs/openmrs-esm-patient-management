@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
 
@@ -15,6 +15,14 @@ jest.mock('./active-visits-table.resource.ts', () => {
   return {
     ...originalModule,
     useServices: jest.fn().mockReturnValue({ services: mockServices }),
+  };
+});
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    openmrsFetch: jest.fn(),
   };
 });
 
@@ -105,5 +113,5 @@ describe('ActiveVisitsTable: ', () => {
 });
 
 function renderActiveVisitsTable() {
-  swrRender(<ActiveVisitsTable />);
+  renderWithSwr(<ActiveVisitsTable />);
 }
