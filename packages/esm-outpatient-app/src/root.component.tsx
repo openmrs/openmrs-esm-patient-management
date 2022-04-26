@@ -14,7 +14,7 @@ const Root: React.FC = () => {
   useEffect(() => {
     setLeftNav({ name: 'outpatient-dashboard-slot', basePath: spaBasePath });
     return () => unsetLeftNav('outpatient-dashboard-slot');
-  }, [spaBasePath]);
+  }, []);
 
   return (
     <main>
