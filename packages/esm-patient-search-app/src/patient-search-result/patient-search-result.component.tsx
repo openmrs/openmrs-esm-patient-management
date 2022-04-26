@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
 import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
+import ResultCard from './result-card/result-card.component';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
@@ -54,19 +55,12 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   return (
     <>
       {fhirPatients.map((patient) => (
-        <div key={patient.id} className={styles.patientChart}>
-          <div className={styles.container}>
-            <ExtensionSlot
-              extensionSlotName="patient-header-slot"
-              state={{
-                patient,
-                patientUuid: patient.id,
-                onClick: onClickSearchResult,
-                onTransition: hidePanel,
-              }}
-            />
-          </div>
-        </div>
+        <ResultCard
+          patient={patient}
+          key={patient.id}
+          onSearchResultClick={onClickSearchResult}
+          closeSearchResultsPanel={hidePanel}
+        />
       ))}
     </>
   );
