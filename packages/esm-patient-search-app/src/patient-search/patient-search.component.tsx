@@ -41,7 +41,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults,
   }, [searchResults]);
 
   return (
-    <div className={styles.searchResultsContainer}>
+    <Tile onClick={(event) => event.stopPropagation()} className={styles.searchResultsContainer}>
       {status === 'resolved' && (
         <>
           {!isEmpty(searchResults) && (
@@ -92,7 +92,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults,
           </Tile>
         </div>
       )}
-    </div>
+    </Tile>
   );
 };
 

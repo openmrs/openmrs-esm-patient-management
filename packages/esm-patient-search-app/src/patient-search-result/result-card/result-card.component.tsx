@@ -19,6 +19,7 @@ const ResultCard: React.FC<ResultCardProp> = ({ patient, onSearchResultClick, cl
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
   const { currentVisit } = useVisit(patient.id);
+  const shouldStartVisit = (patient.deceasedDateTime ? false : true) && currentVisit === null;
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const photoFrameState = useMemo(() => ({ patientUuid: patient.id, patientName }), [patient, patientName]);
@@ -49,6 +50,11 @@ const ResultCard: React.FC<ResultCardProp> = ({ patient, onSearchResultClick, cl
   const handleStartVisit = () => {
     navigate({ to: '${openmrsSpaBase}/patient/' + `${patient.id}/chart` });
     closeSearchResultsPanel();
+  };
+
+  const toggleShowMoreDetails = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setShowContactDetails((prevState) => !prevState);
   };
 
   return (
@@ -94,17 +100,17 @@ const ResultCard: React.FC<ResultCardProp> = ({ patient, onSearchResultClick, cl
           </CustomOverflowMenuComponent>
         </div>
 
-        {currentVisit ? (
+        {shouldStartVisit ? (
+          <Button onClick={handleStartVisit} iconDescription={t('startVisit', 'Start visit')}>
+            {t('startVisit', 'Start visit')}
+          </Button>
+        ) : (
           <Button
             kind="ghost"
             renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
             iconDescription="Toggle contact details"
-            onClick={() => setShowContactDetails((prevState) => !prevState)}>
+            onClick={toggleShowMoreDetails}>
             {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
-          </Button>
-        ) : (
-          <Button onClick={handleStartVisit} iconDescription={t('startVisit', 'Start visit')}>
-            {t('startVisit', 'Start visit')}
           </Button>
         )}
       </div>
