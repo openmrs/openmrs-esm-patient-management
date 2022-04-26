@@ -1,6 +1,9 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
 import { openmrsFetch, Visit, useSession } from '@openmrs/esm-framework';
+
+dayjs.extend(isToday);
 
 export interface ActiveVisit {
   age: string;
