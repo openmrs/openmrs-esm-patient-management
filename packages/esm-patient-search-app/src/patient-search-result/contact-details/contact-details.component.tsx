@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from 'carbon-components-react';
 import styles from './contact-details.scss';
-import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { usePatientContactAttributes } from '../../hooks/usePatientAttributes';
 
 interface ContactDetailsProps {
   patientId: string;

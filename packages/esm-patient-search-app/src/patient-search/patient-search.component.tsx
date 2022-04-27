@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 import { usePagination } from '@openmrs/esm-framework';
 import { Loading, PaginationNav, Tile } from 'carbon-components-react';
 import EmptyDataIllustration from './empty-data-illustration.component';

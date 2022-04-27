@@ -8,7 +8,7 @@ import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
 import capitalize from 'lodash-es/capitalize';
 import CustomOverflowMenuComponent from './overflow-menu.component';
-import ContactDetails from '../contact-details.component';
+import ContactDetails from '../contact-details/contact-details.component';
 
 interface ResultCardProp {
   patient: fhir.Patient;
