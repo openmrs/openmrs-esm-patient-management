@@ -22,7 +22,7 @@ describe('Patient Info', () => {
 
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
     expect(screen.getByText(/35/)).toBeInTheDocument();
-    expect(screen.getByText(/UnKnown/)).toBeInTheDocument();
+    expect(screen.getByText(/Unknown/)).toBeInTheDocument();
     expect(screen.getByText(/04 — Apr — 1972/i)).toBeInTheDocument();
     expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
 
