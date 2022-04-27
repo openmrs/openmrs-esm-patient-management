@@ -10,15 +10,10 @@
 }
 
 .container {
-  // border-bottom: 0.063rem solid $ui-03;
   & .patientBanner {
     background-color: red !important;
   }
 }
-
-// :global(.omrs-breakpoint-gt-tablet) .container {
-//   padding: 1rem 1rem;
-// }
 
 .patientBanner {
   display: flex;
@@ -60,10 +55,26 @@
   margin-top: 1rem;
 }
 
-.sortCriteria {
+.sortingCriteriaSelect {
   display: flex;
   width: 100%;
   justify-content: flex-end;
   @include carbon--type-style('body-short-02');
   width: 100%;
+
+  :global(.bx--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.bx--list-box__menu-icon) {
+    height: 1rem;
+  }
+
+  :global(.bx--list-box__menu) {
+    left: -7.5rem;
+  }
+
+  :global(.bx--label) {
+    margin-right: 0.25rem;
+  }
 }
