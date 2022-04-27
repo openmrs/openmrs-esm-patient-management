@@ -19,4 +19,5 @@ export interface PatientSearchConfig {
     patientResultUrl: string;
   };
   includeDead: boolean;
+  contactAttributeType: Array<string>;
 }

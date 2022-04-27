@@ -1,15 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
-import styles from './patient-search-result.scss';
-import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
-import { SearchedPatient } from '../types/index';
+import { useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
+import { Patient } from '../types/index';
 import ResultCard from './result-card/result-card.component';
+import { PatientSearchConfig } from '../config-schema';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
-  const config = useConfig();
+  const { search } = useConfig() as PatientSearchConfig;
 
   const onClickSearchResult = useCallback((patientUuid) => {
     navigate({
-      to: interpolateString(config.search.patientResultUrl, {
+      to: interpolateString(search.patientResultUrl, {
         patientUuid: patientUuid,
       }),
     });
@@ -56,7 +56,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
     <>
       {fhirPatients.map((patient) => (
         <ResultCard
-          patient={patient}
+          patient={patient as fhir.Patient}
           key={patient.id}
           onSearchResultClick={onClickSearchResult}
           closeSearchResultsPanel={hidePanel}
@@ -67,7 +67,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
 };
 
 interface PatientSearchResultsProps {
-  patients: Array<SearchedPatient>;
+  patients: Array<Patient>;
   hidePanel?: any;
 }
 

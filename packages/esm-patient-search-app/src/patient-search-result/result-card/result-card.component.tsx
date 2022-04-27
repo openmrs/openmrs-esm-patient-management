@@ -8,6 +8,7 @@ import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
 import capitalize from 'lodash-es/capitalize';
 import CustomOverflowMenuComponent from './overflow-menu.component';
+import ContactDetails from '../contact-details.component';
 
 interface ResultCardProp {
   patient: fhir.Patient;
@@ -59,61 +60,66 @@ const ResultCard: React.FC<ResultCardProp> = ({ patient, onSearchResultClick, cl
 
   return (
     <ClickableTile className={styles.clickableTile} onClick={handleNavigateToPatientChart}>
-      <div className={styles.photoFrame}>
-        <ExtensionSlot extensionSlotName="patient-photo-slot" state={photoFrameState} />
-      </div>
-      <div className={styles.patientDetails}>
-        <span className={styles.patientName}>
-          {capitalize(patientName)}{' '}
-          <ExtensionSlot
-            extensionSlotName="patient-banner-tags-slot"
-            state={{ patientUuid: patient.id, patient }}
-            className={styles.flexRow}
-          />
-        </span>
-        <div className={styles.patientGender}>
-          {patientGender()} &middot; &nbsp;
-          {age(patient.birthDate)} &middot;
-          {formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}
+      <div className={styles.patientInfo}>
+        <div className={styles.photoFrame}>
+          <ExtensionSlot extensionSlotName="patient-photo-slot" state={photoFrameState} />
         </div>
-        <div className={styles.row}>
-          <div className={styles.identifier}>
-            {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
+        <div className={styles.patientDetails}>
+          <span className={styles.patientName}>
+            {capitalize(patientName)}{' '}
+            <ExtensionSlot
+              extensionSlotName="patient-banner-tags-slot"
+              state={{ patientUuid: patient.id, patient }}
+              className={styles.flexRow}
+            />
+          </span>
+          <div className={styles.patientGender}>
+            {patientGender()} &middot; &nbsp;
+            {age(patient.birthDate)} &middot;
+            {formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}
+          </div>
+          <div className={styles.row}>
+            <div className={styles.identifier}>
+              {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
+            </div>
           </div>
         </div>
-      </div>
-      <div className={styles.action}>
-        <div ref={overFlowMenuRef}>
-          <CustomOverflowMenuComponent
-            menuTitle={
-              <>
-                <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
-              </>
-            }>
-            <ExtensionSlot
-              extensionSlotName="patient-actions-slot"
-              key="patient-actions-slot"
-              className={styles.overflowMenuItemList}
-              state={patientActionsSlotState}
-            />
-          </CustomOverflowMenuComponent>
-        </div>
+        <div className={styles.action}>
+          <div ref={overFlowMenuRef}>
+            <CustomOverflowMenuComponent
+              menuTitle={
+                <>
+                  <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
+                  <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
+                </>
+              }>
+              <ExtensionSlot
+                extensionSlotName="patient-actions-slot"
+                key="patient-actions-slot"
+                className={styles.overflowMenuItemList}
+                state={patientActionsSlotState}
+              />
+            </CustomOverflowMenuComponent>
+          </div>
 
-        {shouldStartVisit ? (
-          <Button onClick={handleStartVisit} iconDescription={t('startVisit', 'Start visit')}>
-            {t('startVisit', 'Start visit')}
-          </Button>
-        ) : (
-          <Button
-            kind="ghost"
-            renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
-            iconDescription="Toggle contact details"
-            onClick={toggleShowMoreDetails}>
-            {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
-          </Button>
-        )}
+          {shouldStartVisit ? (
+            <Button onClick={handleStartVisit} iconDescription={t('startVisit', 'Start visit')}>
+              {t('startVisit', 'Start visit')}
+            </Button>
+          ) : (
+            <Button
+              kind="ghost"
+              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
+              iconDescription="Toggle contact details"
+              onClick={toggleShowMoreDetails}>
+              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+            </Button>
+          )}
+        </div>
       </div>
+      {showContactDetails && (
+        <ContactDetails address={patient.address} patientId={patient.id} contact={patient.contact} />
+      )}
     </ClickableTile>
   );
 };

@@ -1,0 +1,36 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+// TO DO : move this color variable to style guide
+$color-blue-20: #d0e2ff;
+
+.heading {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+}
+
+.container {
+  background-color: $color-blue-10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid $color-blue-20;
+  margin-top: $spacing-01;
+  width: 100%;
+  padding: $spacing-02;
+
+  & > div {
+    margin-left: $spacing-05;
+    padding-top: $spacing-01;
+  }
+
+  & > div:first-child {
+    border-right: 1px solid $color-blue-20;
+  }
+
+  & ul > li {
+    padding: $spacing-02 0;
+    color: $text-02;
+    @include carbon--type-style('body-short-01');
+  }
+}

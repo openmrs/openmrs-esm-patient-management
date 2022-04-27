@@ -1,59 +1,66 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .clickableTile {
-    display: flex;
-    width: 100%;
-    height: 7rem;
-    border-bottom: 0.0125rem solid $grey-2;
-    padding: 0;
-    background-color: $ui-02;
-    align-items: center;
+  display: flex;
+  width: 100%;
+  min-height: 7rem;
+  border-bottom: 0.0125rem solid $grey-2;
+  padding: 0;
+  background-color: $ui-02;
+  align-items: center;
+  flex-direction: column;
+}
+.patientInfo {
+  display: flex;
+  height: 7rem;
+  width: 100%;
+  align-items: center;
 }
 
 .photoFrame {
-    height: $spacing-11;
-    aspect-ratio: 1/1;
-    margin: 0 $spacing-05;
+  height: $spacing-11;
+  aspect-ratio: 1/1;
+  margin: 0 $spacing-05;
 }
 
 .patientDetails {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    & > div {
-        padding: $spacing-02 0;
-    }
+  & > div {
+    padding: $spacing-02 0;
+  }
 }
 
 .patientName {
-    @include carbon--type-style("productive-heading-03");
-    color: $ui-05;
-    display: flex;
+  @include carbon--type-style('productive-heading-03');
+  color: $ui-05;
+  display: flex;
 }
 
 .patientGender {
-    @include carbon--type-style("body-short-02");
-    color: $text-02;
+  @include carbon--type-style('body-short-02');
+  color: $text-02;
 }
 
 .identifier {
-    @include carbon--type-style("body-short-02");
-    color: $ui-04;
+  @include carbon--type-style('body-short-02');
+  color: $ui-04;
 }
 
 .row {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .action {
-    position: absolute;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 7rem;
-    align-items: flex-end;
+  position: absolute;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 7rem;
+  align-items: flex-end;
 }

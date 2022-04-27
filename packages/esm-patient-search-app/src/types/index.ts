@@ -1,4 +1,6 @@
-export interface SearchedPatient {
+import { OpenmrsResource } from '@openmrs/esm-framework';
+
+export interface Patient {
   patientId: number;
   uuid: string;
   identifiers: Array<Identifier>;
@@ -17,7 +19,7 @@ export interface SearchedPatient {
       middleName: string;
     };
   };
-  attributes: Array<{ value: string; attributeType: { name: string } }>;
+  attributes: Array<Attribute>;
   display: string;
 }
 
@@ -43,4 +45,10 @@ export interface Address {
   country: string;
   postalCode: string;
   stateProvince: string;
+}
+export interface Attribute {
+  attributeType: OpenmrsResource;
+  display: string;
+  uuid: string;
+  value: string | number;
 }
