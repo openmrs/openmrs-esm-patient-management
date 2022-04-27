@@ -18,7 +18,7 @@ interface PatientSearchProps {
 const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, querySearchTerm }) => {
   const { t } = useTranslation();
   const { patients, isLoading, error } = usePatients(querySearchTerm);
-  const { totalPages, currentPage, goToNext, goToPrevious, results, goTo } = usePagination(patients, resultsPerPage);
+  const { totalPages, results, goTo } = usePagination(patients, resultsPerPage);
 
   const handlePageChange = (page: number) => {
     goTo(page + 1);
@@ -59,7 +59,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, querySearchTer
   return (
     <Tile onClick={(event) => event.stopPropagation()} className={styles.searchResultsContainer}>
       <>
-        {!isEmpty(patients) && (
+        {patients.length > 0 ? (
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>{t('patientsFound', { count: patients.length })}</p>
             <PatientSearchResults hidePanel={hidePanel} patients={results} />
@@ -67,8 +67,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, querySearchTer
               <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
             </div>
           </div>
-        )}
-        {isEmpty(patients) && (
+        ) : (
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
             <Tile className={styles.emptySearchResultsTile}>

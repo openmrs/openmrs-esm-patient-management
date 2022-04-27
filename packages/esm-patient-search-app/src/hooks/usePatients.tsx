@@ -9,7 +9,12 @@ const customRepresentation =
   'patientIdentifier:(uuid,identifier),' +
   'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
   'attributes:(value,attributeType:(name)))';
-
+/**
+ * React hook that performs a search for patient matching search term and returns
+ * an Array of patients {@link Array<SearchedPatient>}
+ * @param searchTerm Search terms can either be patient identifier or patient name
+ * @returns Array of patients matching the search term, loading status and error object
+ */
 export const usePatients = (searchTerm: string) => {
   const { includeDead } = useConfig() as PatientSearchConfig;
   const url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}`;

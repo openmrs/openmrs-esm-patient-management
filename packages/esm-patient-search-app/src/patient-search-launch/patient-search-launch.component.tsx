@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import { useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
-import styles from './patient-search-icon.component.scss';
+import styles from './patient-search-launch.scss';
 
 const searchTimeout = 300;
 
