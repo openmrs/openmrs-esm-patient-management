@@ -12,8 +12,8 @@
     "release": "lerna version --no-git-tag-version",
     "verify": "turbo run lint && turbo run test && turbo run typescript",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\"",
-    "test": "jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "jest --watch --config jest.config.json",
+    "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
+    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage",
     "prepare": "husky install",
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
@@ -44,6 +44,7 @@
     "@typescript-eslint/parser": "^4.15.1",
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^5.3.0",
+    "cross-env": "^7.0.3",
     "dayjs": "^1.8.36",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.2.0",
