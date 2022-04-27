@@ -6,9 +6,9 @@ import styles from './result-card.scss';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
-import capitalize from 'lodash-es/capitalize';
 import CustomOverflowMenuComponent from './overflow-menu.component';
 import ContactDetails from '../contact-details/contact-details.component';
+import { capitalize } from 'lodash-es';
 
 interface ResultCardProp {
   patient: fhir.Patient;

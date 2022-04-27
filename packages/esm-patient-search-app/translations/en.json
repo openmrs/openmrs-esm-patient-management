@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "address": "Address",
   "clearSearch": "Clear",
   "contactDetails": "Contact Details",
   "error": "Error",
@@ -13,7 +14,6 @@
   "orPatientName": "OR the patient's name(s)",
   "patientsFound": "Found {count, plural, one{{count} patient} other{{count} patients}}",
   "patientsFound_plural": "",
-  "placeOfResidence": "Place Of Residence",
   "search": "Search",
   "searchForPatient": "Search for a patient by name or identifier number",
   "showAllDetails": "Show all details",

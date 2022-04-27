@@ -18,7 +18,6 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, querySearchTer
   const { t } = useTranslation();
   const { patients, isLoading, error } = usePatients(querySearchTerm);
   const { totalPages, results, goTo } = usePagination(patients, resultsPerPage);
-
   const handlePageChange = (page: number) => {
     goTo(page + 1);
   };

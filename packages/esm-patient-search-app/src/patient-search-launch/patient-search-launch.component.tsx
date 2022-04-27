@@ -4,12 +4,8 @@ import Close20 from '@carbon/icons-react/es/close/20';
 import { Button, HeaderGlobalAction, Search } from 'carbon-components-react';
 import PatientSearch from '../patient-search/patient-search.component';
 import { useTranslation } from 'react-i18next';
-import debounce from 'lodash-es/debounce';
 import { useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
-import isEmpty from 'lodash-es/isEmpty';
 import styles from './patient-search-launch.scss';
-
-const searchTimeout = 300;
 
 const PatientSearchLaunch: React.FC = () => {
   const { t } = useTranslation();
@@ -21,7 +17,7 @@ const PatientSearchLaunch: React.FC = () => {
   const [querySearchTerm, setQuerySearchTerm] = useState<string>();
 
   const performSearch = useCallback(() => {
-    if (!isEmpty(searchTerm)) {
+    if (searchTerm) {
       setShowResultsPanel(true);
       setQuerySearchTerm(searchTerm);
     }
@@ -29,8 +25,6 @@ const PatientSearchLaunch: React.FC = () => {
 
   const handleEnterKeyPressed = (event: React.KeyboardEvent<HTMLInputElement>) =>
     event.key.toLowerCase() === 'enter' && performSearch();
-
-  const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
 
   const handleCloseSearchInput = useCallback(() => setShowSearchInput(false), []);
 
@@ -41,7 +35,7 @@ const PatientSearchLaunch: React.FC = () => {
   }, [showSearchInput]);
 
   useEffect(() => {
-    if (isEmpty(searchTerm)) {
+    if (!searchTerm) {
       setShowResultsPanel(false);
     }
   }, [searchTerm]);
@@ -62,7 +56,7 @@ const PatientSearchLaunch: React.FC = () => {
               labelText=""
               closeButtonLabelText={t('clearSearch', 'Clear')}
               onKeyUp={handleEnterKeyPressed}
-              onChange={(event) => handleChange(event.target.value)}
+              onChange={(event) => setSearchTerm(event.target.value)}
               autoFocus={true}
             />
             <Button
