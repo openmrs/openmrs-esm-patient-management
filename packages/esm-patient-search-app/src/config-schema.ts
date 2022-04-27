@@ -13,3 +13,10 @@ export const configSchema = {
     _description: 'Whether to include dead patients in search results',
   },
 };
+
+export interface PatientSearchConfig {
+  search: {
+    patientResultUrl: string;
+  };
+  includeDead: boolean;
+}
