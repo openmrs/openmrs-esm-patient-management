@@ -1,0 +1,42 @@
+import dayjs from 'dayjs';
+import useSWR from 'swr';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { AppointmentsFetchResponse } from '../types';
+
+export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+
+export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
+  const fetcher = () =>
+    openmrsFetch(appointmentsSearchUrl, {
+      method: 'POST',
+      signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        patientUuid: patientUuid,
+        startDate: startDate,
+      },
+    });
+
+  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
+
+  const appointments = data?.data?.length
+    ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
+    : null;
+
+  const pastAppointments = appointments?.filter((appointment) =>
+    dayjs((appointment.startDateTime / 1000) * 1000).isBefore(dayjs()),
+  );
+
+  const upcomingAppointments = appointments?.filter((appointment) =>
+    dayjs((appointment.startDateTime / 1000) * 1000).isAfter(dayjs()),
+  );
+
+  return {
+    data: data ? { pastAppointments, upcomingAppointments } : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
