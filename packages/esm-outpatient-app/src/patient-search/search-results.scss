@@ -25,9 +25,9 @@
 }
 
 .patientAvatar {
-  width: 5rem;
-  height: 5rem;
-  margin: 1rem 1rem 1rem 0;
+  width: $spacing-11;
+  height: $spacing-11;
+  margin: $spacing-05 $spacing-05 0;
   border-radius: 1px;
 }
 
@@ -35,7 +35,7 @@
   width: 100%;
   display: flex;
   flex-flow: column wrap;
-  margin: 1rem 0;
+  margin: $spacing-05 0;
   cursor: pointer;
 }
 
@@ -51,8 +51,8 @@
 }
 
 .actionsContainer {
-  padding-top: 0.5rem;
-  margin-top: 1rem;
+  padding-top: $spacing-03;
+  margin-top: $spacing-05;
 }
 
 .sortingCriteriaSelect {
@@ -67,7 +67,7 @@
   }
 
   :global(.bx--list-box__menu-icon) {
-    height: 1rem;
+    height: $spacing-05;
   }
 
   :global(.bx--list-box__menu) {
@@ -75,6 +75,6 @@
   }
 
   :global(.bx--label) {
-    margin-right: 0.25rem;
+    margin-right: $spacing-02;
   }
 }
