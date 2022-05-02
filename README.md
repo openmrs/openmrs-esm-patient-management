@@ -1,62 +1,58 @@
-:wave:	*New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher:	
-
+:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher:
 
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/workflows/Node.js%20CI/badge.svg)
 
-
 # OpenMRS Patient Management
 
-This is a [Lerna](https://lerna.js.org/) project containing patient management frontend modules which deal with creating, searching, and listing patients. This package handles the following:
+This is a frontend module for the OpenMRS SPA. It bundles together various microfrontends that handle registering and editing patients, searching for existing patients, creating patient lists and managing patients in an outpatient setting. The microfrontends within this module include:
 
--  [@openmrs/esm-patient-search-app](packages/esm-patient-search-app)
--  [@openmrs/esm-patient-registration-app](packages/esm-patient-registration-app)
--  [@openmrs/esm-patient-list-app](packages/esm-patient-list-app)
--  [@openmrs/esm-outpatient-app](packages/esm-outpatient-app)
+-  [Patient search](packages/esm-patient-search-app)
+-  [Patient registration](packages/esm-patient-registration-app)
+-  [Patient list](packages/esm-patient-list-app)
+-  [Outpatient app](packages/esm-outpatient-app/README.md)
 
-## Repository Development
+## Setup
 
+Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-### Prerequisites
+This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
 
-- [Node](https://nodejs.org/en/download)
-- yarn ```sh npm install yarn -g ```
-### Getting started
+To start a dev server for a specific microfrontend, run:
 
-To install and setup the repository once cloned just use the following command
-
-```sh
-npx lerna bootstrap
+```bash
+yarn start --sources 'packages/esm-<insert-package-name>-app'
 ```
 
-To develop on a specific package e.g [@openmrs/esm-patient-search-app](packages/esm-patient-search-app)
+This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
 
-```sh
-npx openmrs develop --sources 'packages/esm-patient-search-app'
+To start a dev server running all the packages, run:
+
+```bash
+yarn start-all
 ```
 
-You can always use regex
+Note that this is very resource-intensive. 
 
-```sh
-npx openmrs develop --sources 'packages/esm-patient-{package1,package2}-app/'
+There are two approaches for working on multiple microfrontends simultaneously.
+
+You could run `yarn start` with as many `sources` arguments as you require. For example, to run the biometrics and vitals microfrontends simultaneously, you'd use:
+
+```bash
+yarn start --sources 'packages/esm-patient-registration-app' --sources 'packages/esm-patient-search-app'
 ```
 
+Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
 
-### Building
+## Contributing
 
-For building the code just run
+Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/contributing) guide.
 
-```sh
-npx lerna run build
+## Running tests
 
-```
-
-
-### Tests
-
-To verify that all the test run
+To run tests, use:
 
 ```sh
-yarn test or npm test
+yarn test
 ```
 
 ## Deployment
@@ -66,7 +62,3 @@ The `main` branch of this repo is deployed in a [demo environment](https://openm
 ## Configuration
 
 This module is designed to be driven by configuration files.
-
-## Resources
-
-- [JIRA Epic](https://issues.openmrs.org/browse)
