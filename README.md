@@ -4,12 +4,13 @@
 
 # OpenMRS Patient Management
 
-This is a frontend module for the OpenMRS SPA. It bundles together various microfrontends that handle registering and editing patients, searching for existing patients, creating patient lists and managing patients in an outpatient setting. The microfrontends within this module include:
+This repository bundles together frontend modules for the OpenMRS SPA. These modules handle concerns relating to registering and editing patients, searching for existing patients, creating and managing patient lists and managing patient queues in an outpatient setting. The microfrontends within this module include:
 
--  [Patient search](packages/esm-patient-search-app)
--  [Patient registration](packages/esm-patient-registration-app)
--  [Patient list](packages/esm-patient-list-app)
--  [Outpatient app](packages/esm-outpatient-app/README.md)
+- [Active visits app](packages/esm-active-visits-app/)
+- [Outpatient app](packages/esm-outpatient-app/README.md)
+- [Patient search](packages/esm-patient-search-app)
+- [Patient registration](packages/esm-patient-registration-app)
+- [Patient list](packages/esm-patient-list-app)
 
 ## Setup
 
@@ -28,7 +29,7 @@ This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling t
 To start a dev server running all the packages, run:
 
 ```bash
-yarn start-all
+yarn start
 ```
 
 Note that this is very resource-intensive. 
@@ -40,8 +41,6 @@ You could run `yarn start` with as many `sources` arguments as you require. For 
 ```bash
 yarn start --sources 'packages/esm-patient-registration-app' --sources 'packages/esm-patient-search-app'
 ```
-
-Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
 
 ## Contributing
 
