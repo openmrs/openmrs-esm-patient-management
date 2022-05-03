@@ -40,7 +40,9 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
       <TextInput
         {...props}
         {...field}
-        invalid={!!(meta.touched && meta.error)}
+        //invalid={!!(meta.touched && meta.error)}
+        invalid={false}
+        required={false}
         invalidText={invalidText}
         warn={!!warnText}
         warnText={warnText}
