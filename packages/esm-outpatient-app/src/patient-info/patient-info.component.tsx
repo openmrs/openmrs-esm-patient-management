@@ -1,5 +1,5 @@
 import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
-import { Button } from 'carbon-components-react';
+import { Button, ClickableTile } from 'carbon-components-react';
 import React, { useState } from 'react';
 import styles from './patient-info.scss';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
@@ -10,9 +10,10 @@ import Edit16 from '@carbon/icons-react/es/edit/16';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
+  handlePatientInfoClick: () => void;
 }
 
-const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
+const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoClick }) => {
   const { t } = useTranslation();
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
@@ -32,7 +33,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
 
   return (
-    <div className={styles.container}>
+    <ClickableTile className={styles.container} onClick={handlePatientInfoClick}>
       <div className={`${showContactDetails ? styles.activePatientInfoContainer : styles.patientInfoContainer}`}>
         <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
         <div className={styles.patientInfoContent}>
@@ -69,7 +70,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       {showContactDetails && (
         <ContactDetails patientId={patient.id} address={patient.address ?? []} contact={patient.contact} />
       )}
-    </div>
+    </ClickableTile>
   );
 };
 
