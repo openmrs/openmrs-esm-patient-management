@@ -143,7 +143,10 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       <div className={styles['text-divider']}>{t('or', 'Or')}</div>
 
       <div className={styles.buttonContainer}>
-        <Button kind="ghost" iconDescription="Start another visit type">
+        <Button
+          kind="ghost"
+          iconDescription="Start another visit type"
+          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM)}>
           {t('anotherVisitType', 'Start another visit type')}
         </Button>
       </div>
