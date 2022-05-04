@@ -4,7 +4,7 @@
 
 # OpenMRS Patient Management
 
-This repository bundles together frontend modules for the OpenMRS SPA. These modules handle concerns relating to registering and editing patients, searching for existing patients, creating and managing patient lists and managing patient queues in an outpatient setting. The microfrontends within this module include:
+This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists and managing patient queues in an outpatient setting. The modules within this repository include:
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Outpatient app](packages/esm-outpatient-app/README.md)
@@ -18,28 +18,26 @@ Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
 This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
 
-To start a dev server for a specific microfrontend, run:
-
-```bash
-yarn start --sources 'packages/esm-<insert-package-name>-app'
-```
-
-This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
-
-To start a dev server running all the packages, run:
+To start a dev server running all the modules simultaneously, run:
 
 ```bash
 yarn start
 ```
 
-Note that this is very resource-intensive. 
+This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified module.
 
-There are two approaches for working on multiple microfrontends simultaneously.
+Note that this is very resource-intensive.
 
-You could run `yarn start` with as many `sources` arguments as you require. For example, to run the biometrics and vitals microfrontends simultaneously, you'd use:
+To start a dev server for a specific module, run:
 
 ```bash
-yarn start --sources 'packages/esm-patient-registration-app' --sources 'packages/esm-patient-search-app'
+yarn start --sources 'packages/esm-<insert-package-name>-app'
+```
+
+You could provide `yarn start` with as many `sources` arguments as you require. For example, to run the patient registration and patient search modules only, use:
+
+```bash
+yarn start --sources 'packages/esm-patient-search-app' --sources 'packages/esm-patient-registration-app'
 ```
 
 ## Contributing
