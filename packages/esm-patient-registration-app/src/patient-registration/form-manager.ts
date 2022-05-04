@@ -282,6 +282,7 @@ export default class FormManager {
         });
       }
     }
+
     if (values.unidentifiedPatient) {
       attributes.push({
         // The UUID of the 'Unknown Patient' attribute-type will always be static across all implementations of OpenMRS

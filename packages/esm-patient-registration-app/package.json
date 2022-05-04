@@ -49,7 +49,6 @@
     "dayjs": "1.x",
     "react": "16.x",
     "react-i18next": "11.x",
-    "react-router-dom": "5.x",
     "rxjs": "6.x"
   }
 }

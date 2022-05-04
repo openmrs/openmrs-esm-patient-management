@@ -1,11 +1,10 @@
-import { navigate, openmrsFetch } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
   FormValues,
   PatientIdentifier,
   PatientUuidMapType,
-  PatientIdentifierValue,
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';

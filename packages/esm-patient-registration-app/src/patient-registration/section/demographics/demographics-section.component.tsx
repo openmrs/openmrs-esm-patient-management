@@ -1,17 +1,26 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './../section.scss';
 import { useField } from 'formik';
-import { getField } from '../section-helper';
+import { SectionProps } from '../section-helper';
+import { FieldSections } from '../registration-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
-export interface DemographicsSectionProps {
-  id: 'demographics';
-  fields: Array<any>;
-}
-
-export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
+export const DemographicsSection: React.FC<SectionProps> = ({ fieldSections }) => {
+  const { currentPhoto, setFieldValue, setCapturePhotoProps } = useContext(PatientRegistrationContext);
   const [field, meta] = useField('addNameInLocalLanguage');
-  const { setFieldValue } = useContext(PatientRegistrationContext);
+
+  const onCapturePhoto = useCallback(
+    (dataUri: string, photoDateTime: string) => {
+      if (setCapturePhotoProps) {
+        setCapturePhotoProps({
+          imageData: dataUri,
+          dateTime: photoDateTime,
+        });
+      }
+    },
+    [setCapturePhotoProps],
+  );
 
   useEffect(() => {
     if (!field.value && meta.touched) {
@@ -19,13 +28,16 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
       setFieldValue('additionalMiddleName', '');
       setFieldValue('additionalFamilyName', '');
     }
-  }, [field.value, meta.touched]);
+  }, [field.value, meta.touched, setFieldValue]);
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">
-      {fields.map((field) => (
-        <div key={field}>{getField(field)}</div>
-      ))}
+      <ExtensionSlot
+        className={styles.photoExtension}
+        extensionSlotName="capture-patient-photo-slot"
+        state={{ onCapturePhoto, initialState: currentPhoto }}
+      />
+      <FieldSections id="demographics" fieldSections={fieldSections} />
     </section>
   );
 };

@@ -4,12 +4,9 @@ import { SelectInput } from '../../input/basic-input/select/select-input.compone
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
 import styles from './../section.scss';
+import { SectionProps } from '../section-helper';
 
-export interface DeathInfoSectionProps {
-  id: 'death';
-}
-
-export const DeathInfoSection: React.FC<DeathInfoSectionProps> = () => {
+export const DeathInfoSection: React.FC<SectionProps> = () => {
   const { values } = React.useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 

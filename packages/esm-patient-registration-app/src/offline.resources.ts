@@ -1,11 +1,11 @@
 import React from 'react';
+import clone from 'lodash-es/clone';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
 import { FetchResponse, messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
 import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-registration/patient-registration-types';
 import { cacheForOfflineHeaders } from './constants';
-
 export interface Resources {
   addressTemplate: any;
   currentSession: Session;
@@ -39,7 +39,7 @@ export async function fetchPatientIdentifierTypesWithSources(
   const patientIdentifierTypes = await fetchPatientIdentifierTypes(abortController);
 
   // @ts-ignore Reason: The required props of the type are generated below.
-  const identifierTypes: Array<PatientIdentifierType> = patientIdentifierTypes.filter(Boolean);
+  const identifierTypes: Array<PatientIdentifierType> = clone(patientIdentifierTypes);
 
   for (const identifierType of identifierTypes) {
     const [identifierSources, autoGenOptions] = await Promise.all([
@@ -60,15 +60,10 @@ export async function fetchPatientIdentifierTypesWithSources(
 async function fetchPatientIdentifierTypes(
   abortController?: AbortController,
 ): Promise<Array<FetchedPatientIdentifierType>> {
-  const patientIdentifierTypesResponse = await cacheAndFetch(
-    '/ws/rest/v1/patientidentifiertype?v=full',
-    abortController,
-  );
-
-  const primaryIdentifierTypeResponse = await cacheAndFetch(
-    '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
-    abortController,
-  );
+  const [patientIdentifierTypesResponse, primaryIdentifierTypeResponse] = await Promise.all([
+    cacheAndFetch('/ws/rest/v1/patientidentifiertype?v=full', abortController),
+    cacheAndFetch('/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType', abortController),
+  ]);
 
   if (patientIdentifierTypesResponse.ok) {
     // Primary identifier type is to be kept at the top of the list.

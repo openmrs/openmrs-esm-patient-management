@@ -1,1 +1,17 @@
 @import '../patient-registration.scss';
+
+.productiveHeading02Light {
+  @include carbon--type-style('productive-heading-02');
+  margin-bottom: 1rem;
+  color: #525252;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: $spacing-05;
+}
+
+.halfWidthInDesktopView {
+  width: calc(50% - $spacing-05);
+}

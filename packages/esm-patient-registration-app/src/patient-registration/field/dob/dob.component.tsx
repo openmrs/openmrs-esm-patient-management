@@ -36,8 +36,7 @@ export const DobField: React.FC = () => {
   };
 
   return (
-    <div className={styles.halfWidthInDesktopView}>
-      <h4 className={styles.productiveHeading02Light}>{t('birthFieldLabelText', 'Birth')}</h4>
+    <>
       <div className={styles.dobField}>
         <div className={styles.dobContentSwitcherLabel}>
           <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
@@ -81,6 +80,6 @@ export const DobField: React.FC = () => {
           />
         </div>
       )}
-    </div>
+    </>
   );
 };

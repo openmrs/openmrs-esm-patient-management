@@ -1,5 +1,7 @@
 import { Type, validators } from '@openmrs/esm-framework';
+
 const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
+
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
@@ -17,32 +19,78 @@ export const esmPatientRegistrationSchema = {
         _default: '',
         _description: 'The title to display at the top of the section.',
       },
-      fields: {
+      fieldSections: {
         _type: Type.Array,
         _default: [],
-        _description: `The parts to include in the section. Can be any of the following built-in fields: ${builtInFields.join(
-          ', ',
-        )}. Can also be any of the keys from the fieldDefinitions object, which you can use to define custom fields.`,
-        _elements: { _type: Type.String }, // another validator at top level
+        _description: '',
+        _elements: {
+          _type: Type.Object,
+          _elements: {
+            name: {
+              _type: Type.String,
+              _default: '',
+              _description: 'The title for this section of fields such as "Full Name", "Sex", etc.',
+            },
+            fields: {
+              _type: Type.Array,
+              _default: [],
+              _description: `The parts to include in the section. Can be any of the following built-in fields: ${builtInFields.join(
+                ', ',
+              )}. Can also be any of the keys from the fieldDefinitions object, which you can use to define custom fields.`,
+              _elements: { _type: Type.String },
+            },
+          },
+        },
       },
     },
     _default: {
       demographics: {
         name: 'Basic Info',
-        fields: ['name', 'gender', 'dob', 'id', 'codedAttributes', 'textBasedAttributes'],
+        fieldSections: [
+          {
+            name: 'fullNameLabelText',
+            fields: ['name'],
+          },
+          {
+            name: 'sexLabelText',
+            fields: ['sex'],
+          },
+          {
+            name: 'birthFieldLabelText',
+            fields: ['dob'],
+          },
+          {
+            name: '',
+            fields: ['id'],
+          },
+        ],
       },
-      contact: { name: 'Contact Details', fields: ['address', 'phone & email'] },
-      death: { name: 'Death Info', fields: ['death'] },
+      contact: {
+        name: 'Contact Details',
+        fieldSections: [
+          {
+            name: 'addressHeader',
+            fields: ['address'],
+          },
+          {
+            name: 'phoneEmailLabelText',
+            fields: ['phone', 'email'],
+          },
+        ],
+      },
       relationships: { name: 'Relationships' },
     },
   },
   fieldDefinitions: {
     _type: Type.Object,
     _elements: {
-      label: { _type: Type.String, _description: 'The label of the input' },
       uuid: {
         _type: Type.UUID,
         _description: 'Person attributetype uuid used to save the attribute',
+      },
+      conceptUuid: {
+        _type: Type.ConceptUuid,
+        _description: 'Uuid for the concept set that defines the allowable values',
       },
       placeholder: {
         _type: Type.String,
@@ -58,7 +106,17 @@ export const esmPatientRegistrationSchema = {
         },
       },
     },
-    _default: {},
+    _default: {
+      email: {
+        uuid: 'e075706b-98d7-11ec-8f6f-0242ac1e0002',
+      },
+      phone: {
+        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        validation: {
+          matches: '[0-9.+- ()]*',
+        },
+      },
+    },
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
@@ -86,42 +144,9 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  codedPersonAttributes: {
-    _type: Type.Array,
-    _default: [],
-    _elements: {
-      _type: Type.Object,
-      personAttributeUuid: {
-        _type: Type.PersonAttributeTypeUuid,
-        _description: 'The uuid of the person attribute type used to save the attribute',
-      },
-      conceptUuid: {
-        _type: Type.ConceptUuid,
-        _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
-      },
-    },
-  },
-
-  textBasedAttributes: {
-    _type: Type.Array,
-    _elements: {
-      _type: Type.Object,
-      personAttributeUuid: {
-        _type: Type.PersonAttributeTypeUuid,
-        _description: 'The uuid of the person attribute type used to save the attribute',
-      },
-      validationRegex: {
-        _type: Type.String,
-        _description: 'Regular expression to validate the user input.',
-      },
-    },
-    _default: [],
-  },
-
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
-      // @ts-ignore
       _type: Type.PatientIdentifierTypeUuid,
     },
     _default: [],

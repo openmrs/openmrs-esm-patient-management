@@ -29,27 +29,25 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
-  match: any;
   isOffline: boolean;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
-  const { search } = useLocation();
+  const search = window.location.search;
   const config = useConfig();
   const [sections, setSections] = useState([]);
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
-  const { patientUuid: uuidOfPatientToEdit } = match.params;
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient();
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [fieldConfigs, setFieldConfigs] = useState({});
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
-  const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
-  const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
+  const [fieldConfigs, setFieldConfigs] = useState<Record<string, any>>();
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(patientToEdit?.id);
+  const [initialAddressFieldValues] = useInitialAddressFieldValues(patientToEdit?.id);
+  const [patientUuidMap] = usePatientUuidMap(patientToEdit?.id);
   const location = currentSession.sessionLocation?.uuid;
-  const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
+  const inEditMode = !isLoadingPatientToEdit && Boolean(patientToEdit?.id);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
 
@@ -61,8 +59,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     if (config?.sections) {
       const configuredSections = config.sections.map((section) => ({
         id: section,
-        name: config.sectionDefinitions[section].name,
-        fields: config.sectionDefinitions[section].fields,
+        name: config.sectionDefinitions[section]?.name,
+        fieldSections: config.sectionDefinitions[section]?.fieldSections,
       }));
 
       setSections(configuredSections);
@@ -92,7 +90,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
     }
-  }, [inEditMode, addressTemplate, initialAddressFieldValues]);
+  }, [inEditMode, addressTemplate, initialAddressFieldValues, initialFormValues, setInitialFormValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
@@ -157,7 +155,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             <div>
               <div className={styles.stickyColumn}>
                 <h4>
-                  {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
+                  {inEditMode ? t('edit', 'Edit') : t('register', 'Register')} {t('patient', 'Patient')}
                 </h4>
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
@@ -169,7 +167,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   </div>
                 ))}
                 <Button className={styles.submitButton} type="submit">
-                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                  {inEditMode
+                    ? t('updatePatientRegistration', 'Update Patient Registration')
+                    : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}

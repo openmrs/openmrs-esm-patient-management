@@ -10,6 +10,7 @@ import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
 import { RelationshipValue } from '../../patient-registration-types';
 import { TrashCan16 } from '@carbon/icons-react';
+import { SectionProps } from '../section-helper';
 
 interface RelationshipType {
   display: string;
@@ -17,17 +18,7 @@ interface RelationshipType {
   direction: string;
 }
 
-async function searchPerson(query: string) {
-  const abortController = new AbortController();
-  const searchResults = await fetchPerson(query, abortController);
-  return searchResults.data.results;
-}
-
-export interface RelationshipsSectionProps {
-  id: 'relationships';
-}
-
-export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
+export const RelationshipsSection: React.FC<SectionProps> = () => {
   const { relationshipTypes } = useContext(ResourcesContext);
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { t } = useTranslation();

@@ -20,7 +20,7 @@ export default function DisplayPatientPhoto({ patientUuid, patientName }: Displa
         color="rgba(0,0,0,0)"
         name={patientName}
         src={photo?.imageSrc}
-        size="80"
+        size="120"
         style={{ backgroundImage: `url(${patternUrl})`, backgroundRepeat: 'round' }}
       />
     </div>

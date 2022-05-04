@@ -56,7 +56,7 @@ export function useInitialPatientRelationships(patientUuid: string): {
       data: relationships,
       isLoading: !data && !error,
     };
-  }, [data, error]);
+  }, [data, error, patientUuid]);
 
   return result;
 }

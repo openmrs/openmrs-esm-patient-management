@@ -1,7 +1,7 @@
 import { FetchResponse, getSynchronizationItems, openmrsFetch, usePatient } from '@openmrs/esm-framework';
 import { Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -25,7 +25,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
-    patientUuid: v4(),
+    patientUuid: uuid(),
     givenName: '',
     middleName: '',
     familyName: '',
@@ -52,6 +52,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     deathCause: '',
     relationships: [],
     identifiers: [],
+    attributes: {},
   });
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         setInitialFormValues(registration._patientRegistrationData.formValues);
       }
     })();
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [isLoadingPatientToEdit, patientToEdit, patientUuid, initialFormValues]);
 
   // Set initial patient relationships
   useEffect(() => {
@@ -131,7 +132,7 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
         setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
       }
     })();
-  }, [isLoading, patient, patientUuid]);
+  }, [isLoading, patient, patientUuid, initialAddressFieldValues, fallback]);
 
   return [initialAddressFieldValues, setInitialAddressFieldValues];
 }
@@ -151,7 +152,7 @@ export function usePatientUuidMap(
         setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback),
       );
     }
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [isLoadingPatientToEdit, patientToEdit, patientUuid, patientUuidMap, fallback]);
 
   return [patientUuidMap, setPatientUuidMap];
 }
@@ -165,10 +166,15 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
   data: Array<PatientIdentifierValue>;
   isLoading: boolean;
 } {
-  const shouldFetch = !!patientUuid;
+  const shouldFetch = patientUuid !== null && typeof patientUuid !== 'undefined' && Boolean(patientUuid);
 
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
-    shouldFetch ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=full` : null,
+  const { data: response, error } = useSWRImmutable<
+    FetchResponse<{ results: Array<PatientIdentifierResponse> }>,
+    Error
+  >(
+    shouldFetch
+      ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,isPrimary))`
+      : null,
     openmrsFetch,
   );
 
@@ -177,7 +183,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
     isLoading: boolean;
   } = useMemo(
     () => ({
-      data: data?.data?.results?.map((patientIdentifier) => ({
+      data: response?.data?.results?.map((patientIdentifier) => ({
         uuid: patientIdentifier.uuid,
         identifier: patientIdentifier.identifier,
         identifierTypeUuid: patientIdentifier.identifierType.uuid,
@@ -185,25 +191,30 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
         source: null,
         preferred: patientIdentifier.identifierType.isPrimary,
       })),
-      isLoading: !data && !error,
+      isLoading: !response && !error,
     }),
-    [data, error],
+    [response, error],
   );
 
   return result;
 }
 
-function useInitialPersonAttributes(personUuid: string) {
-  const shouldFetch = !!personUuid;
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
-    shouldFetch ? `/ws/rest/v1/person/${personUuid}/attribute` : null,
+function useInitialPersonAttributes(personUuid?: string) {
+  const shouldFetch = personUuid !== null && typeof personUuid !== 'undefined' && Boolean(personUuid);
+
+  const { data: response, error } = useSWRImmutable<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
+    shouldFetch
+      ? `/ws/rest/v1/person/${personUuid}/attribute?v=custom:(uuid,display,value,attributeType:(uuid,display))`
+      : null,
     openmrsFetch,
   );
+
   const result = useMemo(() => {
     return {
-      data: data?.data?.results,
-      isLoading: !data && !error,
+      data: response?.data?.results,
+      isLoading: !response && !error,
     };
-  }, [data, error]);
+  }, [response, error]);
+
   return result;
 }

@@ -10,6 +10,7 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
     `/ws/rest/v1/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );
+
   if (error) {
     showToast({
       title: error.name,
@@ -17,6 +18,7 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
       kind: 'error',
     });
   }
+
   return {
     data: data?.data,
     isLoading: !data && !error,
@@ -29,6 +31,7 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
     shouldFetch ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
+
   if (error) {
     showToast({
       title: error.name,
@@ -36,5 +39,6 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
       kind: 'error',
     });
   }
+
   return { data: data?.data?.answers, isLoading: !data && !error };
 }

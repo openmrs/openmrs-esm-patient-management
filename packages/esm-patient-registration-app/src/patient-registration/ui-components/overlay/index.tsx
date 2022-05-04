@@ -8,9 +8,10 @@ interface OverlayProps {
   close: () => void;
   header: string;
   buttonsGroup?: React.ReactElement;
+  ariaLabel: string;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup }) => {
+const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup, ariaLabel }) => {
   const isDesktop = useLayoutType() === 'desktop';
 
   return (
@@ -23,7 +24,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
           </Button>
         </div>
       ) : (
-        <Header className={styles.tabletOverlayHeader}>
+        <Header className={styles.tabletOverlayHeader} aria-label={ariaLabel}>
           <Button onClick={close} hasIconOnly>
             <ArrowLeft16 onClick={close} />
           </Button>

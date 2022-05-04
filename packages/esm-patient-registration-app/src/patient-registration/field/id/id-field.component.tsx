@@ -17,8 +17,7 @@ export const IdField: React.FC = () => {
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
-  const config = useConfig();
-  const { defaultPatientIdentifierTypes } = config;
+  const { defaultPatientIdentifierTypes } = useConfig();
 
   useEffect(() => {
     if (!inEditMode && identifierTypes) {

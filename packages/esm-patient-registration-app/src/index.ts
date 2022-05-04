@@ -14,6 +14,7 @@ const importTranslation = require.context('../translations', false, /.json$/, 'l
 
 const backendDependencies = {
   'webservices.rest': '^2.24.0',
+  fhir2: '>= 1.2',
 };
 
 const frontendDependencies = {
@@ -49,7 +50,7 @@ function setupOpenMRS() {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./root.component'), options),
-        route: /^patient-registration/,
+        route: new RegExp(`^${patientRegistration}|patient\/(?:[a-zA-Z0-9\-]+\/edit)`),
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
           isOffline: false,
@@ -57,20 +58,6 @@ function setupOpenMRS() {
         offline: {
           savePatientForm: FormManager.savePatientFormOffline,
           isOffline: true,
-        },
-        resources,
-      },
-      {
-        load: getAsyncLifecycle(() => import('./root.component'), {
-          featureName: 'edit-patient-details-form',
-          moduleName,
-        }),
-        route: /^patient\/([a-zA-Z0-9\-]+)\/edit/,
-        online: {
-          savePatientForm: FormManager.savePatientFormOnline,
-        },
-        offline: {
-          savePatientForm: FormManager.savePatientFormOffline,
         },
         resources,
       },

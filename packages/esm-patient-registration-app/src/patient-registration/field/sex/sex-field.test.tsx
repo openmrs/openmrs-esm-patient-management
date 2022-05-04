@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import { Formik, Form } from 'formik';
 
-import { GenderField } from './gender-field.component';
+import { SexField } from './sex-field.component';
 
 jest.mock('react', () => ({
   ...(jest.requireActual('react') as any),
@@ -18,12 +18,12 @@ jest.mock('formik', () => ({
   useField: jest.fn(() => [{}, {}]),
 }));
 
-describe('GenderField', () => {
+describe('SexField', () => {
   const renderComponent = () => {
     return render(
       <Formik initialValues={{}} onSubmit={null}>
         <Form>
-          <GenderField />
+          <SexField />
         </Form>
       </Formik>,
     );

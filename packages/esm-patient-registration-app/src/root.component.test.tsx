@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './root.component';
 import { match } from 'react-router-dom';
+import { Session } from '@openmrs/esm-framework';
 
 window['getOpenmrsSpaBase'] = jest.fn().mockImplementation(() => '/');
 
@@ -19,11 +20,11 @@ describe('root component', () => {
     ReactDOM.render(
       <Root
         savePatientForm={jest.fn()}
-        match={sampleMatchProp}
         addressTemplate={{ results: [] }}
-        currentSession={{} as any}
-        patientIdentifiers={[]}
+        currentSession={{} as Session}
+        identifierTypes={[]}
         relationshipTypes={{ results: [] }}
+        isOffline={false}
       />,
       div,
     );

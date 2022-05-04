@@ -217,7 +217,8 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
             {t('configureIdentifiers', 'Configure identifiers')}
           </Button>
         </div>
-      }>
+      }
+      ariaLabel="Configure Identifiers Overlay">
       <div>
         <p className={styles.bodyLong02}>
           {t('IDInstructions', "Select the identifiers you'd like to add for this patient:")}
