@@ -42,6 +42,7 @@
   "offlinePatientsTableLastUpdatedErrors": "errors",
   "offlinePatientsTableLastUpdatedNotYetSynchronized": "Not synchronized",
   "offlinePatientsTableLastUpdatedOutdatedData": "Outdated data",
+  "offlinePatientsTableNameNewlyRegistered": "New",
   "offlinePatientsTableRemoveFromOfflineList": "Remove from list",
   "offlinePatientsTableSearchLabel": "Search this list",
   "offlinePatientsTableSearchPlaceholder": "Search this list",

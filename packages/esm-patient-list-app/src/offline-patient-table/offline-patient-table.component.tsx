@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Button,
   DataTable,
@@ -16,6 +16,8 @@ import {
   FilterRowsData,
   TableSelectAll,
   TableSelectRow,
+  DataTableCustomRenderProps,
+  DenormalizedRow,
 } from 'carbon-components-react';
 import {
   useStore,
@@ -25,6 +27,9 @@ import {
   useLayoutType,
   syncOfflinePatientData,
   showModal,
+  getSynchronizationItems,
+  deleteSynchronizationItem,
+  getFullSynchronizationItems,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
@@ -34,6 +39,7 @@ import PatientNameTableCell from './patient-name-table-cell.component';
 import Renew32 from '@carbon/icons-react/es/renew/32';
 import { removePatientFromLocalPatientList, offlinePatientListId } from '../api/api-local';
 import { useAllPatientsFromOfflinePatientList } from '../api/hooks';
+import useSWR from 'swr';
 
 export interface OfflinePatientTableProps {
   isInteractive: boolean;
@@ -43,70 +49,120 @@ export interface OfflinePatientTableProps {
 const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive, showHeader }) => {
   const { t } = useTranslation();
   const store = useStore(getOfflinePatientDataStore());
-  const userId = useSession()?.user.uuid;
+  const userId = useSession()?.user?.uuid;
   const layout = useLayoutType();
-  const { isValidating, data: patients, mutate } = useAllPatientsFromOfflinePatientList(userId);
+  const offlinePatientsSwr = useAllPatientsFromOfflinePatientList(userId);
+  const offlineRegisteredPatientsSwr = useOfflineRegisteredPatients();
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
 
-  const headers = [
-    {
-      key: 'name',
-      header: t('offlinePatientsTableHeaderName', 'Name'),
-    },
-    {
-      key: 'lastUpdated',
-      header: t('offlinePatientsTableHeaderLastUpdated', 'Last updated'),
-    },
-    {
-      key: 'gender',
-      header: t('offlinePatientsTableHeaderGender', 'Gender'),
-    },
-    {
-      key: 'age',
-      header: t('offlinePatientsTableHeaderAge', 'Age'),
-    },
-  ];
+  const headers = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: t('offlinePatientsTableHeaderName', 'Name'),
+      },
+      {
+        key: 'lastUpdated',
+        header: t('offlinePatientsTableHeaderLastUpdated', 'Last updated'),
+      },
+      {
+        key: 'gender',
+        header: t('offlinePatientsTableHeaderGender', 'Gender'),
+      },
+      {
+        key: 'age',
+        header: t('offlinePatientsTableHeaderAge', 'Age'),
+      },
+    ],
+    [t],
+  );
 
-  const rows =
-    patients?.map((patient) => {
-      const syncState = store.offlinePatientDataSyncState?.[patient.id];
+  const rows = useMemo(() => {
+    const result = [];
+    const mapPatientToRow = (patient: fhir.Patient, isNewlyRegistered: boolean) => ({
+      id: patient.id,
+      name: {
+        value: <PatientNameTableCell key={patient.id} patient={patient} isNewlyRegistered={isNewlyRegistered} />,
+        filterableValue: JSON.stringify(patient.name),
+      },
+      lastUpdated: isNewlyRegistered ? (
+        '--'
+      ) : (
+        <LastUpdatedTableCell
+          key={patient.id}
+          syncState={store.offlinePatientDataSyncState?.[patient.id]}
+          patientUuid={patient.id}
+        />
+      ),
+      gender: capitalize(patient.gender),
+      age: patient.birthDate ? age(patient.birthDate) : '',
+    });
 
-      return {
-        id: patient.id,
-        name: patient,
-        lastUpdated: syncState,
-        gender: capitalize(patient.gender),
-        age: patient.birthDate ? age(patient.birthDate) : '',
-      };
-    }) ?? [];
+    for (const patient of offlineRegisteredPatientsSwr.data ?? []) {
+      result.push(mapPatientToRow(patient, true));
+    }
 
-  const handleUpdateSelectedPatientsClick = async (selectedRows: Array<{ id: string }>) => {
-    const patientUuids = selectedRows.map((row) => row.id);
-    return await syncOfflinePatientDataOfAllGivenPatients(patientUuids);
+    for (const patient of offlinePatientsSwr.data ?? []) {
+      result.push(mapPatientToRow(patient, false));
+    }
+
+    return result;
+  }, [offlinePatientsSwr.data, offlineRegisteredPatientsSwr.data, store.offlinePatientDataSyncState]);
+
+  const handleUpdateSelectedPatientsClick = async (selectedRows: ReadonlyArray<DenormalizedRow>) => {
+    const offlinePatientUuidsToSync = selectedRows
+      .map((row) => row.id)
+      .filter((id) => offlinePatientsSwr.data.some((offlinePatient) => offlinePatient.id === id));
+    return await Promise.all(offlinePatientUuidsToSync.map((patientUuid) => syncOfflinePatientData(patientUuid)));
   };
 
-  const handleRemovePatientsFromOfflineListClick = async (selectedRows: Array<{ id: string }>) => {
+  const handleRemovePatientsFromOfflineListClick = async (selectedRows: ReadonlyArray<DenormalizedRow>) => {
     const closeModal = showModal('offline-tools-confirmation-modal', {
       title: t('offlinePatientsTableDeleteConfirmationModalTitle', 'Remove offline patients'),
       children: t(
         'offlinePatientsTableDeleteConfirmationModalContent',
-        'Are you sure that you want to remove all selected patients from the offline list? The charts will no longer be available in offline mode.',
+        'Are you sure that you want to remove all selected patients from the offline list? Their charts will no longer be available in offline mode and any newly registered patient will be permanently deleted.',
       ),
       confirmText: t('offlinePatientsTableDeleteConfirmationModalConfirm', 'Remove patients'),
       cancelText: t('offlinePatientsTableDeleteConfirmationModalCancel', 'Cancel'),
       closeModal: () => closeModal(),
       onConfirm: async () => {
-        const patientUuids = selectedRows.map((row) => row.id);
-        for (const patientUuid of patientUuids) {
-          await removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid);
-        }
+        const offlineRegisteredPatients = await getFullSynchronizationItems<{ fhirPatient: fhir.Patient }>(
+          'patient-registration',
+        );
+        const allPatientUuidsToBeDeleted = selectedRows.map((row) => row.id);
+        const offlinePatientUuidsToBeDeleted = allPatientUuidsToBeDeleted.filter((id) =>
+          offlinePatientsSwr.data.some((patient) => patient.id === id),
+        );
+        const offlineRegisteredPatientUuidsToBeDeleted = allPatientUuidsToBeDeleted.filter((id) =>
+          offlineRegisteredPatientsSwr.data.some((patient) => patient.id === id),
+        );
 
-        mutate();
+        await Promise.all(
+          offlinePatientUuidsToBeDeleted.map((patientUuid) =>
+            removePatientFromLocalPatientList(userId, offlinePatientListId, patientUuid),
+          ),
+        );
+
+        await Promise.all(
+          offlineRegisteredPatientUuidsToBeDeleted.map(async (patientUuid) => {
+            const offlineRegisteredPatient = offlineRegisteredPatients.find(
+              (syncItem) => syncItem.content.fhirPatient.id === patientUuid,
+            );
+
+            if (offlineRegisteredPatient) {
+              await deleteSynchronizationItem(offlineRegisteredPatient.id);
+            }
+          }),
+        );
+
+        offlinePatientsSwr.mutate();
+        offlineRegisteredPatientsSwr.mutate();
       },
     });
   };
 
-  if (isValidating) {
+  if (offlinePatientsSwr.isValidating || offlineRegisteredPatientsSwr.isValidating) {
     return <TableSkeleton showHeader={showHeader} />;
   }
 
@@ -123,7 +179,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
           getSelectionProps,
           onInputChange,
           selectedRows,
-        }) => (
+        }: DataTableCustomRenderProps) => (
           <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
             <div className={styles.tableHeaderContainer}>
               {showHeader && (
@@ -161,7 +217,7 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                 </>
               )}
             </div>
-            <Table {...getTableProps()} isSortable useZebraStyles>
+            <Table {...getTableProps()} useZebraStyles>
               <TableHead>
                 <TableRow>
                   {isInteractive && <TableSelectAll {...getSelectionProps()} />}
@@ -176,16 +232,9 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                 {rows.map((row) => (
                   <TableRow {...getRowProps({ row })}>
                     {isInteractive && <TableSelectRow {...getSelectionProps({ row })} />}
-                    {row.cells.map((cell) => {
-                      switch (cell.info.header) {
-                        case 'name':
-                          return <PatientNameTableCell key={cell.id} patient={cell.value} />;
-                        case 'lastUpdated':
-                          return <LastUpdatedTableCell key={cell.id} syncState={cell.value} patientUuid={row.id} />;
-                        default:
-                          return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                      }
-                    })}
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value?.value ?? cell.value}</TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>
@@ -217,20 +266,21 @@ function filterTableRows({
   // @ts-ignore `getCellId` is not in the types, but present in Carbon.
   getCellId,
 }: FilterRowsData) {
-  // Adapted from https://github.com/carbon-design-system/carbon-components-react/blob/c3bf0123a2a98ca84acfc7e86e69840eaf57a89e/src/components/DataTable/tools/filter.js#L23
-  // Notable change: Instead of using the cell's value as a literal string, this JSON.stringify's the
-  // cell value first. This means that filtering even works with complex JS objects.
-  // This may have to be refined eventually, but for the moment it gives good results with minimal effort.
   return rowIds.filter((rowId) =>
     headers.some(({ key }) => {
       const cellId = getCellId(rowId, key);
-      return JSON.stringify(cellsById[cellId].value).toLowerCase().includes(inputValue.toLowerCase());
+      const value = cellsById[cellId].value;
+      const filterableValue = value?.filterableValue?.toString() ?? value?.toString() ?? '';
+      return filterableValue.replace(/\s/g, '').toLowerCase().includes(inputValue.replace(/\s/g, '').toLowerCase());
     }),
   );
 }
 
-function syncOfflinePatientDataOfAllGivenPatients(patientUuids: Array<string>) {
-  return Promise.all(patientUuids.map((patientUuid) => syncOfflinePatientData(patientUuid)));
+function useOfflineRegisteredPatients() {
+  return useSWR('offlineRegisteredPatients', async () => {
+    const syncItems = await getSynchronizationItems<{ fhirPatient?: fhir.Patient }>('patient-registration');
+    return syncItems.filter((item) => item.fhirPatient).map((item) => item.fhirPatient);
+  });
 }
 
 export default OfflinePatientTable;

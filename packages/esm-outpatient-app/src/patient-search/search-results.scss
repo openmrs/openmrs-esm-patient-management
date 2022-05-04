@@ -10,15 +10,10 @@
 }
 
 .container {
-  // border-bottom: 0.063rem solid $ui-03;
   & .patientBanner {
     background-color: red !important;
   }
 }
-
-// :global(.omrs-breakpoint-gt-tablet) .container {
-//   padding: 1rem 1rem;
-// }
 
 .patientBanner {
   display: flex;
@@ -30,9 +25,9 @@
 }
 
 .patientAvatar {
-  width: 5rem;
-  height: 5rem;
-  margin: 1rem 1rem 1rem 0;
+  width: $spacing-11;
+  height: $spacing-11;
+  margin: $spacing-05 $spacing-05 0;
   border-radius: 1px;
 }
 
@@ -40,7 +35,7 @@
   width: 100%;
   display: flex;
   flex-flow: column wrap;
-  margin: 1rem 0;
+  margin: $spacing-05 0;
   cursor: pointer;
 }
 
@@ -56,14 +51,30 @@
 }
 
 .actionsContainer {
-  padding-top: 0.5rem;
-  margin-top: 1rem;
+  padding-top: $spacing-03;
+  margin-top: $spacing-05;
 }
 
-.sortCriteria {
+.sortingCriteriaSelect {
   display: flex;
   width: 100%;
   justify-content: flex-end;
   @include carbon--type-style('body-short-02');
   width: 100%;
+
+  :global(.bx--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.bx--list-box__menu-icon) {
+    height: $spacing-05;
+  }
+
+  :global(.bx--list-box__menu) {
+    left: -7.5rem;
+  }
+
+  :global(.bx--label) {
+    margin-right: $spacing-02;
+  }
 }

@@ -28,7 +28,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     if (patient.gender === 'F') {
       return t('female', 'Female');
     }
-    return t('unknown', 'UnKnown');
+    return t('unknown', 'Unknown');
   };
 
   return (

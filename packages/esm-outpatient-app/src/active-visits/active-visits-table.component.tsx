@@ -30,7 +30,7 @@ import {
 import Add16 from '@carbon/icons-react/es/add/16';
 import Group16 from '@carbon/icons-react/es/group/16';
 import InProgress16 from '@carbon/icons-react/es/in-progress/16';
-import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
+import { useLayoutType, ConfigurableLink, navigate } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -51,7 +51,7 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-function ActionsMenu() {
+function ActionsMenu({ patientUuid }: { patientUuid: string }) {
   const { t } = useTranslation();
 
   return (
@@ -59,7 +59,12 @@ function ActionsMenu() {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#editPatientDetails"
-        itemText={t('editPatientDetails', 'Edit patient details')}>
+        itemText={t('editPatientDetails', 'Edit patient details')}
+        onClick={() =>
+          navigate({
+            to: `\${openmrsSpaBase}/patient/${patientUuid}/edit`,
+          })
+        }>
         {t('editPatientDetails', 'Edit patient details')}
       </OverflowMenuItem>
       <OverflowMenuItem
@@ -301,7 +306,7 @@ function ActiveVisitsTable() {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="bx--table-column-menu">
-                            <ActionsMenu />
+                            <ActionsMenu patientUuid={tableRows?.[index]?.patientUuid} />
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
