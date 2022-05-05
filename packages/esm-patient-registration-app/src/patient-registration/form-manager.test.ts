@@ -35,6 +35,7 @@ const formValues: FormValues = {
       identifier: 'foo',
       identifierTypeUuid: 'identifierType',
       preferred: true,
+      required: false,
       source: {
         uuid: 'some-uuid',
         name: 'unique',

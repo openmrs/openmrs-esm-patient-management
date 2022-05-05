@@ -184,6 +184,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
         action: 'NONE',
         source: null,
         preferred: patientIdentifier.identifierType.isPrimary,
+        required: false,
       })),
       isLoading: !data && !error,
     }),

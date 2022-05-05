@@ -83,6 +83,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       ...patientIdentifier,
       action: 'UPDATE',
       source: identifierType?.identifierSources?.[0],
+      required: false,
     } as PatientIdentifierValue);
   }, [patientIdentifier]);
 
