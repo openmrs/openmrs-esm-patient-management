@@ -40,6 +40,7 @@ export const IdField: React.FC = () => {
                 identifierTypeUuid: identifierType.uuid,
                 source: identifierType.identifierSources?.[0],
                 preferred: identifierType.isPrimary,
+                required: identifierType.required,
               } as PatientIdentifierValue),
           ),
       );

@@ -34,6 +34,7 @@ export interface PatientIdentifierValue {
   source: IdentifierSource;
   autoGeneration?: boolean;
   preferred: boolean;
+  required: boolean;
   /**
    * @kind ADD -> add a new identifier to a patient
    * @kind UPDATE -> update an existing patient identifier
