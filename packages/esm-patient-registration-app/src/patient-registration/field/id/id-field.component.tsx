@@ -3,7 +3,7 @@ import { IdentifierInput } from '../../input/custom-input/identifier/identifier-
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Button } from 'carbon-components-react';
+import { Button, SkeletonText } from 'carbon-components-react';
 import { ArrowRight16 } from '@carbon/icons-react';
 import { useLayoutType, useConfig } from '@openmrs/esm-framework';
 import { PatientIdentifierValue } from '../../patient-registration-types';
@@ -54,37 +54,42 @@ export const IdField: React.FC = () => {
           kind="ghost"
           className={styles.setIDNumberButton}
           onClick={() => setShowIdentifierOverlay(true)}
-          size={desktop ? 'sm' : 'md'}>
+          size={desktop ? 'sm' : 'md'}
+          disabled={!identifierTypes}>
           {t('configure', 'Configure')} <ArrowRight16 />
         </Button>
       </div>
       <div>
-        <FieldArray name="identifiers">
-          {({
-            push,
-            remove,
-            form: {
-              values: { identifiers },
-            },
-          }) => (
-            <>
-              {identifiers
-                .filter((identifier) => identifier.action !== 'DELETE')
-                .map((identifier: PatientIdentifierValue, index) => (
-                  <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
-                ))}
-              {showIdentifierOverlay && (
-                <IdentifierSelectionOverlay
-                  setFieldValue={setFieldValue}
-                  closeOverlay={() => setShowIdentifierOverlay(false)}
-                  push={push}
-                  identifiers={identifiers}
-                  remove={remove}
-                />
-              )}
-            </>
-          )}
-        </FieldArray>
+        {identifierTypes ? (
+          <FieldArray name="identifiers">
+            {({
+              push,
+              remove,
+              form: {
+                values: { identifiers },
+              },
+            }) => (
+              <>
+                {identifiers
+                  .filter((identifier) => identifier.action !== 'DELETE')
+                  .map((identifier: PatientIdentifierValue, index) => (
+                    <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
+                  ))}
+                {showIdentifierOverlay && (
+                  <IdentifierSelectionOverlay
+                    setFieldValue={setFieldValue}
+                    closeOverlay={() => setShowIdentifierOverlay(false)}
+                    push={push}
+                    identifiers={identifiers}
+                    remove={remove}
+                  />
+                )}
+              </>
+            )}
+          </FieldArray>
+        ) : (
+          <SkeletonText />
+        )}
       </div>
     </div>
   );

@@ -24,6 +24,7 @@ import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
+import { add } from 'lodash-es';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -48,7 +49,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
-  const location = currentSession.sessionLocation?.uuid;
+  const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
@@ -71,26 +72,28 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
 
   useEffect(() => {
-    const addressTemplateXml = addressTemplate.results[0].value;
+    if (addressTemplate) {
+      const addressTemplateXml = addressTemplate.results[0].value;
 
-    if (!addressTemplateXml) {
-      return;
-    }
-
-    const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
-    setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
-
-    // `=== false` is here on purpose (`inEditMode` is a triple state value).
-    // We *only* want to set initial address field values when *creating* a patient.
-    // We must wait until after loading for this info.
-    if (inEditMode === false) {
-      for (const { name, defaultValue } of addressFieldValues) {
-        if (!initialAddressFieldValues[name]) {
-          initialAddressFieldValues[name] = defaultValue;
-        }
+      if (!addressTemplateXml) {
+        return;
       }
 
-      setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
+      const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
+      setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
+
+      // `=== false` is here on purpose (`inEditMode` is a triple state value).
+      // We *only* want to set initial address field values when *creating* a patient.
+      // We must wait until after loading for this info.
+      if (inEditMode === false) {
+        for (const { name, defaultValue } of addressFieldValues) {
+          if (!initialAddressFieldValues[name]) {
+            initialAddressFieldValues[name] = defaultValue;
+          }
+        }
+
+        setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
+      }
     }
   }, [inEditMode, addressTemplate, initialAddressFieldValues]);
 
@@ -168,7 +171,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Link>
                   </div>
                 ))}
-                <Button className={styles.submitButton} type="submit">
+                <Button
+                  className={styles.submitButton}
+                  type="submit"
+                  disabled={!identifierTypes || !currentSession || !addressTemplate}>
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>

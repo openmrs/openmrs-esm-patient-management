@@ -58,7 +58,6 @@ function setupOpenMRS() {
           savePatientForm: FormManager.savePatientFormOffline,
           isOffline: true,
         },
-        resources,
       },
       {
         load: getAsyncLifecycle(() => import('./root.component'), {
@@ -72,7 +71,6 @@ function setupOpenMRS() {
         offline: {
           savePatientForm: FormManager.savePatientFormOffline,
         },
-        resources,
       },
     ],
     extensions: [

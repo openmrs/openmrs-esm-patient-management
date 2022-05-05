@@ -7,16 +7,16 @@ import { PatientIdentifierType, FetchedPatientIdentifierType } from './patient-r
 import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
-  addressTemplate: any;
-  currentSession: Session;
+  addressTemplate: undefined | any;
+  currentSession: Session | undefined;
   relationshipTypes: any;
-  identifierTypes: Array<PatientIdentifierType>;
+  identifierTypes: Array<PatientIdentifierType> | undefined;
 }
 
 export const ResourcesContext = React.createContext<Resources>(null);
 
-export async function fetchCurrentSession(abortController?: AbortController): Promise<FetchResponse<Session>> {
-  const { data } = await cacheAndFetch('/ws/rest/v1/session', abortController);
+export async function fetchCurrentSession(abortController?: AbortController): Promise<Session> {
+  const { data } = await cacheAndFetch<Session>('/ws/rest/v1/session', abortController);
   return data;
 }
 
