@@ -1,0 +1,38 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.topNavHeader {
+    top: var(--omrs-offline-banner-height);
+}
+
+.headerGlobalBarButton {
+    @include brand-01(background-color);
+}
+
+.headerName {
+    display: flex;
+}
+.navLogo {
+    margin-right: $spacing-05;
+}
+
+.startVisitButton {
+    width: 15rem;
+}
+
+.patientDetails {
+    display: flex;
+    align-items: center;
+    color: $ui-02;
+
+    .patientName {
+        @include carbon--type-style("productive-heading-01");
+        margin-right: $spacing-05;
+    }
+
+    .patientInfo {
+        color: #ccd9d9;
+        @include carbon--type-style("body-short-01");
+    }
+}
