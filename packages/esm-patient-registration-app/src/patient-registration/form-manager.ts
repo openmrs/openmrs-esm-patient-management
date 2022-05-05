@@ -154,7 +154,12 @@ export default class FormManager {
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
     let identifierTypeRequests = patientIdentifiers
-      .filter((identifier) => identifier.action !== 'DELETE' && identifier.action !== 'NONE')
+      .filter(
+        (identifier) =>
+          identifier.action !== 'DELETE' &&
+          identifier.action !== 'NONE' &&
+          (identifier.required ? true : !!identifier.identifier),
+      )
       .map(async (patientIdentifier) => {
         const { identifierTypeUuid, identifier, uuid, action, source, preferred, autoGeneration } = patientIdentifier;
         if (identifier || (source && autoGeneration)) {

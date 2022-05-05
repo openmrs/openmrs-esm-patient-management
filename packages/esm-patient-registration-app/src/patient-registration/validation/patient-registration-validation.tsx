@@ -26,7 +26,11 @@ export const validationSchema = Yup.object({
   }),
   identifiers: Yup.array().of(
     Yup.object().shape({
-      identifier: Yup.string().required('identifierRequired'),
+      required: Yup.bool(),
+      identifier: Yup.string().when('required', {
+        is: true,
+        then: Yup.string().required('identifierRequired'),
+      }),
     }),
   ),
   yearsEstimated: Yup.number().min(0, 'negativeYears'),
