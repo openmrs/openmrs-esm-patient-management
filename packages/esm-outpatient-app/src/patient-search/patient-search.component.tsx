@@ -14,9 +14,11 @@ interface PatientSearchProps {
 const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
+  const [selectedPatientUuid, setSelectedPatientUuid] = useState('');
 
-  const toggleSearchType = (searchType: SearchTypes) => {
+  const toggleSearchType = (searchType: SearchTypes, patientUuid: string = '') => {
     setSearchType(searchType);
+    setSelectedPatientUuid(patientUuid);
   };
 
   return (
@@ -30,7 +32,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
           ) : searchType === SearchTypes.SEARCH_RESULTS ? (
             <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
           ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
-            <PatientScheduledVisits toggleSearchType={toggleSearchType} />
+            <PatientScheduledVisits patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
           ) : null}
         </div>
       </Overlay>
