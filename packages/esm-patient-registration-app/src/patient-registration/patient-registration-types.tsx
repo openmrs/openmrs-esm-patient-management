@@ -148,7 +148,6 @@ export interface FormValues {
   addNameInLocalLanguage: boolean;
   gender: string;
   birthdate: Date | string;
-  ageEstimate?: number;
   yearsEstimated: number;
   monthsEstimated: number;
   birthdateEstimated: boolean;
