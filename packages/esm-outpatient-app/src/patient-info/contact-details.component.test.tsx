@@ -1,18 +1,18 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
 import * as usePatientContactAttributeMock from './hooks/usePatientAttributes';
 
 const testProps = {
   address: [
     {
-      city: 'Foo',
-      country: 'Bar',
+      city: 'City9564',
+      country: 'Country9564',
       id: '0000',
-      postalCode: '00100',
-      state: 'Quux',
+      postalCode: '18156',
+      state: 'State9564',
       use: 'home',
     },
   ],
@@ -44,7 +44,12 @@ describe('ContactDetails: ', () => {
     renderContactDetails();
 
     expect(screen.getByText('Place Of Residence')).toBeInTheDocument();
+    expect(screen.getByText(/City9564/)).toBeInTheDocument();
+    expect(screen.getByText(/Country9564/)).toBeInTheDocument();
+    expect(screen.getByText(/18156/)).toBeInTheDocument();
+    expect(screen.getByText(/State9564/)).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText(/0123456789/)).toBeInTheDocument();
   });
 
   it('renders an empty stateview when address and contact details is not available', () => {
@@ -53,7 +58,6 @@ describe('ContactDetails: ', () => {
       isLoading: false,
       ContactDetails: [],
     });
-    mockOpenmrsFetch.mockResolvedValueOnce({ data: { results: [] } });
 
     expect(screen.getByText('Place Of Residence')).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
