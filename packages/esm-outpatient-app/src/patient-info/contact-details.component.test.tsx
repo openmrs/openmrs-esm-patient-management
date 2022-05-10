@@ -1,11 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
 import * as usePatientContactAttributeMock from './hooks/usePatientAttributes';
 
-const testProps = {
+let testProps = {
   address: [
     {
       city: 'City9564',
@@ -32,8 +31,6 @@ const personAttributeMock = [
   },
 ];
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
 describe('ContactDetails: ', () => {
   it("renders the patient's address and contact details when available", async () => {
     spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
@@ -43,24 +40,30 @@ describe('ContactDetails: ', () => {
 
     renderContactDetails();
 
-    expect(screen.getByText('Place Of Residence')).toBeInTheDocument();
+    expect(screen.getByText(/Place Of Residence/i)).toBeInTheDocument();
     expect(screen.getByText(/City9564/)).toBeInTheDocument();
     expect(screen.getByText(/Country9564/)).toBeInTheDocument();
     expect(screen.getByText(/18156/)).toBeInTheDocument();
     expect(screen.getByText(/State9564/)).toBeInTheDocument();
-    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
     expect(screen.getByText(/0123456789/)).toBeInTheDocument();
   });
 
   it('renders an empty stateview when address and contact details is not available', () => {
-    renderWithSwr(<ContactDetails address={null} contact={null} patientId={'some-uuid'} />);
+    testProps = {
+      address: null,
+      contact: null,
+      patientId: 'some-uuid',
+    };
+
+    renderWithSwr(<ContactDetails {...testProps} />);
     spyOn(usePatientContactAttributeMock, 'usePatientAttributes').and.returnValue({
       isLoading: false,
       ContactDetails: [],
     });
 
-    expect(screen.getByText('Place Of Residence')).toBeInTheDocument();
-    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText(/Place Of Residence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
     expect(screen.getAllByText('--').length).toBe(2);
   });
 });
