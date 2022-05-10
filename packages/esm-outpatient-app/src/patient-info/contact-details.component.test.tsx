@@ -50,17 +50,18 @@ describe('ContactDetails: ', () => {
   });
 
   it('renders an empty stateview when address and contact details is not available', () => {
+    spyOn(usePatientContactAttributeMock, 'usePatientAttributes').and.returnValue({
+      isLoading: false,
+      ContactDetails: [],
+    });
+
     testProps = {
       address: null,
       contact: null,
       patientId: 'some-uuid',
     };
 
-    renderWithSwr(<ContactDetails {...testProps} />);
-    spyOn(usePatientContactAttributeMock, 'usePatientAttributes').and.returnValue({
-      isLoading: false,
-      ContactDetails: [],
-    });
+    renderContactDetails();
 
     expect(screen.getByText(/Place Of Residence/i)).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
