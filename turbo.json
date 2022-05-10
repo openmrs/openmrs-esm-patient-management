@@ -21,6 +21,10 @@
     "extract-translations": {
       "outputs": []
     },
+    "size": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "dev": {
       "cache": false
     }

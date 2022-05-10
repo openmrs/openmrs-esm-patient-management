@@ -15,8 +15,14 @@
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext ts,tsx",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx'"
+    "extract-translations": "i18next 'src/**/*.component.tsx'",
+    "size": "size-limit"
   },
+  "size-limit": [
+    {
+      "path": "dist/openmrs-esm-patient-list-app.js"
+    }
+  ],
   "browserslist": [
     "extends browserslist-config-openmrs"
   ],
