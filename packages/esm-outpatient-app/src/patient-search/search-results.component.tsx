@@ -92,8 +92,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients }) => {
           onChange={({ selectedItem }) => setSelectedSortingCriteria(selectedItem.id as SortingCriteria)}
         />
       </div>
-      {sortedPatient.map((patient) => (
-        <div key={patient.id} className={styles.patientChart}>
+      {sortedPatient.map((patient, index) => (
+        <div key={index} className={styles.patientChart}>
           <div className={styles.container}>
             <PatientInfo patient={patient} />
           </div>
