@@ -3,6 +3,5 @@
 
 set -e  # die on error
 
-npx lerna run lint --since main
-npx lerna run typescript --since main
+yarn run verify
 yarn run test
