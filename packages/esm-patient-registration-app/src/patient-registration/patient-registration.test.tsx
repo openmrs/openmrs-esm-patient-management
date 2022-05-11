@@ -1,6 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { render, wait, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as backendController from './patient-registration.resource';
 import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
@@ -94,8 +93,7 @@ describe('patient registration sections', () => {
           <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
         </ResourcesContext.Provider>,
       );
-      await wait();
-      expect(screen.getByLabelText(labelText)).not.toBeNull();
+      await waitFor(() => expect(screen.getByLabelText(labelText)).not.toBeNull());
     });
   };
 
@@ -180,6 +178,7 @@ describe('form submit', () => {
       patientUuid: mockPatient.id,
       error: null,
     });
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <PatientRegistration
@@ -189,7 +188,6 @@ describe('form submit', () => {
         />
       </ResourcesContext.Provider>,
     );
-    await wait();
 
     const givenNameInput = screen.getByLabelText('Given Name') as HTMLInputElement;
     const familyNameInput = screen.getByLabelText('Family Name') as HTMLInputElement;
@@ -212,7 +210,6 @@ describe('form submit', () => {
     userEvent.type(familyNameInput, 'Smith');
     userEvent.type(address1, 'Bom Jesus Street');
     userEvent.click(screen.getByText('Update Patient'));
-    await wait();
 
     expect(backendController.savePatient).toHaveBeenCalledWith(
       expect.anything(),
