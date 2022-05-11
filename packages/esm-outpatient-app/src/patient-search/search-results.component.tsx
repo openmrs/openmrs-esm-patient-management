@@ -93,7 +93,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients }) => {
         />
       </div>
       {sortedPatient.map((patient, index) => (
-        <div key={index} className={styles.patientChart}>
+        <div key={`search-result-${index}`} className={styles.patientChart}>
           <div className={styles.container}>
             <PatientInfo patient={patient} />
           </div>
