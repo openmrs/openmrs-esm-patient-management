@@ -76,7 +76,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ patientUuid }) 
   if (isLoading) {
     return (
       <div className={styles.widgetCard}>
-        <InlineLoading description={t('loading', 'Loading...')} />
+        <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />
       </div>
     );
   }
