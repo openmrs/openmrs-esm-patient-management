@@ -13,7 +13,7 @@ import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { formatDatetime, useLayoutType, parseDate } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
-import { useRecentScheduledVisits, useFutureScheduledVisits } from './patient-scheduled-visits.resource';
+import { useRecentScheduledVisits, useFutureScheduledVisits } from './hooks/useScheduledVisits';
 interface PatientSearchProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
   patientUuid: string;
@@ -25,100 +25,36 @@ enum priority {
   EMERGENCY = 'Emergency',
 }
 
-const PatientRecentScheduledVisits: React.FC<{ recentVisits; isLoading }> = ({ recentVisits, isLoading }) => {
-  const { t } = useTranslation();
-  const [showRecentPriority, setShowRecentPriority] = useState(false);
-  const [recentPrioritySwitcherValue, setRecentPrioritySwitcherValue] = useState(0);
-  const [recentVisitsIndex, setRecentVisitsIndex] = useState(0);
+enum visitType {
+  RECENT = 'Recent',
+  FUTURE = 'Future',
+}
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-  if (recentVisits) {
-    return (
-      <div>
-        {recentVisits.length >= 1 ? (
-          <div className={styles.row}>
-            <p className={styles.heading}>{t('recentScheduledVisits', { count: recentVisits.length })} </p>
-            <TileGroup name="tile-group" defaultSelected="forever" className="trigger-tile">
-              {recentVisits.map((visit, index) => (
-                <RadioTile
-                  id={visit.id}
-                  value={visit.id}
-                  key={visit.id}
-                  className={styles.visitTile}
-                  onClick={() => {
-                    setShowRecentPriority(true);
-                    setRecentVisitsIndex(index);
-                  }}>
-                  <div className={styles.helperText}>
-                    <p className={styles.primaryText}>{visit.visit_type}</p>
-                    <p className={styles.secondaryText}>
-                      {' '}
-                      {formatDatetime(parseDate(visit?.visit_date))} · {visit.clinic}{' '}
-                    </p>
-                    {showRecentPriority && index == recentVisitsIndex ? (
-                      <ContentSwitcher
-                        size="sm"
-                        className={styles.prioritySwitcher}
-                        onChange={({ index }) => {
-                          setRecentPrioritySwitcherValue(index);
-                        }}>
-                        <Switch
-                          name={priority.NOT_URGENT}
-                          text={t('notUrgent', 'Not Urgent')}
-                          value={recentPrioritySwitcherValue}
-                        />
-                        <Switch
-                          name={priority.PRIORITY}
-                          text={t('priority', 'Priority')}
-                          value={recentPrioritySwitcherValue}
-                        />
-                        <Switch
-                          name={priority.EMERGENCY}
-                          text={t('emergency', 'Emergency')}
-                          value={recentPrioritySwitcherValue}
-                        />
-                      </ContentSwitcher>
-                    ) : null}
-                  </div>
-                </RadioTile>
-              ))}
-            </TileGroup>
-          </div>
-        ) : (
-          '--'
-        )}
-      </div>
-    );
-  }
-};
-
-const PatientFutureScheduledVisits: React.FC<{ futureVisits; isLoading }> = ({ futureVisits, isLoading }) => {
+const ScheduledVisits: React.FC<{ visits; isLoading; visitType }> = ({ visits, isLoading, visitType }) => {
   const { t } = useTranslation();
-  const [futurePrioritySwitcherValue, setFuturePrioritySwitcherValue] = useState(0);
-  const [futureVisitsIndex, setFutureVisitsIndex] = useState(0);
-  const [show_future_priority, setShowFuturePriority] = useState(false);
+  const [prioritySwitcherValue, setSwitcherValue] = useState(0);
+  const [visitsIndex, setVisitsIndex] = useState(0);
+  const [show_priority, setShowPriority] = useState(false);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (futureVisits) {
+  if (visits) {
     return (
       <div>
-        {futureVisits.length >= 1 ? (
+        {visits.length >= 1 ? (
           <div className={styles.row}>
-            <p className={styles.heading}>{t('futureScheduledVisits', { count: futureVisits.length })} </p>
+            <p className={styles.heading}>{t('futureScheduledVisits', { count: visits.length })} </p>
             <TileGroup name="tile-group" defaultSelected="default-selected">
-              {futureVisits.map((visit, ind) => (
+              {visits.map((visit, ind) => (
                 <RadioTile
                   value={visit.id}
                   key={visit.id}
                   className={styles.visitTile}
                   onClick={() => {
-                    setShowFuturePriority(true);
-                    setFutureVisitsIndex(ind);
+                    setShowPriority(true);
+                    setVisitsIndex(ind);
                   }}>
                   <div className={styles.helperText}>
                     <p className={styles.primaryText}>{visit.visit_type}</p>
@@ -127,25 +63,25 @@ const PatientFutureScheduledVisits: React.FC<{ futureVisits; isLoading }> = ({ f
                       {formatDatetime(parseDate(visit?.visit_date))} · {visit.clinic}{' '}
                     </p>
 
-                    {show_future_priority && ind == futureVisitsIndex ? (
+                    {show_priority && ind == visitsIndex ? (
                       <ContentSwitcher
                         size="sm"
                         className={styles.prioritySwitcher}
-                        onChange={({ index }) => setFuturePrioritySwitcherValue(index)}>
+                        onChange={({ index }) => setSwitcherValue(index)}>
                         <Switch
                           name={priority.NOT_URGENT}
                           text={t('notUrgent', 'Not Urgent')}
-                          value={futurePrioritySwitcherValue}
+                          value={prioritySwitcherValue}
                         />
                         <Switch
                           name={priority.PRIORITY}
                           text={t('priority', 'Priority')}
-                          value={futurePrioritySwitcherValue}
+                          value={prioritySwitcherValue}
                         />
                         <Switch
                           name={priority.EMERGENCY}
                           text={t('emergency', 'Emergency')}
-                          value={futurePrioritySwitcherValue}
+                          value={prioritySwitcherValue}
                         />
                       </ContentSwitcher>
                     ) : null}
@@ -181,8 +117,8 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
         </Button>
       </div>
 
-      <PatientRecentScheduledVisits recentVisits={recentVisits} isLoading={isLoading} />
-      <PatientFutureScheduledVisits futureVisits={futureVisits} isLoading={loading} />
+      <ScheduledVisits visitType={visitType.RECENT} visits={recentVisits} isLoading={isLoading} />
+      <ScheduledVisits visitType={visitType.FUTURE} visits={futureVisits} isLoading={loading} />
 
       <div className={styles['text-divider']}>{t('or', 'Or')}</div>
 
