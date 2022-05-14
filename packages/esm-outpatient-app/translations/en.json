@@ -66,6 +66,7 @@
   "primaryHelperText": "Search for a patient",
   "priority": "Priority",
   "provider": "Provider",
+  "recentScheduledVisits": " {count, plural, one{{count} visit} other{{count} visits}} scheduled for +/- 7 days",
   "returnDate": "Return date",
   "scheduledAppointments": "Scheduled appts. today",
   "search": "Search",
