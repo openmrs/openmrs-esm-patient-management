@@ -309,7 +309,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npx lerna bootstrap
       
-      - run: npx lerna run build
+      - run: npx lerna run build --color
       - run: npx lerna version patch --no-git-tag-version --no-push --yes
       - run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
@@ -344,7 +344,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npx lerna bootstrap
       
-      - run: npx lerna run build
+      - run: npx lerna run build --color
       - run: npm run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
