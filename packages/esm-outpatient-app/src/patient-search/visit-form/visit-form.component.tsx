@@ -69,7 +69,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <Button
               kind="ghost"
               renderIcon={ArrowLeft24}
-              iconDescription="Back to scheduled visits"
+              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
               size="sm"
               onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS)}>
               <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>

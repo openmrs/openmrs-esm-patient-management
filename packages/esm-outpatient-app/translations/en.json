@@ -89,5 +89,6 @@
   "vitals": "Vitals",
   "waitingFor": "Waiting for:",
   "waitTime": "Wait time (mins)",
-  "youngest": "Youngest first"
+  "youngest": "Youngest first",
+  "backToScheduledVisits": "Back To Scheduled Visits"
 }
