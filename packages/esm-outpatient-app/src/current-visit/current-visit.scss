@@ -1,0 +1,31 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.visitContainer {
+  background-color: $ui-background;
+  display: grid;
+  grid-template-columns: max-content auto;
+}
+
+.bodyLong01 {
+  @include carbon--type-style('body-long-01');
+}
+
+.heading {
+  @include carbon--type-style('productive-heading-02');
+  color: var(--text-01);
+}
+
+.subHeading {
+  @include carbon--type-style('label-01');
+  color: var(--text-02);
+}
+
+.structuredListRow {
+  border-bottom: none;
+}
+
+.structuredList {
+  margin-bottom: 0;
+}
