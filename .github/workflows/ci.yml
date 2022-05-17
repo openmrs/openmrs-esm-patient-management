@@ -16,24 +16,38 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "14.x"
+          node-version: "16"
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      
       - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npx lerna bootstrap
+
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
+      
       - name: Run tests
         run: yarn run test
+      
       - name: Run lint and typechecking
         run: yarn run verify 
+      
       - name: Run build
         run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+      
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -56,8 +70,10 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
+      
       - name: Compute Timestamp
         run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
       - name: Prepare Directory
         shell: bash
         run: |
@@ -98,13 +114,16 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
+      
       - name: Compute Timestamp
         run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
       - name: Prepare Directory
         shell: bash
         run: |
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+      
       - name: Publish to Digital Ocean
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -115,6 +134,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DIGITAL_OCEAN_SPACES_ACCESS_KEY }}
           AWS_S3_ENDPOINT: ${{ secrets.DIGITAL_OCEAN_SPACES_ENDPOINT }}
           SOURCE_DIR: "dist"
+      
       - name: Update Importmap
         uses: fjogeleit/http-request-action@master
         with:
@@ -140,13 +160,16 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
+      
       - name: Compute Timestamp
         run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
       - name: Prepare Directory
         shell: bash
         run: |
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+      
       - name: Publish to Digital Ocean
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -157,6 +180,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DIGITAL_OCEAN_SPACES_ACCESS_KEY }}
           AWS_S3_ENDPOINT: ${{ secrets.DIGITAL_OCEAN_SPACES_ENDPOINT }}
           SOURCE_DIR: "dist"
+      
       - name: Update Importmap
         uses: fjogeleit/http-request-action@master
         with:
@@ -182,13 +206,16 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
+      
       - name: Compute Timestamp
         run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
       - name: Prepare Directory
         shell: bash
         run: |
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+      
       - name: Publish to Digital Ocean
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -199,6 +226,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DIGITAL_OCEAN_SPACES_ACCESS_KEY }}
           AWS_S3_ENDPOINT: ${{ secrets.DIGITAL_OCEAN_SPACES_ENDPOINT }}
           SOURCE_DIR: "dist"
+      
       - name: Update Importmap
         uses: fjogeleit/http-request-action@master
         with:
@@ -224,13 +252,16 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
+      
       - name: Compute Timestamp
         run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
       - name: Prepare Directory
         shell: bash
         run: |
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+      
       - name: Publish to Digital Ocean
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -241,6 +272,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DIGITAL_OCEAN_SPACES_ACCESS_KEY }}
           AWS_S3_ENDPOINT: ${{ secrets.DIGITAL_OCEAN_SPACES_ENDPOINT }}
           SOURCE_DIR: "dist"
+      
       - name: Update Importmap
         uses: fjogeleit/http-request-action@master
         with:
@@ -259,14 +291,25 @@ jobs:
     if: ${{ github.event_name == 'push' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "14.x"
+          node-version: "16"
           registry-url: "https://registry.npmjs.org"
-      - run: npx lerna bootstrap
-      - run: npx lerna run build
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap
+      
+      - run: npx lerna run build --color
       - run: npx lerna version patch --no-git-tag-version --no-push --yes
       - run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
@@ -283,14 +326,25 @@ jobs:
     if: ${{ github.event_name == 'release' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "14.x"
+          node-version: "16"
           registry-url: "https://registry.npmjs.org"
-      - run: npx lerna bootstrap
-      - run: npx lerna run build
+          
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap
+      
+      - run: npx lerna run build --color
       - run: npm run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
