@@ -1,5 +1,6 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'death'];
+
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
@@ -39,10 +40,21 @@ export const esmPatientRegistrationSchema = {
   fieldDefinitions: {
     _type: Type.Object,
     _elements: {
-      label: { _type: Type.String, _description: 'The label of the input' },
+      type: {
+        _type: Type.String,
+        _default: 'person attribute',
+        _description: 'What type of data this field will save.',
+        _validators: [
+          validator(
+            (v: string) => ['person attribute', 'obs'].includes(v),
+            "Value must be one of 'person attribute' or 'obs'",
+          ),
+        ],
+      },
+      label: { _type: Type.String, _description: 'The label of the input.' },
       uuid: {
         _type: Type.UUID,
-        _description: 'Person attributetype uuid used to save the attribute',
+        _description: 'Person attribute type UUID or Concept UUID, depending on the `type` of this field.',
       },
       placeholder: {
         _type: Type.String,
@@ -57,19 +69,39 @@ export const esmPatientRegistrationSchema = {
           _description: 'Optional RegEx for testing the validity of the input.',
         },
       },
+      answerConceptSetUuid: {
+        _type: Type.ConceptUuid,
+        _default: null,
+        _description: 'The convenience set that defines the allowed values. Only used if the type is coded.',
+      },
+      _validators: [
+        validator(
+          (v) => v.type != 'obs' || v.validation.matches === null,
+          "Validation using 'validation.matches' is not allowed for fields with type 'obs'.",
+        ),
+      ],
     },
     _default: {},
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
   fieldConfigurations: {
-    _type: Type.Object,
-    _default: {
-      name: {
-        displayMiddleName: true,
-        unidentifiedPatient: true,
-        defaultUnknownGivenName: 'UNKNOWN',
-        defaultUnknownFamilyName: 'UNKNOWN',
+    name: {
+      displayMiddleName: { _type: Type.Boolean, _default: true },
+      unidentifiedPatient: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Whether to allow patients to be registered without names.',
+      },
+      defaultUnknownGivenName: {
+        _type: Type.String,
+        _default: 'UNKNOWN',
+        _description: 'The given/first name to record for unidentified patients.',
+      },
+      defaultUnknownFamilyName: {
+        _type: Type.String,
+        _default: 'UNKNOWN',
+        _description: 'The family/last name to record for unidentified patients.',
       },
     },
   },
@@ -86,37 +118,6 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-  codedPersonAttributes: {
-    _type: Type.Array,
-    _default: [],
-    _elements: {
-      _type: Type.Object,
-      personAttributeUuid: {
-        _type: Type.PersonAttributeTypeUuid,
-        _description: 'The uuid of the person attribute type used to save the attribute',
-      },
-      conceptUuid: {
-        _type: Type.ConceptUuid,
-        _description: 'Uuid for the convenience set that defines the allowed values. Only used if the type is coded.',
-      },
-    },
-  },
-
-  textBasedAttributes: {
-    _type: Type.Array,
-    _elements: {
-      _type: Type.Object,
-      personAttributeUuid: {
-        _type: Type.PersonAttributeTypeUuid,
-        _description: 'The uuid of the person attribute type used to save the attribute',
-      },
-      validationRegex: {
-        _type: Type.String,
-        _description: 'Regular expression to validate the user input.',
-      },
-    },
-    _default: [],
-  },
 
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
@@ -127,3 +128,47 @@ export const esmPatientRegistrationSchema = {
     _default: [],
   },
 };
+
+export interface RegistrationConfig {
+  sections: Array<string>;
+  sectionDefinitions: {
+    [sectionName: string]: {
+      name: string;
+      fields: Array<string>;
+    };
+  };
+  fieldDefinitions: {
+    [fieldName: string]: {
+      type: string;
+      label: string;
+      uuid: string;
+      placeholder: string;
+      validation: {
+        required: boolean;
+        matches: string;
+      };
+    };
+  };
+  fieldConfigurations: {
+    name: {
+      displayMiddleName: boolean;
+      unidentifiedPatient: boolean;
+      defaultUnknownGivenName: string;
+      defaultUnknownFamilyName: string;
+    };
+  };
+  links: {
+    submitButton: string;
+  };
+  concepts: {
+    patientPhotoUuid: string;
+  };
+  defaultPatientIdentifierTypes: {
+    _type: Type.Array;
+    _elements: {
+      // @ts-ignore
+      _type: Type.PatientIdentifierTypeUuid;
+    };
+    _default: [];
+  };
+}
