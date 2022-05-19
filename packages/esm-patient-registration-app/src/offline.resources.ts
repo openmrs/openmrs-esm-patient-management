@@ -8,9 +8,9 @@ import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
   addressTemplate: undefined | any;
-  currentSession: Session | undefined;
+  currentSession: Session;
   relationshipTypes: any;
-  identifierTypes: Array<PatientIdentifierType> | undefined;
+  identifierTypes: Array<PatientIdentifierType>;
 }
 
 export const ResourcesContext = React.createContext<Resources>(null);

@@ -24,7 +24,6 @@ import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
-import { add } from 'lodash-es';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 

@@ -20,13 +20,6 @@ const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
-const resources = {
-  currentSession: fetchCurrentSession,
-  addressTemplate: fetchAddressTemplate,
-  relationshipTypes: fetchAllRelationshipTypes,
-  identifierTypes: fetchPatientIdentifierTypesWithSources,
-};
-
 function setupOpenMRS() {
   const options = {
     featureName: 'Patient Registration',
