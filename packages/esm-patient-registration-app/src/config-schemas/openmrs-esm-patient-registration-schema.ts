@@ -40,21 +40,10 @@ export const esmPatientRegistrationSchema = {
   fieldDefinitions: {
     _type: Type.Object,
     _elements: {
-      type: {
-        _type: Type.String,
-        _default: 'person attribute',
-        _description: 'What type of data this field will save.',
-        _validators: [
-          validator(
-            (v: string) => ['person attribute', 'obs'].includes(v),
-            "Value must be one of 'person attribute' or 'obs'",
-          ),
-        ],
-      },
       label: { _type: Type.String, _description: 'The label of the input.' },
       uuid: {
         _type: Type.UUID,
-        _description: 'Person attribute type UUID or Concept UUID, depending on the `type` of this field.',
+        _description: "Person attribute type UUID that this field's data should be saved to.",
       },
       placeholder: {
         _type: Type.String,
@@ -74,12 +63,6 @@ export const esmPatientRegistrationSchema = {
         _default: null,
         _description: 'The convenience set that defines the allowed values. Only used if the type is coded.',
       },
-      _validators: [
-        validator(
-          (v) => v.type != 'obs' || v.validation.matches === null,
-          "Validation using 'validation.matches' is not allowed for fields with type 'obs'.",
-        ),
-      ],
     },
     _default: {},
     _description:
@@ -122,7 +105,6 @@ export const esmPatientRegistrationSchema = {
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
-      // @ts-ignore
       _type: Type.PatientIdentifierTypeUuid,
     },
     _default: [],
@@ -163,12 +145,5 @@ export interface RegistrationConfig {
   concepts: {
     patientPhotoUuid: string;
   };
-  defaultPatientIdentifierTypes: {
-    _type: Type.Array;
-    _elements: {
-      // @ts-ignore
-      _type: Type.PatientIdentifierTypeUuid;
-    };
-    _default: [];
-  };
+  defaultPatientIdentifierTypes: Array<string>;
 }
