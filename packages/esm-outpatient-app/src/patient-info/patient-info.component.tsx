@@ -7,7 +7,7 @@ import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import { useTranslation } from 'react-i18next';
 import ContactDetails from './contact-details.component';
 import Edit16 from '@carbon/icons-react/es/edit/16';
-
+import AppointmentDetails from './appointment-details.component';
 interface PatientInfoProps {
   patient: fhir.Patient;
 }
@@ -67,7 +67,10 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails patientId={patient.id} address={patient.address ?? []} contact={patient.contact} />
+        <>
+          <ContactDetails patientId={patient.id} address={patient.address ?? []} contact={patient.contact} />
+          <AppointmentDetails patientUuid={patient.id} />
+        </>
       )}
     </div>
   );

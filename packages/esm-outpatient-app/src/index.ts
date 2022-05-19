@@ -27,6 +27,15 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        route: /^patient\/.+\/chart/,
+        load: getAsyncLifecycle(() => import('./visit-header/visit-header.component'), {
+          featureName: 'Visit Header',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
     ],
     extensions: [
       {

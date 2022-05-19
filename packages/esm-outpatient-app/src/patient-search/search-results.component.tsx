@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import styles from './search-results.scss';
+import { Dropdown } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
 import { SearchTypes } from '../types';
 import PatientInfo from '../patient-info/patient-info.component';
-import { useTranslation } from 'react-i18next';
-import { Dropdown } from 'carbon-components-react';
+import styles from './search-results.scss';
 
 interface SearchResultsProps {
   patients: Array<any>;
@@ -11,11 +11,11 @@ interface SearchResultsProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
 }
 
-type SortCriteria = 'firstNameFirst' | 'lastNameFirst' | 'oldest' | 'youngest';
+type SortingCriteria = 'firstNameFirst' | 'lastNameFirst' | 'oldest' | 'youngest';
 
-const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({ patients }) => {
   const { t } = useTranslation();
-  const [sortCriteria, setSortCriteria] = useState<SortCriteria>('firstNameFirst');
+  const [selectedSortingCriteria, setSelectedSortingCriteria] = useState<SortingCriteria>('firstNameFirst');
   const fhirPatients = useMemo(() => {
     return patients.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
@@ -55,45 +55,45 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
 
   const sortedPatient = useMemo(() => {
     return fhirPatients.sort((patientA, patientB) => {
-      if (sortCriteria === 'oldest') {
+      if (selectedSortingCriteria === 'oldest') {
         return new Date(patientA.birthDate).getTime() - new Date(patientB.birthDate).getTime();
       }
-      if (sortCriteria === 'youngest') {
+      if (selectedSortingCriteria === 'youngest') {
         return new Date(patientB.birthDate).getTime() - new Date(patientA.birthDate).getTime();
       }
-      if (sortCriteria === 'firstNameFirst') {
+      if (selectedSortingCriteria === 'firstNameFirst') {
         return patientA.person.personName.givenName < patientB.person.personName.givenName ? -1 : 0;
       }
-      if (sortCriteria === 'lastNameFirst') {
+      if (selectedSortingCriteria === 'lastNameFirst') {
         return patientA.person.personName.familyName < patientB.person.personName.familyName ? -1 : 0;
       }
     });
-  }, [fhirPatients, sortCriteria]);
+  }, [fhirPatients, selectedSortingCriteria]);
 
-  const sortByCriteria = [
-    { id: 'firstNameFirst', label: t('firstNameSort', 'First name (a -z)') },
-    { id: 'lastNameFirst', label: t('lastNameSort', 'Last name (a -z)') },
+  const sortingCriteria = [
+    { id: 'firstNameFirst', label: t('firstNameSort', 'First name (a-z)') },
+    { id: 'lastNameFirst', label: t('lastNameSort', 'Last name (a-z)') },
     { id: 'oldest', label: t('oldest', 'Oldest first') },
     { id: 'youngest', label: t('youngest', 'Youngest first') },
   ];
 
   return (
     <>
-      <div className={styles.sortCriteria}>
+      <div className={styles.sortingCriteriaSelect}>
         <Dropdown
           ariaLabel="sortBy"
-          id="sortCriteria"
-          items={sortByCriteria}
-          initialSelectedItem={sortByCriteria[0]}
-          label={t('sortBy', 'Sort by :')}
-          titleText={t('sortBy', 'Sort by')}
+          id="sortingCriteriaDropdown"
+          items={sortingCriteria}
+          initialSelectedItem={sortingCriteria[0]}
+          label={`${t('sortBy', 'Sort by')}:`}
+          titleText={`${t('sortBy', 'Sort by')}:`}
           type="inline"
           size="sm"
-          onChange={({ selectedItem }) => setSortCriteria(selectedItem.id as SortCriteria)}
+          onChange={({ selectedItem }) => setSelectedSortingCriteria(selectedItem.id as SortingCriteria)}
         />
       </div>
-      {sortedPatient.map((patient) => (
-        <div key={patient.id} className={styles.patientChart}>
+      {sortedPatient.map((patient, index) => (
+        <div key={`search-result-${index}`} className={styles.patientChart}>
           <div className={styles.container}>
             <PatientInfo patient={patient} />
           </div>

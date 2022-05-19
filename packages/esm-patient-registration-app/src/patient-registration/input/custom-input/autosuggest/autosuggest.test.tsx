@@ -1,6 +1,6 @@
 import React from 'react';
 import { Autosuggest } from './autosuggest.component';
-import { render, screen, fireEvent, waitForElement } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
@@ -37,6 +37,7 @@ describe('autosuggest', () => {
     render(
       <BrowserRouter>
         <Autosuggest
+          labelText=""
           name="person"
           placeholder="Find Person"
           onSuggestionSelected={handleSuggestionSelected}
@@ -58,7 +59,7 @@ describe('autosuggest', () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
-    const list = await waitForElement(() => screen.getByRole('list'));
+    const list = await waitFor(() => screen.getByRole('list'));
     expect(list).toBeInTheDocument();
     expect(list.children).toHaveLength(2);
   });
@@ -67,7 +68,7 @@ describe('autosuggest', () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
-    const list = await waitForElement(() => screen.getAllByRole('listitem'));
+    const list = await waitFor(() => screen.getAllByRole('listitem'));
     expect(list[0].textContent).toBe('John Doe');
     expect(list[1].textContent).toBe('John Smith');
   });
@@ -76,7 +77,7 @@ describe('autosuggest', () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
-    const listitems = await waitForElement(() => screen.getAllByRole('listitem'));
+    const listitems = await waitFor(() => screen.getAllByRole('listitem'));
     fireEvent.click(listitems[0]);
     expect(handleSuggestionSelected).toHaveBeenNthCalledWith(1, 'person', 'randomuuid1');
   });
@@ -85,7 +86,7 @@ describe('autosuggest', () => {
     setup();
     let searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
-    const listitems = await waitForElement(() => screen.getAllByRole('listitem'));
+    const listitems = await waitFor(() => screen.getAllByRole('listitem'));
     fireEvent.click(listitems[0]);
     searchbox = screen.getByRole('searchbox');
     expect(searchbox.textContent).toBe('John Doe');
@@ -97,7 +98,7 @@ describe('autosuggest', () => {
     expect(list).toBeNull();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
-    list = await waitForElement(() => screen.queryByRole('list'));
+    list = await waitFor(() => screen.getByRole('list'));
     expect(list).toBeInTheDocument();
     const listitems = screen.getAllByRole('listitem');
     fireEvent.click(listitems[0]);
