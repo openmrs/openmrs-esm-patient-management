@@ -31,7 +31,10 @@ export function useActiveVisits() {
     '&location=' +
     sessionLocation;
   const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(url, openmrsFetch);
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    sessionLocation ? url : '',
+    openmrsFetch,
+  );
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => ({
     age: visit?.patient?.person?.age,
