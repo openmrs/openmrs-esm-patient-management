@@ -32,7 +32,7 @@ export function useActiveVisits() {
     sessionLocation;
   const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    sessionLocation ? url : '',
+    sessionLocation ? url : null,
     openmrsFetch,
   );
 
