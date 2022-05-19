@@ -1,7 +1,8 @@
 import React from 'react';
 import { Button, Grid, Row, Tag, Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { PatientVitals, calculateBMI } from '../current-visit.resource';
+import { calculateBMI } from '../current-visit.resource';
+import { PatientVitals } from '../../types/index';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { navigate } from '@openmrs/esm-framework';
 import styles from './triage-note.scss';
@@ -14,97 +15,102 @@ interface VitalsComponentProps {
 const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
   const { t } = useTranslation();
 
-  let formattedVitals = vitals.reduce((r, c) => Object.assign(r, c), {});
+  const vitalsToDisplay = vitals.reduce(
+    (previousVital, currentVital) => Object.assign(previousVital, currentVital),
+    {},
+  );
 
   return (
     <div>
-      {formattedVitals ? (
+      {Object.keys(vitalsToDisplay).length > 0 ? (
         <div>
           <Grid className={styles.grid}>
             <Row>
               <Tile light>
-                <p>Temperature</p>
+                <p>{t('temperature', 'Temperature')}</p>
                 <div className={styles.vitalValuesWrapper}>
                   <p className={styles.vitalValues}>
-                    {formattedVitals.temperature ? formattedVitals.temperature : '--'}
+                    {vitalsToDisplay.temperature ? vitalsToDisplay.temperature : '--'}
                   </p>
-                  <p className={styles.unit}>°C</p>
+                  <p className={styles.unit}>{t('°C', '°C')}</p>
                 </div>
               </Tile>
               <Tile light>
-                <p>Bp</p>
+                <p>{t('bp', 'Bp')}</p>
                 <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{formattedVitals.systolic ? formattedVitals.systolic : '--'}</p>
-                  <p className={styles.unit}> mmHg</p>
+                  <p className={styles.vitalValues}>{vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'}</p>
+                  <p className={styles.unit}> {t('mmHg', 'mmHg')}</p>
                 </div>
               </Tile>
               <Tile>
                 <p>
-                  Heart rate <CircleFillGlyph className={styles.notification} />
+                  {t('heartRate', 'Heart rate')} <CircleFillGlyph className={styles.notification} />
                 </p>
                 <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{formattedVitals.pulse ? formattedVitals.pulse : '--'}</p>
-                  <p className={styles.unit}>bpm</p>
+                  <p className={styles.vitalValues}>{vitalsToDisplay.pulse ? vitalsToDisplay.pulse : '--'}</p>
+                  <p className={styles.unit}>{t('bpm', 'bpm')}</p>
                 </div>
               </Tile>
             </Row>
 
             <Row>
               <Tile light>
-                <p>Sp02</p>
+                <p>{t('sp02', 'Sp02')}</p>
                 <div className={styles.vitalValuesWrapper}>
                   <p className={styles.vitalValues}>
-                    {formattedVitals.oxygenSaturation ? formattedVitals.oxygenSaturation : '--'}
+                    {vitalsToDisplay.oxygenSaturation ? vitalsToDisplay.oxygenSaturation : '--'}
                   </p>
-                  <p className={styles.unit}>%</p>
+                  <p className={styles.unit}>{t('%', '%')}</p>
                 </div>
               </Tile>
               <Tile light>
-                <p>R. Rate</p>
+                <p>{t('rRate', 'R. Rate')}</p>
                 <div className={styles.vitalValuesWrapper}>
                   <p className={styles.vitalValues}>
-                    {formattedVitals.respiratoryRate ? formattedVitals.respiratoryRate : '--'}
+                    {vitalsToDisplay.respiratoryRate ? vitalsToDisplay.respiratoryRate : '--'}
                   </p>
-                  <p className={styles.unit}>/ min</p>
+                  <p className={styles.unit}>{t('/min', '/ min')}</p>
                 </div>
               </Tile>
             </Row>
 
             <Row>
               <Tile light>
-                <p>Height</p>
+                <p>{t('height', 'Height')}</p>
                 <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{formattedVitals.height ? formattedVitals.height : '--'}</p>
-                  <p className={styles.unit}>cm</p>
+                  <p className={styles.vitalValues}>{vitalsToDisplay.height ? vitalsToDisplay.height : '--'}</p>
+                  <p className={styles.unit}>{t('cm', 'cm')}</p>
                 </div>
               </Tile>
               <Tile light>
-                <p>Bmi</p>
+                <p>{t('bmi', 'Bmi')}</p>
                 <div className={styles.vitalValuesWrapper}>
                   <p className={styles.vitalValues}>
                     {' '}
-                    {calculateBMI(Number(formattedVitals.weight), Number(formattedVitals.height))}
+                    {calculateBMI(Number(vitalsToDisplay.weight), Number(vitalsToDisplay.height))}
                   </p>
-                  <p className={styles.unit}>kg / m²</p>
+                  <p className={styles.unit}>{t('kg/m²', 'kg / m²')}</p>
                 </div>
               </Tile>
               <Tile light>
-                <p>Weight</p>
+                <p>{t('weight', 'Weight')}</p>
                 <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{formattedVitals.weight ? formattedVitals.weight : '--'} </p>
-                  <p className={styles.unit}>kg</p>
+                  <p className={styles.vitalValues}>{vitalsToDisplay.weight ? vitalsToDisplay.weight : '--'} </p>
+                  <p className={styles.unit}>{t('kg', 'kg')}</p>
                 </div>
               </Tile>
             </Row>
           </Grid>
           <p className={styles.subHeading}>
-            {formattedVitals.provider.name ? <span> {formattedVitals.provider.name} </span> : null} ·{' '}
-            {formattedVitals.time}
+            {vitalsToDisplay.provider.name ? <span> {vitalsToDisplay.provider.name} </span> : null} ·{' '}
+            {vitalsToDisplay.time}
           </p>
         </div>
       ) : (
         <div>
-          <p className={styles.emptyText}>Vitals has not been recorded for this patient for this visit</p>
+          <p className={styles.emptyText}>
+            {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}
+          </p>
           <Button
             size="small"
             kind="ghost"

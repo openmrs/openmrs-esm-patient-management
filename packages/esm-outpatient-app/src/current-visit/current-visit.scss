@@ -14,12 +14,12 @@
 
 .heading {
   @include carbon--type-style('productive-heading-02');
-  color: var(--text-01);
+  color: $text-01;
 }
 
 .subHeading {
   @include carbon--type-style('label-01');
-  color: var(--text-02);
+  color: $text-02;
 }
 
 .structuredListRow {

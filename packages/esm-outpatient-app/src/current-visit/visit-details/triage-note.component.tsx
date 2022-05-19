@@ -1,18 +1,18 @@
 import React from 'react';
 import { Tag, Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { DiagnosisItem, Note } from '../current-visit.resource';
+import { DiagnosisItem, Note } from '../../types/index';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { navigate } from '@openmrs/esm-framework';
 import styles from './triage-note.scss';
 
-interface TriageNoteComponentProps {
+interface TriageNoteProps {
   notes: Array<Note>;
   diagnoses: Array<DiagnosisItem>;
   patientUuid: string;
 }
 
-const TriageNote: React.FC<TriageNoteComponentProps> = ({ notes, patientUuid, diagnoses }) => {
+const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }) => {
   const { t } = useTranslation();
 
   return (
@@ -35,7 +35,7 @@ const TriageNote: React.FC<TriageNoteComponentProps> = ({ notes, patientUuid, di
         ))
       ) : (
         <div>
-          <p className={styles.emptyText}>Triage has not yet been completed</p>
+          <p className={styles.emptyText}>{t('tirageNotYetCompleted', 'Triage has not yet been completed')}</p>
           <Button
             size="small"
             kind="ghost"

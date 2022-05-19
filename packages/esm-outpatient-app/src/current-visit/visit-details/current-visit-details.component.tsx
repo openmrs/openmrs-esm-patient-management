@@ -11,7 +11,7 @@ import { OpenmrsResource, useConfig, formatTime, parseDate } from '@openmrs/esm-
 import styles from '../current-visit.scss';
 import TriageNote from './triage-note.component';
 import Vitals from './vitals.component';
-import { Note, Encounter, Observation, PatientVitals, DiagnosisItem } from '../current-visit.resource';
+import { Note, Encounter, Observation, PatientVitals, DiagnosisItem } from '../../types/index';
 
 interface CurrentVisitProps {
   patientUuid: string;

@@ -23,7 +23,7 @@ const CurrentVisit: React.FC<CurrentVisitProps> = ({ patientUuid, visitUuid }) =
         <div>
           <p className={styles.heading}>{visit?.visitType?.display}</p>
           <p className={styles.subHeading}>
-            Scheduled for today <Tag type="blue"> On time</Tag>
+            {t('scheduledToday', 'Scheduled for today')} <Tag type="blue"> {t('onTime', 'On time')}</Tag>
           </p>
         </div>
 
