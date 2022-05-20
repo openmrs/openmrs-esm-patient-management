@@ -166,15 +166,4 @@ export const esmPatientRegistrationSchema = {
     },
     _default: [],
   },
-  _validators: [
-    validator((val: RegistrationConfig) => {
-      const definedSectionIds = val.sectionDefinitions.concat(builtInSections).map((s) => s.id);
-      return val.sections.every((s) => definedSectionIds.includes(s));
-    }, `Unknown section ID provided in \`sections\`. Section IDs come from the built-ins ('${builtInSections.map((s) => s.id).join("', '")}') and from \`sectionDefinitions\`.`),
-    validator((val: RegistrationConfig) => {
-      const definedFields = val.fieldDefinitions.map((f) => f.id).concat(builtInFields);
-      return val.sectionDefinitions.every((s) => s.fields.every((f) => definedFields.includes(f)));
-    }, `Unknown field ID provided for one or more sections (see the \`fields\` element under \`sectionDefinitions\`). Field IDs come from the built-ins ('${builtInFields.join("', '")}') and from \`fieldDefinitions\`.`),
-    validator(() => true, 'fuck'),
-  ],
 };
