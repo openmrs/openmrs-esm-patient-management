@@ -1,6 +1,6 @@
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
-$inverse-02: #393939;
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .patientSearchIconWrapper {
   display: flex;
@@ -19,7 +19,7 @@ $inverse-02: #393939;
   flex-direction: row;
   align-items: center;
   width: 50vw;
-  border: $spacing-01 solid var(--omrs-color-brand-orange);
+  border: $spacing-01 solid $carbon--orange-40;
   height: calc($spacing-08 - 0.25rem);
   margin-right: $spacing-01;
   width: 50vw;
@@ -32,7 +32,7 @@ $inverse-02: #393939;
   flex-direction: row;
   align-items: center;
   width: 100vw;
-  border: $spacing-01 solid var(--omrs-color-brand-orange);
+  border: $spacing-01 solid $carbon--orange-40;
   margin-right: $spacing-01;
   position: fixed;
   top: $spacing-09;
@@ -41,17 +41,17 @@ $inverse-02: #393939;
 }
 
 .searchIconButton {
-  background-color: var(--brand-01);
+  @include brand-01(background-color);
 }
 
 .activeSearchIconButton {
-  background-color: var(--brand-02);
+  @include brand-02(background-color);
 }
 
 .closeButton {
-  background-color: var(--brand-02);
+  @include brand-02(background-color);
 }
 
 .searchButton {
-  background-color: $inverse-02;
+  background-color: $carbon--gray-80;
 }
