@@ -28,7 +28,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
       return (
         <CodedPersonAttributeField
           personAttributeType={personAttributeType}
-          conceptUuid={fieldDefinition.answerConceptSetUuid}
+          answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
           label={fieldDefinition.label}
         />
       );

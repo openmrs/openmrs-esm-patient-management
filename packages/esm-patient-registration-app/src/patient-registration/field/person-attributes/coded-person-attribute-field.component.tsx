@@ -7,12 +7,16 @@ import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 
 export interface CodedPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
-  conceptUuid: string;
+  answerConceptSetUuid: string;
   label?: string;
 }
 
-export function CodedPersonAttributeField({ personAttributeType, conceptUuid, label }: CodedPersonAttributeFieldProps) {
-  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
+export function CodedPersonAttributeField({
+  personAttributeType,
+  answerConceptSetUuid,
+  label,
+}: CodedPersonAttributeFieldProps) {
+  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(answerConceptSetUuid);
 
   return (
     <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
