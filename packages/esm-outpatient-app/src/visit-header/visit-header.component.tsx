@@ -20,7 +20,7 @@ import {
 } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import isEmpty from 'lodash-es/isEmpty';
-import { launchPatientWorkspace } from './work-spaces';
+import { launchPatientWorkspace } from './workspaces';
 
 const PatientInfo = ({ patient, isTabletView }) => {
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
