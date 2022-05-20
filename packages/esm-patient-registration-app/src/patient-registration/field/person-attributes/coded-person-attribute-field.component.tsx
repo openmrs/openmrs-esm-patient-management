@@ -8,9 +8,10 @@ import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 export interface CodedPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
   conceptUuid: string;
+  label?: string;
 }
 
-export function CodedPersonAttributeField({ personAttributeType, conceptUuid }: CodedPersonAttributeFieldProps) {
+export function CodedPersonAttributeField({ personAttributeType, conceptUuid, label }: CodedPersonAttributeFieldProps) {
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
 
   return (
@@ -19,7 +20,7 @@ export function CodedPersonAttributeField({ personAttributeType, conceptUuid }: 
         <Select
           id={`person-attribute-${personAttributeType.uuid}`}
           name={`attributes.${personAttributeType.uuid}`}
-          labelText={personAttributeType?.display}
+          labelText={label ?? personAttributeType?.display}
           light>
           {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
@@ -28,7 +29,7 @@ export function CodedPersonAttributeField({ personAttributeType, conceptUuid }: 
       ) : (
         <Input
           id={`person-attribute-${personAttributeType.uuid}`}
-          labelText={personAttributeType?.display}
+          labelText={label ?? personAttributeType?.display}
           name={`attributes.${personAttributeType.uuid}`}
           light
         />

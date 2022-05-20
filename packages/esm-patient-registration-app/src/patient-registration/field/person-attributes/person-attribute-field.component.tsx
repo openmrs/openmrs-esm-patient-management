@@ -21,6 +21,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
         <TextPersonAttributeField
           personAttributeType={personAttributeType}
           validationRegex={fieldDefinition.validation.matches}
+          label={fieldDefinition.label}
         />
       );
     case 'org.openmrs.Concept':
@@ -28,6 +29,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
         <CodedPersonAttributeField
           personAttributeType={personAttributeType}
           conceptUuid={fieldDefinition.answerConceptSetUuid}
+          label={fieldDefinition.label}
         />
       );
     default:

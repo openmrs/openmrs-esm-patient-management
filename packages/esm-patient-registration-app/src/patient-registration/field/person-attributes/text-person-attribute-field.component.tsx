@@ -7,10 +7,15 @@ import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 
 export interface TextPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
-  validationRegex: string;
+  validationRegex?: string;
+  label?: string;
 }
 
-export function TextPersonAttributeField({ personAttributeType, validationRegex }: TextPersonAttributeFieldProps) {
+export function TextPersonAttributeField({
+  personAttributeType,
+  validationRegex,
+  label,
+}: TextPersonAttributeFieldProps) {
   const { t } = useTranslation();
 
   const validateInput = (value: string) => {
@@ -34,7 +39,7 @@ export function TextPersonAttributeField({ personAttributeType, validationRegex 
           return (
             <Input
               id={`person-attribute-${personAttributeType.uuid}`}
-              labelText={personAttributeType?.display}
+              labelText={label ?? personAttributeType?.display}
               light
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}

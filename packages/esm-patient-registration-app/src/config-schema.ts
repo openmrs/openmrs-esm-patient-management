@@ -83,7 +83,7 @@ export const esmPatientRegistrationSchema = {
         _description: `The parts to include in the section. Can be any of the following built-in fields: ${builtInFields.join(
           ', ',
         )}. Can also be an id from an object in the \`fieldDefinitions\` array, which you can use to define custom fields.`,
-        _elements: { _type: Type.String }, // another validator at top level
+        _elements: { _type: Type.String },
       },
     },
     _default: [],
@@ -96,10 +96,14 @@ export const esmPatientRegistrationSchema = {
         _description:
           'How this field will be referred to in the `fields` element of the `sectionDefinitions` configuration.',
       },
-      label: { _type: Type.String, _description: 'The label of the input.' },
       uuid: {
         _type: Type.UUID,
         _description: "Person attribute type UUID that this field's data should be saved to.",
+      },
+      label: {
+        _type: Type.String,
+        _default: null,
+        _description: 'The label of the input. By default, uses the metadata `display` attribute.',
       },
       placeholder: {
         _type: Type.String,
@@ -121,7 +125,7 @@ export const esmPatientRegistrationSchema = {
           'For coded questions only. A concept which has the possible responses either as answers or as set members.',
       },
     },
-    _default: {},
+    _default: [],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
