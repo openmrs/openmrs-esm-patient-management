@@ -209,6 +209,7 @@ export interface PersonAttributeTypeResponse {
   display: string;
   name: string;
   description: string;
+  format: string;
 }
 
 export interface PersonAttributeResponse {

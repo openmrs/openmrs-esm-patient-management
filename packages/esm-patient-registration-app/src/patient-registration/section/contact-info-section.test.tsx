@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { ContactInfoSection } from './contact-info-section.component';
-import { initialFormValues } from '../../patient-registration.component';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { initialFormValues } from '../patient-registration.component';
+import { Resources, ResourcesContext } from '../../offline.resources';
 
 const predefinedAddressTemplate = {
   results: [
