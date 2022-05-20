@@ -32,7 +32,7 @@
   padding: 0 $spacing-05;
 
   &:hover {
-    background-color: #022b30;
+    background-color: $carbon--teal-90;
   }
 
   .patientName {
@@ -44,7 +44,7 @@
   }
 
   .patientInfo {
-    color: #ccd9d9;
+    color: $color-gray-30;
     @include carbon--type-style('body-short-01');
   }
 }
@@ -54,7 +54,7 @@
 }
 
 .navDivider {
-  background-color: #037d79;
+  background-color: $carbon--teal-20;
   width: 0.05rem;
   height: 2.25rem;
 }
