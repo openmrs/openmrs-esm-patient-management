@@ -5,15 +5,42 @@ import {
   HeaderGlobalAction,
   HeaderGlobalBar,
   HeaderMenuButton,
-  HeaderName,
+  TooltipDefinition,
 } from 'carbon-components-react';
-import Search20 from '@carbon/icons-react/lib/search/20';
 import CloseFilled20 from '@carbon/icons-react/es//close--filled/20';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-header.scss';
-import { age, ConfigurableLink, useAssignedExtensions, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import {
+  age,
+  ConfigurableLink,
+  useAssignedExtensions,
+  useLayoutType,
+  usePatient,
+  useVisit,
+} from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import isEmpty from 'lodash-es/isEmpty';
+import { launchPatientWorkspace } from './workspaces';
+
+const PatientInfo = ({ patient, isTabletView }) => {
+  const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
+  const info = `${parseInt(age(patient.birthDate))}, ${capitalize(patient.gender)}`;
+  const tooltipText = `${name} ${info}`;
+  const truncate = !isTabletView && name.trim().length > 25;
+
+  return truncate ? (
+    <TooltipDefinition className={styles.tooltip} align="start" direction="bottom" tooltipText={tooltipText}>
+      <span className={styles.patientName}>{name.slice(0, 25) + '...'}</span>
+    </TooltipDefinition>
+  ) : (
+    <>
+      <span className={styles.patientName}>{name} </span>
+      <span className={styles.patientInfo}>
+        {parseInt(age(patient.birthDate))}, {capitalize(patient.gender)}
+      </span>
+    </>
+  );
+};
 
 interface VisitHeadeProps {}
 
@@ -24,10 +51,17 @@ const VisitHeader: React.FC<VisitHeadeProps> = () => {
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((e) => e.id);
 
+  const { currentVisit, isValidating } = useVisit(patient?.id);
+  const handleStartVisit = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useMemo(
     () => isTabletViewPort && navMenuItems.length > 0,
     [navMenuItems.length, isTabletViewPort],
   );
+
+  const isloading = isValidating && currentVisit === null;
+  const visitNotLoaded = !isValidating && currentVisit === null;
+
+  const noActiveVisit = !isloading && visitNotLoaded;
 
   if (!showVisitHeader) {
     return null;
@@ -54,29 +88,23 @@ const VisitHeader: React.FC<VisitHeadeProps> = () => {
               </svg>
             </div>
           </ConfigurableLink>
-
+          <div className={styles.navDivider} />
           <div className={styles.patientDetails}>
-            <span className={styles.patientName}>
-              {`${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`}{' '}
-            </span>
-            <span className={styles.patientInfo}>
-              {parseInt(age(patient.birthDate))}, {capitalize(patient.gender)}
-            </span>
+            <PatientInfo patient={patient} isTabletView={isTabletViewPort} />
           </div>
           <HeaderGlobalBar>
-            <HeaderGlobalAction aria-label="Search" onClick={() => {}}>
-              <Search20 />
-            </HeaderGlobalAction>
+            {noActiveVisit && (
+              <HeaderGlobalAction
+                className={styles.headerGlobalBarButton}
+                aria-label={t('startVisit', 'Start a visit')}
+                onClick={handleStartVisit}>
+                <Button as="div" className={styles.startVisitButton}>
+                  {t('startVisit', 'Start a visit')}
+                </Button>
+              </HeaderGlobalAction>
+            )}
             <HeaderGlobalAction
-              className={styles.headerGlobalBarButton}
-              aria-label={t('startVisit', 'Start a visit')}
-              onClick={() => {}}>
-              <Button as="div" className={styles.startVisitButton}>
-                {t('startVisit', 'Start a visit')}
-              </Button>
-            </HeaderGlobalAction>
-            <HeaderGlobalAction
-              className={styles.headerGlobalBarButton}
+              className={styles.headerGlobalBarCloseButton}
               aria-label={t('close', 'Close')}
               onClick={() => setShowVisitHeader((prevState) => !prevState)}>
               <CloseFilled20 />
