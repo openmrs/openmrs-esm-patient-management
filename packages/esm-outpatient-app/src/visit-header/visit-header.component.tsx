@@ -51,12 +51,17 @@ const VisitHeader: React.FC<VisitHeadeProps> = () => {
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((e) => e.id);
 
-  const { currentVisit } = useVisit(patient?.id);
+  const { currentVisit, isValidating } = useVisit(patient?.id);
   const handleStartVisit = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useMemo(
     () => isTabletViewPort && navMenuItems.length > 0,
     [navMenuItems.length, isTabletViewPort],
   );
+
+  const isloading = isValidating && currentVisit === null;
+  const visitNotLoaded = !isValidating && currentVisit === null;
+
+  const noActiveVisit = !isloading && visitNotLoaded;
 
   if (!showVisitHeader) {
     return null;
@@ -88,7 +93,7 @@ const VisitHeader: React.FC<VisitHeadeProps> = () => {
             <PatientInfo patient={patient} isTabletView={isTabletViewPort} />
           </div>
           <HeaderGlobalBar>
-            {!currentVisit && (
+            {noActiveVisit && (
               <HeaderGlobalAction
                 className={styles.headerGlobalBarButton}
                 aria-label={t('startVisit', 'Start a visit')}
