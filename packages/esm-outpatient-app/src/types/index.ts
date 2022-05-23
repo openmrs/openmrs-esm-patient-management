@@ -5,6 +5,7 @@ export enum SearchTypes {
   ADVANCED = 'advanced',
   SEARCH_RESULTS = 'search_results',
   SCHEDULED_VISITS = 'scheduled-visits',
+  VISIT_FORM = 'visit_form',
 }
 
 export interface Patient {
