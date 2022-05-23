@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -30,7 +30,7 @@ import {
 import Add16 from '@carbon/icons-react/es/add/16';
 import Group16 from '@carbon/icons-react/es/group/16';
 import InProgress16 from '@carbon/icons-react/es/in-progress/16';
-import { useLayoutType, ConfigurableLink, navigate } from '@openmrs/esm-framework';
+import { useLayoutType, ConfigurableLink, navigate, showModal } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -54,6 +54,13 @@ type FilterProps = {
 function ActionsMenu({ patientUuid }: { patientUuid: string }) {
   const { t } = useTranslation();
 
+  const launchEndVisitModal = useCallback(() => {
+    const dispose = showModal('end-visit-dialog', {
+      closeModal: () => dispose(),
+      patientUuid,
+    });
+  }, [patientUuid]);
+
   return (
     <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
       <OverflowMenuItem
@@ -76,6 +83,7 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#endVisit"
+        onClick={launchEndVisitModal}
         hasDivider
         isDelete
         itemText={t('endVisit', 'End visit')}>
