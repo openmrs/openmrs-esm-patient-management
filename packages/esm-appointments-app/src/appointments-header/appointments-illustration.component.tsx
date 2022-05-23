@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PatientQueueIllustration: React.FC = () => {
+const AppointmentsIllustration: React.FC = () => {
   return (
     <svg width="92" height="94" viewBox="0 0 92 94" xmlns="http://www.w3.org/2000/svg">
       <title>Patient queue illustration</title>
@@ -19,4 +19,4 @@ const PatientQueueIllustration: React.FC = () => {
   );
 };
 
-export default PatientQueueIllustration;
+export default AppointmentsIllustration;

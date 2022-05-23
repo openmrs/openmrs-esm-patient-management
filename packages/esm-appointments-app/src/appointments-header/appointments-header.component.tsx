@@ -2,12 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
 import Location16 from '@carbon/icons-react/es/location/16';
-import { Dropdown } from 'carbon-components-react';
 import { formatDate, useSessionUser } from '@openmrs/esm-framework';
-import PatientQueueIllustration from './patient-queue-illustration.component';
-import styles from './patient-queue-header.scss';
+import styles from './appointments-header.scss';
+import AppointmentsIllustration from './appointments-illustration.component';
 
-const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
+const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSessionUser();
   const userLocation = userSession?.sessionLocation?.display;
@@ -15,7 +14,7 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
-        <PatientQueueIllustration />
+        <AppointmentsIllustration />
         <div className={styles['page-labels']}>
           <p>{t('appointments', 'Appointments')}</p>
           <p className={styles['page-name']}>{title}</p>
@@ -34,4 +33,4 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   );
 };
 
-export default PatientQueueHeader;
+export default AppointmentsHeader;
