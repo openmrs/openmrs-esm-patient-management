@@ -54,7 +54,7 @@ type FilterProps = {
 function ActionsMenu({ patientUuid }: { patientUuid: string }) {
   const { t } = useTranslation();
 
-  const openEndVisitModal = useCallback(() => {
+  const launchEndVisitModal = useCallback(() => {
     const dispose = showModal('end-visit-dialog', {
       closeModal: () => dispose(),
       patientUuid,
@@ -83,7 +83,7 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#endVisit"
-        onClick={openEndVisitModal}
+        onClick={launchEndVisitModal}
         hasDivider
         isDelete
         itemText={t('endVisit', 'End visit')}>
