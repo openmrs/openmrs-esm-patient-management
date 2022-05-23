@@ -4,10 +4,12 @@ import { Button, DataTableHeader, Tab, Tabs } from 'carbon-components-react';
 import PatientListTable from './patient-list-table.component';
 import CreateNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
+import { ExtensionSlot, showModal, useSessionUser } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
+import AppointmentsTable from '../tabs/appointments-table.component';
+import PatientSearch from '../patient-search/patient-search.component';
 
 enum TabTypes {
   STARRED,
@@ -72,6 +74,16 @@ interface CreateNewListState {
 
 type RouteState = AllListRouteState | CreateNewListState;
 
+function closeOverflowMenu() {
+  document.body.dispatchEvent(
+    new MouseEvent('mousedown', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+}
+
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [routeState, setRouteState] = useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
@@ -81,8 +93,13 @@ const PatientListList: React.FC = () => {
   const userId = useSessionUser()?.user.uuid;
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
   const patientListQuery = useAllPatientLists(userId, patientListFilter);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const handleSearch = (str) => setSearchString(str);
+
+  // const startOverlay = {
+  //   setShowOverlay(true);
+  // }
 
   if (patientListQuery.error) {
     //TODO show toast with error
@@ -92,16 +109,18 @@ const PatientListList: React.FC = () => {
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
       <section className={styles.patientListList}>
-        <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
-          <h2 className={styles.productiveHeading03}>{t('patientLists', 'Patient Lists')}</h2>
+          <h2 className={styles.productiveHeading03}>{t('appointments', 'Appointments')}</h2>
           <Button
             className={styles.newListButton}
             kind="ghost"
             renderIcon={Add16}
             iconDescription="Add"
-            onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
-            {t('newList', 'New List')}
+            data-floating-menu-primary-focus
+            onClick={() => {
+              setShowOverlay(true);
+            }}>
+            {t('addNewAppointment', 'Add New apppointment')}
           </Button>
         </div>
         <Tabs
@@ -112,7 +131,9 @@ const PatientListList: React.FC = () => {
           {createLabels()}
         </Tabs>
         <div className={styles.patientListTableContainer}>
-          <PatientListTable
+          <AppointmentsTable />
+          {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
+          {/* <PatientListTable
             loading={!patientListQuery.data}
             fetching={patientListQuery.isValidating}
             headers={customHeaders}
@@ -123,7 +144,7 @@ const PatientListList: React.FC = () => {
               placeHolder: t('search', 'Search'),
               currentSearchTerm: searchString,
             }}
-          />
+          /> */}
         </div>
       </section>
       <section>
