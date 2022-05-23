@@ -20,6 +20,7 @@ interface CurrentVisitProps {
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
   const { t } = useTranslation();
+  const { concepts } = useConfig();
   const [diagnoses, notes, vitals]: [Array<DiagnosisItem>, Array<Note>, Array<PatientVitals>] = useMemo(() => {
     const notes: Array<Note> = [];
     const vitals: Array<PatientVitals> = [];
@@ -80,11 +81,11 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
           vitals.push({
             diastolic: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Weight') {
+        } else if (obs.concept && obs.concept.display === 'Weight (kg)') {
           vitals.push({
             weight: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Height') {
+        } else if (obs.concept && obs.concept.display === 'Height (cm)') {
           vitals.push({
             height: obs.value,
           });
