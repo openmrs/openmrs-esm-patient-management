@@ -1,4 +1,4 @@
-@import '../style.scss';
+@import '../root.scss';
 
 title {
   width: 6.938rem;
@@ -22,7 +22,7 @@ title {
 }
 
 .breadcrumbsSlot {
-  grid-row: 1 / 2; 
+  grid-row: 1 / 2;
   grid-column: 1 / 2;
 }
 
@@ -40,8 +40,8 @@ title {
 }
 
 .newListButton {
-  width: fit-content; 
-  justify-self: end; 
+  width: fit-content;
+  justify-self: end;
   align-self: center;
 }
 
@@ -55,8 +55,8 @@ title {
 }
 
 .patientListTableContainer {
-  grid-row: 3 / 4; 
-  grid-column: 1 / 2; 
+  grid-row: 3 / 4;
+  grid-column: 1 / 2;
   height: 100%;
   padding: $spacing-05;
   background-color: $ui-01;
@@ -98,7 +98,7 @@ title {
     height: $spacing-09 !important;
 }
 
-// Search Overlay 
+// Search Overlay
 
 .searchOverlay {
   z-index: 1;

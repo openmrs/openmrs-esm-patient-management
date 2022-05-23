@@ -39,10 +39,11 @@ import {
   QueueStatus,
   MappedVisitQueueEntry,
   MappedQueuePriority,
-} from './active-visits-table.resource';
-import PatientSearch from '../../patient-search/patient-search.component';
-import PastVisit from '../../past-visit/past-visit.component';
-import styles from './active-visits-table.scss';
+  useAppointmentEntries,
+} from './appointments-table.resource';
+import PatientSearch from '../patient-search/patient-search.component';
+import PastVisit from '../past-visit/past-visit.component';
+import styles from './appointments-table.scss';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -92,10 +93,10 @@ function StatusIcon({ status }) {
   }
 }
 
-function ActiveVisitsTable() {
+function AppointmentsTable() {
   const { t } = useTranslation();
   const { services } = useServices();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
+  const { visitQueueEntries, isLoading } = useAppointmentEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
@@ -117,18 +118,23 @@ function ActiveVisitsTable() {
       },
       {
         id: 1,
-        header: t('priority', 'Priority'),
-        key: 'priority',
+        header: t('dateTime', 'Date & Time'),
+        key: 'dateTime',
       },
       {
         id: 2,
-        header: t('status', 'Status'),
-        key: 'status',
+        header: t('serviceType', 'Service Type'),
+        key: 'serviceType',
       },
       {
         id: 3,
-        header: t('waitTime', 'Wait time (mins)'),
-        key: 'waitTime',
+        header: t('provider', 'Provider'),
+        key: 'provider',
+      },
+      {
+        id: 4,
+        header: t('location', 'Location'),
+        key: 'location',
       },
     ],
     [t],
@@ -331,12 +337,12 @@ function ActiveVisitsTable() {
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
                       <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
                     <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-                      {t('addPatientToList', 'Add patient to list')}
+                      {t('addNewAppointment', 'Add New apppointment')}
                     </Button>
                   </Tile>
                 </div>
@@ -351,22 +357,11 @@ function ActiveVisitsTable() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
-        <Button
-          iconDescription={t('addPatientToList', 'Add patient to list')}
-          kind="secondary"
-          onClick={() => setShowOverlay(true)}
-          renderIcon={Add16}
-          size="small">
-          {t('addPatientList', 'Add patient to list')}
-        </Button>
-      </div>
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
-          <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+          <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
           <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-            {t('addPatientToList', 'Add patient to list')}
+            {t('addNewAppointment', 'Add New apppointment')}
           </Button>
         </Tile>
       </div>
@@ -375,4 +370,4 @@ function ActiveVisitsTable() {
   );
 }
 
-export default ActiveVisitsTable;
+export default AppointmentsTable;

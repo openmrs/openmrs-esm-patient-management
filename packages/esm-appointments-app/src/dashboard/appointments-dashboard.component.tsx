@@ -1,6 +1,6 @@
 import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
-import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
+import PatientQueueHeader from '../appointments-header/appointments-header.component';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
 import styles from './appointments-dashboard.scss';
 

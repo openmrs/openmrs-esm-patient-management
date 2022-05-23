@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
-import ActiveVisitsTable from './active-visits-table.component';
+import AppointmentsTable from './appointments-table.component';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
@@ -31,25 +31,25 @@ describe('ActiveVisitsTable: ', () => {
   it('renders an empty state view if data is unavailable', async () => {
     mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    renderActiveVisitsTable();
+    AppointmentsListTable();
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/active visits/i)).toBeInTheDocument();
-    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/No appointments to display/i)).toBeInTheDocument();
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
     mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitQueueEntries } });
 
-    renderActiveVisitsTable();
+    AppointmentsListTable();
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/active visits/i)).toBeInTheDocument();
-    expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/No appointments to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
 
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
@@ -98,12 +98,12 @@ describe('ActiveVisitsTable: ', () => {
 
     expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/No appointments to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
     expect(screen.getByRole('separator')).toBeInTheDocument();
   });
 });
 
-function renderActiveVisitsTable() {
-  swrRender(<ActiveVisitsTable />);
+function AppointmentsListTable() {
+  swrRender(<AppointmentsTable />);
 }
