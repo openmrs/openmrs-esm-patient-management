@@ -5,11 +5,7 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
 import styles from './../section.scss';
 
-export interface DeathInfoSectionProps {
-  id: 'death';
-}
-
-export const DeathInfoSection: React.FC<DeathInfoSectionProps> = () => {
+export const DeathInfoSection = () => {
   const { values } = React.useContext(PatientRegistrationContext);
   const { t } = useTranslation();
 
