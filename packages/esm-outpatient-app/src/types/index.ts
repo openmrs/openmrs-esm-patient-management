@@ -83,6 +83,62 @@ export interface Note {
   };
   time: string;
 }
+export interface Order {
+  uuid: string;
+  dateActivated: string;
+  dateStopped?: Date | null;
+  dose: number;
+  dosingInstructions: string | null;
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
+  doseUnits: {
+    uuid: string;
+    display: string;
+  };
+  drug: {
+    uuid: string;
+    name: string;
+    strength: string;
+  };
+  duration: number;
+  durationUnits: {
+    uuid: string;
+    display: string;
+  };
+  frequency: {
+    uuid: string;
+    display: string;
+  };
+  numRefills: number;
+  orderNumber: string;
+  orderReason: string | null;
+  orderReasonNonCoded: string | null;
+  orderer: {
+    uuid: string;
+    person: {
+      uuid: string;
+      display: string;
+    };
+  };
+  orderType: {
+    uuid: string;
+    display: string;
+  };
+  route: {
+    uuid: string;
+    display: string;
+  };
+  quantity: number;
+  quantityUnits: OpenmrsResource;
+}
+
+export interface OrderItem {
+  order: Order;
+  provider: {
+    name: string;
+    role: string;
+  };
+  time: string;
+}
 
 export interface DiagnosisItem {
   diagnosis: string;
@@ -113,6 +169,7 @@ export interface Encounter {
   obs: Array<Observation>;
   form: OpenmrsResource;
   patient: OpenmrsResource;
+  orders: Array<Order>;
 }
 
 export interface Observation {
@@ -157,4 +214,25 @@ export interface PatientVitals {
     role: string;
   };
   time?: string;
+}
+
+export interface MappedEncounter {
+  id: string;
+  datetime: string;
+  encounterType: string;
+  form: OpenmrsResource;
+  obs: Array<Observation>;
+  provider: string;
+  visitUuid?: string;
+}
+
+export interface FormattedEncounter {
+  id: string;
+  datetime: string;
+  encounterType: string;
+  form: OpenmrsResource;
+  obs: Array<Observation>;
+  provider: string;
+  visitType: string;
+  visitUuid: string;
 }
