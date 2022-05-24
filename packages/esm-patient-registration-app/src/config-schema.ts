@@ -96,6 +96,13 @@ export const esmPatientRegistrationSchema = {
         _description:
           'How this field will be referred to in the `fields` element of the `sectionDefinitions` configuration.',
       },
+      type: {
+        _type: Type.String,
+        _description: "How this field's data will be stored—a person attribute or an obs.",
+        _validators: [
+          validator((val) => ['person attribute', 'obs'].includes(val), "Must be one of 'person attribute' or 'obs'."),
+        ],
+      },
       uuid: {
         _type: Type.UUID,
         _description: "Person attribute type UUID that this field's data should be saved to.",

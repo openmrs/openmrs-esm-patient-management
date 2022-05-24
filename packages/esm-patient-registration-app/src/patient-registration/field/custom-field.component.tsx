@@ -11,5 +11,11 @@ export function CustomField({ name }: CustomFieldProps) {
   const config = useConfig() as RegistrationConfig;
   const fieldDefinition = config.fieldDefinitions.filter((def) => def.id == name)[0];
 
-  return <PersonAttributeField fieldDefinition={fieldDefinition} />;
+  if (fieldDefinition.type === 'person attribute') {
+    return <PersonAttributeField fieldDefinition={fieldDefinition} />;
+  } else if (fieldDefinition.type === 'obs') {
+    return <ObsField fieldDefinition={fieldDefinition} />;
+  } else {
+    return <div>Error: Unknown field type {fieldDefinition.type}</div>;
+  }
 }

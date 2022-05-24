@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers } from './person-attributes.resource';
+import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 
 export interface CodedPersonAttributeFieldProps {
