@@ -102,7 +102,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
             </Row>
           </Grid>
           <p className={styles.subHeading}>
-            {vitalsToDisplay.provider.name ? <span> {vitalsToDisplay.provider.name} </span> : null} ·{' '}
+            {vitalsToDisplay.provider?.name ? <span> {vitalsToDisplay.provider.name} </span> : null} ·{' '}
             {vitalsToDisplay.time}
           </p>
         </div>
