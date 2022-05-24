@@ -1,0 +1,38 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.subHeading {
+  @include carbon--type-style('label-01');
+  color: var(--text-02);
+}
+
+.emptyText {
+  padding: $spacing-05;
+  @include carbon--type-style('body-long-02');
+  color: var(--text-01);
+}
+
+.unit {
+  @include carbon--type-style('body-short-01');
+  color: var(--text-02);
+  margin-left: $spacing-02;
+}
+
+.vitalValues {
+  @include carbon--type-style('body-short-01');
+  color: $ui-05;
+  margin-left: $spacing-02;
+}
+
+.grid {
+  padding-left: 0;
+}
+
+.vitalValuesWrapper {
+  display: flex;
+}
+
+.notification {
+  fill: $danger;
+}

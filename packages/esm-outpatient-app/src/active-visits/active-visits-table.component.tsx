@@ -42,6 +42,7 @@ import {
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -322,10 +323,10 @@ function ActiveVisitsTable() {
                             <>
                               <Tabs>
                                 <Tab label={t('currentVisit', 'Current visit')}>
-                                  <>
-                                    <span className={styles.visitType}>{tableRows?.[index]?.visitType}</span>
-                                    <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </>
+                                  <CurrentVisit
+                                    patientUuid={tableRows?.[index]?.patientUuid}
+                                    visitUuid={tableRows?.[index]?.visitUuid}
+                                  />
                                 </Tab>
                                 <Tab label={t('previousVisit', 'Previous visit')}>
                                   <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />

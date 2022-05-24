@@ -73,3 +73,88 @@ export interface AppointmentService {
   uuid: string;
   serviceTypes: Array<ServiceTypes>;
 }
+
+export interface Note {
+  concept: OpenmrsResource;
+  note: string;
+  provider: {
+    name: string;
+    role: string;
+  };
+  time: string;
+}
+
+export interface DiagnosisItem {
+  diagnosis: string;
+}
+
+export interface Encounter {
+  uuid: string;
+  encounterDatetime: string;
+  encounterProviders: Array<{
+    uuid: string;
+    display: string;
+    encounterRole: {
+      uuid: string;
+      display: string;
+    };
+    provider: {
+      uuid: string;
+      person: {
+        uuid: string;
+        display: string;
+      };
+    };
+  }>;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
+  obs: Array<Observation>;
+  form: OpenmrsResource;
+  patient: OpenmrsResource;
+}
+
+export interface Observation {
+  uuid: string;
+  concept: {
+    uuid: string;
+    display: string;
+    conceptClass: {
+      uuid: string;
+      display: string;
+    };
+  };
+  display: string;
+  groupMembers: null | Array<{
+    uuid: string;
+    concept: {
+      uuid: string;
+      display: string;
+    };
+    value: {
+      uuid: string;
+      display: string;
+    };
+  }>;
+  value: any;
+  obsDatetime: string;
+}
+
+export interface PatientVitals {
+  systolic?: number;
+  diastolic?: number;
+  pulse?: number;
+  temperature?: number;
+  oxygenSaturation?: number;
+  height?: number;
+  weight?: number;
+  bmi?: number | null;
+  respiratoryRate?: number;
+  muac?: number;
+  provider?: {
+    name: string;
+    role: string;
+  };
+  time?: string;
+}
