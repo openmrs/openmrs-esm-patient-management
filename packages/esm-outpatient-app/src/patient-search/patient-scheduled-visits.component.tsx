@@ -15,7 +15,7 @@ import { SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useRecentScheduledVisits, useFutureScheduledVisits } from './hooks/useScheduledVisits';
 interface PatientSearchProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
 }
 
@@ -122,7 +122,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
           renderIcon={ArrowLeft24}
           iconDescription="Back to search results"
           size="sm"
-          onClick={() => toggleSearchType(SearchTypes.BASIC)}>
+          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
       </div>
@@ -146,13 +146,16 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
         <Button
           kind="ghost"
           iconDescription="Start another visit type"
-          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM)}>
+          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid)}>
           {t('anotherVisitType', 'Start another visit type')}
         </Button>
       </div>
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.BASIC)}>
+        <Button
+          className={styles.button}
+          kind="secondary"
+          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">
