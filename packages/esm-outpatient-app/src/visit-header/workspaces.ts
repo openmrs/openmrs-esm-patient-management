@@ -190,3 +190,14 @@ export function getWorkspaceStore() {
 export function resetWorkspaceStore() {
   getWorkspaceStore().setState(initialState);
 }
+/**
+ * Tells the workspace system about a workspace. Should be called at the top level
+ * of a module which will be loaded whenever the patient chart loads.
+ */
+export function registerWorkspace(workspace: WorkspaceRegistration) {
+  registeredWorkspaces[workspace.name] = {
+    ...workspace,
+    preferredWindowSize: workspace.preferredWindowSize ?? 'normal',
+    type: workspace.type ?? 'form',
+  };
+}
