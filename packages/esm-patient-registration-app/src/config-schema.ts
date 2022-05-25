@@ -38,6 +38,11 @@ export interface RegistrationConfig {
     patientPhotoUuid: string;
   };
   defaultPatientIdentifierTypes: Array<string>;
+  registrationObs: {
+    encounterTypeUuid: string | null;
+    encounterProviderRoleUuid: string;
+    registrationFormUuid: string | null;
+  };
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -169,7 +174,6 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
@@ -177,4 +181,28 @@ export const esmPatientRegistrationSchema = {
     },
     _default: [],
   },
+  registrationObs: {
+    encounterTypeUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'Obs created during registration will be associated with an encounter of this type. This must be set in order to use fields of type `obs`.',
+    },
+    encounterProviderRoleUuid: {
+      _type: Type.UUID,
+      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+      _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
+    },
+    registrationFormUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'The form UUID to associate with the registration encounter. By default no form will be associated.',
+    },
+  },
+
+  // TODO: validate that
+  //  - if a field has type 'obs', registrationObs.encounterTypeUuid is not null
+  //  - all sections have been defined
+  //  - all fields have been defined
 };

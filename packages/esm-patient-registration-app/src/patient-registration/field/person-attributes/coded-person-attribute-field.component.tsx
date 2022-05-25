@@ -19,7 +19,7 @@ export function CodedPersonAttributeField({
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(answerConceptSetUuid);
 
   return (
-    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
+    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeType.uuid}`}

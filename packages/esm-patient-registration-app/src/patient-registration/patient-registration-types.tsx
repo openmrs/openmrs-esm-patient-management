@@ -163,6 +163,9 @@ export interface FormValues {
   attributes?: {
     [attributeTypeUuid: string]: string;
   };
+  obs?: {
+    [conceptUuid: string]: string;
+  };
 }
 
 export interface PatientUuidMapType {
@@ -223,7 +226,12 @@ export interface PersonAttributeResponse {
 export interface ConceptResponse {
   uuid: string;
   display: string;
+  datatype: {
+    uuid: string;
+    display: string;
+  };
   answers: Array<ConceptAnswers>;
+  setMembers: Array<ConceptAnswers>;
 }
 
 export interface ConceptAnswers {
