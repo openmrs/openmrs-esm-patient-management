@@ -28,6 +28,7 @@ import {
 import styles from './visit-form.scss';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { SearchTypes } from '../../types/index';
+import BaseVisitType from './base-visit-type.component';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -143,7 +144,29 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               <Switch name="recommended" text={t('recommended', 'Recommended')} />
               <Switch name="all" text={t('all', 'All')} />
             </ContentSwitcher>
+            {contentSwitcherIndex === 0 && <></>}
+            {contentSwitcherIndex === 1 && (
+              <BaseVisitType
+                onChange={(visitType) => {
+                  setVisitType(visitType);
+                  setIsMissingVisitType(false);
+                }}
+                visitTypes={allVisitTypes}
+                patientUuid={patientUuid}
+              />
+            )}
           </section>
+          {isMissingVisitType && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingVisitType', 'Missing visit type')}
+                subtitle={t('selectVisitType', 'Please select a Visit Type')}
+              />
+            </section>
+          )}
           {isMissingVisitType && (
             <section className={styles.section}>
               <InlineNotification

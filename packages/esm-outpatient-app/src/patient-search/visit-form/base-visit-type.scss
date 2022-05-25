@@ -1,0 +1,93 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.visitTypeOverviewWrapper {
+  margin: $spacing-05 0rem;
+  border: 0.0625rem solid $grey-2;
+}
+
+.tablet {
+  background-color: $ui-02;
+}
+
+.desktop {
+  background-color: $ui-01;
+
+  .paginationContainer div {
+    background-color: $ui-01;
+  }
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+  position: relative;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) span * {
+  display: none;
+}
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: $spacing-03;
+  min-height: $spacing-10;
+  width: 100%;
+  @include carbon--type-style('body-short-01');
+  color: $text-01;
+}
+
+.radioButton {
+  padding: $spacing-02 $spacing-05;
+  margin: $spacing-03 0;
+}
+
+.content {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+  margin-top: $spacing-05;
+  margin-bottom: $spacing-03;
+}
+
+.desktopHeading {
+  h4 {
+    @include carbon--type-style('productive-heading-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include carbon--type-style('productive-heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: $spacing-05;
+
+  h4:after {
+    content: '';
+    display: block;
+    width: 2rem;
+    padding-top: 0.188rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+  }
+}
+
+.heading:after {
+  content: '';
+  display: block;
+  width: 2rem;
+  padding-top: 0.188rem;
+  border-bottom: 0.375rem solid var(--brand-03);
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+}
