@@ -30,7 +30,7 @@
   border: 1px solid $grey-2;
   padding: $spacing-05;
   margin: $spacing-05 0rem $spacing-05;
-  width: 100%;
+  width: 100% !important;
 }
 
 .tabs > :global(.bx--tab-content) {
