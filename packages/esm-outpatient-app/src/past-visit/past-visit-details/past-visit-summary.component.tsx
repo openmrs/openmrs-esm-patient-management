@@ -19,7 +19,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
   const isTablet = useLayoutType() === 'tablet';
 
   const encountersToDisplay = encounters
-    .filter((encounter) => encounter.encounters.length)
+    .filter((encounter) => encounter?.encounters?.length)
     .flatMap((visitWithEncounters) => mapEncounters(visitWithEncounters));
 
   const [medications, notes, diagnoses]: [Array<OrderItem>, Array<Note>, Array<DiagnosisItem>] = useMemo(() => {
@@ -29,8 +29,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     const diagnoses: Array<DiagnosisItem> = [];
 
     // Iterating through every Encounter
-    encounters.forEach((encounter) => {
-      encounter.encounters.forEach((val: Encounter) => {
+    encounters?.forEach((encounter) => {
+      encounter?.encounters?.forEach((val: Encounter) => {
         if (val.orders != undefined) {
           medications.push(
             ...val.orders.map((order: Order) => ({
@@ -45,26 +45,25 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
         }
 
         // Check for Visit Diagnoses and Notes
-        val.obs &&
-          val.obs.forEach((obs: Observation) => {
-            if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
-              // Putting all the diagnoses in a single array.
-              diagnoses.push({
-                diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
-              });
-            } else if (obs.concept.display === 'General patient note') {
-              // Putting all notes in a single array.
-              notes.push({
-                note: obs.value,
-                provider: {
-                  name: val.encounterProviders.length ? val.encounterProviders[0].provider.person.display : '',
-                  role: val.encounterProviders.length ? val.encounterProviders[0].encounterRole.display : '',
-                },
-                time: val.encounterDatetime ? formatTime(parseDate(val.encounterDatetime)) : '',
-                concept: obs.concept,
-              });
-            }
-          });
+        val?.obs?.forEach((obs: Observation) => {
+          if (obs?.concept?.display === 'Visit Diagnoses') {
+            // Putting all the diagnoses in a single array.
+            diagnoses.push({
+              diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
+            });
+          } else if (obs?.concept?.display === 'General patient note') {
+            // Putting all notes in a single array.
+            notes.push({
+              note: obs.value,
+              provider: {
+                name: val.encounterProviders.length ? val.encounterProviders[0].provider.person.display : '',
+                role: val.encounterProviders.length ? val.encounterProviders[0].encounterRole.display : '',
+              },
+              time: val.encounterDatetime ? formatTime(parseDate(val.encounterDatetime)) : '',
+              concept: obs.concept,
+            });
+          }
+        });
       });
     });
     return [medications, notes, diagnoses];
@@ -110,7 +109,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
 export default PastVisitSummary;
 
 export function mapEncounters(encounters) {
-  return encounters.encounters?.map((encounter) => ({
+  return encounters?.encounters?.map((encounter) => ({
     id: encounter?.uuid,
     datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
     encounterType: encounter?.encounterType?.display,

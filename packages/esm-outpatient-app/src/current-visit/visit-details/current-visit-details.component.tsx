@@ -12,6 +12,7 @@ import styles from '../current-visit.scss';
 import TriageNote from './triage-note.component';
 import Vitals from './vitals.component';
 import { Note, Encounter, Observation, PatientVitals, DiagnosisItem } from '../../types/index';
+import { ConfigObject } from '../../config-schema';
 
 interface CurrentVisitProps {
   patientUuid: string;
@@ -20,7 +21,8 @@ interface CurrentVisitProps {
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
   const { t } = useTranslation();
-  const { concepts } = useConfig();
+  const config = useConfig() as ConfigObject;
+
   const [diagnoses, notes, vitals]: [Array<DiagnosisItem>, Array<Note>, Array<PatientVitals>] = useMemo(() => {
     const notes: Array<Note> = [];
     const vitals: Array<PatientVitals> = [];
@@ -52,7 +54,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
       }
 
       enc.obs.forEach((obs: Observation) => {
-        if (obs.concept && obs.concept.display === 'Pulse') {
+        if (obs.concept?.uuid === config.concepts.pulseUuid) {
           vitals.push({
             pulse: obs.value,
             provider: {
@@ -61,31 +63,31 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
             },
             time: formatTime(parseDate(obs.obsDatetime)),
           });
-        } else if (obs.concept && obs.concept.display === 'Arterial blood oxygen saturation (pulse oximeter)') {
+        } else if (obs.concept?.uuid === config.concepts.oxygenSaturationUuid) {
           vitals.push({
             oxygenSaturation: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Respiratory rate') {
+        } else if (obs.concept?.uuid === config.concepts.respiratoryRateUuid) {
           vitals.push({
             respiratoryRate: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Temperature (C)') {
+        } else if (obs.concept?.uuid === config.concepts.temperatureUuid) {
           vitals.push({
             temperature: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Systolic') {
+        } else if (obs.concept?.uuid === config.concepts.systolicBloodPressureUuid) {
           vitals.push({
             systolic: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Diastolic') {
+        } else if (obs.concept?.uuid === config.concepts.diastolicBloodPressureUuid) {
           vitals.push({
             diastolic: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Weight (kg)') {
+        } else if (obs.concept?.uuid === config.concepts.weightUuid) {
           vitals.push({
             weight: obs.value,
           });
-        } else if (obs.concept && obs.concept.display === 'Height (cm)') {
+        } else if (obs.concept?.uuid === config.concepts.heightUuid) {
           vitals.push({
             height: obs.value,
           });
