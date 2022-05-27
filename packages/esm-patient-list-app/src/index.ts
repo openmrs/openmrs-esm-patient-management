@@ -84,26 +84,6 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
-      {
-        id: 'overview-offline-patient-table',
-        slot: 'offline-tools-home-overview-slot',
-        load: getAsyncLifecycle(() => import('./offline-patient-table/overview-offline-patient-table.component'), {
-          featureName: 'overview-offline-patient-table',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'offline-patient-table',
-        slot: 'offline-tools-offline-patients-slot',
-        load: getAsyncLifecycle(() => import('./offline-patient-table/interactive-offline-patient-table.component'), {
-          featureName: 'offline-patient-table',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
     ],
   };
 }

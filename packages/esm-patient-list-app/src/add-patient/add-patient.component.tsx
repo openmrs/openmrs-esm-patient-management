@@ -1,107 +1,79 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toOmrsIsoString, showToast, usePagination, useSession } from '@openmrs/esm-framework';
+import {
+  toOmrsIsoString,
+  showToast,
+  usePagination,
+  getDynamicOfflineDataEntries,
+  putDynamicOfflineData,
+  syncDynamicOfflineData,
+} from '@openmrs/esm-framework';
 import { Button, Checkbox, Pagination, Search, SkeletonText } from 'carbon-components-react';
 import styles from './add-patient.scss';
-import { addPatientToLocalOrRemotePatientList } from '../api/api';
-import { useAllPatientListsWhichDoNotIncludeGivenPatient } from '../api/hooks';
+import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
+import useSWR from 'swr';
+import { TFunction } from 'i18next';
 
 interface AddPatientProps {
   closeModal: () => void;
   patientUuid: string;
 }
 
-interface PatientListProp {
-  name: string;
-  visible: boolean;
-  selected: boolean;
-}
-
-type PatientListObj = Record<string, PatientListProp>;
-
 const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
-  const userId = useSession()?.user.uuid;
-  const { data, isValidating } = useAllPatientListsWhichDoNotIncludeGivenPatient(userId, patientUuid);
-  const [patientListsObj, setPatientListsObj] = useState<PatientListObj | null>(null);
+  const [selected, setSelected] = useState<Array<string>>([]);
+  const { data, isValidating } = useAddablePatientLists(patientUuid);
 
-  useEffect(() => {
-    if (data) {
-      const newPatientListsObj: PatientListObj = {};
-
-      for (const patientList of data) {
-        newPatientListsObj[patientList.id] = {
-          visible: true,
-          selected: false,
-          name: patientList?.display,
-        };
-      }
-
-      setPatientListsObj(newPatientListsObj);
+  const handleSelectionChanged = useCallback((patientListId: string, selected: boolean) => {
+    if (selected) {
+      setSelected((prev) => [...prev, patientListId]);
+    } else {
+      setSelected((prev) => prev.filter((x) => x !== patientListId));
     }
-  }, [data]);
-
-  const handleChange = useCallback((uuid, e) => {
-    setPatientListsObj((patientListsObj) => ({
-      ...patientListsObj,
-      [uuid]: {
-        ...patientListsObj[uuid],
-        selected: e,
-      },
-    }));
-  }, []);
-
-  const handleClose = useCallback(() => {
-    closeModal();
   }, []);
 
   const handleSubmit = useCallback(() => {
-    Object.keys(patientListsObj).forEach((patientListUuid) => {
-      if (patientListsObj[patientListUuid].selected) {
-        addPatientToLocalOrRemotePatientList(userId, {
-          patient: patientUuid,
-          cohort: patientListUuid,
-          startDate: toOmrsIsoString(new Date()),
-        })
-          .then(() =>
-            showToast({
-              title: t('successfullyAdded', 'Successfully added'),
-              kind: 'success',
-              description: `${t('successAddPatientToList', 'Patient added to list')}: ${
-                patientListsObj[patientListUuid].name
-              }`,
-            }),
-          )
-          .catch(() =>
-            showToast({
-              title: t('error', 'Error'),
-              kind: 'error',
-              description: `${t('errorAddPatientToList', 'Patient not added to list')}: ${
-                patientListsObj[patientListUuid].name
-              }`,
-            }),
-          );
+    for (const selectedId of selected) {
+      const patientList = data.find((list) => list.id === selectedId);
+      if (!patientList) {
+        continue;
       }
-    });
-    handleClose();
-  }, [patientListsObj]);
+
+      patientList
+        .addPatient()
+        .then(() =>
+          showToast({
+            title: t('successfullyAdded', 'Successfully added'),
+            kind: 'success',
+            description: `${t('successAddPatientToList', 'Patient added to list')}: ${patientList.displayName}`,
+          }),
+        )
+        .catch(() =>
+          showToast({
+            title: t('error', 'Error'),
+            kind: 'error',
+            description: `${t('errorAddPatientToList', 'Patient not added to list')}: ${patientList.displayName}`,
+          }),
+        );
+    }
+
+    closeModal();
+  }, [data, selected, closeModal, t]);
 
   const searchResults = useMemo(() => {
-    if (data && patientListsObj) {
-      if (searchValue && searchValue.trim() !== '') {
-        const search = searchValue.toLowerCase();
-        return data.filter(
-          (patientList) =>
-            patientListsObj[patientList.id]?.visible && patientList.display.toLowerCase().includes(search),
-        );
-      } else {
-        return data.filter((patientList) => patientListsObj[patientList.id]?.visible);
-      }
-    } else {
+    if (!data) {
       return [];
     }
-  }, [searchValue, data, patientListsObj]);
+
+    if (searchValue?.trim().length > 0) {
+      const search = searchValue.toLowerCase();
+      return data.filter((patientList) => patientList.displayName.toLowerCase().includes(search));
+    }
+
+    return data;
+  }, [searchValue, data]);
+
   const { results, goTo, currentPage, paginated } = usePagination(searchResults, 5);
 
   useEffect(() => {
@@ -132,15 +104,15 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="bx--fieldset">
           <p className="bx--label">Patient Lists</p>
-          {!isValidating && patientListsObj && results ? (
+          {!isValidating && results ? (
             results.length > 0 ? (
-              results.map((patientList, ind) => (
-                <div key={ind} className={styles.checkbox}>
+              results.map((patientList) => (
+                <div key={patientList.id} className={styles.checkbox}>
                   <Checkbox
-                    key={ind}
-                    onChange={(e) => handleChange(patientList.id, e)}
-                    checked={patientListsObj[patientList.id]?.selected}
-                    labelText={patientList.display}
+                    key={patientList.id}
+                    onChange={(e) => handleSelectionChanged(patientList.id, e)}
+                    checked={selected.some((id) => id === patientList.id)}
+                    labelText={patientList.displayName}
                     id={patientList.id}
                   />
                 </div>
@@ -173,7 +145,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.buttonSet}>
         <Button kind="ghost">{t('createNewPatientList', 'Create new patient list')}</Button>
         <div>
-          <Button kind="secondary" className={styles.largeButtons} onClick={handleClose}>
+          <Button kind="secondary" className={styles.largeButtons} onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button onClick={handleSubmit} className={styles.largeButtons}>
@@ -184,5 +156,73 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     </div>
   );
 };
+
+// This entire modal is a little bit special since it not only displays the "real" patient lists (i.e. data from
+// the cohorts/backend), but also a fake patient list which doesn't really exist in the backend:
+// The offline patient list.
+// When a patient is added to the offline list, that patient should become available offline, i.e.
+// a dynamic offline data entry must be created.
+// This is why the following abstracts away the differences between the real and the fake patient lists.
+// The component doesn't really care about which is which - the only thing that matters is that the
+// data can be fetched and that there is an "add patient" function.
+
+interface AddablePatientListViewModel {
+  id: string;
+  displayName: string;
+  addPatient(): Promise<void>;
+}
+
+export function useAddablePatientLists(patientUuid: string) {
+  const { t } = useTranslation();
+  return useSWR(['addablePatientLists', patientUuid], async () => {
+    const [fakeLists, realLists] = await Promise.all([
+      findFakePatientListsWithoutPatient(patientUuid, t),
+      findRealPatientListsWithoutPatient(patientUuid),
+    ]);
+
+    return [...fakeLists, ...realLists];
+  });
+}
+
+async function findRealPatientListsWithoutPatient(patientUuid: string): Promise<Array<AddablePatientListViewModel>> {
+  const [allLists, listsIdsOfThisPatient] = await Promise.all([
+    getAllPatientLists(),
+    getPatientListIdsForPatient(patientUuid),
+  ]);
+
+  return allLists
+    .filter((list) => !listsIdsOfThisPatient.includes(list.id))
+    .map((list) => ({
+      id: list.id,
+      displayName: list.display,
+      async addPatient() {
+        await addPatientToList({
+          cohort: list.id,
+          patient: patientUuid,
+          startDate: toOmrsIsoString(new Date()),
+        });
+      },
+    }));
+}
+
+async function findFakePatientListsWithoutPatient(
+  patientUuid: string,
+  t: TFunction,
+): Promise<Array<AddablePatientListViewModel>> {
+  const offlinePatients = await getDynamicOfflineDataEntries('patient');
+  const isPatientOnOfflineList = offlinePatients.some((x) => x.identifier === patientUuid);
+  return isPatientOnOfflineList
+    ? []
+    : [
+        {
+          id: 'fake-offline-patient-list',
+          displayName: t('offlinePatients', 'Offline patients'),
+          async addPatient() {
+            await putDynamicOfflineData('patient', patientUuid);
+            await syncDynamicOfflineData('patient', patientUuid);
+          },
+        },
+      ];
+}
 
 export default AddPatient;

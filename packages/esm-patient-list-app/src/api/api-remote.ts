@@ -8,7 +8,7 @@ import {
   OpenmrsCohortRef,
   PatientListFilter,
   PatientListMember,
-  PatientListType,
+  PatientListUpdate,
 } from './types';
 
 export const cohortUrl = '/ws/rest/v1/cohortm';
@@ -50,11 +50,18 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
     query.push(['attribute', `starred:${filter.isStarred}`]);
   }
 
-  if (filter.type !== undefined) {
-    const type =
-      filter.type === PatientListType.SYSTEM ? '"Patient List Type":"System"' : '"Patient List Type":"My lists"';
-    query.push(['attributes', type]);
-  }
+  //
+  // ⚠️ TODO:
+  // I commented the following out since it leads to crashes on dev3 (500 internal server error).
+  // In particular, the backend doesn't like us querying for the attributes at the moment.
+  // This must be fixed/updated when the patient list feature gets continued/restored eventually.
+  //
+
+  // if (filter.type !== undefined) {
+  //   const type =
+  //     filter.type === PatientListType.SYSTEM ? '"Patient List Type":"System"' : '"Patient List Type":"My lists"';
+  //   query.push(['attributes', type]);
+  // }
 
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
   const {
@@ -67,7 +74,21 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
     throw error;
   }
 
-  return results;
+  return results.map((cohort) => ({
+    id: cohort.uuid,
+    display: cohort.name,
+    description: cohort.description,
+    type: cohort.attributes.find((att) => att?.cohortAttributeType?.name === 'Patient List Type')?.value,
+    size: cohort.size,
+    isStarred: false, // TODO
+  }));
+}
+
+export function updatePatientList(id: string, update: PatientListUpdate) {
+  // TODO: Support updating a full patient list, i.e. including the `isStarred` value.
+  // Basically implement the (missing) functionality which was previously declared as "TODO" here:
+  // https://github.com/openmrs/openmrs-esm-patient-management/blob/25ec687afd37c383a0dbd4d8be8b8e09c8c53129/packages/esm-patient-list-app/src/api/api.ts#L89
+  return Promise.resolve();
 }
 
 export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
