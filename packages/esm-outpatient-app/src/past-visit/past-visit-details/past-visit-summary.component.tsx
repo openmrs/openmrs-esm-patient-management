@@ -7,7 +7,7 @@ import EncounterList from './encounter-list.component';
 import styles from '../past-visit.scss';
 import { Encounter, OrderItem, Order, Note, DiagnosisItem } from '../../types/index';
 import Medications from './medications-list.component';
-
+import Notes from './notes-list.component';
 interface PastVisitSummaryProps {
   encounters: Array<any>;
   patientUuid: string;
@@ -83,7 +83,9 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
             className={`${styles.tab} ${selectedTabIndex === 1 && styles.selectedTab}`}
             id="notes-tab"
             onClick={() => setSelectedTabIndex(1)}
-            label={t('notes', 'Notes')}></Tab>
+            label={t('notes', 'Notes')}>
+            <Notes notes={notes} diagnoses={diagnoses} />
+          </Tab>
 
           <Tab
             className={`${styles.tab} ${selectedTabIndex === 2 && styles.selectedTab}`}
