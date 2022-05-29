@@ -1,7 +1,7 @@
 import {
   fetchCurrentPatient,
   navigate,
-  registerOfflinePatientHandler,
+  setupDynamicOfflineDataHandler,
   setupOfflineSync,
   subscribePrecacheStaticDependencies,
   SyncProcessOptions,
@@ -25,9 +25,15 @@ export function setupOffline() {
 
   subscribePrecacheStaticDependencies(precacheStaticAssets);
 
-  registerOfflinePatientHandler('esm-patient-registration-app', {
+  setupDynamicOfflineDataHandler({
+    id: 'esm-patient-registration-app:patient',
+    type: 'patient',
     displayName: 'Patient registration',
-    async onOfflinePatientAdded({ patientUuid }) {
+    async isSynced(patientUuid) {
+      // TODO.
+      return true;
+    },
+    async sync(patientUuid) {
       await fetchCurrentPatient(patientUuid, { headers: cacheForOfflineHeaders });
     },
   });
