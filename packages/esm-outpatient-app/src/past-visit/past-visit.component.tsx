@@ -20,15 +20,13 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
 
   if (visits) {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.visitContainer}>
-          <div className={styles.container}>
-            <div className={styles.header}>
-              <h4 className={styles.visitType}>{visits?.visitType?.display}</h4>
-              <p className={styles.date}>{formatDatetime(parseDate(visits?.startDatetime))}</p>
-            </div>
-            <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} />
+      <div className={styles.visitContainer}>
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <h4 className={styles.visitType}>{visits?.visitType?.display}</h4>
+            <p className={styles.date}>{formatDatetime(parseDate(visits?.startDatetime))}</p>
           </div>
+          <PastVisitSummary encounters={visits.encounters} patientUuid={patientUuid} />
         </div>
       </div>
     );
