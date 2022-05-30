@@ -21,10 +21,7 @@ import {
   useSession,
   ExtensionSlot,
   useLayoutType,
-  useConfig,
   useVisitTypes,
-  useVisit,
-  navigate,
   NewVisitPayload,
   saveVisit,
   toOmrsIsoString,
@@ -38,13 +35,13 @@ import { SearchTypes } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
-
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
+  closePanel: () => void;
 }
 
-const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType }) => {
+const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -99,13 +96,14 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             if (response.status === 201) {
               showToast({
                 kind: 'success',
+                title: t('startVisit', 'Start a visit'),
                 description: t(
                   'startVisitSuccessfully',
-                  'Visit started successfully. Patient has been added to active visits list.',
+                  'Patient has been added to active visits list.',
                   `${hours} : ${minutes}`,
                 ),
               });
-              navigate({ to: `\${openmrsSpaBase}/home` });
+              closePanel();
             }
           },
           (error) => {
@@ -118,7 +116,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           },
         );
     },
-    [patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
+    [patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType, closePanel],
   );
 
   const handleOnChange = () => {
@@ -249,10 +247,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         </div>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button
-          className={styles.button}
-          kind="secondary"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
+        <Button className={styles.button} kind="secondary" onClick={closePanel}>
           {t('discard', 'Discard')}
         </Button>
         <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
