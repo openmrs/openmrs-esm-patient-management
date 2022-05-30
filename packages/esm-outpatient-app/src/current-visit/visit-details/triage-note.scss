@@ -14,8 +14,8 @@
 }
 
 .unit {
-  @include carbon--type-style('body-short-01');
-  color: var(--text-02);
+  @include carbon--type-style('body-short-02');
+  color: var(--text-01);
   margin-left: $spacing-02;
 }
 
@@ -31,8 +31,46 @@
 
 .vitalValuesWrapper {
   display: flex;
+  align-items: center;
 }
 
 .notification {
   fill: $danger;
+}
+
+.danger-icon {
+  color: $danger;
+  height: 0.25rem;
+  width: 0.25rem;
+  margin-left: $spacing-02;
+}
+
+.iconWrapper {
+  margin-left: $spacing-02;
+}
+
+.critically-low,
+.critically-high,
+.low,
+.high {
+  &::after {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+  }
+}
+
+.low::after {
+  content: ' ↓';
+}
+
+.critically-low::after {
+  content: ' ↓↓';
+}
+
+.high::after {
+  content: ' ↑';
+}
+
+.critically-high::after {
+  content: ' ↑↑';
 }
