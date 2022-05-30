@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
+import { last } from 'lodash';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -155,3 +156,8 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     isValidating,
   };
 }
+
+export const getOriginFromPathName = (pathname = '') => {
+  const from = pathname.split('/');
+  return last(from);
+};
