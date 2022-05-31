@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes, Children } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -56,13 +56,12 @@ type FilterProps = {
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
   handleNameClick: (e: MouseEvent, to: string) => void;
-  name: string;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ handleNameClick, name, to }) => {
+const PatientNameLink: React.FC<NameLinkProps> = ({ handleNameClick, to, children }) => {
   return (
     <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {name}
+      {children}
     </a>
   );
 };
@@ -201,9 +200,9 @@ function ActiveVisitsTable() {
         content: (
           <PatientNameLink
             to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}
-            handleNameClick={handleNameClick}
-            name={entry.name}
-          />
+            handleNameClick={handleNameClick}>
+            {entry.name}
+          </PatientNameLink>
         ),
       },
       priority: {
