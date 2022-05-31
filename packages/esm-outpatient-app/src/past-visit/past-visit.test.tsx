@@ -12,7 +12,7 @@ describe('PastVisit: ', () => {
     spyOn(mockPastVisitResource, 'usePastVisits').and.returnValue({ data: mockPastVisit.data.results });
     renderPastVisitTabs();
 
-    expect(screen.getAllByText(/vitals/i));
+    expect(screen.queryAllByText(/vitals/i));
     const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
     const encountersTab = screen.getByRole('tab', { name: /encounters/i });
 

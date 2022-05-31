@@ -13,9 +13,10 @@ import { ConfigObject } from '../../config-schema';
 interface VitalsComponentProps {
   vitals: Array<PatientVitals>;
   patientUuid: string;
+  visitType: string;
 }
 
-const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
+const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
@@ -146,17 +147,23 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
         </div>
       ) : (
         <div>
-          <p className={styles.emptyText}>
-            {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}
-          </p>
-          <Button
-            size="small"
-            kind="ghost"
-            renderIcon={ArrowRight16}
-            onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
-            iconDescription={t('vitalsForm', 'Vitals form')}>
-            {t('vitalsForm', 'Vitals form')}
-          </Button>
+          {visitType === 'current' ? (
+            <div>
+              <p className={styles.emptyText}>
+                {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}
+              </p>
+              <Button
+                size="small"
+                kind="ghost"
+                renderIcon={ArrowRight16}
+                onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
+                iconDescription={t('vitalsForm', 'Vitals form')}>
+                {t('vitalsForm', 'Vitals form')}
+              </Button>
+            </div>
+          ) : (
+            <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noVitalsFound', 'No vitals found')}</p>
+          )}
         </div>
       )}
     </div>

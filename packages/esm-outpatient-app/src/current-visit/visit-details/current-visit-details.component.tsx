@@ -19,6 +19,11 @@ interface CurrentVisitProps {
   encounters: Array<Encounter | OpenmrsResource>;
 }
 
+enum visitTypes {
+  CURRENT = 'current',
+  PAST = 'past',
+}
+
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
@@ -114,7 +119,7 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
               <StructuredListCell>{t('vitals', 'Vitals')}</StructuredListCell>
               <StructuredListCell>
                 {' '}
-                <Vitals vitals={vitals} patientUuid={patientUuid} />
+                <Vitals vitals={vitals} patientUuid={patientUuid} visitType={visitTypes.CURRENT} />
               </StructuredListCell>
             </StructuredListRow>
           </StructuredListBody>
