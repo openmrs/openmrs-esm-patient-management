@@ -12,26 +12,44 @@
   outline: none;
 }
 
-// desktop mode styling
-:global(.omrs-breakpoint-gt-tablet) .searchArea {
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-  width: 50vw;
-  border: $spacing-01 solid $carbon--orange-40;
-  height: calc($spacing-08 - 0.25rem);
-  margin-right: $spacing-01;
-  width: 50vw;
+// desktop & tablet mode styling
+:global(.omrs-breakpoint-gt-phone) {
+  .searchArea {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    width: 50vw;
+    border: $spacing-01 solid $carbon--orange-40;
+    height: calc($spacing-08 - 0.25rem);
+    margin-right: $spacing-01;
+  }
+
+  .patientSearchIconWrapper {
+    .patientSearchInput {
+      input:focus {
+        height: 2rem;
+      }
+      input {
+        height: 2rem;
+      }
+      button {
+        height: 2rem;
+      }
+    }
+    .searchButton {
+      min-height: 2rem !important;
+      height: 2rem;
+    }
+  }
 }
 
-// tablet mode styling
-:global(.omrs-breakpoint-lt-desktop) .searchArea {
+// mobile mode styling
+:global(.omrs-breakpoint-lt-tablet) .searchArea {
   display: flex;
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  width: 100vw;
   border: $spacing-01 solid $carbon--orange-40;
   margin-right: $spacing-01;
   position: fixed;
