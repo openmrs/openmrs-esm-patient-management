@@ -73,7 +73,6 @@ describe('name input', () => {
               identifierTypes: [],
               validationSchema,
               setValidationSchema: () => {},
-              fieldConfigs: mockFieldConfigs,
               values: formValues,
               inEditMode: false,
               setFieldValue: () => null,

@@ -1,4 +1,6 @@
+import { useConfig } from '@openmrs/esm-framework';
 import { createContext, SetStateAction, useContext } from 'react';
+import { RegistrationConfig } from '../config-schema';
 import { FormValues, CapturePhotoProps } from './patient-registration-types';
 
 export interface PatientRegistrationContextProps {
@@ -7,7 +9,6 @@ export interface PatientRegistrationContextProps {
   validationSchema: any;
   setValidationSchema(value: any): void;
   inEditMode: boolean;
-  fieldConfigs: Record<string, any>;
   setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
@@ -17,6 +18,6 @@ export interface PatientRegistrationContextProps {
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);
 
 export function useFieldConfig(field: string) {
-  const { fieldConfigs } = useContext(PatientRegistrationContext);
-  return fieldConfigs[field];
+  const { fieldConfigurations } = useConfig() as RegistrationConfig;
+  return fieldConfigurations[field];
 }
