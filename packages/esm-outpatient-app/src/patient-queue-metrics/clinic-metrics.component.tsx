@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from 'carbon-components-react';
 import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
+import MetricsCardAvgWaitTime from './metrics-card-avg-wait-time.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
 
@@ -43,7 +44,7 @@ const ClinicMetrics: React.FC = () => {
             onChange={handleServiceCountChange}
           />
         </MetricsCard>
-        <MetricsCard
+        <MetricsCardAvgWaitTime
           label={t('minutes', 'Minutes')}
           value={metrics ? metrics.average_wait_time : 0}
           headerLabel={t('averageWaitTime', 'Average wait time today')}
