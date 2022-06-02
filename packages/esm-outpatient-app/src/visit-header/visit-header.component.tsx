@@ -18,6 +18,7 @@ import {
   useLayoutType,
   usePatient,
   useVisit,
+  navigate,
 } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import { launchPatientWorkspace } from './workspaces';
@@ -64,6 +65,13 @@ const VisitHeader: React.FC = () => {
 
   const noActiveVisit = !isLoading && visitNotLoaded;
 
+  const originPage = localStorage.getItem('fromPage');
+
+  const onClosePatientChart = () => {
+    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
+    setShowVisitHeader((prevState) => !prevState);
+    localStorage.removeItem('fromPage');
+  };
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
@@ -110,7 +118,7 @@ const VisitHeader: React.FC = () => {
               <HeaderGlobalAction
                 className={styles.headerGlobalBarCloseButton}
                 aria-label={t('close', 'Close')}
-                onClick={() => setShowVisitHeader((prevState) => !prevState)}>
+                onClick={onClosePatientChart}>
                 <CloseFilled20 />
               </HeaderGlobalAction>
             </HeaderGlobalBar>
