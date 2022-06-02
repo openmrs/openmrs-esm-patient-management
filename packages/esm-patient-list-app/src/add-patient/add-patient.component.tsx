@@ -175,12 +175,18 @@ interface AddablePatientListViewModel {
 export function useAddablePatientLists(patientUuid: string) {
   const { t } = useTranslation();
   return useSWR(['addablePatientLists', patientUuid], async () => {
-    const [fakeLists, realLists] = await Promise.all([
+    // Using Promise.allSettled instead of Promise.all here because some distros might not have the
+    // cohort module installed, leading to the real patient list call failing.
+    // In that case we still want to show fake lists and *not* error out here.
+    const [fakeLists, realLists] = await Promise.allSettled([
       findFakePatientListsWithoutPatient(patientUuid, t),
       findRealPatientListsWithoutPatient(patientUuid),
     ]);
 
-    return [...fakeLists, ...realLists];
+    return [
+      ...(fakeLists.status === 'fulfilled' ? fakeLists.value : []),
+      ...(realLists.status === 'fulfilled' ? realLists.value : []),
+    ];
   });
 }
 
