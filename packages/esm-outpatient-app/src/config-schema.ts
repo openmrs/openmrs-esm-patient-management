@@ -81,3 +81,9 @@ export interface ConfigObject {
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
 }
+
+export interface OutpatientConfig {
+  offlineVisitTypeUuid: string;
+  visitTypeResourceUrl: string;
+  showRecommendedVisitTypeTab: boolean;
+}

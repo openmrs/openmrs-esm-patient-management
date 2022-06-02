@@ -14,6 +14,9 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
+  FormGroup,
+  RadioButton,
+  RadioButtonGroup,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -28,13 +31,18 @@ import {
   toDateObjectStrict,
   showNotification,
   showToast,
+  useConfig,
 } from '@openmrs/esm-framework';
 import styles from './visit-form.scss';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import { SearchTypes } from '../../types/index';
+import { SearchTypes, PatientProgram } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
+import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import { useActivePatientEnrollment } from '../hooks/useActivePaientEnrollment';
+import { OutpatientConfig } from '../../config-schema';
+
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
@@ -57,6 +65,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const [ignoreChanges, setIgnoreChanges] = useState(true);
+  const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
+  const config = useConfig() as OutpatientConfig;
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -200,7 +211,32 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             </Select>
           </section>
 
-          <section className={styles.section}>
+          {config.showRecommendedVisitTypeTab && (
+            <section>
+              <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
+              <FormGroup legendText={t('selectProgramType', 'Select program type')}>
+                <RadioButtonGroup
+                  defaultSelected={enrollment?.program?.uuid}
+                  orientation="vertical"
+                  onChange={(uuid) =>
+                    setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))
+                  }
+                  name="program-type-radio-group"
+                  valueSelected="default-selected">
+                  {activePatientEnrollment.map(({ uuid, display, program }) => (
+                    <RadioButton
+                      key={uuid}
+                      className={styles.radioButton}
+                      id={uuid}
+                      labelText={display}
+                      value={program.uuid}
+                    />
+                  ))}
+                </RadioButtonGroup>
+              </FormGroup>
+            </section>
+          )}
+          <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
             <ContentSwitcher
               selectedIndex={contentSwitcherIndex}
@@ -210,7 +246,17 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               <Switch name="recommended" text={t('recommended', 'Recommended')} />
               <Switch name="all" text={t('all', 'All')} />
             </ContentSwitcher>
-            {contentSwitcherIndex === 0 && <></>}
+            {contentSwitcherIndex === 0 && !isLoading && (
+              <MemoizedRecommendedVisitType
+                onChange={(visitType) => {
+                  setVisitType(visitType);
+                  setIsMissingVisitType(false);
+                }}
+                patientUuid={patientUuid}
+                patientProgramEnrollment={enrollment}
+                locationUuid={selectedLocation}
+              />
+            )}
             {contentSwitcherIndex === 1 && (
               <BaseVisitType
                 onChange={(visitType) => {
@@ -224,17 +270,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           </section>
           {isMissingVisitType && (
             <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingVisitType', 'Missing visit type')}
-                subtitle={t('selectVisitType', 'Please select a Visit Type')}
-              />
-            </section>
-          )}
-          {isMissingVisitType && (
-            <section className={styles.section}>
               <InlineNotification
                 style={{ margin: '0', minWidth: '100%' }}
                 kind="error"
