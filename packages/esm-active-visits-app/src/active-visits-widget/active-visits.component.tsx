@@ -40,14 +40,18 @@ interface PaginationData {
 }
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
-  handleNameClick: (e: MouseEvent, to: string) => void;
-  name: string;
+  from: string;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ handleNameClick, name, to }) => {
+const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+  const handleNameClick = (event: MouseEvent, to: string) => {
+    event.preventDefault();
+    navigate({ to });
+    localStorage.setItem('fromPage', from);
+  };
   return (
     <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {name}
+      {children}
     </a>
   );
 };
@@ -64,12 +68,6 @@ const ActiveVisitsTable = () => {
 
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
-
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', fromPage);
-  };
 
   const headerData = useMemo(
     () => [
@@ -190,10 +188,10 @@ const ActiveVisitsTable = () => {
                           <TableCell key={cell.id}>
                             {cell.info.header === 'name' ? (
                               <PatientNameLink
-                                name={cell.value}
-                                handleNameClick={handleNameClick}
-                                to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}
-                              />
+                                from={fromPage}
+                                to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
+                                {cell.value}
+                              </PatientNameLink>
                             ) : (
                               cell.value
                             )}

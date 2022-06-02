@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes, Children } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -55,10 +55,16 @@ type FilterProps = {
 
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
-  handleNameClick: (e: MouseEvent, to: string) => void;
+  from: string;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ handleNameClick, to, children }) => {
+const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+  const handleNameClick = (event: MouseEvent, to: string) => {
+    event.preventDefault();
+    navigate({ to });
+    localStorage.setItem('fromPage', from);
+  };
+
   return (
     <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
       {children}
@@ -131,12 +137,6 @@ function ActiveVisitsTable() {
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
 
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', fromPage);
-  };
-
   useEffect(() => {
     if (filter) {
       setFilteredRows(visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)));
@@ -198,9 +198,7 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <PatientNameLink
-            to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}
-            handleNameClick={handleNameClick}>
+          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
             {entry.name}
           </PatientNameLink>
         ),
