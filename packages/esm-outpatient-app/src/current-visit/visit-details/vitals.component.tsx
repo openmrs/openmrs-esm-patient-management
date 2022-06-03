@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Grid, Row, Tag, Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { calculateBMI } from '../current-visit.resource';
+import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { PatientVitals } from '../../types/index';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { navigate, useConfig } from '@openmrs/esm-framework';
@@ -18,7 +18,7 @@ interface VitalsComponentProps {
 const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
 
   const vitalsToDisplay = vitals.reduce(
     (previousVital, currentVital) => Object.assign(previousVital, currentVital),
@@ -38,22 +38,55 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid }) => {
                     {vitalsToDisplay.temperature ? vitalsToDisplay.temperature : '--'}
                   </p>
                   <p className={styles.unit}>{conceptUnits.get(config.concepts.temperatureUuid) ?? ''}</p>
+                  <p>{}</p>
                 </div>
               </Tile>
               <Tile light>
                 <p>{t('bp', 'Bp')}</p>
                 <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'}</p>
+                  <p className={styles.vitalValues}>
+                    {vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'} /
+                    {vitalsToDisplay.systolic ? vitalsToDisplay.diastolic : '--'}
+                  </p>
                   <p className={styles.unit}>{conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}</p>
                 </div>
               </Tile>
               <Tile>
-                <p>
-                  {t('heartRate', 'Heart rate')} <CircleFillGlyph className={styles.notification} />
+                <p className={styles.vitalValuesWrapper}>
+                  {t('heartRate', 'Heart rate')}
+                  {assessValue(
+                    vitalsToDisplay.pulse,
+                    getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                  ) !== 'normal' ? (
+                    <CircleFillGlyph className={styles['danger-icon']} />
+                  ) : null}
                 </p>
                 <div className={styles.vitalValuesWrapper}>
                   <p className={styles.vitalValues}>{vitalsToDisplay.pulse ? vitalsToDisplay.pulse : '--'}</p>
                   <p className={styles.unit}>{conceptUnits.get(config.concepts.pulseUuid) ?? ''}</p>
+                  <p className={styles.iconWrapper}>
+                    {assessValue(
+                      vitalsToDisplay.pulse,
+                      getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                    ) === 'high' ? (
+                      <span className={styles.high}></span>
+                    ) : assessValue(
+                        vitalsToDisplay.pulse,
+                        getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                      ) === 'critically_high' ? (
+                      <span className={styles['critically-high']}></span>
+                    ) : assessValue(
+                        vitalsToDisplay.pulse,
+                        getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                      ) === 'low' ? (
+                      <span className={styles.low}></span>
+                    ) : assessValue(
+                        vitalsToDisplay.pulse,
+                        getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
+                      ) === 'critically_low' ? (
+                      <span className={styles['critically-low']}></span>
+                    ) : null}
+                  </p>
                 </div>
               </Tile>
             </Row>
