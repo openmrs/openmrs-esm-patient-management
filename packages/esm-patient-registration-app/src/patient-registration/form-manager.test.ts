@@ -16,7 +16,7 @@ const formValues: FormValues = {
   gender: '',
   birthdate: '',
   yearsEstimated: 1000,
-  monthsEstimated: 1000,
+  monthsEstimated: 11,
   birthdateEstimated: false,
   telephoneNumber: '',
   address1: '',

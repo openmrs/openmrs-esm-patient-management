@@ -11,7 +11,8 @@ export const DobField: React.FC = () => {
   const [dobUnknown] = useField('birthdateEstimated');
   const dobKnown = !dobUnknown.value;
   const [birthdate, birthdateMeta] = useField('birthdate');
-  const [ageEstimate, ageEstimateMeta] = useField('ageEstimate');
+  const [yearsEstimated, YearsEstimateMeta] = useField('yearsEstimated');
+  const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
   const today = new Date();
@@ -19,19 +20,34 @@ export const DobField: React.FC = () => {
   const onToggle = (e) => {
     setFieldValue('birthdateEstimated', e.name === 'unknown');
     setFieldValue('birthdate', '');
-    setFieldValue('ageEstimate', '');
+    setFieldValue('yearsEstimated', '');
+    setFieldValue('monthsEstimated', '');
   };
 
   const onDateChange = ([birthdate]) => {
     setFieldValue('birthdate', birthdate);
   };
 
-  const onEstimatedAgeChange = (ev) => {
+  const onEstimatedYearsChange = (ev) => {
     const years = +ev.target.value;
 
     if (!isNaN(years) && years < 140 && years >= 0) {
-      setFieldValue('birthdate', new Date(today.getFullYear() - years, 0, 1));
-      setFieldValue('ageEstimate', years);
+      setFieldValue('yearsEstimated', years);
+      setFieldValue('birthdate', new Date(today.getFullYear() - years, today.getMonth() - monthsEstimateMeta.value, 1));
+    }
+  };
+
+  const onEstimatedMonthsChange = (e) => {
+    const months = +e.target.value;
+
+    if (!isNaN(months) && months < 11 && months >= 0) {
+      const estimate_Months = YearsEstimateMeta.value * 12 + months;
+
+      setFieldValue('monthsEstimated', months);
+      setFieldValue(
+        'birthdate',
+        new Date(today.getFullYear() - YearsEstimateMeta.value, today.getMonth() - estimate_Months, 1),
+      );
     }
   };
 
@@ -67,16 +83,27 @@ export const DobField: React.FC = () => {
           </DatePicker>
         </div>
       ) : (
-        <div className={styles.dobField}>
+        <div className={styles.grid}>
           <TextInput
-            id="ageEstimate"
+            id="yearsEstimated"
             type="number"
             light
-            onChange={onEstimatedAgeChange}
+            onChange={onEstimatedYearsChange}
             labelText={t('estimatedYearsLabelText', 'Estimated Years')}
-            invalid={!!(ageEstimateMeta.touched && ageEstimateMeta.error)}
-            invalidText={ageEstimateMeta.error && t(ageEstimateMeta.error)}
-            value={ageEstimate.value}
+            invalid={!!(YearsEstimateMeta.touched && YearsEstimateMeta.error)}
+            invalidText={YearsEstimateMeta.error && t(YearsEstimateMeta.error)}
+            value={yearsEstimated.value}
+            min={0}
+          />
+          <TextInput
+            id="monthsEstimated"
+            type="number"
+            light
+            onChange={onEstimatedMonthsChange}
+            labelText={t('estimatedMonthsLabelText', 'Estimated Months')}
+            invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+            invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+            value={monthsEstimated.value}
             min={0}
           />
         </div>
