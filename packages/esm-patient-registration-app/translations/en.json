@@ -75,5 +75,6 @@
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
   "years": "Years",
+  "yearsEstimateRequired": "Years estimate is required",
   "yes": "Yes"
 }
