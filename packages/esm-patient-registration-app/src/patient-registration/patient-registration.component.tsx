@@ -140,6 +140,29 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
+  const getDescription = (errors) => {
+    return (
+      <div>
+        <p>The following fields have errors:</p>
+        <ul style={{ listStyle: 'inside' }}>
+          {Object.keys(errors).map((error, index) => (
+            <li key={index}>{t(`${error}LabelText`, error)}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const displayErrors = (errors) => {
+    if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
+      showToast({
+        description: getDescription(errors),
+        title: 'Incomplete form',
+        kind: 'warning',
+      });
+    }
+  };
+
   return (
     <Formik
       enableReinitialize
@@ -164,7 +187,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Link>
                   </div>
                 ))}
-                <Button className={styles.submitButton} type="submit">
+                <Button
+                  className={styles.submitButton}
+                  type="submit"
+                  onClick={() => props.validateForm().then((errors) => displayErrors(errors))}>
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
