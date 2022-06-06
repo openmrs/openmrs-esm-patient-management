@@ -26,6 +26,7 @@
   "editIdentifierTooltip": "Edit",
   "editPatientDetails": "Edit patient details",
   "emailLabelText": "Email address (optional)",
+  "estimatedMonthsLabelText": "Estimated Months",
   "estimatedYearsLabelText": "Estimated Years",
   "familyNameLabelText": "Family Name",
   "familyNameRequired": "Family name is required",
@@ -74,5 +75,6 @@
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
   "years": "Years",
+  "yearsEstimateRequired": "Years estimate is required",
   "yes": "Yes"
 }

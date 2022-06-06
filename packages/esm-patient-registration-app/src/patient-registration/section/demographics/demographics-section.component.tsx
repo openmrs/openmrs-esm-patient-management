@@ -1,12 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import styles from './../section.scss';
 import { useField } from 'formik';
-import { getField } from '../section-helper';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Field } from '../../field/field.component';
 
 export interface DemographicsSectionProps {
-  id: 'demographics';
-  fields: Array<any>;
+  fields: Array<string>;
 }
 
 export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields }) => {
@@ -24,7 +23,7 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
   return (
     <section className={styles.formSection} aria-label="Demographics Section">
       {fields.map((field) => (
-        <div key={field}>{getField(field)}</div>
+        <Field key={`demographics-${field}`} name={field} />
       ))}
     </section>
   );

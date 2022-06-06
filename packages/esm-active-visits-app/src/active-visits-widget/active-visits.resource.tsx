@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
+import { last } from 'lodash';
 import { openmrsFetch, Visit, useSession } from '@openmrs/esm-framework';
 
 dayjs.extend(isToday);
@@ -31,7 +32,10 @@ export function useActiveVisits() {
     '&location=' +
     sessionLocation;
   const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(url, openmrsFetch);
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    sessionLocation ? url : null,
+    openmrsFetch,
+  );
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => ({
     age: visit?.patient?.person?.age,
@@ -57,3 +61,8 @@ export function useActiveVisits() {
     isValidating,
   };
 }
+
+export const getOriginFromPathName = (pathname = '') => {
+  const from = pathname.split('/');
+  return last(from);
+};

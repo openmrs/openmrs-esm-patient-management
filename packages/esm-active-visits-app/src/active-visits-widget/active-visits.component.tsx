@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
 import {
   DataTable,
   DataTableSkeleton,
@@ -22,14 +22,15 @@ import {
   useLayoutType,
   useConfig,
   usePagination,
-  ConfigurableLink,
   ExtensionSlot,
   formatDatetime,
   parseDate,
+  interpolateUrl,
+  navigate,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
-import { ActiveVisit, useActiveVisits } from './active-visits.resource';
+import { ActiveVisit, useActiveVisits, getOriginFromPathName } from './active-visits.resource';
 import styles from './active-visits.scss';
 
 interface PaginationData {
@@ -37,6 +38,23 @@ interface PaginationData {
   results: Array<ActiveVisit>;
   currentPage: number;
 }
+interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  to: string;
+  from: string;
+}
+
+const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+  const handleNameClick = (event: MouseEvent, to: string) => {
+    event.preventDefault();
+    navigate({ to });
+    localStorage.setItem('fromPage', from);
+  };
+  return (
+    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
+      {children}
+    </a>
+  );
+};
 
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
@@ -47,6 +65,9 @@ const ActiveVisitsTable = () => {
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
+
+  const currentPathName: string = window.location.pathname;
+  const fromPage: string = getOriginFromPathName(currentPathName);
 
   const headerData = useMemo(
     () => [
@@ -166,10 +187,11 @@ const ActiveVisitsTable = () => {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'name' ? (
-                              <ConfigurableLink
+                              <PatientNameLink
+                                from={fromPage}
                                 to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
                                 {cell.value}
-                              </ConfigurableLink>
+                              </PatientNameLink>
                             ) : (
                               cell.value
                             )}

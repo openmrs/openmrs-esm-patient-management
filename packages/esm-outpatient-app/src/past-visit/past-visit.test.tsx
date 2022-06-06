@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import PastVisit from './past-visit.component';
+import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../__mocks__/patient.mock';
 import { mockPastVisit } from '../../__mocks__/visits.mock';
@@ -12,7 +12,7 @@ describe('PastVisit: ', () => {
     spyOn(mockPastVisitResource, 'usePastVisits').and.returnValue({ data: mockPastVisit.data.results });
     renderPastVisitTabs();
 
-    expect(screen.getByText(/vitals/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/vitals/i));
     const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
     const encountersTab = screen.getByRole('tab', { name: /encounters/i });
 
@@ -30,5 +30,5 @@ describe('PastVisit: ', () => {
 });
 
 function renderPastVisitTabs() {
-  renderWithSwr(<PastVisit patientUuid={mockPatient.id} />);
+  renderWithSwr(<PastVisitSummary patientUuid={mockPatient.id} encounters={[]} />);
 }

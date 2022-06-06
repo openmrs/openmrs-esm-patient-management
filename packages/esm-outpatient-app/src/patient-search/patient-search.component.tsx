@@ -6,6 +6,7 @@ import AdvancedSearch from './advanced-search.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import SearchResults from './search-results.component';
 import { SearchTypes } from '../types';
+import VisitForm from './visit-form/visit-form.component';
 
 interface PatientSearchProps {
   closePanel: () => void;
@@ -33,6 +34,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
             <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
           ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
+          ) : searchType === SearchTypes.VISIT_FORM ? (
+            <VisitForm patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} closePanel={closePanel} />
           ) : null}
         </div>
       </Overlay>

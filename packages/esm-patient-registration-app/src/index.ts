@@ -6,7 +6,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
   fetchAllRelationshipTypes,
 } from './offline.resources';
-import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
+import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
 
@@ -104,4 +104,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };

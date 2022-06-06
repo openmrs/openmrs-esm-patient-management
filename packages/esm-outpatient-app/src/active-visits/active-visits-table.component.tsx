@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -30,7 +30,7 @@ import {
 import Add16 from '@carbon/icons-react/es/add/16';
 import Group16 from '@carbon/icons-react/es/group/16';
 import InProgress16 from '@carbon/icons-react/es/in-progress/16';
-import { useLayoutType, ConfigurableLink, navigate } from '@openmrs/esm-framework';
+import { useLayoutType, navigate, showModal, interpolateUrl } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -38,10 +38,12 @@ import {
   QueueStatus,
   MappedVisitQueueEntry,
   MappedQueuePriority,
+  getOriginFromPathName,
 } from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -51,8 +53,34 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
+interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  to: string;
+  from: string;
+}
+
+const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+  const handleNameClick = (event: MouseEvent, to: string) => {
+    event.preventDefault();
+    navigate({ to });
+    localStorage.setItem('fromPage', from);
+  };
+
+  return (
+    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
+      {children}
+    </a>
+  );
+};
+
 function ActionsMenu({ patientUuid }: { patientUuid: string }) {
   const { t } = useTranslation();
+
+  const launchEndVisitModal = useCallback(() => {
+    const dispose = showModal('end-visit-dialog', {
+      closeModal: () => dispose(),
+      patientUuid,
+    });
+  }, [patientUuid]);
 
   return (
     <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
@@ -76,6 +104,7 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#endVisit"
+        onClick={launchEndVisitModal}
         hasDivider
         isDelete
         itemText={t('endVisit', 'End visit')}>
@@ -104,6 +133,9 @@ function ActiveVisitsTable() {
   const [filter, setFilter] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
+
+  const currentPathName: string = window.location.pathname;
+  const fromPage: string = getOriginFromPathName(currentPathName);
 
   useEffect(() => {
     if (filter) {
@@ -166,7 +198,9 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
+          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
+            {entry.name}
+          </PatientNameLink>
         ),
       },
       priority: {
@@ -314,10 +348,10 @@ function ActiveVisitsTable() {
                             <>
                               <Tabs>
                                 <Tab label={t('currentVisit', 'Current visit')}>
-                                  <>
-                                    <span className={styles.visitType}>{tableRows?.[index]?.visitType}</span>
-                                    <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </>
+                                  <CurrentVisit
+                                    patientUuid={tableRows?.[index]?.patientUuid}
+                                    visitUuid={tableRows?.[index]?.visitUuid}
+                                  />
                                 </Tab>
                                 <Tab label={t('previousVisit', 'Previous visit')}>
                                   <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />

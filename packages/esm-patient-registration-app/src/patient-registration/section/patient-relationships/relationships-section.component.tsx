@@ -25,17 +25,7 @@ interface RelationshipType {
   direction: string;
 }
 
-async function searchPerson(query: string) {
-  const abortController = new AbortController();
-  const searchResults = await fetchPerson(query, abortController);
-  return searchResults.data.results;
-}
-
-export interface RelationshipsSectionProps {
-  id: 'relationships';
-}
-
-export const RelationshipsSection: React.FC<RelationshipsSectionProps> = () => {
+export const RelationshipsSection = () => {
   const { relationshipTypes } = useContext(ResourcesContext);
   const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
   const { t } = useTranslation();
