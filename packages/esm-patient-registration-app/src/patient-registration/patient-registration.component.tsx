@@ -144,7 +144,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const getDescription = (errors) => {
     return (
       <div>
-        <p>The following fields have errors:</p>
+        <p>{t('fieldErrorTitleMessage', 'The following fields have errors:')}</p>
         <ul style={{ listStyle: 'inside' }}>
           {Object.keys(errors).map((error, index) => (
             <li key={index}>{t(`${error}LabelText`, error)}</li>
@@ -158,7 +158,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
       showToast({
         description: getDescription(errors),
-        title: 'Incomplete form',
+        title: t('incompleteForm', 'Incomplete form'),
         kind: 'warning',
       });
     }
