@@ -1,46 +1,44 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
-import { formatTime, parseDate, useLayoutType, formatDatetime, useConfig } from '@openmrs/esm-framework';
+import { formatTime, parseDate, useLayoutType, formatDatetime } from '@openmrs/esm-framework';
 import EncounterList from './encounter-list.component';
 import styles from '../past-visit.scss';
-import { Encounter, OrderItem, Order, Note, DiagnosisItem, PatientVitals, Observation } from '../../types/index';
+import { Encounter, OrderItem, Order, Note, DiagnosisItem, Observation } from '../../types/index';
 import Medications from './medications-list.component';
 import Notes from './notes-list.component';
-import { ConfigObject } from '../../config-schema';
 import Vitals from '../../current-visit/visit-details/vitals.component';
-
+import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
 interface PastVisitSummaryProps {
   encounters: Array<any>;
   patientUuid: string;
 }
 
 enum visitTypes {
-  CURRENT = 'current',
-  PAST = 'past',
+  CURRENT = 'currentVisit',
+  PAST = 'pastVisit',
 }
 
 const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patientUuid }) => {
   const { t } = useTranslation();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const isTablet = useLayoutType() === 'tablet';
-  const config = useConfig() as ConfigObject;
 
   const encountersToDisplay = encounters
     .filter((encounter) => encounter?.encounters?.length)
     .flatMap((visitWithEncounters) => mapEncounters(visitWithEncounters));
 
-  const [medications, notes, diagnoses, vitals]: [
+  const [medications, notes, diagnoses, vitalsToRetrieve]: [
     Array<OrderItem>,
     Array<Note>,
     Array<DiagnosisItem>,
-    Array<PatientVitals>,
+    Array<Encounter>,
   ] = useMemo(() => {
     // Medication Tab
     const medications: Array<OrderItem> = [];
     const notes: Array<Note> = [];
     const diagnoses: Array<DiagnosisItem> = [];
-    const vitals: Array<PatientVitals> = [];
+    const vitalsToRetrieve: Array<Encounter> = [];
 
     // Iterating through every Encounter
     encounters?.forEach((encounter) => {
@@ -79,10 +77,12 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           }
         });
 
+        vitalsToRetrieve.push(val);
+
         // Iterating through every Encounter
         encounters.forEach((enc: Encounter) => {
           // Check for Visit Diagnoses and Notes
-          if (enc.encounterType.display === 'Visit Note') {
+          if (enc.encounterType?.display === 'Visit Note') {
             enc.obs.forEach((obs: Observation) => {
               if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
                 // // Putting all the diagnoses in a single array.
@@ -105,49 +105,8 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           }
         });
       });
-
-      encounter?.obs.forEach((obs: Observation) => {
-        if (obs.concept?.uuid === config.concepts.pulseUuid) {
-          vitals.push({
-            pulse: obs.value,
-            provider: {
-              name: encounter.encounterProviders.length ? encounter.encounterProviders[0].provider.person.display : '',
-              role: encounter.encounterProviders.length ? encounter.encounterProviders[0].encounterRole.display : '',
-            },
-            time: formatTime(parseDate(obs.obsDatetime)),
-          });
-        } else if (obs.concept?.uuid === config.concepts.oxygenSaturationUuid) {
-          vitals.push({
-            oxygenSaturation: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.respiratoryRateUuid) {
-          vitals.push({
-            respiratoryRate: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.temperatureUuid) {
-          vitals.push({
-            temperature: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.systolicBloodPressureUuid) {
-          vitals.push({
-            systolic: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.diastolicBloodPressureUuid) {
-          vitals.push({
-            diastolic: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.weightUuid) {
-          vitals.push({
-            weight: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.heightUuid) {
-          vitals.push({
-            height: obs.value,
-          });
-        }
-      });
     });
-    return [medications, notes, diagnoses, vitals];
+    return [medications, notes, diagnoses, vitalsToRetrieve];
   }, [encounters]);
 
   return (
@@ -159,7 +118,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
             id="vitals-tab"
             onClick={() => setSelectedTabIndex(0)}
             label={t('vitals', 'Vitals')}>
-            <Vitals vitals={vitals} patientUuid={patientUuid} visitType={visitTypes.PAST} />
+            <Vitals vitals={useVitalsFromObs(vitalsToRetrieve)} patientUuid={patientUuid} visitType={visitTypes.PAST} />
           </Tab>
 
           <Tab

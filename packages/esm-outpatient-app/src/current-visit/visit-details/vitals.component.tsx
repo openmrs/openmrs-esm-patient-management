@@ -147,7 +147,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
         </div>
       ) : (
         <div>
-          {visitType === 'current' ? (
+          {visitType === 'currentVisit' ? (
             <div>
               <p className={styles.emptyText}>
                 {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}

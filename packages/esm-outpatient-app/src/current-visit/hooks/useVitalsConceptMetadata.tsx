@@ -1,5 +1,7 @@
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, formatTime, parseDate } from '@openmrs/esm-framework';
+import { Observation, PatientVitals, Encounter } from '../../types/index';
+import { ConfigObject } from '../../config-schema';
 
 export function useVitalsConceptMetadata() {
   const customRepresentation =
@@ -43,3 +45,54 @@ interface VitalsConceptMetadataResponse {
     setMembers: Array<ConceptMetadata>;
   }>;
 }
+
+export const useVitalsFromObs = (encounter) => {
+  const config = useConfig() as ConfigObject;
+
+  const vitals: Array<PatientVitals> = [];
+
+  encounter.forEach((enc) => {
+    enc.obs?.forEach((obs: Observation) => {
+      if (obs.concept?.uuid === config.concepts.pulseUuid) {
+        vitals.push({
+          pulse: obs.value,
+          provider: {
+            name: encounter.encounterProviders?.length ? encounter.encounterProviders[0].provider.person.display : '',
+            role: encounter.encounterProviders?.length ? encounter.encounterProviders[0].encounterRole.display : '',
+          },
+          time: formatTime(parseDate(obs.obsDatetime)),
+        });
+      } else if (obs.concept?.uuid === config.concepts.oxygenSaturationUuid) {
+        vitals.push({
+          oxygenSaturation: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.respiratoryRateUuid) {
+        vitals.push({
+          respiratoryRate: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.temperatureUuid) {
+        vitals.push({
+          temperature: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.systolicBloodPressureUuid) {
+        vitals.push({
+          systolic: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.diastolicBloodPressureUuid) {
+        vitals.push({
+          diastolic: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.weightUuid) {
+        vitals.push({
+          weight: obs.value,
+        });
+      } else if (obs.concept?.uuid === config.concepts.heightUuid) {
+        vitals.push({
+          height: obs.value,
+        });
+      }
+    });
+  });
+
+  return vitals;
+};

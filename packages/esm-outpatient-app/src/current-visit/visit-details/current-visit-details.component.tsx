@@ -7,12 +7,12 @@ import {
   StructuredListWrapper,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { OpenmrsResource, useConfig, formatTime, parseDate } from '@openmrs/esm-framework';
+import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
 import styles from '../current-visit.scss';
 import TriageNote from './triage-note.component';
 import Vitals from './vitals.component';
-import { Note, Encounter, Observation, PatientVitals, DiagnosisItem } from '../../types/index';
-import { ConfigObject } from '../../config-schema';
+import { Note, Encounter, Observation, DiagnosisItem } from '../../types/index';
+import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
 
 interface CurrentVisitProps {
   patientUuid: string;
@@ -20,23 +20,22 @@ interface CurrentVisitProps {
 }
 
 enum visitTypes {
-  CURRENT = 'current',
-  PAST = 'past',
+  CURRENT = 'currentVisit',
+  PAST = 'pastVisit',
 }
 
 const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encounters }) => {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
 
-  const [diagnoses, notes, vitals]: [Array<DiagnosisItem>, Array<Note>, Array<PatientVitals>] = useMemo(() => {
+  const [diagnoses, notes, vitalsToRetrieve]: [Array<DiagnosisItem>, Array<Note>, Array<Encounter>] = useMemo(() => {
     const notes: Array<Note> = [];
-    const vitals: Array<PatientVitals> = [];
+    const vitalsToRetrieve: Array<Encounter> = [];
     const diagnoses: Array<DiagnosisItem> = [];
 
     // Iterating through every Encounter
-    encounters.forEach((enc: Encounter) => {
+    encounters?.forEach((enc: Encounter) => {
       // Check for Visit Diagnoses and Notes
-      if (enc.encounterType.display === 'Visit Note') {
+      if (enc.encounterType?.display === 'Visit Note') {
         enc.obs.forEach((obs: Observation) => {
           if (obs.concept && obs.concept.display === 'Visit Diagnoses') {
             // // Putting all the diagnoses in a single array.
@@ -58,48 +57,9 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
         });
       }
 
-      enc.obs.forEach((obs: Observation) => {
-        if (obs.concept?.uuid === config.concepts.pulseUuid) {
-          vitals.push({
-            pulse: obs.value,
-            provider: {
-              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-            },
-            time: formatTime(parseDate(obs.obsDatetime)),
-          });
-        } else if (obs.concept?.uuid === config.concepts.oxygenSaturationUuid) {
-          vitals.push({
-            oxygenSaturation: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.respiratoryRateUuid) {
-          vitals.push({
-            respiratoryRate: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.temperatureUuid) {
-          vitals.push({
-            temperature: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.systolicBloodPressureUuid) {
-          vitals.push({
-            systolic: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.diastolicBloodPressureUuid) {
-          vitals.push({
-            diastolic: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.weightUuid) {
-          vitals.push({
-            weight: obs.value,
-          });
-        } else if (obs.concept?.uuid === config.concepts.heightUuid) {
-          vitals.push({
-            height: obs.value,
-          });
-        }
-      });
+      vitalsToRetrieve.push(enc);
     });
-    return [diagnoses, notes, vitals];
+    return [diagnoses, notes, vitalsToRetrieve];
   }, [encounters]);
 
   return (
@@ -119,7 +79,11 @@ const CurrentVisitDetails: React.FC<CurrentVisitProps> = ({ patientUuid, encount
               <StructuredListCell>{t('vitals', 'Vitals')}</StructuredListCell>
               <StructuredListCell>
                 {' '}
-                <Vitals vitals={vitals} patientUuid={patientUuid} visitType={visitTypes.CURRENT} />
+                <Vitals
+                  vitals={useVitalsFromObs(vitalsToRetrieve)}
+                  patientUuid={patientUuid}
+                  visitType={visitTypes.CURRENT}
+                />
               </StructuredListCell>
             </StructuredListRow>
           </StructuredListBody>
