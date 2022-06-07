@@ -17,7 +17,7 @@ const mockPatient = {
   id: 'b73bee73-7bf0-4872-9657-ba9de0d93478',
   name: [{ given: ['John', null], family: 'Smith' }],
   person: {
-    gender: 'M',
+    gender: 'Male',
     age: 2,
     birthdate: '2020-02-01T00:00:00.000+0000',
     birthdateEstimated: true,
@@ -48,7 +48,7 @@ const mockPatient = {
     dead: false,
     deathDate: null,
   },
-  gender: 'M',
+  gender: 'Male',
   birthDate: '2020-02-01T00:00:00.000+0000',
   deceasedDateTime: null,
   identifier: [{ value: '10001F0' }],

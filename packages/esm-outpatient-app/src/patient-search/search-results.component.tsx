@@ -6,7 +6,7 @@ import PatientInfo from '../patient-info/patient-info.component';
 import styles from './search-results.scss';
 
 interface SearchResultsProps {
-  patients: Array<any>;
+  patients: Array<fhir.Patient>;
   hidePanel?: any;
   toggleSearchType: (searchMode: SearchTypes, patientUuid: string) => void;
 }
@@ -16,45 +16,9 @@ type SortingCriteria = 'firstNameFirst' | 'lastNameFirst' | 'oldest' | 'youngest
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const { t } = useTranslation();
   const [selectedSortingCriteria, setSelectedSortingCriteria] = useState<SortingCriteria>('firstNameFirst');
-  const fhirPatients = useMemo(() => {
-    return patients.map((patient) => {
-      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
-      return {
-        id: patient.uuid,
-        name: [
-          {
-            given: [patient.person.personName.givenName, patient.person.personName.middleName],
-            family: patient.person.personName.familyName,
-          },
-        ],
-        person: patient.person,
-        gender: patient.person.gender,
-        birthDate: patient.person.birthdate,
-        deceasedDateTime: patient.person.deathDate,
-        deceasedBoolean: patient.person.death,
-        identifier: [
-          {
-            value: patient.patientIdentifier.identifier,
-          },
-        ],
-        address: preferredAddress
-          ? [
-              {
-                city: preferredAddress.cityVillage,
-                country: preferredAddress.country,
-                postalCode: preferredAddress.postalCode,
-                state: preferredAddress.stateProvince,
-                use: 'home',
-              },
-            ]
-          : [],
-        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.name == 'Telephone Number'),
-      };
-    });
-  }, [patients]);
 
   const sortedPatient = useMemo(() => {
-    return fhirPatients.sort((patientA, patientB) => {
+    return patients.sort((patientA, patientB) => {
       if (selectedSortingCriteria === 'oldest') {
         return new Date(patientA.birthDate).getTime() - new Date(patientB.birthDate).getTime();
       }
@@ -62,13 +26,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
         return new Date(patientB.birthDate).getTime() - new Date(patientA.birthDate).getTime();
       }
       if (selectedSortingCriteria === 'firstNameFirst') {
-        return patientA.person.personName.givenName < patientB.person.personName.givenName ? -1 : 0;
+        return patientA.name?.[0].given?.join('') < patientB.name?.[0].given?.join('') ? -1 : 0;
       }
       if (selectedSortingCriteria === 'lastNameFirst') {
-        return patientA.person.personName.familyName < patientB.person.personName.familyName ? -1 : 0;
+        return patientA?.name?.[0].family < patientB?.name?.[0].family ? -1 : 0;
       }
     });
-  }, [fhirPatients, selectedSortingCriteria]);
+  }, [patients, selectedSortingCriteria]);
 
   const sortingCriteria = [
     { id: 'firstNameFirst', label: t('firstNameSort', 'First name (a-z)') },
