@@ -13,7 +13,7 @@ import { ResourcesContext } from '../../../offline.resources';
 
 export const IdField: React.FC = () => {
   const { identifierTypes } = useContext(ResourcesContext);
-  const { setFieldValue, inEditMode } = useContext(PatientRegistrationContext);
+  const { values, setFieldValue, inEditMode } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
@@ -21,7 +21,7 @@ export const IdField: React.FC = () => {
   const { defaultPatientIdentifierTypes } = config;
 
   useEffect(() => {
-    if (!inEditMode && identifierTypes) {
+    if (!inEditMode && identifierTypes && !values?.identifiers?.length) {
       const defaultPatientIdentifierTypesMap = {};
       if (defaultPatientIdentifierTypes?.length) {
         defaultPatientIdentifierTypes.forEach((typeUuid) => {
@@ -44,7 +44,7 @@ export const IdField: React.FC = () => {
           ),
       );
     }
-  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes, setFieldValue]);
+  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes, setFieldValue, values]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
