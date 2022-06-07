@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, wait, screen } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { validationSchema } from './patient-registration-validation';
 import { NameField } from '../field/name/name-field.component';
@@ -16,6 +16,7 @@ const mockFieldConfigs = {
     },
   },
 };
+
 describe('name input', () => {
   const formValues: FormValues = initialFormValues;
 
@@ -72,7 +73,6 @@ describe('name input', () => {
               identifierTypes: [],
               validationSchema,
               setValidationSchema: () => {},
-              fieldConfigs: mockFieldConfigs,
               values: formValues,
               inEditMode: false,
               setFieldValue: () => null,
@@ -97,8 +97,6 @@ describe('name input', () => {
     fireEvent.blur(middleNameInput);
     fireEvent.change(familyNameInput, { target: { value: familyNameValue } });
     fireEvent.blur(familyNameInput);
-
-    await wait();
 
     return {
       givenNameError: screen.queryByText('Given name is required'),

@@ -6,7 +6,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
   fetchAllRelationshipTypes,
 } from './offline.resources';
-import { esmPatientRegistrationSchema } from './config-schemas/openmrs-esm-patient-registration-schema';
+import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
 
@@ -14,10 +14,6 @@ const importTranslation = require.context('../translations', false, /.json$/, 'l
 
 const backendDependencies = {
   'webservices.rest': '^2.24.0',
-};
-
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 const resources = {
@@ -113,4 +109,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };

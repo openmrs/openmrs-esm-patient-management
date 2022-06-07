@@ -1,6 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { render, wait, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import * as backendController from './patient-registration.resource';
 import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
@@ -35,20 +34,11 @@ const mockResourcesContextValue = {
 
 let mockOpenmrsConfig = {
   sections: ['demographics', 'contact'],
-  sectionDefinitions: {
-    demographics: {
-      name: 'Demographics',
-      fields: ['name', 'gender', 'dob'],
-    },
-    contact: {
-      name: 'Contact Info',
-      fields: ['address'],
-    },
-    relationships: {
-      name: 'Relationships',
-      fields: ['relationship'],
-    },
-  },
+  sectionDefinitions: [
+    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob'] },
+    { id: 'contact', name: 'Contact Info', fields: ['address'] },
+    { id: 'relationships', name: 'Relationships', fields: ['relationship'] },
+  ],
   fieldConfigurations: {
     name: {
       displayMiddleName: true,
@@ -84,27 +74,17 @@ describe('patient registration', () => {
       </ResourcesContext.Provider>,
     );
   });
-});
 
-describe('patient registration sections', () => {
-  const testSectionExists = (labelText: string) => {
-    it(labelText + ' exists', async () => {
-      render(
-        <ResourcesContext.Provider value={mockResourcesContextValue}>
-          <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
-        </ResourcesContext.Provider>,
-      );
-      await wait();
-      expect(screen.getByLabelText(labelText)).not.toBeNull();
-    });
-  };
-
-  beforeAll(() => {
+  it('has the expected sections', async () => {
     spyOn(mockOpenmrsFramework, 'useConfig').and.returnValue(mockOpenmrsConfig);
+    render(
+      <ResourcesContext.Provider value={mockResourcesContextValue}>
+        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
+      </ResourcesContext.Provider>,
+    );
+    await waitFor(() => expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull());
+    expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
   });
-
-  testSectionExists('Demographics Section');
-  testSectionExists('Contact Info Section');
 });
 
 describe('form submit', () => {
@@ -180,6 +160,7 @@ describe('form submit', () => {
       patientUuid: mockPatient.id,
       error: null,
     });
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <PatientRegistration
@@ -189,7 +170,6 @@ describe('form submit', () => {
         />
       </ResourcesContext.Provider>,
     );
-    await wait();
 
     const givenNameInput = screen.getByLabelText('Given Name') as HTMLInputElement;
     const familyNameInput = screen.getByLabelText('Family Name') as HTMLInputElement;
@@ -212,7 +192,6 @@ describe('form submit', () => {
     userEvent.type(familyNameInput, 'Smith');
     userEvent.type(address1, 'Bom Jesus Street');
     userEvent.click(screen.getByText('Update Patient'));
-    await wait();
 
     expect(backendController.savePatient).toHaveBeenCalledWith(
       expect.anything(),

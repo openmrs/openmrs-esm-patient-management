@@ -20,10 +20,11 @@ import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { getSection } from './section/section-helper';
 import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
+import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
+import { SectionWrapper } from './section/section-wrapper.component';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -36,15 +37,13 @@ export interface PatientRegistrationProps {
 export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match, isOffline }) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
-  const config = useConfig();
-  const [sections, setSections] = useState([]);
+  const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = match.params;
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [fieldConfigs, setFieldConfigs] = useState({});
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
@@ -57,18 +56,15 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     exportedInitialFormValuesForTesting = initialFormValues;
   }, [initialFormValues]);
 
-  useEffect(() => {
-    if (config?.sections) {
-      const configuredSections = config.sections.map((section) => ({
-        id: section,
-        name: config.sectionDefinitions[section].name,
-        fields: config.sectionDefinitions[section].fields,
-      }));
-
-      setSections(configuredSections);
-      setFieldConfigs(config.fieldConfigurations);
-    }
-  }, [config.sections, config.fieldConfigurations, config.sectionDefinitions]);
+  const sections: Array<SectionDefinition> = useMemo(() => {
+    return config.sections
+      .map(
+        (sectionName) =>
+          config.sectionDefinitions.filter((s) => s.id == sectionName)[0] ??
+          builtInSections.filter((s) => s.id == sectionName)[0],
+      )
+      .filter((s) => s);
+  }, [config.sections, config.sectionDefinitions]);
 
   useEffect(() => {
     const addressTemplateXml = addressTemplate.results[0].value;
@@ -80,7 +76,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
     setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
 
-    // `=== false` is here on purpose (`inEditMode` is a triple state value).
+    // `=== false` is here on purpose (`inEditMode` can be null).
     // We *only* want to set initial address field values when *creating* a patient.
     // We must wait until after loading for this info.
     if (inEditMode === false) {
@@ -144,6 +140,29 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
+  const getDescription = (errors) => {
+    return (
+      <div>
+        <p>The following fields have errors:</p>
+        <ul style={{ listStyle: 'inside' }}>
+          {Object.keys(errors).map((error, index) => (
+            <li key={index}>{t(`${error}LabelText`, error)}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const displayErrors = (errors) => {
+    if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
+      showToast({
+        description: getDescription(errors),
+        title: 'Incomplete form',
+        kind: 'warning',
+      });
+    }
+  };
+
   return (
     <Formik
       enableReinitialize
@@ -168,7 +187,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Link>
                   </div>
                 ))}
-                <Button className={styles.submitButton} type="submit">
+                <Button
+                  className={styles.submitButton}
+                  type="submit"
+                  onClick={() => props.validateForm().then((errors) => displayErrors(errors))}>
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
@@ -182,7 +204,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   identifierTypes: identifierTypes,
                   validationSchema,
                   setValidationSchema,
-                  fieldConfigs,
                   values: props.values,
                   inEditMode,
                   setFieldValue: props.setFieldValue,
@@ -191,7 +212,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   isOffline,
                 }}>
                 {sections.map((section, index) => (
-                  <div key={index}>{getSection(section, index)}</div>
+                  <SectionWrapper
+                    key={`registration-section-${section.id}`}
+                    sectionDefinition={section}
+                    index={index}
+                  />
                 ))}
               </PatientRegistrationContext.Provider>
             </div>

@@ -8,12 +8,12 @@ import styles from './search-results.scss';
 interface SearchResultsProps {
   patients: Array<any>;
   hidePanel?: any;
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patientUuid: string) => void;
 }
 
 type SortingCriteria = 'firstNameFirst' | 'lastNameFirst' | 'oldest' | 'youngest';
 
-const SearchResults: React.FC<SearchResultsProps> = ({ patients }) => {
+const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const { t } = useTranslation();
   const [selectedSortingCriteria, setSelectedSortingCriteria] = useState<SortingCriteria>('firstNameFirst');
   const fhirPatients = useMemo(() => {
@@ -92,10 +92,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients }) => {
           onChange={({ selectedItem }) => setSelectedSortingCriteria(selectedItem.id as SortingCriteria)}
         />
       </div>
-      {sortedPatient.map((patient) => (
-        <div key={patient.id} className={styles.patientChart}>
+      {sortedPatient.map((patient, index) => (
+        <div key={`search-result-${index}`} className={styles.patientChart}>
           <div className={styles.container}>
-            <PatientInfo patient={patient} />
+            <PatientInfo
+              patient={patient}
+              handlePatientInfoClick={() => {
+                toggleSearchType(SearchTypes.SCHEDULED_VISITS, patient.id);
+              }}
+            />
           </div>
         </div>
       ))}
