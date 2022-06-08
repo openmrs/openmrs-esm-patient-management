@@ -44,6 +44,14 @@ export const AddressField: React.FC = () => {
         };
       });
       setAddressFields(propertiesObj);
+      // Do not remove the comments below
+      /*
+        t('postalCode')
+        t('address1')
+        t('stateProvince')
+        t('cityVillage')
+        t('country')
+      */
     }
   }, [t, addressTemplateXml]);
 
