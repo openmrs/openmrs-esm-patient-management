@@ -29,7 +29,7 @@ export const AddressHierarchy: React.FC = () => {
   const [selected, setselected] = useState();
   const [addressconfig, setaddressconfig] = useState(nulldata);
   const { t } = useTranslation();
-  const [field] = useField('gender');
+  // const [field] = useField('gender');
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const setComboBoxFieldValue = (filedname: string, filedvalue: string) => {
@@ -91,7 +91,7 @@ export const AddressHierarchy: React.FC = () => {
               setComboBoxFieldValue(id, e.selectedItem.name);
               setcomboboxlist([]);
             }}
-            selectedItem={field.value}
+            // selectedItem={field.value}
             name={id}
             placeholder={id}
             titleText={id}
