@@ -22,16 +22,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
     [patient.id, patientName],
   );
 
-  const patientGender = () => {
-    if (patient.gender === 'M') {
-      return t('male', 'Male');
-    }
-    if (patient.gender === 'F') {
-      return t('female', 'Female');
-    }
-    return t('unknown', 'Unknown');
-  };
-
   const toggleShowMore = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowContactDetails((prevState) => !prevState);
@@ -53,7 +43,9 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
           </div>
           <div className={styles.patientInfoRow}>
             <div className={styles.demographics}>
-              <span>{patientGender()} &middot; </span>
+              <span>
+                {(patient.gender ?? t('unknown', 'Unknown')).replace(/^\w/, (c) => c.toUpperCase())} &middot;{' '}
+              </span>
               <span>{age(patient.birthDate)} &middot; </span>
               <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
             </div>
