@@ -47,7 +47,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
-  const location = currentSession.sessionLocation?.uuid;
+  const location = currentSession?.sessionLocation?.uuid;
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
@@ -67,26 +67,28 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.sectionDefinitions]);
 
   useEffect(() => {
-    const addressTemplateXml = addressTemplate.results[0].value;
+    if (addressTemplate) {
+      const addressTemplateXml = addressTemplate?.results[0].value;
 
-    if (!addressTemplateXml) {
-      return;
-    }
-
-    const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
-    setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
-
-    // `=== false` is here on purpose (`inEditMode` can be null).
-    // We *only* want to set initial address field values when *creating* a patient.
-    // We must wait until after loading for this info.
-    if (inEditMode === false) {
-      for (const { name, defaultValue } of addressFieldValues) {
-        if (!initialAddressFieldValues[name]) {
-          initialAddressFieldValues[name] = defaultValue;
-        }
+      if (!addressTemplateXml) {
+        return;
       }
 
-      setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
+      const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
+      setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
+
+      // `=== false` is here on purpose (`inEditMode` can be null).
+      // We *only* want to set initial address field values when *creating* a patient.
+      // We must wait until after loading for this info.
+      if (inEditMode === false) {
+        for (const { name, defaultValue } of addressFieldValues) {
+          if (!initialAddressFieldValues[name]) {
+            initialAddressFieldValues[name] = defaultValue;
+          }
+        }
+
+        setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
+      }
     }
   }, [inEditMode, addressTemplate, initialAddressFieldValues]);
 
