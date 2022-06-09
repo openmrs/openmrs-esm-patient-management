@@ -11,6 +11,21 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   const [field, meta] = useField(props.name);
   const { t } = useTranslation();
 
+  /*
+    Do not remove these comments
+    t('givenNameRequired')
+    t('familyNameRequired')
+    t('genderUnspecified')
+    t('genderRequired')
+    t('birthdayRequired')
+    t('birthdayNotInTheFuture')
+    t('negativeYears')
+    t('negativeMonths')
+    t('deathdayNotInTheFuture')
+    t('invalidEmail')
+    t('numberInNameDubious')
+  */
+
   const value = field.value || '';
   const invalidText = meta.error && t(meta.error);
   const warnText = useMemo(() => {
