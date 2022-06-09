@@ -198,6 +198,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({
           source: identifierType.source,
           identifierTypeUuid: identifierType.uuid,
           preferred: identifierType.isPrimary,
+          required: identifierType.isPrimary || identifierType.required,
         });
       }
     });

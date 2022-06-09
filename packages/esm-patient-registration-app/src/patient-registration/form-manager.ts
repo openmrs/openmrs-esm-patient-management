@@ -155,6 +155,7 @@ export default class FormManager {
   ): Promise<Array<PatientIdentifier>> {
     let identifierTypeRequests = patientIdentifiers
       .filter((identifier) => identifier.action !== 'DELETE' && identifier.action !== 'NONE')
+      .filter(({ identifier, source, autoGeneration }) => identifier || (source && autoGeneration))
       .map(async (patientIdentifier) => {
         const { identifierTypeUuid, identifier, uuid, action, source, preferred, autoGeneration } = patientIdentifier;
         if (identifier || (source && autoGeneration)) {
@@ -180,12 +181,6 @@ export default class FormManager {
           }
 
           return identifierToCreate;
-        } else {
-          // This is a case that should not occur.
-          // If it did, the subsequent network request (when creating the patient) would fail with
-          // BadRequest since the (returned) identifier type is undefined.
-          // Better stop early.
-          throw new Error('No approach for generating a patient identifier could be found.');
         }
       });
 
