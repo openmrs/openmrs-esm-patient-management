@@ -24,6 +24,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('deathdayNotInTheFuture')
     t('invalidEmail')
     t('numberInNameDubious')
+    t('yearsEstimateRequired')
   */
 
   const value = field.value || '';
