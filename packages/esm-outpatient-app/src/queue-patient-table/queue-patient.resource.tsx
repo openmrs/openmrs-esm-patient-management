@@ -1,18 +1,26 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
-import { last } from 'lodash';
-
-export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
-export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
-export type QueueService = 'Clinical consultation' | 'Triage';
-export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import {
+  QueuePriority,
+  MappedQueuePriority,
+  MappedEncounter,
+  Encounter,
+  QueueService,
+  QueueStatus,
+} from '../active-visits/active-visits-table.resource';
+import { AppointmentsFetchResponse, Appointment } from '../types/index';
 
 export interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
   uuid: string;
   visit: Visit;
+}
+export interface UseVisitQueueEntries {
+  linelistsQueueEntries: Array<MappedVisitQueueEntry> | null;
+  isLoading: boolean;
+  isError: Error;
+  isValidating?: boolean;
 }
 
 export interface VisitQueueEntry {
@@ -21,6 +29,11 @@ export interface VisitQueueEntry {
   locationWaitingFor: string | null;
   patient: {
     uuid: string;
+    person: {
+      gender: string;
+      age: number;
+      birthdate: string;
+    };
   };
   priority: {
     display: QueuePriority;
@@ -42,12 +55,23 @@ export interface VisitQueueEntry {
   };
   uuid: string;
   visit: Visit;
+  provider: {
+    name: string;
+    role: string;
+  };
 }
 
 export interface MappedVisitQueueEntry {
   id: string;
   encounters: Array<MappedEncounter>;
   name: string;
+  age?: number;
+  gender?: string;
+  dob?: string;
+  provider?: {
+    name: string | null;
+    role: string | null;
+  };
   patientUuid: string;
   priority: MappedQueuePriority;
   priorityComment: string;
@@ -59,56 +83,7 @@ export interface MappedVisitQueueEntry {
   waitTime: string;
 }
 
-export interface UseVisitQueueEntries {
-  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
-  isLoading: boolean;
-  isError: Error;
-  isValidating?: boolean;
-}
-
-interface ObsData {
-  concept: {
-    display: string;
-    uuid: string;
-  };
-  value?: string | any;
-  groupMembers?: Array<{
-    concept: { uuid: string; display: string };
-    value?: string | any;
-  }>;
-  obsDatetime: string;
-}
-
-export interface Encounter {
-  diagnoses: Array<any>;
-  encounterDatetime: string;
-  encounterProviders?: Array<{ provider: { person: { display: string } } }>;
-  encounterType: { display: string; uuid: string };
-  obs: Array<ObsData>;
-  uuid: string;
-  voided: boolean;
-}
-
-export interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> {
-  encounterType: string;
-  provider: string;
-}
-
-export function useServices() {
-  const config = useConfig();
-  const {
-    concepts: { serviceConceptSetUuid },
-  } = config;
-
-  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
-  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
-  };
-}
-
-export function useVisitQueueEntries(): UseVisitQueueEntries {
+export function useQueueDetails(): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
@@ -129,6 +104,13 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     id: visitQueueEntry.queueEntry.uuid,
     encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
     name: visitQueueEntry.queueEntry.display,
+    age: visitQueueEntry.queueEntry.patient.person.age,
+    dob: visitQueueEntry.queueEntry.patient.person.birthdate,
+    gender: visitQueueEntry.queueEntry.patient.person.gender,
+    provider: {
+      name: visitQueueEntry.provider?.name,
+      role: visitQueueEntry.provider?.role,
+    },
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
     // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
@@ -150,14 +132,22 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
   const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    linelistsQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
     isLoading: !data && !error,
     isError: error,
     isValidating,
   };
 }
 
-export const getOriginFromPathName = (pathname = '') => {
-  const from = pathname.split('/');
-  return last(from);
-};
+export function useAppointments() {
+  const { data, error } = useSWR<{ data: { results: Array<Appointment> } }, Error>(
+    `/ws/rest/v1/appointments`,
+    openmrsFetch,
+  );
+
+  return {
+    appointmentQueueEntries: data ? data.data?.results : null,
+    isError: error,
+    isLoading: !data && !error,
+  };
+}

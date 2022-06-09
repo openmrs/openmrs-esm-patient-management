@@ -5,6 +5,7 @@ import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const ClinicMetrics: React.FC = () => {
   const { t } = useTranslation();
@@ -23,16 +24,20 @@ const ClinicMetrics: React.FC = () => {
   return (
     <>
       <MetricsHeader />
+      <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
+
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
           value={metrics ? metrics.scheduled_appointments : 0}
           headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          service="scheduled"
         />
         <MetricsCard
           label={t('patients', 'Patients')}
           value={serviceCount}
-          headerLabel={t('waitingFor', 'Waiting for:')}>
+          headerLabel={t('waitingFor', 'Waiting for:')}
+          service={selectedService}>
           <Dropdown
             style={{ marginTop: '1.5rem' }}
             id="inline"
