@@ -27,7 +27,11 @@ export const validationSchema = Yup.object({
   monthsEstimated: Yup.number().min(0, 'negativeMonths'),
   identifiers: Yup.array().of(
     Yup.object().shape({
-      identifier: Yup.string().required('identifierRequired'),
+      required: Yup.bool(),
+      identifier: Yup.string().when('required', {
+        is: true,
+        then: Yup.string().required('identifierRequired'),
+      }),
     }),
   ),
   deathDate: Yup.date().max(Date(), 'deathdayNotInTheFuture').nullable(),
