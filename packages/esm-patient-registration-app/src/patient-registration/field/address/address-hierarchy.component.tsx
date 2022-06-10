@@ -5,6 +5,7 @@ import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
+import { ComboInput } from '../../input/combo/comboinput.component';
 
 const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form';
 const CONF_BASE_WS_API_URL = '/ws/rest/v1/';
@@ -24,7 +25,6 @@ export function performAdressHirarchiWithParentSearch(addressField, parentid, qu
 }
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
-  console.log(fieldElement);
   return fieldElement ? fieldElement.getAttribute('value') : null;
 }
 function parseString(xmlDockAsString: string) {
@@ -100,26 +100,17 @@ export const AddressHierarchy: React.FC = () => {
           paddingBottom: '5%',
         }}>
         {addressconfig.map((attributes) => (
-          <ComboBox
-            downshiftProps={{
-              onStateChange: function noRefCheck() {},
-            }}
-            id={attributes.name}
-            onInputChange={(event) => comboboxevent(event, attributes.name)}
-            itemToString={(item) => (item ? item.text : '')}
-            items={comboboxlist}
-            onChange={(e) => {
-              e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
-              setComboBoxFieldValue(attributes.name, e.selectedItem.text);
-              setcomboboxlist([]);
-            }}
-            // selectedItem={"top"}
+          <ComboInput
             name={attributes.name}
-            // value={attributes.name}
+            onSearch={(event) => comboboxevent(event, attributes.name)}
+            itemToString={(item) => (item ? item.text : '')}
+            onSelect={(e) => {
+              e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
+            }}
+            labeltext={attributes.labelText}
+            items={comboboxlist}
+            id={attributes.name}
             placeholder={attributes.labelText}
-            titleText={attributes.labelText}
-            key={attributes.name}
-            light
           />
         ))}
       </div>
