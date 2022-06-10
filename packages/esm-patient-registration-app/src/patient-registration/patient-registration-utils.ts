@@ -13,22 +13,20 @@ import capitalize from 'lodash-es/capitalize';
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
   const nameMappings = templateXmlDoc.querySelector('nameMappings'); //.querySelectorAll('property');
-  const validationSchemaObjs: AddressValidationSchemaType[] = Array.prototype.map.call(
-    nameMappings,
-    (nameMapping: Element) => {
-      const name = nameMapping.getAttribute('name');
-      const label = nameMapping.getAttribute('value');
-      const regex = findElementValueInXmlDoc(name, 'elementRegex', templateXmlDoc) || '.*';
-      const regexFormat = findElementValueInXmlDoc(name, 'elementRegexFormats', templateXmlDoc) || '';
+  const properties = nameMappings.getElementsByTagName('entry');
+  const validationSchemaObjs = Array.prototype.map.call(properties, (property: Element) => {
+    const name = property.getElementsByTagName('string')[0].innerHTML;
+    const label = property.getElementsByTagName('string')[1].innerHTML;
+    const regex = findElementValueInXmlDoc(name, 'elementRegex', templateXmlDoc) || '.*';
+    const regexFormat = findElementValueInXmlDoc(name, 'elementRegexFormats', templateXmlDoc) || '';
 
-      return {
-        name,
-        label,
-        regex,
-        regexFormat,
-      };
-    },
-  );
+    return {
+      name,
+      label,
+      regex,
+      regexFormat,
+    };
+  });
 
   const addressValidationSchema = Yup.object(
     validationSchemaObjs.reduce((final, current) => {
@@ -37,7 +35,6 @@ export function parseAddressTemplateXml(addressTemplate: string) {
     }, {}),
   );
 
-  const properties = nameMappings.getElementsByTagName('entry');
   const addressFieldValues = Array.prototype.map.call(properties, (property: Element) => {
     const name = property.getElementsByTagName('string')[0].innerHTML;
     return {
@@ -45,7 +42,7 @@ export function parseAddressTemplateXml(addressTemplate: string) {
       defaultValue: '',
     };
   });
-  // console.log(addressFieldValues);
+  console.log(addressValidationSchema);
   return {
     addressFieldValues,
     addressValidationSchema,
