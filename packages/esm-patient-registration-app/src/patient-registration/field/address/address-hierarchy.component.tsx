@@ -4,7 +4,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { useField } from 'formik';
+import { ResourcesContext } from '../../../offline.resources';
 
 const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form';
 const CONF_BASE_WS_API_URL = '/ws/rest/v1/';
@@ -22,6 +22,19 @@ export function performAdressHirarchiWithParentSearch(addressField, parentid, qu
     },
   );
 }
+export function getFieldValue(field: string, doc: XMLDocument) {
+  const fieldElement = doc.getElementsByName(field)[0];
+  console.log(fieldElement);
+  return fieldElement ? fieldElement.getAttribute('value') : null;
+}
+function parseString(xmlDockAsString: string) {
+  const parser = new DOMParser();
+  return parser.parseFromString(xmlDockAsString, 'text/xml');
+}
+function getTagAsDocument(tagName: string, template: XMLDocument) {
+  const tmp = template.getElementsByTagName(tagName)[0];
+  return tmp ? parseString(tmp.outerHTML) : parseString('');
+}
 
 export const AddressHierarchy: React.FC = () => {
   const nulldata = [];
@@ -29,26 +42,35 @@ export const AddressHierarchy: React.FC = () => {
   const [selected, setselected] = useState();
   const [addressconfig, setaddressconfig] = useState(nulldata);
   const { t } = useTranslation();
-  // const [field] = useField('gender');
+  const { addressTemplate } = useContext(ResourcesContext);
+  const addressTemplateXml = addressTemplate.results[0].value;
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const setComboBoxFieldValue = (filedname: string, filedvalue: string) => {
+    console.log(filedname);
+    console.log(filedvalue);
     setFieldValue(filedname, filedvalue);
   };
 
   useEffect(() => {
-    getConfig('layout.address.format&v=custom:(value)')
-      .then((value) => {
-        const xmlstring = value.data.results[0].value;
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlstring, 'text/xml');
-        const filteredarray = xml.getElementsByTagName('nameMappings')[0].textContent.split('     ');
-        setaddressconfig(filteredarray.filter((text) => !text.includes('.') && text.trim().length));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
+    const templateXmlDoc = parseString(addressTemplateXml);
+    const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
+    const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
+    const properties = nameMappings.getElementsByTagName('entry');
+    const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
+      const name = property.getElementsByTagName('string')[0].innerHTML;
+      const labelText = t(name, property.getElementsByTagName('string')[1].innerHTML);
+      const value = getFieldValue(name, elementDefaults);
+      return {
+        id: name,
+        name,
+        labelText,
+        value,
+      };
+    });
+    console.log(propertiesObj);
+    setaddressconfig(propertiesObj);
+  }, [t, addressTemplateXml]);
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
@@ -77,25 +99,26 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {addressconfig.map((id, index) => (
+        {addressconfig.map((attributes) => (
           <ComboBox
             downshiftProps={{
               onStateChange: function noRefCheck() {},
             }}
-            id={id + '-combobox'}
-            onInputChange={(event) => comboboxevent(event, id)}
+            id={attributes.name}
+            onInputChange={(event) => comboboxevent(event, attributes.name)}
             itemToString={(item) => (item ? item.text : '')}
             items={comboboxlist}
             onChange={(e) => {
               e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
-              setComboBoxFieldValue(id, e.selectedItem.name);
+              setComboBoxFieldValue(attributes.name, e.selectedItem.text);
               setcomboboxlist([]);
             }}
-            // selectedItem={field.value}
-            name={id}
-            placeholder={id}
-            titleText={id}
-            key={id}
+            // selectedItem={"top"}
+            name={attributes.name}
+            // value={attributes.name}
+            placeholder={attributes.labelText}
+            titleText={attributes.labelText}
+            key={attributes.name}
             light
           />
         ))}
