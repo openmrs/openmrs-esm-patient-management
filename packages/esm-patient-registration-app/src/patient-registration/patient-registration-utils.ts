@@ -12,6 +12,47 @@ import capitalize from 'lodash-es/capitalize';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
+  const nameMappings = templateXmlDoc.querySelector('nameMappings'); //.querySelectorAll('property');
+  const validationSchemaObjs: AddressValidationSchemaType[] = Array.prototype.map.call(
+    nameMappings,
+    (nameMapping: Element) => {
+      const name = nameMapping.getAttribute('name');
+      const label = nameMapping.getAttribute('value');
+      const regex = findElementValueInXmlDoc(name, 'elementRegex', templateXmlDoc) || '.*';
+      const regexFormat = findElementValueInXmlDoc(name, 'elementRegexFormats', templateXmlDoc) || '';
+
+      return {
+        name,
+        label,
+        regex,
+        regexFormat,
+      };
+    },
+  );
+
+  const addressValidationSchema = Yup.object(
+    validationSchemaObjs.reduce((final, current) => {
+      final[current.name] = Yup.string().matches(current.regex, current.regexFormat);
+      return final;
+    }, {}),
+  );
+
+  const properties = nameMappings.getElementsByTagName('entry');
+  const addressFieldValues = Array.prototype.map.call(properties, (property: Element) => {
+    const name = property.getElementsByTagName('string')[0].innerHTML;
+    return {
+      name,
+      defaultValue: '',
+    };
+  });
+  // console.log(addressFieldValues);
+  return {
+    addressFieldValues,
+    addressValidationSchema,
+  };
+}
+export function parseAddressTemplateXmlOld(addressTemplate: string) {
+  const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
   const nameMappings = templateXmlDoc.querySelector('nameMappings').querySelectorAll('property');
   const validationSchemaObjs: AddressValidationSchemaType[] = Array.prototype.map.call(
     nameMappings,
