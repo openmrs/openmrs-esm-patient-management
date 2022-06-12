@@ -42,7 +42,6 @@ export function parseAddressTemplateXml(addressTemplate: string) {
       defaultValue: '',
     };
   });
-  console.log(addressValidationSchema);
   return {
     addressFieldValues,
     addressValidationSchema,

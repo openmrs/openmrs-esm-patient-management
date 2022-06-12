@@ -47,8 +47,6 @@ export const AddressHierarchy: React.FC = () => {
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const setComboBoxFieldValue = (filedname: string, filedvalue: string) => {
-    console.log(filedname);
-    console.log(filedvalue);
     setFieldValue(filedname, filedvalue);
   };
 
@@ -68,7 +66,6 @@ export const AddressHierarchy: React.FC = () => {
         value,
       };
     });
-    console.log(propertiesObj);
     setaddressconfig(propertiesObj);
   }, [t, addressTemplateXml]);
   const comboboxevent = (text, id) => {
@@ -102,11 +99,6 @@ export const AddressHierarchy: React.FC = () => {
         {addressconfig.map((attributes) => (
           <ComboInput
             name={attributes.name}
-            onSearch={(event) => comboboxevent(event, attributes.name)}
-            itemToString={(item) => (item ? item.text : '')}
-            onSelect={(e) => {
-              e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
-            }}
             labeltext={attributes.labelText}
             items={comboboxlist}
             id={attributes.name}
