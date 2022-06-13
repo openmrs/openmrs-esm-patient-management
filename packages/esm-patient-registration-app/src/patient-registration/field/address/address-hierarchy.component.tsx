@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { ComboBox } from 'carbon-components-react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
-import { ComboInput } from '../../input/combo/comboinput.component';
+import { ComboInput } from '../../input/comboinput/comboinput.component';
 
 const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form';
 const CONF_BASE_WS_API_URL = '/ws/rest/v1/';
