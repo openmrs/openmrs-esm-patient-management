@@ -1,7 +1,8 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { ComboBox, ComboBoxProps } from 'carbon-components-react';
 import { useField } from 'formik';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form';
 
 interface InputProps extends ComboBoxProps {
@@ -21,6 +22,8 @@ export const ComboInput: React.FC<InputProps> = ({ name, labeltext }) => {
   const nulldata = [];
   const [comboboxlist, setcomboboxlist] = useState(nulldata);
   const [selected, setselected] = useState();
+  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const [value, setvalue] = useState(field.value);
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
@@ -45,10 +48,11 @@ export const ComboInput: React.FC<InputProps> = ({ name, labeltext }) => {
       itemToString={(item) => (item ? item.text : '')}
       onChange={(e) => {
         e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
-        // field.onChange(e);
+        setvalue(e.selectedItem.text);
+        setFieldValue(name, e.selectedItem.text);
       }}
-      // value={field.value}
-      name={field.name}
+      value={value}
+      name={name}
       selectedItem={field.value}
       placeholder={labeltext}
       titleText={labeltext}
