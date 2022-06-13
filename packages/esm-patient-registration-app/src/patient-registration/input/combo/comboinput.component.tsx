@@ -8,6 +8,8 @@ const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHier
 interface InputProps extends ComboBoxProps {
   name: string;
   labeltext: string;
+  setSelectedValue: any;
+  selected: string;
 }
 export function performAdressHirarchiWithParentSearch(addressField, parentid, query) {
   return openmrsFetch(
@@ -17,13 +19,11 @@ export function performAdressHirarchiWithParentSearch(addressField, parentid, qu
     },
   );
 }
-export const ComboInput: React.FC<InputProps> = ({ name, labeltext }) => {
-  const [field, fieldMeta] = useField(name);
+export const ComboInput: React.FC<InputProps> = ({ name, labeltext, setSelectedValue, selected }) => {
+  const [field, Meta, helpers] = useField(name);
   const nulldata = [];
   const [comboboxlist, setcomboboxlist] = useState(nulldata);
-  const [selected, setselected] = useState();
-  const { setFieldValue } = useContext(PatientRegistrationContext);
-  const [value, setvalue] = useState(field.value);
+  const { setValue } = helpers;
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
@@ -43,17 +43,17 @@ export const ComboInput: React.FC<InputProps> = ({ name, labeltext }) => {
   return (
     <ComboBox
       id={name}
-      onInputChange={(event) => comboboxevent(event, name)}
+      onInputChange={(event) => {
+        comboboxevent(event, name);
+        setValue(event);
+      }}
       items={comboboxlist}
       itemToString={(item) => (item ? item.text : '')}
+      {...field}
       onChange={(e) => {
-        e.selectedItem != null ? setselected(e.selectedItem.id) : setselected(null);
-        setvalue(e.selectedItem.text);
-        setFieldValue(name, e.selectedItem.text);
+        e.selectedItem != null ? setSelectedValue(e.selectedItem.id) : setSelectedValue(null);
+        setValue(e.selectedItem != null ? e.selectedItem.text : null);
       }}
-      value={value}
-      name={name}
-      selectedItem={field.value}
       placeholder={labeltext}
       titleText={labeltext}
       light

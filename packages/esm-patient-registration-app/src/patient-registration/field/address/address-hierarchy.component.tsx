@@ -39,15 +39,14 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 export const AddressHierarchy: React.FC = () => {
   const nulldata = [];
   const [comboboxlist, setcomboboxlist] = useState(nulldata);
-  const [selected, setselected] = useState();
+  const [selected, setSelected] = useState('');
   const [addressconfig, setaddressconfig] = useState(nulldata);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate.results[0].value;
-  const { setFieldValue } = useContext(PatientRegistrationContext);
 
-  const setComboBoxFieldValue = (filedname: string, filedvalue: string) => {
-    setFieldValue(filedname, filedvalue);
+  const setSelectedValue = (value: string) => {
+    setSelected(value);
   };
 
   useEffect(() => {
@@ -68,25 +67,6 @@ export const AddressHierarchy: React.FC = () => {
     });
     setaddressconfig(propertiesObj);
   }, [t, addressTemplateXml]);
-  const comboboxevent = (text, id) => {
-    if (text == '') {
-    } else {
-      //set to empty first
-      setcomboboxlist([]);
-      //parse and and add to list
-      performAdressHirarchiWithParentSearch(id.replace(' ', ''), selected, text)
-        .then((value) => {
-          var element = [];
-          value.data.forEach((parent1) => {
-            element.push({ id: parent1['uuid'], text: parent1['name'] });
-          });
-          setcomboboxlist(element);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
 
   return (
     <div>
@@ -103,6 +83,8 @@ export const AddressHierarchy: React.FC = () => {
             items={comboboxlist}
             id={attributes.name}
             placeholder={attributes.labelText}
+            setSelectedValue={setSelectedValue}
+            selected={selected}
           />
         ))}
       </div>
