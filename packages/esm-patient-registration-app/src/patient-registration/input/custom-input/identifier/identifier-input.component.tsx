@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useCallback, useContext, useMemo } from 'react';
 import styles from '../../input.scss';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
-import { IdentifierSourceAutoGenerationOption, PatientIdentifierValue } from '../../../patient-registration-types';
+import { PatientIdentifierValue } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { TrashCan16, Edit16, Reset16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
@@ -117,7 +117,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             <Edit16 />
           </Button>
         )}
-        {!patientIdentifier.required && !hideInputField && initialValue && (
+        {initialValue && initialValue !== identifierValue && (
           <Button
             kind="ghost"
             onClick={handleReset}

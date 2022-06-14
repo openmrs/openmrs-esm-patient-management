@@ -37,35 +37,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
     setUnsavedIdentifierTypes(values.identifiers);
   }, [values.identifiers]);
 
-  // useEffect(() => {
-  //   if (identifierTypes) {
-  //     setUnsavedIdentifierTypes(
-  //       identifierTypes.map((identifierType) => {
-  //         const identifier = getIdentifierByTypeUuid(identifierType.uuid);
-  //         const alreadySelectedSource = identifier?.source;
-  //         const defaultSelectedSource =
-  //           isOffline && isUniqueIdentifierTypeForOffline(identifierType)
-  //             ? identifierType.identifierSources?.find(
-  //                 (identifierSource) =>
-  //                   !identifierSource.autoGenerationOption?.manualEntryEnabled &&
-  //                   identifierSource.autoGenerationOption?.automaticGenerationEnabled,
-  //               )
-  //             : identifierType.identifierSources?.[0];
-
-  //         return {
-  //           ...identifierType,
-  //           checked: identifier
-  //             ? identifier.action !== 'DELETE'
-  //             : identifierType.isPrimary ||
-  //               identifierType.required ||
-  //               defaultPatientIdentifierTypesMap[identifierType.uuid],
-  //           source: alreadySelectedSource ?? defaultSelectedSource,
-  //         };
-  //       }),
-  //     );
-  //   }
-  // }, [identifierTypes, identifiers]);
-
   const handleSearch = useCallback((event) => setSearchString(event?.target?.value ?? ''), []);
 
   const filteredIdentifiers = useMemo(
@@ -110,7 +81,6 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
   const identifierTypeFields = useMemo(
     () =>
       filteredIdentifiers.map((identifierType) => {
-        // const showIdentifierSources = !(identifier?.action === 'NONE');
         const isDisabled =
           identifierType.isPrimary ||
           identifierType.required ||

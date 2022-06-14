@@ -1,5 +1,3 @@
-import { string } from 'yup';
-
 interface NameValue {
   uuid: string;
   preferred: boolean;

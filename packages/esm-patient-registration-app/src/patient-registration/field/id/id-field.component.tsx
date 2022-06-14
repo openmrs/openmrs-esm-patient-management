@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,7 @@ import {
   PatientIdentifierValue,
 } from '../../patient-registration-types';
 import IdentifierSelectionOverlay from './identifier-selection-overlay';
-import { FieldArray } from 'formik';
 import { ResourcesContext } from '../../../offline.resources';
-import camelCase from 'lodash-es/camelCase';
 
 export function setIdentifierSource(
   identifierSource: IdentifierSource,
