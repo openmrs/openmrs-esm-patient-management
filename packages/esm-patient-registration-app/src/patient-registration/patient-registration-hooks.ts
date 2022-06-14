@@ -192,7 +192,6 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
         required: patientIdentifier.identifierType.required,
         selectedSource: null,
         autoGeneration: false,
-        deleteIdentifier: false,
       };
     });
     return {
