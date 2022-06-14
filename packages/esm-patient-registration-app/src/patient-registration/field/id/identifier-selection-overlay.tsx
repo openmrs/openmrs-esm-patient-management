@@ -81,6 +81,7 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
   const identifierTypeFields = useMemo(
     () =>
       filteredIdentifiers.map((identifierType) => {
+        const patientIdentifier = unsavedIdentifierTypes[identifierType.fieldName];
         const isDisabled =
           identifierType.isPrimary ||
           identifierType.required ||
@@ -97,34 +98,46 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
               value={identifierType.uuid}
               labelText={identifierType.name}
               onChange={(checked) => handleCheckingIdentifier(identifierType, checked)}
-              checked={!!unsavedIdentifierTypes[identifierType.fieldName]}
+              checked={!!patientIdentifier}
               disabled={isDisabled || (isOffline && isDisabledOffline)}
             />
-            {unsavedIdentifierTypes[identifierType.fieldName] && identifierType?.identifierSources?.length > 0 && (
-              <div className={styles.radioGroup}>
-                <RadioButtonGroup
-                  legendText={t('source', 'Source')}
-                  name={`${identifierType?.fieldName}-identifier-sources`}
-                  defaultSelected={unsavedIdentifierTypes[identifierType.fieldName]?.selectedSource?.uuid}
-                  onChange={(sourceUuid: string) => handleSelectingIdentifierSource(identifierType, sourceUuid)}
-                  orientation="vertical">
-                  {identifierType?.identifierSources.map((source) => (
-                    <RadioButton
-                      key={source.uuid}
-                      labelText={source.name}
-                      name={source.uuid}
-                      value={source.uuid}
-                      className={styles.radioButton}
-                      disabled={
-                        isOffline &&
-                        isUniqueIdentifierTypeForOffline(identifierType) &&
-                        source.autoGenerationOption?.manualEntryEnabled
-                      }
-                    />
-                  ))}
-                </RadioButtonGroup>
-              </div>
-            )}
+            {patientIdentifier &&
+              identifierType?.identifierSources?.length > 0 &&
+              /* 
+                This check are for the cases when there's an initialValue identifier is assigned
+                to the patient
+                The corresponding flow is like:
+                1. If there's no change to the actual initial identifier, then the source remains null, 
+                hence the list of the identifier sources shouldn't be displayed.
+                2. If user wants to edit the patient identifier's value, hence there will be an initialValue,
+                along with a source assigned to itself(only if the identifierType has sources, else there's nothing to worry about), which by
+                default is the first identifierSource
+              */
+              (!patientIdentifier.initialValue || patientIdentifier?.selectedSource) && (
+                <div className={styles.radioGroup}>
+                  <RadioButtonGroup
+                    legendText={t('source', 'Source')}
+                    name={`${identifierType?.fieldName}-identifier-sources`}
+                    defaultSelected={patientIdentifier?.selectedSource?.uuid}
+                    onChange={(sourceUuid: string) => handleSelectingIdentifierSource(identifierType, sourceUuid)}
+                    orientation="vertical">
+                    {identifierType?.identifierSources.map((source) => (
+                      <RadioButton
+                        key={source.uuid}
+                        labelText={source.name}
+                        name={source.uuid}
+                        value={source.uuid}
+                        className={styles.radioButton}
+                        disabled={
+                          isOffline &&
+                          isUniqueIdentifierTypeForOffline(identifierType) &&
+                          source.autoGenerationOption?.manualEntryEnabled
+                        }
+                      />
+                    ))}
+                  </RadioButtonGroup>
+                </div>
+              )}
           </div>
         );
       }),
