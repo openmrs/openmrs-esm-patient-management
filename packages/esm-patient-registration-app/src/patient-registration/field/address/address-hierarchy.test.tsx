@@ -10,7 +10,7 @@ const mockResponse = {
   results: [
     {
       value:
-        '<org.openmrs.layout.address.AddressTemplate>\r\n<nameMappings class="properties">\r\n<property name="postalCode" value="Location.postalCode"/>\r\n<property name="address1" value="Location.address1"/>\r\n<property name="country" value="Location.country"/>\r\n<property name="stateProvince" value="Location.stateProvince"/>\r\n<property name="cityVillage" value="Location.cityVillage"/>\r\n</nameMappings>\r\n<elementDefaults class="properties">\r\n<property name="country" value="Uganda"/>\r\n</elementDefaults>\r\n</org.openmrs.layout.address.AddressTemplate>',
+        '<org.openmrs.layout.address.AddressTemplate>\r\n<nameMappings>\r\n<entry>\r\n<string>country</string>\r\n<string>Location.country</string>\r\n</entry>\r\n<entry>\r\n<string>stateProvince</string>\r\n<string>Location.province</string>\r\n</entry>\r\n<entry>\r\n<string>countyDistrict</string>\r\n<string>Location.district</string>\r\n</entry>\r\n<entry>\r\n<string>cityVillage</string>\r\n<string>Location.village</string>\r\n</entry>\r\n</nameMappings></org.openmrs.layout.address.AddressTemplate>',
     },
   ],
 };
@@ -27,16 +27,14 @@ describe('address hierarchy', () => {
       </ResourcesContext.Provider>,
     );
 
-    const postalCode = await findByLabelText('Location.postalCode');
-    const address1 = await findByLabelText('Location.address1');
     const country = await findByLabelText('Location.country');
-    const stateProvince = await findByLabelText('Location.stateProvince');
-    const cityVillage = await findByLabelText('Location.cityVillage');
+    const stateProvince = await findByLabelText('Location.province');
+    const cityVillage = await findByLabelText('Location.village');
+    const countyDistrict = await findByLabelText('Location.district');
 
-    expect(postalCode).toBeInTheDocument();
-    expect(address1).toBeInTheDocument();
     expect(country).toBeInTheDocument();
     expect(stateProvince).toBeInTheDocument();
     expect(cityVillage).toBeInTheDocument();
+    expect(countyDistrict).toBeInTheDocument();
   });
 });
