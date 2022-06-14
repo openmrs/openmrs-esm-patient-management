@@ -1,4 +1,6 @@
 import * as Yup from 'yup';
+import mapValues from 'lodash/mapValues';
+import { FormValues } from '../patient-registration-types';
 
 export const validationSchema = Yup.object({
   givenName: Yup.string().required('givenNameRequired'),
@@ -27,4 +29,18 @@ export const validationSchema = Yup.object({
   monthsEstimated: Yup.number().min(0, 'negativeMonths'),
   deathDate: Yup.date().max(Date(), 'deathdayNotInTheFuture').nullable(),
   email: Yup.string().optional().email('invalidEmail'),
+  identifiers: Yup.lazy((obj: FormValues['identifiers']) =>
+    Yup.object(
+      mapValues(obj, () =>
+        Yup.object({
+          required: Yup.bool(),
+          identifierValue: Yup.string().when('required', {
+            is: true,
+            then: Yup.string().required('identifierValueRequired'),
+            otherwise: Yup.string().notRequired(),
+          }),
+        }),
+      ),
+    ),
+  ),
 });
