@@ -1,8 +1,10 @@
 import { FetchResponse, getSynchronizationItems, openmrsFetch, usePatient } from '@openmrs/esm-framework';
+import camelCase from 'lodash-es/camelCase';
 import { Dispatch, useEffect, useMemo, useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
+import { Identifiers } from './field/id/id-field.component';
 import {
   FormValues,
   PatientRegistration,
@@ -50,7 +52,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     deathDate: '',
     deathCause: '',
     relationships: [],
-    identifiers: [],
+    identifiers: {},
   });
 
   useEffect(() => {
@@ -161,40 +163,50 @@ async function getPatientRegistration(patientUuid: string) {
 }
 
 export function useInitialPatientIdentifiers(patientUuid: string): {
-  data: Array<PatientIdentifierValue>;
+  data: FormValues['identifiers'];
   isLoading: boolean;
 } {
   const shouldFetch = !!patientUuid;
 
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
-    shouldFetch ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=full` : null,
+  const { data, error } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
+    shouldFetch
+      ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`
+      : null,
     openmrsFetch,
   );
 
   const result: {
-    data: Array<PatientIdentifierValue>;
+    data: FormValues['identifiers'];
     isLoading: boolean;
-  } = useMemo(
-    () => ({
-      data: data?.data?.results?.map((patientIdentifier) => ({
-        uuid: patientIdentifier.uuid,
-        identifier: patientIdentifier.identifier,
+  } = useMemo(() => {
+    const identifiers: FormValues['identifiers'] = {};
+
+    data?.data?.results?.forEach((patientIdentifier) => {
+      identifiers[camelCase(patientIdentifier.identifierType.name)] = {
+        identifierUuid: patientIdentifier.uuid,
+        preferred: patientIdentifier.preferred,
+        initialValue: patientIdentifier.identifier,
+        identifierValue: patientIdentifier.identifier,
         identifierTypeUuid: patientIdentifier.identifierType.uuid,
-        action: 'NONE',
-        source: null,
-        preferred: patientIdentifier.identifierType.isPrimary,
-      })),
+        identifierName: patientIdentifier.identifierType.name,
+        required: patientIdentifier.identifierType.required,
+        selectedSource: null,
+        autoGeneration: false,
+        deleteIdentifier: false,
+      };
+    });
+    return {
+      data: identifiers,
       isLoading: !data && !error,
-    }),
-    [data, error],
-  );
+    };
+  }, [data, error]);
 
   return result;
 }
 
 function useInitialPersonAttributes(personUuid: string) {
   const shouldFetch = !!personUuid;
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
+  const { data, error } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
     shouldFetch ? `/ws/rest/v1/person/${personUuid}/attribute` : null,
     openmrsFetch,
   );

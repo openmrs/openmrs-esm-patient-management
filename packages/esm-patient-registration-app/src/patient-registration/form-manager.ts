@@ -7,7 +7,6 @@ import {
   Patient,
   CapturePhotoProps,
   PatientIdentifier,
-  PatientIdentifierValue,
   PatientRegistration,
 } from './patient-registration-types';
 import {
@@ -32,6 +31,7 @@ export type SavePatientForm = (
   capturePhotoProps: CapturePhotoProps,
   patientPhotoConceptUuid: string,
   currentLocation: string,
+  initialIdentifierValues: FormValues['identifiers'],
   abortController?: AbortController,
 ) => Promise<string | null>;
 
@@ -44,6 +44,7 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
+    initialIdentifierValues: FormValues['identifiers'],
   ): Promise<null> {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
@@ -57,6 +58,7 @@ export default class FormManager {
         capturePhotoProps,
         patientPhotoConceptUuid,
         currentLocation,
+        initialIdentifierValues,
       },
     };
 
@@ -78,12 +80,14 @@ export default class FormManager {
     capturePhotoProps: CapturePhotoProps,
     patientPhotoConceptUuid: string,
     currentLocation: string,
+    initialIdentifierValues: FormValues['identifiers'],
     abortController: AbortController,
   ): Promise<string> {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
       isNewPatient,
       values.patientUuid,
       values.identifiers,
+      initialIdentifierValues,
       currentLocation,
       abortController,
     );
@@ -149,33 +153,47 @@ export default class FormManager {
   static async savePatientIdentifiers(
     isNewPatient: boolean,
     patientUuid: string,
-    patientIdentifiers: Array<PatientIdentifierValue>, // values.identifiers
+    patientIdentifiers: FormValues['identifiers'], // values.identifiers
+    initialIdentifierValues: FormValues['identifiers'], // Initial identifiers assigned to the patient
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    let identifierTypeRequests = patientIdentifiers
-      .filter((identifier) => identifier.action !== 'DELETE' && identifier.action !== 'NONE')
+    let identifierTypeRequests = Object.values(patientIdentifiers)
+      .filter((identifier) => !identifier.deleteIdentifier)
       .map(async (patientIdentifier) => {
-        const { identifierTypeUuid, identifier, uuid, action, source, preferred, autoGeneration } = patientIdentifier;
-        if (identifier || (source && autoGeneration)) {
-          const identifierValue = !(autoGeneration && source)
-            ? identifier
+        const {
+          identifierTypeUuid,
+          identifierValue,
+          identifierUuid,
+          selectedSource,
+          preferred,
+          autoGeneration,
+          initialValue,
+        } = patientIdentifier;
+        if (identifierValue || (autoGeneration && selectedSource)) {
+          const identifier = !autoGeneration
+            ? identifierValue
             : await (
-                await generateIdentifier(patientIdentifier.source.uuid, abortController)
+                await generateIdentifier(patientIdentifier.selectedSource.uuid, abortController)
               ).data.identifier;
           const identifierToCreate = {
-            uuid,
-            identifier: identifierValue,
+            uuid: identifierUuid,
+            identifier,
             identifierType: identifierTypeUuid,
             location,
             preferred,
           };
 
           if (!isNewPatient) {
-            if (action === 'ADD') {
+            if (!initialValue) {
               await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
-            } else if (action === 'UPDATE') {
-              await updatePatientIdentifier(patientUuid, uuid, identifierToCreate.identifier, abortController);
+            } else if (initialValue !== identifier) {
+              await updatePatientIdentifier(
+                patientUuid,
+                identifierUuid,
+                identifierToCreate.identifier,
+                abortController,
+              );
             }
           }
 
@@ -189,13 +207,23 @@ export default class FormManager {
         }
       });
 
+    /*
+      If there was initially an identifier assigned to the patient, 
+      which is now not present in the patientIdentifiers(values.identifiers),
+      this means that the identifier is meant to be deleted, hence we need
+      to delete the respective identifiers.
+    */
+
     if (patientUuid) {
-      patientIdentifiers
-        .filter((patientIdentifier) => patientIdentifier.action === 'DELETE')
-        .forEach(
-          async (patientIdentifier) =>
-            await deletePatientIdentifier(patientUuid, patientIdentifier.uuid, abortController),
-        );
+      Object.keys(initialIdentifierValues)
+        .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
+        .forEach(async (identifierFieldName) => {
+          await deletePatientIdentifier(
+            patientUuid,
+            initialIdentifierValues[identifierFieldName].identifierUuid,
+            abortController,
+          );
+        });
     }
 
     return Promise.all(identifierTypeRequests);
