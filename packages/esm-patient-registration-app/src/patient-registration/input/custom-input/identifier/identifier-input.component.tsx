@@ -76,7 +76,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           confirmDeleteIdentifierModal();
         },
         identifierName,
-        identifierValue,
+        initialValue,
       });
     } else {
       setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
