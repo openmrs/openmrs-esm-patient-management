@@ -42,7 +42,6 @@ export function initializeIdentifier(identifierType: PatientIdentifierType, iden
     identifierName: identifierType.name,
     preferred: identifierType.isPrimary,
     initialValue: '',
-    deleteIdentifier: false,
     required: identifierType.isPrimary || identifierType.required,
     ...identifierProps,
     ...setIdentifierSource(
@@ -125,11 +124,9 @@ export const Identifiers: React.FC = () => {
         </Button>
       </div>
       <div>
-        {Object.entries(values.identifiers)
-          .filter(([, identifier]) => !identifier.deleteIdentifier)
-          .map(([fieldName, identifier]) => (
-            <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
-          ))}
+        {Object.entries(values.identifiers).map(([fieldName, identifier]) => (
+          <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
+        ))}
         {showIdentifierOverlay && (
           <IdentifierSelectionOverlay
             setFieldValue={setFieldValue}

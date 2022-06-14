@@ -34,7 +34,6 @@ export interface PatientIdentifierValue {
   selectedSource: IdentifierSource;
   autoGeneration?: boolean;
   preferred: boolean;
-  deleteIdentifier: boolean;
   required: boolean;
 }
 

@@ -158,54 +158,47 @@ export default class FormManager {
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    let identifierTypeRequests = Object.values(patientIdentifiers)
-      .filter((identifier) => !identifier.deleteIdentifier)
-      .map(async (patientIdentifier) => {
-        const {
-          identifierTypeUuid,
-          identifierValue,
-          identifierUuid,
-          selectedSource,
+    let identifierTypeRequests = Object.values(patientIdentifiers).map(async (patientIdentifier) => {
+      const {
+        identifierTypeUuid,
+        identifierValue,
+        identifierUuid,
+        selectedSource,
+        preferred,
+        autoGeneration,
+        initialValue,
+      } = patientIdentifier;
+      if (identifierValue || (autoGeneration && selectedSource)) {
+        const identifier = !autoGeneration
+          ? identifierValue
+          : await (
+              await generateIdentifier(patientIdentifier.selectedSource.uuid, abortController)
+            ).data.identifier;
+        const identifierToCreate = {
+          uuid: identifierUuid,
+          identifier,
+          identifierType: identifierTypeUuid,
+          location,
           preferred,
-          autoGeneration,
-          initialValue,
-        } = patientIdentifier;
-        if (identifierValue || (autoGeneration && selectedSource)) {
-          const identifier = !autoGeneration
-            ? identifierValue
-            : await (
-                await generateIdentifier(patientIdentifier.selectedSource.uuid, abortController)
-              ).data.identifier;
-          const identifierToCreate = {
-            uuid: identifierUuid,
-            identifier,
-            identifierType: identifierTypeUuid,
-            location,
-            preferred,
-          };
+        };
 
-          if (!isNewPatient) {
-            if (!initialValue) {
-              await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
-            } else if (initialValue !== identifier) {
-              await updatePatientIdentifier(
-                patientUuid,
-                identifierUuid,
-                identifierToCreate.identifier,
-                abortController,
-              );
-            }
+        if (!isNewPatient) {
+          if (!initialValue) {
+            await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
+          } else if (initialValue !== identifier) {
+            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier, abortController);
           }
-
-          return identifierToCreate;
-        } else {
-          // This is a case that should not occur.
-          // If it did, the subsequent network request (when creating the patient) would fail with
-          // BadRequest since the (returned) identifier type is undefined.
-          // Better stop early.
-          throw new Error('No approach for generating a patient identifier could be found.');
         }
-      });
+
+        return identifierToCreate;
+      } else {
+        // This is a case that should not occur.
+        // If it did, the subsequent network request (when creating the patient) would fail with
+        // BadRequest since the (returned) identifier type is undefined.
+        // Better stop early.
+        throw new Error('No approach for generating a patient identifier could be found.');
+      }
+    });
 
     /*
       If there was initially an identifier assigned to the patient, 
