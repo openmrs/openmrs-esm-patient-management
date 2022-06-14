@@ -95,7 +95,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           required={required}
           invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
           invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
-          // t('identifierValueRequired', 'identifierValue is required')
+          // t('identifierValueRequired', 'Identifier value is required')
           {...identifierField}
         />
       ) : (
