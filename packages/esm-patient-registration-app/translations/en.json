@@ -64,6 +64,7 @@
   "relationshipToPatient": "Relationship to patient",
   "relativeFullNameLabelText": "Full name",
   "relativeNamePlaceholder": "Firstname Familyname",
+  "resetIdentifierTooltip": "Reset",
   "restoreRelationshipActionButton": "Undo",
   "sexFieldLabelText": "Sex",
   "stateProvince": "Region",

@@ -71,7 +71,7 @@ export const Identifiers: React.FC = () => {
 
   useEffect(() => {
     // Initialization
-    if (identifierTypes && !Object.keys(values.identifiers).length) {
+    if (identifierTypes) {
       const identifiers = {};
       identifierTypes
         .filter(
@@ -82,13 +82,18 @@ export const Identifiers: React.FC = () => {
               (defaultIdentifierTypeUuid) => defaultIdentifierTypeUuid === type.uuid,
             ),
         )
-        .filter((type) => !values.identifiers[type.uuid])
+        .filter((type) => !values.identifiers[type.fieldName])
         .forEach((type) => {
           identifiers[type.fieldName] = initializeIdentifier(
             type,
             values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},
           );
         });
+      /*
+        Identifier value should only be updated if there is any update in the
+        identifier values, otherwise, if the below 'if' clause is removed, it will
+        fall into an infinite run.
+      */
       if (Object.keys(identifiers).length) {
         setFieldValue('identifiers', {
           ...values.identifiers,
