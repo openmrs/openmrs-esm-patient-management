@@ -22,7 +22,7 @@ interface PatientReturnType {
  * @param includeDead Whether to include dead patients in search results
  * @returns Object {patients,isLoading,error}
  */
-const usePatients = (query: string, includeDead: boolean = false): PatientReturnType => {
+const usePatientSearch = (query: string, includeDead: boolean = false): PatientReturnType => {
   const url = `${fhirBaseUrl}/Patient?name=${query}&_summary=data${includeDead ? '&deceased=[true]' : ''}`;
   const { data, error } = useSWR<{ data: FHIRResponse }>(query?.length ? url : null, openmrsFetch);
 
@@ -34,4 +34,4 @@ const usePatients = (query: string, includeDead: boolean = false): PatientReturn
   return { patients: searchPatient, isLoading: !data && !error, error: error };
 };
 
-export default usePatients;
+export default usePatientSearch;

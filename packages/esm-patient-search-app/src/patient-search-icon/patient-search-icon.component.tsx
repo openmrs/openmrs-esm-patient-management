@@ -8,7 +8,7 @@ import debounce from 'lodash-es/debounce';
 import { useConfig, useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './patient-search-icon.component.scss';
-import usePatients from '../hooks/usePatients';
+import usePatientSearch from '../hooks/usePatientSearch';
 
 interface PatientSearchLaunchProps {}
 
@@ -22,7 +22,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const [showResultsPanel, setShowResultsPanel] = useState<boolean>(false);
   const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>();
-  const { patients, isLoading, error } = usePatients(searchTerm, config.includeDead);
+  const { patients, isLoading, error } = usePatientSearch(searchTerm, config.includeDead);
 
   const performSearch = useCallback(() => {
     setShowResultsPanel(true);
