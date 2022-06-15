@@ -1,26 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { openmrsFetch } from '@openmrs/esm-framework';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
 import { ComboInput } from '../../input/comboinput/comboinput.component';
 
-const AH_BASE_WS_API_URL = '/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form';
-const CONF_BASE_WS_API_URL = '/ws/rest/v1/';
-
-export function getConfig(query) {
-  return openmrsFetch(`${CONF_BASE_WS_API_URL}systemsetting?q=${query}`, {
-    method: 'GET',
-  });
-}
-export function performAdressHirarchiWithParentSearch(addressField, parentid, query) {
-  return openmrsFetch(
-    `${AH_BASE_WS_API_URL}?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`,
-    {
-      method: 'GET',
-    },
-  );
-}
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
   return fieldElement ? fieldElement.getAttribute('value') : null;
