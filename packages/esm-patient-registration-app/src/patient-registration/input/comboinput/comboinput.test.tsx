@@ -4,14 +4,13 @@ import { ComboInput } from './comboinput.component';
 
 describe.skip('Combo box input', () => {
   const setupInput = async () => {
-    const nulldata = [];
     const selected = null;
     const setSelectedValue = null;
     render(
       <Formik initialValues={{ text: '' }} onSubmit={null}>
         <Form>
           <ComboInput
-            items={nulldata}
+            items={[]}
             selected={selected}
             setSelectedValue={setSelectedValue}
             id="text"

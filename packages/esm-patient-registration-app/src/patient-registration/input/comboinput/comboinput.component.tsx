@@ -12,8 +12,7 @@ interface InputProps extends ComboBoxProps {
 
 export const ComboInput: React.FC<InputProps> = ({ name, labeltext, setSelectedValue, selected }) => {
   const [field, Meta, helpers] = useField(name);
-  const nulldata = [];
-  const [comboboxlist, setcomboboxlist] = useState(nulldata);
+  const [comboboxlist, setcomboboxlist] = useState([]);
   const { setValue } = helpers;
   const comboboxevent = (text, id) => {
     if (text == '') {

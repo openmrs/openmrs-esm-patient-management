@@ -18,10 +18,9 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 }
 
 export const AddressHierarchy: React.FC = () => {
-  const nulldata = [];
-  const [comboboxlist, setcomboboxlist] = useState(nulldata);
+  const [comboboxlist, setcomboboxlist] = useState([]);
   const [selected, setSelected] = useState('');
-  const [addressconfig, setaddressconfig] = useState(nulldata);
+  const [addressconfig, setaddressconfig] = useState([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate.results[0].value;
