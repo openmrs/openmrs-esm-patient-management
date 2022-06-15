@@ -6,16 +6,13 @@
 }
 
 .searchResultsContainer {
-  display: flex;
-  justify-content: center;
   position: fixed;
-  width: 100vw;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  width: inherit;
   background-color: $ui-02;
-  padding: 0rem $spacing-05;
+  padding: $spacing-03 0;
   overflow-y: auto;
+  box-shadow: 0 $spacing-03 $spacing-05 $ui-03;
+  border: 0 0.063rem 0.063rem 0.063rem solid $ui-03;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
@@ -23,9 +20,7 @@
 }
 
 :global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
-  padding: 0;
-  background-color: var(--omrs-color-bg-low-contrast);
-  top: $spacing-09;
+  top: $spacing-08;
 }
 
 .searchResults {
@@ -43,15 +38,10 @@
   margin-top: 0.375rem;
 }
 
-.resultsText {
+.labelText {
   @include carbon--type-style('label-01');
+  margin-left: $spacing-04;
   color: $text-02;
-  border-bottom: 0.063rem solid $ui-03;
-  padding: $spacing-03 0rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .resultsText {
-  margin: $spacing-05;
 }
 
 .helperText {

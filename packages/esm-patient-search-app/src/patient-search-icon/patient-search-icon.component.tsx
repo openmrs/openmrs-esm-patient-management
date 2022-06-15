@@ -152,6 +152,12 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               size={layout === 'desktop' ? 'small' : 'default'}>
               {t('search', 'Search')}
             </Button>
+            <PatientSearch
+              hidePanel={handleCloseSearchInput}
+              searchResults={searchResults}
+              status={status}
+              error={error}
+            />
           </div>
         )}
 
@@ -166,9 +172,6 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           </HeaderGlobalAction>
         </div>
       </div>
-      {showResultsPanel && (
-        <PatientSearch hidePanel={handleCloseSearchInput} searchResults={searchResults} status={status} error={error} />
-      )}
     </>
   );
 };

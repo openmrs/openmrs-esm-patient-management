@@ -42,20 +42,23 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults,
 
   return (
     <div className={styles.searchResultsContainer}>
+      {/* <div>
+        <p className={styles.labelText}>{t('recentlyViewedChartsText', 'Recently viewed charts')}</p>
+      </div> */}
       {status === 'resolved' && (
         <>
           {!isEmpty(searchResults) && (
             <div className={styles.searchResults}>
-              <p className={styles.resultsText}>{t('patientsFound', { count: searchResults.length })}</p>
+              <p className={styles.labelText}>{t('patientsFound', { count: searchResults.length })}</p>
               <PatientSearchResults hidePanel={hidePanel} patients={results} />
-              <div className={styles.pagination}>
+              {/* <div className={styles.pagination}>
                 <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
-              </div>
+              </div> */}
             </div>
           )}
           {isEmpty(searchResults) && (
             <div className={styles.searchResults}>
-              <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
+              <p className={styles.labelText}>{t('noResultsFound', 'No results found')}</p>
               <Tile className={styles.emptySearchResultsTile}>
                 <EmptyDataIllustration />
                 <p className={styles.emptyResultText}>
@@ -74,7 +77,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults,
       {status === 'searching' && <Loading description="Active loading indicator" withOverlay={true} />}
       {status === 'error' && (
         <div className={styles.searchResults}>
-          <p className={styles.resultsText}>{t('errorText', 'An error occurred while performing search')}</p>
+          <p className={styles.labelText}>{t('errorText', 'An error occurred while performing search')}</p>
           <Tile className={styles.emptySearchResultsTile}>
             <EmptyDataIllustration />
             <div>

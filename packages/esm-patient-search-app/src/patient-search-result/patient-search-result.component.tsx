@@ -1,12 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
-import { ExtensionSlot, useConfig, interpolateString, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
 
-  const onClickSearchResult = useCallback((patientUuid) => {
+  const onClickSearchResult = useCallback((evt, patientUuid) => {
+    evt.preventDefault();
     navigate({
       to: interpolateString(config.search.patientResultUrl, {
         patientUuid: patientUuid,
@@ -54,19 +55,33 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   return (
     <>
       {fhirPatients.map((patient) => (
-        <div key={patient.id} className={styles.patientChart}>
-          <div className={styles.container}>
+        <ConfigurableLink
+          onClick={(evt) => onClickSearchResult(evt, patient.id)}
+          to={interpolateString(config.search.patientResultUrl, {
+            patientUuid: patient.id,
+          })}
+          key={patient.id}
+          className={styles.patientSearchResult}
+          role="a">
+          <div className={styles.patientAvatar} role="img">
             <ExtensionSlot
-              extensionSlotName="patient-header-slot"
+              extensionSlotName="patient-photo-slot"
               state={{
-                patient,
                 patientUuid: patient.id,
-                onClick: onClickSearchResult,
-                onTransition: hidePanel,
+                patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
+                size: 'small',
               }}
             />
           </div>
-        </div>
+          <div>
+            <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
+              patient.name?.[0]?.family
+            }`}</h2>
+            <p className={styles.demographics}>
+              {patient.gender} &middot; {patient.birthDate} &middot; {patient.identifier?.[0]?.value}
+            </p>
+          </div>
+        </ConfigurableLink>
       ))}
     </>
   );
