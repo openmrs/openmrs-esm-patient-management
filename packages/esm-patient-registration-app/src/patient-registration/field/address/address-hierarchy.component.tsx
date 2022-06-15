@@ -18,7 +18,7 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 }
 
 export const AddressHierarchy: React.FC = () => {
-  const [comboboxlist, setcomboboxlist] = useState([]);
+  const [comboboxlist] = useState([]);
   const [selected, setSelected] = useState('');
   const [addressconfig, setaddressconfig] = useState([]);
   const { t } = useTranslation();
