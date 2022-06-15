@@ -168,6 +168,10 @@ export default class FormManager {
         autoGeneration,
         initialValue,
       } = patientIdentifier;
+      /* Since default identifier-types will be present on the form and are also in the not-required state,
+        therefore we might be running into situations when there's no value and no source associated,
+        hence filtering these fields out.
+      */
       if (identifierValue || (autoGeneration && selectedSource)) {
         const identifier = !autoGeneration
           ? identifierValue
@@ -191,12 +195,6 @@ export default class FormManager {
         }
 
         return identifierToCreate;
-      } else {
-        // This is a case that should not occur.
-        // If it did, the subsequent network request (when creating the patient) would fail with
-        // BadRequest since the (returned) identifier type is undefined.
-        // Better stop early.
-        throw new Error('No approach for generating a patient identifier could be found.');
       }
     });
 
