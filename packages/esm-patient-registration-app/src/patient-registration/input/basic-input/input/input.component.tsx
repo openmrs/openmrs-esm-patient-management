@@ -10,7 +10,9 @@ interface InputProps extends TextInputProps {
 export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
   const [field, meta] = useField(props.name);
   const { t } = useTranslation();
+
   /*
+    Do not remove these comments
     t('givenNameRequired')
     t('familyNameRequired')
     t('genderUnspecified')
@@ -22,6 +24,7 @@ export const Input: React.FC<InputProps> = ({ checkWarning, ...props }) => {
     t('deathdayNotInTheFuture')
     t('invalidEmail')
     t('numberInNameDubious')
+    t('yearsEstimateRequired')
   */
 
   const value = field.value || '';

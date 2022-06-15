@@ -236,3 +236,27 @@ export interface FormattedEncounter {
   visitType: string;
   visitUuid: string;
 }
+
+export interface ObsMetaInfo {
+  [_: string]: any;
+  assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
+}
+
+export type OBSERVATION_INTERPRETATION =
+  | 'NORMAL'
+  | 'HIGH'
+  | 'CRITICALLY_HIGH'
+  | 'OFF_SCALE_HIGH'
+  | 'LOW'
+  | 'CRITICALLY_LOW'
+  | 'OFF_SCALE_LOW'
+  | '--';
+export interface PatientProgram {
+  uuid: string;
+  display: string;
+  patient: OpenmrsResource;
+  program: OpenmrsResource;
+  dateEnrolled: string;
+  dateCompleted: string;
+  location: OpenmrsResource;
+}

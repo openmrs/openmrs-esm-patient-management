@@ -35,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
           ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
           ) : searchType === SearchTypes.VISIT_FORM ? (
-            <VisitForm patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
+            <VisitForm patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} closePanel={closePanel} />
           ) : null}
         </div>
       </Overlay>

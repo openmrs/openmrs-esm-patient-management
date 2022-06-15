@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -30,7 +30,7 @@ import {
 import Add16 from '@carbon/icons-react/es/add/16';
 import Group16 from '@carbon/icons-react/es/group/16';
 import InProgress16 from '@carbon/icons-react/es/in-progress/16';
-import { useLayoutType, ConfigurableLink, navigate, showModal } from '@openmrs/esm-framework';
+import { useLayoutType, navigate, showModal, interpolateUrl } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -38,6 +38,7 @@ import {
   QueueStatus,
   MappedVisitQueueEntry,
   MappedQueuePriority,
+  getOriginFromPathName,
 } from './active-visits-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
@@ -50,6 +51,25 @@ type FilterProps = {
   cellsById: any;
   inputValue: string;
   getCellId: (row, key) => string;
+};
+
+interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  to: string;
+  from: string;
+}
+
+const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+  const handleNameClick = (event: MouseEvent, to: string) => {
+    event.preventDefault();
+    navigate({ to });
+    localStorage.setItem('fromPage', from);
+  };
+
+  return (
+    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
+      {children}
+    </a>
+  );
 };
 
 function ActionsMenu({ patientUuid }: { patientUuid: string }) {
@@ -114,6 +134,9 @@ function ActiveVisitsTable() {
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
 
+  const currentPathName: string = window.location.pathname;
+  const fromPage: string = getOriginFromPathName(currentPathName);
+
   useEffect(() => {
     if (filter) {
       setFilteredRows(visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)));
@@ -175,7 +198,9 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
+          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
+            {entry.name}
+          </PatientNameLink>
         ),
       },
       priority: {
