@@ -1,6 +1,6 @@
 import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
 import { RelationshipValue } from '../../patient-registration-types';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 import { useMemo } from 'react';
 
 const customRepresentation =
@@ -14,7 +14,7 @@ export function useInitialPatientRelationships(patientUuid: string): {
   isLoading: boolean;
 } {
   const shouldFetch = !!patientUuid;
-  const { data, error } = useSWRImmutable<FetchResponse<RelationshipsResponse>, Error>(
+  const { data, error } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
     shouldFetch ? `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}` : null,
     openmrsFetch,
   );

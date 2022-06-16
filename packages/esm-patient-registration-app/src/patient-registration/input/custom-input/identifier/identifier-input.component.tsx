@@ -1,41 +1,38 @@
-import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
+import React, { useState, useCallback, useContext, useMemo } from 'react';
 import styles from '../../input.scss';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../basic-input/input/input.component';
-import { IdentifierSourceAutoGenerationOption, PatientIdentifierValue } from '../../../patient-registration-types';
+import { PatientIdentifierValue } from '../../../patient-registration-types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
-import { TrashCan16, Edit16 } from '@carbon/icons-react';
+import { TrashCan16, Edit16, Reset16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
 import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { useField } from 'formik';
+import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
-  index: number;
-  remove: <T>(index: number) => T;
+  fieldName: string;
 }
 
-export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, index, remove }) => {
+export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { identifierTypes } = useContext(ResourcesContext);
-  const { isOffline } = useContext(PatientRegistrationContext);
+  const { isOffline, values } = useContext(PatientRegistrationContext);
   const identifierType = useMemo(
     () => identifierTypes.find((identifierType) => identifierType.uuid === patientIdentifier.identifierTypeUuid),
     [patientIdentifier, identifierTypes],
   );
-  const fieldName = `identifiers[${index}].identifier`;
-  const [identifierField, identifierFieldMeta] = useField(fieldName);
-  const { setFieldValue, values } = React.useContext(PatientRegistrationContext);
-  const { source, action, identifier } = patientIdentifier;
-  const identifierName = identifierType?.name;
+  const { autoGeneration, initialValue, identifierValue, identifierName, required } = patientIdentifier;
+  const [hideInputField, setHideInputField] = useState(autoGeneration || initialValue === identifierValue);
+  const name = `identifiers.${fieldName}.identifierValue`;
+  const [identifierField, identifierFieldMeta] = useField(name);
+  const { setFieldValue } = React.useContext(PatientRegistrationContext);
   const { t } = useTranslation();
-  const [option, setAutoGenerationOption] = useState<Partial<IdentifierSourceAutoGenerationOption>>({
-    manualEntryEnabled: source ? true : undefined,
-    automaticGenerationEnabled: undefined,
-  });
 
   const disabled = isOffline && shouldBlockPatientIdentifierInOfflineMode(identifierType);
+
   const { defaultPatientIdentifierTypes } = useConfig();
   const defaultPatientIdentifierTypesMap = useMemo(() => {
     const map = {};
@@ -44,100 +41,98 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     });
     return map;
   }, [defaultPatientIdentifierTypes]);
-  const isNewIdentifier = patientIdentifier?.action === 'ADD' || patientIdentifier?.action === undefined;
 
-  useEffect(() => {
-    if (source && values?.identifiers?.length) {
-      if (source.autoGenerationOption) {
-        setAutoGenerationOption(source.autoGenerationOption);
-
-        if (source.autoGenerationOption.automaticGenerationEnabled) {
-          setFieldValue(`identifiers[${index}].autoGeneration`, true);
-          setFieldValue(`identifiers[${index}].identifier`, 'auto-generated');
-        }
-      } else {
-        setAutoGenerationOption({
-          manualEntryEnabled: true,
-          automaticGenerationEnabled: false,
-        });
-        setFieldValue(`identifiers[${index}].autoGeneration`, false);
-      }
-    } else {
-      setAutoGenerationOption({
-        manualEntryEnabled: true,
-        automaticGenerationEnabled: false,
-      });
-      setFieldValue(`identifiers[${index}].autoGeneration`, false);
-    }
-  }, [source, index, setFieldValue, values.identifiers]);
-
-  const handleEdit = useCallback(() => {
-    setFieldValue(`identifiers[${index}]`, {
+  const handleReset = useCallback(() => {
+    setHideInputField(true);
+    setFieldValue(`identifiers.${fieldName}`, {
       ...patientIdentifier,
-      action: 'UPDATE',
-      source: identifierType?.identifierSources?.[0],
+      identifierValue: initialValue,
+      selectedSource: null,
+      autoGeneration: false,
     } as PatientIdentifierValue);
-  }, [patientIdentifier]);
+  }, [initialValue, setHideInputField]);
 
-  const handleDelete = useCallback(() => {
-    if (action === 'ADD') {
-      remove(index);
-    } else {
+  const handleEdit = () => {
+    setHideInputField(false);
+    setFieldValue(`identifiers.${fieldName}`, {
+      ...patientIdentifier,
+      ...setIdentifierSource(identifierType?.identifierSources?.[0], initialValue, initialValue),
+    });
+  };
+
+  const handleDelete = () => {
+    /* 
+    If there is an initialValue to the identifier, a confirmation modal seeking 
+    confirmation to delete the identifier should be shown, else in the other case, 
+    we can directly delete the identifier. 
+    */
+
+    if (initialValue) {
       const confirmDeleteIdentifierModal = showModal('delete-identifier-confirmation-modal', {
         deleteIdentifier: (deleteIdentifier) => {
           if (deleteIdentifier) {
-            setFieldValue(`identifiers[${index}].action`, 'DELETE');
+            setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
           }
           confirmDeleteIdentifierModal();
         },
         identifierName,
-        identifierValue: identifier,
+        initialValue,
       });
+    } else {
+      setFieldValue('identifiers', deleteIdentifierType(values.identifiers, fieldName));
     }
-  }, [action, patientIdentifier, identifierName, identifier]);
+  };
 
   return (
     <div className={styles.IDInput}>
-      {option.manualEntryEnabled && (action === 'ADD' || action === 'UPDATE') ? (
+      {!autoGeneration && !hideInputField ? (
         <Input
-          id={identifierName}
+          id={name}
           light
           labelText={identifierName}
-          name={fieldName}
-          disabled={!option.manualEntryEnabled || disabled}
+          name={name}
+          disabled={disabled}
+          required={required}
           invalid={!!(identifierFieldMeta.touched && identifierFieldMeta.error)}
           invalidText={identifierFieldMeta.error && t(identifierFieldMeta.error)}
+          // t('identifierValueRequired', 'Identifier value is required')
           {...identifierField}
         />
       ) : (
         <div className={styles.textID}>
           <p className={styles.label}>{identifierName}</p>
           <p className={styles.bodyShort02}>
-            {!isNewIdentifier ? identifier : t('autoGeneratedPlaceholderText', 'Auto generated')}
+            {autoGeneration ? t('autoGeneratedPlaceholderText', 'Auto-generated') : identifierValue}
           </p>
+          <input type="hidden" {...identifierField} disabled />
+          {/* This is added for any error descriptions */}
+          {!!(identifierFieldMeta.touched && identifierFieldMeta.error) && (
+            <span className={styles.dangerLabel01}>{identifierFieldMeta.error && t(identifierFieldMeta.error)}</span>
+          )}
         </div>
       )}
       <div>
-        {!(
-          identifierType.isPrimary ||
-          identifierType.required ||
-          defaultPatientIdentifierTypesMap[identifierType.uuid]
-        ) &&
-          patientIdentifier.action === 'NONE' && (
-            <Button
-              kind="ghost"
-              onClick={handleEdit}
-              iconDescription={t('editIdentifierTooltip', 'Edit')}
-              disabled={disabled}
-              hasIconOnly>
-              <Edit16 />
-            </Button>
-          )}
-        {!(
-          identifierType?.isPrimary ||
-          identifierType?.required ||
-          defaultPatientIdentifierTypesMap[identifierType.uuid]
-        ) && (
+        {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
+          <Button
+            kind="ghost"
+            onClick={handleEdit}
+            iconDescription={t('editIdentifierTooltip', 'Edit')}
+            disabled={disabled}
+            hasIconOnly>
+            <Edit16 />
+          </Button>
+        )}
+        {initialValue && initialValue !== identifierValue && (
+          <Button
+            kind="ghost"
+            onClick={handleReset}
+            iconDescription={t('resetIdentifierTooltip', 'Reset')}
+            disabled={disabled}
+            hasIconOnly>
+            <Reset16 />
+          </Button>
+        )}
+        {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <Button
             kind="danger--ghost"
             onClick={handleDelete}

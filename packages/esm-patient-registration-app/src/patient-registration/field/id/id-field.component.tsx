@@ -3,17 +3,63 @@ import { IdentifierInput } from '../../input/custom-input/identifier/identifier-
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Button } from 'carbon-components-react';
+import { Button, SkeletonText } from 'carbon-components-react';
 import { ArrowRight16 } from '@carbon/icons-react';
 import { useLayoutType, useConfig } from '@openmrs/esm-framework';
-import { PatientIdentifierValue } from '../../patient-registration-types';
+import {
+  FormValues,
+  IdentifierSource,
+  PatientIdentifierType,
+  PatientIdentifierValue,
+} from '../../patient-registration-types';
 import IdentifierSelectionOverlay from './identifier-selection-overlay';
-import { FieldArray } from 'formik';
 import { ResourcesContext } from '../../../offline.resources';
 
-export const IdField: React.FC = () => {
+export function setIdentifierSource(
+  identifierSource: IdentifierSource,
+  identifierValue: string,
+  initialValue: string,
+): {
+  identifierValue: string;
+  autoGeneration: boolean;
+  selectedSource: IdentifierSource;
+} {
+  const autoGeneration = identifierSource?.autoGenerationOption?.automaticGenerationEnabled;
+  return {
+    selectedSource: identifierSource,
+    autoGeneration,
+    identifierValue: autoGeneration
+      ? 'auto-generated'
+      : identifierValue !== 'auto-generated'
+      ? identifierValue
+      : initialValue,
+  };
+}
+
+export function initializeIdentifier(identifierType: PatientIdentifierType, identifierProps): PatientIdentifierValue {
+  return {
+    identifierTypeUuid: identifierType.uuid,
+    identifierName: identifierType.name,
+    preferred: identifierType.isPrimary,
+    initialValue: '',
+    required: identifierType.isPrimary || identifierType.required,
+    ...identifierProps,
+    ...setIdentifierSource(
+      identifierProps?.selectedSource ?? identifierType.identifierSources?.[0],
+      identifierProps?.identifierValue,
+      identifierProps?.initialValue ?? '',
+    ),
+  };
+}
+
+export function deleteIdentifierType(identifiers: FormValues['identifiers'], identifierFieldName) {
+  return Object.fromEntries(Object.entries(identifiers).filter(([fieldName]) => fieldName !== identifierFieldName));
+}
+
+export const Identifiers: React.FC = () => {
   const { identifierTypes } = useContext(ResourcesContext);
-  const { values, setFieldValue, inEditMode } = useContext(PatientRegistrationContext);
+  const isLoading = !identifierTypes;
+  const { values, setFieldValue, initialFormValues } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
   const desktop = useLayoutType() === 'desktop';
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
@@ -21,30 +67,49 @@ export const IdField: React.FC = () => {
   const { defaultPatientIdentifierTypes } = config;
 
   useEffect(() => {
-    if (!inEditMode && identifierTypes && !values?.identifiers?.length) {
-      const defaultPatientIdentifierTypesMap = {};
-      if (defaultPatientIdentifierTypes?.length) {
-        defaultPatientIdentifierTypes.forEach((typeUuid) => {
-          defaultPatientIdentifierTypesMap[typeUuid] = true;
+    // Initialization
+    if (identifierTypes) {
+      const identifiers = {};
+      identifierTypes
+        .filter(
+          (type) =>
+            type.isPrimary ||
+            type.required ||
+            !!defaultPatientIdentifierTypes?.find(
+              (defaultIdentifierTypeUuid) => defaultIdentifierTypeUuid === type.uuid,
+            ),
+        )
+        .filter((type) => !values.identifiers[type.fieldName])
+        .forEach((type) => {
+          identifiers[type.fieldName] = initializeIdentifier(
+            type,
+            values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},
+          );
+        });
+      /*
+        Identifier value should only be updated if there is any update in the
+        identifier values, otherwise, if the below 'if' clause is removed, it will
+        fall into an infinite run.
+      */
+      if (Object.keys(identifiers).length) {
+        setFieldValue('identifiers', {
+          ...values.identifiers,
+          ...identifiers,
         });
       }
-      setFieldValue(
-        'identifiers',
-        identifierTypes
-          .filter((identifierType) => identifierType.required || defaultPatientIdentifierTypesMap[identifierType.uuid])
-          .map(
-            (identifierType) =>
-              ({
-                action: 'ADD',
-                identifier: '',
-                identifierTypeUuid: identifierType.uuid,
-                source: identifierType.identifierSources?.[0],
-                preferred: identifierType.isPrimary,
-              } as PatientIdentifierValue),
-          ),
-      );
     }
-  }, [identifierTypes, inEditMode, defaultPatientIdentifierTypes, setFieldValue, values]);
+  }, [identifierTypes, setFieldValue, initializeIdentifier, defaultPatientIdentifierTypes, values.identifiers]);
+
+  if (isLoading) {
+    return (
+      <div className={styles.halfWidthInDesktopView}>
+        <div className={styles.identifierLabelText}>
+          <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
+        </div>
+        <SkeletonText />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -59,32 +124,15 @@ export const IdField: React.FC = () => {
         </Button>
       </div>
       <div>
-        <FieldArray name="identifiers">
-          {({
-            push,
-            remove,
-            form: {
-              values: { identifiers },
-            },
-          }) => (
-            <>
-              {identifiers
-                .filter((identifier) => identifier.action !== 'DELETE')
-                .map((identifier: PatientIdentifierValue, index) => (
-                  <IdentifierInput key={index} index={index} patientIdentifier={identifier} remove={remove} />
-                ))}
-              {showIdentifierOverlay && (
-                <IdentifierSelectionOverlay
-                  setFieldValue={setFieldValue}
-                  closeOverlay={() => setShowIdentifierOverlay(false)}
-                  push={push}
-                  identifiers={identifiers}
-                  remove={remove}
-                />
-              )}
-            </>
-          )}
-        </FieldArray>
+        {Object.entries(values.identifiers).map(([fieldName, identifier]) => (
+          <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
+        ))}
+        {showIdentifierOverlay && (
+          <IdentifierSelectionOverlay
+            setFieldValue={setFieldValue}
+            closeOverlay={() => setShowIdentifierOverlay(false)}
+          />
+        )}
       </div>
     </div>
   );

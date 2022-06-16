@@ -13,6 +13,7 @@ export interface PatientRegistrationContextProps {
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;
   currentPhoto: string;
   isOffline: boolean;
+  initialFormValues: FormValues;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);
