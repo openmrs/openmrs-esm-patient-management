@@ -1,5 +1,4 @@
 import React from 'react';
-import { AddressField } from './address/address-field.component';
 import { PhoneEmailField } from './email/email-field.component';
 import { NameField } from './name/name-field.component';
 import { GenderField } from './gender/gender-field.component';
