@@ -1,6 +1,6 @@
 import { ComboBox, ComboBoxProps } from 'carbon-components-react';
 import { useField } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { performAdressHierarchyWithParentSearch } from '../../../resource';
 
 interface InputProps extends ComboBoxProps {
