@@ -1,7 +1,7 @@
 import { ComboBox, ComboBoxProps } from 'carbon-components-react';
 import { useField } from 'formik';
 import React, { useContext, useState } from 'react';
-import { performAdressHirarchiWithParentSearch } from '../../../resource';
+import { performAdressHierarchyWithParentSearch } from '../../../resource';
 
 interface InputProps extends ComboBoxProps {
   name: string;
@@ -17,7 +17,7 @@ export const ComboInput: React.FC<InputProps> = ({ name, labeltext, setSelectedV
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
-      performAdressHirarchiWithParentSearch(id.replace(' ', ''), selected, text)
+      performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text)
         .then((value) => {
           var element = [];
           value.data.forEach((parent1) => {

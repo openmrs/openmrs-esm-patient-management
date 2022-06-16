@@ -12,7 +12,7 @@ import capitalize from 'lodash-es/capitalize';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
-  const nameMappings = templateXmlDoc.querySelector('nameMappings'); //.querySelectorAll('property');
+  const nameMappings = templateXmlDoc.querySelector('nameMappings');
   const properties = nameMappings.getElementsByTagName('entry');
   const validationSchemaObjs = Array.prototype.map.call(properties, (property: Element) => {
     const name = property.getElementsByTagName('string')[0].innerHTML;

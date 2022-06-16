@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, wait } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { ComboInput } from './comboinput.component';
+import React from 'react';
 
-describe.skip('Combo box input', () => {
+describe('Combo box input', () => {
   const setupInput = async () => {
     const selected = null;
     const setSelectedValue = null;
@@ -22,7 +23,7 @@ describe.skip('Combo box input', () => {
         </Form>
       </Formik>,
     );
-    return screen.getByLabelText('text') as HTMLInputElement;
+    return screen.getByLabelText('Text') as HTMLInputElement;
   };
 
   it('exists', async () => {
@@ -32,7 +33,7 @@ describe.skip('Combo box input', () => {
 
   it('can input data', async () => {
     const input = await setupInput();
-    const expected = 'Some text';
+    const expected = 'Some Text';
 
     fireEvent.change(input, { target: { value: expected } });
     fireEvent.blur(input);
