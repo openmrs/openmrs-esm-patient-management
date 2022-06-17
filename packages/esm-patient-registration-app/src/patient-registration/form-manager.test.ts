@@ -29,23 +29,20 @@ const formValues: FormValues = {
   deathDate: 'string',
   deathCause: 'string',
   relationships: [],
-  identifiers: {
-    foo: {
-      identifierUuid: 'aUuid',
-      identifierName: 'Foo',
-      required: false,
-      initialValue: 'foo',
-      identifierValue: 'foo',
+  identifiers: [
+    {
+      uuid: 'aUuid',
+      identifier: 'foo',
       identifierTypeUuid: 'identifierType',
       preferred: true,
-      autoGeneration: false,
-      selectedSource: {
+      source: {
         uuid: 'some-uuid',
         name: 'unique',
         autoGenerationOption: { manualEntryEnabled: true, automaticGenerationEnabled: false },
       },
+      action: 'ADD',
     },
-  },
+  ],
 };
 
 describe('FormManager', () => {
@@ -55,7 +52,6 @@ describe('FormManager', () => {
         true,
         undefined,
         formValues.identifiers,
-        {},
         'Nyc',
         new AbortController(),
       );

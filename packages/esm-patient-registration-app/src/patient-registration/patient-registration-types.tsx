@@ -1,3 +1,5 @@
+import { string } from 'yup';
+
 interface NameValue {
   uuid: string;
   preferred: boolean;
@@ -26,15 +28,19 @@ export interface FetchedPatientIdentifierType {
 }
 
 export interface PatientIdentifierValue {
-  identifierUuid?: string;
-  identifierTypeUuid: string;
-  initialValue: string;
-  identifierValue: string;
-  identifierName: string;
-  selectedSource: IdentifierSource;
+  uuid?: string;
+  identifier: string;
+  identifierTypeUuid?: string;
+  source: IdentifierSource;
   autoGeneration?: boolean;
   preferred: boolean;
-  required: boolean;
+  /**
+   * @kind ADD -> add a new identifier to a patient
+   * @kind UPDATE -> update an existing patient identifier
+   * @kind DELETE -> delete an existing patient identifier
+   * @kind NONE -> No action to be taken on the patient identifier
+   */
+  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
 }
 
 /**
@@ -84,7 +90,6 @@ export interface PatientRegistration {
     capturePhotoProps: CapturePhotoProps;
     patientPhotoConceptUuid: string;
     currentLocation: string;
-    initialIdentifierValues: FormValues['identifiers'];
   };
 }
 
@@ -157,9 +162,7 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<RelationshipValue>;
-  identifiers: {
-    [identifierFieldName: string]: PatientIdentifierValue;
-  };
+  identifiers: Array<PatientIdentifierValue>;
   attributes?: {
     [attributeTypeUuid: string]: string;
   };
@@ -195,11 +198,9 @@ export interface TextBasedPersonAttributeConfig {
 export interface PatientIdentifierResponse {
   uuid: string;
   identifier: string;
-  preferred: boolean;
   identifierType: {
     uuid: string;
-    required: boolean;
-    name: string;
+    isPrimary: boolean;
   };
 }
 export interface PersonAttributeTypeResponse {
