@@ -54,7 +54,6 @@ export async function syncPatientRegistration(
     queuedPatient._patientRegistrationData.capturePhotoProps,
     queuedPatient._patientRegistrationData.patientPhotoConceptUuid,
     queuedPatient._patientRegistrationData.currentLocation,
-    queuedPatient._patientRegistrationData.initialIdentifierValues,
     options.abort,
   );
 }

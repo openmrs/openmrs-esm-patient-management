@@ -103,7 +103,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         capturePhotoProps,
         config?.concepts?.patientPhotoUuid,
         location,
-        initialFormValues['identifiers'],
         abortController,
       );
 
@@ -211,7 +210,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   setCapturePhotoProps,
                   currentPhoto: photo?.imageSrc,
                   isOffline,
-                  initialFormValues: props.initialValues,
                 }}>
                 {sections.map((section, index) => (
                   <SectionWrapper
