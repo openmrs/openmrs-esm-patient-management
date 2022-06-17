@@ -55,7 +55,7 @@ describe('demographics section', () => {
               isOffline: true,
               setCapturePhotoProps: (value) => {},
             }}>
-            <DemographicsSection fields={['name', 'gender', 'id']} id="demographics" />
+            <DemographicsSection fields={['name', 'gender', 'dob']} id="demographics" />
           </PatientRegistrationContext.Provider>
         </Form>
       </Formik>,
