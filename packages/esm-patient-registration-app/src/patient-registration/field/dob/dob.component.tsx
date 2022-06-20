@@ -6,12 +6,24 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { generateFormatting } from '../../date-util';
 import styles from '../field.scss';
 
+const calcBirthdate = (yearDelta, monthDelta) => {
+  const startDate = new Date();
+  const resultMonth = new Date(startDate.getFullYear() - yearDelta, startDate.getMonth() - monthDelta, 1);
+  const daysInResultMonth = new Date(resultMonth.getFullYear(), resultMonth.getMonth() + 1, 0).getDate();
+  const resultDate = new Date(
+    resultMonth.getFullYear(),
+    resultMonth.getMonth(),
+    Math.min(startDate.getDate(), daysInResultMonth),
+  );
+  return resultDate;
+};
+
 export const DobField: React.FC = () => {
   const { t } = useTranslation();
   const [dobUnknown] = useField('birthdateEstimated');
   const dobKnown = !dobUnknown.value;
   const [birthdate, birthdateMeta] = useField('birthdate');
-  const [yearsEstimated, YearsEstimateMeta] = useField('yearsEstimated');
+  const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
@@ -33,21 +45,16 @@ export const DobField: React.FC = () => {
 
     if (!isNaN(years) && years < 140 && years >= 0) {
       setFieldValue('yearsEstimated', years);
-      setFieldValue('birthdate', new Date(today.getFullYear() - years, today.getMonth() - monthsEstimateMeta.value, 1));
+      setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value));
     }
   };
 
   const onEstimatedMonthsChange = (e) => {
     const months = +e.target.value;
 
-    if (!isNaN(months) && months < 11 && months >= 0) {
-      const estimate_Months = YearsEstimateMeta.value * 12 + months;
-
+    if (!isNaN(months) && months <= 11 && months >= 0) {
       setFieldValue('monthsEstimated', months);
-      setFieldValue(
-        'birthdate',
-        new Date(today.getFullYear() - YearsEstimateMeta.value, today.getMonth() - estimate_Months, 1),
-      );
+      setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months));
     }
   };
 
@@ -90,8 +97,8 @@ export const DobField: React.FC = () => {
             light
             onChange={onEstimatedYearsChange}
             labelText={t('estimatedYearsLabelText', 'Estimated Years')}
-            invalid={!!(YearsEstimateMeta.touched && YearsEstimateMeta.error)}
-            invalidText={YearsEstimateMeta.error && t(YearsEstimateMeta.error)}
+            invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
+            invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
             value={yearsEstimated.value}
             min={0}
           />
