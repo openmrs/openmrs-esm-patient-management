@@ -29,21 +29,6 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
   });
 }
 
-// export function useAllPatientsFromOfflinePatientList(userId?: string) {
-//   return useSWR<Array<fhir.Patient>>(['offlinePatientListPatients', userId], async () => {
-//     if (!userId) {
-//       return [];
-//     }
-
-//     const allPatientUuids = await getLocalPatientListMembers(userId, offlinePatientListId);
-//     const patients: Array<{ data: fhir.Patient } | null> = await Promise.all(
-//       allPatientUuids.map(({ id }) => fetchCurrentPatient(id)),
-//     );
-
-//     return patients.filter(Boolean).map((result) => result.data);
-//   });
-// }
-
 export function usePatientListDetails(patientListUuid: string) {
   const swrResult = useSWR<FetchResponse<OpenmrsCohort>, Error>(`${cohortUrl}/cohort/${patientListUuid}`, openmrsFetch);
   return { ...swrResult, data: swrResult?.data?.data };
