@@ -115,10 +115,6 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   }, [showSearchInput]);
 
   useEffect(() => {
-    showSearchInput ? setCanClickOutside(true) : setCanClickOutside(false);
-  }, [showSearchInput]);
-
-  useEffect(() => {
     if (isEmpty(searchTerm)) {
       setShowResultsPanel(false);
     }
