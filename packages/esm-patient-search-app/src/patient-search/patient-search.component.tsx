@@ -1,89 +1,116 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
-import { usePagination } from '@openmrs/esm-framework';
-import { Loading, PaginationNav, Tile } from 'carbon-components-react';
-import { SearchedPatient } from '../types/index';
+import { useConfig } from '@openmrs/esm-framework';
+import { Loading, Tile } from 'carbon-components-react';
 import EmptyDataIllustration from './empty-data-illustration.component';
-import PatientSearchResults from '../patient-search-result/patient-search-result.component';
+import PatientSearchResults, { SearchResultSkeleton } from '../patient-search-result/patient-search-result.component';
 import styles from './patient-search.scss';
+import { usePatientSearch } from './patient-search.resource';
 
 const resultsPerPage = 5;
 
+const customRepresentation =
+  'custom:(patientId,uuid,identifiers,display,' +
+  'patientIdentifier:(uuid,identifier),' +
+  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
+  'attributes:(value,attributeType:(name)))';
+
 interface PatientSearchProps {
   hidePanel?: () => void;
-  searchResults: Array<SearchedPatient>;
-  status: 'searching' | 'resolved' | 'error' | 'idle';
-  error;
+  query: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, searchResults, status, error }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '' }) => {
   const { t } = useTranslation();
-  const { totalPages, currentPage, goToNext, goToPrevious, results, goTo } = usePagination(
-    searchResults,
-    resultsPerPage,
+  const config = useConfig();
+  const {
+    isLoading,
+    data: searchResults,
+    fetchError,
+    loadingNewData,
+    setPage,
+    hasMore,
+  } = usePatientSearch(query, customRepresentation, config.includeDead, !!query);
+
+  const observer = useRef(null);
+  const loadingIconRef = useCallback(
+    (node) => {
+      if (loadingNewData) {
+        return;
+      }
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            setPage((page) => page + 1);
+          }
+        },
+        {
+          threshold: 0.75,
+        },
+      );
+      if (node) {
+        observer.current.observe(node);
+      }
+    },
+    [loadingNewData, hasMore, setPage],
   );
 
-  const handlePageChange = (page: number) => {
-    if (page === 0 && currentPage === 0) {
-      goToNext();
-    } else if (page + 1 > currentPage) {
-      goToNext();
-    } else if (page + 1 < currentPage) {
-      goToPrevious();
-    }
-  };
-
-  useEffect(() => {
-    if (searchResults.length) {
-      goTo(0);
-    }
-  }, [searchResults]);
+  if (isLoading) {
+    return (
+      <div className={styles.searchResultsContainer}>
+        <SearchResultSkeleton />
+        <SearchResultSkeleton />
+        <SearchResultSkeleton />
+        <SearchResultSkeleton />
+        <SearchResultSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.searchResultsContainer}>
-      {/* <div>
-        <p className={styles.labelText}>{t('recentlyViewedChartsText', 'Recently viewed charts')}</p>
-      </div> */}
-      {status === 'resolved' && (
-        <>
-          {!isEmpty(searchResults) && (
-            <div className={styles.searchResults}>
-              <p className={styles.labelText}>{t('patientsFound', { count: searchResults.length })}</p>
-              <PatientSearchResults hidePanel={hidePanel} patients={results} />
-              {/* <div className={styles.pagination}>
-                <PaginationNav itemsShown={resultsPerPage} totalItems={totalPages} onChange={handlePageChange} />
-              </div> */}
+      {!isEmpty(searchResults) ? (
+        <div
+          className={styles.searchResults}
+          style={{
+            maxHeight: '20rem',
+          }}>
+          {/* <p className={styles.labelText}>{t('patientsFound', { count: searchResults.length })}</p> */}
+          <PatientSearchResults hidePanel={hidePanel} patients={searchResults} />
+          {hasMore && (
+            <div className={styles.loadingIcon} ref={loadingIconRef}>
+              <Loading withOverlay={false} small />
             </div>
           )}
-          {isEmpty(searchResults) && (
-            <div className={styles.searchResults}>
-              <p className={styles.labelText}>{t('noResultsFound', 'No results found')}</p>
-              <Tile className={styles.emptySearchResultsTile}>
-                <EmptyDataIllustration />
-                <p className={styles.emptyResultText}>
-                  {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
-                </p>
-                <p className={styles.actionText}>
-                  <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
-                  <br />
-                  <span>{t('orPatientName', "OR the patient's name(s)")}</span>
-                </p>
-              </Tile>
-            </div>
-          )}
-        </>
+        </div>
+      ) : (
+        <div className={styles.searchResults}>
+          <Tile className={styles.emptySearchResultsTile}>
+            <EmptyDataIllustration />
+            <p className={styles.emptyResultText}>
+              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
+            </p>
+            <p className={styles.actionText}>
+              <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
+              <br />
+              <span>{t('orPatientName', "OR the patient's name(s)")}</span>
+            </p>
+          </Tile>
+        </div>
       )}
-      {status === 'searching' && <Loading description="Active loading indicator" withOverlay={true} />}
-      {status === 'error' && (
+      {fetchError && (
         <div className={styles.searchResults}>
           <p className={styles.labelText}>{t('errorText', 'An error occurred while performing search')}</p>
           <Tile className={styles.emptySearchResultsTile}>
             <EmptyDataIllustration />
             <div>
               <p className={styles.errorMessage}>
-                {t('error', 'Error')} {`${error?.status}: `}
-                {error?.statusText}
+                {t('error', 'Error')} {`${fetchError?.status}: `}
+                {fetchError?.statusText}
               </p>
               <p className={styles.errorCopy}>
                 {t(

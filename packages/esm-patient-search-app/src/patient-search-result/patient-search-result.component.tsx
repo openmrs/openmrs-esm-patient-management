@@ -2,6 +2,46 @@ import React, { useCallback, useMemo } from 'react';
 import styles from './patient-search-result.scss';
 import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
+import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
+
+function getGender(gender) {
+  switch (gender) {
+    case 'M':
+      return 'Male';
+    case 'F':
+      return 'Female';
+    case 'O':
+      return 'Other';
+    default:
+      return 'Unknown';
+  }
+}
+
+function getAge(dateString) {
+  var today = new Date();
+  var birthDate = new Date(dateString);
+  var years = today.getFullYear() - birthDate.getFullYear();
+  var months = today.getMonth() - birthDate.getMonth();
+  if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+    years--;
+  }
+  if (years > 0) {
+    return `${years} years`;
+  }
+  var d = today.getDate() - birthDate.getDate();
+  if (d < 0) {
+    months--;
+  }
+  if (months > 0) {
+    return `${months} months`;
+  }
+  return `${d} days`;
+}
+
+interface PatientSearchResultsProps {
+  patients: Array<SearchedPatient>;
+  hidePanel?: any;
+}
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
@@ -78,7 +118,8 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
               patient.name?.[0]?.family
             }`}</h2>
             <p className={styles.demographics}>
-              {patient.gender} &middot; {patient.birthDate} &middot; {patient.identifier?.[0]?.value}
+              {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {getAge(patient.birthDate)}{' '}
+              <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.value}
             </p>
           </div>
         </ConfigurableLink>
@@ -87,9 +128,28 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   );
 };
 
-interface PatientSearchResultsProps {
-  patients: Array<SearchedPatient>;
-  hidePanel?: any;
-}
+export const SearchResultSkeleton = () => {
+  return (
+    <div className={styles.patientSearchResult}>
+      <div className={styles.patientAvatar} role="img">
+        <SkeletonIcon
+          style={{
+            height: '3rem',
+            width: '3rem',
+          }}
+        />
+      </div>
+      <div>
+        <h2 className={styles.patientName}>
+          <SkeletonText />
+        </h2>
+        <p className={styles.demographics}>
+          <SkeletonIcon /> <span className={styles.middot}>&middot;</span> <SkeletonIcon />{' '}
+          <span className={styles.middot}>&middot;</span> <SkeletonIcon />
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export default PatientSearchResults;
