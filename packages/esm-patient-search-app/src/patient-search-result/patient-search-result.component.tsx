@@ -46,15 +46,18 @@ interface PatientSearchResultsProps {
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
   const config = useConfig();
 
-  const onClickSearchResult = useCallback((evt, patientUuid) => {
-    evt.preventDefault();
-    navigate({
-      to: interpolateString(config.search.patientResultUrl, {
-        patientUuid: patientUuid,
-      }),
-    });
-    hidePanel();
-  }, []);
+  const onClickSearchResult = useCallback(
+    (evt, patientUuid) => {
+      evt.preventDefault();
+      navigate({
+        to: interpolateString(config.search.patientResultUrl, {
+          patientUuid: patientUuid,
+        }),
+      });
+      hidePanel();
+    },
+    [config.search.patientResultUrl, hidePanel],
+  );
 
   const fhirPatients = useMemo(() => {
     return patients.map((patient) => {
@@ -101,8 +104,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
             patientUuid: patient.id,
           })}
           key={patient.id}
-          className={styles.patientSearchResult}
-          role="a">
+          className={styles.patientSearchResult}>
           <div className={styles.patientAvatar} role="img">
             <ExtensionSlot
               extensionSlotName="patient-photo-slot"

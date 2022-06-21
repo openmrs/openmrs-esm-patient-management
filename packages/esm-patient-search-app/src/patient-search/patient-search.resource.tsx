@@ -54,8 +54,7 @@ export function usePatientSearch(
       loadingNewData: isValidating,
       setPage: setSize,
     }),
-    [data, isValidating, error],
+    [data, isValidating, error, setSize],
   );
-  console.log(results);
   return results;
 }

@@ -27,15 +27,13 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>();
   const [query, setQueryTerm] = useState<string>();
-  const initialState: PatientSearch = { status: 'idle', searchResults: [] };
 
   const performSearch = useCallback(
     (evt) => {
       evt.preventDefault();
-      console.log(evt);
       setQueryTerm(searchTerm);
     },
-    [searchTerm],
+    [searchTerm, setQueryTerm],
   );
 
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
