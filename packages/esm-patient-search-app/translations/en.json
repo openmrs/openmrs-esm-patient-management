@@ -2,7 +2,6 @@
   "clearSearch": "Clear",
   "error": "Error",
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
-  "errorText": "An error occurred while performing search",
   "noPatientChartsFoundMessage": "Sorry, no patient charts have been found",
   "orPatientName": "OR the patient's name(s)",
   "search": "Search",

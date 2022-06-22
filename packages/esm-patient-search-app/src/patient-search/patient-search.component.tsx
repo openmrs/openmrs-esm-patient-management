@@ -71,8 +71,6 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '' }) 
     );
   }
 
-  console.log(fetchError as Error);
-
   return (
     <div className={styles.searchResultsContainer}>
       {!fetchError ? (
