@@ -1,47 +1,14 @@
-import {
-  CohortResponse,
-  CohortType,
-  OpenmrsCohort,
-  OpenmrsCohortMember,
-  PatientList,
-  PatientListFilter,
-  PatientListMember,
-} from './types';
-import {
-  getLocalAndRemotePatientListMembers,
-  getLocalAndRemotePatientLists,
-  getLocalAndRemotePatientListsForPatient,
-} from './api';
-import { getLocalPatientListMembers, offlinePatientListId, removePatientFromLocalPatientList } from './api-local';
-import { fetchCurrentPatient, openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
+import { CohortResponse, CohortType, OpenmrsCohort, OpenmrsCohortMember, PatientListFilter } from './types';
+import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { cohortUrl } from './api-remote';
+import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
 
-/**
- * A hook for querying all local and remote patient lists belonging to a given user,
- * optionally filtered by the specified {@link filter}.
- */
-export function useAllPatientLists(userId?: string, filter?: PatientListFilter) {
-  return useSWR(['patientList', userId, filter], () => {
-    if (!userId) {
-      return Promise.resolve<Array<PatientList>>([]);
-    }
-
-    return getLocalAndRemotePatientLists(userId, filter);
-  });
+export function useAllPatientLists(filter?: PatientListFilter) {
+  return useSWR(['patientList', filter], () => getAllPatientLists(filter));
 }
 
-/**
- * A hook for querying all members of a given local or remote patient list.
- */
-export function useAllPatientListMembers(userId?: string, patientListId?: string) {
-  return useSWR(['patientListMembers', userId, patientListId], () => {
-    if (!userId || !patientListId) {
-      return Promise.resolve<Array<PatientListMember>>([]);
-    }
-
-    return getLocalAndRemotePatientListMembers(userId, patientListId);
-  });
+export function useAllPatientListMembers(patientListId: string) {
+  return useSWR(['patientListMembers', patientListId], () => getPatientListMembers(patientListId));
 }
 
 /**
@@ -50,34 +17,15 @@ export function useAllPatientListMembers(userId?: string, patientListId?: string
  *
  * This is intended for displaying all lists to which a given patient can still be added.
  */
-export function useAllPatientListsWhichDoNotIncludeGivenPatient(userId?: string, patientUuid?: string) {
-  return useSWR(['patientListWithoutPatient', userId, patientUuid], async () => {
-    if (!userId || !patientUuid) {
-      return [];
-    }
-
+export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: string) {
+  return useSWR(['patientListWithoutPatient', patientUuid], async () => {
     const [allLists, listsIdsOfThisPatient] = await Promise.all([
-      getLocalAndRemotePatientLists(userId, undefined),
-      getLocalAndRemotePatientListsForPatient(userId, patientUuid),
+      getAllPatientLists(),
+      getPatientListIdsForPatient(patientUuid),
     ]);
 
     const listsWithoutPatient = allLists.filter((list) => !listsIdsOfThisPatient.includes(list.id));
     return listsWithoutPatient;
-  });
-}
-
-export function useAllPatientsFromOfflinePatientList(userId?: string) {
-  return useSWR<Array<fhir.Patient>>(['offlinePatientListPatients', userId], async () => {
-    if (!userId) {
-      return [];
-    }
-
-    const allPatientUuids = await getLocalPatientListMembers(userId, offlinePatientListId);
-    const patients: Array<{ data: fhir.Patient } | null> = await Promise.all(
-      allPatientUuids.map(({ id }) => fetchCurrentPatient(id)),
-    );
-
-    return patients.filter(Boolean).map((result) => result.data);
   });
 }
 

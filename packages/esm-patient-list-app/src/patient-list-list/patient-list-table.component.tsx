@@ -20,8 +20,8 @@ import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
 import { useSession, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
-import { updateLocalOrRemotePatientList } from '../api/api';
 import { PatientList } from '../api/types';
+import { updatePatientList } from '../api/api-remote';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -60,7 +60,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
-      await updateLocalOrRemotePatientList(userId, patientListId, { isStarred });
+      await updatePatientList(patientListId, { isStarred });
       refetch();
     }
   };
