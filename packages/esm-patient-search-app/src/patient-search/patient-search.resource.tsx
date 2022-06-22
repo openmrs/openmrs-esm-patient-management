@@ -6,7 +6,7 @@ import { SearchedPatient } from '../types';
 interface PatientSearchResponse {
   data?: Array<SearchedPatient>;
   isLoading: boolean;
-  fetchError: any;
+  fetchError: Error;
   loadingNewData: boolean;
   hasMore: boolean;
   setPage: (size: number | ((_size: number) => number)) => Promise<
@@ -25,6 +25,7 @@ export function usePatientSearch(
   includeDead: boolean,
   searching: boolean = true,
 ): PatientSearchResponse {
+  const resultsToFetch = 15;
   const getUrl = useCallback(
     (
       page,
@@ -33,16 +34,18 @@ export function usePatientSearch(
       if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
         return null;
       }
-      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=10`;
+      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}`;
       if (page) {
-        url += `&startIndex=${page * 10}`;
+        url += `&startIndex=${page * resultsToFetch}`;
       }
       return url;
     },
-    [searchTerm, customRepresentation, includeDead],
+    [searchTerm, customRepresentation, includeDead, resultsToFetch],
   );
+
   const { data, isValidating, setSize, error } = useSWRInfinite<
-    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>
+    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+    Error
   >(searching ? getUrl : null, openmrsFetch);
 
   const results = useMemo(

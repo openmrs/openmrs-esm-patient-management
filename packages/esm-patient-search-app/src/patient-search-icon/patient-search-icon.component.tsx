@@ -5,7 +5,7 @@ import { Button, HeaderGlobalAction, Search } from 'carbon-components-react';
 import PatientSearch from '../patient-search/patient-search.component';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import { useConfig, useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
+import { useOnClickOutside, useLayoutType } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import { SearchedPatient } from '../types';
 import styles from './patient-search-icon.component.scss';
@@ -26,15 +26,6 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false);
   const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>();
-  const [query, setQueryTerm] = useState<string>();
-
-  const performSearch = useCallback(
-    (evt) => {
-      evt.preventDefault();
-      setQueryTerm(searchTerm);
-    },
-    [searchTerm, setQueryTerm],
-  );
 
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
 
@@ -54,36 +45,24 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     showSearchInput ? setCanClickOutside(true) : setCanClickOutside(false);
   }, [showSearchInput]);
 
-  useEffect(() => {
-    if (isEmpty(searchTerm)) {
-      setQueryTerm('');
-    }
-  }, [searchTerm]);
-
   return (
     <>
       <div className={styles.patientSearchIconWrapper} ref={ref}>
         {showSearchInput && (
           <div className={styles.searchArea}>
-            <form onSubmit={performSearch} className={styles.searchArea}>
-              <Search
-                size={layout === 'desktop' ? 'sm' : 'xl'}
-                className={styles.patientSearchInput}
-                placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-                labelText=""
-                closeButtonLabelText={t('clearSearch', 'Clear')}
-                onChange={(event) => handleChange(event.target.value)}
-                autoFocus={true}
-              />
-              <Button
-                type="submit"
-                onClick={performSearch}
-                className={styles.searchButton}
-                size={layout === 'desktop' ? 'small' : 'default'}>
-                {t('search', 'Search')}
-              </Button>
-            </form>
-            {!!query && <PatientSearch hidePanel={handleCloseSearchInput} query={query} />}
+            <Search
+              size={layout === 'desktop' ? 'sm' : 'xl'}
+              className={styles.patientSearchInput}
+              placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
+              labelText=""
+              closeButtonLabelText={t('clearSearch', 'Clear')}
+              onChange={(event) => handleChange(event.target.value)}
+              autoFocus={true}
+            />
+            <Button type="submit" className={styles.searchButton} size={layout === 'desktop' ? 'small' : 'default'}>
+              {t('search', 'Search')}
+            </Button>
+            {!!searchTerm && <PatientSearch hidePanel={handleCloseSearchInput} query={searchTerm} />}
           </div>
         )}
 

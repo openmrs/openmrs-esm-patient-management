@@ -71,51 +71,50 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '' }) 
     );
   }
 
+  console.log(fetchError as Error);
+
   return (
     <div className={styles.searchResultsContainer}>
-      {!isEmpty(searchResults) ? (
-        <div
-          className={styles.searchResults}
-          style={{
-            maxHeight: '20rem',
-          }}>
-          {/* <p className={styles.labelText}>{t('patientsFound', { count: searchResults.length })}</p> */}
-          <PatientSearchResults hidePanel={hidePanel} patients={searchResults} />
-          {hasMore && (
-            <div className={styles.loadingIcon} ref={loadingIconRef}>
-              <Loading withOverlay={false} small />
-            </div>
-          )}
-        </div>
+      {!fetchError ? (
+        !isEmpty(searchResults) ? (
+          <div
+            className={styles.searchResults}
+            style={{
+              maxHeight: '20rem',
+            }}>
+            <PatientSearchResults hidePanel={hidePanel} patients={searchResults} />
+            {hasMore && (
+              <div className={styles.loadingIcon} ref={loadingIconRef}>
+                <Loading withOverlay={false} small />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={styles.searchResults}>
+            <Tile className={styles.emptySearchResultsTile}>
+              <EmptyDataIllustration />
+              <p className={styles.emptyResultText}>
+                {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
+              </p>
+              <p className={styles.actionText}>
+                <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
+                <br />
+                <span>{t('orPatientName', "OR the patient's name(s)")}</span>
+              </p>
+            </Tile>
+          </div>
+        )
       ) : (
         <div className={styles.searchResults}>
-          <Tile className={styles.emptySearchResultsTile}>
-            <EmptyDataIllustration />
-            <p className={styles.emptyResultText}>
-              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
-            </p>
-            <p className={styles.actionText}>
-              <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
-              <br />
-              <span>{t('orPatientName', "OR the patient's name(s)")}</span>
-            </p>
-          </Tile>
-        </div>
-      )}
-      {fetchError && (
-        <div className={styles.searchResults}>
-          <p className={styles.labelText}>{t('errorText', 'An error occurred while performing search')}</p>
+          {/* <p className={styles.labelText}>{t('errorText', 'An error occurred while performing search')}</p> */}
           <Tile className={styles.emptySearchResultsTile}>
             <EmptyDataIllustration />
             <div>
-              <p className={styles.errorMessage}>
-                {t('error', 'Error')} {`${fetchError?.status}: `}
-                {fetchError?.statusText}
-              </p>
+              <p className={styles.errorMessage}>{t('error', 'Error')}</p>
               <p className={styles.errorCopy}>
                 {t(
                   'errorCopy',
-                  'Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
+                  'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
                 )}
               </p>
             </div>
