@@ -4,9 +4,8 @@
 @import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
 @import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
-// to add #d0e2ff in styleguide
 .widgetCard {
-  border-top: 1px solid #d0e2ff;
+  border-top: 1px solid $carbon--blue-20;
   background-color: $color-blue-10;
   padding: $spacing-03 $spacing-05 $spacing-03;
 }

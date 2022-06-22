@@ -2,9 +2,6 @@
 @import '~carbon-components/src/globals/scss/vars';
 @import '~carbon-components/src/globals/scss/mixins';
 
-// TO DO : move this color variable to style guide
-$color-blue-20: #d0e2ff;
-
 .heading {
   @include carbon--type-style('productive-heading-01');
   color: $text-02;
@@ -14,7 +11,7 @@ $color-blue-20: #d0e2ff;
   background-color: $color-blue-10;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-top: 1px solid $color-blue-20;
+  border-top: 1px solid $carbon--blue-20;
   margin-top: $spacing-01;
 
   & > div {
@@ -23,7 +20,7 @@ $color-blue-20: #d0e2ff;
   }
 
   & > div:first-child {
-    border-right: 1px solid $color-blue-20;
+    border-right: 1px solid $carbon--blue-20;
   }
 
   & ul > li {
