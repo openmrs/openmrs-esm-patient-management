@@ -109,7 +109,6 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
         )
       ) : (
         <div className={styles.searchResults}>
-          {/* <p className={styles.labelText}>{t('errorText', 'An error occurred while performing search')}</p> */}
           <Tile className={styles.emptySearchResultsTile}>
             <EmptyDataIllustration />
             <div>

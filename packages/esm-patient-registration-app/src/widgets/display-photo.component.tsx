@@ -9,7 +9,7 @@ interface DisplayPatientPhotoProps {
   size?: string;
 }
 
-export default function DisplayPatientPhoto({ patientUuid, patientName, size = 'normal' }: DisplayPatientPhotoProps) {
+export default function DisplayPatientPhoto({ patientUuid, patientName, size }: DisplayPatientPhotoProps) {
   const { data: photo } = usePatientPhoto(patientUuid);
   const patternUrl: string = GeoPattern.generate(patientUuid).toDataUri();
 

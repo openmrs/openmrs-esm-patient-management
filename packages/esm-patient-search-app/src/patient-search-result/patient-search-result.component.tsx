@@ -3,19 +3,7 @@ import styles from './patient-search-result.scss';
 import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
-
-function getGender(gender) {
-  switch (gender) {
-    case 'M':
-      return 'Male';
-    case 'F':
-      return 'Female';
-    case 'O':
-      return 'Other';
-    default:
-      return 'Unknown';
-  }
-}
+import { useTranslation } from 'react-i18next';
 
 function getAge(dateString) {
   var today = new Date();
@@ -46,6 +34,29 @@ interface PatientSearchResultsProps {
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel, selectPatientAction }) => {
   const config = useConfig();
+  const { t } = useTranslation();
+
+  const getGender = (gender) => {
+    switch (gender) {
+      case 'M':
+        return t('male');
+      case 'F':
+        return t('female');
+      case 'O':
+        return t('other');
+      case 'U':
+        return t('unknown');
+      default:
+        return gender;
+    }
+    /* 
+      Don't remove these comments
+      t('male', 'Male')
+      t('female', 'Female')
+      t('other', 'Other')
+      t('unknown', 'Unknown')
+    */
+  };
 
   const onClickSearchResult = useCallback(
     (evt, patientUuid) => {
