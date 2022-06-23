@@ -5,7 +5,7 @@
 @import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
 .widgetCard {
-  border: 1px solid $ui-03;
+  border-top: 1px solid $carbon--blue-20;
   background-color: $color-blue-10;
   padding: $spacing-03 $spacing-05 $spacing-03;
 }
