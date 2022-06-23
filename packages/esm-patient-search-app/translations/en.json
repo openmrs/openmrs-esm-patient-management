@@ -2,9 +2,13 @@
   "clearSearch": "Clear",
   "error": "Error",
   "errorCopy": "Sorry, there was a an error. You can try to reload this page, or contact the site administrator and quote the error code above.",
+  "female": "Female",
+  "male": "Male",
   "noPatientChartsFoundMessage": "Sorry, no patient charts have been found",
   "orPatientName": "OR the patient's name(s)",
+  "other": "Other",
   "search": "Search",
   "searchForPatient": "Search for a patient by name or identifier number",
-  "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number"
+  "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number",
+  "unknown": "Unknown"
 }
