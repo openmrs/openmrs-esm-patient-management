@@ -29,6 +29,11 @@ function setupOpenMRS() {
         order: 0,
         load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
       },
+      {
+        id: 'patient-search-button',
+        slot: 'patient-search-button-slot',
+        load: getAsyncLifecycle(() => import('./patient-search-button/patient-search-button.component'), options),
+      },
     ],
   };
 }
