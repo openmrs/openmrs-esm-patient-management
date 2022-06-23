@@ -9,6 +9,8 @@
   "other": "Other",
   "search": "Search",
   "searchForPatient": "Search for a patient by name or identifier number",
+  "searchPatient": "Search Patient",
+  "searchResults": "Search Results",
   "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number",
   "unknown": "Unknown"
 }
