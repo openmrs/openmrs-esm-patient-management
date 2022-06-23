@@ -70,7 +70,9 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
           }),
         });
       }
-      hidePanel();
+      if (hidePanel) {
+        hidePanel();
+      }
     },
     [config.search.patientResultUrl, hidePanel],
   );
