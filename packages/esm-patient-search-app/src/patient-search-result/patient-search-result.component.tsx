@@ -41,19 +41,24 @@ function getAge(dateString) {
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
   hidePanel?: any;
+  selectPatientAction?: (patientUuid: string) => void;
 }
 
-const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel }) => {
+const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel, selectPatientAction }) => {
   const config = useConfig();
 
   const onClickSearchResult = useCallback(
     (evt, patientUuid) => {
       evt.preventDefault();
-      navigate({
-        to: interpolateString(config.search.patientResultUrl, {
-          patientUuid: patientUuid,
-        }),
-      });
+      if (selectPatientAction) {
+        selectPatientAction(patientUuid);
+      } else {
+        navigate({
+          to: interpolateString(config.search.patientResultUrl, {
+            patientUuid: patientUuid,
+          }),
+        });
+      }
       hidePanel();
     },
     [config.search.patientResultUrl, hidePanel],

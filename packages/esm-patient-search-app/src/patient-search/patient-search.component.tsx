@@ -19,9 +19,10 @@ const customRepresentation =
 interface PatientSearchProps {
   hidePanel?: () => void;
   query: string;
+  selectPatientAction?: (patientUuid: string) => void;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '' }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', selectPatientAction }) => {
   const { t } = useTranslation();
   const config = useConfig();
   const {
@@ -80,7 +81,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '' }) 
             style={{
               maxHeight: '20rem',
             }}>
-            <PatientSearchResults hidePanel={hidePanel} patients={searchResults} />
+            <PatientSearchResults
+              hidePanel={hidePanel}
+              patients={searchResults}
+              selectPatientAction={selectPatientAction}
+            />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />

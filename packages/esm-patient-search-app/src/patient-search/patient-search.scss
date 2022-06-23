@@ -6,21 +6,18 @@
 }
 
 .searchResultsContainer {
-  position: fixed;
-  width: inherit;
+  position: absolute;
+  width: 100%;
   background-color: $ui-02;
   overflow-y: auto;
   box-shadow: 0 $spacing-03 $spacing-05 $ui-03;
   border: 0 0.063rem 0.063rem 0.063rem solid $ui-03;
+  z-index: 99;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
-  top: 6.25rem;
+  // top: 6.25rem;
   height: calc(100vh - 6.25rem);
-}
-
-:global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
-  top: $spacing-08;
 }
 
 .searchResults {
