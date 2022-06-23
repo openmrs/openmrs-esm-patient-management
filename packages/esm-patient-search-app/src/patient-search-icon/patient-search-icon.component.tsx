@@ -31,7 +31,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       {showSearchInput &&
         (isDesktop ? (
           <div className={styles.patientSearchBar}>
-            <PatientSearchBar small floatingSearchResults />
+            <PatientSearchBar hidePanel={() => setShowSearchInput(false)} small floatingSearchResults />
           </div>
         ) : (
           <Overlay close={() => setShowSearchInput(false)} header={t('searchResults', 'Search Results')}>
