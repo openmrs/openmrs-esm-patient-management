@@ -33,6 +33,15 @@
   justify-content: center;
   flex-direction: row;
   align-items: center;
+  border: 1px solid $ui-04;
+}
+
+.patientSearchInput {
+  border: none;
+}
+
+.orangeBorder {
+  border: 1px solid $carbon--orange-40;
 }
 
 .searchButton,

@@ -10,6 +10,7 @@ interface PatientSearchBarProps {
   selectPatientAction?: (patientUuid: string) => void;
   floatingSearchResults?: boolean;
   hidePanel?: () => void;
+  orangeBorder?: boolean;
 }
 
 const searchTimeout = 300;
@@ -17,7 +18,8 @@ const searchTimeout = 300;
 const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   small,
   selectPatientAction,
-  floatingSearchResults,
+  floatingSearchResults = true,
+  orangeBorder,
   hidePanel,
 }) => {
   const { t } = useTranslation();
@@ -26,7 +28,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
 
   return (
     <div className={styles.patientSearchWrapper}>
-      <div className={styles.searchArea}>
+      <div className={`${styles.searchArea} ${orangeBorder && styles.orangeBorder}`}>
         <Search
           className={styles.patientSearchInput}
           size={small ? 'sm' : 'xl'}

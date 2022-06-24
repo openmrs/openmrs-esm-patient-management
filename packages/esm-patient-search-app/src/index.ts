@@ -30,9 +30,16 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
       },
       {
+        // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
         id: 'patient-search-button',
         slot: 'patient-search-button-slot',
         load: getAsyncLifecycle(() => import('./patient-search-button/patient-search-button.component'), options),
+      },
+      {
+        // P.S. This extension is not compatible with the tablet view.
+        id: 'patient-search-bar',
+        slot: 'patient-search-bar-slot',
+        load: getAsyncLifecycle(() => import('./patient-search-bar/patient-search-bar.component'), options),
       },
     ],
   };
