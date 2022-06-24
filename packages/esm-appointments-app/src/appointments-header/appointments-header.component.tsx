@@ -2,13 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
 import Location16 from '@carbon/icons-react/es/location/16';
-import { formatDate, useSessionUser } from '@openmrs/esm-framework';
+import { formatDate, useSession } from '@openmrs/esm-framework';
 import styles from './appointments-header.scss';
 import AppointmentsIllustration from './appointments-illustration.component';
 
 const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
-  const userSession = useSessionUser();
+  const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
 
   return (
