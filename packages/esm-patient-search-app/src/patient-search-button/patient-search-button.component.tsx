@@ -9,7 +9,7 @@ interface PatientSearchButtonProps {
   buttonText?: string;
   overlayHeader?: string;
   selectPatientAction?: (patientUuid: string) => {};
-  buttonProps?: {};
+  buttonProps?: Object;
 }
 
 const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({

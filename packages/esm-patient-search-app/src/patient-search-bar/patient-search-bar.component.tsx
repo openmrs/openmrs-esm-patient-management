@@ -11,6 +11,7 @@ interface PatientSearchBarProps {
   floatingSearchResults?: boolean;
   hidePanel?: () => void;
   orangeBorder?: boolean;
+  buttonProps?: Object;
 }
 
 const searchTimeout = 300;
@@ -21,6 +22,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   floatingSearchResults = true,
   orangeBorder,
   hidePanel,
+  buttonProps,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -38,7 +40,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           onChange={(event) => handleChange(event.target.value)}
           autoFocus={true}
         />
-        <Button type="submit" className={styles.searchButton} size={small ? 'sm' : 'md'}>
+        <Button type="submit" className={styles.searchButton} size={small ? 'sm' : 'md'} {...buttonProps}>
           {t('search', 'Search')}
         </Button>
       </div>
