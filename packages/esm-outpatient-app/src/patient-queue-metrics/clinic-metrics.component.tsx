@@ -28,11 +28,13 @@ const ClinicMetrics: React.FC = () => {
           label={t('patients', 'Patients')}
           value={metrics ? metrics.scheduled_appointments : 0}
           headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          showList={true}
         />
         <MetricsCard
           label={t('patients', 'Patients')}
           value={serviceCount}
-          headerLabel={t('waitingFor', 'Waiting for:')}>
+          headerLabel={t('waitingFor', 'Waiting for:')}
+          showList={true}>
           <Dropdown
             style={{ marginTop: '1.5rem' }}
             id="inline"
@@ -47,6 +49,7 @@ const ClinicMetrics: React.FC = () => {
           label={t('minutes', 'Minutes')}
           value={metrics ? metrics.average_wait_time : 0}
           headerLabel={t('averageWaitTime', 'Average wait time today')}
+          showList={false}
         />
       </div>
     </>
