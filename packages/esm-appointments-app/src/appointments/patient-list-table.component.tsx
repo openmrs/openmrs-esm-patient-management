@@ -17,7 +17,7 @@ import {
 } from 'carbon-components-react';
 import Star16 from '@carbon/icons-react/es/star/16';
 import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { useSessionUser, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
+import { useSession, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
 import { updateLocalOrRemotePatientList } from '../api/api';
@@ -54,7 +54,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   refetch,
   search,
 }) => {
-  const userId = useSessionUser()?.user.uuid;
+  const userId = useSession()?.user.uuid;
   const isDesktop = useLayoutType() === 'desktop';
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
