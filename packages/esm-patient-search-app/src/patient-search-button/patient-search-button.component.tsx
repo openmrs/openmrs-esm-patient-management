@@ -9,7 +9,7 @@ interface PatientSearchButtonProps {
   buttonText?: string;
   overlayHeader?: string;
   selectPatientAction?: (patientUuid: string) => {};
-  buttonProps?: {};
+  buttonProps?: Object;
 }
 
 const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
@@ -27,7 +27,11 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
         <Overlay
           close={() => setShowSearchOverlay(false)}
           header={overlayHeader ? overlayHeader : t('searchResults', 'Search Results')}>
-          <PatientSearchBar hidePanel={() => setShowSearchOverlay(false)} selectPatientAction={selectPatientAction} />
+          <PatientSearchBar
+            hidePanel={() => setShowSearchOverlay(false)}
+            selectPatientAction={selectPatientAction}
+            floatingSearchResults={false}
+          />
         </Overlay>
       )}
 
