@@ -18,9 +18,8 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 }
 
 export const AddressHierarchy: React.FC = () => {
-  const [comboboxlist] = useState([]);
   const [selected, setSelected] = useState('');
-  const [addressconfig, setaddressconfig] = useState([]);
+  const [addressConfig, setaddressConfig] = useState([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate.results[0].value;
@@ -45,7 +44,7 @@ export const AddressHierarchy: React.FC = () => {
         value,
       };
     });
-    setaddressconfig(propertiesObj);
+    setaddressConfig(propertiesObj);
   }, [t, addressTemplateXml]);
 
   return (
@@ -56,11 +55,11 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {addressconfig.map((attributes) => (
+        {addressConfig.map((attributes) => (
           <ComboInput
             name={attributes.name}
             labeltext={attributes.labelText}
-            items={comboboxlist}
+            items={[]}
             id={attributes.name}
             placeholder={attributes.labelText}
             setSelectedValue={setSelectedValue}
