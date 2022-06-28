@@ -3,7 +3,7 @@
 @import '~carbon-components/src/globals/scss/mixins';
 
 .wrapper {
-  margin-top: 0.5rem;
+  margin-top: $spacing-03;
 }
 
 .bodyShort02 {
@@ -17,7 +17,7 @@
 .date {
   @include carbon--type-style('label-01');
   color: $text-02;
-  margin: 0.5rem 0rem 0.25rem;
+  margin: $spacing-03 0rem $spacing-02;
 }
 
 .visitType {
@@ -67,13 +67,13 @@
 
 .desktopTabs {
   button {
-    height: 32px;
+    height: $spacing-07;
   }
 }
 
 .tabletTabs {
   button {
-    height: 48px;
+    height: $spacing-09;
   }
 }
 
