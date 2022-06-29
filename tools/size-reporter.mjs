@@ -5,4 +5,5 @@ await reportFileSizeImpact({
   buildCommand: 'npx lerna run build',
   installCommand: 'npx lerna bootstrap',
   fileSizeReportModulePath: './tools/size-generator.mjs#fileSizeReport',
+  projectDirectoryUrl: new URL('../', import.meta.url),
 });
