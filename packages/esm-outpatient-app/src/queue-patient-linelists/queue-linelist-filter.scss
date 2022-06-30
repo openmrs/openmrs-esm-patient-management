@@ -1,0 +1,59 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.grid {
+  background-color: $ui-02;
+  padding: $spacing-06;
+}
+
+.row {
+  margin: $spacing-05 0 $spacing-03;
+  background-color: $ui-01;
+  padding: $spacing-03 0 $spacing-03;
+}
+
+.heading {
+  color: $text-02;
+  @include carbon--type-style('productive-heading-02');
+}
+
+.radioButton {
+  margin-top: $spacing-03;
+}
+
+:global(.bx--label) {
+  margin-top: $spacing-05;
+}
+
+.button {
+  height: $spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: $spacing-06 $spacing-05;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+  margin-top: $spacing-05;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: calc(100vh - 3rem);
+  }
+}
