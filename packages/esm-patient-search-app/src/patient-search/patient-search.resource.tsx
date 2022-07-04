@@ -1,4 +1,5 @@
 import useSWRInfinite from 'swr/infinite';
+import useSWR from 'swr';
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useCallback, useMemo } from 'react';
 import { SearchedPatient } from '../types';
@@ -9,6 +10,7 @@ interface PatientSearchResponse {
   fetchError: Error;
   loadingNewData: boolean;
   hasMore: boolean;
+  currentPage: number;
   setPage: (size: number | ((_size: number) => number)) => Promise<
     FetchResponse<{
       results: Array<SearchedPatient>;
@@ -19,13 +21,19 @@ interface PatientSearchResponse {
   >;
 }
 
+const v =
+  'custom:(patientId,uuid,identifiers,display,' +
+  'patientIdentifier:(uuid,identifier),' +
+  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
+  'attributes:(value,attributeType:(name)))';
+
 export function usePatientSearch(
   searchTerm: string,
-  customRepresentation: string,
   includeDead: boolean,
   searching: boolean = true,
+  resultsToFetch: number = 10,
+  customRepresentation: string = v,
 ): PatientSearchResponse {
-  const resultsToFetch = 15;
   const getUrl = useCallback(
     (
       page,
@@ -43,7 +51,7 @@ export function usePatientSearch(
     [searchTerm, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const { data, isValidating, setSize, error } = useSWRInfinite<
+  const { data, isValidating, setSize, error, size } = useSWRInfinite<
     FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
     Error
   >(searching ? getUrl : null, openmrsFetch);
@@ -56,8 +64,12 @@ export function usePatientSearch(
       hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
       loadingNewData: isValidating,
       setPage: setSize,
+      currentPage: size,
     }),
-    [data, isValidating, error, setSize],
+    [data, isValidating, error, setSize, size],
   );
+
+  console.log(results);
+
   return results;
 }

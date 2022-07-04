@@ -1,0 +1,66 @@
+@import '../root.scss';
+@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+
+:global(.bx--side-nav) {
+  z-index: 0;
+}
+
+.searchResultsContainer {
+  margin-top: $spacing-05;
+  width: 37.5rem;
+}
+
+.searchResults {
+  width: 100%;
+  margin-bottom: 5rem;
+}
+
+.resultsHeader {
+  @include carbon--type-style('productive-heading-02');
+  margin: $spacing-05 0;
+}
+
+.results {
+  border: 1px solid $ui-03;
+}
+
+.emptySearchResultsTile {
+  text-align: center;
+  margin: $spacing-05;
+  padding: $spacing-09 0rem;
+  background-color: $ui-02;
+}
+
+.emptyResultText {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+  margin-top: $spacing-05;
+  margin-bottom: 0.313rem;
+}
+
+.actionText {
+  @include carbon--type-style('body-long-01');
+  color: $text-02;
+}
+
+.pagination {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-05 0;
+  background: $ui-01;
+}
+
+.errorMessage {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-01;
+  margin-top: 2.25rem;
+  margin-bottom: $spacing-03;
+}
+
+.errorCopy {
+  margin-bottom: $spacing-03;
+  @include carbon--type-style('body-long-01');
+  color: $text-02;
+}

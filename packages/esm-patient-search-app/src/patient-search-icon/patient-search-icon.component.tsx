@@ -7,17 +7,34 @@ import styles from './patient-search-icon.component.scss';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import Overlay from '../ui-components/overlay';
 import { useTranslation } from 'react-i18next';
+import { RouteComponentProps, useParams } from 'react-router-dom';
 
-interface PatientSearchLaunchProps {}
+interface RouteParams {
+  page: string;
+  query: string;
+}
 
-const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
+interface PatientSearchLaunchProps extends RouteComponentProps<RouteParams> {}
+
+const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
+  console.log(props);
+  const page = props?.location?.pathname?.split('/')?.[1];
+  const query = props?.location?.pathname?.split('/')?.[2];
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false);
   const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
   const isDesktop = useLayoutType() === 'desktop';
   const { t } = useTranslation();
 
+  useEffect(() => {
+    // Search input should always be open when we direct to the search page.
+    setShowSearchInput(page === 'search');
+  }, [page]);
+
   const handleCloseSearchInput = useCallback(() => {
-    setShowSearchInput(false);
+    // Clicking outside of the search input when "/search" page is open should not close the search input.
+    if (page !== 'search') {
+      setShowSearchInput(false);
+    }
   }, []);
 
   const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
@@ -31,7 +48,13 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
       {showSearchInput &&
         (isDesktop ? (
           <div className={styles.patientSearchBar}>
-            <PatientSearchBar hidePanel={() => setShowSearchInput(false)} small orangeBorder />
+            <PatientSearchBar
+              hidePanel={() => setShowSearchInput(false)}
+              small
+              orangeBorder
+              page={page}
+              queryTerm={page === 'search' ? query : null}
+            />
           </div>
         ) : (
           <Overlay close={() => setShowSearchInput(false)} header={t('searchResults', 'Search Results')}>

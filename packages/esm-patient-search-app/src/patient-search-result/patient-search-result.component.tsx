@@ -5,7 +5,7 @@ import { SearchedPatient } from '../types/index';
 import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 
-function getAge(dateString) {
+export function getAge(dateString) {
   var today = new Date();
   var birthDate = new Date(dateString);
   var years = today.getFullYear() - birthDate.getFullYear();

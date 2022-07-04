@@ -10,12 +10,6 @@ import { usePatientSearch } from './patient-search.resource';
 
 const resultsPerPage = 5;
 
-const customRepresentation =
-  'custom:(patientId,uuid,identifiers,display,' +
-  'patientIdentifier:(uuid,identifier),' +
-  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
-  'attributes:(value,attributeType:(name)))';
-
 interface PatientSearchProps {
   hidePanel?: () => void;
   query: string;
@@ -32,7 +26,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
     loadingNewData,
     setPage,
     hasMore,
-  } = usePatientSearch(query, customRepresentation, config.includeDead, !!query);
+  } = usePatientSearch(query, config.includeDead, !!query);
 
   const observer = useRef(null);
   const loadingIconRef = useCallback(

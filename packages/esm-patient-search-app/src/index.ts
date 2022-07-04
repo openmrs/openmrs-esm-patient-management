@@ -22,12 +22,18 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, configSchema);
 
   return {
+    pages: [
+      {
+        route: /^search/,
+        load: getAsyncLifecycle(() => import('./root.component'), options),
+      },
+    ],
     extensions: [
       {
         id: 'patient-search-icon',
         slot: 'top-nav-actions-slot',
         order: 0,
-        load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
+        load: getAsyncLifecycle(() => import('./patient-search-icon'), options),
       },
       {
         // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.

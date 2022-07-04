@@ -4,6 +4,7 @@ import PatientSearch from '../patient-search/patient-search.component';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import styles from './patient-search-bar.scss';
+import { navigate } from '@openmrs/esm-framework';
 
 interface PatientSearchBarProps {
   small?: boolean;
@@ -12,6 +13,8 @@ interface PatientSearchBarProps {
   hidePanel?: () => void;
   orangeBorder?: boolean;
   buttonProps?: Object;
+  page?: string;
+  queryTerm?: string;
 }
 
 const searchTimeout = 300;
@@ -23,10 +26,22 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   orangeBorder,
   hidePanel,
   buttonProps,
+  page,
+  queryTerm,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string>();
   const handleChange = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), searchTimeout), []);
+
+  console.log(queryTerm);
+
+  const handleSubmit = () => {
+    if (searchTerm) {
+      navigate({
+        to: `\${openmrsSpaBase}/search/${searchTerm}`,
+      });
+    }
+  };
 
   return (
     <div className={styles.patientSearchWrapper}>
@@ -39,12 +54,13 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           closeButtonLabelText={t('clearSearch', 'Clear')}
           onChange={(event) => handleChange(event.target.value)}
           autoFocus={true}
+          defaultValue={queryTerm ?? ''}
         />
-        <Button type="submit" className={styles.searchButton} size={small ? 'sm' : 'md'} {...buttonProps}>
+        <Button type="submit" kind={'secondary'} size={small ? 'sm' : 'md'} onClick={handleSubmit} {...buttonProps}>
           {t('search', 'Search')}
         </Button>
       </div>
-      {!!searchTerm && (
+      {!!searchTerm && page !== 'search' && (
         <div className={floatingSearchResults && styles.floatingSearchResultsContainer}>
           <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} hidePanel={hidePanel} />
         </div>
