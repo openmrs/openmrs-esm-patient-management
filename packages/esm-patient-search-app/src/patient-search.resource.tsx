@@ -45,8 +45,7 @@ export function usePatientSearchFHIR(
   sort: string,
   page: number,
 ) {
-  // name:contains=${searchTerm}&
-  let url = `/ws/fhir2/R4/Patient?_count=${resultsToFetch}`;
+  let url = `/ws/fhir2/R4/Patient?name:contains=${searchTerm}&_count=${resultsToFetch}`;
   if (page > 1) {
     url += `&_getpagesoffset=${(page - 1) * resultsToFetch}`;
   }

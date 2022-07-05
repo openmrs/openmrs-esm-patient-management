@@ -8,14 +8,9 @@ interface PaginationProps {
   hasMore: boolean;
   currentPage: number;
   setPage: (page: number) => void;
-  pages?: number;
-  disableButtons?: boolean;
+  totalPages?: number;
 }
-const Pagination: React.FC<PaginationProps> = ({ pages, currentPage, setPage, hasMore, disableButtons }) => {
-  const [totalPages, setTotalPages] = useState<number>(pages ?? 1);
-
-  console.log(currentPage, totalPages);
-
+const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setPage, hasMore }) => {
   const buttons = useMemo(() => {
     let buttonsArray = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -56,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({ pages, currentPage, setPage, ha
         iconDescription=""
         renderIcon={CaretRight24}
         onClick={incrementPage}
-        disabled={disableButtons || (!hasMore && currentPage === totalPages)}
+        disabled={!hasMore && currentPage === totalPages}
       />
     </div>
   );

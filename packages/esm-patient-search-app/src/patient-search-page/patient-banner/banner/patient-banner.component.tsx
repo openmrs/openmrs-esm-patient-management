@@ -191,11 +191,10 @@ export const PatientBannerSkeleton = () => {
             <SkeletonText />
           </div>
         </div>
-
-        <div className={styles.buttonCol}>
-          <ButtonSkeleton />
-          <ButtonSkeleton />
-        </div>
+      </div>
+      <div className={styles.buttonCol}>
+        <ButtonSkeleton />
+        <ButtonSkeleton />
       </div>
     </div>
   );

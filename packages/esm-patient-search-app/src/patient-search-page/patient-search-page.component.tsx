@@ -1,3 +1,4 @@
+import { useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import PatientSearchComponent from './patient-search-lg.component';
@@ -11,9 +12,13 @@ interface PatientSearchPageComponentProps extends RouteComponentProps<RouteParam
 
 const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ({ match }) => {
   const { query } = match.params;
+  const isDesktop = useLayoutType() === 'desktop';
+
   return (
     <div className={styles.patientSearchPage}>
-      <PatientSearchComponent query={query} />
+      <div className={styles.patientSearchComponent}>
+        <PatientSearchComponent query={query} resultsToShow={isDesktop ? 5 : 15} />
+      </div>
     </div>
   );
 };
