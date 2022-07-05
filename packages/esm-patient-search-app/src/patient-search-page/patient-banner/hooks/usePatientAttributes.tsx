@@ -1,7 +1,6 @@
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { ConfigObject } from '../config-schema';
-import { Patient, Attribute } from '../types';
+import { Patient } from '../types';
 
 const customRepresentation =
   'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name),identifierType:(uuid,name,format,formatDescription,validator)),person:(uuid,display,gender,birthdate,dead,age,deathDate,birthdateEstimated,causeOfDeath,preferredName:(uuid,preferred,givenName,middleName,familyName),attributes,preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))';
@@ -31,7 +30,7 @@ export const usePatientAttributes = (patientUuid: string) => {
  * @returns Object containing `contactAttribute` {@link Attribute} loading status
  */
 export const usePatientContactAttributes = (patientUuid: string) => {
-  const { contactAttributeType } = useConfig() as ConfigObject;
+  const { contactAttributeType } = useConfig();
   const { attributes, isLoading } = usePatientAttributes(patientUuid);
   const contactAttributes = attributes.filter(({ attributeType }) =>
     contactAttributeType?.some((uuid) => attributeType.uuid === uuid),
