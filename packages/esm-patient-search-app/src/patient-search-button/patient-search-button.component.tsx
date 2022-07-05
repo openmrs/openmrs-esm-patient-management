@@ -6,6 +6,7 @@ import Overlay from '../ui-components/overlay';
 import { useTranslation } from 'react-i18next';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import PatientSearchComponent from '../patient-search-page/patient-search-lg.component';
+import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 
 interface PatientSearchButtonProps {
   buttonText?: string;
@@ -26,11 +27,11 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   return (
     <>
       {showSearchOverlay && (
-        <Overlay
-          close={() => setShowSearchOverlay(false)}
-          header={overlayHeader ? overlayHeader : t('searchResults', 'Search Results')}>
-          <PatientSearchComponent query={''} onPatientSelect={onPatientSelect} />
-        </Overlay>
+        <PatientSearchOverlay
+          onClose={() => setShowSearchOverlay(false)}
+          header={overlayHeader}
+          onPatientSelect={onPatientSelect}
+        />
       )}
 
       <Button

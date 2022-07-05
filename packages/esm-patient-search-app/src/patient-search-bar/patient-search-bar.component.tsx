@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Button, Search } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
@@ -6,8 +6,10 @@ import styles from './patient-search-bar.scss';
 interface PatientSearchBarProps {
   buttonProps?: Object;
   initialSearchTerm?: string;
-  setGlobalSearchTerm: (searchTerm) => void;
   small?: boolean;
+  onChange?: (searchTerm) => void;
+  onClear: () => void;
+  onSubmit: (searchTerm) => void;
 }
 
 const searchTimeout = 300;
@@ -16,13 +18,33 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   small,
   buttonProps,
   initialSearchTerm,
-  setGlobalSearchTerm,
+  onSubmit,
+  onClear,
+  onChange,
 }) => {
   const { t } = useTranslation();
-  const handleChange = useMemo(() => debounce((searchTerm) => setGlobalSearchTerm(searchTerm), searchTimeout), []);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleChange = useCallback(
+    (val) => {
+      if (onChange) {
+        onChange(val);
+      }
+      setSearchTerm(val);
+    },
+    [onChange, debounce, searchTimeout, setSearchTerm],
+  );
+
+  const handleSubmit = useCallback(
+    (evt) => {
+      evt.preventDefault();
+      onSubmit(searchTerm);
+    },
+    [searchTerm, onSubmit],
+  );
 
   return (
-    <div className={styles.searchArea}>
+    <form onSubmit={handleSubmit} className={styles.searchArea}>
       <Search
         className={styles.patientSearchInput}
         size={small ? 'sm' : 'xl'}
@@ -30,13 +52,15 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
         labelText=""
         closeButtonLabelText={t('clearSearch', 'Clear')}
         onChange={(event) => handleChange(event.target.value)}
+        onClear={onClear}
         autoFocus
         defaultValue={initialSearchTerm ?? ''}
+        value={searchTerm}
       />
-      <Button type="submit" kind={'secondary'} size={small ? 'sm' : 'md'} {...buttonProps}>
+      <Button type="submit" kind={'secondary'} size={small ? 'sm' : 'md'} onClick={handleSubmit} {...buttonProps}>
         {t('search', 'Search')}
       </Button>
-    </div>
+    </form>
   );
 };
 

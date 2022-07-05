@@ -17,7 +17,7 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ({
   return isDesktop ? (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
-        <PatientSearchComponent query={query} resultsToShow={isDesktop ? 5 : 15} stickyPagination />
+        <PatientSearchComponent query={query} inTabletOrOverlay={!isDesktop} stickyPagination />
       </div>
     </div>
   ) : (

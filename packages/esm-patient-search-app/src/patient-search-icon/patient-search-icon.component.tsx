@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import Search20 from '@carbon/icons-react/es/search/20';
 import Close20 from '@carbon/icons-react/es/close/20';
 import { HeaderGlobalAction } from 'carbon-components-react';
-import { useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
+import { navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
 import styles from './patient-search-icon.component.scss';
 import { RouteComponentProps } from 'react-router-dom';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
@@ -31,11 +31,18 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
   const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
 
   const handleGlobalAction = useCallback(() => {
-    if (page === 'search') {
-      props.history.goBack();
+    if (showSearchInput) {
+      if (page === 'search') {
+        navigate({
+          to: window.localStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
+        });
+        window.localStorage.removeItem('searchReturnUrl');
+      }
+      setShowSearchInput(false);
+    } else {
+      setShowSearchInput(true);
     }
-    setShowSearchInput((prevState) => !prevState);
-  }, [page, props.history.goBack, setShowSearchInput]);
+  }, [page, setShowSearchInput, window.localStorage, showSearchInput]);
 
   useEffect(() => {
     // Search input should always be open when we direct to the search page.
@@ -50,9 +57,9 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
     <div className={styles.patientSearchIconWrapper} ref={ref}>
       {showSearchInput &&
         (isDesktop ? (
-          <CompactPatientSearchComponent query={query} />
+          <CompactPatientSearchComponent query={query} searchPage={page === 'search'} />
         ) : (
-          <PatientSearchOverlay onClose={handleCloseSearchInput} query={query} resultsToShow={15} />
+          <PatientSearchOverlay onClose={handleGlobalAction} query={query} />
         ))}
 
       <div className={`${showSearchInput && styles.closeButton}`}>

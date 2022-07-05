@@ -94,7 +94,5 @@ export function usePatientSearch(
     [data, isValidating, error, setSize, size],
   );
 
-  console.log(results);
-
   return results;
 }

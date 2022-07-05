@@ -14,9 +14,16 @@
 }
 
 .resultsHeader {
-  margin: $spacing-05 0 0;
   display: flex;
   justify-content: space-between;
+}
+
+.paddedResultsHeader {
+  margin: $spacing-03 0;
+}
+
+.leftPaddedResultHeader {
+  margin-left: $spacing-05;
 }
 
 .productiveHeading02 {
@@ -30,9 +37,13 @@
 
 .emptySearchResultsTile {
   text-align: center;
-  margin: $spacing-05;
+  margin: 0;
   padding: $spacing-09 0rem;
   background-color: $ui-02;
+}
+
+.paddedEmptySearchResultsTile {
+  margin: 0 $spacing-05;
 }
 
 .emptyResultText {
