@@ -98,32 +98,33 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
   };
 
   return (
-    <div className={styles.container} role="banner">
-      <ConfigurableLink
-        to={interpolateString(config.search.patientResultUrl, {
-          patientUuid: patientUuid,
-        })}
-        onClick={(evt) => handleNavigateToPatientChart(evt)}
-        className={`${styles.patientBanner} ${handleClick && styles.patientAvatarButton}`}>
-        {patientAvatar}
-        <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
-          <div className={styles.flexRow}>
-            <span className={styles.patientName}>{patientName}</span>
-            <ExtensionSlot
-              extensionSlotName="patient-banner-tags-slot"
-              state={{ patientUuid, patient }}
-              className={styles.flexRow}
-            />
+    <>
+      <div className={styles.container} role="banner">
+        <ConfigurableLink
+          to={interpolateString(config.search.patientResultUrl, {
+            patientUuid: patientUuid,
+          })}
+          onClick={(evt) => handleNavigateToPatientChart(evt)}
+          className={`${styles.patientBanner} ${handleClick && styles.patientAvatarButton}`}>
+          {patientAvatar}
+          <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
+            <div className={styles.flexRow}>
+              <span className={styles.patientName}>{patientName}</span>
+              <ExtensionSlot
+                extensionSlotName="patient-banner-tags-slot"
+                state={{ patientUuid, patient }}
+                className={styles.flexRow}
+              />
+            </div>
+            <div className={styles.demographics}>
+              <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
+              <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
+            </div>
+            <div className={styles.identifiers}>
+              {patient.identifier?.length ? patient.identifier.map((i) => i.value).join(', ') : '--'}
+            </div>
           </div>
-          <div className={styles.demographics}>
-            <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
-          </div>
-          <div className={styles.identifiers}>
-            {patient.identifier?.length ? patient.identifier.map((i) => i.value).join(', ') : '--'}
-          </div>
-        </div>
-
+        </ConfigurableLink>
         <div className={styles.buttonCol}>
           {!hideActionsOverflow && (
             <div ref={overFlowMenuRef}>
@@ -146,9 +147,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
             </div>
           )}
           {!currentVisit ? (
-            <Button ref={startVisitButtonRef} kind="primary">
-              {t('startVisit', 'Start visit')}
-            </Button>
+            <ExtensionSlot
+              extensionSlotName="start-visit-button-slot"
+              state={{
+                patientUuid,
+              }}
+            />
           ) : (
             <Button
               ref={showContactDetailsRef}
@@ -161,9 +165,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
             </Button>
           )}
         </div>
-      </ConfigurableLink>
+      </div>
       {showContactDetails && <ContactDetails address={patient.address ?? []} telecom={[]} patientId={patient.id} />}
-    </div>
+    </>
   );
 };
 

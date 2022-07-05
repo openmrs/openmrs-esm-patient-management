@@ -3,12 +3,14 @@
 .container {
   border-bottom: 0.063rem solid $ui-03;
   background-color: $ui-02;
+  display: grid;
+  grid-template-columns: 1fr auto;
 }
 
 .patientBanner {
   text-decoration: none;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
 }
 
 .patientName {
@@ -33,6 +35,7 @@
 
 .patientInfo {
   width: 100%;
+  padding-right: 1rem;
 }
 
 .demographics {
