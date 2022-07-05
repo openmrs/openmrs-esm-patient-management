@@ -14,12 +14,14 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ({
   const { query } = match.params;
   const isDesktop = useLayoutType() === 'desktop';
 
-  return (
+  return isDesktop ? (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
-        <PatientSearchComponent query={query} resultsToShow={isDesktop ? 5 : 15} />
+        <PatientSearchComponent query={query} resultsToShow={isDesktop ? 5 : 15} stickyPagination />
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 

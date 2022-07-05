@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { useConfig } from '@openmrs/esm-framework';
 import { Loading, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from './empty-data-illustration.component';
-import PatientSearchResults, { SearchResultSkeleton } from '../patient-search-result/patient-search-result.component';
+import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
+import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
 import styles from './patient-search.scss';
-import { usePatientSearch } from './patient-search.resource';
+import { usePatientSearch } from '../patient-search.resource';
 
 const resultsPerPage = 5;
 

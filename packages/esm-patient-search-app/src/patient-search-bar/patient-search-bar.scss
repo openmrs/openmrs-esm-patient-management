@@ -2,36 +2,10 @@
 @import '~carbon-components/src/globals/scss/vars';
 @import '~carbon-components/src/globals/scss/mixins';
 
-.patientSearchWrapper {
-  position: relative;
-  width: inherit;
-}
-
-.floatingSearchResultsContainer {
-  position: absolute;
-  overflow-y: auto;
-  box-shadow: 0 $spacing-03 $spacing-05 $ui-03;
-  z-index: 99;
-  border: 0 0.063rem 0.063rem 0.063rem solid $ui-03;
-  width: 100%;
-  background-color: $ui-02;
-}
-
-.tabletOverlaySearch {
-  width: 100vw;
-  border: $spacing-01 solid $carbon--orange-40;
-  margin-right: $spacing-01;
-  position: fixed;
-  top: $spacing-09;
-  right: 0;
-  left: 0;
-  z-index: 99;
-}
-
 .searchArea {
+  width: inherit;
   display: flex;
   justify-content: center;
-  flex-direction: row;
   align-items: center;
   border: 1px solid $ui-04;
 }
@@ -40,6 +14,6 @@
   border: none;
 }
 
-.orangeBorder {
-  border: 1px solid $carbon--orange-40;
+.patientSearchInput input:focus {
+  outline: 1px solid $carbon--orange-40;
 }

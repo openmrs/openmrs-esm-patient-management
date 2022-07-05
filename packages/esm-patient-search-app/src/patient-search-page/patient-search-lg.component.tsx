@@ -1,22 +1,29 @@
-import { useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import React, { useMemo, useState } from 'react';
-import { usePatientSearch } from '../patient-search/patient-search.resource';
+import React, { useCallback, useMemo, useState } from 'react';
 import styles from './patient-search-lg.scss';
 import isEmpty from 'lodash-es/isEmpty';
-import { Dropdown, DropdownSkeleton, Loading, Select, SelectItem, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from '../patient-search/empty-data-illustration.component';
+import { Dropdown, Tile } from 'carbon-components-react';
+import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import { useTranslation } from 'react-i18next';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
 import Pagination from '../ui-components/pagination/pagination.component';
 import { usePatientSearchFHIR } from '../patient-search.resource';
+import { interpolateString, navigate, useConfig } from '@openmrs/esm-framework';
 
 interface PatientSearchComponentProps {
   query: string;
-  resultsToShow: number;
+  resultsToShow?: number;
+  stickyPagination?: boolean;
+  onPatientSelect?: (patientUuid: string) => void;
 }
 
-const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({ query, resultsToShow }) => {
+const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
+  query,
+  resultsToShow,
+  stickyPagination,
+  onPatientSelect,
+}) => {
   const { t } = useTranslation();
+  const config = useConfig();
   const [currentPage, setPage] = useState(1);
   const sortingOptions = [
     {
@@ -46,10 +53,34 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({ query, 
     [totalResults, resultsToShow, Math.ceil],
   );
 
+  const handleSortingChange = ({ selectedItem }) => {
+    setSortBy(selectedItem);
+  };
+
+  const handlePatientSelection = useCallback(
+    (evt, patientUuid: string) => {
+      evt.preventDefault();
+      if (onPatientSelect) {
+        onPatientSelect(patientUuid);
+      } else {
+        navigate({
+          to: interpolateString(config.search.patientResultUrl, {
+            patientUuid: patientUuid,
+          }),
+        });
+      }
+    },
+    [navigate, interpolateString, config, onPatientSelect],
+  );
+
+  if (!query) {
+    return <></>;
+  }
+
   if (isLoading) {
     return (
       <div className={styles.searchResultsContainer}>
-        <div className={styles.searchResults}>
+        <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
           <div>
             <h2 className={styles.resultsHeader}>
               <span className={styles.productiveHeading02}>
@@ -66,24 +97,22 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({ query, 
               <PatientBannerSkeleton />
             </div>
           </div>
-          <div className={styles.pagination}>
-            <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
-          </div>
+          {totalResults !== 1 && (
+            <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+              <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
+            </div>
+          )}
         </div>
       </div>
     );
   }
-
-  const handleSortingChange = ({ selectedItem }) => {
-    setSortBy(selectedItem);
-  };
 
   return (
     <div className={styles.searchResultsContainer}>
       {!fetchError ? (
         !isEmpty(searchResults) ? (
           <div>
-            <div className={styles.searchResults}>
+            <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
               <h2 className={styles.resultsHeader}>
                 <span className={styles.productiveHeading02}>
                   {totalResults} {t('seachResultsSmall', 'search results')}
@@ -105,13 +134,15 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({ query, 
               </h2>
               <div className={styles.results}>
                 {searchResults.map((patient) => (
-                  <PatientBanner patientUuid={patient.id} patient={patient} />
+                  <PatientBanner onPatientSelect={handlePatientSelection} patientUuid={patient.id} patient={patient} />
                 ))}
               </div>
             </div>
-            <div className={styles.pagination}>
-              <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
-            </div>
+            {totalPages !== 1 && (
+              <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+                <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
+              </div>
+            )}
           </div>
         ) : (
           <EmptySearchResultsTile />

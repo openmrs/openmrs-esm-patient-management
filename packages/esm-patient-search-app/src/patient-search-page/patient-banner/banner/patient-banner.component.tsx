@@ -1,5 +1,4 @@
 import React, { MouseEvent } from 'react';
-import capitalize from 'lodash-es/capitalize';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
@@ -14,22 +13,27 @@ import {
   formatDate,
   parseDate,
   useVisit,
-  navigate,
   interpolateString,
   useConfig,
   ConfigurableLink,
 } from '@openmrs/esm-framework';
-import { FHIRPatientType } from '../../../patient-search.resource';
-import {} from 'single-spa';
+import { FHIRPatientType } from '../../../types';
 
 interface PatientBannerProps {
   patient: FHIRPatientType;
   patientUuid: string;
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
+  onPatientSelect: (evt: any, patientUuid: string) => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onTransition, hideActionsOverflow }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+  onTransition,
+  hideActionsOverflow,
+  onPatientSelect,
+}) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
   const showContactDetailsRef = React.useRef(null);
@@ -38,17 +42,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
   const [showDropdown, setShowDropdown] = React.useState(false);
   const config = useConfig();
 
-  const handleClick = () => {
-    navigate({
-      to: interpolateString(config.search.patientResultUrl, {
-        patientUuid: patientUuid,
-      }),
-    });
-  };
-
   const patientActionsSlotState = React.useMemo(
-    () => ({ patientUuid, handleClick, onTransition }),
-    [patientUuid, handleClick, onTransition],
+    () => ({ patientUuid, onPatientSelect, onTransition }),
+    [patientUuid, onPatientSelect, onTransition],
   );
 
   const patientName = `${patient.name?.[0].given.join(' ')} ${patient.name?.[0].family}`;
@@ -66,17 +62,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
     </div>
   );
 
-  const handleNavigateToPatientChart = (event: MouseEvent) => {
-    event.preventDefault();
-    if (
-      handleClick &&
-      !(overFlowMenuRef?.current && overFlowMenuRef?.current.contains(event.target)) &&
-      !(showContactDetailsRef?.current && showContactDetailsRef?.current.contains(event.target)) &&
-      !(startVisitButtonRef?.current && startVisitButtonRef?.current.contains(event.target))
-    ) {
-      handleClick();
-    }
-  };
   const closeDropdownMenu = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
     setShowDropdown((value) => !value);
@@ -104,8 +89,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onT
           to={interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
           })}
-          onClick={(evt) => handleNavigateToPatientChart(evt)}
-          className={`${styles.patientBanner} ${handleClick && styles.patientAvatarButton}`}>
+          onClick={(evt) => onPatientSelect(evt, patientUuid)}
+          className={`${styles.patientBanner} ${onPatientSelect && styles.patientAvatarButton}`}>
           {patientAvatar}
           <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
             <div className={styles.flexRow}>

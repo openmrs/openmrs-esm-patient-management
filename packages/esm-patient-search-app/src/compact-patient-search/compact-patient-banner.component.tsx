@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import styles from './patient-search-result.scss';
+import styles from './compact-patient-banner.scss';
 import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 import { SkeletonIcon, SkeletonText } from 'carbon-components-react';

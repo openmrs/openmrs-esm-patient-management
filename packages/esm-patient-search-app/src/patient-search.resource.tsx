@@ -1,42 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-
-export interface FHIRPatientType {
-  id: string;
-  identifier: Array<{
-    id: string;
-    use: string;
-    value: string;
-  }>;
-  name: Array<{
-    id: string;
-    family: string;
-    given: Array<string>;
-  }>;
-  gender: string;
-  birthDate: string;
-  deceasedBoolean: boolean;
-  address: Array<{
-    id: string;
-    use: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country: string;
-  }>;
-}
-
-interface FHIRPatientSearchResponse {
-  total: number;
-  link?: Array<{
-    relation: 'self' | 'previous' | 'next';
-    url: string;
-  }>;
-  entry: Array<{
-    resource: FHIRPatientType;
-  }>;
-}
+import useSWRInfinite from 'swr/infinite';
+import { SearchedPatient, FHIRPatientSearchResponse, FHIRPatientType, PatientSearchResponse } from './types';
 
 export function usePatientSearchFHIR(
   searchTerm: string,
@@ -67,8 +33,8 @@ export function usePatientSearchFHIR(
     totalResults: number;
   } = useMemo(
     () => ({
-      data: data ? data?.data?.entry.map((entry) => entry.resource) : null,
-      isLoading: !data && !error,
+      data: data?.data?.entry?.map((entry) => entry.resource),
+      isLoading: !data?.data && !error,
       fetchError: error,
       hasMore: data?.data?.link?.some((link) => link.relation === 'next'),
       loadingNewData: isValidating,
@@ -76,6 +42,59 @@ export function usePatientSearchFHIR(
     }),
     [data, isValidating, error],
   );
+
+  return results;
+}
+
+const v =
+  'custom:(patientId,uuid,identifiers,display,' +
+  'patientIdentifier:(uuid,identifier),' +
+  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
+  'attributes:(value,attributeType:(name)))';
+
+export function usePatientSearch(
+  searchTerm: string,
+  includeDead: boolean,
+  searching: boolean = true,
+  resultsToFetch: number = 10,
+  customRepresentation: string = v,
+): PatientSearchResponse {
+  const getUrl = useCallback(
+    (
+      page,
+      prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+    ) => {
+      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
+        return null;
+      }
+      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}`;
+      if (page) {
+        url += `&startIndex=${page * resultsToFetch}`;
+      }
+      return url;
+    },
+    [searchTerm, customRepresentation, includeDead, resultsToFetch],
+  );
+
+  const { data, isValidating, setSize, error, size } = useSWRInfinite<
+    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+    Error
+  >(searching ? getUrl : null, openmrsFetch);
+
+  const results = useMemo(
+    () => ({
+      data: data ? [].concat(...data?.map((resp) => resp?.data?.results)) : null,
+      isLoading: !data && !error,
+      fetchError: error,
+      hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
+      loadingNewData: isValidating,
+      setPage: setSize,
+      currentPage: size,
+    }),
+    [data, isValidating, error, setSize, size],
+  );
+
+  console.log(results);
 
   return results;
 }

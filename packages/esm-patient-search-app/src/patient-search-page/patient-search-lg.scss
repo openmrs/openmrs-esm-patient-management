@@ -5,12 +5,11 @@
   z-index: 0;
 }
 
-.searchResultsContainer {
-  margin-top: $spacing-05;
-}
-
 .searchResults {
   width: 100%;
+}
+
+.broadBottomMargin {
   margin-bottom: 5rem;
 }
 
@@ -49,12 +48,15 @@
 }
 
 .pagination {
+  padding: $spacing-05 0;
+  background: $ui-01;
+}
+
+.stickyPagination {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: $spacing-05 0;
-  background: $ui-01;
 }
 
 .errorMessage {
