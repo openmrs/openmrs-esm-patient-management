@@ -39,23 +39,16 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   const getGender = (gender) => {
     switch (gender) {
       case 'M':
-        return t('male');
+        return t('male', 'Male');
       case 'F':
-        return t('female');
+        return t('female', 'Female');
       case 'O':
-        return t('other');
+        return t('other', 'Other');
       case 'U':
-        return t('unknown');
+        return t('unknown', 'Unknown');
       default:
         return gender;
     }
-    /* 
-      Don't remove these comments
-      t('male', 'Male')
-      t('female', 'Female')
-      t('other', 'Other')
-      t('unknown', 'Unknown')
-    */
   };
 
   const onClickSearchResult = useCallback(
