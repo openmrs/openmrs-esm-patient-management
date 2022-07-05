@@ -21,9 +21,10 @@
   "showAllDetails": "Show all details",
   "showLess": "Show less",
   "sortBy": "Sort by",
-  "sortByAge": "Oldest first",
   "sortByFirstName(a-z)": "First name (a-z)",
   "sortByLastName(a-z)": "Last name (a-z)",
+  "sortOldestFirst": "Oldest first",
+  "sortYoungestFirst": "Youngest first",
   "trySearchWithPatientUniqueID": "Try searching with the patient's unique ID number",
   "unknown": "Unknown"
 }
