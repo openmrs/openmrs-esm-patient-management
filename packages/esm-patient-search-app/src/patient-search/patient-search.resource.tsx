@@ -16,14 +16,7 @@ interface PatientSearchResponse {
   fetchError: Error;
   loadingNewData: boolean;
   hasMore: boolean;
-  setPage: (size: number | ((_size: number) => number)) => Promise<
-    FetchResponse<{
-      results: Array<SearchedPatient>;
-      links: Array<{
-        rel: 'prev' | 'next';
-      }>;
-    }>[]
-  >;
+  setPage: (size: number | ((_size: number) => number)) => Promise<Array<PatientFetchResponse>>;
 }
 
 type PatientFetchResponse = FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>;
@@ -96,11 +89,11 @@ async function fetchOfflinePatients(searchTerm: string, includeDead: boolean): P
 
 function patientMatchesSearchTerm(patient: fhir.Patient, searchTerm: string) {
   const matchableStrings = [
-    ...patient.name?.map((name) => name.family),
-    ...patient.name?.flatMap((name) => name.given),
-    ...patient.identifier?.map((identifier) => identifier.value),
+    ...(patient.name?.map((name) => name.family) ?? []),
+    ...(patient.name?.flatMap((name) => name.given) ?? []),
+    ...(patient.identifier?.map((identifier) => identifier.value) ?? []),
     // TODO: If necessary, expand this list with searchable patient data.
-  ].filter(Boolean);
+  ].filter((value) => typeof value === 'string');
 
   return matchableStrings.some((str) => str.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()));
 }
@@ -110,6 +103,9 @@ function fhirPatientToSearchedPatient(patient: fhir.Patient): SearchedPatient {
   // This module expects the REST structure, requiring us to make a FHIR->REST conversion.
   // This is based upon the reversed code here:
   // https://github.com/openmrs/openmrs-esm-patient-management/blob/e54fbb473aaccf6bbc0b89a2e3d5db22e04e1c4c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L81
+  //
+  // TODO: If/When the online patient search is migrated to the FHIR API at some point, this entire conversion
+  // can be deleted.
   const name = patient.name?.[0];
   const preferredAddress = patient.address?.[0];
 

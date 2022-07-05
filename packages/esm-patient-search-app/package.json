@@ -8,7 +8,7 @@
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
   "scripts": {
-    "start": "openmrs develop --backend https://openmrs-dev-v2.test.icrc.org --add-cookie \"MRHSession=502223e152f051d7b6c1112e5664c70f\"",
+    "start": "openmrs develop",
     "serve": "webpack serve --mode=development",
     "debug": "npm run serve",
     "build": "webpack --mode production",
