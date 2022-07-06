@@ -8,8 +8,6 @@ import PatientSearchResults, { SearchResultSkeleton } from '../patient-search-re
 import styles from './patient-search.scss';
 import { usePatientSearch } from './patient-search.resource';
 
-const resultsPerPage = 5;
-
 const customRepresentation =
   'custom:(patientId,uuid,identifiers,display,' +
   'patientIdentifier:(uuid,identifier),' +
