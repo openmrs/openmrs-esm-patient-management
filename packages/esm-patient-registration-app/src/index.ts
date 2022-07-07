@@ -100,6 +100,13 @@ function setupOpenMRS() {
         offline: true,
       },
       {
+        id: 'edit-patient-details-button',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./widgets/edit-patient-details-button.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
         id: 'delete-identifier-confirmation-modal',
         load: getAsyncLifecycle(() => import('./widgets/delete-identifier-confirmation-modal'), options),
         online: true,
