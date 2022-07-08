@@ -50,6 +50,10 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   );
 
   const fhirPatients = useMemo(() => {
+    // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
+    // be removed. In fact, it could maybe be done at this point already, but doing it when the
+    // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
+    // doesn't have to be touched then.
     return patients.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
       return {

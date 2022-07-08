@@ -8,8 +8,6 @@ import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-ba
 import styles from './patient-search.scss';
 import { usePatientSearchInfinite } from '../patient-search.resource';
 
-const resultsPerPage = 5;
-
 interface PatientSearchProps {
   hidePanel?: () => void;
   query: string;
