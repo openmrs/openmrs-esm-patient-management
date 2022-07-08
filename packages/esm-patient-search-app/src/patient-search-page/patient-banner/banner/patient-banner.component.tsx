@@ -17,10 +17,10 @@ import {
   useConfig,
   ConfigurableLink,
 } from '@openmrs/esm-framework';
-import { FHIRPatientType } from '../../../types';
+import { SearchedPatient } from '../../../types';
 
 interface PatientBannerProps {
-  patient: FHIRPatientType;
+  patient: SearchedPatient;
   patientUuid: string;
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
@@ -47,7 +47,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     [patientUuid, onPatientSelect, onTransition],
   );
 
-  const patientName = `${patient.name?.[0].given.join(' ')} ${patient.name?.[0].family}`;
+  const patientName = patient.person.personName.display;
   const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
@@ -102,11 +102,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               />
             </div>
             <div className={styles.demographics}>
-              <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-              <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
+              <span>{getGender(patient.person.gender)}</span> &middot; <span>{age(patient.person.birthdate)}</span>{' '}
+              &middot; <span>{formatDate(parseDate(patient.person.birthdate), { mode: 'wide', time: false })}</span>
             </div>
             <div className={styles.identifiers}>
-              {patient.identifier?.length ? patient.identifier.map((i) => i.value).join(', ') : '--'}
+              {patient.identifiers?.length ? patient.identifiers.map((i) => i.identifier).join(', ') : '--'}
             </div>
           </div>
         </ConfigurableLink>
@@ -123,8 +123,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 dropDownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
-                  extensionSlotName="patient-actions-slot"
-                  key="patient-actions-slot"
+                  extensionSlotName="patient-search-actions-slot"
                   className={styles.overflowMenuItemList}
                   state={patientActionsSlotState}
                 />
@@ -151,7 +150,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           )}
         </div>
       </div>
-      {showContactDetails && <ContactDetails address={patient.address ?? []} telecom={[]} patientId={patient.id} />}
+      {showContactDetails && (
+        <ContactDetails address={patient.person.addresses ?? []} telecom={[]} patientId={patient.uuid} />
+      )}
     </>
   );
 };

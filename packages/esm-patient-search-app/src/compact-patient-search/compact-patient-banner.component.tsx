@@ -1,30 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import styles from './compact-patient-banner.scss';
-import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink, age } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
 import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-
-export function getAge(dateString) {
-  var today = new Date();
-  var birthDate = new Date(dateString);
-  var years = today.getFullYear() - birthDate.getFullYear();
-  var months = today.getMonth() - birthDate.getMonth();
-  if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-    years--;
-  }
-  if (years > 0) {
-    return `${years} years`;
-  }
-  var d = today.getDate() - birthDate.getDate();
-  if (d < 0) {
-    months--;
-  }
-  if (months > 0) {
-    return `${months} months`;
-  }
-  return `${d} days`;
-}
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
@@ -131,7 +110,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
               patient.name?.[0]?.family
             }`}</h2>
             <p className={styles.demographics}>
-              {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {getAge(patient.birthDate)}{' '}
+              {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
               <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.value}
             </p>
           </div>

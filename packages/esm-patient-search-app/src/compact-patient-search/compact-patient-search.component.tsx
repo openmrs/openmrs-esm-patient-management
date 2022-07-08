@@ -10,7 +10,7 @@ interface CompactPatientSearchProps {
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ query, searchPage = false }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(query);
 
   const onSubmit = useCallback(
     (searchTerm) => {

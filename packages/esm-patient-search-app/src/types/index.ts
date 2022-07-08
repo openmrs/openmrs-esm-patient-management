@@ -14,6 +14,7 @@ export interface SearchedPatient {
     death: boolean;
     deathDate: string;
     personName: {
+      display: string;
       givenName: string;
       familyName: string;
       middleName: string;
@@ -90,6 +91,7 @@ export interface PatientSearchResponse {
   loadingNewData: boolean;
   hasMore: boolean;
   currentPage: number;
+  totalResults: number;
   setPage: (size: number | ((_size: number) => number)) => Promise<
     FetchResponse<{
       results: Array<SearchedPatient>;

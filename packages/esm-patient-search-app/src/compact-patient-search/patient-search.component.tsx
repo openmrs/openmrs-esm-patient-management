@@ -6,7 +6,7 @@ import { Loading, Tile } from 'carbon-components-react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
 import styles from './patient-search.scss';
-import { usePatientSearch } from '../patient-search.resource';
+import { usePatientSearchInfinite } from '../patient-search.resource';
 
 const resultsPerPage = 5;
 
@@ -26,7 +26,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
     loadingNewData,
     setPage,
     hasMore,
-  } = usePatientSearch(query, config.includeDead, !!query);
+    totalResults,
+  } = usePatientSearchInfinite(query, config.includeDead, !!query);
 
   const observer = useRef(null);
   const loadingIconRef = useCallback(
@@ -73,8 +74,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
           <div
             className={styles.searchResults}
             style={{
-              maxHeight: '20rem',
+              maxHeight: '22rem',
             }}>
+            <p className={styles.labelText}>
+              {totalResults} {t('searchResultsText', 'search results')}
+            </p>
             <PatientSearchResults
               hidePanel={hidePanel}
               patients={searchResults}

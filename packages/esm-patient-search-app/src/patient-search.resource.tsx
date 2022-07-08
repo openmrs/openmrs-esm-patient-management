@@ -1,50 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { openmrsFetch, FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { SearchedPatient, FHIRPatientSearchResponse, FHIRPatientType, PatientSearchResponse } from './types';
-
-export function usePatientSearchFHIR(
-  searchTerm: string,
-  searching: boolean = true,
-  resultsToFetch: number = 10,
-  sort: string,
-  page: number,
-) {
-  let url = `/ws/fhir2/R4/Patient?name:contains=${searchTerm}&_count=${resultsToFetch}`;
-  if (page > 1) {
-    url += `&_getpagesoffset=${(page - 1) * resultsToFetch}`;
-  }
-  if (sort) {
-    url += `&_sort=${sort}`;
-  }
-
-  const { data, isValidating, error } = useSWR<FetchResponse<FHIRPatientSearchResponse>, Error>(
-    searching ? url : null,
-    openmrsFetch,
-  );
-
-  const results: {
-    data: Array<FHIRPatientType>;
-    isLoading: boolean;
-    fetchError: any;
-    hasMore: boolean;
-    loadingNewData: boolean;
-    totalResults: number;
-  } = useMemo(
-    () => ({
-      data: data?.data?.entry?.map((entry) => entry.resource),
-      isLoading: !data?.data && !error,
-      fetchError: error,
-      hasMore: data?.data?.link?.some((link) => link.relation === 'next'),
-      loadingNewData: isValidating,
-      totalResults: data?.data?.total,
-    }),
-    [data, isValidating, error],
-  );
-
-  return results;
-}
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +
@@ -52,7 +10,49 @@ const v =
   'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
   'attributes:(value,attributeType:(name)))';
 
-export function usePatientSearch(
+export function usePatientSearchPaginated(
+  searchTerm: string,
+  searching: boolean = true,
+  resultsToFetch: number,
+  page: number,
+  customRepresentation: string = v,
+) {
+  const config = useConfig();
+  let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&limit=${resultsToFetch}&totalCount=true`;
+  if (config.includeDead) {
+    url += `&includeDead=${config?.includeDead}`;
+  }
+  if (page > 1) {
+    url += `&startIndex=${(page - 1) * resultsToFetch}`;
+  }
+
+  const { data, isValidating, error } = useSWR<
+    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>
+  >(searching ? url : null, openmrsFetch);
+
+  const results: {
+    data: Array<SearchedPatient>;
+    isLoading: boolean;
+    fetchError: any;
+    hasMore: boolean;
+    loadingNewData: boolean;
+    totalResults: number;
+  } = useMemo(
+    () => ({
+      data: data?.data?.results,
+      isLoading: !data?.data && !error,
+      fetchError: error,
+      hasMore: data?.data?.links?.some((link) => link.rel === 'next'),
+      loadingNewData: isValidating,
+      totalResults: data?.data?.totalCount,
+    }),
+    [data, isValidating, error],
+  );
+
+  return results;
+}
+
+export function usePatientSearchInfinite(
   searchTerm: string,
   includeDead: boolean,
   searching: boolean = true,
@@ -67,7 +67,7 @@ export function usePatientSearch(
       if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
         return null;
       }
-      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}`;
+      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}&totalCount=true`;
       if (page) {
         url += `&startIndex=${page * resultsToFetch}`;
       }
@@ -77,7 +77,7 @@ export function usePatientSearch(
   );
 
   const { data, isValidating, setSize, error, size } = useSWRInfinite<
-    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
+    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>,
     Error
   >(searching ? getUrl : null, openmrsFetch);
 
@@ -90,6 +90,7 @@ export function usePatientSearch(
       loadingNewData: isValidating,
       setPage: setSize,
       currentPage: size,
+      totalResults: data?.[0]?.data?.totalCount,
     }),
     [data, isValidating, error, setSize, size],
   );

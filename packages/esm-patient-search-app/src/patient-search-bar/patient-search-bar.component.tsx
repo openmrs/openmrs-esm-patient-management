@@ -23,7 +23,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   onChange,
 }) => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   const handleChange = useCallback(
     (val) => {
@@ -54,7 +54,6 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
         onChange={(event) => handleChange(event.target.value)}
         onClear={onClear}
         autoFocus
-        defaultValue={initialSearchTerm ?? ''}
         value={searchTerm}
       />
       <Button type="submit" kind={'secondary'} size={small ? 'sm' : 'md'} onClick={handleSubmit} {...buttonProps}>
