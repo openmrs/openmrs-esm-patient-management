@@ -9,6 +9,7 @@ import {
   PatientIdentifier,
   PatientRegistration,
   RelationshipValue,
+  Encounter,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -21,9 +22,11 @@ import {
   saveRelationship,
   updateRelationship,
   updatePatientIdentifier,
+  saveEncounter,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
+import _ from 'lodash';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -31,23 +34,26 @@ export type SavePatientForm = (
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
   capturePhotoProps: CapturePhotoProps,
-  patientPhotoConceptUuid: string,
   currentLocation: string,
   initialIdentifierValues: FormValues['identifiers'],
+  currentUser: Session,
+  config: RegistrationConfig,
+  savePatientTransactionManager: SavePatientTransactionManager,
   abortController?: AbortController,
-) => Promise<string | null>;
+) => Promise<string | void>;
 
 export default class FormManager {
-  static async savePatientFormOffline(
-    isNewPatient: boolean,
-    values: FormValues,
-    patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: Record<string, any>,
-    capturePhotoProps: CapturePhotoProps,
-    patientPhotoConceptUuid: string,
-    currentLocation: string,
-    initialIdentifierValues: FormValues['identifiers'],
-  ): Promise<null> {
+  static savePatientFormOffline: SavePatientForm = async (
+    isNewPatient,
+    values,
+    patientUuidMap,
+    initialAddressFieldValues,
+    capturePhotoProps,
+    currentLocation,
+    initialIdentifierValues,
+    currentUser,
+    config,
+  ) => {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
         FormManager.getPatientToCreate(values, patientUuidMap, initialAddressFieldValues, []),
@@ -58,9 +64,11 @@ export default class FormManager {
         patientUuidMap,
         initialAddressFieldValues,
         capturePhotoProps,
-        patientPhotoConceptUuid,
         currentLocation,
         initialIdentifierValues,
+        currentUser,
+        config,
+        savePatientTransactionManager: new SavePatientTransactionManager(),
       },
     };
 
@@ -72,20 +80,21 @@ export default class FormManager {
     });
 
     return null;
-  }
+  };
 
-  static async savePatientFormOnline(
-    isNewPatient: boolean,
-    values: FormValues,
-    patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: Record<string, any>,
-    capturePhotoProps: CapturePhotoProps,
-    currentLocation: string,
-    initialIdentifierValues: FormValues['identifiers'],
-    currentUser: Session,
-    config: RegistrationConfig,
-    abortController: AbortController,
-  ): Promise<string> {
+  static savePatientFormOnline: SavePatientForm = async (
+    isNewPatient,
+    values,
+    patientUuidMap,
+    initialAddressFieldValues,
+    capturePhotoProps,
+    currentLocation,
+    initialIdentifierValues,
+    currentUser,
+    config,
+    savePatientTransactionManager,
+    abortController,
+  ) => {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
       isNewPatient,
       values.patientUuid,
@@ -109,10 +118,12 @@ export default class FormManager {
     const savePatientResponse = await savePatient(
       abortController,
       createdPatient,
-      isNewPatient ? undefined : values.patientUuid,
+      isNewPatient && !savePatientTransactionManager.patientSaved ? undefined : values.patientUuid,
     );
 
     if (savePatientResponse.ok) {
+      savePatientTransactionManager.patientSaved = true;
+      console.log('got ok savePatientResponse');
       await this.saveRelationships(values.relationships, savePatientResponse, abortController);
 
       await this.saveObservations(
@@ -136,8 +147,9 @@ export default class FormManager {
       }
     }
 
+    console.log('returning patient UUID');
     return savePatientResponse.data.uuid;
-  }
+  };
 
   static async saveRelationships(
     relationships: Array<RelationshipValue>,
@@ -171,30 +183,40 @@ export default class FormManager {
   }
 
   static async saveObservations(
-    obss: Record<string, string>,
+    obss: { [conceptUuid: string]: string },
     savePatientResponse: FetchResponse,
     currentLocation: string,
     currentUser: Session,
     config: RegistrationConfig,
     abortController: AbortController,
   ) {
-    if (Object.keys(obss).length > 0 && config.registrationObs.encounterTypeUuid) {
-      const encounterToSave = {
-        encounterDatetime: new Date(),
-        patient: savePatientResponse.data.uuid,
-        encounterType: config.registrationObs.encounterTypeUuid,
-        location: currentLocation,
-        encounterProviders: [
-          {
-            provider: currentUser.currentProvider.uuid,
-            encounterRole: config.registrationObs.encounterProviderRoleUuid,
-          },
-        ],
-        form: config.registrationObs.registrationFormUuid,
-        obs: null, // TODO: transform `obss` into here
-      };
-
-      // TODO: fill this in
+    if (obss && Object.keys(obss).length > 0) {
+      if (!config.registrationObs.encounterTypeUuid) {
+        console.error(
+          'The registration form has been configured to have obs fields, ' +
+            'but no registration encounter type has been configured. Obs field values ' +
+            'will not be saved.',
+        );
+      } else {
+        const encounterToSave: Encounter = {
+          encounterDatetime: new Date(),
+          patient: savePatientResponse.data.uuid,
+          encounterType: config.registrationObs.encounterTypeUuid,
+          location: currentLocation,
+          encounterProviders: [
+            {
+              provider: currentUser.currentProvider.uuid,
+              encounterRole: config.registrationObs.encounterProviderRoleUuid,
+            },
+          ],
+          form: config.registrationObs.registrationFormUuid,
+          obs: Object.keys(obss).map((conceptUuid) => ({
+            concept: conceptUuid,
+            value: obss[conceptUuid],
+          })),
+        };
+        return saveEncounter(abortController, encounterToSave);
+      }
     }
   }
 
@@ -419,4 +441,8 @@ export default class FormManager {
       telecom: patient.person.attributes?.filter((attribute) => attribute.attributeType === 'Telephone Number'),
     };
   }
+}
+
+export class SavePatientTransactionManager {
+  patientSaved = false;
 }

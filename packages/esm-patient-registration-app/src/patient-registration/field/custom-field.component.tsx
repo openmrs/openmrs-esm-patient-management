@@ -1,6 +1,7 @@
 import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { RegistrationConfig } from '../../config-schema';
+import { ObsField } from './obs/obs-field.component';
 import { PersonAttributeField } from './person-attributes/person-attribute-field.component';
 
 export interface CustomFieldProps {

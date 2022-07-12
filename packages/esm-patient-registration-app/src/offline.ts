@@ -62,16 +62,17 @@ export async function syncPatientRegistration(
   queuedPatient: PatientRegistration,
   options: SyncProcessOptions<PatientRegistration>,
 ) {
-  // TODO: fix the arguments
   await FormManager.savePatientFormOnline(
     queuedPatient._patientRegistrationData.isNewPatient,
     queuedPatient._patientRegistrationData.formValues,
     queuedPatient._patientRegistrationData.patientUuidMap,
     queuedPatient._patientRegistrationData.initialAddressFieldValues,
     queuedPatient._patientRegistrationData.capturePhotoProps,
-    queuedPatient._patientRegistrationData.patientPhotoConceptUuid,
     queuedPatient._patientRegistrationData.currentLocation,
     queuedPatient._patientRegistrationData.initialIdentifierValues,
+    queuedPatient._patientRegistrationData.currentUser,
+    queuedPatient._patientRegistrationData.config,
+    queuedPatient._patientRegistrationData.savePatientTransactionManager,
     options.abort,
   );
 }

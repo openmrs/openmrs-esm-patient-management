@@ -1,3 +1,7 @@
+import { Session } from '@openmrs/esm-framework';
+import { RegistrationConfig } from '../config-schema';
+import { SavePatientTransactionManager } from './form-manager';
+
 interface NameValue {
   uuid: string;
   preferred: boolean;
@@ -82,9 +86,11 @@ export interface PatientRegistration {
     patientUuidMap: PatientUuidMapType;
     initialAddressFieldValues: Record<string, any>;
     capturePhotoProps: CapturePhotoProps;
-    patientPhotoConceptUuid: string;
     currentLocation: string;
     initialIdentifierValues: FormValues['identifiers'];
+    currentUser: Session;
+    config: RegistrationConfig;
+    savePatientTransactionManager: SavePatientTransactionManager;
   };
 }
 
@@ -110,6 +116,22 @@ export type Patient = {
     causeOfDeath?: string;
   };
 };
+
+export interface Encounter {
+  encounterDatetime: Date;
+  patient: string;
+  encounterType: string;
+  location: string;
+  encounterProviders: Array<{
+    provider: string;
+    encounterRole: string;
+  }>;
+  form: string;
+  obs: Array<{
+    concept: string;
+    value: string | number;
+  }>;
+}
 
 export interface RelationshipValue {
   relatedPersonName?: string;

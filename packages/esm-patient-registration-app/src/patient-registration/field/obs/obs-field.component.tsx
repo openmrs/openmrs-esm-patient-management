@@ -1,8 +1,9 @@
+import { useConfig } from '@openmrs/esm-framework';
 import { InlineNotification, Select, SelectItem } from 'carbon-components-react';
 import { Field } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FieldDefinition } from '../../../config-schema';
+import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { ConceptResponse } from '../../patient-registration-types';
 import { useConcept, useConceptAnswers } from '../field.resource';
@@ -14,6 +15,16 @@ export interface ObsFieldProps {
 
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
+  const config = useConfig() as RegistrationConfig;
+
+  if (!config.registrationObs.encounterTypeUuid) {
+    console.error(
+      'The registration form has been configured to have obs fields, ' +
+        'but no registration encounter type has been configured. Obs fields ' +
+        'will not be displayed.',
+    );
+    return null;
+  }
 
   if (isLoading) {
     return null;
@@ -27,6 +38,8 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           label={fieldDefinition.label}
         />
       );
+    case 'Numeric':
+      return <NumericObsField concept={concept} label={fieldDefinition.label} />;
     case 'Coded':
       return (
         <CodedObsField
@@ -86,27 +99,58 @@ function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
   );
 }
 
-interface CodedObsFieldProps {
+interface NumericObsFieldProps {
   concept: ConceptResponse;
-  answerConceptSetUuid: string;
-  label?: string;
+  label: string;
 }
 
-function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldProps) {
-  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(answerConceptSetUuid);
+function NumericObsField({ concept, label }: NumericObsFieldProps) {
+  const { t } = useTranslation();
+
   const fieldName = `obs.${concept.uuid}`;
 
   return (
     <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
-      {!isLoadingConceptAnswers && conceptAnswers?.length ? (
+      <Field name={fieldName}>
+        {({ field, form: { touched, errors }, meta }) => {
+          return (
+            <Input
+              id={fieldName}
+              labelText={label ?? concept.display}
+              light
+              invalid={errors[fieldName] && touched[fieldName]}
+              type="number"
+              {...field}
+            />
+          );
+        }}
+      </Field>
+    </div>
+  );
+}
+
+interface CodedObsFieldProps {
+  concept: ConceptResponse;
+  answerConceptSetUuid?: string;
+  label?: string;
+}
+
+function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldProps) {
+  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
+    answerConceptSetUuid ?? concept.uuid,
+  );
+  const fieldName = `obs.${concept.uuid}`;
+
+  return (
+    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+      {!isLoadingConceptAnswers ? (
         <Select id={fieldName} name={fieldName} labelText={label ?? concept?.display} light>
+          <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
           {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
           ))}
         </Select>
-      ) : (
-        <Input id={fieldName} labelText={label ?? concept?.display} name={fieldName} light />
-      )}
+      ) : null}
     </div>
   );
 }
