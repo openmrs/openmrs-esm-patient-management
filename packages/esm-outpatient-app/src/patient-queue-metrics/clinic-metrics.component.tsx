@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from 'carbon-components-react';
+
 import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
 
-const ClinicMetrics: React.FC = () => {
+function ClinicMetrics() {
   const { t } = useTranslation();
-  const { metrics, isError, isLoading } = useMetrics();
+  const { metrics, isLoading } = useMetrics();
   const { services } = useServices();
   const [selectedService, setSelectedService] = useState('Triage');
   const { serviceCount } = useServiceMetricsCount(selectedService);
 
+  const handleServiceCountChange = ({ selectedItem }: { selectedItem: string }) => {
+    setSelectedService(selectedItem);
+  };
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
-  const handleServiceCountChange = ({ selectedItem }) => {
-    setSelectedService(selectedItem);
-  };
 
   return (
     <>
@@ -51,6 +53,6 @@ const ClinicMetrics: React.FC = () => {
       </div>
     </>
   );
-};
+}
 
 export default ClinicMetrics;
