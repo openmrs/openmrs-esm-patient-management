@@ -9,7 +9,8 @@ import {
   RadioButton,
   RadioButtonGroup,
 } from 'carbon-components-react';
-import { showNotification, showToast, useVisit, useVisitTypes, openmrsFetch } from '@openmrs/esm-framework';
+import { showNotification, showToast, useVisit, openmrsFetch } from '@openmrs/esm-framework';
+import { useServices } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 
@@ -24,7 +25,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
   const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
   const [status, setStatus] = useState('');
-  const allVisitTypes = useVisitTypes();
+  const { services } = useServices();
 
   const changeQueuePriority = useCallback(() => {
     const payload = {
@@ -72,7 +73,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
               onChange={(event) => setStatus(event.toString())}
               name="radio-button-group"
               valueSelected="default-selected">
-              {allVisitTypes.map(({ uuid, display, name }) => (
+              {services.map(({ uuid, display, name }) => (
                 <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
               ))}
             </RadioButtonGroup>

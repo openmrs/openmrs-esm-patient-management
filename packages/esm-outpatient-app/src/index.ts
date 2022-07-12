@@ -70,7 +70,7 @@ function setupOpenMRS() {
       {
         id: 'edit-queue-entry-status-modal',
         load: getAsyncLifecycle(() => import('./active-visits/change-status-dialog.component'), {
-          featureName: 'end visit',
+          featureName: 'edit queue status',
           moduleName,
         }),
       },
