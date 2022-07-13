@@ -123,7 +123,6 @@ export default class FormManager {
 
     if (savePatientResponse.ok) {
       savePatientTransactionManager.patientSaved = true;
-      console.log('got ok savePatientResponse');
       await this.saveRelationships(values.relationships, savePatientResponse, abortController);
 
       await this.saveObservations(
@@ -147,7 +146,6 @@ export default class FormManager {
       }
     }
 
-    console.log('returning patient UUID');
     return savePatientResponse.data.uuid;
   };
 

@@ -144,12 +144,24 @@ function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldPr
   return (
     <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers ? (
-        <Select id={fieldName} name={fieldName} labelText={label ?? concept?.display} light>
-          <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-          {conceptAnswers.map((answer) => (
-            <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
-          ))}
-        </Select>
+        <Field name={fieldName}>
+          {({ field, form: { touched, errors }, meta }) => {
+            return (
+              <Select
+                id={fieldName}
+                name={fieldName}
+                labelText={label ?? concept?.display}
+                light
+                invalid={errors[fieldName] && touched[fieldName]}
+                {...field}>
+                <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
+                {conceptAnswers.map((answer) => (
+                  <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+                ))}
+              </Select>
+            );
+          }}
+        </Field>
       ) : null}
     </div>
   );

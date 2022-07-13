@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 
 export interface SectionDefinition {
   id: string;
@@ -9,14 +9,14 @@ export interface SectionDefinition {
 export interface FieldDefinition {
   id: string;
   type: string;
-  label: string;
+  label: string | null;
   uuid: string;
   placeholder: string;
   validation: {
     required: boolean;
-    matches: string;
+    matches: string | null;
   };
-  answerConceptSetUuid: string;
+  answerConceptSetUuid: string | null;
 }
 
 export interface RegistrationConfig {
@@ -104,9 +104,7 @@ export const esmPatientRegistrationSchema = {
       type: {
         _type: Type.String,
         _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [
-          validator((val) => ['person attribute', 'obs'].includes(val), "Must be one of 'person attribute' or 'obs'."),
-        ],
+        _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,
