@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 
 export interface SectionDefinition {
   id: string;
@@ -198,9 +198,58 @@ export const esmPatientRegistrationSchema = {
         'The form UUID to associate with the registration encounter. By default no form will be associated.',
     },
   },
-
-  // TODO: validate that
-  //  - if a field has type 'obs', registrationObs.encounterTypeUuid is not null
-  //  - all sections have been defined
-  //  - all fields have been defined
+  _validators: [
+    validator(
+      (config: RegistrationConfig) =>
+        !config.fieldDefinitions.some((d) => d.type == 'obs') || config.registrationObs.encounterTypeUuid != null,
+      "If fieldDefinitions contains any fields of type 'obs', `registrationObs.encounterTypeUuid` must be specified.",
+    ),
+    validator(
+      (config: RegistrationConfig) =>
+        config.sections.every((s) =>
+          [...builtInSections, ...config.sectionDefinitions].map((sDef) => sDef.id).includes(s),
+        ),
+      (config: RegistrationConfig) => {
+        const allowedSections = [...builtInSections, ...config.sectionDefinitions].map((sDef) => sDef.id);
+        const badSection = config.sections.find((s) => !allowedSections.includes(s));
+        return (
+          `'${badSection}' is not a valid section ID. Valid section IDs include the built-in sections ${stringifyDefinitions(
+            builtInSections,
+          )}` +
+          (config.sectionDefinitions.length
+            ? `; and the defined sections ${stringifyDefinitions(config.sectionDefinitions)}.`
+            : '.')
+        );
+      },
+    ),
+    validator(
+      (config: RegistrationConfig) =>
+        config.sectionDefinitions.every((sectionDefinition) =>
+          sectionDefinition.fields.every((f) =>
+            [...builtInFields, ...config.fieldDefinitions.map((fDef) => fDef.id)].includes(f),
+          ),
+        ),
+      (config: RegistrationConfig) => {
+        const allowedFields = [...builtInFields, ...config.fieldDefinitions.map((fDef) => fDef.id)];
+        const badSection = config.sectionDefinitions.find((sectionDefinition) =>
+          sectionDefinition.fields.some((f) => !allowedFields.includes(f)),
+        );
+        const badField = badSection.fields.find((f) => !allowedFields.includes(f));
+        return (
+          `The section definition '${
+            badSection.id
+          }' contains an invalid field '${badField}'. 'fields' can only contain the built-in fields '${builtInFields.join(
+            "', '",
+          )}'` +
+          (config.fieldDefinitions.length
+            ? `; or the defined fields ${stringifyDefinitions(config.fieldDefinitions)}.`
+            : '.')
+        );
+      },
+    ),
+  ],
 };
+
+function stringifyDefinitions(sectionDefinitions: Array<SectionDefinition | FieldDefinition>) {
+  return `'${sectionDefinitions.map((s) => s.id).join("', '")}'`;
+}
