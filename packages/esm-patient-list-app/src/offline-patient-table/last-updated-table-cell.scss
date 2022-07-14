@@ -1,0 +1,17 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../style.scss';
+
+.errorIcon {
+  color: $danger;
+}
+
+.pendingIcon {
+  color: #ff832b;
+}
+
+.cellContainer {
+  display: flex;
+  align-items: center;
+  gap: spacing.$spacing-02;
+}

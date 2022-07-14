@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-import { last } from 'lodash';
+import last from 'lodash-es/last';
 import { openmrsFetch, Visit, useSession } from '@openmrs/esm-framework';
 
 dayjs.extend(isToday);

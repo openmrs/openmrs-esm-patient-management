@@ -1,28 +1,27 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .subHeading {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
   color: var(--text-02);
 }
 
 .emptyText {
-  padding: $spacing-05;
-  @include carbon--type-style('body-long-02');
-  color: var(--text-01);
+  padding: spacing.$spacing-05;
+  @include type.type-style('body-02');
 }
 
 .unit {
-  @include carbon--type-style('body-short-02');
-  color: var(--text-01);
-  margin-left: $spacing-02;
+  @include type.type-style('body-compact-01');
+  color: var(--text-02);
+  margin-left: spacing.$spacing-02;
 }
 
 .vitalValues {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $ui-05;
-  margin-left: $spacing-02;
+  margin-left: spacing.$spacing-02;
 }
 
 .grid {
@@ -40,13 +39,13 @@
 
 .danger-icon {
   color: $danger;
-  height: $spacing-02;
-  width: $spacing-02;
-  margin-left: $spacing-02;
+  height: spacing.$spacing-02;
+  width: spacing.$spacing-02;
+  margin-left: spacing.$spacing-02;
 }
 
 .iconWrapper {
-  margin-left: $spacing-02;
+  margin-left: spacing.$spacing-02;
 }
 
 .critically-low,
@@ -54,7 +53,7 @@
 .low,
 .high {
   &::after {
-    @include carbon--type-style('productive-heading-01');
+    @include type.type-style('heading-compact-01');
     color: $text-01;
   }
 }
@@ -76,5 +75,5 @@
 }
 
 .bodyLong01 {
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-long-01');
 }

@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './../field.scss';
+import { Select, SelectItem } from '@carbon/react';
 import { Input } from '../../input/basic-input/input/input.component';
-import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeTypeResponse } from '../../patient-registration-types';
+import { useConceptAnswers } from '../field.resource';
+import styles from './../field.scss';
 
 export interface CodedPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;

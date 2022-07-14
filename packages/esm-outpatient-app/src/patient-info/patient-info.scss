@@ -1,6 +1,6 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   border-bottom: 0.0125rem solid $color-gray-30;
@@ -9,7 +9,8 @@
 }
 
 .patientInfoContainer {
-  padding: 0 0 0 $spacing-05;
+  background-color: $ui-02;
+  padding: 0 0 0 spacing.$spacing-05;
   display: flex;
   align-items: center;
   min-height: 7rem;
@@ -17,29 +18,29 @@
 
 .activePatientInfoContainer {
   background-color: $color-blue-10;
-  padding: 0 0 0 $spacing-05;
+  padding: 0 0 0 spacing.$spacing-05;
   display: flex;
   align-items: center;
   min-height: 7rem;
 }
 
 .patientName {
-  @include carbon--type-style('productive-heading-03');
+  @include type.type-style('heading-03');
 }
 
 .patientInfoContent {
-  margin: $spacing-05 0 0 $spacing-05;
+  margin: spacing.$spacing-05 0 0 spacing.$spacing-05;
   width: 100%;
 }
 
 .demographics {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $text-02;
-  margin-top: $spacing-02;
+  margin-top: spacing.$spacing-02;
 }
 
 .identifier {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $ui-04;
 }
 
@@ -55,5 +56,5 @@
 
 .patientEditBtn {
   color: $ui-05;
-  margin: $spacing-03;
+  margin: spacing.$spacing-03;
 }

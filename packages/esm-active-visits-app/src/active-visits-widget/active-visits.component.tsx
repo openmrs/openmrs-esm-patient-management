@@ -3,6 +3,7 @@ import {
   DataTable,
   DataTableSkeleton,
   InlineLoading,
+  Layer,
   Pagination,
   Search,
   Table,
@@ -17,9 +18,10 @@ import {
   TableExpandRow,
   TableExpandHeader,
   Tile,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import {
   useLayoutType,
+  isDesktop,
   useConfig,
   usePagination,
   ExtensionSlot,
@@ -61,7 +63,6 @@ const ActiveVisitsTable = () => {
   const config = useConfig();
   const layout = useLayoutType();
   const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
-  const desktopView = layout === 'desktop';
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
@@ -147,7 +148,7 @@ const ActiveVisitsTable = () => {
     return (
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
-          <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
             <h4>{t('activeVisits', 'Active Visits')}</h4>
           </div>
           <div className={styles.backgroundDataFetchingIndicator}>
@@ -157,7 +158,7 @@ const ActiveVisitsTable = () => {
         <DataTable
           rows={paginatedActiveVisits}
           headers={headerData}
-          size={desktopView ? 'compact' : 'normal'}
+          size={isDesktop(layout) ? 'xs' : 'md'}
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
@@ -220,7 +221,10 @@ const ActiveVisitsTable = () => {
               </Table>
               {rows.length === 0 && (
                 <p
-                  style={{ height: desktopView ? '2rem' : '3rem', marginLeft: desktopView ? '2rem' : '3rem' }}
+                  style={{
+                    height: isDesktop(layout) ? '2rem' : '3rem',
+                    marginLeft: isDesktop(layout) ? '2rem' : '3rem',
+                  }}
                   className={`${styles.emptyRow} ${styles.bodyLong01}`}>
                   {t('noVisitsFound', 'No visits found')}
                 </p>
@@ -250,15 +254,17 @@ const ActiveVisitsTable = () => {
   }
   return (
     <div className={styles.activeVisitsContainer}>
-      <Tile light className={styles.tile}>
-        <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('activeVisits', 'Active Visits')}</h4>
-        </div>
-        <EmptyDataIllustration />
-        <p className={styles.content}>
-          {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
-        </p>
-      </Tile>
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('activeVisits', 'Active Visits')}</h4>
+          </div>
+          <EmptyDataIllustration />
+          <p className={styles.content}>
+            {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
+          </p>
+        </Tile>
+      </Layer>
     </div>
   );
 };

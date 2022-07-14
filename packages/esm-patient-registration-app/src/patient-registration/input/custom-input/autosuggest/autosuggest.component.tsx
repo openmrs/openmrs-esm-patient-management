@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, SearchProps } from 'carbon-components-react';
-import styles from './autosuggest.scss';
 import { useTranslation } from 'react-i18next';
+import { Layer, Search, SearchProps } from '@carbon/react';
+import styles from './autosuggest.scss';
 
 interface AutosuggestProps extends SearchProps {
   getDisplayValue: Function;
@@ -10,7 +10,7 @@ interface AutosuggestProps extends SearchProps {
   onSuggestionSelected: (field: string, value: string) => void;
 }
 
-export const Autosuggest: React.FC<AutosuggestProps> = ({
+export const Autosuggest: React.FC<any> = ({
   getDisplayValue,
   getFieldValue,
   getSearchResults,
@@ -58,15 +58,16 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
   return (
     <div className={styles.autocomplete} ref={wrapper}>
-      <label className="bx--label">{labelText}</label>
-      <Search
-        id="autosuggest"
-        onChange={handleChange}
-        ref={searchBox}
-        className={styles.autocompleteSearch}
-        light
-        {...searchProps}
-      />
+      <label className="cds--label">{labelText}</label>
+      <Layer>
+        <Search
+          id="autosuggest"
+          onChange={handleChange}
+          ref={searchBox}
+          className={styles.autocompleteSearch}
+          {...searchProps}
+        />
+      </Layer>
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>
           {suggestions.map((suggestion, index) => (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag } from 'carbon-components-react';
+import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { DiagnosisItem, Note } from '../../types/index';
 import styles from './past-visit-summary.scss';
@@ -22,8 +22,8 @@ const Notes: React.FC<NotesProps> = ({ notes, diagnoses }) => {
           ))
         : null}
       {notes.length ? (
-        notes.map((note: Note, i) => (
-          <div>
+        notes.map((note: Note, index) => (
+          <div key={`note-` + index}>
             <p className={styles.notesContainer}>{note.note}</p>
             <p className={styles.notesSubHeading}>
               {note.provider.name ? <span> {note.provider.name} </span> : null} · {note.time}

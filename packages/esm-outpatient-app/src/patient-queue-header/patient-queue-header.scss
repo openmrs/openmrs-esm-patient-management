@@ -1,11 +1,11 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .header {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $text-02;
-  height: $spacing-12;
+  height: spacing.$spacing-12;
   background-color: $ui-02;
   border: 1px solid $ui-03;
   border-left: 0px;
@@ -20,14 +20,13 @@
 }
 
 .right-justified-items {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $text-02;
   padding-top: 1rem;
 }
 
 .page-name {
-  @include carbon--type-style('productive-heading-04');
-  color: $text-01;
+  @include type.type-style('heading-04');
 }
 
 .page-labels {
@@ -52,7 +51,7 @@
 }
 
 .view {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
 }
 
 .dropdown {
@@ -61,12 +60,12 @@
   justify-content: flex-end;
   margin-top: 0.25rem;
 
-  :global(.bx--dropdown__wrapper--inline) {
+  :global(.cds--dropdown__wrapper--inline) {
     align-items: center;
     display: flex;
   }
 
-  :global(.bx--list-box__menu) {
+  :global(.cds--list-box__menu) {
     left: -10.15rem;
   }
 }

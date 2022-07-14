@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import styles from './patient-search-result.scss';
+import { useTranslation } from 'react-i18next';
+import { SkeletonIcon, SkeletonText } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
-import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
-import { useTranslation } from 'react-i18next';
+import styles from './patient-search-result.scss';
 
 function getAge(dateString) {
   var today = new Date();

@@ -1,31 +1,30 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
-@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
 .widgetCard {
-  border-top: 1px solid $carbon--blue-20;
+  border-top: 1px solid colors.$blue-20;
   background-color: $color-blue-10;
-  padding: $spacing-03 $spacing-05 $spacing-03;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
 }
 
 .title {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('productive-heading-01');
   color: $text-02;
-  margin-bottom: $spacing-02;
+  margin-bottom: spacing.$spacing-02;
 }
 
 .subtitle {
   color: $text-02;
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-short-01');
 }
 
 .content {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('productive-heading-01');
   color: $text-02;
-  margin-top: $spacing-05;
-  margin-bottom: $spacing-03;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .tile {

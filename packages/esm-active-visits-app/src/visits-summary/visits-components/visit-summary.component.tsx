@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from 'carbon-components-react';
+import { Tab, Tabs } from '@carbon/react';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';

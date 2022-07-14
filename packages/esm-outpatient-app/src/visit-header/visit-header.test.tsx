@@ -1,9 +1,9 @@
 import React from 'react';
 import VisitHeader from './visit-header.component';
-import { render, screen } from '@testing-library/react';
-import { mockPatient, mockPatientWithLongName } from '../../__mocks__/patient.mock';
-import { useAssignedExtensions, useLayoutType, useOnClickOutside, usePatient, useVisit } from '@openmrs/esm-framework';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
+import { useAssignedExtensions, useLayoutType, useOnClickOutside, usePatient, useVisit } from '@openmrs/esm-framework';
 import { registerWorkspace, launchPatientWorkspace } from './workspaces';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
@@ -43,7 +43,7 @@ describe('VisitHeader', () => {
     jest.clearAllMocks();
   });
 
-  test('should display visit header and left nav bar hamburger icon', () => {
+  test('should display visit header and left nav bar hamburger icon', async () => {
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
@@ -67,19 +67,19 @@ describe('VisitHeader', () => {
     expect(homeLink).toHaveAttribute('href', '/openmrs/spa/home');
 
     // Should display the leftNavMenu
-    userEvent.click(hamburgerButton);
+    await userEvent.click(hamburgerButton);
     const linkElement = screen.getByText(/Left Nav Menu/i);
     expect(linkElement).toBeInTheDocument();
 
     // Should close the leftNavMenu
-    userEvent.click(linkElement);
+    await userEvent.click(linkElement);
     expect(useOnClickOutside).toHaveBeenCalled();
 
     // Should be able to start a visit
     const startVisitButton = screen.getByRole('button', { name: /Start a visit/i });
     expect(startVisitButton).toBeInTheDocument();
 
-    userEvent.click(startVisitButton);
+    await userEvent.click(startVisitButton);
     expect(launchPatientWorkspace).toHaveBeenCalled();
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
 
@@ -87,7 +87,7 @@ describe('VisitHeader', () => {
     expect(closeButton).toBeInTheDocument();
 
     // Should close the visit-header
-    userEvent.click(closeButton);
+    await userEvent.click(closeButton);
     expect(screen.queryByRole('banner', { name: /OpenMRS/i })).not.toBeInTheDocument();
   });
 

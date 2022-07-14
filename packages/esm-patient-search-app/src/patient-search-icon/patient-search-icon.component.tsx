@@ -1,20 +1,19 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import Search20 from '@carbon/icons-react/es/search/20';
-import Close20 from '@carbon/icons-react/es/close/20';
-import { HeaderGlobalAction } from 'carbon-components-react';
-import { useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
-import styles from './patient-search-icon.component.scss';
-import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
-import Overlay from '../ui-components/overlay';
 import { useTranslation } from 'react-i18next';
+import { HeaderGlobalAction } from '@carbon/react';
+import { Close, Search } from '@carbon/react/icons';
+import { isDesktop, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
+import Overlay from '../ui-components/overlay';
+import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
+import styles from './patient-search-icon.component.scss';
 
 interface PatientSearchLaunchProps {}
 
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
-  const [showSearchInput, setShowSearchInput] = useState<boolean>(false);
-  const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
-  const isDesktop = useLayoutType() === 'desktop';
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [canClickOutside, setCanClickOutside] = useState(false);
 
   const handleCloseSearchInput = useCallback(() => {
     setShowSearchInput(false);
@@ -29,7 +28,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
       {showSearchInput &&
-        (isDesktop ? (
+        (isDesktop(layout) ? (
           <div className={styles.patientSearchBar}>
             <PatientSearchBar hidePanel={() => setShowSearchInput(false)} small orangeBorder />
           </div>
@@ -46,7 +45,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           aria-label="Search Patient"
           aria-labelledby="Search Patient"
           name="SearchPatientIcon">
-          {showSearchInput ? <Close20 /> : <Search20 />}
+          {showSearchInput ? <Close size={20} /> : <Search size={20} />}
         </HeaderGlobalAction>
       </div>
     </div>

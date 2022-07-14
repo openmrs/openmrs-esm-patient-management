@@ -1,18 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import * as patientRegistrationResource from './patient-registration.resource';
-import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
-import { PatientRegistration } from './patient-registration.component';
-import { mockPatient } from '../../__mocks__/patient.mock';
-import { match } from 'react-router-dom';
-import FormManager from './form-manager';
-import { Resources, ResourcesContext } from '../offline.resources';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { showToast, useConfig } from '@openmrs/esm-framework';
-import { cloneDeep } from 'lodash-es';
-import { RegistrationConfig } from '../config-schema';
-import { useConcept, useConceptAnswers } from './field/field.resource';
+import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
+import FormManager from './form-manager';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { Resources, ResourcesContext } from '../offline.resources';
+import { PatientRegistration } from './patient-registration.component';
+import * as patientRegistrationResource from './patient-registration.resource';
 import { ConceptResponse, Encounter } from './patient-registration-types';
+import { useConcept, useConceptAnswers } from './field/field.resource';
+import { RegistrationConfig } from '../config-schema';
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),

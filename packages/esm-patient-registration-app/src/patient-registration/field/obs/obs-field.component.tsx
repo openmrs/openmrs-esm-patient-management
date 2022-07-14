@@ -1,11 +1,11 @@
 import { useConfig } from '@openmrs/esm-framework';
-import { InlineNotification, Select, SelectItem } from 'carbon-components-react';
 import { Field } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { InlineNotification, Select, SelectItem } from '@carbon/react';
+import { ConceptResponse } from '../../patient-registration-types';
 import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
-import { ConceptResponse } from '../../patient-registration-types';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 
@@ -79,9 +79,9 @@ function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
   };
 
   const fieldName = `obs.${concept.uuid}`;
-
+styles.customField
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={`${} ${styles.halfWidthInDesktopView}`}>
       <Field name={fieldName} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (

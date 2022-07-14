@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from '../patient-registration.scss';
-import { Tile } from 'carbon-components-react';
+import { Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { SectionDefinition } from '../../config-schema';
 import { Section } from './section.component';

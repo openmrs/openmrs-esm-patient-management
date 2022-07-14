@@ -1,5 +1,6 @@
-import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
+import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
 import styles from './outpatient-dashboard.scss';
@@ -10,10 +11,8 @@ export interface DashboardConfig {
   title: string;
 }
 
-export const OutpatientDashboard = ({ match }) => {
-  const {
-    params: { view },
-  } = match;
+export const OutpatientDashboard = () => {
+  const { view } = useParams();
   const layout = useLayoutType();
 
   const extensionStore = useExtensionStore();
@@ -30,7 +29,7 @@ export const OutpatientDashboard = ({ match }) => {
   const currentDashboard = dashboards.find((dashboard) => dashboard.name === view) || dashboards[0];
 
   useEffect(() => {
-    if (layout != 'desktop') {
+    if (!isDesktop(layout)) {
       attach('global-nav-menu-slot', 'outpatient-side-nav-ext');
     }
     return () => detach('global-nav-menu-slot', 'outpatient-side-nav-ext');
@@ -38,9 +37,9 @@ export const OutpatientDashboard = ({ match }) => {
 
   return (
     <div className={styles.dashboardContainer}>
-      {layout === 'desktop' && <ExtensionSlot extensionSlotName="outpatient-sidebar-slot" key={layout} />}
+      {isDesktop(layout) && <ExtensionSlot extensionSlotName="outpatient-sidebar-slot" key={layout} />}
       {currentDashboard && (
-        <div className={`bx--grid ${styles.dashboardContent}`}>
+        <div className={`cds--grid ${styles.dashboardContent}`}>
           <PatientQueueHeader title={currentDashboard.title} />
           <DashboardView
             dashboardSlot={currentDashboard.slot}

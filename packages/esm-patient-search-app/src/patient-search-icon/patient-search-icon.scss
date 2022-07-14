@@ -1,0 +1,61 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.patientSearchIconWrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.patientSearchInput input:focus {
+  outline: none;
+}
+
+.patientSearchBar {
+  width: 50vw;
+}
+
+// desktop mode styling
+:global(.omrs-breakpoint-gt-tablet) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 50vw;
+  border: spacing.$spacing-01 solid colors.$orange-40;
+  height: calc(spacing.$spacing-08 - 0.25rem);
+  margin-right: spacing.$spacing-01;
+  width: 50vw;
+}
+
+// tablet mode styling
+:global(.omrs-breakpoint-lt-desktop) .searchArea {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 100vw;
+  border: spacing.$spacing-01 solid colors.$orange-40;
+  margin-right: spacing.$spacing-01;
+  position: fixed;
+  top: spacing.$spacing-09;
+  right: 0;
+  left: 0;
+}
+
+.searchIconButton {
+  @include brand-01(background-color);
+}
+
+.activeSearchIconButton {
+  @include brand-02(background-color);
+}
+
+.closeButton {
+  @include brand-02(background-color);
+}
+
+.searchButton {
+  background-color: colors.$gray-80;
+}

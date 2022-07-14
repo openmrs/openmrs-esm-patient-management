@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
-import { Button, Search } from 'carbon-components-react';
-import PatientSearch from '../patient-search/patient-search.component';
+import React, { useState, useMemo } from 'react';
+import { Button, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
+import PatientSearch from '../patient-search/patient-search.component';
 import styles from './patient-search-bar.scss';
 
 interface PatientSearchBarProps {

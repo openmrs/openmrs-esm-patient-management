@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
-import { Grid, Row } from 'carbon-components-react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Grid, Row } from '@carbon/react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { Resources, ResourcesContext } from './offline.resources';
 import { SavePatientForm } from './patient-registration/form-manager';
@@ -27,30 +27,26 @@ export default function Root({
   };
 
   return (
-    <ResourcesContext.Provider value={resources}>
-      <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
-        <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
-          <Grid>
-            <Row>
-              <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-            </Row>
-            <Route
-              exact
-              path="/patient-registration"
-              render={(props) => (
-                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
-              )}
-            />
-            <Route
-              exact
-              path="/patient/:patientUuid/edit"
-              render={(props) => (
-                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
-              )}
-            />
-          </Grid>
-        </main>
-      </BrowserRouter>
-    </ResourcesContext.Provider>
+    <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
+      <Grid>
+        <Row>
+          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+        </Row>
+        <ResourcesContext.Provider value={resources}>
+          <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
+            <Routes>
+              <Route
+                path="/patient-registration"
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+              />
+              <Route
+                path="/patient/:patientUuid/edit"
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+              />
+            </Routes>
+          </BrowserRouter>
+        </ResourcesContext.Provider>
+      </Grid>
+    </main>
   );
 }

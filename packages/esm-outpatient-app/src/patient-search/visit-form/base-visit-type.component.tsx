@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import styles from './base-visit-type.scss';
+import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Search, RadioButtonGroup, RadioButton, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from '../empty-data-illustration.component';
-import { useTranslation } from 'react-i18next';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
+import EmptyDataIllustration from '../empty-data-illustration.component';
+import styles from './base-visit-type.scss';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;

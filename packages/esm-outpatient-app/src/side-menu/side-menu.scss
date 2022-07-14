@@ -8,17 +8,17 @@
   border-right: 1px #e0e0e0;
 }
 
-.sideMenuContainer :global(ul.bx--side-nav__items) {
+.sideMenuContainer :global(ul.cds--side-nav__items) {
   border-style: solid !important;
   border-right: 1px #e0e0e0;
 }
 
 @media (max-width: 1200px) {
-  .sideMenuContainer :global(.bx--side-nav) {
+  .sideMenuContainer :global(.cds--side-nav) {
     z-index: -100 !important;
   }
 
-  .sideMenuContainer :global(.bx--side-nav__items) {
+  .sideMenuContainer :global(.cds--side-nav__items) {
     padding: 0 !important;
   }
 }

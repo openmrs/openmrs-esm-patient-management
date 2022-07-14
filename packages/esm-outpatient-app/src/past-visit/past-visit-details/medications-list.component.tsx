@@ -1,11 +1,11 @@
 import React from 'react';
-import { OrderItem } from '../../types/index';
-import { useTranslation } from 'react-i18next';
-import styles from './past-visit-summary.scss';
-import { formatDate } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
+import { useTranslation } from 'react-i18next';
+import { Tile } from '@carbon/react';
+import { formatDate } from '@openmrs/esm-framework';
 import { getDosage } from '../past-visit.resource';
-import { Tile } from 'carbon-components-react';
+import { OrderItem } from '../../types/index';
+import styles from './past-visit-summary.scss';
 interface MedicationProps {
   medications: Array<OrderItem>;
 }
