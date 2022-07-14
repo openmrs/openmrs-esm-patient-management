@@ -31,6 +31,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
     const payload = {
       status: { uuid: status },
       endedAt: new Date(),
+      visitUuid: currentVisit.uuid,
+      patientUuid: patientUuid,
     };
 
     openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
@@ -58,7 +60,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
         });
       },
     );
-  }, []);
+  }, [status, currentVisit, patientUuid, queueEntryUuid, t, queueUuid, closeModal, mutate]);
 
   return (
     <div>
