@@ -1,5 +1,4 @@
 import {
-  fetchCurrentPatient,
   makeUrl,
   messageOmrsServiceWorker,
   navigate,
@@ -8,7 +7,7 @@ import {
   subscribePrecacheStaticDependencies,
   SyncProcessOptions,
 } from '@openmrs/esm-framework';
-import { cacheForOfflineHeaders, patientRegistration } from './constants';
+import { patientRegistration, personRelationshipRepresentation } from './constants';
 import {
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
@@ -32,21 +31,34 @@ export function setupOffline() {
     type: 'patient',
     displayName: 'Patient registration',
     async isSynced(patientUuid) {
-      const expectedUrls = [`/ws/fhir2/R4/Patient/${patientUuid}`];
-      const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
+      const expectedUrls = getPatientUrlsToBeCached(patientUuid);
       const cache = await caches.open('omrs-spa-cache-v1');
       const keys = (await cache.keys()).map((key) => key.url);
-      return absoluteExpectedUrls.every((url) => keys.includes(url));
+      return expectedUrls.every((url) => keys.includes(url));
     },
     async sync(patientUuid) {
-      await messageOmrsServiceWorker({
-        type: 'registerDynamicRoute',
-        pattern: `/ws/fhir2/R4/Patient/${patientUuid}`,
-      });
+      const urlsToCache = getPatientUrlsToBeCached(patientUuid);
+      await Promise.allSettled(
+        urlsToCache.map(async (url) => {
+          await messageOmrsServiceWorker({
+            type: 'registerDynamicRoute',
+            url,
+          });
 
-      await fetchCurrentPatient(patientUuid, { headers: cacheForOfflineHeaders });
+          await fetch(url);
+        }),
+      );
     },
   });
+}
+
+function getPatientUrlsToBeCached(patientUuid: string) {
+  return [
+    `/ws/fhir2/R4/Patient/${patientUuid}`,
+    `/ws/rest/v1/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}`,
+    `/ws/rest/v1/person/${patientUuid}/attribute`,
+    `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`,
+  ].map((url) => window.origin + makeUrl(url));
 }
 
 async function precacheStaticAssets() {
