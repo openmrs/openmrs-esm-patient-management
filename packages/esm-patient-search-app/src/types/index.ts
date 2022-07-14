@@ -2,7 +2,7 @@ import { FetchResponse } from '@openmrs/esm-framework';
 
 export interface SearchedPatient {
   uuid: string;
-  patientIdentifier: { identifier: string };
+  identifiers: { identifier: string };
   person: {
     addresses: Array<Address>;
     birthdate: string;
