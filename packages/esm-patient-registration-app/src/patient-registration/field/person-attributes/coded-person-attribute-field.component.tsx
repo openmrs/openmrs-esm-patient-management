@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers } from './person-attributes.resource';
+import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 
 export interface CodedPersonAttributeFieldProps {
@@ -19,7 +19,7 @@ export function CodedPersonAttributeField({
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(answerConceptSetUuid);
 
   return (
-    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
+    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Select
           id={`person-attribute-${personAttributeType.uuid}`}
