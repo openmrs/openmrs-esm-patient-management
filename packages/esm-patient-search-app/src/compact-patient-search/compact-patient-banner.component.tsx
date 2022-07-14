@@ -68,11 +68,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         birthDate: patient.person.birthdate,
         deceasedDateTime: patient.person.deathDate,
         deceasedBoolean: patient.person.death,
-        identifier: [
-          {
-            value: patient.patientIdentifier.identifier,
-          },
-        ],
+        identifier: patient.identifiers,
         address: preferredAddress
           ? [
               {
@@ -115,7 +111,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
             }`}</h2>
             <p className={styles.demographics}>
               {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
-              <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.value}
+              <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
             </p>
           </div>
         </ConfigurableLink>
