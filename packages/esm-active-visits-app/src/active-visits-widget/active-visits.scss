@@ -1,3 +1,5 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '../root.scss';
 
 .activeVisitsContainer {
@@ -12,7 +14,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
   background-color: $ui-background;
 }
 
@@ -60,26 +62,26 @@
 }
 
 .action {
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .content {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: $spacing-05;
-  margin-bottom: $spacing-03;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .desktopHeading {
   h4 {
-    @include carbon--type-style('productive-heading-02');
+    @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 }
 
 .tabletHeading {
   h4 {
-    @include carbon--type-style('productive-heading-03');
+    @include type.type-style('heading-03');
     color: $text-02;
   }
 }
@@ -88,7 +90,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 
   h4:after {
     content: '';

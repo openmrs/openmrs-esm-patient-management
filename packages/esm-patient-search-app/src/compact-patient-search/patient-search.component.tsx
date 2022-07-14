@@ -2,11 +2,11 @@ import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { useConfig } from '@openmrs/esm-framework';
-import { Loading, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
-import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
-import styles from './patient-search.scss';
+import { Loading, Tile } from '@carbon/react';
 import { usePatientSearchInfinite } from '../patient-search.resource';
+import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
+import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
+import styles from './patient-search.scss';
 
 interface PatientSearchProps {
   hidePanel?: () => void;

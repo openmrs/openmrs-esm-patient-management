@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { Tag, DataTableSkeleton } from 'carbon-components-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './current-visit.scss';
+import { Tag, DataTableSkeleton } from '@carbon/react';
 import CurrentVisitDetails from './visit-details/current-visit-details.component';
 import { useVisit } from './current-visit.resource';
+import styles from './current-visit.scss';
 
 interface CurrentVisitProps {
   patientUuid: string;

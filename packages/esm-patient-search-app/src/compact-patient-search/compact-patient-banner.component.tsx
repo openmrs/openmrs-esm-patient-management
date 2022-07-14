@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import styles from './compact-patient-banner.scss';
+import { useTranslation } from 'react-i18next';
+import { SkeletonIcon, SkeletonText } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink, age } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../types/index';
-import { SkeletonIcon, SkeletonText } from 'carbon-components-react';
-import { useTranslation } from 'react-i18next';
+import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;

@@ -1,6 +1,7 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .topNavHeader {
   top: var(--omrs-offline-banner-height);
@@ -10,15 +11,18 @@
 .headerGlobalBarButton {
   @include brand-01(background-color);
 }
+
 .headerGlobalBarCloseButton {
   @include brand-02(background-color);
 }
+
 .headerName {
   display: flex;
 }
+
 .navLogo {
-  margin-right: $spacing-06;
-  margin-left: $spacing-04;
+  margin-right: spacing.$spacing-06;
+  margin-left: spacing.$spacing-04;
 }
 
 .startVisitButton {
@@ -29,32 +33,32 @@
   display: flex;
   align-items: center;
   color: $ui-02;
-  padding: 0 $spacing-05;
+  padding: 0 spacing.$spacing-05;
 
   &:hover {
-    background-color: $carbon--teal-90;
+    background-color: colors.$teal-90;
   }
 
   .patientName {
-    @include carbon--type-style('productive-heading-01');
-    margin-right: $spacing-05;
+    @include type.type-style('heading-compact-01');
+    margin-right: spacing.$spacing-05;
     color: $ui-02;
-    margin: $spacing-04 0;
+    margin: spacing.$spacing-04 0;
     padding-right: 0.5rem;
   }
 
   .patientInfo {
     color: $color-gray-30;
-    @include carbon--type-style('body-short-01');
+    @include type.type-style('body-compact-01');
   }
 }
 
-.tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
+.tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
   border-bottom: none;
 }
 
 .navDivider {
-  background-color: $carbon--teal-20;
+  background-color: colors.$teal-20;
   width: 0.05rem;
   height: 2.25rem;
 }

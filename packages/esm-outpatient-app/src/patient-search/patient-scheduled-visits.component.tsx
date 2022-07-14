@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  ButtonSet,
-  Switch,
-  ContentSwitcher,
-  RadioTile,
-  TileGroup,
-  DataTableSkeleton,
-} from 'carbon-components-react';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+import { Button, ButtonSet, Switch, ContentSwitcher, RadioTile, TileGroup, DataTableSkeleton } from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { formatDatetime, useLayoutType, parseDate } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
@@ -114,7 +106,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       <div className={styles.backButton}>
         <Button
           kind="ghost"
-          renderIcon={ArrowLeft24}
+          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
           iconDescription="Back to search results"
           size="sm"
           onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>

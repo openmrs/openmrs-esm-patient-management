@@ -1,12 +1,12 @@
 import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
-import { Button, Dropdown, OnChangeData, TextArea, TextInput } from 'carbon-components-react';
-import Overlay from '../../overlay.component';
 import { useTranslation } from 'react-i18next';
+import { Button, Dropdown, OnChangeData, TextArea, TextInput } from '@carbon/react';
+import { useLayoutType, showToast, useSession, isDesktop } from '@openmrs/esm-framework';
+import { createPatientList, editPatientList } from '../api/api-remote';
+import { useCohortTypes } from '../api/hooks';
+import { OpenmrsCohort, NewCohortData } from '../api/types';
+import Overlay from '../overlay.component';
 import styles from './create-edit-patient-list.scss';
-import { useLayoutType, showToast, useSession } from '@openmrs/esm-framework';
-import { createPatientList, editPatientList } from '../../api/api-remote';
-import { useCohortTypes } from '../../api/hooks';
-import { OpenmrsCohort, NewCohortData } from '../../api/types';
 
 interface CreateEditPatientListProps {
   close: () => void;
@@ -28,7 +28,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     cohortType: '',
     location: '',
   });
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const user = useSession();
   const { data: cohortTypes } = useCohortTypes();
 
@@ -135,7 +135,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           id="list_name"
           name="name"
           onChange={handleChange}
-          light={!isDesktop}
+          light={!isDesktop(layout)}
           value={cohortDetails?.name}
         />
       </div>
@@ -148,7 +148,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
           )}
           labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
-          light={!isDesktop}
+          light={!isDesktop(layout)}
           value={cohortDetails?.description}
         />
       </div>
@@ -163,7 +163,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
           }
           onChange={handleTypeChange}
-          light={!isDesktop}
+          light={!isDesktop(layout)}
         />
       </div>
     </Overlay>

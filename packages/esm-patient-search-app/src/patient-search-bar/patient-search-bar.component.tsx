@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Search } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
+
 interface PatientSearchBarProps {
   buttonProps?: Object;
   initialSearchTerm?: string;
@@ -10,8 +11,6 @@ interface PatientSearchBarProps {
   onClear: () => void;
   onSubmit: (searchTerm) => void;
 }
-
-const searchTimeout = 300;
 
 const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   small,

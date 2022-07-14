@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput } from 'carbon-components-react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
@@ -74,7 +74,7 @@ export const DobField: React.FC = () => {
         <div className={styles.dobField}>
           <DatePicker
             dateFormat={dateFormat}
-            datePickerType="single"
+            datePickerType="simple"
             light
             onChange={onDateChange}
             maxDate={format(today)}>

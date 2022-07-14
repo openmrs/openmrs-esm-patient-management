@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectItem } from 'carbon-components-react';
+import { Select, SelectItem } from '@carbon/react';
 import { useField } from 'formik';
 
 interface SelectInputProps {

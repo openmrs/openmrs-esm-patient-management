@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown, DataTableSkeleton } from 'carbon-components-react';
-
+import { Dropdown, DataTableSkeleton } from '@carbon/react';
 import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
@@ -38,7 +37,6 @@ function ClinicMetrics() {
           headerLabel={t('waitingFor', 'Waiting for:')}
           service={selectedService}>
           <Dropdown
-            style={{ marginTop: '1.5rem' }}
             id="inline"
             initialSelectedItem={t('triage', 'Triage')}
             label=""

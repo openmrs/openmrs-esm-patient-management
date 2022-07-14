@@ -1,9 +1,9 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .heading {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
 }
 
@@ -11,12 +11,12 @@
   background-color: $color-blue-10;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-top: 1px solid $carbon--blue-20;
-  margin-top: $spacing-01;
+  border-top: 1px solid $color-blue-20;
+  margin-top: spacing.$spacing-01;
 
   & > div {
-    margin-left: $spacing-05;
-    padding-top: $spacing-01;
+    margin-left: spacing.$spacing-05;
+    padding-top: spacing.$spacing-01;
   }
 
   & > div:first-child {
@@ -24,8 +24,8 @@
   }
 
   & ul > li {
-    padding: $spacing-02 0;
+    padding: spacing.$spacing-02 0;
     color: $text-02;
-    @include carbon--type-style('body-short-01');
+    @include type.type-style('body-compact-01');
   }
 }

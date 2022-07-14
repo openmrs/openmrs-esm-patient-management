@@ -1,12 +1,12 @@
 import React from 'react';
+import { Layer, Tile } from '@carbon/react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
-import BaseVisitType from './base-visit-type.component';
 import { PatientProgram } from '../../types/index';
 import { useTranslation } from 'react-i18next';
-import styles from './base-visit-type.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
-import { Tile } from 'carbon-components-react';
 import EmptyDataIllustration from '../empty-data-illustration.component';
+import BaseVisitType from './base-visit-type.component';
+import styles from './base-visit-type.scss';
 
 interface RecommendedVisitTypeProp {
   patientUuid: string;
@@ -35,15 +35,17 @@ const RecommendedVisitType: React.FC<RecommendedVisitTypeProp> = ({
       {recommendedVisitTypes.length > 0 ? (
         <BaseVisitType onChange={onChange} visitTypes={recommendedVisitTypes} patientUuid={patientUuid} />
       ) : (
-        <Tile light className={styles.tile}>
-          <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('recommendedVisitType', 'Recommended Visit type')}</h4>
-          </div>
-          <EmptyDataIllustration />
-          <p className={styles.content}>
-            {t('noRecommendedVisitTypes', 'There are no recommended visit types to display for this patient')}
-          </p>
-        </Tile>
+        <Layer>
+          <Tile className={styles.tile}>
+            <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+              <h4>{t('recommendedVisitType', 'Recommended Visit type')}</h4>
+            </div>
+            <EmptyDataIllustration />
+            <p className={styles.content}>
+              {t('noRecommendedVisitTypes', 'There are no recommended visit types to display for this patient')}
+            </p>
+          </Tile>
+        </Layer>
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import PatientInfo from './patient-info.component';
-import { mockPatient } from '../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { age } from '@openmrs/esm-framework';
 
 const mockAge = age as jest.Mock;
@@ -16,7 +16,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('Patient Info', () => {
-  test('should render patient info correctly', () => {
+  test('should render patient info correctly', async () => {
     mockAge.mockReturnValue(35);
     renderPatientInfo();
 
@@ -29,7 +29,7 @@ describe('Patient Info', () => {
     const showDetailsButton = screen.getByRole('button', { name: /Show all details/ });
     expect(showDetailsButton).toBeInTheDocument();
 
-    userEvent.click(showDetailsButton);
+    await userEvent.click(showDetailsButton);
 
     expect(screen.queryByRole('button', { name: /Show all details/ })).not.toBeInTheDocument();
     const showLessButton = screen.getByRole('button', { name: /Show less/i });

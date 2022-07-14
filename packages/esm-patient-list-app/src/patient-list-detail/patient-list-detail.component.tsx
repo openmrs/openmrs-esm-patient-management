@@ -1,15 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
-import { RouteComponentProps } from 'react-router-dom';
-import styles from './patient-list-detail.scss';
-import CustomOverflowMenuComponent from '../ui-components/overflow-menu/overflow-menu.component';
-import { OverflowMenuVertical16 } from '@carbon/icons-react';
+import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from 'carbon-components-react';
+import { OverflowMenuItem } from '@carbon/react';
+import { OverflowMenuVertical } from '@carbon/react/icons';
 import PatientListTable from '../patient-table/patient-table.component';
-import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
+import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
+import styles from './patient-list-detail.scss';
 
 function getPatientListUuidFromUrl(): string {
   const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
@@ -24,11 +23,7 @@ interface PatientListMemberRow {
   uuid: string;
 }
 
-interface PatientListDetailProps {
-  patientListUuid: string;
-}
-
-const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetailProps>> = () => {
+const PatientListDetailComponent = () => {
   const patientListUuid = getPatientListUuidFromUrl();
   const { t } = useTranslation();
   const [currentPage, setPageCount] = useState(1);
@@ -131,7 +126,7 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             menuTitle={
               <>
                 <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
+                <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
               </>
             }>
             <OverflowMenuItem

@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
-import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
+import { Button, SkeletonText } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
+import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
+import IdentifierSelectionOverlay from './identifier-selection-overlay';
+import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Button, SkeletonText } from 'carbon-components-react';
-import { ArrowRight16 } from '@carbon/icons-react';
-import { useLayoutType, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import {
   FormValues,
   IdentifierSource,
   PatientIdentifierType,
   PatientIdentifierValue,
 } from '../../patient-registration-types';
-import IdentifierSelectionOverlay from './identifier-selection-overlay';
 import { ResourcesContext } from '../../../offline.resources';
+import styles from '../field.scss';
 
 export function setIdentifierSource(
   identifierSource: IdentifierSource,
@@ -61,7 +61,7 @@ export const Identifiers: React.FC = () => {
   const isLoading = !identifierTypes;
   const { values, setFieldValue, initialFormValues } = useContext(PatientRegistrationContext);
   const { t } = useTranslation();
-  const desktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const [showIdentifierOverlay, setShowIdentifierOverlay] = useState(false);
   const config = useConfig();
   const { defaultPatientIdentifierTypes } = config;
@@ -120,8 +120,8 @@ export const Identifiers: React.FC = () => {
             kind="ghost"
             className={styles.setIDNumberButton}
             onClick={() => setShowIdentifierOverlay(true)}
-            size={desktop ? 'sm' : 'md'}>
-            {t('configure', 'Configure')} <ArrowRight16 />
+            size={isDesktop(layout) ? 'sm' : 'md'}>
+            {t('configure', 'Configure')} <ArrowRight size={16} />
           </Button>
         </div>
       </UserHasAccess>

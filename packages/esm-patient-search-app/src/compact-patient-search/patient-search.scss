@@ -1,13 +1,26 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '../root.scss';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
-:global(.bx--side-nav) {
+:global(.cds--side-nav) {
   z-index: 0;
 }
 
 .searchResultsContainer {
   width: 100%;
   background-color: $ui-02;
+  padding: 0rem spacing.$spacing-05;
+  overflow-y: auto;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
+  top: 6.25rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
+  padding: 0;
+  background-color: var(--omrs-color-bg-low-contrast);
+  top: spacing.$spacing-09;
 }
 
 .searchResults {
@@ -15,23 +28,28 @@
 }
 
 .loadingIcon {
-  padding: $spacing-05 0;
+  padding: spacing.$spacing-05 0;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .searchTerm {
-  @include carbon--type-style('productive-heading-03');
-  color: $text-01;
+  @include type.type-style('heading-03');
   margin-top: 0.375rem;
 }
 
-.labelText {
-  @include carbon--type-style('label-01');
+.resultsText {
+  @include type.type-style('label-01');
   color: $text-02;
   line-height: $spacing-05;
   padding: $spacing-03 $spacing-04 0 $spacing-04;
+  // border-bottom: 0.063rem solid $ui-03;
+  // padding: spacing.$spacing-03 0rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .resultsText {
+  margin: spacing.$spacing-05;
 }
 
 .helperText {
@@ -40,39 +58,41 @@
 }
 
 .emptyResultText {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: $spacing-05;
+  margin-top: spacing.$spacing-05;
   margin-bottom: 0.313rem;
 }
 
 .actionText {
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
 .pagination {
   display: flex;
   justify-content: space-evenly;
-  padding: 4.688rem 0 $spacing-06;
+  padding: 4.688rem 0 spacing.$spacing-06;
 }
 
 .emptySearchResultsTile {
   text-align: center;
-  margin: $spacing-05;
-  padding: $spacing-09 0rem;
-  background-color: $ui-02;
+  margin-top: spacing.$spacing-05;
+  padding: spacing.$spacing-09 0rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
+  margin: spacing.$spacing-05;
 }
 
 .errorMessage {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
+  @include type.type-style('heading-compact-02');
   margin-top: 2.25rem;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .errorCopy {
-  margin-bottom: $spacing-03;
-  @include carbon--type-style('body-long-01');
+  margin-bottom: spacing.$spacing-03;
+  @include type.type-style('body-01');
   color: $text-02;
 }

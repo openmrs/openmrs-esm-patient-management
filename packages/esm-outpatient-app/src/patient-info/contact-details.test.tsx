@@ -1,8 +1,16 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { renderWithSwr } from '../../../../tools/test-helpers';
+import { usePatientAttributes, usePatientContactAttributes } from './hooks/usePatientAttributes';
 import ContactDetails from './contact-details.component';
-import * as usePatientContactAttributeMock from './hooks/usePatientAttributes';
+
+const mockUsePatientAttributes = usePatientAttributes as jest.Mock;
+const mockUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;
+
+jest.mock('./hooks/usePatientAttributes', () => ({
+  usePatientContactAttributes: jest.fn(),
+  usePatientAttributes: jest.fn(),
+}));
 
 let testProps = {
   address: [
@@ -33,9 +41,15 @@ const personAttributeMock = [
 
 describe('ContactDetails: ', () => {
   it("renders the patient's address and contact details when available", async () => {
-    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+    mockUsePatientAttributes.mockReturnValueOnce({
       isLoading: false,
-      ContactDetails: personAttributeMock,
+      attributes: personAttributeMock,
+      error: null,
+    });
+
+    mockUsePatientContactAttributes.mockReturnValueOnce({
+      isLoading: false,
+      contactAttributes: personAttributeMock,
     });
 
     renderContactDetails();
@@ -49,17 +63,23 @@ describe('ContactDetails: ', () => {
     expect(screen.getByText(/0123456789/)).toBeInTheDocument();
   });
 
-  it('renders an empty stateview when address and contact details is not available', () => {
-    spyOn(usePatientContactAttributeMock, 'usePatientAttributes').and.returnValue({
-      isLoading: false,
-      ContactDetails: [],
-    });
-
+  it('renders an empty state view when address and contact information are not available', () => {
     testProps = {
       address: null,
       contact: null,
       patientId: 'some-uuid',
     };
+
+    mockUsePatientAttributes.mockReturnValueOnce({
+      isLoading: false,
+      attributes: [],
+      error: null,
+    });
+
+    mockUsePatientContactAttributes.mockReturnValueOnce({
+      isLoading: false,
+      contactAttributes: [],
+    });
 
     renderContactDetails();
 

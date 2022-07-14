@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { SideNavMenu } from 'carbon-components-react';
+import { SideNavMenu } from '@carbon/react';
 import { registerNavGroup } from './nav-group';
 
 export interface NavGroupExtensionProps {

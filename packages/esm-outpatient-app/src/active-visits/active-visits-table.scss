@@ -1,6 +1,6 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   padding-bottom: 2rem;
@@ -15,21 +15,20 @@
 }
 
 .heading {
-  @include carbon--type-style('productive-heading-03');
-  color: $text-01;
+  @include type.type-style('heading-03');
 }
 
 .filterContainer {
-  :global(.bx--dropdown__wrapper--inline) {
+  :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
 
-  :global(.bx--list-box__menu-icon) {
+  :global(.cds--list-box__menu-icon) {
     height: 1rem;
   }
 }
 
-.tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
+.tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
   border-bottom: none;
 }
 
@@ -39,7 +38,7 @@
 
 .priorityTag {
   @extend .tag;
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
   color: #943d00;
   background-color: #ffc9a3;
 }
@@ -61,6 +60,7 @@
 
   input {
     background-color: $ui-02 !important;
+    // height: 2rem !important;
   }
 }
 
@@ -75,33 +75,33 @@
     color: $text-02;
   }
 
-  :global(.bx--data-table-content) {
+  :global(.cds--data-table-content) {
     border: 1px solid $ui-03;
     overflow: visible;
   }
 
-  :global(.bx--data-table) {
+  :global(.cds--data-table) {
     background: $ui-03;
   }
 
-  :global(.bx--data-table-header) {
+  :global(.cds--data-table-header) {
     padding: 0;
   }
 
-  :global(.bx--table-toolbar) {
+  :global(.cds--table-toolbar) {
     position: relative;
     height: 2rem;
     overflow: visible;
     background-color: $ui-01;
   }
 
-  :global(.bx--toolbar-content),
-  :global(.bx--toolbar-search-container-expandable) {
+  :global(.cds--toolbar-content),
+  :global(.cds--toolbar-search-container-expandable) {
     height: 2rem;
     margin-bottom: 0.25rem;
   }
 
-  :global(.bx--data-table--zebra tbody tr[data-child-row]:hover td) {
+  :global(.cds--data-table--zebra tbody tr[data-child-row]:hover td) {
     background-color: $ui-02;
   }
 }
@@ -119,7 +119,7 @@
 }
 
 .expandedActiveVisitRow {
-  :global(.bx--tab-content) {
+  :global(.cds--tab-content) {
     padding: 0.5rem 0;
   }
 
@@ -141,18 +141,18 @@
 }
 
 .content {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: 0.5rem;
 }
 
 .helper {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }
 
 .separator {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $text-02;
   width: 80%;
   margin: 1.5rem auto;
@@ -204,14 +204,14 @@
 
 .desktopHeading {
   h4 {
-    @include carbon--type-style('productive-heading-02');
+    @include type.type-style('heading-compact-02');
     color: $text-02;
   }
 }
 
 .tabletHeading {
   h4 {
-    @include carbon--type-style('productive-heading-03');
+    @include type.type-style('heading-03');
     color: $text-02;
   }
 }
@@ -220,7 +220,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 
   h4:after {
     content: '';
@@ -241,6 +241,5 @@
 }
 
 .visitType {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
+  @include type.type-style('heading-compact-02');
 }

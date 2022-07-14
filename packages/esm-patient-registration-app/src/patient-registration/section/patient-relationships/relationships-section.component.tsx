@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import sectionStyles from '../section.scss';
-import styles from './relationships.scss';
-import { Button, Select, SelectItem, InlineNotification, NotificationActionButton } from 'carbon-components-react';
+import { Button, Select, SelectItem, InlineNotification, NotificationActionButton } from '@carbon/react';
+import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
@@ -9,7 +8,8 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
 import { RelationshipValue } from '../../patient-registration-types';
-import { TrashCan16 } from '@carbon/icons-react';
+import sectionStyles from '../section.scss';
+import styles from './relationships.scss';
 
 interface RelationshipType {
   display: string;
@@ -149,7 +149,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
             iconDescription={t('deleteRelationshipTooltipText', 'Delete')}
             hasIconOnly
             onClick={deleteRelationship}>
-            <TrashCan16 className={styles.trashCan} />
+            <TrashCan size={16} className={styles.trashCan} />
           </Button>
         </div>
         <div>

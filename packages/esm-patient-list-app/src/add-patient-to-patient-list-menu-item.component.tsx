@@ -28,9 +28,9 @@ const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProp
 
   return (
     <>
-      <li className="bx--overflow-menu-options__option">
+      <li className="cds--overflow-menu-options__option">
         <button
-          className="bx--overflow-menu-options__btn"
+          className="cds--overflow-menu-options__btn"
           role="menuitem"
           title={t('openPatientList', 'Add to list')}
           data-floating-menu-primary-focus
@@ -38,7 +38,7 @@ const AddPatientToPatientListMenuItem: React.FC<AddPastVisitOverflowMenuItemProp
           style={{
             maxWidth: '100vw',
           }}>
-          <span className="bx--overflow-menu-options__option-content">{t('openPatientList', 'Add to list')}</span>
+          <span className="cds--overflow-menu-options__option-content">{t('openPatientList', 'Add to list')}</span>
         </button>
       </li>
     </>

@@ -1,13 +1,12 @@
-import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
-import { Button, ClickableTile } from 'carbon-components-react';
 import React, { useState } from 'react';
-import styles from './patient-info.scss';
-import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
-import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import { useTranslation } from 'react-i18next';
-import ContactDetails from './contact-details.component';
-import Edit16 from '@carbon/icons-react/es/edit/16';
+import { Button, ClickableTile } from '@carbon/react';
+import { ChevronDown, ChevronUp, Edit } from '@carbon/react/icons';
+import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import AppointmentDetails from './appointment-details.component';
+import ContactDetails from './contact-details.component';
+import styles from './patient-info.scss';
+
 interface PatientInfoProps {
   patient: fhir.Patient;
   handlePatientInfoClick: () => void;
@@ -38,7 +37,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
               to={`\${openmrsSpaBase}/patient/${patient.id}/edit`}
               className={styles.patientEditBtn}
               title={t('editPatientDetails', 'Edit Patient Details')}>
-              <Edit16 />
+              <Edit size={16} />
             </ConfigurableLink>
           </div>
           <div className={styles.patientInfoRow}>
@@ -56,7 +55,9 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
             </span>
             <Button
               kind="ghost"
-              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
+              renderIcon={(props) =>
+                showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+              }
               iconDescription="Toggle contact details"
               onClick={(e) => toggleShowMore(e)}>
               {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}

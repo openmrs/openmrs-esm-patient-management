@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Calendar16 from '@carbon/icons-react/es/calendar/16';
-import Location16 from '@carbon/icons-react/es/location/16';
-import { Dropdown } from 'carbon-components-react';
+import { Calendar, Location } from '@carbon/react/icons';
+import { Dropdown } from '@carbon/react';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
@@ -37,10 +36,10 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
       </div>
       <div className={styles['right-justified-items']}>
         <div className={styles['date-and-location']}>
-          <Location16 />
+          <Location size={16} />
           <span className={styles.value}>{userLocation}</span>
           <span className={styles.middot}>&middot;</span>
-          <Calendar16 />
+          <Calendar size={16} />
           <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
         <div className={styles.dropdown}>

@@ -1,0 +1,16 @@
+@use '@carbon/styles/scss/spacing';
+@import '../style.scss';
+
+.overflowMenu {
+  width: auto;
+  height: auto;
+  margin-bottom: -(spacing.$spacing-06);
+  margin-top: -(spacing.$spacing-05);
+}
+
+.overflowMenuButton {
+  width: auto;
+  height: auto;
+  padding: (spacing.$spacing-05);
+  color: $interactive-01;
+}

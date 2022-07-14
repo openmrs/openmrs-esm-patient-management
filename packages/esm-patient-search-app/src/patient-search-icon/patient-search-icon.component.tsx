@@ -1,25 +1,25 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import Search20 from '@carbon/icons-react/es/search/20';
-import Close20 from '@carbon/icons-react/es/close/20';
-import { HeaderGlobalAction } from 'carbon-components-react';
-import { navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
-import styles from './patient-search-icon.component.scss';
-import { RouteComponentProps } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { HeaderGlobalAction } from '@carbon/react';
+import { Close, Search } from '@carbon/react/icons';
+import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
-interface RouteParams {
-  page: string;
-  query: string;
+import styles from './patient-search-icon.component.scss';
+
+interface PatientSearchLaunchProps {
+  location: {
+    pathname: string;
+  };
 }
 
-interface PatientSearchLaunchProps extends RouteComponentProps<RouteParams> {}
-
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
+  const { t } = useTranslation();
+  const layout = useLayoutType();
   const page = props?.location?.pathname?.split('/')?.[1];
   const query = page === 'search' ? props?.location?.pathname?.split('/')?.[2] : '';
-  const [showSearchInput, setShowSearchInput] = useState<boolean>(false);
-  const [canClickOutside, setCanClickOutside] = useState<boolean>(false);
-  const isDesktop = useLayoutType() === 'desktop';
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [canClickOutside, setCanClickOutside] = useState(false);
 
   const handleCloseSearchInput = useCallback(() => {
     // Clicking outside of the search input when "/search" page is open should not close the search input.
@@ -59,7 +59,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
       {showSearchInput &&
-        (isDesktop ? (
+        (isDesktop(layout) ? (
           <CompactPatientSearchComponent query={query} searchPage={page === 'search'} />
         ) : (
           <PatientSearchOverlay onClose={handleGlobalAction} query={query} />
@@ -72,7 +72,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
           aria-label="Search Patient"
           aria-labelledby="Search Patient"
           name="SearchPatientIcon">
-          {showSearchInput ? <Close20 /> : <Search20 />}
+          {showSearchInput ? <Close size={20} /> : <Search size={20} />}
         </HeaderGlobalAction>
       </div>
     </div>

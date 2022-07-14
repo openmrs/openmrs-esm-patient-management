@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Button, Grid, Row, Tag, Tile } from 'carbon-components-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
-import { PatientVitals } from '../../types/index';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Button, Grid, Row, Tile } from '@carbon/react';
+import { ArrowRight, CircleFillGlyph } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
-import styles from './triage-note.scss';
-import CircleFillGlyph from '@carbon/icons-react/es/circle--solid/16';
+import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
 import { ConfigObject } from '../../config-schema';
+import { PatientVitals } from '../../types/index';
+import styles from './triage-note.scss';
 
 interface VitalsComponentProps {
   vitals: Array<PatientVitals>;
@@ -59,7 +58,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                     vitalsToDisplay.pulse,
                     getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
                   ) !== 'normal' ? (
-                    <CircleFillGlyph className={styles['danger-icon']} />
+                    <CircleFillGlyph className={styles['danger-icon']} size={16} />
                   ) : null}
                 </p>
                 <div className={styles.vitalValuesWrapper}>
@@ -155,7 +154,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               <Button
                 size="small"
                 kind="ghost"
-                renderIcon={ArrowRight16}
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
                 onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
                 iconDescription={t('vitalsForm', 'Vitals form')}>
                 {t('vitalsForm', 'Vitals form')}

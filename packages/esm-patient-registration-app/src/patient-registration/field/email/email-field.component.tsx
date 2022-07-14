@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useTranslation } from 'react-i18next';
 import { PhoneField } from '../phone/phone-field.component';
+import styles from '../field.scss';
 
 export const PhoneEmailField: React.FC = () => {
   const { t } = useTranslation();
