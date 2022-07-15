@@ -6,6 +6,7 @@ import {
   DataTableSkeleton,
   DenormalizedRow,
   FilterRowsData,
+  Layer,
   Search,
   SearchSkeleton,
   SkeletonText,
@@ -187,14 +188,15 @@ const OfflinePatientTable: React.FC<OfflinePatientTableProps> = ({ isInteractive
                 <h4 className={styles.tableHeader}>{t('offlinePatientsTableTitle', 'Offline patients')}</h4>
               )}
               {selectedRows.length === 0 && (
-                <Search
-                  className={styles.tableSearch}
-                  labelText={t('offlinePatientsTableSearchLabel', 'Search this list')}
-                  placeholder={t('offlinePatientsTableSearchPlaceholder', 'Search this list')}
-                  size={toolbarItemSize}
-                  onChange={onInputChange}
-                  light
-                />
+                <Layer>
+                  <Search
+                    className={styles.tableSearch}
+                    labelText={t('offlinePatientsTableSearchLabel', 'Search this list')}
+                    placeholder={t('offlinePatientsTableSearchPlaceholder', 'Search this list')}
+                    size={toolbarItemSize}
+                    onChange={onInputChange}
+                  />
+                </Layer>
               )}
               {selectedRows.length > 0 && (
                 <>

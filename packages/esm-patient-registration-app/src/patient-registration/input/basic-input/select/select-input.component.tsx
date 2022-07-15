@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectItem } from '@carbon/react';
+import { Layer, Select, SelectItem } from '@carbon/react';
 import { useField } from 'formik';
 
 interface SelectInputProps {
@@ -17,9 +17,11 @@ export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label }
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <Select id="identifier" {...field} labelText={label} light>
-        {selectOptions}
-      </Select>
+      <Layer>
+        <Select id="identifier" {...field} labelText={label}>
+          {selectOptions}
+        </Select>
+      </Layer>
     </div>
   );
 };

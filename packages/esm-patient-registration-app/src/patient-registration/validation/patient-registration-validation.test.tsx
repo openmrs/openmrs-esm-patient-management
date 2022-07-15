@@ -67,6 +67,8 @@ describe('name input', () => {
   };
 
   const updateNameAndReturnError = async (givenNameValue: string, middleNameValue: string, familyNameValue: string) => {
+    const user = userEvent.setup();
+
     mockUseConfig.mockReturnValue(mockFieldConfigs);
 
     render(
@@ -100,7 +102,7 @@ describe('name input', () => {
     const middleNameInput = screen.getByLabelText(/Middle Name/i) as HTMLInputElement;
     const familyNameInput = screen.getByLabelText('Family Name') as HTMLInputElement;
 
-    await userEvent.click(givenNameInput);
+    await user.click(givenNameInput);
 
     fireEvent.change(givenNameInput, { target: { value: givenNameValue } });
     fireEvent.blur(givenNameInput);

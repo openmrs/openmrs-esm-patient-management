@@ -15,6 +15,8 @@ jest.mock('./past-visit.resource', () => ({
 
 describe('PastVisit: ', () => {
   it('renders an empty state when notes, encounters, medications, and vitals data is not available', async () => {
+    const user = userEvent.setup();
+
     mockUsePastVisits.mockReturnValueOnce({
       data: mockPastVisit.data.results,
     });
@@ -31,7 +33,7 @@ describe('PastVisit: ', () => {
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
-    await userEvent.click(vitalsTab);
+    await user.click(vitalsTab);
 
     expect(vitalsTab).toHaveAttribute('aria-selected', 'true');
     expect(encountersTab).toHaveAttribute('aria-selected', 'false');

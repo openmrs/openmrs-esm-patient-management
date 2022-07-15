@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Root from './root.component';
 
 window['getOpenmrsSpaBase'] = jest.fn().mockImplementation(() => '/');
@@ -7,7 +7,9 @@ window['getOpenmrsSpaBase'] = jest.fn().mockImplementation(() => '/');
 describe('root component', () => {
   it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(
+    const root = createRoot(div);
+
+    root.render(
       <Root
         savePatientForm={jest.fn()}
         addressTemplate={{ results: [] }}
@@ -16,7 +18,6 @@ describe('root component', () => {
         identifierTypes={[]}
         isOffline={false}
       />,
-      div,
     );
   });
 });

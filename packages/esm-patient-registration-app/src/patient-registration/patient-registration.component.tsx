@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Button, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
-import { useLocation, useParams } from 'react-router-dom';
+import { Router, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
 import {

@@ -4,6 +4,7 @@ import {
   DataTableCustomRenderProps,
   DataTableHeader,
   DataTableSkeleton,
+  Layer,
   Table,
   TableBody,
   TableContainer,
@@ -69,17 +70,18 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
       <div id="table-tool-bar" className={styles.searchContainer}>
         <div>{fetching && <InlineLoading />}</div>
         <div>
-          <Search
-            id="patient-list-search"
-            placeholder={search.placeHolder}
-            labelText=""
-            size={isDesktop(layout) ? 'md' : 'lg'}
-            className={styles.search}
-            light
-            onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={search.currentSearchTerm}
-            {...search?.otherSearchProps}
-          />
+          <Layer>
+            <Search
+              id="patient-list-search"
+              placeholder={search.placeHolder}
+              labelText=""
+              size={isDesktop(layout) ? 'md' : 'lg'}
+              className={styles.search}
+              onChange={(evnt) => handleSearch(evnt.target.value)}
+              defaultValue={search.currentSearchTerm}
+              {...search?.otherSearchProps}
+            />
+          </Layer>
         </div>
       </div>
       <DataTable rows={patientLists} headers={headers}>
