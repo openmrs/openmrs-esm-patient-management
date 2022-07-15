@@ -30,11 +30,6 @@ enum visitType {
   FUTURE = 'Future',
 }
 
-enum visitTypeHeading {
-  RECENT_VISITS = 'recentScheduledVisits',
-  FUTURE_VISITS = 'futureScheduledVisits',
-}
-
 const ScheduledVisits: React.FC<{ visits; isLoading; visitType; heading }> = ({
   visits,
   isLoading,
@@ -55,7 +50,7 @@ const ScheduledVisits: React.FC<{ visits; isLoading; visitType; heading }> = ({
       <div>
         {visits.length > 0 ? (
           <div className={styles.row}>
-            <p className={styles.heading}>{t(heading, { count: visits.length })} </p>
+            <p className={styles.heading}>{heading} </p>
             <TileGroup name="tile-group" defaultSelected="default-selected">
               {visits.map((visit, ind) => (
                 <RadioTile
@@ -130,13 +125,13 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={recentVisits}
-        heading={visitTypeHeading.RECENT_VISITS}
+        heading={t('recentScheduledVisits', { count: recentVisits.length })}
         isLoading={isLoading}
       />
       <ScheduledVisits
         visitType={visitType.FUTURE}
         visits={futureVisits}
-        heading={visitTypeHeading.FUTURE_VISITS}
+        heading={t('futureScheduledVisits', { count: futureVisits.length })}
         isLoading={loading}
       />
 
