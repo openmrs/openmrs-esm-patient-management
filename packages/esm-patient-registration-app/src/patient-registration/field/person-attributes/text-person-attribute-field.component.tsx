@@ -40,7 +40,6 @@ export function TextPersonAttributeField({
             <Input
               id={`person-attribute-${personAttributeType.uuid}`}
               labelText={label ?? personAttributeType?.display}
-              light
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}
             />

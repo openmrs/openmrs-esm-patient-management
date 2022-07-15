@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectItem } from '@carbon/react';
+import { Layer, Select, SelectItem } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
 import { CodedPersonAttributeConfig } from '../../patient-registration-types';
@@ -37,21 +37,21 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
   return !isLoading ? (
     <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
-        <Select
-          id={`person-attribute-${personAttributeTypeUuid}`}
-          name={`attributes.${personAttributeTypeUuid}`}
-          labelText={personAttributeType?.display}
-          light>
-          {conceptAnswers.map((answer) => (
-            <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
-          ))}
-        </Select>
+        <Layer>
+          <Select
+            id={`person-attribute-${personAttributeTypeUuid}`}
+            name={`attributes.${personAttributeTypeUuid}`}
+            labelText={personAttributeType?.display}>
+            {conceptAnswers.map((answer) => (
+              <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+            ))}
+          </Select>
+        </Layer>
       ) : (
         <Input
           id={`person-attribute-${personAttributeTypeUuid}`}
           labelText={personAttributeType?.display}
           name={`attributes.${personAttributeTypeUuid}`}
-          light
         />
       )}
     </div>

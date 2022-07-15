@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
-import { ResourcesContext } from '../../../offline.resources';
 import { ComboInput } from '../../input/comboinput/comboinput.component';
+import { ResourcesContext } from '../../../offline.resources';
+import styles from '../field.scss';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];

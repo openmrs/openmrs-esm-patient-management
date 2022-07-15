@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, wait, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { Input } from './input.component';
 
@@ -8,7 +9,7 @@ describe.skip('number input', () => {
     render(
       <Formik initialValues={{ number: 0 }} onSubmit={null}>
         <Form>
-          <Input id="number" labelText="Number" name="number" light />
+          <Input id="number" labelText="Number" name="number" />
         </Form>
       </Formik>,
     );
@@ -21,13 +22,13 @@ describe.skip('number input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
+
     const input = await setupInput();
     const expected = 1;
 
-    fireEvent.change(input, { target: { valueAsNumber: expected } });
-    fireEvent.blur(input);
-
-    await wait();
+    await user.type(input, expected.toString());
+    await user.tab();
 
     expect(input.valueAsNumber).toEqual(expected);
   });
@@ -38,7 +39,7 @@ describe.skip('text input', () => {
     render(
       <Formik initialValues={{ text: '' }} onSubmit={null}>
         <Form>
-          <Input id="text" labelText="Text" name="text" placeholder="Enter text" light />
+          <Input id="text" labelText="Text" name="text" placeholder="Enter text" />
         </Form>
       </Formik>,
     );
@@ -51,13 +52,13 @@ describe.skip('text input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
+
     const input = await setupInput();
     const expected = 'Some text';
 
-    fireEvent.change(input, { target: { value: expected } });
-    fireEvent.blur(input);
-
-    await wait();
+    await user.type(input, expected);
+    await user.tab();
 
     expect(input.value).toEqual(expected);
   });
@@ -68,13 +69,7 @@ describe.skip('telephone number input', () => {
     render(
       <Formik initialValues={{ telephoneNumber: '' }} onSubmit={null}>
         <Form>
-          <Input
-            id="tel"
-            labelText="Telephone Number"
-            name="telephoneNumber"
-            placeholder="Enter telephone number"
-            light
-          />
+          <Input id="tel" labelText="Telephone Number" name="telephoneNumber" placeholder="Enter telephone number" />
         </Form>
       </Formik>,
     );
@@ -87,13 +82,13 @@ describe.skip('telephone number input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
+
     const input = await setupInput();
     const expected = '0800001066';
 
-    fireEvent.change(input, { target: { value: expected } });
-    fireEvent.blur(input);
-
-    await wait();
+    await user.type(input, expected);
+    await user.tab();
 
     expect(input.value).toEqual(expected);
   });
@@ -104,7 +99,7 @@ describe.skip('date input', () => {
     render(
       <Formik initialValues={{ date: '' }} onSubmit={null}>
         <Form>
-          <Input id="date" labelText="date" name="date" light />
+          <Input id="date" labelText="date" name="date" />
         </Form>
       </Formik>,
     );
@@ -117,13 +112,13 @@ describe.skip('date input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
+
     const input = await setupInput();
     const expected = '1990-09-10';
 
-    fireEvent.change(input, { target: { value: expected } });
-    fireEvent.blur(input);
-
-    await wait();
+    await user.type(input, expected);
+    await user.tab();
 
     expect(input.value).toEqual(expected);
   });
@@ -134,7 +129,7 @@ describe.skip('checkbox input', () => {
     render(
       <Formik initialValues={{ checkbox: false }} onSubmit={null}>
         <Form>
-          <Input id="checkbox" labelText="checkbox" name="checkbox" light />
+          <Input id="checkbox" labelText="checkbox" name="checkbox" />
         </Form>
       </Formik>,
     );
@@ -147,28 +142,28 @@ describe.skip('checkbox input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
     const input = await setupInput();
+
     const expected = true;
 
-    fireEvent.click(input);
-    fireEvent.blur(input);
-
-    await wait();
+    await user.click(input);
+    await user.tab();
 
     expect(input.checked).toEqual(expected);
   });
 
   it('can update data', async () => {
+    const user = userEvent.setup();
     const input = await setupInput();
+
     const expected = false;
 
-    fireEvent.click(input);
-    fireEvent.blur(input);
+    await user.click(input);
+    await user.tab();
 
-    fireEvent.click(input);
-    fireEvent.blur(input);
-
-    await wait();
+    await user.click(input);
+    await user.tab();
 
     expect(input.checked).toEqual(expected);
   });

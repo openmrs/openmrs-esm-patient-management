@@ -1,8 +1,8 @@
-import { useConfig } from '@openmrs/esm-framework';
-import { Field } from 'formik';
 import React from 'react';
+import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { InlineNotification, Select, SelectItem } from '@carbon/react';
+import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { ConceptResponse } from '../../patient-registration-types';
 import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
@@ -79,16 +79,14 @@ function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
   };
 
   const fieldName = `obs.${concept.uuid}`;
-styles.customField
   return (
-    <div className={`${} ${styles.halfWidthInDesktopView}`}>
+    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       <Field name={fieldName} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input
               id={fieldName}
               labelText={label ?? concept.display}
-              light
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}
             />
@@ -117,7 +115,6 @@ function NumericObsField({ concept, label }: NumericObsFieldProps) {
             <Input
               id={fieldName}
               labelText={label ?? concept.display}
-              light
               invalid={errors[fieldName] && touched[fieldName]}
               type="number"
               {...field}
@@ -166,18 +163,19 @@ function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldPr
               );
             }
             return (
-              <Select
-                id={fieldName}
-                name={fieldName}
-                labelText={label ?? concept?.display}
-                light
-                invalid={errors[fieldName] && touched[fieldName]}
-                {...field}>
-                <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                {conceptAnswers.map((answer) => (
-                  <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
-                ))}
-              </Select>
+              <Layer>
+                <Select
+                  id={fieldName}
+                  name={fieldName}
+                  labelText={label ?? concept?.display}
+                  invalid={errors[fieldName] && touched[fieldName]}
+                  {...field}>
+                  <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
+                  {conceptAnswers.map((answer) => (
+                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+                  ))}
+                </Select>
+              </Layer>
             );
           }}
         </Field>

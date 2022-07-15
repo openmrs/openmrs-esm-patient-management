@@ -17,6 +17,8 @@ jest.mock('@openmrs/esm-framework', () => {
 
 describe('Patient Info', () => {
   test('should render patient info correctly', async () => {
+    const user = userEvent.setup();
+
     mockAge.mockReturnValue(35);
     renderPatientInfo();
 
@@ -29,7 +31,7 @@ describe('Patient Info', () => {
     const showDetailsButton = screen.getByRole('button', { name: /Show all details/ });
     expect(showDetailsButton).toBeInTheDocument();
 
-    await userEvent.click(showDetailsButton);
+    await user.click(showDetailsButton);
 
     expect(screen.queryByRole('button', { name: /Show all details/ })).not.toBeInTheDocument();
     const showLessButton = screen.getByRole('button', { name: /Show less/i });

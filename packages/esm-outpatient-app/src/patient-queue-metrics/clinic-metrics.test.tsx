@@ -23,6 +23,8 @@ jest.mock('./queue-metrics.resource.ts', () => {
 
 describe('Clinic metrics', () => {
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
+    const user = userEvent.setup();
+
     mockedUseConfig.mockReturnValue({
       concepts: {
         serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
@@ -44,8 +46,10 @@ describe('Clinic metrics', () => {
 
     // Select a different service to show metrics for
     const serviceDropdown = screen.getByRole('button', { name: /triage open menu/i });
-    userEvent.click(serviceDropdown);
-    userEvent.click(screen.getByRole('option', { name: /clinical consultation/i }));
+
+    await user.click(serviceDropdown);
+    await user.click(screen.getByRole('option', { name: /clinical consultation/i }));
+
     expect(screen.getByRole('button', { name: /clinical consultation/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /triage/i })).not.toBeInTheDocument();
   });

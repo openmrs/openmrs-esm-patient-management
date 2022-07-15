@@ -1,10 +1,10 @@
 import React, { useCallback, useContext } from 'react';
-import { Input } from '../../input/basic-input/input/input.component';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useField } from 'formik';
+import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { Input } from '../../input/basic-input/input/input.component';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
 
 const containsNoNumbers = /^([^0-9]*)$/;
@@ -73,7 +73,6 @@ export const NameField = () => {
                 id="givenName"
                 name="givenName"
                 labelText={t('givenNameLabelText', 'First Name')}
-                light
                 checkWarning={checkNumber}
               />
               {fieldConfigs.displayMiddleName && (
@@ -81,7 +80,6 @@ export const NameField = () => {
                   id="middleName"
                   name="middleName"
                   labelText={t('middleNameLabelText', 'Middle Name (optional)')}
-                  light
                   checkWarning={checkNumber}
                 />
               )}
@@ -89,7 +87,6 @@ export const NameField = () => {
                 id="familyName"
                 name="familyName"
                 labelText={t('familyNameLabelText', 'Family Name')}
-                light
                 checkWarning={checkNumber}
               />
             </>

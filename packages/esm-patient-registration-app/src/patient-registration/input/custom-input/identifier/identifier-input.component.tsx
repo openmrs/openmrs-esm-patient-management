@@ -87,7 +87,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       {!autoGeneration && !hideInputField ? (
         <Input
           id={name}
-          light
           labelText={identifierName}
           name={name}
           disabled={disabled}

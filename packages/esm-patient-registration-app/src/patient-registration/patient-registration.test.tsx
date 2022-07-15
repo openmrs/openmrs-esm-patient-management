@@ -1,17 +1,16 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import cloneDeep from 'lodash-es/cloneDeep';
 import { showToast, useConfig } from '@openmrs/esm-framework';
 import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
-import FormManager from './form-manager';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { Resources, ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
 import * as patientRegistrationResource from './patient-registration.resource';
-import { ConceptResponse, Encounter } from './patient-registration-types';
-import { useConcept, useConceptAnswers } from './field/field.resource';
+import { Encounter } from './patient-registration-types';
 import { RegistrationConfig } from '../config-schema';
+import FormManager from './form-manager';
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
@@ -85,7 +84,7 @@ const mockUseConfig = useConfig as jest.Mock;
 // Mock field.resource using the manual mock (in __mocks__)
 jest.mock('./field/field.resource');
 
-const configWithObs = cloneDeep(mockOpenmrsConfig);
+const configWithObs = JSON.parse(JSON.stringify(mockOpenmrsConfig));
 configWithObs.fieldDefinitions = [
   {
     id: 'weight',
@@ -115,7 +114,7 @@ configWithObs.fieldDefinitions = [
     answerConceptSetUuid: null,
   },
 ];
-configWithObs.sectionDefinitions.push({
+configWithObs.sectionDefinitions?.push({
   id: 'custom',
   name: 'Custom',
   fields: ['weight', 'chief complaint', 'nationality'],
@@ -135,16 +134,18 @@ const mockSaveEncounter = patientRegistrationResource.saveEncounter as jest.Mock
 const mockShowToast = showToast as jest.Mock;
 
 const fillRequiredFields = async () => {
+  const user = userEvent.setup();
+
   const demographicsSection = await screen.findByLabelText('Demographics Section');
   const givenNameInput = within(demographicsSection).getByLabelText(/first/i) as HTMLInputElement;
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
   const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i) as HTMLInputElement;
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
 
-  userEvent.type(givenNameInput, 'Paul');
-  userEvent.type(familyNameInput, 'Gaihre');
-  userEvent.clear(dateOfBirthInput);
-  userEvent.type(dateOfBirthInput, '02/08/1993');
+  await user.type(givenNameInput, 'Paul');
+  await user.type(familyNameInput, 'Gaihre');
+  await user.clear(dateOfBirthInput);
+  await user.type(dateOfBirthInput, '02/08/1993');
   fireEvent.blur(dateOfBirthInput);
   fireEvent.click(genderInput);
 };
@@ -158,10 +159,13 @@ describe('patient registration', () => {
     mockShowToast.mockClear();
   });
 
-  it('renders without crashing', () => {
+  it.only('renders without crashing', () => {
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
+        </Router>
+        ,
       </ResourcesContext.Provider>,
     );
   });
@@ -169,7 +173,9 @@ describe('patient registration', () => {
   it('has the expected sections', async () => {
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={jest.fn()} />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
+        </Router>
       </ResourcesContext.Provider>,
     );
     await waitFor(() => expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull());
@@ -177,18 +183,18 @@ describe('patient registration', () => {
   });
 
   it('saves the patient without extra info', async () => {
+    const user = userEvent.setup();
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration
-          isOffline={false}
-          match={sampleMatchProp}
-          savePatientForm={FormManager.savePatientFormOnline}
-        />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
+        </Router>
       </ResourcesContext.Provider>,
     );
 
     await fillRequiredFields();
-    userEvent.click(await screen.findByText('Register Patient'));
+    await user.click(await screen.findByText('Register Patient'));
 
     await waitFor(() => {
       expect(patientRegistrationResource.savePatient).toHaveBeenCalledWith(
@@ -214,23 +220,29 @@ describe('patient registration', () => {
   });
 
   it('should not save the patient if validation fails', async () => {
+    const user = userEvent.setup();
+
     const mockSavePatientForm = jest.fn();
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration isOffline={false} match={sampleMatchProp} savePatientForm={mockSavePatientForm} />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />
+        </Router>
       </ResourcesContext.Provider>,
     );
 
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
-    userEvent.type(givenNameInput, '');
+    await user.type(givenNameInput, '');
 
-    userEvent.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText('Register Patient'));
 
     expect(mockSavePatientForm).not.toHaveBeenCalled();
   });
 
   it.skip('edits patient demographics', async () => {
+    const user = userEvent.setup();
+
     spyOn(patientRegistrationResource, 'savePatient').and.returnValue(Promise.resolve({}));
     spyOn(mockOpenmrsFramework, 'usePatient').and.returnValue({
       isLoading: false,
@@ -241,11 +253,9 @@ describe('patient registration', () => {
 
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration
-          isOffline={false}
-          match={sampleMatchProp}
-          savePatientForm={FormManager.savePatientFormOnline}
-        />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
+        </Router>
       </ResourcesContext.Provider>,
     );
 
@@ -262,14 +272,14 @@ describe('patient registration', () => {
     expect(dateOfBirthInput.value).toBe('04/04/1972');
 
     // do some edits
-    userEvent.clear(givenNameInput);
-    userEvent.clear(middleNameInput);
-    userEvent.clear(familyNameInput);
-    userEvent.type(givenNameInput, 'Eric');
-    userEvent.type(middleNameInput, 'Johnson');
-    userEvent.type(familyNameInput, 'Smith');
-    userEvent.type(address1, 'Bom Jesus Street');
-    userEvent.click(screen.getByText('Update Patient'));
+    await user.clear(givenNameInput);
+    await user.clear(middleNameInput);
+    await user.clear(familyNameInput);
+    await user.type(givenNameInput, 'Eric');
+    await user.type(middleNameInput, 'Johnson');
+    await user.type(familyNameInput, 'Smith');
+    await user.type(address1, 'Bom Jesus Street');
+    await user.click(screen.getByText('Update Patient'));
 
     expect(patientRegistrationResource.savePatient).toHaveBeenCalledWith(
       expect.anything(),
@@ -322,29 +332,29 @@ describe('patient registration', () => {
   });
 
   it('renders and saves registration obs', async () => {
+    const user = userEvent.setup();
+
     mockSaveEncounter.mockResolvedValue({});
     mockUseConfig.mockReturnValue(configWithObs);
 
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration
-          isOffline={false}
-          match={sampleMatchProp}
-          savePatientForm={FormManager.savePatientFormOnline}
-        />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
+        </Router>
       </ResourcesContext.Provider>,
     );
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
     const weight = within(customSection).getByLabelText('Weight (kg)');
-    userEvent.type(weight, '50');
+    await user.type(weight, '50');
     const complaint = within(customSection).getByLabelText('Chief Complaint');
-    userEvent.type(complaint, 'sad');
+    await user.type(complaint, 'sad');
     const nationality = within(customSection).getByLabelText('Nationality');
-    userEvent.selectOptions(nationality, 'USA');
+    await user.selectOptions(nationality, 'USA');
 
-    userEvent.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText('Register Patient'));
 
     await waitFor(() => expect(mockSavePatient).toHaveBeenCalled());
     await waitFor(() =>
@@ -364,26 +374,26 @@ describe('patient registration', () => {
   });
 
   it('retries saving registration obs after a failed attempt', async () => {
+    const user = userEvent.setup();
+
     mockUseConfig.mockReturnValue(configWithObs);
 
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <PatientRegistration
-          isOffline={false}
-          match={sampleMatchProp}
-          savePatientForm={FormManager.savePatientFormOnline}
-        />
+        <Router>
+          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
+        </Router>
       </ResourcesContext.Provider>,
     );
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
     const weight = within(customSection).getByLabelText('Weight (kg)');
-    userEvent.type(weight, '-999');
+    await user.type(weight, '-999');
 
     mockSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
 
-    userEvent.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText('Register Patient'));
 
     await waitFor(() => expect(mockSavePatient).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(mockSaveEncounter).toHaveBeenCalledTimes(1));
@@ -393,7 +403,7 @@ describe('patient registration', () => {
 
     mockSaveEncounter.mockResolvedValue({});
 
-    userEvent.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText('Register Patient'));
     await waitFor(() => expect(mockSavePatient).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(mockSaveEncounter).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })));

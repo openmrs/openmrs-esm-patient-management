@@ -1,9 +1,10 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+
 import {
   DataTable,
   DataTableSkeleton,
   InlineLoading,
+  Layer,
   Pagination,
   Search,
   SearchProps,
@@ -16,6 +17,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import debounce from 'lodash-es/debounce';
+import { ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import styles from './patient-table.scss';
 
 interface PatientTableProps {
@@ -94,17 +96,18 @@ const PatientTable: React.FC<PatientTableProps> = ({
       <div id="table-tool-bar" className={styles.searchContainer}>
         <div>{isFetching && <InlineLoading />}</div>
         <div>
-          <Search
-            id="patient-list-search"
-            placeholder={search.placeHolder}
-            labelText=""
-            size={isDesktop(layout) ? 'sm' : 'xl'}
-            className={styles.searchOverrides}
-            light
-            onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={search.currentSearchTerm}
-            {...otherSearchProps}
-          />
+          <Layer>
+            <Search
+              id="patient-list-search"
+              placeholder={search.placeHolder}
+              labelText=""
+              size={isDesktop(layout) ? 'sm' : 'xl'}
+              className={styles.searchOverrides}
+              onChange={(evnt) => handleSearch(evnt.target.value)}
+              defaultValue={search.currentSearchTerm}
+              {...otherSearchProps}
+            />
+          </Layer>
         </div>
       </div>
       <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>

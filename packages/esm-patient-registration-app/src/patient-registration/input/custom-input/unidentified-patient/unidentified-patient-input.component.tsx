@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { Input } from '../../basic-input/input/input.component';
-import { useTranslation } from 'react-i18next';
 
 interface UnidentifiedPatientInputProps {
   name: string;
@@ -20,5 +20,5 @@ export const UnidentifiedPatientInput: React.FC<UnidentifiedPatientInputProps> =
     }
   }, [field.value, setName]);
 
-  return <Input id="checkbox" labelText={t('unidentifiedPatient', 'Unidentified Patient')} name={name} light />;
+  return <Input id="checkbox" labelText={t('unidentifiedPatient', 'Unidentified Patient')} name={name} />;
 };

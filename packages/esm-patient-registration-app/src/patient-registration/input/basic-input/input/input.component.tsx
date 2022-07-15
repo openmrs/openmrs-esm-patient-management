@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TextInput, TextInputProps } from '@carbon/react';
+import { Layer, TextInput, TextInputProps } from '@carbon/react';
 import { useField } from 'formik';
 
 interface InputProps extends TextInputProps {
@@ -40,15 +40,17 @@ export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <TextInput
-        {...props}
-        {...field}
-        invalid={!!(meta.touched && meta.error)}
-        invalidText={invalidText}
-        warn={!!warnText}
-        warnText={warnText}
-        value={value}
-      />
+      <Layer>
+        <TextInput
+          {...props}
+          {...field}
+          invalid={!!(meta.touched && meta.error)}
+          invalidText={invalidText}
+          warn={!!warnText}
+          warnText={warnText}
+          value={value}
+        />
+      </Layer>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Dropdown, OnChangeData, TextArea, TextInput } from '@carbon/react';
+import { Button, Dropdown, Layer, OnChangeData, TextArea, TextInput } from '@carbon/react';
 import { useLayoutType, showToast, useSession, isDesktop } from '@openmrs/esm-framework';
 import { createPatientList, editPatientList } from '../api/api-remote';
 import { useCohortTypes } from '../api/hooks';
@@ -129,42 +129,83 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
       }>
       <h4 className={styles.header}>{t('configureList', 'Configure your patient list using the fields below')}</h4>
       <div>
-        <TextInput
-          labelText={t('newPatientListNameLabel', 'List name')}
-          placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
-          id="list_name"
-          name="name"
-          onChange={handleChange}
-          light={!isDesktop(layout)}
-          value={cohortDetails?.name}
-        />
+        {isDesktop(layout) ? (
+          <TextInput
+            labelText={t('newPatientListNameLabel', 'List name')}
+            placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
+            id="list_name"
+            name="name"
+            onChange={handleChange}
+            value={cohortDetails?.name}
+          />
+        ) : (
+          <Layer>
+            <TextInput
+              labelText={t('newPatientListNameLabel', 'List name')}
+              placeholder={t('listNamePlaceholder', 'e.g. Potential research participants')}
+              id="list_name"
+              name="name"
+              onChange={handleChange}
+              value={cohortDetails?.name}
+            />
+          </Layer>
+        )}
       </div>
       <div className={styles.input}>
-        <TextArea
-          name="description"
-          onChange={handleChange}
-          placeholder={t(
-            'listDescriptionPlaceholder',
-            'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
-          )}
-          labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
-          light={!isDesktop(layout)}
-          value={cohortDetails?.description}
-        />
+        {isDesktop(layout) ? (
+          <Layer>
+            <TextArea
+              name="description"
+              onChange={handleChange}
+              placeholder={t(
+                'listDescriptionPlaceholder',
+                'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
+              )}
+              labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
+              value={cohortDetails?.description}
+            />
+          </Layer>
+        ) : (
+          <TextArea
+            name="description"
+            onChange={handleChange}
+            placeholder={t(
+              'listDescriptionPlaceholder',
+              'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
+            )}
+            labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
+            value={cohortDetails?.description}
+          />
+        )}
       </div>
       <div className={styles.input}>
-        <Dropdown
-          id="cohortType"
-          label={t('selectCohortType', 'Select patient list type')}
-          titleText={t('newPatientListCohortTypeLabel', 'Choose the type for the new patient list')}
-          items={cohortTypes?.map((type) => type?.display) || []}
-          selectedItem={
-            cohortTypes?.find((type) => type.uuid === cohortDetails?.cohortType)?.display ||
-            cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
-          }
-          onChange={handleTypeChange}
-          light={!isDesktop(layout)}
-        />
+        {isDesktop(layout) ? (
+          <Dropdown
+            id="cohortType"
+            label={t('selectCohortType', 'Select patient list type')}
+            titleText={t('newPatientListCohortTypeLabel', 'Choose the type for the new patient list')}
+            items={cohortTypes?.map((type) => type?.display) || []}
+            selectedItem={
+              cohortTypes?.find((type) => type.uuid === cohortDetails?.cohortType)?.display ||
+              cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
+            }
+            onChange={handleTypeChange}
+          />
+        ) : (
+          <Layer>
+            <Dropdown
+              id="cohortType"
+              label={t('selectCohortType', 'Select patient list type')}
+              titleText={t('newPatientListCohortTypeLabel', 'Choose the type for the new patient list')}
+              items={cohortTypes?.map((type) => type?.display) || []}
+              selectedItem={
+                cohortTypes?.find((type) => type.uuid === cohortDetails?.cohortType)?.display ||
+                cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
+              }
+              onChange={handleTypeChange}
+            />
+          </Layer>
+        )}
       </div>
     </Overlay>
   );

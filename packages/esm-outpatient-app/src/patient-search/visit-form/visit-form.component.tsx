@@ -9,6 +9,7 @@ import {
   DatePickerInput,
   Form,
   InlineNotification,
+  Layer,
   Row,
   Select,
   SelectItem,
@@ -156,59 +157,98 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id="visitDate"
-                light={isTablet}
-                style={{ paddingBottom: '1rem' }}
-                maxDate={new Date().toISOString()}
-                onChange={([date]) => setVisitDate(date)}
-                value={visitDate}>
-                <DatePickerInput
-                  id="visitStartDateInput"
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
-              <TimePicker
-                id="visitStartTime"
-                labelText={t('time', 'Time')}
-                light={isTablet}
-                onChange={(event) => setVisitTime(event.target.value as amPm)}
-                pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                style={{ marginLeft: '0.125rem', flex: 'none' }}
-                value={visitTime}>
-                <TimePickerSelect
-                  id="visitStartTimeSelect"
-                  onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                  value={timeFormat}
+              <Layer>
+                <DatePicker
+                  dateFormat="d/m/Y"
+                  datePickerType="single"
+                  id="visitDate"
+                  style={{ paddingBottom: '1rem' }}
+                  maxDate={new Date().toISOString()}
+                  onChange={([date]) => setVisitDate(date)}
+                  value={visitDate}>
+                  <DatePickerInput
+                    id="visitStartDateInput"
+                    labelText={t('date', 'Date')}
+                    placeholder="dd/mm/yyyy"
+                    style={{ width: '100%' }}
+                  />
+                </DatePicker>
+              </Layer>
+              {isTablet ? (
+                <Layer>
+                  <TimePicker
+                    id="visitStartTime"
+                    labelText={t('time', 'Time')}
+                    onChange={(event) => setVisitTime(event.target.value as amPm)}
+                    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                    style={{ marginLeft: '0.125rem', flex: 'none' }}
+                    value={visitTime}>
+                    <TimePickerSelect
+                      id="visitStartTimeSelect"
+                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                      value={timeFormat}
+                      labelText={t('time', 'Time')}
+                      aria-label={t('time', 'Time')}>
+                      <SelectItem value="AM" text="AM" />
+                      <SelectItem value="PM" text="PM" />
+                    </TimePickerSelect>
+                  </TimePicker>
+                </Layer>
+              ) : (
+                <TimePicker
+                  id="visitStartTime"
                   labelText={t('time', 'Time')}
-                  aria-label={t('time', 'Time')}>
-                  <SelectItem value="AM" text="AM" />
-                  <SelectItem value="PM" text="PM" />
-                </TimePickerSelect>
-              </TimePicker>
+                  onChange={(event) => setVisitTime(event.target.value as amPm)}
+                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                  style={{ marginLeft: '0.125rem', flex: 'none' }}
+                  value={visitTime}>
+                  <TimePickerSelect
+                    id="visitStartTimeSelect"
+                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                    value={timeFormat}
+                    labelText={t('time', 'Time')}
+                    aria-label={t('time', 'Time')}>
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                </TimePicker>
+              )}
             </div>
           </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <Select
-              labelText={t('selectLocation', 'Select a location')}
-              id="location"
-              invalidText="Required"
-              value={selectedLocation}
-              onChange={(event) => setSelectedLocation(event.target.value)}
-              light={isTablet}>
-              {locations?.length > 0 &&
-                locations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
-                  </SelectItem>
-                ))}
-            </Select>
+            {isTablet ? (
+              <Layer>
+                <Select
+                  labelText={t('selectLocation', 'Select a location')}
+                  id="location"
+                  invalidText="Required"
+                  value={selectedLocation}
+                  onChange={(event) => setSelectedLocation(event.target.value)}>
+                  {locations?.length > 0 &&
+                    locations.map((location) => (
+                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                        {location.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              </Layer>
+            ) : (
+              <Select
+                labelText={t('selectLocation', 'Select a location')}
+                id="location"
+                invalidText="Required"
+                value={selectedLocation}
+                onChange={(event) => setSelectedLocation(event.target.value)}>
+                {locations?.length > 0 &&
+                  locations.map((location) => (
+                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                      {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
           </section>
 
           {config.showRecommendedVisitTypeTab && (
