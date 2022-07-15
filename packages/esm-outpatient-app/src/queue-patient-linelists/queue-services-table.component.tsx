@@ -3,8 +3,13 @@ import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { formatDatetime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { useServiceQueueEntries } from '../active-visits/active-visits-table.resource';
+import { filterType } from '../types';
 
-const ServicesTable: React.FC = () => {
+interface ServicesTableProps {
+  toggleFilter?: (filterMode: filterType) => void;
+}
+
+const ServicesTable: React.FC<ServicesTableProps> = ({ toggleFilter }) => {
   const { t } = useTranslation();
 
   const currentPathName: string = window.location.pathname;
@@ -78,6 +83,7 @@ const ServicesTable: React.FC = () => {
         patientData={serviceQueueEntries}
         serviceType={service}
         isLoading={isLoading}
+        toggleFilter={() => toggleFilter(filterType.SHOW)}
       />
     </div>
   );

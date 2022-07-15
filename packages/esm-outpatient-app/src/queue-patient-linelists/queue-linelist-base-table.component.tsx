@@ -22,6 +22,7 @@ import {
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
+import { filterType } from '../types';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -38,6 +39,7 @@ interface QueuePatientTableProps {
   rows: any;
   serviceType: string;
   isLoading: boolean;
+  toggleFilter?: (filterMode: filterType) => void;
 }
 
 const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
@@ -47,6 +49,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   rows,
   serviceType,
   isLoading,
+  toggleFilter,
 }) => {
   const { t } = useTranslation();
 
@@ -94,7 +97,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </p>
         </div>
 
-        <Button kind="ghost" size="small" renderIcon={(props) => <OverflowMenuVertical size={16} {...props} />}>
+        <Button kind="ghost" size="sm" renderIcon={(props) => <OverflowMenuVertical size={16} {...props} />}>
           {t('actions', 'Actions')}
         </Button>
       </div>
@@ -110,6 +113,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
               kind="ghost"
               renderIcon={(props) => <Filter size={16} {...props} />}
               iconDescription={t('filter', 'Filter (1)')}
+              onClick={toggleFilter}
               size="sm">
               {t('filter', 'Filter (1)')}
             </Button>
@@ -124,7 +128,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           headers={headers}
           overflowMenuOnHover={false}
           rows={rows}
-          size="compact"
+          size="md"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>

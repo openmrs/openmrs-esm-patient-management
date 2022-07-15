@@ -11,8 +11,8 @@ interface QueueLinelistProps {
 const QueueLinelist: React.FC<QueueLinelistProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const [showFilter, setShowFilter] = useState<filterType>(filterType.SHOW);
-  const toggleFilter = (filterMode: filterType) => {
-    setShowFilter(filterMode);
+  const toggleFilter = (filterType: filterType) => {
+    setShowFilter(filterType);
   };
 
   return (

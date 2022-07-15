@@ -14,7 +14,7 @@ import {
   ButtonSet,
   NumberInput,
   ToggleSmall,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { filterType } from '../types/index';
 import { mockVisitTypes } from '../../__mocks__/visits.mock';
 import dayjs from 'dayjs';
@@ -29,8 +29,8 @@ interface QueueLinelistFilterProps {
 const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const [gender, setGender] = useState('');
-  const [startAge, setStartAge] = useState(0);
-  const [endAge, setEndAge] = useState(50);
+  const [startAge, setStartAge] = useState<number>();
+  const [endAge, setEndAge] = useState<number>();
   const [returnDate, setReturnDate] = useState(new Date());
   const [visitType, setVisitType] = useState('');
   const isTablet = useLayoutType() === 'tablet';
@@ -122,7 +122,7 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
                 onClick={() => {
                   handleTodaysDate();
                 }}>
-                {t('useTodaysDate', 'Use todays date')}
+                {t('useTodaysDate', "Use today's date")}
               </Button>
             </Column>
           </Row>
