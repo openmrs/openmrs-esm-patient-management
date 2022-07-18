@@ -338,7 +338,7 @@ function ActiveVisitsTable() {
                       label=""
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
-                      items={services}
+                      items={[{ display: 'All' }, ...services]}
                       itemToString={(item) => (item ? item.display : '')}
                       onChange={handleServiceChange}
                       size="sm"

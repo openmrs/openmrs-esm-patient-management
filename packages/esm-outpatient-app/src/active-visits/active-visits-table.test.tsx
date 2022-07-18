@@ -82,6 +82,7 @@ describe('ActiveVisitsTable: ', () => {
     // filter table to only show patients waiting for `Triage`
     const serviceFilter = screen.getByRole('button', { name: /show patients waiting for/i });
     userEvent.click(serviceFilter);
+    expect(screen.getByRole('listbox', { name: /show patients waiting for/i }));
     userEvent.click(screen.getByRole('option', { name: /Triage/i }));
 
     expect(screen.queryByText(/waiting for clinical consultation/i)).not.toBeInTheDocument();
