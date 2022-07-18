@@ -17,17 +17,13 @@ export const ComboInput: React.FC<InputProps> = ({ name, labeltext, setSelectedV
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
-      performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text)
-        .then((value) => {
-          var element = [];
-          value.data.forEach((parent1) => {
-            element.push({ id: parent1['uuid'], text: parent1['name'] });
-          });
-          setcomboboxlist(element);
-        })
-        .catch((err) => {
-          console.log(err);
+      performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text).then((value) => {
+        var element = [];
+        value.data.forEach((parent1) => {
+          element.push({ id: parent1['uuid'], text: parent1['name'] });
         });
+        setcomboboxlist(element);
+      });
     }
   };
   return (
