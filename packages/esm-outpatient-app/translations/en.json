@@ -26,7 +26,7 @@
   "dateTime": "Date & time",
   "discard": "Discard",
   "dose": "Dose",
-  "editIdentifierTooltip": "Edit",
+  "editQueueEntryStatusTooltip": "Edit",
   "editPatientDetails": "Edit patient details",
   "emergency": "Emergency",
   "encounters": "Encounters",

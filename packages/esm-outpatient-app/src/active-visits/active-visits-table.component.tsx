@@ -138,7 +138,7 @@ function EditMenu({
     <Button
       kind="ghost"
       onClick={launchEditPriorityModal}
-      iconDescription={t('editIdentifierTooltip', 'Edit')}
+      iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
       className={styles.editStatusBtn}
       hasIconOnly
       renderIcon={Edit16}
