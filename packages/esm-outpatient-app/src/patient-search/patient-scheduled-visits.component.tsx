@@ -30,11 +30,11 @@ enum visitType {
   FUTURE = 'Future',
 }
 
-const ScheduledVisits: React.FC<{ visits; isLoading; visitType; heading }> = ({
+const ScheduledVisits: React.FC<{ visits; isLoading; visitType; scheduledVisitHeader }> = ({
   visits,
   isLoading,
   visitType,
-  heading,
+  scheduledVisitHeader,
 }) => {
   const { t } = useTranslation();
   const [prioritySwitcherValue, setSwitcherValue] = useState(0);
@@ -50,7 +50,7 @@ const ScheduledVisits: React.FC<{ visits; isLoading; visitType; heading }> = ({
       <div>
         {visits.length > 0 ? (
           <div className={styles.row}>
-            <p className={styles.heading}>{heading} </p>
+            <p className={styles.heading}>{scheduledVisitHeader} </p>
             <TileGroup name="tile-group" defaultSelected="default-selected">
               {visits.map((visit, ind) => (
                 <RadioTile
@@ -125,13 +125,13 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={recentVisits}
-        heading={t('recentScheduledVisits', { count: recentVisits.length })}
+        scheduledVisitHeader={t('recentScheduledVisits', { count: recentVisits.length })}
         isLoading={isLoading}
       />
       <ScheduledVisits
         visitType={visitType.FUTURE}
         visits={futureVisits}
-        heading={t('futureScheduledVisits', { count: futureVisits.length })}
+        scheduledVisitHeader={t('futureScheduledVisits', { count: futureVisits.length })}
         isLoading={loading}
       />
 
