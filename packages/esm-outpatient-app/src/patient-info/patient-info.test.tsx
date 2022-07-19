@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import PatientInfo from './patient-info.component';
-import { mockPatient } from '../../__mocks__/patient.mock';
 import { age } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
+import PatientInfo from './patient-info.component';
 
 const mockAge = age as jest.Mock;
 
@@ -16,8 +16,11 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('Patient Info', () => {
-  test('should render patient info correctly', () => {
+  test('should render patient info correctly', async () => {
+    const user = userEvent.setup();
+
     mockAge.mockReturnValue(35);
+
     renderPatientInfo();
 
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
@@ -29,7 +32,7 @@ describe('Patient Info', () => {
     const showDetailsButton = screen.getByRole('button', { name: /Show all details/ });
     expect(showDetailsButton).toBeInTheDocument();
 
-    userEvent.click(showDetailsButton);
+    await user.click(showDetailsButton);
 
     expect(screen.queryByRole('button', { name: /Show all details/ })).not.toBeInTheDocument();
     const showLessButton = screen.getByRole('button', { name: /Show less/i });
@@ -38,5 +41,5 @@ describe('Patient Info', () => {
 });
 
 const renderPatientInfo = () => {
-  render(<PatientInfo patient={mockPatient} />);
+  render(<PatientInfo handlePatientInfoClick={() => {}} patient={mockPatient} />);
 };

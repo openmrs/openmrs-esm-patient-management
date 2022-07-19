@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { SWRConfig } from 'swr';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { spaBasePath } from './constants';
 import { OutpatientDashboard } from './dashboard/outpatient-dashboard.component';
 import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
@@ -20,7 +20,9 @@ const Root: React.FC = () => {
     <main>
       <SWRConfig value={swrConfiguration}>
         <BrowserRouter basename={spaBasePath}>
-          <Route path="/:view?" component={OutpatientDashboard} />
+          <Routes>
+            <Route path="/:view?" element={<OutpatientDashboard />} />
+          </Routes>
         </BrowserRouter>
       </SWRConfig>
     </main>

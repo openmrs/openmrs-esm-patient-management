@@ -7,9 +7,9 @@ const customRepresentation =
   'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name),identifierType:(uuid,name,format,formatDescription,validator)),person:(uuid,display,gender,birthdate,dead,age,deathDate,birthdateEstimated,causeOfDeath,preferredName:(uuid,preferred,givenName,middleName,familyName),attributes,preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))';
 
 /**
- *  React hook that takes patientUuid and return Patient Attributes {@link Attribute}
- * @param patientUuid Unique Patient identifier
- * @returns Object containing `patient-attributes`, `isLoading` loading status, `error`
+ *  React hook that takes a patientUuid and returns patient attributes {@link Attribute}
+ * @param patientUuid Unique patient identifier
+ * @returns An object containing patient attributes, an `isLoading` boolean and an `error` object
  */
 export const usePatientAttributes = (patientUuid: string) => {
   const { data, error } = useSWRImmutable<{ data: Patient }>(

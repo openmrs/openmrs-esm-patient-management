@@ -4,6 +4,7 @@ import {
   DataTableCustomRenderProps,
   DataTableHeader,
   DataTableSkeleton,
+  Layer,
   Table,
   TableBody,
   TableContainer,
@@ -14,10 +15,9 @@ import {
   Search,
   SearchProps,
   InlineLoading,
-} from 'carbon-components-react';
-import Star16 from '@carbon/icons-react/es/star/16';
-import StarFilled16 from '@carbon/icons-react/es/star--filled/16';
-import { useSession, ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
+} from '@carbon/react';
+import { Star, StarFilled } from '@carbon/react/icons';
+import { useSession, ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
 import { PatientList } from '../api/types';
@@ -55,7 +55,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   search,
 }) => {
   const userId = useSession()?.user.uuid;
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
@@ -70,17 +70,18 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
       <div id="table-tool-bar" className={styles.searchContainer}>
         <div>{fetching && <InlineLoading />}</div>
         <div>
-          <Search
-            id="patient-list-search"
-            placeholder={search.placeHolder}
-            labelText=""
-            size={isDesktop ? 'sm' : 'xl'}
-            className={styles.search}
-            light
-            onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={search.currentSearchTerm}
-            {...search?.otherSearchProps}
-          />
+          <Layer>
+            <Search
+              id="patient-list-search"
+              placeholder={search.placeHolder}
+              labelText=""
+              size={isDesktop(layout) ? 'md' : 'lg'}
+              className={styles.search}
+              onChange={(evnt) => handleSearch(evnt.target.value)}
+              defaultValue={search.currentSearchTerm}
+              {...search?.otherSearchProps}
+            />
+          </Layer>
         </div>
       </div>
       <DataTable rows={patientLists} headers={headers}>
@@ -103,7 +104,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={isDesktop ? styles.desktopHeader : styles.tabletHeader}
+                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}
                       key={header.key}
                       {...getHeaderProps({ header })}
                       isSortable>
@@ -115,7 +116,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
               <TableBody className={styles.tableBody}>
                 {rows.map((row, index) => (
                   <TableRow
-                    className={isDesktop ? styles.desktopRow : styles.tabletRow}
+                    className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
                     key={row.id}
                     {...getRowProps({ row })}>
                     {row.cells.map((cell) => {
@@ -138,9 +139,9 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                               style={{ cursor: 'pointer' }}
                               onClick={() => handleToggleStarred(row.id, !cell.value)}>
                               {cell.value ? (
-                                <StarFilled16 className={styles.interactiveText01} />
+                                <StarFilled size={16} className={styles.interactiveText01} />
                               ) : (
-                                <Star16 className={styles.interactiveText01} />
+                                <Star size={16} className={styles.interactiveText01} />
                               )}
                             </TableCell>
                           );

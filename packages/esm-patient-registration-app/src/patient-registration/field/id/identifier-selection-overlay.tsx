@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect, useState, useContext } from 'react';
-import styles from './identifier-selection.scss';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
+import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
@@ -10,8 +10,8 @@ import {
   isUniqueIdentifierTypeForOffline,
   shouldBlockPatientIdentifierInOfflineMode,
 } from '../../input/custom-input/identifier/utils';
-import { useConfig } from '@openmrs/esm-framework';
 import { initializeIdentifier, setIdentifierSource } from './id-field.component';
+import styles from './identifier-selection.scss';
 
 interface PatientIdentifierOverlayProps {
   setFieldValue: (string, PatientIdentifierValue) => void;

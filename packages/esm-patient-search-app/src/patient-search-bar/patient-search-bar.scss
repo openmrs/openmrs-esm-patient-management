@@ -1,6 +1,6 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .patientSearchWrapper {
   position: relative;
@@ -10,7 +10,7 @@
 .floatingSearchResultsContainer {
   position: absolute;
   overflow-y: auto;
-  box-shadow: 0 $spacing-03 $spacing-05 $ui-03;
+  box-shadow: 0 spacing.$spacing-03 spacing.$spacing-05 $ui-03;
   z-index: 99;
   border: 0 0.063rem 0.063rem 0.063rem solid $ui-03;
   width: 100%;
@@ -19,10 +19,10 @@
 
 .tabletOverlaySearch {
   width: 100vw;
-  border: $spacing-01 solid $carbon--orange-40;
-  margin-right: $spacing-01;
+  border: spacing.$spacing-01 solid colors.$orange-40;
+  margin-right: spacing.$spacing-01;
   position: fixed;
-  top: $spacing-09;
+  top: spacing.$spacing-09;
   right: 0;
   left: 0;
   z-index: 99;
@@ -41,10 +41,10 @@
 }
 
 .orangeBorder {
-  border: 1px solid $carbon--orange-40;
+  border: 1px solid colors.$orange-40;
 }
 
 .searchButton,
 .searchButton:hover {
-  background-color: $carbon--gray-80;
+  background-color: colors.$gray-80;
 }

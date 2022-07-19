@@ -11,12 +11,12 @@ import {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 import { Observation } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -32,7 +32,6 @@ interface EncounterListProps {
 const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visitUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const isDesktop = layout === 'desktop';
   const [headerWidth, setHeaderWidth] = useState(0);
   const headerRef = useRef(null);
 
@@ -69,7 +68,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer>
-            <Table className={styles.customTable} {...getTableProps()} size={!isDesktop ? 'normal' : 'short'}>
+            <Table className={styles.customTable} {...getTableProps()} size={!isDesktop(layout) ? 'normal' : 'short'}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
@@ -97,7 +96,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                     {row.isExpanded && (
                       <TableExpandedRow
                         className={styles.expandedRow}
-                        style={{ paddingLeft: isDesktop ? '3rem' : '4rem' }}
+                        style={{ paddingLeft: isDesktop(layout) ? '3rem' : '4rem' }}
                         colSpan={headers.length + 2}>
                         <div style={{ marginLeft: headerWidth }}>
                           <EncounterObservations observations={encounters[ind].obs} />

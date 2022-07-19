@@ -8,7 +8,7 @@ import {
   FormGroup,
   RadioButton,
   RadioButtonGroup,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { showNotification, showToast, useVisit, openmrsFetch } from '@openmrs/esm-framework';
 import { useServices } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';

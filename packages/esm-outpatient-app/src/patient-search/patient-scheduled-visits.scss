@@ -1,6 +1,6 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   background-color: $ui-background;
@@ -15,38 +15,38 @@
 }
 
 .visitTile {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 
-  &:global(.bx--tile--is-selected:focus) {
+  &:global(.cds--tile--is-selected:focus) {
     background-color: $color-blue-10;
     color: $color-blue-10;
     border: 1px solid $color-blue-60-2;
     outline: none;
   }
 
-  &:global(.bx--tile--is-selected:hover) {
+  &:global(.cds--tile--is-selected:hover) {
     background-color: $color-blue-10;
     color: $color-blue-10;
     border: 1px solid $color-blue-60-2;
     outline: none;
   }
 
-  &:global(.bx--tile--is-selected:hover .bx--tile__checkmark svg) {
+  &:global(.cds--tile--is-selected:hover .cds--tile__checkmark svg) {
     fill: $color-blue-60-2;
   }
 }
 
 .row {
-  margin: 0 $spacing-05 $spacing-05 $spacing-05;
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
 }
 
 .backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: $spacing-03 0 $spacing-03 0rem;
+  margin: spacing.$spacing-03 0 spacing.$spacing-03 0rem;
   padding: 0;
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
 
   button {
     display: flex;
@@ -64,18 +64,17 @@
 }
 
 .heading {
-  @include carbon--type-style('body-long-02');
+  @include type.type-style('body-02');
   color: $text-02;
   margin-left: 1.2rem;
 }
 
 .primaryText {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
+  @include type.type-style('heading-compact-02');
 }
 
 .secondaryText {
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
@@ -90,8 +89,8 @@
 .text-divider {
   display: flex;
   align-items: center;
-  margin: $spacing-06 25%;
-  @include carbon--type-style('productive-heading-02');
+  margin: spacing.$spacing-06 25%;
+  @include type.type-style('heading-compact-02');
   color: $text-02;
 }
 
@@ -104,20 +103,20 @@
 }
 
 .text-divider::before {
-  margin-right: $spacing-05;
+  margin-right: spacing.$spacing-05;
 }
 
 .text-divider::after {
-  margin-left: $spacing-05;
+  margin-left: spacing.$spacing-05;
 }
 
 .buttonContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .prioritySwitcher {
-  margin: $spacing-03 0 $spacing-03;
+  margin: spacing.$spacing-03 0 spacing.$spacing-03;
 }

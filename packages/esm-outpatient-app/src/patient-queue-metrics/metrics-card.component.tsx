@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile, Button } from 'carbon-components-react';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Button, Layer, Tile } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
@@ -15,21 +15,26 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
   const { t } = useTranslation();
 
   return (
-    <Tile className={styles.tileContainer} light={true}>
-      <div className={styles.tileHeader}>
-        <div className={styles.headerLabelContainer}>
-          <label className={styles.headerLabel}>{headerLabel}</label>
-          {children}
+    <Layer>
+      <Tile className={styles.tileContainer}>
+        <div className={styles.tileHeader}>
+          <div className={styles.headerLabelContainer}>
+            <label className={styles.headerLabel}>{headerLabel}</label>
+            {children}
+          </div>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowRight {...props} size={16} />}
+            iconDescription={t('patientList', 'Patient list')}>
+            {t('patientList', 'Patient list')}
+          </Button>
         </div>
-        <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('patientList', 'Patient list')}>
-          {t('patientList', 'Patient list')}
-        </Button>
-      </div>
-      <div>
-        <label className={styles.totalsLabel}>{label}</label>
-        <p className={styles.totalsValue}>{value}</p>
-      </div>
-    </Tile>
+        <div>
+          <label className={styles.totalsLabel}>{label}</label>
+          <p className={styles.totalsValue}>{value}</p>
+        </div>
+      </Tile>
+    </Layer>
   );
 };
 

@@ -2,11 +2,11 @@ import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { useConfig } from '@openmrs/esm-framework';
-import { Loading, Tile } from 'carbon-components-react';
+import { Loading, Tile } from '@carbon/react';
+import { usePatientSearch } from './patient-search.resource';
 import EmptyDataIllustration from './empty-data-illustration.component';
 import PatientSearchResults, { SearchResultSkeleton } from '../patient-search-result/patient-search-result.component';
 import styles from './patient-search.scss';
-import { usePatientSearch } from './patient-search.resource';
 
 const customRepresentation =
   'custom:(patientId,uuid,identifiers,display,' +

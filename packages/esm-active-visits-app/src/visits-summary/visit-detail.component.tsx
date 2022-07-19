@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { Button, DataTableSkeleton } from 'carbon-components-react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { Encounter, useVisit } from './visit.resource';
-import styles from './visit-detail-overview.scss';
+import { formatTime, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
-import { formatTime, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import styles from './visit-detail-overview.scss';
 
 interface VisitDetailComponentProps {
   visitUuid: string;
@@ -14,8 +14,8 @@ interface VisitDetailComponentProps {
 
 const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, patientUuid }) => {
   const { t } = useTranslation();
-  const [listView, setView] = useState(true);
-  const { visit, isError, isLoading, isValidating } = useVisit(visitUuid);
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(0);
+  const { visit, isLoading } = useVisit(visitUuid);
 
   const encounters = useMemo(
     () =>
@@ -43,25 +43,20 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
             <br />
             <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(parseDate(visit?.startDatetime))}</p>
           </h4>
-          <div className={styles.toggleButtons}>
-            <Button
-              className={`${styles.toggle} ${listView ? styles.toggleActive : ''}`}
-              size="small"
-              kind="ghost"
-              onClick={() => setView(true)}>
-              {t('allEncounters', 'All Encounters')}
-            </Button>
-            <Button
-              className={`${styles.toggle} ${!listView ? styles.toggleActive : ''}`}
-              size="small"
-              kind="ghost"
-              onClick={() => setView(false)}>
-              {t('visitSummary', 'Visit Summary')}
-            </Button>
+          <div style={{ margin: '0 1rem' }}>
+            <ContentSwitcher
+              className={styles.contentSwitcher}
+              selectedIndex={contentSwitcherIndex}
+              onChange={({ index }) => setContentSwitcherIndex(index)}>
+              <Switch name="allEncounters" text={t('allEncounters', 'All Encounters')} />
+              <Switch name="visitSummary" text={t('visitSummary', 'Vist Summary')} />
+            </ContentSwitcher>
           </div>
         </div>
-        {listView && visit?.encounters && <EncounterList visitUuid={visit.uuid} encounters={encounters} />}
-        {!listView && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
+        {contentSwitcherIndex === 0 && visit?.encounters && (
+          <EncounterList visitUuid={visit.uuid} encounters={encounters} />
+        )}
+        {contentSwitcherIndex === 1 && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
       </div>
     );
   } else {

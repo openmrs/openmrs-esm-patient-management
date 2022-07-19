@@ -1,11 +1,11 @@
-@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .searchContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin-top: $spacing-05;
+  margin-top: spacing.$spacing-05;
 }
 
 .searchContainer > div {
@@ -29,17 +29,17 @@ div.tableOverride > div {
 }
 
 div#table-tool-bar {
-  margin-top: $carbon--spacing-09;
+  margin-top: spacing.$spacing-09;
 }
 
 .desktopRow,
 .desktopHeader {
-  height: $spacing-07 !important;
+  height: spacing.$spacing-07 !important;
 }
 
 .tabletRow,
 .tabletHeader {
-  height: $spacing-09 !important;
+  height: spacing.$spacing-09 !important;
 }
 
 .paginationOverride {

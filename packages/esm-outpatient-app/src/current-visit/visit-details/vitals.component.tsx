@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { Button, Grid, Row, Tag, Tile } from 'carbon-components-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
-import { PatientVitals } from '../../types/index';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Button, Grid, Layer, Row, Tile } from '@carbon/react';
+import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
-import styles from './triage-note.scss';
-import CircleFillGlyph from '@carbon/icons-react/es/circle--solid/16';
+import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
 import { ConfigObject } from '../../config-schema';
+import { PatientVitals } from '../../types/index';
+import styles from './triage-note.scss';
 
 interface VitalsComponentProps {
   vitals: Array<PatientVitals>;
@@ -32,26 +31,30 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
         <div>
           <Grid className={styles.grid}>
             <Row>
-              <Tile light>
-                <p>{t('temperature', 'Temperature')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>
-                    {vitalsToDisplay.temperature ? vitalsToDisplay.temperature : '--'}
-                  </p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.temperatureUuid) ?? ''}</p>
-                  <p>{}</p>
-                </div>
-              </Tile>
-              <Tile light>
-                <p>{t('bp', 'Bp')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>
-                    {vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'} /
-                    {vitalsToDisplay.systolic ? vitalsToDisplay.diastolic : '--'}
-                  </p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}</p>
-                </div>
-              </Tile>
+              <Layer>
+                <Tile>
+                  <p>{t('temperature', 'Temperature')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>
+                      {vitalsToDisplay.temperature ? vitalsToDisplay.temperature : '--'}
+                    </p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.temperatureUuid) ?? ''}</p>
+                    <p>{}</p>
+                  </div>
+                </Tile>
+              </Layer>
+              <Layer>
+                <Tile>
+                  <p>{t('bp', 'Bp')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>
+                      {vitalsToDisplay.systolic ? vitalsToDisplay.systolic : '--'} /
+                      {vitalsToDisplay.systolic ? vitalsToDisplay.diastolic : '--'}
+                    </p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}</p>
+                  </div>
+                </Tile>
+              </Layer>
               <Tile>
                 <p className={styles.vitalValuesWrapper}>
                   {t('heartRate', 'Heart rate')}
@@ -59,7 +62,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                     vitalsToDisplay.pulse,
                     getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
                   ) !== 'normal' ? (
-                    <CircleFillGlyph className={styles['danger-icon']} />
+                    <CircleFilled className={styles['danger-icon']} size={16} />
                   ) : null}
                 </p>
                 <div className={styles.vitalValuesWrapper}>
@@ -91,53 +94,61 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 </div>
               </Tile>
             </Row>
-
             <Row>
-              <Tile light>
-                <p>{t('sp02', 'Sp02')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>
-                    {vitalsToDisplay.oxygenSaturation ? vitalsToDisplay.oxygenSaturation : '--'}
-                  </p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}</p>
-                </div>
-              </Tile>
-              <Tile light>
-                <p>{t('rRate', 'R. Rate')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>
-                    {vitalsToDisplay.respiratoryRate ? vitalsToDisplay.respiratoryRate : '--'}
-                  </p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}</p>
-                </div>
-              </Tile>
+              <Layer>
+                <Tile>
+                  <p>{t('sp02', 'Sp02')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>
+                      {vitalsToDisplay.oxygenSaturation ? vitalsToDisplay.oxygenSaturation : '--'}
+                    </p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}</p>
+                  </div>
+                </Tile>
+              </Layer>
+              <Layer>
+                <Tile>
+                  <p>{t('rRate', 'R. Rate')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>
+                      {vitalsToDisplay.respiratoryRate ? vitalsToDisplay.respiratoryRate : '--'}
+                    </p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}</p>
+                  </div>
+                </Tile>
+              </Layer>
             </Row>
-
             <Row>
-              <Tile light>
-                <p>{t('height', 'Height')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{vitalsToDisplay.height ? vitalsToDisplay.height : '--'}</p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.heightUuid) ?? ''}</p>
-                </div>
-              </Tile>
-              <Tile light>
-                <p>{t('bmi', 'Bmi')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>
-                    {' '}
-                    {calculateBMI(Number(vitalsToDisplay.weight), Number(vitalsToDisplay.height))}
-                  </p>
-                  <p className={styles.unit}>{config.biometrics['bmiUnit']}</p>
-                </div>
-              </Tile>
-              <Tile light>
-                <p>{t('weight', 'Weight')}</p>
-                <div className={styles.vitalValuesWrapper}>
-                  <p className={styles.vitalValues}>{vitalsToDisplay.weight ? vitalsToDisplay.weight : '--'} </p>
-                  <p className={styles.unit}>{conceptUnits.get(config.concepts.weightUuid) ?? ''}</p>
-                </div>
-              </Tile>
+              <Layer>
+                <Tile>
+                  <p>{t('height', 'Height')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>{vitalsToDisplay.height ? vitalsToDisplay.height : '--'}</p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.heightUuid) ?? ''}</p>
+                  </div>
+                </Tile>
+              </Layer>
+              <Layer>
+                <Tile>
+                  <p>{t('bmi', 'Bmi')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>
+                      {' '}
+                      {calculateBMI(Number(vitalsToDisplay.weight), Number(vitalsToDisplay.height))}
+                    </p>
+                    <p className={styles.unit}>{config.biometrics['bmiUnit']}</p>
+                  </div>
+                </Tile>
+              </Layer>
+              <Layer>
+                <Tile>
+                  <p>{t('weight', 'Weight')}</p>
+                  <div className={styles.vitalValuesWrapper}>
+                    <p className={styles.vitalValues}>{vitalsToDisplay.weight ? vitalsToDisplay.weight : '--'} </p>
+                    <p className={styles.unit}>{conceptUnits.get(config.concepts.weightUuid) ?? ''}</p>
+                  </div>
+                </Tile>
+              </Layer>
             </Row>
           </Grid>
           <p className={styles.subHeading}>
@@ -155,7 +166,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               <Button
                 size="small"
                 kind="ghost"
-                renderIcon={ArrowRight16}
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
                 onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
                 iconDescription={t('vitalsForm', 'Vitals form')}>
                 {t('vitalsForm', 'Vitals form')}

@@ -1,16 +1,16 @@
 import React, { useState, useCallback, useContext, useMemo } from 'react';
-import styles from '../../input.scss';
 import { useTranslation } from 'react-i18next';
-import { Input } from '../../basic-input/input/input.component';
-import { PatientIdentifierValue } from '../../../patient-registration-types';
-import { PatientRegistrationContext } from '../../../patient-registration-context';
-import { TrashCan16, Edit16, Reset16 } from '@carbon/icons-react';
-import { Button } from 'carbon-components-react';
+import { useField } from 'formik';
+import { Button } from '@carbon/react';
+import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
-import { useField } from 'formik';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
+import { PatientIdentifierValue } from '../../../patient-registration-types';
+import { PatientRegistrationContext } from '../../../patient-registration-context';
+import { Input } from '../../basic-input/input/input.component';
+import styles from '../../input.scss';
 
 interface IdentifierInputProps {
   patientIdentifier: PatientIdentifierValue;
@@ -88,7 +88,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       {!autoGeneration && !hideInputField ? (
         <Input
           id={name}
-          light
           labelText={identifierName}
           name={name}
           disabled={disabled}
@@ -119,7 +118,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             iconDescription={t('editIdentifierTooltip', 'Edit')}
             disabled={disabled}
             hasIconOnly>
-            <Edit16 />
+            <Edit size={16} />
           </Button>
         )}
         {initialValue && initialValue !== identifierValue && (
@@ -129,7 +128,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             iconDescription={t('resetIdentifierTooltip', 'Reset')}
             disabled={disabled}
             hasIconOnly>
-            <Reset16 />
+            <Reset size={16} />
           </Button>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
@@ -139,7 +138,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             iconDescription={t('deleteIdentifierTooltip', 'Delete')}
             disabled={disabled}
             hasIconOnly>
-            <TrashCan16 />
+            <TrashCan size={16} />
           </Button>
         )}
       </div>

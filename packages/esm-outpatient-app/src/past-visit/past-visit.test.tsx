@@ -2,14 +2,25 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockPastVisit } from '../../__mocks__/visits.mock';
 import { renderWithSwr } from '../../../../tools/test-helpers';
-import * as mockPastVisitResource from './past-visit.resource';
+import { usePastVisits } from './past-visit.resource';
+
+const mockUsePastVisits = usePastVisits as jest.Mock;
+
+jest.mock('./past-visit.resource', () => ({
+  usePastVisits: jest.fn(),
+}));
 
 describe('PastVisit: ', () => {
-  it('renders an empty state for notes, encounters, medications, and vitals', () => {
-    spyOn(mockPastVisitResource, 'usePastVisits').and.returnValue({ data: mockPastVisit.data.results });
+  it('renders an empty state when notes, encounters, medications, and vitals data is not available', async () => {
+    const user = userEvent.setup();
+
+    mockUsePastVisits.mockReturnValueOnce({
+      data: mockPastVisit.data.results,
+    });
+
     renderPastVisitTabs();
 
     expect(screen.queryAllByText(/vitals/i));
@@ -22,7 +33,7 @@ describe('PastVisit: ', () => {
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
-    userEvent.click(vitalsTab);
+    await user.click(vitalsTab);
 
     expect(vitalsTab).toHaveAttribute('aria-selected', 'true');
     expect(encountersTab).toHaveAttribute('aria-selected', 'false');

@@ -1,3 +1,4 @@
+@use '@carbon/styles/scss/spacing';
 @import '../../patient-registration.scss';
 
 .overlayButtons {
@@ -11,18 +12,18 @@
 
 .radioGroup {
   background-color: $ui-01;
-  padding: $spacing-05;
+  padding: spacing.$spacing-05;
 }
 
 .radioButton {
   margin: 0 !important;
   label {
-    height: $spacing-07;
+    height: spacing.$spacing-07;
   }
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
   .radioButton label {
-    height: $spacing-09 !important;
+    height: spacing.$spacing-09 !important;
   }
 }

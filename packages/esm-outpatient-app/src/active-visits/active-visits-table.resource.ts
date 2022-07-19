@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
-import { last } from 'lodash';
+import last from 'lodash-es/last';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;

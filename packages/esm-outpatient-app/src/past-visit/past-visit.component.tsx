@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { StructuredListSkeleton } from 'carbon-components-react';
-import { parseDate, formatDatetime, OpenmrsResource } from '@openmrs/esm-framework';
+import { StructuredListSkeleton } from '@carbon/react';
+import { parseDate, formatDatetime } from '@openmrs/esm-framework';
 import { usePastVisits } from './past-visit.resource';
-import styles from './past-visit.scss';
 import PastVisitSummary from './past-visit-details/past-visit-summary.component';
-import { Observation } from '../types/index';
+import styles from './past-visit.scss';
+
 interface PastVisitProps {
   patientUuid: string;
 }

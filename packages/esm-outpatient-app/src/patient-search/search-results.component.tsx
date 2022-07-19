@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dropdown } from 'carbon-components-react';
+import { Dropdown } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { SearchTypes } from '../types';
 import PatientInfo from '../patient-info/patient-info.component';

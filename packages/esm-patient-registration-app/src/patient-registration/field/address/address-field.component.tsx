@@ -56,7 +56,7 @@ export const AddressField: React.FC = () => {
       <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
       <div>
         {addressFields.map((attributes) => (
-          <Input key={attributes.name} {...attributes} light />
+          <Input key={attributes.name} {...attributes} />
         ))}
       </div>
     </div>
