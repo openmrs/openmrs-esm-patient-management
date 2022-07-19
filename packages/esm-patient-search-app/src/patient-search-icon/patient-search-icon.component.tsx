@@ -5,7 +5,7 @@ import { Close, Search } from '@carbon/react/icons';
 import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
-import styles from './patient-search-icon.component.scss';
+import styles from './patient-search-icon.scss';
 
 interface PatientSearchLaunchProps {
   location: {

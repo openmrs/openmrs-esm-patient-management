@@ -1,5 +1,6 @@
-@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .heading {
@@ -11,7 +12,7 @@
   background-color: $color-blue-10;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-top: 1px solid $color-blue-20;
+  border-top: 1px solid colors.$blue-20;
   margin-top: spacing.$spacing-01;
 
   & > div {
@@ -20,7 +21,7 @@
   }
 
   & > div:first-child {
-    border-right: 1px solid $carbon--blue-20;
+    border-right: 1px solid colors.$blue-20;
   }
 
   & ul > li {

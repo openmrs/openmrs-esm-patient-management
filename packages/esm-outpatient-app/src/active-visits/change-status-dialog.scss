@@ -10,7 +10,6 @@
   min-height: spacing.$spacing-10;
   width: 100%;
   @include type.type-style('body-compact-01');
-  color: $text-01;
 }
 
 .radioButton {

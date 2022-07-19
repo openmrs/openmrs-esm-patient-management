@@ -54,7 +54,6 @@
 .high {
   &::after {
     @include type.type-style('heading-compact-01');
-    color: $text-01;
   }
 }
 

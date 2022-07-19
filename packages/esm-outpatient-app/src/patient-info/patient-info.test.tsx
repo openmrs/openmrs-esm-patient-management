@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import PatientInfo from './patient-info.component';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { age } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
+import PatientInfo from './patient-info.component';
 
 const mockAge = age as jest.Mock;
 
@@ -20,6 +20,7 @@ describe('Patient Info', () => {
     const user = userEvent.setup();
 
     mockAge.mockReturnValue(35);
+
     renderPatientInfo();
 
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
@@ -40,5 +41,5 @@ describe('Patient Info', () => {
 });
 
 const renderPatientInfo = () => {
-  render(<PatientInfo patient={mockPatient} />);
+  render(<PatientInfo handlePatientInfoClick={() => {}} patient={mockPatient} />);
 };
