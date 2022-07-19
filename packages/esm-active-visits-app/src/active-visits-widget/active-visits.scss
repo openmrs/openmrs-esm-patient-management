@@ -37,6 +37,10 @@
   overflow: hidden;
 }
 
+.hiddenRow {
+  display: none;
+}
+
 .emptyRow {
   padding: 0 1rem;
   display: flex;

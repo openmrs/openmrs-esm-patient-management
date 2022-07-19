@@ -6,6 +6,7 @@ import styles from './overlay.scss';
 
 interface OverlayProps {
   close: () => void;
+  children?: React.ReactNode;
   header: string;
   buttonsGroup?: React.ReactElement;
 }

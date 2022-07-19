@@ -135,10 +135,10 @@ export const SearchResultSkeleton = () => {
         <h2 className={styles.patientName}>
           <SkeletonText />
         </h2>
-        <p className={styles.demographics}>
+        <span className={styles.demographics}>
           <SkeletonIcon /> <span className={styles.middot}>&middot;</span> <SkeletonIcon />{' '}
           <span className={styles.middot}>&middot;</span> <SkeletonIcon />
-        </p>
+        </span>
       </div>
     </div>
   );

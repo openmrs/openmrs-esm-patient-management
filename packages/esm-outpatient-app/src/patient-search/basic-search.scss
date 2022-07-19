@@ -8,6 +8,10 @@
   margin-bottom: spacing.$spacing-05;
 }
 
+.searchboxLayer {
+  flex-grow: 1;
+}
+
 .searchInput {
   input:focus {
     outline: none;
@@ -119,10 +123,6 @@
   padding: spacing.$spacing-03 0rem;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .resultsText {
-  margin: spacing.$spacing-05;
-}
-
 .emptyResultText {
   @include type.type-style('heading-compact-01');
   color: $text-02;
@@ -142,6 +142,5 @@
 }
 
 :global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
-  margin: spacing.$spacing-05;
   background-color: $ui-02;
 }

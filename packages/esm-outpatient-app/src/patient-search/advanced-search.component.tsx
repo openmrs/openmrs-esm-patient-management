@@ -9,9 +9,8 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
-  FlexGrid,
   Layer,
-  Row,
+  Stack,
   Switch,
   TextInput,
 } from '@carbon/react';
@@ -56,8 +55,8 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
   };
 
   return (
-    <Form onSubmit={handleSearch}>
-      <FlexGrid className={styles.grid}>
+    <Form onSubmit={handleSearch} className={styles.form}>
+      <div>
         <div className={styles.backButton}>
           <Button
             kind="ghost"
@@ -68,7 +67,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
             <span>{t('backToSimpleSearch', 'Back to simple search')}</span>
           </Button>
         </div>
-        <Row className={styles.row}>
+        <Stack gap={4} className={styles.grid}>
           <Column>
             <div className={styles.contentSwitcherContainer}>
               <span>{t('match', 'Match')}</span>
@@ -82,8 +81,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
               <span>{t('fields', 'of the following fields')}:</span>
             </div>
           </Column>
-        </Row>
-        <Row className={styles.row}>
+
           <Column>
             <h3 className={styles.heading}>{t('name', 'Name')}</h3>
             <Layer>
@@ -114,9 +112,8 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
               />
             </Layer>
           </Column>
-        </Row>
-        <span className={styles.spacer} />
-        <Row className={styles.row}>
+          <span className={styles.spacer} />
+
           <Column>
             <h3 className={styles.heading}>{t('personalDetails', 'Personal details')}</h3>
             <FormGroup legendText={t('sex', 'Sex')}>
@@ -159,9 +156,8 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
               />
             </Layer>
           </Column>
-        </Row>
-        <span className={styles.spacer} />
-        <Row className={styles.row}>
+          <span className={styles.spacer} />
+
           <Column>
             <h3 className={styles.heading}>{t('lastVisit', 'Last visit')}</h3>
             <Layer>
@@ -177,8 +173,8 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
               </DatePicker>
             </Layer>
           </Column>
-        </Row>
-      </FlexGrid>
+        </Stack>
+      </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.BASIC)}>
           {t('cancel', 'Cancel')}

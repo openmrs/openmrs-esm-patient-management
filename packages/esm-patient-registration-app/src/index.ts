@@ -24,6 +24,8 @@ const resources = {
 };
 
 function setupOpenMRS() {
+  setupOffline();
+
   const options = {
     featureName: 'Patient Registration',
     moduleName,
@@ -39,13 +41,11 @@ function setupOpenMRS() {
     },
   ]);
 
-  setupOffline();
-
   return {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./root.component'), options),
-        route: /^patient-registration/,
+        route: 'patient-registration',
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
           isOffline: false,

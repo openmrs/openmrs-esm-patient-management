@@ -54,7 +54,7 @@ describe('ContactDetails: ', () => {
 
     renderContactDetails();
 
-    expect(screen.getByText(/Place Of Residence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Place of Residence/i)).toBeInTheDocument();
     expect(screen.getByText(/City9564/)).toBeInTheDocument();
     expect(screen.getByText(/Country9564/)).toBeInTheDocument();
     expect(screen.getByText(/18156/)).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('ContactDetails: ', () => {
 
     renderContactDetails();
 
-    expect(screen.getByText(/Place Of Residence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Place of Residence/i)).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
     expect(screen.getAllByText('--').length).toBe(2);
   });

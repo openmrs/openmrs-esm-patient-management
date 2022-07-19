@@ -15,7 +15,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
 
   return (
     <div>
-      <p className={styles.heading}>{t('placeOfResidence', 'Place Of Residence')}</p>
+      <p className={styles.heading}>{t('placeOfResidence', 'Place of Residence')}</p>
       <ul>
         {address ? (
           <>

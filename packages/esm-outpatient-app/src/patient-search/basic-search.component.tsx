@@ -29,11 +29,11 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
   return (
     <div className={patients?.length ? styles.lightBackground : styles.resultsContainer}>
       <div className={styles.searchboxContainer}>
-        <Layer>
+        <Layer className={styles.searchboxLayer}>
           <Search
             autoFocus
             className={styles.searchInput}
-            labelText="Search for a patient"
+            labelText={t('searchForPatient', 'Search for a patient')}
             placeholder={t('searchboxPlaceholder', 'Search for a patient name or ID number')}
             onChange={(event) => handleSearch(event.target.value)}
             onClear={() => setQuery(null)}
@@ -82,7 +82,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
 
           {patients.length === 0 && query !== null && !isLoading && (
             <div className={styles.resultsContainer}>
-              <div>
+              <div style={{ margin: '1rem' }}>
                 <p className={styles.resultsText}>{t('noResultsFound', 'No results found')}</p>
                 <Layer>
                   <Tile className={styles.emptySearchResultsTile}>

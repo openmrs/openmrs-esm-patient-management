@@ -2,6 +2,7 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
+// FIX: This is not ideal
 :global(.cds--side-nav) {
   z-index: 0;
 }
@@ -11,6 +12,13 @@
   background-color: $ui-02;
   padding: 0rem spacing.$spacing-05;
   overflow-y: auto;
+
+  a {
+    text-decoration: none;
+    @include type.type-style('heading-02');
+    color: $text-02;
+    margin: 0rem;
+  }
 }
 
 :global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
@@ -19,7 +27,6 @@
 
 :global(.omrs-breakpoint-gt-tablet) .searchResultsContainer {
   padding: 0;
-  background-color: var(--omrs-color-bg-low-contrast);
   top: spacing.$spacing-09;
 }
 

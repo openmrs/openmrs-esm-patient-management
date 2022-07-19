@@ -2,9 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.container {
+  flex-grow: 1;
+}
+
 .tileContainer {
   border: 0.0625rem solid $ui-03;
-  flex-grow: 1;
   height: 7.875rem;
   padding: 0 spacing.$spacing-05;
   margin: spacing.$spacing-03 spacing.$spacing-03;

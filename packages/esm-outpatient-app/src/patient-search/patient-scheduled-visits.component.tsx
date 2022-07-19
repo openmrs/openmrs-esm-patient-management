@@ -103,41 +103,43 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
 
   return (
     <div className={styles.container}>
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-          iconDescription="Back to search results"
-          size="sm"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
-          <span>{t('backToSearchResults', 'Back to search results')}</span>
-        </Button>
+      <div>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            iconDescription="Back to search results"
+            size="sm"
+            onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
+            <span>{t('backToSearchResults', 'Back to search results')}</span>
+          </Button>
+        </div>
+        <div className={styles.recentlyScheduledVisitsContainer}>
+          <ScheduledVisits
+            visitType={visitType.RECENT}
+            visits={recentVisits}
+            scheduledVisitHeader={t('recentScheduledVisits', { count: recentVisits.length })}
+            isLoading={isLoading}
+          />
+        </div>
+        <ScheduledVisits
+          visitType={visitType.FUTURE}
+          visits={futureVisits}
+          scheduledVisitHeader={t('futureScheduledVisits', { count: futureVisits.length })}
+          isLoading={loading}
+        />
+
+        <div className={styles['text-divider']}>{t('or', 'or')}</div>
+
+        <div className={styles.buttonContainer}>
+          <Button
+            kind="ghost"
+            iconDescription="Start another visit type"
+            onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid)}>
+            {t('anotherVisitType', 'Start another visit type')}
+          </Button>
+        </div>
       </div>
-
-      <ScheduledVisits
-        visitType={visitType.RECENT}
-        visits={recentVisits}
-        scheduledVisitHeader={t('recentScheduledVisits', { count: recentVisits.length })}
-        isLoading={isLoading}
-      />
-      <ScheduledVisits
-        visitType={visitType.FUTURE}
-        visits={futureVisits}
-        scheduledVisitHeader={t('futureScheduledVisits', { count: futureVisits.length })}
-        isLoading={loading}
-      />
-
-      <div className={styles['text-divider']}>{t('or', 'Or')}</div>
-
-      <div className={styles.buttonContainer}>
-        <Button
-          kind="ghost"
-          iconDescription="Start another visit type"
-          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid)}>
-          {t('anotherVisitType', 'Start another visit type')}
-        </Button>
-      </div>
-
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button
           className={styles.button}

@@ -13,6 +13,7 @@ import {
   Row,
   Select,
   SelectItem,
+  Stack,
   Switch,
   TimePicker,
   TimePickerSelect,
@@ -143,21 +144,39 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <div className={styles.container}>
-          <div className={styles.backButton}>
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-            </Button>
-          </div>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
+            size="sm"
+            onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
+            <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
+          </Button>
+        </div>
+        <Stack gap={8} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              <Layer>
+              {isTablet ? (
+                <Layer>
+                  <DatePicker
+                    dateFormat="d/m/Y"
+                    datePickerType="single"
+                    id="visitDate"
+                    style={{ paddingBottom: '1rem' }}
+                    maxDate={new Date().toISOString()}
+                    onChange={([date]) => setVisitDate(date)}
+                    value={visitDate}>
+                    <DatePickerInput
+                      id="visitStartDateInput"
+                      labelText={t('date', 'Date')}
+                      placeholder="dd/mm/yyyy"
+                      style={{ width: '100%' }}
+                    />
+                  </DatePicker>
+                </Layer>
+              ) : (
                 <DatePicker
                   dateFormat="d/m/Y"
                   datePickerType="single"
@@ -173,7 +192,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     style={{ width: '100%' }}
                   />
                 </DatePicker>
-              </Layer>
+              )}
               {isTablet ? (
                 <Layer>
                   <TimePicker
@@ -281,7 +300,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <ContentSwitcher
               selectedIndex={contentSwitcherIndex}
               className={styles.contentSwitcher}
-              size="lg"
               onChange={({ index }) => setContentSwitcherIndex(index)}>
               <Switch name="recommended" text={t('recommended', 'Recommended')} />
               <Switch name="all" text={t('all', 'All')} />
@@ -319,7 +337,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               />
             </section>
           )}
-        </div>
+        </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={closePanel}>

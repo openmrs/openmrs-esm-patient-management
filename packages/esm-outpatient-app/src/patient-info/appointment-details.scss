@@ -1,11 +1,18 @@
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetCard {
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$blue-20;
+  border-left: none;
+  border-right: none;
   background-color: $color-blue-10;
-  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
+  padding: spacing.$spacing-05;
+
+  &:last-of-type {
+    border: none;
+  }
 }
 
 .title {

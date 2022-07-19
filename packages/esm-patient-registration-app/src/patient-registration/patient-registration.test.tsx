@@ -2,15 +2,23 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showToast, useConfig } from '@openmrs/esm-framework';
-import * as mockOpenmrsFramework from '@openmrs/esm-framework/mock';
+import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
+import FormManager from './form-manager';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { saveEncounter, savePatient } from './patient-registration.resource';
+import { Encounter } from './patient-registration-types';
 import { Resources, ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
-import * as patientRegistrationResource from './patient-registration.resource';
-import { Encounter } from './patient-registration-types';
 import { RegistrationConfig } from '../config-schema';
-import FormManager from './form-manager';
+
+const mockedUseConfig = useConfig as jest.Mock;
+const mockedUsePatient = usePatient as jest.Mock;
+const mockedSaveEncounter = saveEncounter as jest.Mock;
+const mockedSavePatient = savePatient as jest.Mock;
+const mockedShowToast = showToast as jest.Mock;
+
+// Mock field.resource using the manual mock (in __mocks__)
+jest.mock('./field/field.resource');
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
@@ -19,6 +27,15 @@ jest.mock('react-router-dom', () => ({
   }),
   useHistory: () => [],
 }));
+
+jest.mock('./patient-registration.resource', () => {
+  const originalModule = jest.requireActual('./patient-registration.resource');
+
+  return {
+    ...originalModule,
+    savePatient: jest.fn(),
+  };
+});
 
 const predefinedAddressTemplate = {
   results: [
@@ -72,18 +89,6 @@ let mockOpenmrsConfig: RegistrationConfig = {
 
 const path = `/patient/:patientUuid/edit`;
 
-const sampleMatchProp: match<{ patientUuid: string }> = {
-  isExact: false,
-  path,
-  url: path.replace(':patientUuid', '1'),
-  params: { patientUuid: '1' },
-};
-
-const mockUseConfig = useConfig as jest.Mock;
-
-// Mock field.resource using the manual mock (in __mocks__)
-jest.mock('./field/field.resource');
-
 const configWithObs = JSON.parse(JSON.stringify(mockOpenmrsConfig));
 configWithObs.fieldDefinitions = [
   {
@@ -122,17 +127,6 @@ configWithObs.sectionDefinitions?.push({
 configWithObs.sections.push('custom');
 configWithObs.registrationObs.encounterTypeUuid = 'reg-enc-uuid';
 
-jest.mock('./patient-registration.resource', () => ({
-  ...(jest.requireActual('./patient-registration.resource') as any),
-  savePatient: jest.fn(),
-  saveEncounter: jest.fn(),
-}));
-
-const mockSavePatient = patientRegistrationResource.savePatient as jest.Mock;
-const mockSaveEncounter = patientRegistrationResource.saveEncounter as jest.Mock;
-
-const mockShowToast = showToast as jest.Mock;
-
 const fillRequiredFields = async () => {
   const user = userEvent.setup();
 
@@ -152,11 +146,10 @@ const fillRequiredFields = async () => {
 
 describe('patient registration', () => {
   beforeEach(() => {
-    mockUseConfig.mockReturnValue(mockOpenmrsConfig);
-    mockSavePatient.mockClear();
-    mockSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
-    mockSaveEncounter.mockClear();
-    mockShowToast.mockClear();
+    mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
+    mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
+    mockedSaveEncounter.mockClear();
+    mockedShowToast.mockClear();
   });
 
   it.only('renders without crashing', () => {
@@ -195,9 +188,8 @@ describe('patient registration', () => {
 
     await fillRequiredFields();
     await user.click(await screen.findByText('Register Patient'));
-
     await waitFor(() => {
-      expect(patientRegistrationResource.savePatient).toHaveBeenCalledWith(
+      expect(mockedSavePatient).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({
           identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }
@@ -222,11 +214,11 @@ describe('patient registration', () => {
   it('should not save the patient if validation fails', async () => {
     const user = userEvent.setup();
 
-    const mockSavePatientForm = jest.fn();
+    const mockedSavePatientForm = jest.fn();
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Router>
-          <PatientRegistration isOffline={false} savePatientForm={mockSavePatientForm} />
+          <PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />
         </Router>
       </ResourcesContext.Provider>,
     );
@@ -234,17 +226,17 @@ describe('patient registration', () => {
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
     await user.type(givenNameInput, '');
-
     await user.click(screen.getByText('Register Patient'));
 
-    expect(mockSavePatientForm).not.toHaveBeenCalled();
+    expect(mockedSavePatientForm).not.toHaveBeenCalled();
   });
 
   it.skip('edits patient demographics', async () => {
     const user = userEvent.setup();
 
-    spyOn(patientRegistrationResource, 'savePatient').and.returnValue(Promise.resolve({}));
-    spyOn(mockOpenmrsFramework, 'usePatient').and.returnValue({
+    mockedSavePatient.mockResolvedValue({});
+
+    mockedUsePatient.mockReturnValueOnce({
       isLoading: false,
       patient: mockPatient,
       patientUuid: mockPatient.id,
@@ -281,7 +273,7 @@ describe('patient registration', () => {
     await user.type(address1, 'Bom Jesus Street');
     await user.click(screen.getByText('Update Patient'));
 
-    expect(patientRegistrationResource.savePatient).toHaveBeenCalledWith(
+    expect(mockedSavePatient).toHaveBeenCalledWith(
       expect.anything(),
       {
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
@@ -334,8 +326,8 @@ describe('patient registration', () => {
   it('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
-    mockSaveEncounter.mockResolvedValue({});
-    mockUseConfig.mockReturnValue(configWithObs);
+    mockedSaveEncounter.mockResolvedValue({});
+    mockedUseConfig.mockReturnValue(configWithObs);
 
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
@@ -356,9 +348,9 @@ describe('patient registration', () => {
 
     await user.click(screen.getByText('Register Patient'));
 
-    await waitFor(() => expect(mockSavePatient).toHaveBeenCalled());
+    await waitFor(() => expect(mockedSavePatient).toHaveBeenCalled());
     await waitFor(() =>
-      expect(mockSaveEncounter).toHaveBeenCalledWith(
+      expect(mockedSaveEncounter).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining<Partial<Encounter>>({
           encounterType: 'reg-enc-uuid',
@@ -376,7 +368,7 @@ describe('patient registration', () => {
   it('retries saving registration obs after a failed attempt', async () => {
     const user = userEvent.setup();
 
-    mockUseConfig.mockReturnValue(configWithObs);
+    mockedUseConfig.mockReturnValue(configWithObs);
 
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
@@ -391,21 +383,21 @@ describe('patient registration', () => {
     const weight = within(customSection).getByLabelText('Weight (kg)');
     await user.type(weight, '-999');
 
-    mockSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
+    mockedSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
 
     await user.click(screen.getByText('Register Patient'));
 
-    await waitFor(() => expect(mockSavePatient).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(mockSaveEncounter).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(1));
     await waitFor(() =>
-      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ description: 'an error message' })),
+      expect(mockedShowToast).toHaveBeenCalledWith(expect.objectContaining({ description: 'an error message' })),
     );
 
-    mockSaveEncounter.mockResolvedValue({});
+    mockedSaveEncounter.mockResolvedValue({});
 
     await user.click(screen.getByText('Register Patient'));
-    await waitFor(() => expect(mockSavePatient).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(mockSaveEncounter).toHaveBeenCalledTimes(2));
-    await waitFor(() => expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })));
+    await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(mockedShowToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })));
   });
 });

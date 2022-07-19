@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from '@carbon/react';
+import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
+import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import NotesSummary from './notes-summary.component';
+import MedicationSummary from './medications-summary.component';
+import TestsSummary from './tests-summary.component';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
-import MedicationSummary from './medications-summary.component';
-import NotesSummary from './notes-summary.component';
-import TestsSummary from './tests-summary.component';
-import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -71,46 +71,44 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
 
   return (
     <div className={styles.summaryContainer}>
-      <p className={styles.productiveHeading01}>{t('diagnoses', 'Diagnoses')}</p>
-      <div className={`${styles.caption01} ${styles.diagnosesList}`}>
+      <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
+
+      <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          diagnoses.map((d: DiagnosisItem, ind) => (
-            <span
-              key={ind}
-              className={`${styles.diagnosis} ${
-                d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
-              }`}>
-              {d.diagnosis}
-            </span>
+          diagnoses.map((diagnosis, i) => (
+            <Tag key={i} type={diagnosis.order === 'Primary' ? 'blue' : 'red'}>
+              {diagnosis.diagnosis}
+            </Tag>
           ))
         ) : (
-          <span className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
+          <p className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
-          </span>
+          </p>
         )}
       </div>
       <Tabs className={styles.verticalTabs}>
-        <Tab
-          className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
-          onClick={() => setSelectedTab(0)}
-          id="notes-tab"
-          label={t('notes', 'Notes')}>
-          <NotesSummary notes={notes} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
-          onClick={() => setSelectedTab(1)}
-          id="tests-tab"
-          label={t('tests', 'Tests')}>
-          <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
-          onClick={() => setSelectedTab(2)}
-          id="tab-3"
-          label={t('medications', 'Medications')}>
-          <MedicationSummary medications={medications} />
-        </Tab>
+        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab className={`${styles.tab} ${styles.bodyLong01}`} onClick={() => setSelectedTab(0)} id="notes-tab">
+            {t('notes', 'Notes')}
+          </Tab>
+          <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">
+            {t('tests', 'Tests')}
+          </Tab>
+          <Tab className={styles.tab} onClick={() => setSelectedTab(2)} id="tab-3">
+            {t('medications', 'Medications')}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <NotesSummary notes={notes} />
+          </TabPanel>
+          <TabPanel>
+            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+          </TabPanel>
+          <TabPanel>
+            <MedicationSummary medications={medications} />
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </div>
   );

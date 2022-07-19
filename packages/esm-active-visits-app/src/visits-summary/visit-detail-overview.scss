@@ -76,9 +76,15 @@
 }
 
 .summaryContainer {
-  margin-left: 1rem;
+  background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
+  padding: 1rem 0rem;
+  margin: 0 1rem;
+
+  :global(.cds--tabs) {
+    max-height: fit-content;
+  }
 }
 
 .flexSections {
@@ -87,38 +93,55 @@
 
 .verticalTabs {
   margin: 1rem 0;
-}
+  scroll-behavior: smooth;
 
-.verticalTabs > ul {
-  flex-direction: column !important;
+  > ul {
+    flex-direction: column !important;
+  }
+
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0rem;
+  }
+
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
+    border-bottom: 0 !important;
+    border-left: 2px solid $color-gray-30;
+  }
 }
 
 .tab {
-  margin-left: 0 !important;
+  outline: 0;
+  outline-offset: 0;
+
+  &:active,
+  &:focus {
+    outline: 2px solid var(--brand-03) !important;
+  }
+
+  &[aria-selected='true'] {
+    border-left: 3px solid var(--brand-03);
+    border-bottom: none;
+    font-weight: 600;
+    margin-left: 0rem !important;
+  }
+
+  &[aria-selected='false'] {
+    border-bottom: none;
+    border-left: 2px solid $ui-03;
+    margin-left: 0rem !important;
+  }
 }
 
-.tab > button {
-  border-bottom: 0 !important;
-  border-left: 3px solid $ui-03 !important;
-}
+.tablist {
+  :global(.cds--tab--list) {
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-x: visible;
+  }
 
-.tab > button,
-.tab > button:focus,
-.tab > button:active {
-  outline: 0 !important;
-  outline-offset: 0 !important;
-}
-
-.selectedTab > button {
-  border-left: 3px solid #007d79 !important;
-  border-bottom: 0 !important;
-  font-weight: 600 !important;
-}
-
-.tabContent {
-  border-top: 1px solid $ui-03;
-  padding: 1rem 0;
-  width: 70%;
+  > button :global(.cds--tabs .cds--tabs__nav-link) {
+    border-bottom: none;
+  }
 }
 
 .medicationBlock {
@@ -132,30 +155,18 @@
   margin-top: 0;
 }
 
+.diagnosisLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: 5px;
+}
+
 .diagnosesList {
   display: flex;
+  flex-flow: row wrap;
   padding-bottom: 0.5rem;
   margin: 0 1rem;
   border-bottom: 1px solid $ui-03;
-}
-
-.diagnosis {
-  border-radius: 12px;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
-  margin: 0 0.5rem 0.5rem 0;
-}
-
-.primaryDiagnose {
-  background-color: #d0e2ff;
-  color: #0043ce;
-}
-
-.secondaryDiagnose {
-  background-color: #ffd7d9;
-  color: #a2191f;
 }
 
 .testSummaryExtension p {

@@ -109,7 +109,7 @@ export const esmPatientRegistrationSchema = {
       type: {
         _type: Type.String,
         _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [validators.oneOf(['person attribute', 'obs'])],
+        // _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,

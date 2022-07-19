@@ -107,12 +107,10 @@ const PatientListList: React.FC = () => {
             {t('newList', 'New List')}
           </Button>
         </div>
-        <Tabs
-          className={styles.tabs}
-          type="container"
-          tabContentClassName={styles.hiddenTabsContent}
-          onSelectionChange={setSelectedTab}>
-          <TabList aria-label="List tabs">{createLabels()}</TabList>
+        <Tabs className={styles.tabs} tabContentClassName={styles.hiddenTabsContent} onSelectionChange={setSelectedTab}>
+          <TabList aria-label="List tabs" contained>
+            {createLabels()}
+          </TabList>
         </Tabs>
         <div className={styles.patientListTableContainer}>
           <PatientListTable

@@ -17,7 +17,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
   const { t } = useTranslation();
 
   return (
-    <Layer>
+    <Layer className={styles.container}>
       <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>

@@ -17,6 +17,7 @@ import {
   TableToolbarContent,
   TableExpandRow,
   TableExpandHeader,
+  TableExpandedRow,
   Tile,
 } from '@carbon/react';
 import {
@@ -67,8 +68,8 @@ const ActiveVisitsTable = () => {
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
 
-  const currentPathName: string = window.location.pathname;
-  const fromPage: string = getOriginFromPathName(currentPathName);
+  const currentPathName = window.location.pathname;
+  const fromPage = getOriginFromPathName(currentPathName);
 
   const headerData = useMemo(
     () => [
@@ -159,7 +160,7 @@ const ActiveVisitsTable = () => {
           rows={paginatedActiveVisits}
           headers={headerData}
           size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles>
+          useZebraStyles={activeVisits?.length > 1 ? true : false}>
           {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar>
@@ -213,7 +214,7 @@ const ActiveVisitsTable = () => {
                           </th>
                         </TableRow>
                       ) : (
-                        <div />
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                       )}
                     </React.Fragment>
                   ))}
@@ -223,10 +224,10 @@ const ActiveVisitsTable = () => {
                 <p
                   style={{
                     height: isDesktop(layout) ? '2rem' : '3rem',
-                    marginLeft: isDesktop(layout) ? '2rem' : '3rem',
+                    margin: '1rem 1.5rem',
                   }}
                   className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                  {t('noVisitsFound', 'No visits found')}
+                  {t('noVisitsFound', 'No matching visits found')}
                 </p>
               )}
               <Pagination

@@ -27,8 +27,8 @@ const PatientListActionButton: React.FC = () => {
       renderIcon={(props) => <ListBulleted {...props} />}
       hasIconOnly
       iconDescription={t('patientList', 'Patient list')}
-      tooltipAlignment="start"
-      tooltipPosition="left"
+      tooltipAlignment="end"
+      tooltipPosition="bottom"
     />
   );
 };

@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh);
+  height: calc(100vh - 6rem);
 }
 
 .grid {
@@ -15,7 +15,7 @@
 }
 
 .visitTile {
-  margin: spacing.$spacing-05;
+  margin: spacing.$spacing-05 0;
 
   &:global(.cds--tile--is-selected:focus) {
     background-color: $color-blue-10;
@@ -36,6 +36,11 @@
   }
 }
 
+.recentlyScheduledVisitsContainer {
+  margin-top: spacing.$spacing-06;
+  margin-bottom: spacing.$spacing-10;
+}
+
 .row {
   margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
 }
@@ -44,7 +49,7 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03 0rem;
+  margin: spacing.$spacing-03 0;
   padding: 0;
   @include type.type-style('body-compact-01');
 
@@ -89,8 +94,8 @@
 .text-divider {
   display: flex;
   align-items: center;
-  margin: spacing.$spacing-06 25%;
-  @include type.type-style('heading-compact-02');
+  margin: spacing.$spacing-08 25%;
+  @include type.type-style('heading-03');
   color: $text-02;
 }
 
