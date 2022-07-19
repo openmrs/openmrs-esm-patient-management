@@ -48,7 +48,7 @@
 }
 
 .headerContent {
-  @include type.style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   padding: 0 spacing.$spacing-05;
   color: $ui-05;
 }

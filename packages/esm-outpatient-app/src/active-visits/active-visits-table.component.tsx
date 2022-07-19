@@ -43,8 +43,6 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
-import CurrentVisit from '../current-visit/current-visit-summary.component';
-import Edit16 from '@carbon/icons-react/es/edit/16';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -143,7 +141,7 @@ function EditMenu({
       iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
       className={styles.editStatusBtn}
       hasIconOnly
-      renderIcon={Edit16}
+      renderIcon={(props) => <Edit size={16} {...props} />}
     />
   );
 }

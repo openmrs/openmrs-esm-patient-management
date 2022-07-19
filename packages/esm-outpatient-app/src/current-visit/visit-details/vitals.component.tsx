@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Grid, Layer, Row, Tile } from '@carbon/react';
-import { ArrowRight, CircleFillGlyph } from '@carbon/react/icons';
+import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
@@ -62,7 +62,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                     vitalsToDisplay.pulse,
                     getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
                   ) !== 'normal' ? (
-                    <CircleFillGlyph className={styles['danger-icon']} size={16} />
+                    <CircleFilled className={styles['danger-icon']} size={16} />
                   ) : null}
                 </p>
                 <div className={styles.vitalValuesWrapper}>
