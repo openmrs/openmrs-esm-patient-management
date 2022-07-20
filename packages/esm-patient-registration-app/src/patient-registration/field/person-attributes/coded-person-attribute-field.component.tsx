@@ -26,7 +26,7 @@ export function CodedPersonAttributeField({
           name={`attributes.${personAttributeType.uuid}`}
           labelText={label ?? personAttributeType?.display}
           light>
-          <SelectItem value={''} text="" />
+          <SelectItem value="" text="" />
           {conceptAnswers.map((answer) => (
             <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
           ))}
