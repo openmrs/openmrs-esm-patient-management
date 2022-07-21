@@ -15,12 +15,17 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration-types';
+import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
+import {
+  cancelRegistration,
+  filterUndefinedPatientIdenfier,
+  parseAddressTemplateXml,
+  scrollIntoView,
+} from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
@@ -95,10 +100,12 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
+    const updatedFormValues = { ...values, identifiers: filterUndefinedPatientIdenfier(values.identifiers) };
+
     try {
       await savePatientForm(
         !inEditMode,
-        values,
+        updatedFormValues,
         patientUuidMap,
         initialAddressFieldValues,
         capturePhotoProps,
