@@ -1,6 +1,6 @@
 # esm-patient-registration-app
 
-## Configuring the Registration App to show your custom content
+## Configuring the Registration App to collect custom observations
 
 [PR-221](https://github.com/openmrs/openmrs-esm-patient-management/pull/221) made it possible to configure the registration app to include obs, as demoed in the gif video below, using fieldDefinitions:
 
