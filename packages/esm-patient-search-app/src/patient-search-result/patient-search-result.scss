@@ -1,20 +1,17 @@
 @import 'carbon-components/scss/globals/scss/typography.scss';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.patientChart {
+.patientSearchResult {
   text-decoration: none;
-}
-:global(.omrs-breakpoint-gt-tablet) .patientChart {
-  background-color: $ui-02;
-  margin: 0rem 1rem;
-}
-
-.container {
-  border-bottom: 0.063rem solid $ui-03;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid $ui-03;
+  padding: 0 $spacing-04;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .container {
-  padding: 1rem 1rem;
+.patientSearchResult:hover,
+.patientSearchResult:focus {
+  background-color: $ui-01;
 }
 
 .patientBanner {
@@ -22,14 +19,14 @@
 }
 
 .patientName {
-  @include carbon--type-style('productive-heading-03');
-  color: $text-01;
+  @include carbon--type-style('productive-heading-02');
+  color: $text-02;
 }
 
 .patientAvatar {
-  width: 5rem;
-  height: 5rem;
-  margin: 1rem 1rem 1rem 0;
+  width: $spacing-09;
+  height: $spacing-09;
+  margin: $spacing-03 $spacing-05 $spacing-03 0;
   border-radius: 1px;
 }
 
@@ -37,14 +34,14 @@
   width: 100%;
   display: flex;
   flex-flow: column wrap;
-  margin: 1rem 0;
+  margin: $spacing-05;
   cursor: pointer;
 }
 
 .demographics {
-  @include carbon--type-style('body-short-02');
+  margin-top: $spacing-03;
+  @include carbon--type-style('body-short-01');
   color: $text-02;
-  margin: 0.3rem 0;
 }
 
 .identifiers {
@@ -53,6 +50,10 @@
 }
 
 .actionsContainer {
-  padding-top: 0.5rem;
-  margin-top: 1rem;
+  padding-top: $spacing-03;
+  margin-top: $spacing-05;
+}
+
+.middot {
+  margin: 0 $spacing-03;
 }

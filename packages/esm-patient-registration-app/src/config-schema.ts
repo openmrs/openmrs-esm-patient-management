@@ -9,14 +9,14 @@ export interface SectionDefinition {
 export interface FieldDefinition {
   id: string;
   type: string;
-  label: string;
+  label: string | null;
   uuid: string;
   placeholder: string;
   validation: {
     required: boolean;
-    matches: string;
+    matches: string | null;
   };
-  answerConceptSetUuid: string;
+  answerConceptSetUuid: string | null;
 }
 
 export interface RegistrationConfig {
@@ -38,6 +38,11 @@ export interface RegistrationConfig {
     patientPhotoUuid: string;
   };
   defaultPatientIdentifierTypes: Array<string>;
+  registrationObs: {
+    encounterTypeUuid: string | null;
+    encounterProviderRoleUuid: string;
+    registrationFormUuid: string | null;
+  };
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -95,6 +100,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _description:
           'How this field will be referred to in the `fields` element of the `sectionDefinitions` configuration.',
+      },
+      type: {
+        _type: Type.String,
+        _description: "How this field's data will be stored—a person attribute or an obs.",
+        _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -162,7 +172,6 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
-
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
@@ -170,4 +179,77 @@ export const esmPatientRegistrationSchema = {
     },
     _default: [],
   },
+  registrationObs: {
+    encounterTypeUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'Obs created during registration will be associated with an encounter of this type. This must be set in order to use fields of type `obs`.',
+    },
+    encounterProviderRoleUuid: {
+      _type: Type.UUID,
+      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+      _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
+    },
+    registrationFormUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'The form UUID to associate with the registration encounter. By default no form will be associated.',
+    },
+  },
+  _validators: [
+    validator(
+      (config: RegistrationConfig) =>
+        !config.fieldDefinitions.some((d) => d.type == 'obs') || config.registrationObs.encounterTypeUuid != null,
+      "If fieldDefinitions contains any fields of type 'obs', `registrationObs.encounterTypeUuid` must be specified.",
+    ),
+    validator(
+      (config: RegistrationConfig) =>
+        config.sections.every((s) =>
+          [...builtInSections, ...config.sectionDefinitions].map((sDef) => sDef.id).includes(s),
+        ),
+      (config: RegistrationConfig) => {
+        const allowedSections = [...builtInSections, ...config.sectionDefinitions].map((sDef) => sDef.id);
+        const badSection = config.sections.find((s) => !allowedSections.includes(s));
+        return (
+          `'${badSection}' is not a valid section ID. Valid section IDs include the built-in sections ${stringifyDefinitions(
+            builtInSections,
+          )}` +
+          (config.sectionDefinitions.length
+            ? `; and the defined sections ${stringifyDefinitions(config.sectionDefinitions)}.`
+            : '.')
+        );
+      },
+    ),
+    validator(
+      (config: RegistrationConfig) =>
+        config.sectionDefinitions.every((sectionDefinition) =>
+          sectionDefinition.fields.every((f) =>
+            [...builtInFields, ...config.fieldDefinitions.map((fDef) => fDef.id)].includes(f),
+          ),
+        ),
+      (config: RegistrationConfig) => {
+        const allowedFields = [...builtInFields, ...config.fieldDefinitions.map((fDef) => fDef.id)];
+        const badSection = config.sectionDefinitions.find((sectionDefinition) =>
+          sectionDefinition.fields.some((f) => !allowedFields.includes(f)),
+        );
+        const badField = badSection.fields.find((f) => !allowedFields.includes(f));
+        return (
+          `The section definition '${
+            badSection.id
+          }' contains an invalid field '${badField}'. 'fields' can only contain the built-in fields '${builtInFields.join(
+            "', '",
+          )}'` +
+          (config.fieldDefinitions.length
+            ? `; or the defined fields ${stringifyDefinitions(config.fieldDefinitions)}.`
+            : '.')
+        );
+      },
+    ),
+  ],
 };
+
+function stringifyDefinitions(sectionDefinitions: Array<SectionDefinition | FieldDefinition>) {
+  return `'${sectionDefinitions.map((s) => s.id).join("', '")}'`;
+}

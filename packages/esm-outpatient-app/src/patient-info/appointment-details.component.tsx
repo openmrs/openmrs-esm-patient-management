@@ -26,13 +26,13 @@ const PastAppointmentDetails: React.FC<PastAppointmentDetailsProps> = ({ pastApp
       {pastAppointments.length >= 1 ? (
         pastAppointments.map((appointment, index) => {
           return (
-            <>
+            <React.Fragment key={`past-appointment-${index}`}>
               <p className={styles.title}>{t('lastEncounter', 'Last encounter')}</p>
               <p className={styles.subtitle}>
                 {formatDatetime(parseDate(appointment.startDateTime))} · {appointment.service.name} ·{' '}
                 {appointment.location.name}{' '}
               </p>
-            </>
+            </React.Fragment>
           );
         })
       ) : (
@@ -52,13 +52,13 @@ const UpcomingAppointmentDetails: React.FC<UpcomingAppointmentDetailsProps> = ({
       {upcomingAppointments.length >= 1 ? (
         upcomingAppointments.map((appointment, index) => {
           return (
-            <>
+            <React.Fragment key={`upcoming-appointment-${index}`}>
               <p className={styles.title}>{t('returnDate', 'Return date')}</p>
               <p className={styles.subtitle}>
                 {formatDatetime(parseDate(appointment.startDateTime))} · {appointment.service.name} ·{' '}
                 {appointment.location.name}{' '}
               </p>
-            </>
+            </React.Fragment>
           );
         })
       ) : (

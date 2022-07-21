@@ -1,30 +1,18 @@
 import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
 import { RelationshipValue } from '../../patient-registration-types';
-import useSWRImmutable from 'swr/immutable';
+import useSWR from 'swr';
 import { useMemo } from 'react';
-
-const customRepresentation =
-  'custom:(display,uuid,' +
-  'personA:(age,display,birthdate,uuid),' +
-  'personB:(age,display,birthdate,uuid),' +
-  'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
+import { personRelationshipRepresentation } from '../../../constants';
 
 export function useInitialPatientRelationships(patientUuid: string): {
   data: Array<RelationshipValue>;
   isLoading: boolean;
 } {
   const shouldFetch = !!patientUuid;
-  const { data, error } = useSWRImmutable<FetchResponse<RelationshipsResponse>, Error>(
-    shouldFetch ? `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}` : null,
+  const { data, error } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
+    shouldFetch ? `/ws/rest/v1/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}` : null,
     openmrsFetch,
   );
-  if (error) {
-    showToast({
-      title: error.name,
-      description: error.message,
-      kind: 'error',
-    });
-  }
 
   const result = useMemo(() => {
     const relationships: Array<RelationshipValue> | undefined = data?.data?.results.map((r) =>
@@ -54,9 +42,10 @@ export function useInitialPatientRelationships(patientUuid: string): {
     );
     return {
       data: relationships,
+      error,
       isLoading: !data && !error,
     };
-  }, [data, error]);
+  }, [patientUuid, data, error]);
 
   return result;
 }

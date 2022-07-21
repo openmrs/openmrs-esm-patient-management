@@ -67,6 +67,13 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        id: 'edit-queue-entry-status-modal',
+        load: getAsyncLifecycle(() => import('./active-visits/change-status-dialog.component'), {
+          featureName: 'edit queue status',
+          moduleName,
+        }),
+      },
     ],
   };
 }

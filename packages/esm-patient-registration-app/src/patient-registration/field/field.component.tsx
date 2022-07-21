@@ -2,7 +2,7 @@ import React from 'react';
 import { PhoneEmailField } from './email/email-field.component';
 import { NameField } from './name/name-field.component';
 import { GenderField } from './gender/gender-field.component';
-import { IdField } from './id/id-field.component';
+import { Identifiers } from './id/id-field.component';
 import { DobField } from './dob/dob.component';
 import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, RegistrationConfig } from '../../config-schema';
@@ -38,7 +38,7 @@ export function Field({ name }: FieldProps) {
     case 'address':
       return <AddressHierarchy />;
     case 'id':
-      return <IdField />;
+      return <Identifiers />;
     case 'phone & email':
       return <PhoneEmailField />;
     default:

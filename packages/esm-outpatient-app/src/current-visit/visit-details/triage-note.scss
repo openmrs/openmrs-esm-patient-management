@@ -74,3 +74,7 @@
 .critically-high::after {
   content: ' ↑↑';
 }
+
+.bodyLong01 {
+  @include carbon--type-style('body-long-01');
+}

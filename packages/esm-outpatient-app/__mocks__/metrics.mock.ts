@@ -3,3 +3,5 @@ export const mockMetrics = {
   waiting: 8,
   averageMinutes: 28,
 };
+
+export const mockServices = ['Clinical consultation', 'Triage'];

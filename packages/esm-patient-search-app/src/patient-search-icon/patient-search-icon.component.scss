@@ -12,32 +12,8 @@
   outline: none;
 }
 
-// desktop mode styling
-:global(.omrs-breakpoint-gt-tablet) .searchArea {
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
+.patientSearchBar {
   width: 50vw;
-  border: $spacing-01 solid $carbon--orange-40;
-  height: calc($spacing-08 - 0.25rem);
-  margin-right: $spacing-01;
-  width: 50vw;
-}
-
-// tablet mode styling
-:global(.omrs-breakpoint-lt-desktop) .searchArea {
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-  width: 100vw;
-  border: $spacing-01 solid $carbon--orange-40;
-  margin-right: $spacing-01;
-  position: fixed;
-  top: $spacing-09;
-  right: 0;
-  left: 0;
 }
 
 .searchIconButton {
@@ -46,12 +22,4 @@
 
 .activeSearchIconButton {
   @include brand-02(background-color);
-}
-
-.closeButton {
-  @include brand-02(background-color);
-}
-
-.searchButton {
-  background-color: $carbon--gray-80;
 }

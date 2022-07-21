@@ -1,4 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  fetchCurrentPatient,
+  getAsyncLifecycle,
+  makeUrl,
+  messageOmrsServiceWorker,
+  setupDynamicOfflineDataHandler,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -21,6 +28,27 @@ function setupOpenMRS() {
 
   defineConfigSchema(moduleName, configSchema);
 
+  setupDynamicOfflineDataHandler({
+    id: 'esm-patient-search-app:patient',
+    type: 'patient',
+    displayName: 'Patient search',
+    async isSynced(patientUuid) {
+      const expectedUrls = [`/ws/fhir2/R4/Patient/${patientUuid}`];
+      const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
+      const cache = await caches.open('omrs-spa-cache-v1');
+      const keys = (await cache.keys()).map((key) => key.url);
+      return absoluteExpectedUrls.every((url) => keys.includes(url));
+    },
+    async sync(patientUuid) {
+      await messageOmrsServiceWorker({
+        type: 'registerDynamicRoute',
+        pattern: `/ws/fhir2/R4/Patient/${patientUuid}`,
+      });
+
+      await fetchCurrentPatient(patientUuid);
+    },
+  });
+
   return {
     extensions: [
       {
@@ -28,6 +56,21 @@ function setupOpenMRS() {
         slot: 'top-nav-actions-slot',
         order: 0,
         load: getAsyncLifecycle(() => import('./patient-search-icon/patient-search-icon.component'), options),
+        offline: true,
+      },
+      {
+        // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
+        id: 'patient-search-button',
+        slot: 'patient-search-button-slot',
+        load: getAsyncLifecycle(() => import('./patient-search-button/patient-search-button.component'), options),
+        offline: true,
+      },
+      {
+        // P.S. This extension is not compatible with the tablet view.
+        id: 'patient-search-bar',
+        slot: 'patient-search-bar-slot',
+        load: getAsyncLifecycle(() => import('./patient-search-bar/patient-search-bar.component'), options),
+        offline: true,
       },
     ],
   };

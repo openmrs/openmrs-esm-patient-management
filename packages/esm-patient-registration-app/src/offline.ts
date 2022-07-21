@@ -1,12 +1,13 @@
 import {
-  fetchCurrentPatient,
+  makeUrl,
+  messageOmrsServiceWorker,
   navigate,
-  registerOfflinePatientHandler,
+  setupDynamicOfflineDataHandler,
   setupOfflineSync,
   subscribePrecacheStaticDependencies,
   SyncProcessOptions,
 } from '@openmrs/esm-framework';
-import { cacheForOfflineHeaders, patientRegistration } from './constants';
+import { patientRegistration, personRelationshipRepresentation } from './constants';
 import {
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
@@ -25,12 +26,39 @@ export function setupOffline() {
 
   subscribePrecacheStaticDependencies(precacheStaticAssets);
 
-  registerOfflinePatientHandler('esm-patient-registration-app', {
+  setupDynamicOfflineDataHandler({
+    id: 'esm-patient-registration-app:patient',
+    type: 'patient',
     displayName: 'Patient registration',
-    async onOfflinePatientAdded({ patientUuid }) {
-      await fetchCurrentPatient(patientUuid, { headers: cacheForOfflineHeaders });
+    async isSynced(patientUuid) {
+      const expectedUrls = getPatientUrlsToBeCached(patientUuid);
+      const cache = await caches.open('omrs-spa-cache-v1');
+      const keys = (await cache.keys()).map((key) => key.url);
+      return expectedUrls.every((url) => keys.includes(url));
+    },
+    async sync(patientUuid) {
+      const urlsToCache = getPatientUrlsToBeCached(patientUuid);
+      await Promise.allSettled(
+        urlsToCache.map(async (url) => {
+          await messageOmrsServiceWorker({
+            type: 'registerDynamicRoute',
+            url,
+          });
+
+          await fetch(url);
+        }),
+      );
     },
   });
+}
+
+function getPatientUrlsToBeCached(patientUuid: string) {
+  return [
+    `/ws/fhir2/R4/Patient/${patientUuid}`,
+    `/ws/rest/v1/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}`,
+    `/ws/rest/v1/person/${patientUuid}/attribute`,
+    `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`,
+  ].map((url) => window.origin + makeUrl(url));
 }
 
 async function precacheStaticAssets() {
@@ -52,8 +80,11 @@ export async function syncPatientRegistration(
     queuedPatient._patientRegistrationData.patientUuidMap,
     queuedPatient._patientRegistrationData.initialAddressFieldValues,
     queuedPatient._patientRegistrationData.capturePhotoProps,
-    queuedPatient._patientRegistrationData.patientPhotoConceptUuid,
     queuedPatient._patientRegistrationData.currentLocation,
+    queuedPatient._patientRegistrationData.initialIdentifierValues,
+    queuedPatient._patientRegistrationData.currentUser,
+    queuedPatient._patientRegistrationData.config,
+    queuedPatient._patientRegistrationData.savePatientTransactionManager,
     options.abort,
   );
 }

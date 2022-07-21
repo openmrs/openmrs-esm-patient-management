@@ -90,7 +90,10 @@ async function fetchPatientIdentifierTypes(
         identifierTypes.push(mapPatientIdentifierType(type, false));
       }
     });
-    return identifierTypes;
+    return identifierTypes.map((identifierType) => ({
+      ...identifierType,
+      fieldName: camelCase(identifierType.name),
+    }));
   }
 
   return [];

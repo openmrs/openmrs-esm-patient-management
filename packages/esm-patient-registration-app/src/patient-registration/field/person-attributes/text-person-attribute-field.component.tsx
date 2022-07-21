@@ -33,7 +33,7 @@ export function TextPersonAttributeField({
   const fieldName = `attributes.${personAttributeType.uuid}`;
 
   return (
-    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
+    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       <Field name={fieldName} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (

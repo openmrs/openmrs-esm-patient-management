@@ -1,4 +1,6 @@
-import { string } from 'yup';
+import { Session } from '@openmrs/esm-framework';
+import { RegistrationConfig } from '../config-schema';
+import { SavePatientTransactionManager } from './form-manager';
 
 interface NameValue {
   uuid: string;
@@ -28,19 +30,15 @@ export interface FetchedPatientIdentifierType {
 }
 
 export interface PatientIdentifierValue {
-  uuid?: string;
-  identifier: string;
-  identifierTypeUuid?: string;
-  source: IdentifierSource;
+  identifierUuid?: string;
+  identifierTypeUuid: string;
+  initialValue: string;
+  identifierValue: string;
+  identifierName: string;
+  selectedSource: IdentifierSource;
   autoGeneration?: boolean;
   preferred: boolean;
-  /**
-   * @kind ADD -> add a new identifier to a patient
-   * @kind UPDATE -> update an existing patient identifier
-   * @kind DELETE -> delete an existing patient identifier
-   * @kind NONE -> No action to be taken on the patient identifier
-   */
-  action: 'ADD' | 'UPDATE' | 'DELETE' | 'NONE';
+  required: boolean;
 }
 
 /**
@@ -88,8 +86,11 @@ export interface PatientRegistration {
     patientUuidMap: PatientUuidMapType;
     initialAddressFieldValues: Record<string, any>;
     capturePhotoProps: CapturePhotoProps;
-    patientPhotoConceptUuid: string;
     currentLocation: string;
+    initialIdentifierValues: FormValues['identifiers'];
+    currentUser: Session;
+    config: RegistrationConfig;
+    savePatientTransactionManager: SavePatientTransactionManager;
   };
 }
 
@@ -115,6 +116,22 @@ export type Patient = {
     causeOfDeath?: string;
   };
 };
+
+export interface Encounter {
+  encounterDatetime: Date;
+  patient: string;
+  encounterType: string;
+  location: string;
+  encounterProviders: Array<{
+    provider: string;
+    encounterRole: string;
+  }>;
+  form: string;
+  obs: Array<{
+    concept: string;
+    value: string | number;
+  }>;
+}
 
 export interface RelationshipValue {
   relatedPersonName?: string;
@@ -162,9 +179,14 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<RelationshipValue>;
-  identifiers: Array<PatientIdentifierValue>;
+  identifiers: {
+    [identifierFieldName: string]: PatientIdentifierValue;
+  };
   attributes?: {
     [attributeTypeUuid: string]: string;
+  };
+  obs?: {
+    [conceptUuid: string]: string;
   };
 }
 
@@ -198,9 +220,11 @@ export interface TextBasedPersonAttributeConfig {
 export interface PatientIdentifierResponse {
   uuid: string;
   identifier: string;
+  preferred: boolean;
   identifierType: {
     uuid: string;
-    isPrimary: boolean;
+    required: boolean;
+    name: string;
   };
 }
 export interface PersonAttributeTypeResponse {
@@ -224,7 +248,12 @@ export interface PersonAttributeResponse {
 export interface ConceptResponse {
   uuid: string;
   display: string;
+  datatype: {
+    uuid: string;
+    display: string;
+  };
   answers: Array<ConceptAnswers>;
+  setMembers: Array<ConceptAnswers>;
 }
 
 export interface ConceptAnswers {
