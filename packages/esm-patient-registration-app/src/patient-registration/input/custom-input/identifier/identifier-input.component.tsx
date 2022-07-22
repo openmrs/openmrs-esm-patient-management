@@ -7,7 +7,7 @@ import { PatientRegistrationContext } from '../../../patient-registration-contex
 import { TrashCan16, Edit16, Reset16 } from '@carbon/icons-react';
 import { Button } from 'carbon-components-react';
 import { ResourcesContext } from '../../../../offline.resources';
-import { showModal, useConfig } from '@openmrs/esm-framework';
+import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { useField } from 'formik';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
@@ -133,14 +133,16 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           </Button>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <Button
-            kind="danger--ghost"
-            onClick={handleDelete}
-            iconDescription={t('deleteIdentifierTooltip', 'Delete')}
-            disabled={disabled}
-            hasIconOnly>
-            <TrashCan16 />
-          </Button>
+          <UserHasAccess privilege="coreapps.systemAdministration">
+            <Button
+              kind="danger--ghost"
+              onClick={handleDelete}
+              iconDescription={t('deleteIdentifierTooltip', 'Delete')}
+              disabled={disabled}
+              hasIconOnly>
+              <TrashCan16 />
+            </Button>
+          </UserHasAccess>
         )}
       </div>
     </div>

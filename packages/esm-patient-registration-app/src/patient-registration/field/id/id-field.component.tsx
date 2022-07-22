@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Button, SkeletonText } from 'carbon-components-react';
 import { ArrowRight16 } from '@carbon/icons-react';
-import { useLayoutType, useConfig } from '@openmrs/esm-framework';
+import { useLayoutType, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import {
   FormValues,
   IdentifierSource,
@@ -113,16 +113,18 @@ export const Identifiers: React.FC = () => {
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <div className={styles.identifierLabelText}>
-        <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
-        <Button
-          kind="ghost"
-          className={styles.setIDNumberButton}
-          onClick={() => setShowIdentifierOverlay(true)}
-          size={desktop ? 'sm' : 'md'}>
-          {t('configure', 'Configure')} <ArrowRight16 />
-        </Button>
-      </div>
+      <UserHasAccess privilege="coreapps.systemAdministration">
+        <div className={styles.identifierLabelText}>
+          <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
+          <Button
+            kind="ghost"
+            className={styles.setIDNumberButton}
+            onClick={() => setShowIdentifierOverlay(true)}
+            size={desktop ? 'sm' : 'md'}>
+            {t('configure', 'Configure')} <ArrowRight16 />
+          </Button>
+        </div>
+      </UserHasAccess>
       <div>
         {Object.entries(values.identifiers).map(([fieldName, identifier]) => (
           <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />

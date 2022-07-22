@@ -169,3 +169,10 @@ export function getPhonePersonAttributeValueFromFhirPatient(patient: fhir.Patien
   }
   return result;
 }
+
+export const filterUndefinedPatientIdenfier = (patientIdenfiers) =>
+  Object.fromEntries(
+    Object.entries<PatientIdentifierValue>(patientIdenfiers).filter(
+      ([key, value]) => value.identifierValue !== undefined,
+    ),
+  );
