@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
-  DataTableSize,
   DataTableSkeleton,
-  Dropdown,
   OverflowMenu,
   OverflowMenuItem,
-  Tab,
   Table,
   TableBody,
   TableCell,
@@ -23,35 +19,15 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tabs,
-  Tag,
   Tile,
-  TooltipDefinition,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Group16 from '@carbon/icons-react/es/group/16';
-import InProgress16 from '@carbon/icons-react/es/in-progress/16';
-import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
-import {
-  useVisitQueueEntries,
-  useServices,
-  QueueService,
-  QueueStatus,
-  MappedVisitQueueEntry,
-  MappedQueuePriority,
-  useAppointmentEntries,
-} from './appointments-table.resource';
+import CurrencyPound16 from '@carbon/icons-react/es/currency--pound/16';
+import Omega16 from '@carbon/icons-react/es/omega/16';
+import { useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { useAppointmentEntries } from './appointments-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
 import styles from './appointments-table.scss';
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
 
 function ActionsMenu() {
   const { t } = useTranslation();
@@ -82,12 +58,12 @@ function ActionsMenu() {
   );
 }
 
-function StatusIcon({ status }) {
-  switch (status as QueueStatus) {
-    case 'Waiting':
-      return <InProgress16 />;
-    case 'In Service':
-      return <Group16 />;
+function ServiceIcon({ service }) {
+  switch (service) {
+    case 'TB Clinic':
+      return <CurrencyPound16 />;
+    case 'HIV Clinic':
+      return <Omega16 />;
     default:
       return null;
   }
@@ -95,19 +71,9 @@ function StatusIcon({ status }) {
 
 function AppointmentsTable() {
   const { t } = useTranslation();
-  const { services } = useServices();
-  const { visitQueueEntries, isLoading } = useAppointmentEntries();
-  const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
-  const [filter, setFilter] = useState('');
+  const { appointmentEntries, isLoading } = useAppointmentEntries();
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
-
-  useEffect(() => {
-    if (filter) {
-      setFilteredRows(visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)));
-      setFilter('');
-    }
-  }, [filter, filteredRows, visitQueueEntries]);
 
   const tableHeaders = useMemo(
     () => [
@@ -140,107 +106,39 @@ function AppointmentsTable() {
     [t],
   );
 
-  const getTagType = (priority: string) => {
-    switch (priority as MappedQueuePriority) {
-      case 'Emergency':
-        return 'red';
-      case 'Not Urgent':
-        return 'green';
-      default:
-        return 'gray';
-    }
-  };
-
-  const buildStatusString = (status: QueueStatus, service: QueueService) => {
-    if (!status || !service) {
-      return '';
-    }
-
-    if (status === 'Waiting') {
-      return `${status} for ${service}`;
-    } else if (status === 'In Service') {
-      return `Attending ${service}`;
-    }
-  };
-
   const tableRows = useMemo(() => {
-    return (filteredRows.length ? filteredRows : visitQueueEntries)?.map((entry) => ({
-      ...entry,
+    return appointmentEntries?.map((appointment) => ({
+      ...appointment,
       name: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
+          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+            {appointment.name}
+          </ConfigurableLink>
         ),
       },
-      priority: {
-        content: (
-          <>
-            {entry?.priorityComment ? (
-              <TooltipDefinition
-                className={styles.tooltip}
-                align="start"
-                direction="bottom"
-                tooltipText={entry.priorityComment}>
-                <Tag
-                  className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                  type={getTagType(entry.priority as string)}>
-                  {entry.priority}
-                </Tag>
-              </TooltipDefinition>
-            ) : (
-              <Tag
-                className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                type={getTagType(entry.priority as string)}>
-                {entry.priority}
-              </Tag>
-            )}
-          </>
-        ),
-      },
-      status: {
+      dateTime: {
         content: (
           <span className={styles.statusContainer}>
-            <StatusIcon status={entry.status} />
-            <span>{buildStatusString(entry.status, entry.service)}</span>
+            {formatDatetime(parseDate(appointment.dateTime), { mode: 'standard' })}
+          </span>
+        ),
+      },
+      serviceType: {
+        content: (
+          <span className={styles.statusContainer}>
+            <ServiceIcon service={appointment.serviceType} />
+            {appointment.serviceType}
           </span>
         ),
       },
     }));
-  }, [filteredRows, visitQueueEntries]);
-
-  const handleServiceChange = ({ selectedItem }) => {
-    setFilter(selectedItem);
-  };
-
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const id = getCellId(rowId, key);
-        if (typeof cellsById[id].value === 'boolean') {
-          return false;
-        }
-        if (cellsById[id].value.hasOwnProperty('content')) {
-          if (Array.isArray(cellsById[id].value.content.props.children)) {
-            return ('' + cellsById[id].value.content.props.children[1].props.children)
-              .toLowerCase()
-              .includes(inputValue.toLowerCase());
-          }
-          if (typeof cellsById[id].value.content.props.children === 'object') {
-            return ('' + cellsById[id].value.content.props.children.props.children.props.children)
-              .toLowerCase()
-              .includes(inputValue.toLowerCase());
-          }
-          return ('' + cellsById[id].value.content.props.children).toLowerCase().includes(inputValue.toLowerCase());
-        }
-        return ('' + cellsById[id].value).toLowerCase().includes(inputValue.toLowerCase());
-      }),
-    );
-  };
+  }, [appointmentEntries]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (visitQueueEntries?.length) {
+  if (appointmentEntries?.length) {
     return (
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.headerContainer}>
@@ -250,12 +148,11 @@ function AppointmentsTable() {
             kind="secondary"
             renderIcon={Add16}
             onClick={() => setShowOverlay(true)}
-            iconDescription={t('addNewAppointment', 'Add New Appointment')}>
-            {t('addNewAppointment', 'Add New Appointment')}
+            iconDescription={t('addNewAppointment', 'Add New apppointment')}>
+            {t('addNewAppointment', 'Add New apppointment')}
           </Button>
         </div>
         <DataTable
-          filterRows={handleFilter}
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop ? true : false}
           rows={tableRows}
@@ -265,18 +162,6 @@ function AppointmentsTable() {
             <TableContainer className={styles.tableContainer}>
               <TableToolbar>
                 <TableToolbarContent>
-                  <div className={styles.filterContainer}>
-                    <Dropdown
-                      id="serviceFilter"
-                      initialSelectedItem={'All'}
-                      label=""
-                      titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-                      type="inline"
-                      items={['All', ...services]}
-                      onChange={handleServiceChange}
-                      size="sm"
-                    />
-                  </div>
                   <TableToolbarSearch
                     className={styles.search}
                     expanded
@@ -287,7 +172,7 @@ function AppointmentsTable() {
                   />
                 </TableToolbarContent>
               </TableToolbar>
-              <Table {...getTableProps()} className={styles.activeVisitsTable}>
+              <Table {...getTableProps()} className={styles.appointmentsTable}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader />
@@ -310,20 +195,8 @@ function AppointmentsTable() {
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
-                            <>
-                              <Tabs>
-                                <Tab label={t('currentVisit', 'Current visit')}>
-                                  <>
-                                    <span className={styles.visitType}>{tableRows?.[index]?.visitType}</span>
-                                    <p style={{ marginTop: '0.5rem' }}>--</p>
-                                  </>
-                                </Tab>
-                                <Tab label={t('previousVisit', 'Previous visit')}>
-                                  <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />
-                                </Tab>
-                              </Tabs>
-                            </>
+                          <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
+                            <></>
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
