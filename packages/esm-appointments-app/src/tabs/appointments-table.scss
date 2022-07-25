@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
 
 .container {
   padding-bottom: 2rem;
@@ -19,38 +19,6 @@
   color: $text-01;
 }
 
-.filterContainer {
-  :global(.bx--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.bx--list-box__menu-icon) {
-    height: 1rem;
-  }
-}
-
-.tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
-  border-bottom: none;
-}
-
-.tag {
-  margin: 0.25rem 0;
-}
-
-.priorityTag {
-  @extend .tag;
-  @include carbon--type-style("label-01");
-  color: #943d00;
-  background-color: #ffc9a3;
-}
-
-.backgroundDataFetchingIndicator {
-  align-items: center;
-  display: flex;
-  flex: 1 1 0%;
-  justify-content: center;
-}
-
 .tableContainer {
   margin: 0 1rem;
   padding: 0;
@@ -58,7 +26,7 @@
 
 .search {
   max-width: 16rem;
-  
+
   input {
     background-color: $ui-02 !important;
   }
@@ -66,19 +34,19 @@
 
 .tableContainer {
   background-color: $ui-01;
-  
+
   a {
     text-decoration: none;
   }
-  
+
   th {
     color: $text-02;
   }
-  
+
   :global(.bx--data-table-content) {
     border: 1px solid $ui-03;
     overflow: visible;
-  } 
+  }
 
   :global(.bx--data-table-header) {
     padding: 0;
@@ -91,7 +59,8 @@
     background-color: $ui-01;
   }
 
-  :global(.bx--toolbar-content), :global(.bx--toolbar-search-container-expandable) {
+  :global(.bx--toolbar-content),
+  :global(.bx--toolbar-search-container-expandable) {
     height: 2rem;
     margin-bottom: 0.25rem;
   }
@@ -101,19 +70,13 @@
   }
 }
 
-.emptyRow {
-  padding: 0 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.activeVisitsTable tr:last-of-type {
+.appointmentsTable tr:last-of-type {
   td {
     border-bottom: none;
   }
 }
 
-.expandedActiveVisitRow {
+.expandedAppointmentsRow {
   :global(.bx--tab-content) {
     padding: 0.5rem 0;
   }
@@ -136,7 +99,7 @@
 }
 
 .content {
-  @include carbon--type-style("productive-heading-02");
+  @include carbon--type-style('productive-heading-02');
   color: $text-02;
   margin-bottom: 0.5rem;
 }
@@ -154,9 +117,10 @@
   overflow: hidden;
   text-align: center;
 
-  &::before, &::after {
+  &::before,
+  &::after {
     background-color: $text-03;
-    content: "";
+    content: '';
     display: inline-block;
     height: 1px;
     position: relative;
@@ -196,34 +160,6 @@
   max-width: none;
 }
 
-.desktopHeading {
-  h4 {
-    @include carbon--type-style('productive-heading-02');
-    color: $text-02;
-  }
-}
-
-.tabletHeading {
-  h4 {
-    @include carbon--type-style('productive-heading-03');
-    color: $text-02;
-  }
-}
-
-.desktopHeading, .tabletHeading {
-  text-align: left;
-  text-transform: capitalize;
-  margin-bottom: $spacing-05;
-  
-  h4:after {
-    content: "";
-    display: block;
-    width: 2rem;
-    padding-top: 3px;
-    border-bottom: 0.375rem solid var(--brand-03);
-  }
-}
-
 .statusContainer {
   display: flex;
   align-items: center;
@@ -231,9 +167,4 @@
   svg {
     margin-right: 0.5rem;
   }
-}
-
-.visitType {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
 }

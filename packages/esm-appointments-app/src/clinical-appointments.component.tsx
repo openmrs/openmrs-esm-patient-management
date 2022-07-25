@@ -1,6 +1,5 @@
 import React from 'react';
-import PatientListList from './appointments/patient-list-list.component';
-import AppointmentsTable from './tabs/appointments-table.component';
+import AppointmentList from './appointments/appointment-list.component';
 import ClinicMetrics from './appointments-metrics/appointments-metrics.component';
 
 interface ClinicalAppointmentsProps {}
@@ -9,7 +8,7 @@ const ClinicalAppointments: React.FC<ClinicalAppointmentsProps> = () => {
   return (
     <div>
       <ClinicMetrics />
-      <PatientListList />
+      <AppointmentList />
     </div>
   );
 };
