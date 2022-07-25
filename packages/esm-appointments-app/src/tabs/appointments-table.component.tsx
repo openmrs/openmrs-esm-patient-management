@@ -148,8 +148,8 @@ function AppointmentsTable() {
             kind="secondary"
             renderIcon={Add16}
             onClick={() => setShowOverlay(true)}
-            iconDescription={t('addNewAppointment', 'Add New apppointment')}>
-            {t('addNewAppointment', 'Add New apppointment')}
+            iconDescription={t('addNewAppointment', 'Add new apppointment')}>
+            {t('addNewAppointment', 'Add new apppointment')}
           </Button>
         </div>
         <DataTable
@@ -215,7 +215,7 @@ function AppointmentsTable() {
                     </div>
                     <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-                      {t('addNewAppointment', 'Add New apppointment')}
+                      {t('addNewAppointment', 'Add new apppointment')}
                     </Button>
                   </Tile>
                 </div>
@@ -234,7 +234,7 @@ function AppointmentsTable() {
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
           <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-            {t('addNewAppointment', 'Add New apppointment')}
+            {t('addNewAppointment', 'Add new apppointment')}
           </Button>
         </Tile>
       </div>

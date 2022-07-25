@@ -48,7 +48,6 @@ export interface Appointment {
 
 export interface AppointmentService {
   appointmentServiceId: number;
-  color: string;
   creatorName: string;
   description: string;
   durationMins: string;
