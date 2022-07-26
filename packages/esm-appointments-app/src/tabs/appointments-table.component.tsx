@@ -25,7 +25,7 @@ import Add16 from '@carbon/icons-react/es/add/16';
 import CurrencyPound16 from '@carbon/icons-react/es/currency--pound/16';
 import Omega16 from '@carbon/icons-react/es/omega/16';
 import { useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useAppointmentEntries } from './appointments-table.resource';
+import { useAppointments } from './appointments-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
 
@@ -71,7 +71,7 @@ function ServiceIcon({ service }) {
 
 function AppointmentsTable() {
   const { t } = useTranslation();
-  const { appointmentEntries, isLoading } = useAppointmentEntries();
+  const { appointments, isLoading } = useAppointments();
   const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
 
@@ -107,7 +107,7 @@ function AppointmentsTable() {
   );
 
   const tableRows = useMemo(() => {
-    return appointmentEntries?.map((appointment) => ({
+    return appointments?.map((appointment) => ({
       ...appointment,
       name: {
         content: (
@@ -132,13 +132,13 @@ function AppointmentsTable() {
         ),
       },
     }));
-  }, [appointmentEntries]);
+  }, [appointments]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (appointmentEntries?.length) {
+  if (appointments?.length) {
     return (
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.headerContainer}>
@@ -148,8 +148,8 @@ function AppointmentsTable() {
             kind="secondary"
             renderIcon={Add16}
             onClick={() => setShowOverlay(true)}
-            iconDescription={t('addNewAppointment', 'Add new apppointment')}>
-            {t('addNewAppointment', 'Add new apppointment')}
+            iconDescription={t('addNewAppointment', 'Add new Appointment')}>
+            {t('addNewAppointment', 'Add new Appointment')}
           </Button>
         </div>
         <DataTable
@@ -215,7 +215,7 @@ function AppointmentsTable() {
                     </div>
                     <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-                      {t('addNewAppointment', 'Add new apppointment')}
+                      {t('addNewAppointment', 'Add new Appointment')}
                     </Button>
                   </Tile>
                 </div>
@@ -234,7 +234,7 @@ function AppointmentsTable() {
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
           <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
-            {t('addNewAppointment', 'Add new apppointment')}
+            {t('addNewAppointment', 'Add new Appointment')}
           </Button>
         </Tile>
       </div>
