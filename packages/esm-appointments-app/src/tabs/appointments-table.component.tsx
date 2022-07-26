@@ -28,6 +28,7 @@ import { useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@ope
 import { useAppointments } from './appointments-table.resource';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
+import AppointmentDetails from '../appointment-details/appointment-details.component';
 
 function ActionsMenu() {
   const { t } = useTranslation();
@@ -196,7 +197,7 @@ function AppointmentsTable() {
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
-                            <></>
+                            <AppointmentDetails appointment={tableRows?.[index]} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />

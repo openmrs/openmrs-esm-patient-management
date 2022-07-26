@@ -3,7 +3,15 @@ export const mockAppointmentsData = {
     {
       uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
@@ -40,7 +48,15 @@ export const mockAppointmentsData = {
     {
       uuid: 'e10ce4e3-0e91-4b97-bc6c-9b5068e58428',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
@@ -77,7 +93,15 @@ export const mockAppointmentsData = {
     {
       uuid: 'cdb0676f-0805-4c3e-bfef-7757a005e892',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
@@ -111,7 +135,15 @@ export const mockAppointmentsData = {
     {
       uuid: '66565d8b-4849-4b7c-966a-554d6073f80c',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
@@ -145,7 +177,15 @@ export const mockAppointmentsData = {
     {
       uuid: '45dcc19d-dd14-4a07-95c6-afa264972a34',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
@@ -182,7 +222,15 @@ export const mockAppointmentsData = {
     {
       uuid: 'fa4657ad-db46-487d-8e2e-a3858c906ae6',
       appointmentNumber: '0000',
-      patient: { identifier: '100GEJ', name: 'John Wilson', uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+      patient: {
+        identifier: '100GEJ',
+        name: 'John Wilson',
+        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        gender: 'M',
+        birthdate: '1986-04-03T00:00:00.000+0000',
+        age: 35,
+        phoneNumber: '0700000000',
+      },
       service: {
         appointmentServiceId: 1,
         name: 'Outpatient',
