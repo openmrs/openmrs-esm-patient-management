@@ -20,16 +20,6 @@ interface ObsData {
   obsDatetime: string;
 }
 
-interface Encounter {
-  diagnoses: Array<any>;
-  encounterDatetime: string;
-  encounterProviders?: Array<{ provider: { person: { display: string } } }>;
-  encounterType: { display: string; uuid: string };
-  obs: Array<ObsData>;
-  uuid: string;
-  voided: boolean;
-}
-
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }

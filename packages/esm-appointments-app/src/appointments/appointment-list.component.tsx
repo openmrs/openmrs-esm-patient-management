@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs, Tab, Button } from 'carbon-components-react';
-import AppointmentsTable from '../tabs/appointments-table.component';
+import AppointmentsTable from '../appoinments-tabs/appointments-table.component';
 import styles from './appointment-list.scss';
 import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
