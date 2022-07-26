@@ -30,21 +30,21 @@ function setupOpenMRS() {
     ],
     extensions: [
       {
-        id: 'appointments-link',
+        name: 'appointments-link',
         slot: 'app-menu-slot',
         load: getAsyncLifecycle(() => import('./appointment-link'), options),
         online: true,
         offline: false,
       },
       {
-        id: 'appointments-side-nav-ext',
+        name: 'appointments-side-nav',
         slot: 'appointments-sidebar-slot',
         load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),
         online: true,
         offline: true,
       },
       {
-        id: 'clinical-appointments-db-link',
+        name: 'clinical-appointments-db-link',
         slot: 'appointments-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(clinicalAppointmentsDashboardMeta), options),
         meta: clinicalAppointmentsDashboardMeta,
@@ -52,7 +52,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'clinical-appointments-dashboard',
+        name: 'clinical-appointments-dashboard',
         slot: 'clinical-appointments-dashboard-slot',
         load: getAsyncLifecycle(() => import('./clinical-appointments.component'), options),
         online: true,
@@ -67,7 +67,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'patient-table',
+        name: 'patient-table',
         load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
           featureName: 'patient-table',
           moduleName,

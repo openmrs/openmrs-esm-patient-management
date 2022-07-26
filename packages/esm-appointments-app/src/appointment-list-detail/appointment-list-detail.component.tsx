@@ -1,21 +1,15 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDate, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './appointment-detail.scss';
-import CustomOverflowMenuComponent from '../ui-components/overflow-menu/overflow-menu.component';
-import { OverflowMenuVertical16 } from '@carbon/icons-react';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from 'carbon-components-react';
 import PatientListTable from '../patient-table/patient-table.component';
-import EditPatientListDetailsOverlay from '../ui-components/create-edit-patient-list/create-edit-list.component';
-import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 
 function getPatientListUuidFromUrl(): string {
   const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
   return match && match[1];
 }
-
 interface PatientListMemberRow {
   name: string;
   identifier: string;
@@ -41,7 +35,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
     (currentPage - 1) * currentPageSize,
     currentPageSize,
   );
-  const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
 
   const patients: PatientListMemberRow[] = useMemo(
     () =>
@@ -112,18 +105,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
               </>
             )}
           </div>
-          <CustomOverflowMenuComponent
-            menuTitle={
-              <>
-                <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
-              </>
-            }>
-            <OverflowMenuItem
-              itemText={t('editNameDescription', 'Edit Name/ Description')}
-              onClick={() => setEditPatientListDetailOverlay(true)}
-            />
-          </CustomOverflowMenuComponent>
         </div>
         <div className={styles.tableContainer}>
           <PatientListTable
@@ -150,16 +131,6 @@ const PatientListDetailComponent: React.FC<RouteComponentProps<PatientListDetail
             }}
           />
         </div>
-      </section>
-      <section>
-        {showEditPatientListDetailOverlay && (
-          <EditPatientListDetailsOverlay
-            close={() => setEditPatientListDetailOverlay(false)}
-            edit
-            patientListDetails={patientListDetails}
-            onSuccess={mutatePatientListDetails}
-          />
-        )}
       </section>
     </main>
   );

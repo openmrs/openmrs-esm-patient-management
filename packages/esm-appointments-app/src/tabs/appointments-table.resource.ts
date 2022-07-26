@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../__mocks__/appointments.mock';
+import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
 import { AppointmentsFetchResponse } from '../types';
 
 export function useAppointments() {

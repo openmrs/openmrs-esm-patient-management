@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton, Tab, Tabs } from 'carbon-components-react';
 import { formatDate, OpenmrsResource, parseDate, useLayoutType } from '@openmrs/esm-framework';
-import { Observation, usePastVisits } from './past-visit.resource';
+import { usePastVisits } from './past-visit.resource';
 import EncounterList from './encounter-list.component';
 import styles from './past-visit.scss';
+import { Observation } from '../types';
 
 interface PastVisitProps {
   patientUuid: string;

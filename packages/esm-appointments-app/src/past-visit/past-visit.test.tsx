@@ -1,10 +1,8 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import PastVisit from './past-visit.component';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockPatient } from '../../__mocks__/patient.mock';
-import { swrRender } from '../../../../tools/test-helpers';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 
 jest.mock('./past-visit.resource.ts', () => {
   const originalModule = jest.requireActual('./past-visit.resource.ts');
@@ -36,5 +34,5 @@ describe('PastVisit: ', () => {
 });
 
 function renderPastVisitTabs() {
-  swrRender(<PastVisit patientUuid={mockPatient.id} />);
+  render(<PastVisit patientUuid={mockPatient.id} />);
 }

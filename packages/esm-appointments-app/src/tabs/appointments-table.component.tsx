@@ -33,26 +33,12 @@ function ActionsMenu() {
   const { t } = useTranslation();
 
   return (
-    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#editPatientDetails"
-        itemText={t('editPatientDetails', 'Edit patient details')}>
-        {t('editPatientDetails', 'Edit patient details')}
+    <OverflowMenu light selectorPrimaryFocus={'#editPatientAppointment'} size="sm" flipped>
+      <OverflowMenuItem className={styles.menuItem} id="#editPatientAppointment" itemText={t('edit', 'Edit')}>
+        {t('edit', 'Edit')}
       </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#setWaitTimeManually"
-        itemText={t('setWaitTimeManually', 'Set wait time manually')}>
-        {t('setWaitTimeManually', 'Set wait time manually')}
-      </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#endVisit"
-        hasDivider
-        isDelete
-        itemText={t('endVisit', 'End visit')}>
-        {t('endVisit', 'End Visit')}
+      <OverflowMenuItem className={styles.menuItem} id="#cancel" itemText={t('cancel', 'Cancel')}>
+        {t('cancel', 'Cancel')}
       </OverflowMenuItem>
     </OverflowMenu>
   );

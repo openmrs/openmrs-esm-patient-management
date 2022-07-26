@@ -72,7 +72,34 @@ export interface ServiceTypes {
   uuid: string;
 }
 
-interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> {
-  encounterType: string;
-  provider: string;
+export interface DashboardConfig {
+  name: string;
+  slot: string;
+  title: string;
+}
+
+export interface Observation {
+  uuid: string;
+  concept: {
+    uuid: string;
+    display: string;
+    conceptClass: {
+      uuid: string;
+      display: string;
+    };
+  };
+  display: string;
+  groupMembers: null | Array<{
+    uuid: string;
+    concept: {
+      uuid: string;
+      display: string;
+    };
+    value: {
+      uuid: string;
+      display: string;
+    };
+  }>;
+  value: any;
+  obsDatetime: string;
 }

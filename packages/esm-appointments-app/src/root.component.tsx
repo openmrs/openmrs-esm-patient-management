@@ -2,7 +2,7 @@ import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { spaBasePath } from './constants';
-import { AppointmentsDashboard } from './dashboard/appointments-dashboard.component';
+import AppointmentsDashboard from './dashboard/appointments-dashboard.component';
 
 const swrConfiguration = {
   errorRetryCount: 3,

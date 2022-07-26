@@ -1,5 +1,6 @@
 import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import PatientQueueHeader from '../appointments-header/appointments-header.component';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
 import styles from './appointments-dashboard.scss';
@@ -10,7 +11,7 @@ export interface DashboardConfig {
   title: string;
 }
 
-export const AppointmentsDashboard = ({ match }) => {
+const AppointmentsDashboard: React.FC<RouteComponentProps<{ view: string }>> = ({ match }) => {
   const {
     params: { view },
   } = match;
@@ -56,3 +57,5 @@ export const AppointmentsDashboard = ({ match }) => {
 const DashboardView: React.FC<{ dashboardSlot: string; title: string }> = ({ dashboardSlot, title }) => {
   return <ExtensionSlot extensionSlotName={dashboardSlot} state={{ dashboardTitle: title }} />;
 };
+
+export default AppointmentsDashboard;
