@@ -1,0 +1,17 @@
+@import '../root.scss';
+
+.appointmentList {
+  height: 100%;
+  width: 100%;
+  background-color: $ui-02;
+}
+
+.tabs {
+  grid-column: 'span 2';
+  padding: 0 $spacing-05;
+}
+
+.calendarButton {
+  float: right;
+  margin-right: $spacing-05;
+}
