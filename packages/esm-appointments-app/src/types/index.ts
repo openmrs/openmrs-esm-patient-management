@@ -93,3 +93,19 @@ export interface Observation {
   value: any;
   obsDatetime: string;
 }
+
+export interface MappedAppointment {
+  id: string;
+  name: string;
+  age: string;
+  gender: string;
+  phoneNumber: string;
+  dob: string;
+  patientUuid: string;
+  dateTime: string;
+  serviceType: string;
+  visitType: string;
+  provider: string;
+  location: string;
+  comments: string;
+}

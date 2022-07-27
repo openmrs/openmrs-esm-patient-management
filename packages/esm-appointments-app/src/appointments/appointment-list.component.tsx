@@ -1,9 +1,10 @@
 import React from 'react';
 import { Tabs, Tab, Button } from 'carbon-components-react';
-import AppointmentsTable from '../appoinments-tabs/appointments-table.component';
 import styles from './appointment-list.scss';
 import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
+import BookedAppointments from '../appoinments-tabs/booked-appointments.component';
+import CompletedAppointments from '../appoinments-tabs/completed-appointments.component';
 
 const AppointmentList: React.FC = () => {
   const { t } = useTranslation();
@@ -21,13 +22,11 @@ const AppointmentList: React.FC = () => {
 
       <Tabs className={styles.tabs} type="container">
         <Tab label={t('bookedForToday', 'Booked for today')}>
-          <AppointmentsTable />
+          <BookedAppointments />
         </Tab>
-        <Tab label={t('cancelled', 'Cancelled')}>
-          <AppointmentsTable />
-        </Tab>
+        <Tab label={t('cancelled', 'Cancelled')}></Tab>
         <Tab label={t('completed', 'Completed')}>
-          <AppointmentsTable />
+          <CompletedAppointments />
         </Tab>
       </Tabs>
     </div>
