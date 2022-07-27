@@ -19,16 +19,6 @@
   color: $text-01;
 }
 
-.filterContainer {
-  :global(.bx--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.bx--list-box__menu-icon) {
-    height: 1rem;
-  }
-}
-
 .tooltip :global(.bx--tooltip__trigger.bx--tooltip__trigger--definition) {
   border-bottom: none;
 }

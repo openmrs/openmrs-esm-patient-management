@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
 import { AppointmentsFetchResponse } from '../types';
 
@@ -13,11 +13,17 @@ export function useAppointments() {
   const mappedAppointment = (appointment) => ({
     id: appointment.uuid,
     name: appointment.patient.name,
+    age: appointment.patient.age,
+    gender: appointment.patient.gender,
+    phoneNumber: appointment.patient.phoneNumber,
+    dob: formatDate(parseDate(appointment.patient.birthdate), { mode: 'wide' }),
     patientUuid: appointment.patient.uuid,
-    dateTime: appointment.startDateTime,
+    dateTime: formatDatetime(parseDate(appointment.startDateTime)),
     serviceType: appointment.serviceType ? appointment.serviceType.display : '--',
+    visitType: appointment.serviceType ? appointment.serviceType.display : '--',
     provider: appointment.provider ? appointment.provider.person.display : '--',
     location: appointment.location ? appointment.location.name : '--',
+    comments: appointment.comments ? appointment.comments : '--',
   });
 
   const appointmentEntries = mockAppointmentsData.data?.map(mappedAppointment);
