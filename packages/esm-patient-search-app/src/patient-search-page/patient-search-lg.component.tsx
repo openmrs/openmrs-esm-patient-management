@@ -119,26 +119,25 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     );
   }
 
-  return !fetchError ? (
-    !isEmpty(searchResults) ? (
-      <div>
-        <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
-          <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
-            <span className={styles.productiveHeading02}>
-              {totalResults} {t('seachResultsSmall', 'search results')}
-            </span>
-          </h2>
-          <div className={styles.results}>
-            {searchResults.map((patient) => (
-              <PatientBanner onPatientSelect={handlePatientSelection} patientUuid={patient.uuid} patient={patient} />
-            ))}
-          </div>
+  if (fetchError) {
+    return (
+      <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+        <EmptyDataIllustration />
+        <div>
+          <p className={styles.errorMessage}>{t('error', 'Error')}</p>
+          <p className={styles.errorCopy}>
+            {t(
+              'errorCopy',
+              'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
+            )}
+          </p>
         </div>
-        <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-          <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
-        </div>
-      </div>
-    ) : (
+      </Tile>
+    );
+  }
+
+  if (isEmpty(searchResults)) {
+    return (
       <>
         <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
           <span className={styles.productiveHeading02}>0 {t('seachResultsSmall', 'search results')}</span>
@@ -156,20 +155,27 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
           </p>
         </Tile>
       </>
-    )
-  ) : (
-    <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
-      <EmptyDataIllustration />
-      <div>
-        <p className={styles.errorMessage}>{t('error', 'Error')}</p>
-        <p className={styles.errorCopy}>
-          {t(
-            'errorCopy',
-            'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
-          )}
-        </p>
+    );
+  }
+
+  return (
+    <div>
+      <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
+        <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
+          <span className={styles.productiveHeading02}>
+            {totalResults} {t('seachResultsSmall', 'search results')}
+          </span>
+        </h2>
+        <div className={styles.results}>
+          {searchResults.map((patient) => (
+            <PatientBanner onPatientSelect={handlePatientSelection} patientUuid={patient.uuid} patient={patient} />
+          ))}
+        </div>
       </div>
-    </Tile>
+      <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+        <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
+      </div>
+    </div>
   );
 };
 
