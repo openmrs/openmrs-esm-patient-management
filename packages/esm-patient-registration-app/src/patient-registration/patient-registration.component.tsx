@@ -130,10 +130,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         kind: 'success',
       });
 
-      const redirectUrl = interpolateUrl(
-        new URLSearchParams(search).get('afterUrl') ||
-          interpolateString(config.links.submitButton, { patientUuid: values.patientUuid }),
-      );
+      const afterUrl = new URLSearchParams(search).get('afterUrl');
+      const includePatientUuidInAfterUrl = new URLSearchParams(search).get('includePatientUuidInAfterUrl');
+      const redirectUrl = afterUrl
+        ? `${afterUrl}${includePatientUuidInAfterUrl === 'true' && `?patientUuid=${values.patientUuid}`}`
+        : interpolateString(config.links.submitButton, { patientUuid: values.patientUuid });
 
       setTarget(redirectUrl);
     } catch (error) {
