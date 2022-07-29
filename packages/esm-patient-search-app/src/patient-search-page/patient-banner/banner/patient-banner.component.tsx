@@ -150,9 +150,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           )}
         </div>
       </div>
-      {showContactDetails && (
-        <ContactDetails address={patient.person.addresses ?? []} telecom={[]} patientId={patient.uuid} />
-      )}
+      {showContactDetails && <ContactDetails address={patient.person.addresses} patientId={patient.uuid} />}
     </>
   );
 };

@@ -21,6 +21,7 @@ export interface SearchedPatient {
 
 export interface Address {
   preferred: boolean;
+  address1: string;
   cityVillage: string;
   country: string;
   postalCode: string;

@@ -2,10 +2,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 const customRepresentation =
-  'custom:(display,uuid,' +
-  'personA:(uuid,display,person:(age,display)),' +
-  'personB:(uuid,display,person:(age,display)),' +
-  'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
+  'custom:(display,uuid,personA:(age,display,birthdate,uuid),personB:(age,display,birthdate,uuid),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
 export function useRelationships(patientUuid: string) {
   const { data, error, isValidating } = useSWR<{ data: RelationshipsResponse }, Error>(
@@ -34,16 +31,16 @@ function extractRelationshipData(
     if (patientIdentifier === r.personA.uuid) {
       relationshipsData.push({
         uuid: r.uuid,
-        display: r.personB.person.display,
-        relativeAge: r.personB.person.age,
+        display: r.personB.display,
+        relativeAge: r.personB.age,
         relativeUuid: r.personB.uuid,
         relationshipType: r.relationshipType.bIsToA,
       });
     } else {
       relationshipsData.push({
         uuid: r.uuid,
-        display: r.personA.person.display,
-        relativeAge: r.personA.person.age,
+        display: r.personA.display,
+        relativeAge: r.personA.age,
         relativeUuid: r.personA.uuid,
         relationshipType: r.relationshipType.aIsToB,
       });
@@ -69,17 +66,13 @@ export interface Relationship {
   uuid: number;
   personA: {
     uuid: string;
-    person: {
-      age: number;
-      display: string;
-    };
+    age: number;
+    display: string;
   };
   personB: {
     uuid: string;
-    person: {
-      age: number;
-      display: string;
-    };
+    age: number;
+    display: string;
   };
   relationshipType: {
     uuid: string;

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './patient-search-lg.scss';
 import isEmpty from 'lodash-es/isEmpty';
 import { Tile } from 'carbon-components-react';

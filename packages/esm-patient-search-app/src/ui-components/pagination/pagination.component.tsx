@@ -11,7 +11,9 @@ interface PaginationProps {
   totalPages?: number;
 }
 const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCurrentPage, hasMore }) => {
-  if (totalPages <= 1) return <></>;
+  if (totalPages <= 1) {
+    return <></>;
+  }
 
   const decrementPage = useCallback(() => {
     setCurrentPage(Math.max(0, currentPage - 1));
@@ -34,6 +36,7 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
       <div className={styles.pageNumbers}>
         {[...Array(totalPages).keys()].map((indx) => (
           <Button
+            key={indx}
             kind="ghost"
             onClick={() => setCurrentPage(indx + 1)}
             className={`${styles.paginationButton} ${indx + 1 === currentPage && styles.activeButton}`}>
