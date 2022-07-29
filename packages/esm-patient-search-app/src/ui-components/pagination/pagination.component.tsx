@@ -11,17 +11,17 @@ interface PaginationProps {
   totalPages?: number;
 }
 const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCurrentPage, hasMore }) => {
-  if (totalPages <= 1) {
-    return <></>;
-  }
-
   const decrementPage = useCallback(() => {
     setCurrentPage(Math.max(0, currentPage - 1));
-  }, [currentPage, setCurrentPage, Math.max]);
+  }, [currentPage, setCurrentPage]);
 
   const incrementPage = useCallback(() => {
     setCurrentPage(Math.min(totalPages, currentPage + 1));
-  }, [currentPage, setCurrentPage]);
+  }, [currentPage, setCurrentPage, totalPages]);
+
+  if (totalPages <= 1) {
+    return <></>;
+  }
 
   return (
     <div className={styles.paginationBar}>

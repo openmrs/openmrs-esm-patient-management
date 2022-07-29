@@ -46,7 +46,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         hidePanel();
       }
     },
-    [config.search.patientResultUrl, hidePanel],
+    [config.search.patientResultUrl, hidePanel, selectPatientAction],
   );
 
   const fhirPatients = useMemo(() => {

@@ -58,7 +58,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         });
       }
     },
-    [navigate, interpolateString, config, onPatientSelect],
+    [config, onPatientSelect],
   );
 
   if (!query) {

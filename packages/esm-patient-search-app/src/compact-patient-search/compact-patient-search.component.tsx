@@ -21,7 +21,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ qu
         to: `\${openmrsSpaBase}/search/${searchTerm}`,
       });
     },
-    [navigate, window.localStorage, searchPage],
+    [searchPage],
   );
 
   const onClear = useCallback(() => {

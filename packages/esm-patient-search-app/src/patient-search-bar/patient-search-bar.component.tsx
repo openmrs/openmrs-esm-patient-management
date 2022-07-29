@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Search } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import debounce from 'lodash-es/debounce';
 import styles from './patient-search-bar.scss';
 interface PatientSearchBarProps {
   buttonProps?: Object;
@@ -32,7 +31,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       }
       setSearchTerm(val);
     },
-    [onChange, debounce, searchTimeout, setSearchTerm],
+    [onChange, setSearchTerm],
   );
 
   const handleSubmit = useCallback(
