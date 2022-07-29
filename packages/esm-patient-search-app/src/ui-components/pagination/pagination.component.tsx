@@ -7,32 +7,19 @@ import { Button } from 'carbon-components-react';
 interface PaginationProps {
   hasMore: boolean;
   currentPage: number;
-  setPage: (page: number) => void;
+  setCurrentPage: (page: number) => void;
   totalPages?: number;
 }
-const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setPage, hasMore }) => {
-  const buttons = useMemo(() => {
-    let buttonsArray = [];
-    for (let i = 1; i <= totalPages; i++) {
-      buttonsArray.push(
-        <Button
-          kind="ghost"
-          onClick={() => setPage(i)}
-          className={`${styles.paginationButton} ${i === currentPage && styles.activeButton}`}>
-          {i}
-        </Button>,
-      );
-    }
-    return buttonsArray;
-  }, [totalPages, currentPage, styles, setPage]);
+const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCurrentPage, hasMore }) => {
+  if (totalPages <= 1) return <></>;
 
   const decrementPage = useCallback(() => {
-    setPage(Math.max(0, currentPage - 1));
-  }, [currentPage, setPage, Math.max]);
+    setCurrentPage(Math.max(0, currentPage - 1));
+  }, [currentPage, setCurrentPage, Math.max]);
 
   const incrementPage = useCallback(() => {
-    setPage(Math.min(totalPages, currentPage + 1));
-  }, [currentPage, setPage]);
+    setCurrentPage(Math.min(totalPages, currentPage + 1));
+  }, [currentPage, setCurrentPage]);
 
   return (
     <div className={styles.paginationBar}>
@@ -44,7 +31,16 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setPag
         onClick={decrementPage}
         disabled={currentPage == 1}
       />
-      <div className={styles.pageNumbers}>{buttons}</div>
+      <div className={styles.pageNumbers}>
+        {[...Array(totalPages).keys()].map((indx) => (
+          <Button
+            kind="ghost"
+            onClick={() => setCurrentPage(indx + 1)}
+            className={`${styles.paginationButton} ${indx + 1 === currentPage && styles.activeButton}`}>
+            {indx + 1}
+          </Button>
+        ))}
+      </div>
       <Button
         kind="ghost"
         hasIconOnly

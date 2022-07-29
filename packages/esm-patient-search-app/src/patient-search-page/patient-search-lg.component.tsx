@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './patient-search-lg.scss';
 import isEmpty from 'lodash-es/isEmpty';
 import { Tile } from 'carbon-components-react';
@@ -24,7 +24,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const [currentPage, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pages, setPages] = useState(1);
   const resultsToShow = inTabletOrOverlay ? 15 : 5;
   const {
     isLoading,
@@ -34,10 +35,15 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     totalResults,
   } = usePatientSearchPaginated(query, !!query, resultsToShow, currentPage);
 
-  const totalPages = useMemo(
-    () => (totalResults ? Math.ceil(totalResults / resultsToShow) : 0),
-    [totalResults, resultsToShow, Math.ceil],
-  );
+  useEffect(() => {
+    if (!isLoading) {
+      setPages(Math.ceil(totalResults / resultsToShow));
+    }
+  }, [isLoading, totalResults, resultsToShow]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query]);
 
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
@@ -56,7 +62,25 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   );
 
   if (!query) {
-    return <></>;
+    return (
+      <>
+        <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
+          <span className={styles.productiveHeading02}>0 {t('seachResultsSmall', 'search results')}</span>
+        </h2>
+        <Tile
+          className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+          <EmptyDataIllustration />
+          <p className={styles.emptyResultText}>
+            {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
+          </p>
+          <p className={styles.actionText}>
+            <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
+            <br />
+            <span>{t('orPatientName', "OR the patient's name(s)")}</span>
+          </p>
+        </Tile>
+      </>
+    );
   }
 
   if (isLoading) {
@@ -82,11 +106,14 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
               <PatientBannerSkeleton />
             </div>
           </div>
-          {totalResults !== 1 && (
-            <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-              <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
-            </div>
-          )}
+          <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+            <Pagination
+              setCurrentPage={setCurrentPage}
+              currentPage={currentPage}
+              hasMore={hasMore}
+              totalPages={pages}
+            />
+          </div>
         </div>
       </div>
     );
@@ -107,11 +134,9 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
             ))}
           </div>
         </div>
-        {totalPages !== 1 && (
-          <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-            <Pagination setPage={setPage} currentPage={currentPage} hasMore={hasMore} totalPages={totalPages} />
-          </div>
-        )}
+        <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+          <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
+        </div>
       </div>
     ) : (
       <>
