@@ -44,6 +44,7 @@ import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
 import CurrentVisit from '../current-visit/current-visit-summary.component';
+import Edit16 from '@carbon/icons-react/es/edit/16';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -111,6 +112,37 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
         {t('endVisit', 'End Visit')}
       </OverflowMenuItem>
     </OverflowMenu>
+  );
+}
+
+function EditMenu({
+  patientUuid,
+  queueUuid,
+  queueEntryUuid,
+}: {
+  patientUuid: string;
+  queueEntryUuid: string;
+  queueUuid: string;
+}) {
+  const { t } = useTranslation();
+  const launchEditPriorityModal = useCallback(() => {
+    const dispose = showModal('edit-queue-entry-status-modal', {
+      closeModal: () => dispose(),
+      patientUuid,
+      queueEntryUuid,
+      queueUuid,
+    });
+  }, [patientUuid, queueEntryUuid, queueUuid]);
+
+  return (
+    <Button
+      kind="ghost"
+      onClick={launchEditPriorityModal}
+      iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
+      className={styles.editStatusBtn}
+      hasIconOnly
+      renderIcon={Edit16}
+    />
   );
 }
 
@@ -240,7 +272,7 @@ function ActiveVisitsTable() {
   }, [filteredRows, visitQueueEntries]);
 
   const handleServiceChange = ({ selectedItem }) => {
-    setFilter(selectedItem);
+    setFilter(selectedItem.display);
   };
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
@@ -306,7 +338,8 @@ function ActiveVisitsTable() {
                       label=""
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
-                      items={['All', ...services]}
+                      items={[{ display: 'All' }, ...services]}
+                      itemToString={(item) => (item ? item.display : '')}
                       onChange={handleServiceChange}
                       size="sm"
                     />
@@ -339,6 +372,13 @@ function ActiveVisitsTable() {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
+                          <TableCell className="bx--table-column-menu">
+                            <EditMenu
+                              queueEntryUuid={tableRows?.[index]?.id}
+                              queueUuid={tableRows?.[index]?.queueUuid}
+                              patientUuid={tableRows?.[index]?.patientUuid}
+                            />
+                          </TableCell>
                           <TableCell className="bx--table-column-menu">
                             <ActionsMenu patientUuid={tableRows?.[index]?.patientUuid} />
                           </TableCell>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import XAxis16 from '@carbon/icons-react/es/x-axis/16';
 import { Button, Link } from 'carbon-components-react';
 import BeforeSavePrompt from './before-save-prompt';
@@ -15,12 +15,17 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration-types';
+import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm } from './form-manager';
+import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, parseAddressTemplateXml, scrollIntoView } from './patient-registration-utils';
+import {
+  cancelRegistration,
+  filterUndefinedPatientIdenfier,
+  parseAddressTemplateXml,
+  scrollIntoView,
+} from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
@@ -51,6 +56,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const inEditMode = isLoadingPatientToEdit ? undefined : !!(uuidOfPatientToEdit && patientToEdit);
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
+  const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -94,16 +100,20 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     const abortController = new AbortController();
     helpers.setSubmitting(true);
 
+    const updatedFormValues = { ...values, identifiers: filterUndefinedPatientIdenfier(values.identifiers) };
+
     try {
       await savePatientForm(
         !inEditMode,
-        values,
+        updatedFormValues,
         patientUuidMap,
         initialAddressFieldValues,
         capturePhotoProps,
-        config?.concepts?.patientPhotoUuid,
         location,
         initialFormValues['identifiers'],
+        currentSession,
+        config,
+        savePatientTransactionManager.current,
         abortController,
       );
 
@@ -144,7 +154,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const getDescription = (errors) => {
     return (
       <div>
-        <p>The following fields have errors:</p>
+        <p>{t('fieldErrorTitleMessage', 'The following fields have errors:')}</p>
         <ul style={{ listStyle: 'inside' }}>
           {Object.keys(errors).map((error, index) => (
             <li key={index}>{t(`${error}LabelText`, error)}</li>
@@ -158,7 +168,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
       showToast({
         description: getDescription(errors),
-        title: 'Incomplete form',
+        title: t('incompleteForm', 'Incomplete form'),
         kind: 'warning',
       });
     }

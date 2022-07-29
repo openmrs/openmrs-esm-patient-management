@@ -57,6 +57,7 @@ export interface MappedVisitQueueEntry {
   visitType: string;
   visitUuid: string;
   waitTime: string;
+  queueUuid: string;
 }
 
 interface UseVisitQueueEntries {
@@ -104,7 +105,7 @@ export function useServices() {
   const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
-    services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
+    services: data ? data?.data?.setMembers : [],
   };
 }
 
@@ -145,6 +146,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
     visitType: visitQueueEntry.visit?.visitType?.display,
     visitUuid: visitQueueEntry.visit?.uuid,
+    queueUuid: visitQueueEntry.queueEntry.queue.uuid,
   });
 
   const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);

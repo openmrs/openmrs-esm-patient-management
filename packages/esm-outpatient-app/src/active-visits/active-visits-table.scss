@@ -80,6 +80,10 @@
     overflow: visible;
   }
 
+  :global(.bx--data-table) {
+    background: $ui-03;
+  }
+
   :global(.bx--data-table-header) {
     padding: 0;
   }

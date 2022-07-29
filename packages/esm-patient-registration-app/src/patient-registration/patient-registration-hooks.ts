@@ -4,13 +4,11 @@ import { Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
-import { Identifiers } from './field/id/id-field.component';
 import {
   FormValues,
   PatientRegistration,
   PatientUuidMapType,
   PersonAttributeResponse,
-  PatientIdentifierValue,
   PatientIdentifierResponse,
 } from './patient-registration-types';
 import {

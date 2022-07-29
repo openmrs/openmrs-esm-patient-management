@@ -40,7 +40,7 @@ import BaseVisitType from './base-visit-type.component';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { useActivePatientEnrollment } from '../hooks/useActivePaientEnrollment';
+import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { OutpatientConfig } from '../../config-schema';
 
 interface VisitFormProps {

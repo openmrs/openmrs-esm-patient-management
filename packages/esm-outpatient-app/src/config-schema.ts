@@ -10,7 +10,7 @@ export const configSchema = {
     },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
+      _default: '34bd0bbf-855f-4aeb-9b47-76fbd463861d',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,

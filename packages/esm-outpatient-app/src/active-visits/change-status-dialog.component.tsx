@@ -27,10 +27,12 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
   const [status, setStatus] = useState('');
   const { services } = useServices();
 
-  const changeQueuePriority = useCallback(() => {
+  const changeQueueStatus = useCallback(() => {
     const payload = {
       status: { uuid: status },
       endedAt: new Date(),
+      visitUuid: currentVisit.uuid,
+      patientUuid: patientUuid,
     };
 
     openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
@@ -58,13 +60,13 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
         });
       },
     );
-  }, []);
+  }, [status, currentVisit, patientUuid, queueEntryUuid, t, queueUuid, closeModal, mutate]);
 
   return (
     <div>
       <ModalHeader closeModal={closeModal} title={t('changePatientStatus', 'Change patient status?')} />
       <ModalBody>
-        <Form onSubmit={changeQueuePriority}>
+        <Form onSubmit={changeQueueStatus}>
           <FormGroup legendText="">
             <RadioButtonGroup
               className={styles.radioButtonGroup}
@@ -84,7 +86,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button onClick={changeQueuePriority}>{t('exitAndChangeStatus', 'Exit and change status')}</Button>
+        <Button onClick={changeQueueStatus}>{t('exitAndChangeStatus', 'Exit and change status')}</Button>
       </ModalFooter>
     </div>
   );

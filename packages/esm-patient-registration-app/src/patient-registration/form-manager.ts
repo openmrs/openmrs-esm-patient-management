@@ -1,4 +1,4 @@
-import { queueSynchronizationItem } from '@openmrs/esm-framework';
+import { FetchResponse, queueSynchronizationItem, Session } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -8,6 +8,8 @@ import {
   CapturePhotoProps,
   PatientIdentifier,
   PatientRegistration,
+  RelationshipValue,
+  Encounter,
 } from './patient-registration-types';
 import {
   addPatientIdentifier,
@@ -20,8 +22,11 @@ import {
   saveRelationship,
   updateRelationship,
   updatePatientIdentifier,
+  saveEncounter,
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
+import { RegistrationConfig } from '../config-schema';
+import _ from 'lodash';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -29,23 +34,26 @@ export type SavePatientForm = (
   patientUuidMap: PatientUuidMapType,
   initialAddressFieldValues: Record<string, any>,
   capturePhotoProps: CapturePhotoProps,
-  patientPhotoConceptUuid: string,
   currentLocation: string,
   initialIdentifierValues: FormValues['identifiers'],
+  currentUser: Session,
+  config: RegistrationConfig,
+  savePatientTransactionManager: SavePatientTransactionManager,
   abortController?: AbortController,
-) => Promise<string | null>;
+) => Promise<string | void>;
 
 export default class FormManager {
-  static async savePatientFormOffline(
-    isNewPatient: boolean,
-    values: FormValues,
-    patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: Record<string, any>,
-    capturePhotoProps: CapturePhotoProps,
-    patientPhotoConceptUuid: string,
-    currentLocation: string,
-    initialIdentifierValues: FormValues['identifiers'],
-  ): Promise<null> {
+  static savePatientFormOffline: SavePatientForm = async (
+    isNewPatient,
+    values,
+    patientUuidMap,
+    initialAddressFieldValues,
+    capturePhotoProps,
+    currentLocation,
+    initialIdentifierValues,
+    currentUser,
+    config,
+  ) => {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
         FormManager.getPatientToCreate(values, patientUuidMap, initialAddressFieldValues, []),
@@ -56,9 +64,11 @@ export default class FormManager {
         patientUuidMap,
         initialAddressFieldValues,
         capturePhotoProps,
-        patientPhotoConceptUuid,
         currentLocation,
         initialIdentifierValues,
+        currentUser,
+        config,
+        savePatientTransactionManager: new SavePatientTransactionManager(),
       },
     };
 
@@ -70,19 +80,21 @@ export default class FormManager {
     });
 
     return null;
-  }
+  };
 
-  static async savePatientFormOnline(
-    isNewPatient: boolean,
-    values: FormValues,
-    patientUuidMap: PatientUuidMapType,
-    initialAddressFieldValues: Record<string, any>,
-    capturePhotoProps: CapturePhotoProps,
-    patientPhotoConceptUuid: string,
-    currentLocation: string,
-    initialIdentifierValues: FormValues['identifiers'],
-    abortController: AbortController,
-  ): Promise<string> {
+  static savePatientFormOnline: SavePatientForm = async (
+    isNewPatient,
+    values,
+    patientUuidMap,
+    initialAddressFieldValues,
+    capturePhotoProps,
+    currentLocation,
+    initialIdentifierValues,
+    currentUser,
+    config,
+    savePatientTransactionManager,
+    abortController,
+  ) => {
     const patientIdentifiers: Array<PatientIdentifier> = await FormManager.savePatientIdentifiers(
       isNewPatient,
       values.patientUuid,
@@ -106,48 +118,104 @@ export default class FormManager {
     const savePatientResponse = await savePatient(
       abortController,
       createdPatient,
-      isNewPatient ? undefined : values.patientUuid,
+      isNewPatient && !savePatientTransactionManager.patientSaved ? undefined : values.patientUuid,
     );
 
     if (savePatientResponse.ok) {
-      await Promise.all(
-        values.relationships
-          .filter((m) => m.relationshipType)
-          .filter((relationship) => !!relationship.action)
-          .map(({ relatedPersonUuid, relationshipType, uuid: relationshipUuid, action }) => {
-            const [type, direction] = relationshipType.split('/');
-            const thisPatientUuid = savePatientResponse.data.uuid;
-            const isAToB = direction === 'aIsToB';
-            const relationshipToSave = {
-              personA: isAToB ? relatedPersonUuid : thisPatientUuid,
-              personB: isAToB ? thisPatientUuid : relatedPersonUuid,
-              relationshipType: type,
-            };
+      savePatientTransactionManager.patientSaved = true;
+      await this.saveRelationships(values.relationships, savePatientResponse, abortController);
 
-            switch (action) {
-              case 'ADD':
-                return saveRelationship(abortController, relationshipToSave);
-              case 'UPDATE':
-                return updateRelationship(abortController, relationshipUuid, relationshipToSave);
-              case 'DELETE':
-                return deleteRelationship(abortController, relationshipUuid);
-            }
-          }),
+      await this.saveObservations(
+        values.obs,
+        savePatientResponse,
+        currentLocation,
+        currentUser,
+        config,
+        abortController,
       );
 
-      if (patientPhotoConceptUuid && capturePhotoProps?.imageData) {
+      if (config.concepts.patientPhotoUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
           savePatientResponse.data.uuid,
           capturePhotoProps.imageData,
           '/ws/rest/v1/obs',
           capturePhotoProps.dateTime || new Date().toISOString(),
-          patientPhotoConceptUuid,
+          config.concepts.patientPhotoUuid,
           abortController,
         );
       }
     }
 
     return savePatientResponse.data.uuid;
+  };
+
+  static async saveRelationships(
+    relationships: Array<RelationshipValue>,
+    savePatientResponse: FetchResponse,
+    abortController: AbortController,
+  ) {
+    return Promise.all(
+      relationships
+        .filter((m) => m.relationshipType)
+        .filter((relationship) => !!relationship.action)
+        .map(({ relatedPersonUuid, relationshipType, uuid: relationshipUuid, action }) => {
+          const [type, direction] = relationshipType.split('/');
+          const thisPatientUuid = savePatientResponse.data.uuid;
+          const isAToB = direction === 'aIsToB';
+          const relationshipToSave = {
+            personA: isAToB ? relatedPersonUuid : thisPatientUuid,
+            personB: isAToB ? thisPatientUuid : relatedPersonUuid,
+            relationshipType: type,
+          };
+
+          switch (action) {
+            case 'ADD':
+              return saveRelationship(abortController, relationshipToSave);
+            case 'UPDATE':
+              return updateRelationship(abortController, relationshipUuid, relationshipToSave);
+            case 'DELETE':
+              return deleteRelationship(abortController, relationshipUuid);
+          }
+        }),
+    );
+  }
+
+  static async saveObservations(
+    obss: { [conceptUuid: string]: string },
+    savePatientResponse: FetchResponse,
+    currentLocation: string,
+    currentUser: Session,
+    config: RegistrationConfig,
+    abortController: AbortController,
+  ) {
+    if (obss && Object.keys(obss).length > 0) {
+      if (!config.registrationObs.encounterTypeUuid) {
+        console.error(
+          'The registration form has been configured to have obs fields, ' +
+            'but no registration encounter type has been configured. Obs field values ' +
+            'will not be saved.',
+        );
+      } else {
+        const encounterToSave: Encounter = {
+          encounterDatetime: new Date(),
+          patient: savePatientResponse.data.uuid,
+          encounterType: config.registrationObs.encounterTypeUuid,
+          location: currentLocation,
+          encounterProviders: [
+            {
+              provider: currentUser.currentProvider.uuid,
+              encounterRole: config.registrationObs.encounterProviderRoleUuid,
+            },
+          ],
+          form: config.registrationObs.registrationFormUuid,
+          obs: Object.keys(obss).map((conceptUuid) => ({
+            concept: conceptUuid,
+            value: obss[conceptUuid],
+          })),
+        };
+        return saveEncounter(abortController, encounterToSave);
+      }
+    }
   }
 
   static async savePatientIdentifiers(
@@ -371,4 +439,8 @@ export default class FormManager {
       telecom: patient.person.attributes?.filter((attribute) => attribute.attributeType === 'Telephone Number'),
     };
   }
+}
+
+export class SavePatientTransactionManager {
+  patientSaved = false;
 }
