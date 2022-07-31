@@ -9,9 +9,10 @@ interface MetricsCardProps {
   value: number;
   headerLabel: string;
   children?: React.ReactNode;
+  showList: boolean;
 }
 
-const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, children }) => {
+const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, children, showList }) => {
   const { t } = useTranslation();
 
   return (
@@ -21,9 +22,11 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           <label className={styles.headerLabel}>{headerLabel}</label>
           {children}
         </div>
-        <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('patientList', 'Patient list')}>
-          {t('patientList', 'Patient list')}
-        </Button>
+        {showList ? (
+          <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('patientList', 'Patient list')}>
+            {t('patientList', 'Patient list')}
+          </Button>
+        ) : null}
       </div>
       <div>
         <label className={styles.totalsLabel}>{label}</label>
