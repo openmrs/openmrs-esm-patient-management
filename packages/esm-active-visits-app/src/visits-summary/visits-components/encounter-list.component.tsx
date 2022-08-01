@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   TableContainer,
@@ -12,11 +13,10 @@ import {
   TableCell,
   TableExpandedRow,
 } from '@carbon/react';
+import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import { Observation } from '../visit.resource';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
-import { Observation } from '../visit.resource';
-import { useTranslation } from 'react-i18next';
-import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -64,21 +64,21 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   }, []);
 
   return encounters.length !== 0 ? (
-    <DataTable rows={encounters} headers={headerData}>
+    <DataTable rows={encounters} headers={headerData} size={!isDesktop(layout) ? 'md' : 'sm'}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer>
-            <Table className={styles.customTable} {...getTableProps()} size={!isDesktop(layout) ? 'normal' : 'short'}>
+            <Table className={styles.customTable} {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
-                  {headers.map((header, ind) =>
-                    ind === 0 ? (
-                      <TableHeader id={`header_${visitUuid}_${ind}`} ref={headerRef} {...getHeaderProps({ header })}>
+                  {headers.map((header, i) =>
+                    i === 0 ? (
+                      <TableHeader id={`header_${visitUuid}_${i}`} ref={headerRef} {...getHeaderProps({ header })}>
                         {header.header}
                       </TableHeader>
                     ) : (
-                      <TableHeader id={`header_${visitUuid}_${ind}`} {...getHeaderProps({ header })}>
+                      <TableHeader id={`header_${visitUuid}_${i}`} {...getHeaderProps({ header })}>
                         {header.header}
                       </TableHeader>
                     ),
@@ -86,7 +86,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, ind) => (
+                {rows.map((row, i) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
@@ -99,7 +99,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                         style={{ paddingLeft: isDesktop(layout) ? '3rem' : '4rem' }}
                         colSpan={headers.length + 2}>
                         <div style={{ marginLeft: headerWidth }}>
-                          <EncounterObservations observations={encounters[ind].obs} />
+                          <EncounterObservations observations={encounters[i].obs} />
                         </div>
                       </TableExpandedRow>
                     )}

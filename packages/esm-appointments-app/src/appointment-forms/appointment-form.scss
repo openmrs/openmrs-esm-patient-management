@@ -1,12 +1,13 @@
+@use '@carbon/styles/scss/spacing';
 @import '../root.scss';
 
 .formContainer {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 }
 
 .row {
   display: flex;
-  margin: $spacing-03;
+  margin: spacing.$spacing-03;
 }
 
 .select {
@@ -15,11 +16,11 @@
 }
 
 .childRow {
-  margin-left: $spacing-05;
+  margin-left: spacing.$spacing-05;
 }
 
 .inputContainer {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 }
 
 .button {

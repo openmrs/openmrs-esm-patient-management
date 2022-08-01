@@ -1,11 +1,11 @@
 const React = require('react');
 const reactI18next = require('react-i18next');
 
-const hasChildren = node => node && (node.children || (node.props && node.props.children));
+const hasChildren = (node) => node && (node.children || (node.props && node.props.children));
 
-const getChildren = node => (node && node.children ? node.children : node.props && node.props.children);
+const getChildren = (node) => (node && node.children ? node.children : node.props && node.props.children);
 
-const renderNodes = reactNodes => {
+const renderNodes = (reactNodes) => {
   if (typeof reactNodes === 'string') {
     return reactNodes;
   }
@@ -29,14 +29,14 @@ const renderNodes = reactNodes => {
   });
 };
 
-const useMock = [k => k, {}];
+const useMock = [(k) => k, {}];
 useMock.t = (k, o) => (o && o.defaultValue) || (typeof o === 'string' ? o : k);
 useMock.i18n = {};
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop
   Trans: ({ children }) => renderNodes(children),
-  Translation: ({ children }) => children(k => k, { i18n: {} }),
+  Translation: ({ children }) => children((k) => k, { i18n: {} }),
   useTranslation: () => useMock,
 
   // mock if needed

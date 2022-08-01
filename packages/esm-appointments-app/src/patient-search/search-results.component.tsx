@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import styles from './search-results.scss';
-import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
+import { SearchTypes } from '../types';
+import styles from './search-results.scss';
 
 interface SearchResultsProps {
   patients: Array<any>;

@@ -17,6 +17,15 @@ const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
 const mockedShowToast = showToast as jest.Mock;
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
+
 // Mock field.resource using the manual mock (in __mocks__)
 jest.mock('./field/field.resource');
 
@@ -33,7 +42,17 @@ jest.mock('./patient-registration.resource', () => {
 
   return {
     ...originalModule,
+    saveEncounter: jest.fn(),
     savePatient: jest.fn(),
+  };
+});
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
   };
 });
 

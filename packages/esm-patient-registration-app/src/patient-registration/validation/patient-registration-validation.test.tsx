@@ -24,10 +24,11 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     useConfig: jest.fn(),
+    validator: jest.fn(),
   };
 });
 
-describe('name input', () => {
+describe('Name input', () => {
   const formValues: FormValues = initialFormValues;
 
   const testValidName = (givenNameValue: string, middleNameValue: string, familyNameValue: string) => {
@@ -83,6 +84,7 @@ describe('name input', () => {
         <Form>
           <PatientRegistrationContext.Provider
             value={{
+              initialFormValues: null,
               identifierTypes: [],
               validationSchema,
               setValidationSchema: () => {},

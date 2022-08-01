@@ -24,7 +24,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
           </Button>
         </div>
       ) : (
-        <Header className={styles.tabletOverlayHeader}>
+        <Header className={styles.tabletOverlayHeader} aria-label="Close overlay">
           <Button onClick={close} hasIconOnly>
             <ArrowLeft size={16} onClick={close} />
           </Button>

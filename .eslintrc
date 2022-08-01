@@ -25,6 +25,10 @@
           {
             "group": ["@carbon/icons-react"],
             "message": "Import from `@carbon/react/icons`. e.g. `import { ChevronUp } from '@carbon/react/icons'`"
+          },
+          {
+            "group": ["@import '~carbon-components/src/globals/scss/vars'"],
+            "message": "Import from `@carbon/styles/scss`. e.g. `@use '@carbon/styles/scss/type'`"
           }
         ]
       }

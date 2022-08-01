@@ -55,10 +55,13 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {addressLayout.map((attributes) => (
+        {addressLayout.map((attributes, index) => (
           <ComboInput
+            key={`combo_input_${index}`}
             name={attributes.name}
             labeltext={attributes.labelText}
+            // @ts-ignore
+            // Fix this more conclusively
             items={[]}
             id={attributes.name}
             placeholder={attributes.labelText}

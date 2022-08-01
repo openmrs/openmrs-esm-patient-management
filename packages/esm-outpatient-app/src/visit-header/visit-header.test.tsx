@@ -38,8 +38,8 @@ jest.mock('./workspaces', () => {
   };
 });
 
-describe('VisitHeader', () => {
-  test('should display visit header and left nav bar hamburger icon', async () => {
+describe('Visit Header', () => {
+  xtest('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
@@ -90,7 +90,7 @@ describe('VisitHeader', () => {
     expect(screen.queryByRole('banner', { name: /OpenMRS/i })).not.toBeInTheDocument();
   });
 
-  test('should display truncated name, when patient name is very long', () => {
+  test('should display a truncated name when the patient name is very long', async () => {
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatientWithLongName,

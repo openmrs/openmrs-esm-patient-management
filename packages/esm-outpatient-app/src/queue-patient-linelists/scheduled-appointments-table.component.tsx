@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../__mocks__/appointments.mock';
+import { mockAppointmentsData } from '../../__mocks__/appointments-data.mock';
 import { useAppointments } from './queue-linelist.resource';
 
 const pageSize = 20;

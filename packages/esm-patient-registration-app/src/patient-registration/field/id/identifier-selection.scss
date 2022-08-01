@@ -1,13 +1,21 @@
 @use '@carbon/styles/scss/spacing';
 @import '../../patient-registration.scss';
 
-.overlayButtons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
 }
 
-.overlayButtons button {
-  max-width: unset;
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
 }
 
 .radioGroup {

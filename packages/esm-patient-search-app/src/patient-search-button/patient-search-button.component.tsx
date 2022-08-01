@@ -34,7 +34,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
         onClick={() => setShowSearchOverlay(true)}
         aria-label="Search Patient Button"
         aria-labelledby="Search Patient Button"
-        renderIcon={(props) => <Search size={20} />}
+        renderIcon={(props) => <Search size={20} {...props} />}
         {...buttonProps}>
         {buttonText ? buttonText : t('searchPatient', 'Search Patient')}
       </Button>

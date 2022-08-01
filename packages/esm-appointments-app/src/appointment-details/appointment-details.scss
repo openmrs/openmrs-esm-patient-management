@@ -1,38 +1,41 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 .container {
-  padding: $spacing-03;
+  padding: spacing.$spacing-03;
 }
 
 .heading {
-  @include carbon--type-style('body-short-02');
+  @include type.type-style('body-compact-02');
   color: $ui-05;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .subHeading {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
   color: $text-02;
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }
 
 .label {
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
   font: inherit;
 }
 
 .appointmentHistoryLabel {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $color-blue-60-2;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .appointmentHistoryMissedLabel {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $danger;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .tag {
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }

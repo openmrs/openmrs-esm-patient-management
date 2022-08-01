@@ -4,6 +4,7 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  Layer,
   OverflowMenu,
   OverflowMenuItem,
   Table,
@@ -20,18 +21,15 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import Omega16 from '@carbon/icons-react/es/omega/16';
-import Cough16 from '@carbon/icons-react/es/cough/16';
-import Medication16 from '@carbon/icons-react/es/medication/16';
-import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
-import PatientSearch from '../patient-search/patient-search.component';
-import styles from './appointments-base-table.scss';
-import { MappedAppointment } from '../types';
+} from '@carbon/react';
+import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
+import { isDesktop, useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
+import { MappedAppointment, Appointment } from '../types';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import AppointmentForm from '../appointment-forms/appointment-form.component';
+import PatientSearch from '../patient-search/patient-search.component';
+import styles from './appointments-base-table.scss';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -70,11 +68,11 @@ const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment }) => {
 function ServiceIcon({ service }) {
   switch (service) {
     case 'TB Clinic':
-      return <Cough16 />;
+      return <Cough size={16} />;
     case 'HIV Clinic':
-      return <Omega16 />;
+      return <Omega size={16} />;
     case 'Drug Dispense':
-      return <Medication16 />;
+      return <Medication size={16} />;
     default:
       return null;
   }
@@ -82,7 +80,7 @@ function ServiceIcon({ service }) {
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
 
   const tableHeaders = useMemo(
     () => [
@@ -160,7 +158,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
             <Button
               kind="ghost"
               size="small"
-              renderIcon={Add16}
+              renderIcon={<Add size={16} />}
               onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
               {t('addNewAppointment', 'Add new Appointment')}
             </Button>
@@ -177,7 +175,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         <Button
           size="small"
           kind="secondary"
-          renderIcon={Add16}
+          renderIcon={<Add size={16} />}
           onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
           iconDescription={t('addNewAppointment', 'Add new Appointment')}>
           {t('addNewAppointment', 'Add new Appointment')}
@@ -185,9 +183,9 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       </div>
       <DataTable
         headers={tableHeaders}
-        overflowMenuOnHover={isDesktop ? true : false}
+        overflowMenuOnHover={isDesktop(layout) ? true : false}
         rows={tableRows}
-        size="compact"
+        size="sm"
         useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
@@ -221,7 +219,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
-                        <TableCell className="bx--table-column-menu">
+                        <TableCell className="cds--table-column-menu">
                           <ActionsMenu appointment={appointments?.[index]} />
                         </TableCell>
                       </TableExpandRow>
@@ -239,20 +237,22 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
             </Table>
             {rows.length === 0 ? (
               <div className={styles.tileContainer}>
-                <Tile className={styles.tile}>
-                  <div className={styles.tileContent}>
-                    <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                    <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                  </div>
-                  <p className={styles.separator}>{t('or', 'or')}</p>
-                  <Button
-                    kind="ghost"
-                    size="small"
-                    renderIcon={Add16}
-                    onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-                    {t('addNewAppointment', 'Add new Appointment')}
-                  </Button>
-                </Tile>
+                <Layer>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                    <p className={styles.separator}>{t('or', 'or')}</p>
+                    <Button
+                      kind="ghost"
+                      size="small"
+                      renderIcon={<Add size={16} />}
+                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
+                      {t('addNewAppointment', 'Add new Appointment')}
+                    </Button>
+                  </Tile>
+                </Layer>
               </div>
             ) : null}
           </TableContainer>

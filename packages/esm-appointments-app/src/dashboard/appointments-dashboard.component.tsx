@@ -1,8 +1,9 @@
-import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
-import PatientQueueHeader from '../appointments-header/appointments-header.component';
+import { useMatch } from 'react-router-dom';
+import { attach, detach, ExtensionSlot, isDesktop, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
+import { spaBasePath } from '../constants';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
+import PatientQueueHeader from '../appointments-header/appointments-header.component';
 import styles from './appointments-dashboard.scss';
 
 export interface DashboardConfig {
@@ -11,15 +12,13 @@ export interface DashboardConfig {
   title: string;
 }
 
-const AppointmentsDashboard: React.FC<RouteComponentProps<{ view: string }>> = ({ match }) => {
+const AppointmentsDashboard: React.FC = () => {
   const {
     params: { view },
-  } = match;
-  const layout = useLayoutType();
-
-  const extensionStore = useExtensionStore();
+  } = useMatch(spaBasePath);
   const { navGroups } = useNavGroups();
-
+  const extensionStore = useExtensionStore();
+  const layout = useLayoutType();
   const ungroupedDashboards =
     extensionStore.slots['appointments-dashboard-slot']?.assignedExtensions
       .map((e) => e.meta)
@@ -31,7 +30,7 @@ const AppointmentsDashboard: React.FC<RouteComponentProps<{ view: string }>> = (
   const currentDashboard = dashboards.find((dashboard) => dashboard.name === view) || dashboards[0];
 
   useEffect(() => {
-    if (layout != 'desktop') {
+    if (!isDesktop(layout)) {
       attach('global-nav-menu-slot', 'appointments-side-nav-ext');
     }
     return () => detach('global-nav-menu-slot', 'appointments-side-nav-ext');
@@ -39,9 +38,9 @@ const AppointmentsDashboard: React.FC<RouteComponentProps<{ view: string }>> = (
 
   return (
     <div className={styles.dashboardContainer}>
-      {layout === 'desktop' && <ExtensionSlot extensionSlotName="appointments-sidebar-slot" key={layout} />}
+      {isDesktop(layout) && <ExtensionSlot extensionSlotName="appointments-sidebar-slot" key={layout} />}
       {currentDashboard && (
-        <div className={`bx--grid ${styles.dashboardContent}`}>
+        <div className={`cds--grid ${styles.dashboardContent}`}>
           <PatientQueueHeader title={currentDashboard.title} />
           <DashboardView
             dashboardSlot={currentDashboard.slot}

@@ -4,6 +4,15 @@ import Root from './root.component';
 
 window['getOpenmrsSpaBase'] = jest.fn().mockImplementation(() => '/');
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
+
 describe('root component', () => {
   it('renders without crashing', () => {
     const div = document.createElement('div');

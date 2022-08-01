@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import {
-  Toggle,
-  TimePicker,
-  TimePickerSelect,
+  Button,
+  ButtonSet,
+  ContentSwitcher,
+  DatePicker,
+  DatePickerInput,
+  RadioButton,
+  RadioButtonGroup,
   Select,
   SelectItem,
   Switch,
-  ContentSwitcher,
-  RadioButtonGroup,
-  RadioButton,
   TextArea,
-  DatePicker,
-  DatePickerInput,
-  Button,
-  ButtonSet,
-} from 'carbon-components-react';
-import { useTranslation } from 'react-i18next';
-import styles from './appointment-form.scss';
-import { mockFrequency, mockProviders } from '../../../../__mocks__/appointments.mock';
+  TimePicker,
+  TimePickerSelect,
+  Toggle,
+} from '@carbon/react';
 import {
   useLocations,
   useSession,
@@ -27,18 +26,18 @@ import {
   usePatient,
   useConfig,
 } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
-import { AppointmentPayload, MappedAppointment } from '../types';
 import { convertTime12to24, amPm } from '../helpers';
-import { saveAppointment, useServices } from '../appoinments-tabs/appointments-table.resource';
+import { saveAppointment, useServices } from '../appointments-tabs/appointments-table.resource';
+import { mockFrequency, mockProviders, mockServiceTypes } from '../../__mocks__/appointments.mock';
+import { AppointmentPayload, MappedAppointment } from '../types';
 import { ConfigObject } from '../config-schema';
+import styles from './appointment-form.scss';
 
 interface AppointmentFormProps {
   appointment: MappedAppointment;
 }
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   const { t } = useTranslation();
-
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;

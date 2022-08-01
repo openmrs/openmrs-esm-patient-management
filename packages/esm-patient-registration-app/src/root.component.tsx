@@ -5,6 +5,7 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import { Resources, ResourcesContext } from './offline.resources';
 import { SavePatientForm } from './patient-registration/form-manager';
 import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
+import styles from './root.scss';
 
 export interface RootProps extends PatientRegistrationProps, Resources {
   savePatientForm: SavePatientForm;
@@ -28,7 +29,7 @@ export default function Root({
 
   return (
     <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
-      <Grid>
+      <Grid className={styles.grid}>
         <Row>
           <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
         </Row>

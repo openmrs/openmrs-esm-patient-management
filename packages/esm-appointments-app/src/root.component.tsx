@@ -14,7 +14,7 @@ const Root: React.FC = () => {
     <main>
       <SWRConfig value={swrConfiguration}>
         <BrowserRouter basename={spaBasePath}>
-          <Route path="/:view?" component={AppointmentsDashboard} />
+          <Route path="/:view?" element={<AppointmentsDashboard />} />
           <Overlay />
         </BrowserRouter>
       </SWRConfig>

@@ -10,8 +10,6 @@
 .searchResultsContainer {
   width: 100%;
   background-color: $ui-02;
-  padding: 0rem spacing.$spacing-05;
-  overflow-y: auto;
 
   a {
     text-decoration: none;
@@ -49,14 +47,8 @@
 .resultsText {
   @include type.type-style('label-01');
   color: $text-02;
-  line-height: $spacing-05;
-  padding: $spacing-03 $spacing-04 0 $spacing-04;
-  // border-bottom: 0.063rem solid $ui-03;
-  // padding: spacing.$spacing-03 0rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .resultsText {
-  margin: spacing.$spacing-05;
+  line-height: spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-05;
 }
 
 .helperText {

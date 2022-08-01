@@ -1,16 +1,17 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "carbon-components/scss/globals/scss/typography.scss";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .searchboxContainer {
   display: flex;
   align-items: center;
-  margin-bottom: $spacing-08;
+  margin-bottom: spacing.$spacing-08;
 }
 
 .searchInput {
   input:focus {
     outline: none;
-    border: $spacing-01 solid var(--omrs-color-brand-orange);
+    border: spacing.$spacing-01 solid var(--omrs-color-brand-orange);
   }
 }
 
@@ -40,27 +41,28 @@
   color: $text-02;
 
   .primaryText {
-    @include carbon--type-style("productive-heading-01");
+    @include type.type-style('heading-compact-01');
   }
 
   .secondaryText {
     width: 12rem;
     margin-top: 0.25rem;
-    @include carbon--type-style("body-long-01");
+    @include type.type-style('body-01');
   }
 }
 
 .separator {
-  @include carbon--type-style('productive-heading-03');
+  @include type.type-style('heading-03');
   color: $text-02;
   width: 12rem;
   margin: 3rem auto;
   overflow: hidden;
   text-align: center;
 
-  &::before, &::after {
+  &::before,
+  &::after {
     background-color: $text-03;
-    content: "";
+    content: '';
     display: inline-block;
     height: 1px;
     position: relative;

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-const EmptyDataIllustration = ({ width = '61', height = '59' }) => {
+const EmptyDataIllustration = ({ width = '64', height = '64' }) => {
   return (
-    <svg width={width} height={height} viewBox="0 0 61 59">
+    <svg width={width} height={height} viewBox="0 0 64 64">
       <title>Empty data illustration</title>
       <g fill="none" fillRule="evenodd">
         <path

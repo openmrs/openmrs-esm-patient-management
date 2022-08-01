@@ -1,23 +1,21 @@
-import { useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import PatientSearchComponent from './patient-search-lg.component';
 import styles from './patient-search-page.scss';
 
-interface RouteParams {
-  query: string;
+interface PatientSearchPageComponentProps {
+  query?: string;
 }
 
-interface PatientSearchPageComponentProps extends RouteComponentProps<RouteParams> {}
+const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = () => {
+  const { query } = useParams();
+  const layout = useLayoutType();
 
-const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ({ match }) => {
-  const { query } = match.params;
-  const isDesktop = useLayoutType() === 'desktop';
-
-  return isDesktop ? (
+  return isDesktop(layout) ? (
     <div className={styles.patientSearchPage}>
       <div className={styles.patientSearchComponent}>
-        <PatientSearchComponent query={query} inTabletOrOverlay={!isDesktop} stickyPagination />
+        <PatientSearchComponent query={query} inTabletOrOverlay={!isDesktop(layout)} stickyPagination />
       </div>
     </div>
   ) : (

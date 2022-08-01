@@ -44,6 +44,7 @@
   "frequency": "Frequency",
   "futureScheduledVisits": " {count, plural, one{{count} visit} other{{count} visits}} scheduled for dates in the future",
   "futureScheduledVisits_plural": "",
+  "getAppointmentReminder": "Would you like to get a reminder about this appointment?",
   "highestServiceVolume": "High volume Service.  today",
   "lastName": "Last name",
   "lastVisit": "Last Visit",

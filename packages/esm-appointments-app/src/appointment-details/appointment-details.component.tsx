@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './appointment-details.scss';
-import { Row, Grid, Column, Tag } from 'carbon-components-react';
+import { Row, Grid, Column, Tag } from '@carbon/react';
 import { MappedAppointment } from '../types/index';
+import styles from './appointment-details.scss';
 
 export default function AppointmentDetails({ appointment }: { appointment: MappedAppointment }) {
   const { t } = useTranslation();

@@ -1,18 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from 'carbon-components-react';
+import { InlineLoading } from '@carbon/react';
+import { ErrorState } from '@openmrs/esm-framework';
+import { useClinicalMetrics } from '../hooks/useClinicalMetrics';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
-import { ErrorState } from '@openmrs/esm-framework';
-import { useClinicalMetrics } from '../hooks/useClinicalMetrics';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
   const { totalAppointments, highestServiceLoad, isLoading, error } = useClinicalMetrics();
 
   if (isLoading) {
-    return <InlineLoading description={t('loading', 'Loading...')} />;
+    return <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />;
   }
 
   if (error) {
@@ -31,6 +31,7 @@ const AppointmentsMetrics: React.FC = () => {
         <MetricsCard
           label={t(highestServiceLoad?.serviceName)}
           value={highestServiceLoad?.count ?? '--'}
+          // FIX: Strange translation string
           headerLabel={t('highestServiceVolume', 'High volume Service.  today')}
         />
         <MetricsCard
@@ -44,6 +45,3 @@ const AppointmentsMetrics: React.FC = () => {
 };
 
 export default AppointmentsMetrics;
-function useAppointmentsMetrics(): { metrics: any; isError: any; isLoading: any } {
-  throw new Error('Function not implemented.');
-}

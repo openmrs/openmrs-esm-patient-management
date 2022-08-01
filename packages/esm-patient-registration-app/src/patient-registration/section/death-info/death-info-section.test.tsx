@@ -5,6 +5,15 @@ import { initialFormValues } from '../../patient-registration.component';
 import { DeathInfoSection } from './death-info-section.component';
 import { FormValues } from '../../patient-registration-types';
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
+
 // TODO: Implement feature and get tests to pass
 describe.skip('death info section', () => {
   const formValues: FormValues = initialFormValues;

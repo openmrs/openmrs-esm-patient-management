@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
@@ -19,6 +19,7 @@ interface PatientIdentifierOverlayProps {
 }
 
 const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ closeOverlay, setFieldValue }) => {
+  const layout = useLayoutType();
   const { identifierTypes } = useContext(ResourcesContext);
   const { isOffline, values, initialFormValues } = useContext(PatientRegistrationContext);
   const [unsavedIdentifierTypes, setUnsavedIdentifierTypes] = useState<FormValues['identifiers']>(values.identifiers);
@@ -143,14 +144,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       }),
     [
       filteredIdentifiers,
-      values.identifiers,
-      defaultPatientIdentifierTypesMap,
-      isOffline,
-      shouldBlockPatientIdentifierInOfflineMode,
-      isUniqueIdentifierTypeForOffline,
-      handleCheckingIdentifier,
       unsavedIdentifierTypes,
-      handleSelectingIdentifierSource,
+      defaultPatientIdentifierTypesMap,
+      values.identifiers,
+      isOffline,
+      handleCheckingIdentifier,
     ],
   );
 
@@ -164,14 +162,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       close={closeOverlay}
       header={t('configureIdentifiers', 'Configure identifiers')}
       buttonsGroup={
-        <div className={styles.overlayButtons}>
-          <Button kind="secondary" size="lg" onClick={closeOverlay}>
+        <ButtonSet className={isDesktop(layout) ? styles.desktop : styles.tablet}>
+          <Button className={styles.button} kind="secondary" onClick={closeOverlay}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button kind="primary" size="lg" onClick={handleConfiguringIdentifiers}>
+          <Button className={styles.button} kind="primary" onClick={handleConfiguringIdentifiers}>
             {t('configureIdentifiers', 'Configure identifiers')}
           </Button>
-        </div>
+        </ButtonSet>
       }>
       <div>
         <p className={styles.bodyLong02}>

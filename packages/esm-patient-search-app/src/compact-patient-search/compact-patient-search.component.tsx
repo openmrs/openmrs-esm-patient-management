@@ -1,8 +1,8 @@
-import { navigate } from '@openmrs/esm-framework';
 import React, { useCallback, useState } from 'react';
+import { navigate } from '@openmrs/esm-framework';
+import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import styles from './compact-patient-search.scss';
-import PatientSearch from './patient-search.component';
 
 interface CompactPatientSearchProps {
   query: string;

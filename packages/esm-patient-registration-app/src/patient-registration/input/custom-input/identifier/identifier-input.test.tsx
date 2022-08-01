@@ -5,6 +5,15 @@ import { IdentifierInput } from './identifier-input.component';
 import { initialFormValues } from '../../../patient-registration.component';
 import { PatientIdentifierType } from '../../../patient-registration-types';
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
+
 describe.skip('identifier input', () => {
   const openmrsID = {
     name: 'OpenMRS ID',

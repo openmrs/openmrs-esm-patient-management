@@ -8,7 +8,7 @@ import CompactPatientSearchComponent from '../compact-patient-search/compact-pat
 import styles from './patient-search-icon.scss';
 
 interface PatientSearchLaunchProps {
-  location: {
+  location?: {
     pathname: string;
   };
 }
@@ -67,11 +67,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
 
       <div className={`${showSearchInput && styles.closeButton}`}>
         <HeaderGlobalAction
-          className={`${showSearchInput ? styles.activeSearchIconButton : styles.searchIconButton}`}
-          onClick={handleGlobalAction}
-          aria-label="Search Patient"
+          aria-label={t('searchPatient', 'Search Patient')}
           aria-labelledby="Search Patient"
-          name="SearchPatientIcon">
+          className={`${showSearchInput ? styles.activeSearchIconButton : styles.searchIconButton}`}
+          name="SearchPatientIcon"
+          onClick={handleGlobalAction}>
           {showSearchInput ? <Close size={20} /> : <Search size={20} />}
         </HeaderGlobalAction>
       </div>

@@ -1,8 +1,11 @@
-@import "./root.scss";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import './root.scss';
 
 .desktopOverlay {
   position: fixed;
-  top: $spacing-09;
+  top: spacing.$spacing-09;
   width: 37rem;
   right: 0;
   bottom: 0;
@@ -26,7 +29,7 @@
   z-index: 9999;
   background-color: $ui-01;
   overflow: hidden;
-  padding-top: $spacing-09;
+  padding-top: spacing.$spacing-09;
   display: grid;
   grid-template-rows: 1fr auto;
 }
@@ -51,12 +54,12 @@
   position: -webkit-sticky;
   width: 100%;
   z-index: 1000;
-  top: 0
+  top: 0;
 }
 
 .headerContent {
-  @include carbon--type-style("productive-heading-02");
-  padding: 0 $spacing-05;
+  @include type.type-style('heading-compact-02');
+  padding: 0 spacing.$spacing-05;
   color: $ui-05;
 }
 

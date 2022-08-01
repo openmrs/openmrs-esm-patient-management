@@ -1,17 +1,17 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .metricsContainer {
   display: flex;
-  justify-content: space-between ;
-  background-color: $ui-02 ;
-  height: $spacing-10;
+  justify-content: space-between;
+  background-color: $ui-02;
+  height: spacing.$spacing-10;
   align-items: center;
-  padding: 0 $spacing-05;
+  padding: 0 spacing.$spacing-05;
 }
 
 .metricsTitle {
-  @include carbon--type-style("productive-heading-03");
+  @include type.type-style('heading-03');
   color: $ui-05;
 }

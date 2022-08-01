@@ -1,5 +1,5 @@
-import FormManager from './patient-registration/form-manager';
 import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import FormManager from './patient-registration/form-manager';
 import {
   fetchCurrentSession,
   fetchAddressTemplate,
@@ -24,8 +24,6 @@ const resources = {
 };
 
 function setupOpenMRS() {
-  setupOffline();
-
   const options = {
     featureName: 'Patient Registration',
     moduleName,
@@ -41,11 +39,13 @@ function setupOpenMRS() {
     },
   ]);
 
+  setupOffline();
+
   return {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./root.component'), options),
-        route: 'patient-registration',
+        route: '^patient-registration',
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
           isOffline: false,
@@ -61,7 +61,7 @@ function setupOpenMRS() {
           featureName: 'edit-patient-details-form',
           moduleName,
         }),
-        route: /^patient\/([a-zA-Z0-9\-]+)\/edit/,
+        route: /patient\/([a-zA-Z0-9\-]+)\/edit/,
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
         },
@@ -89,13 +89,6 @@ function setupOpenMRS() {
         id: 'patient-photo-widget',
         slot: 'patient-photo-slot',
         load: getAsyncLifecycle(() => import('./widgets/display-photo.component'), options),
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'edit-patient-details-button',
-        slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./widgets/edit-patient-details-button.component'), options),
         online: true,
         offline: true,
       },

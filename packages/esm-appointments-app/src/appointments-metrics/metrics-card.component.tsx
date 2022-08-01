@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile, Button } from 'carbon-components-react';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Tile, Button } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
@@ -21,7 +21,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           <label className={styles.headerLabel}>{headerLabel}</label>
           {children}
         </div>
-        <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('view', 'View')}>
+        <Button kind="ghost" renderIcon={<ArrowRight size={16} />} iconDescription={t('view', 'View')}>
           {t('view', 'View')}
         </Button>
       </div>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Button } from 'carbon-components-react';
-import styles from './appointment-list.scss';
 import { useTranslation } from 'react-i18next';
-import Calendar16 from '@carbon/icons-react/es/calendar/16';
-import BookedAppointments from '../appoinments-tabs/booked-appointments.component';
-import CompletedAppointments from '../appoinments-tabs/completed-appointments.component';
-import CancelledAppointment from '../appoinments-tabs/cancelled-appointments.component';
+import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
+import { Calendar } from '@carbon/react/icons';
+import BookedAppointments from '../appointments-tabs/booked-appointments.component';
+import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
+import CancelledAppointment from '../appointments-tabs/cancelled-appointments.component';
+import styles from './appointment-list.scss';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -38,22 +38,29 @@ const AppointmentList: React.FC = () => {
       <Button
         className={styles.calendarButton}
         kind="primary"
-        renderIcon={Calendar16}
+        renderIcon={<Calendar size={16} />}
         data-floating-menu-primary-focus
         iconDescription={t('viewCalendar', 'View Calendar')}>
         {t('viewCalendar', 'View Calendar')}
       </Button>
 
-      <Tabs className={styles.tabs} type="container" selected={selectedTab} onSelectionChange={handleStatusChange}>
-        <Tab defaultChecked label={t('bookedForToday', 'Booked for today')}>
-          {selectedTab === 0 && <BookedAppointments status={selectedStatus} />}
-        </Tab>
-        <Tab label={t('cancelled', 'Cancelled')}>
-          {selectedTab === 1 && <CancelledAppointment status={selectedStatus} />}
-        </Tab>
-        <Tab label={t('completed', 'Completed')}>
-          {selectedTab === 2 && <CompletedAppointments status={selectedStatus} />}
-        </Tab>
+      <Tabs className={styles.tabs}>
+        <TabList aria-label="Appointment tabs" contained>
+          <Tab>{t('bookedForToday', 'Booked for today')}</Tab>
+          <Tab>{t('cancelled', 'Cancelled')}</Tab>
+          <Tab>{t('completed', 'Completed')}</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <BookedAppointments status={selectedStatus} />
+          </TabPanel>
+          <TabPanel>
+            <CancelledAppointment status={selectedStatus} />
+          </TabPanel>
+          <TabPanel>
+            <CompletedAppointments status={selectedStatus} />
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </div>
   );
