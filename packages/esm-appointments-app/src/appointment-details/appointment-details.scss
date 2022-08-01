@@ -1,0 +1,38 @@
+@import '../root.scss';
+
+.container {
+  padding: $spacing-03;
+}
+
+.heading {
+  @include carbon--type-style('body-short-02');
+  color: $ui-05;
+  margin-bottom: $spacing-03;
+}
+
+.subHeading {
+  @include carbon--type-style('label-01');
+  color: $text-02;
+  margin-bottom: $spacing-05;
+}
+
+.label {
+  margin-bottom: $spacing-03;
+  display: inline-block;
+}
+
+.appointmentHistoryLabel {
+  @include carbon--type-style('productive-heading-01');
+  color: $color-blue-60-2;
+  margin-bottom: $spacing-03;
+}
+
+.appointmentHistoryMissedLabel {
+  @include carbon--type-style('productive-heading-01');
+  color: $danger;
+  margin-bottom: $spacing-03;
+}
+
+.tag {
+  margin-bottom: $spacing-05;
+}

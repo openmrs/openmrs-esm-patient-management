@@ -29,6 +29,7 @@ import { useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@ope
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import { MappedAppointment } from '../types';
+import AppointmentDetails from '../appointment-details/appointment-details.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -200,7 +201,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
-                            <></>
+                            <AppointmentDetails appointment={tableRows?.[index]} />
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
