@@ -8,14 +8,6 @@
   align-items: center;
 }
 
-.patientSearchInput input:focus {
-  outline: none;
-}
-
-.patientSearchBar {
-  width: 50vw;
-}
-
 .searchIconButton {
   @include brand-01(background-color);
 }

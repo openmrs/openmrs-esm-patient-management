@@ -3,16 +3,10 @@ import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { useConfig } from '@openmrs/esm-framework';
 import { Loading, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from './empty-data-illustration.component';
-import PatientSearchResults, { SearchResultSkeleton } from '../patient-search-result/patient-search-result.component';
+import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
+import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
 import styles from './patient-search.scss';
-import { usePatientSearch } from './patient-search.resource';
-
-const customRepresentation =
-  'custom:(patientId,uuid,identifiers,display,' +
-  'patientIdentifier:(uuid,identifier),' +
-  'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
-  'attributes:(value,attributeType:(name)))';
+import { usePatientSearchInfinite } from '../patient-search.resource';
 
 interface PatientSearchProps {
   hidePanel?: () => void;
@@ -30,7 +24,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
     loadingNewData,
     setPage,
     hasMore,
-  } = usePatientSearch(query, customRepresentation, config.includeDead, !!query);
+    totalResults,
+  } = usePatientSearchInfinite(query, config.includeDead, !!query);
 
   const observer = useRef(null);
   const loadingIconRef = useCallback(
@@ -77,8 +72,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
           <div
             className={styles.searchResults}
             style={{
-              maxHeight: '20rem',
+              maxHeight: '22rem',
             }}>
+            <p className={styles.labelText}>
+              {totalResults} {t('searchResultsText', 'search results')}
+            </p>
             <PatientSearchResults
               hidePanel={hidePanel}
               patients={searchResults}

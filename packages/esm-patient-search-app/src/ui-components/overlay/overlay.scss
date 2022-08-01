@@ -6,7 +6,7 @@
   right: 0;
   height: calc(100vh - 3rem);
   min-width: 33rem;
-  background-color: $ui-02;
+  background-color: $ui-01;
   border-left: 1px solid $text-03;
   overflow: hidden;
   display: grid;
@@ -21,7 +21,7 @@
   left: 0;
   right: 0;
   z-index: 9999;
-  background-color: $ui-02;
+  background-color: $ui-01;
   overflow: hidden;
   padding-top: $spacing-09;
   display: grid;
