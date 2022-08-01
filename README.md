@@ -4,9 +4,10 @@
 
 # OpenMRS Patient Management
 
-This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists and managing patient queues in an outpatient setting. The modules within this repository include:
+This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
 
 - [Active visits app](packages/esm-active-visits-app/)
+- [Appointments app](packages/esm-appointments-app/)
 - [Outpatient app](packages/esm-outpatient-app/README.md)
 - [Patient search](packages/esm-patient-search-app)
 - [Patient registration](packages/esm-patient-registration-app)
@@ -17,6 +18,11 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
 This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+
+To install the dependancies, run:
+```bash
+npx lerna bootstrap
+```
 
 To start a dev server running all the modules simultaneously, run:
 
