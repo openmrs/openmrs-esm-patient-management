@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { AppointmentsFetchResponse } from '../types';
+import { AppointmentsFetchResponse, AppointmentPayload } from '../types';
 
 export function useAppointments() {
   const apiUrl = `/ws/rest/v1/appointments?v=full`;
@@ -35,3 +35,28 @@ export function useAppointments() {
     isValidating,
   };
 }
+
+export function editAppointment(appointment: AppointmentPayload, abortController: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/appointment`, {
+    method: 'POST',
+    signal: abortController.signal,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: appointment,
+  });
+}
+
+export function usePatient(uuid: string) {
+  const apiUrl = `/ws/rest/v1/patient/${uuid}`;
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<fhir.Patient> } }, Error>(apiUrl, openmrsFetch);
+
+  return {
+    patient: data ? data.data : null,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
+}
+
+export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

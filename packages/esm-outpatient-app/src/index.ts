@@ -74,6 +74,13 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'patient-info-banner-slot',
+        load: getAsyncLifecycle(() => import('./patient-info/patient-info.component'), {
+          featureName: 'patient info slot',
+          moduleName,
+        }),
+      },
     ],
   };
 }

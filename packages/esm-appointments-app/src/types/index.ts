@@ -109,3 +109,15 @@ export interface MappedAppointment {
   location: string;
   comments: string;
 }
+
+export interface AppointmentPayload {
+  providerUuid: string;
+  patientUuid: string;
+  serviceUuid: string;
+  startDateTime: string;
+  endDateTime: string;
+  appointmentKind?: string;
+  providers?: Array<{ uuid: string; comments: string; response?: string }>;
+  locationUuid: string;
+  comments: string;
+}
