@@ -109,18 +109,3 @@ export interface MappedAppointment {
   location: string;
   comments: string;
 }
-
-export interface AppointmentDetail {
-  id: string;
-  name: { content: JSX.Element };
-  age: string;
-  gender: string;
-  phoneNumber: string;
-  dob: string;
-  patientUuid: string;
-  dateTime: { content: JSX.Element };
-  visitType: string;
-  provider: string;
-  location: string;
-  comments: string;
-}

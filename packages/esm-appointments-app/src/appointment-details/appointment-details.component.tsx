@@ -2,34 +2,34 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './appointment-details.scss';
 import { Row, Grid, Column, Tag } from 'carbon-components-react';
-import { AppointmentDetail } from '../types/index';
+import { MappedAppointment } from '../types/index';
 
-export default function AppointmentDetails({ appointment }: { appointment: AppointmentDetail }) {
+export default function AppointmentDetails({ appointment }: { appointment: MappedAppointment }) {
   const { t } = useTranslation();
 
   return (
     <div className={styles.container}>
       <Grid>
         <p className={styles.heading}>{appointment.visitType}</p>
-        <p className={styles.subHeading}>{appointment.dateTime.content.props.children}</p>
+        <p className={styles.subHeading}>{appointment.dateTime}</p>
         <Tag type="red" size="sm" className={styles.tag}>
-          Missed Appointment
+          {t('missedAppointment', 'Missed appointment')}
         </Tag>
         <Row>
           <Column>
-            <p className={styles.heading}>{t('patientDetails', 'Patient Details')}</p>
-            <span className={styles.label}>{appointment.name.content.props.children}</span> <br></br>
-            <span className={styles.label}>{appointment.age}</span> <br></br>
-            <span className={styles.label}>{appointment.gender}</span> <br></br>
-            <span className={styles.label}>{appointment.dob}</span> <br></br>
-            <span className={styles.label}>{appointment.phoneNumber}</span> <br></br>
+            <h4 className={styles.heading}>{t('patientDetails', 'Patient Details')}</h4>
+            <p className={styles.label}>{appointment.name}</p>
+            <p className={styles.label}>{appointment.age}</p>
+            <p className={styles.label}>{appointment.gender}</p>
+            <p className={styles.label}>{appointment.dob}</p>
+            <p className={styles.label}>{appointment.phoneNumber}</p>
           </Column>
           <Column>
-            <p className={styles.heading}>{t('appointmentNotes', 'Appointment Notes')}</p>
+            <h4 className={styles.heading}>{t('appointmentNotes', 'Appointment Notes')}</h4>
             <span>{appointment.comments}</span>
           </Column>
           <Column>
-            <span className={styles.heading}>{t('appointmentHistory', 'Appointment History')}</span>
+            <h4 className={styles.heading}>{t('appointmentHistory', 'Appointment History')}</h4>
             <Row>
               <Column>
                 <span>{t('completed', 'Completed')}</span>
