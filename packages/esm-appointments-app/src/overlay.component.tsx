@@ -3,34 +3,35 @@ import { ArrowLeft16, Close16 } from '@carbon/icons-react';
 import { Button, Header } from 'carbon-components-react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './overlay.scss';
+import { closeOverlay, useOverlay } from './hooks/useOverlay';
 
-interface OverlayProps {
-  closePanel: () => void;
-  header: string;
-}
-
-const Overlay: React.FC<OverlayProps> = ({ closePanel, children, header }) => {
+const Overlay: React.FC = () => {
+  const { header, component, isOverlayOpen } = useOverlay();
   const isDesktop = useLayoutType() === 'desktop';
 
   return (
-    <div className={isDesktop ? styles.desktopOverlay : styles.tabletOverlay}>
-      {isDesktop ? (
-        <div className={styles.desktopHeader}>
-          <div className={styles.headerContent}>{header}</div>
-          <Button className={styles.closePanelButton} onClick={closePanel} kind="ghost" hasIconOnly>
-            <Close16 />
-          </Button>
+    <>
+      {isOverlayOpen && (
+        <div className={isDesktop ? styles.desktopOverlay : styles.tabletOverlay}>
+          {isDesktop ? (
+            <div className={styles.desktopHeader}>
+              <div className={styles.headerContent}>{header}</div>
+              <Button className={styles.closePanelButton} onClick={() => closeOverlay()} kind="ghost" hasIconOnly>
+                <Close16 />
+              </Button>
+            </div>
+          ) : (
+            <Header onClick={() => closeOverlay()} aria-label="Tablet overlay" className={styles.tabletOverlayHeader}>
+              <Button hasIconOnly>
+                <ArrowLeft16 />
+              </Button>
+              <div className={styles.headerContent}>{header}</div>
+            </Header>
+          )}
+          <div>{component}</div>
         </div>
-      ) : (
-        <Header aria-label="Tablet overlay" className={styles.tabletOverlayHeader}>
-          <Button onClick={closePanel} hasIconOnly>
-            <ArrowLeft16 onClick={closePanel} />
-          </Button>
-          <div className={styles.headerContent}>{header}</div>
-        </Header>
       )}
-      <div>{children}</div>
-    </div>
+    </>
   );
 };
 
