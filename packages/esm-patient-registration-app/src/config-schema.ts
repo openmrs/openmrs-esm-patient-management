@@ -17,6 +17,11 @@ export interface FieldDefinition {
     matches: string | null;
   };
   answerConceptSetUuid: string | null;
+  customConceptAnswers: Array<CustomConceptAnswer>;
+}
+export interface CustomConceptAnswer {
+  label: string | null;
+  uuid: string;
 }
 
 export interface RegistrationConfig {
@@ -133,6 +138,22 @@ export const esmPatientRegistrationSchema = {
         _default: null,
         _description:
           'For coded questions only. A concept which has the possible responses either as answers or as set members.',
+      },
+      customConceptAnswers: {
+        _type: Type.Array,
+        _elements: {
+          uuid: {
+            _type: Type.UUID,
+            _description: 'Answer concept UUID',
+          },
+          label: {
+            _type: Type.String,
+            _default: null,
+            _description: 'The custom label for the answer concept.',
+          },
+        },
+        _default: [],
+        _description: 'For coded questions only. Provide ability to add custom concept answers.',
       },
     },
     _default: [],
