@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Calendar16 from '@carbon/icons-react/es/calendar/16';
 import BookedAppointments from '../appoinments-tabs/booked-appointments.component';
 import CompletedAppointments from '../appoinments-tabs/completed-appointments.component';
+import CancelledAppointment from '../appoinments-tabs/cancelled-appointments.component';
 
 const AppointmentList: React.FC = () => {
   const { t } = useTranslation();
@@ -24,7 +25,9 @@ const AppointmentList: React.FC = () => {
         <Tab label={t('bookedForToday', 'Booked for today')}>
           <BookedAppointments />
         </Tab>
-        <Tab label={t('cancelled', 'Cancelled')}></Tab>
+        <Tab label={t('cancelled', 'Cancelled')}>
+          <CancelledAppointment />
+        </Tab>
         <Tab label={t('completed', 'Completed')}>
           <CompletedAppointments />
         </Tab>
