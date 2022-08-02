@@ -7,7 +7,7 @@ import PatientSearch from './patient-search.component';
 interface CompactPatientSearchProps {
   query: string;
   searchPage: boolean;
-  selectPatientAction?: () => undefined;
+  selectPatientAction?: (patientUuid: string) => undefined;
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
