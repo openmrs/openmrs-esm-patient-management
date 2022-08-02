@@ -30,9 +30,8 @@
 .labelText {
   @include carbon--type-style('label-01');
   color: $text-02;
-  border-bottom: 0.063rem solid $ui-03;
   line-height: $spacing-05;
-  padding: 0 $spacing-04 $spacing-03 $spacing-04;
+  padding: $spacing-03 $spacing-04 0 $spacing-04;
 }
 
 .helperText {
@@ -62,10 +61,7 @@
   text-align: center;
   margin: $spacing-05;
   padding: $spacing-09 0rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
-  background-color: $ui-01;
+  background-color: $ui-02;
 }
 
 .errorMessage {

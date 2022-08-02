@@ -1,0 +1,45 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.contactDetails {
+  color: $text-02;
+  width: 100%;
+  border-top: 1px solid $ui-03;
+}
+
+.heading {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+}
+
+.row {
+  @include carbon--type-style('body-short-01');
+  display: flex;
+
+  &:first-child {
+    border-bottom: 1px solid $ui-03;
+  }
+}
+
+.row > .col {
+  flex: 1;
+  padding: 1rem 1rem;
+
+  &:nth-of-type(2n + 1) {
+    border-right: 1px solid $ui-03;
+  }
+}
+
+.row li {
+  margin: 0.5rem 0;
+}
+
+.relationship {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.relationship div {
+  flex: 1 1;
+}

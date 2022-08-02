@@ -1,0 +1,16 @@
+@import '../root.scss';
+
+.patientSearchBar {
+  width: 50vw;
+  position: relative;
+}
+
+.floatingSearchResultsContainer {
+  position: absolute;
+  overflow-y: auto;
+  box-shadow: 0 $spacing-03 $spacing-05 $ui-03;
+  z-index: 99;
+  border: 0 1px 1px 1px solid $ui-03;
+  width: 100%;
+  background-color: $ui-02;
+}
