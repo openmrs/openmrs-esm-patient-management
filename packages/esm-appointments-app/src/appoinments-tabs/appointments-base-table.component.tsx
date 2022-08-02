@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -25,10 +25,11 @@ import Add16 from '@carbon/icons-react/es/add/16';
 import Omega16 from '@carbon/icons-react/es/omega/16';
 import Cough16 from '@carbon/icons-react/es/cough/16';
 import Medication16 from '@carbon/icons-react/es/medication/16';
-import { useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { useLayoutType, ConfigurableLink } from '@openmrs/esm-framework';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
-import { MappedAppointment, Appointment } from '../types';
+import { MappedAppointment } from '../types';
+import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 
 interface AppointmentsProps {
@@ -73,7 +74,6 @@ function ServiceIcon({ service }) {
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
-  const [showOverlay, setShowOverlay] = useState(false);
   const isDesktop = useLayoutType() === 'desktop';
 
   const tableHeaders = useMemo(
@@ -152,7 +152,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
             size="small"
             kind="secondary"
             renderIcon={Add16}
-            onClick={() => setShowOverlay(true)}
+            onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
             iconDescription={t('addNewAppointment', 'Add new Appointment')}>
             {t('addNewAppointment', 'Add new Appointment')}
           </Button>
@@ -219,7 +219,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                       <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
                     <p className={styles.separator}>{t('or', 'or')}</p>
-                    <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
+                    <Button
+                      kind="ghost"
+                      size="small"
+                      renderIcon={Add16}
+                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
                       {t('addNewAppointment', 'Add new Appointment')}
                     </Button>
                   </Tile>
@@ -228,7 +232,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
       </div>
     );
   }
@@ -238,12 +241,15 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-          <Button kind="ghost" size="small" renderIcon={Add16} onClick={() => setShowOverlay(true)}>
+          <Button
+            kind="ghost"
+            size="small"
+            renderIcon={Add16}
+            onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
             {t('addNewAppointment', 'Add new Appointment')}
           </Button>
         </Tile>
       </div>
-      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 };
