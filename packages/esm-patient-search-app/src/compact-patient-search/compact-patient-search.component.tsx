@@ -7,9 +7,14 @@ import PatientSearch from './patient-search.component';
 interface CompactPatientSearchProps {
   query: string;
   searchPage: boolean;
+  selectPatientAction?: () => undefined;
 }
 
-const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ query, searchPage = false }) => {
+const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
+  query,
+  searchPage = false,
+  selectPatientAction,
+}) => {
   const [searchTerm, setSearchTerm] = useState(query);
 
   const onSubmit = useCallback(
@@ -39,7 +44,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ qu
       />
       {!!searchTerm && !searchPage && (
         <div className={styles.floatingSearchResultsContainer}>
-          <PatientSearch query={searchTerm} />
+          <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} />
         </div>
       )}
     </div>
