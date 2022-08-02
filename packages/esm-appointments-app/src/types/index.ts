@@ -116,7 +116,7 @@ export interface AppointmentPayload {
   serviceUuid: string;
   startDateTime: string;
   endDateTime: string;
-  appointmentKind?: string;
+  appointmentKind: string;
   providers?: Array<{ uuid: string; comments: string; response?: string }>;
   locationUuid: string;
   comments: string;

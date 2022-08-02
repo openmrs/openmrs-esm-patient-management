@@ -31,6 +31,7 @@ import styles from './appointments-base-table.scss';
 import { MappedAppointment } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
+import EditAppointment from '../appointment-forms/edit-appointment.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -38,7 +39,7 @@ interface AppointmentsProps {
   tableHeading: String;
 }
 
-function ActionsMenu() {
+function ActionsMenu(appoinments) {
   const { t } = useTranslation();
 
   return (
@@ -46,6 +47,9 @@ function ActionsMenu() {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#editAppointment"
+        onClick={() =>
+          launchOverlay(t('editAppointment', 'Edit Appointment'), <EditAppointment appointment={appoinments} />)
+        }
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'EditAppointment')}
       </OverflowMenuItem>
@@ -143,113 +147,113 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (appointments?.length) {
+  if (appointments?.length === 0) {
     return (
-      <div className={styles.container} data-floating-menu-container>
-        <div className={styles.headerContainer}>
-          <span className={styles.heading}>{tableHeading}</span>
-          <Button
-            size="small"
-            kind="secondary"
-            renderIcon={Add16}
-            onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-            iconDescription={t('addNewAppointment', 'Add new Appointment')}>
-            {t('addNewAppointment', 'Add new Appointment')}
-          </Button>
+      <div className={styles.container}>
+        <div className={styles.tileContainer}>
+          <Tile className={styles.tile}>
+            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+            <Button
+              kind="ghost"
+              size="small"
+              renderIcon={Add16}
+              onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
+              {t('addNewAppointment', 'Add new Appointment')}
+            </Button>
+          </Tile>
         </div>
-        <DataTable
-          headers={tableHeaders}
-          overflowMenuOnHover={isDesktop ? true : false}
-          rows={tableRows}
-          size="compact"
-          useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
-            <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    className={styles.search}
-                    expanded
-                    light
-                    onChange={onInputChange}
-                    placeholder={t('searchThisList', 'Search this list')}
-                    size="sm"
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
-              <Table {...getTableProps()} className={styles.appointmentsTable}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader />
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                    <TableExpandHeader />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => {
-                    return (
-                      <React.Fragment key={row.id}>
-                        <TableExpandRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                          ))}
-                          <TableCell className="bx--table-column-menu">
-                            <ActionsMenu />
-                          </TableCell>
-                        </TableExpandRow>
-                        {row.isExpanded ? (
-                          <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
-                            <AppointmentDetails appointment={appointments?.[index]} />
-                          </TableExpandedRow>
-                        ) : (
-                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              {rows.length === 0 ? (
-                <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                    <p className={styles.separator}>{t('or', 'or')}</p>
-                    <Button
-                      kind="ghost"
-                      size="small"
-                      renderIcon={Add16}
-                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-                      {t('addNewAppointment', 'Add new Appointment')}
-                    </Button>
-                  </Tile>
-                </div>
-              ) : null}
-            </TableContainer>
-          )}
-        </DataTable>
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.tileContainer}>
-        <Tile className={styles.tile}>
-          <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-          <Button
-            kind="ghost"
-            size="small"
-            renderIcon={Add16}
-            onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-            {t('addNewAppointment', 'Add new Appointment')}
-          </Button>
-        </Tile>
+    <div className={styles.container} data-floating-menu-container>
+      <div className={styles.headerContainer}>
+        <span className={styles.heading}>{tableHeading}</span>
+        <Button
+          size="small"
+          kind="secondary"
+          renderIcon={Add16}
+          onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+          iconDescription={t('addNewAppointment', 'Add new Appointment')}>
+          {t('addNewAppointment', 'Add new Appointment')}
+        </Button>
       </div>
+      <DataTable
+        headers={tableHeaders}
+        overflowMenuOnHover={isDesktop ? true : false}
+        rows={tableRows}
+        size="compact"
+        useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
+          <TableContainer className={styles.tableContainer}>
+            <TableToolbar>
+              <TableToolbarContent>
+                <TableToolbarSearch
+                  className={styles.search}
+                  expanded
+                  light
+                  onChange={onInputChange}
+                  placeholder={t('searchThisList', 'Search this list')}
+                  size="sm"
+                />
+              </TableToolbarContent>
+            </TableToolbar>
+            <Table {...getTableProps()} className={styles.appointmentsTable}>
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader />
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                  <TableExpandHeader />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => {
+                  return (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        <TableCell className="bx--table-column-menu">
+                          <ActionsMenu appointment={appointments?.[index]} />
+                        </TableCell>
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
+                          <AppointmentDetails appointment={appointments?.[index]} />
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {rows.length === 0 ? (
+              <div className={styles.tileContainer}>
+                <Tile className={styles.tile}>
+                  <div className={styles.tileContent}>
+                    <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                    <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                  </div>
+                  <p className={styles.separator}>{t('or', 'or')}</p>
+                  <Button
+                    kind="ghost"
+                    size="small"
+                    renderIcon={Add16}
+                    onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
+                    {t('addNewAppointment', 'Add new Appointment')}
+                  </Button>
+                </Tile>
+              </div>
+            ) : null}
+          </TableContainer>
+        )}
+      </DataTable>
     </div>
   );
 };

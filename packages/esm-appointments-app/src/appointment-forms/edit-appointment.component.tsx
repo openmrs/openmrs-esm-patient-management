@@ -12,25 +12,35 @@ import {
   TextArea,
   DatePicker,
   DatePickerInput,
+  Button,
+  ButtonSet,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import styles from './edit-appointment.scss';
-import { mockFrequency, mockServices, mockProviders } from '../../../../__mocks__/appointments.mock';
-import { useLocations, useSession, showToast, showNotification, ExtensionSlot } from '@openmrs/esm-framework';
+import { mockFrequency, mockProviders, mockServiceTypes } from '../../../../__mocks__/appointments.mock';
+import {
+  useLocations,
+  useSession,
+  showToast,
+  showNotification,
+  ExtensionSlot,
+  usePatient,
+} from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { AppointmentPayload } from '../types';
+import { AppointmentPayload, MappedAppointment } from '../types';
 import { convertTime12to24, amPm } from '../helpers';
-import { editAppointment, weekdays, usePatient } from '../appoinments-tabs/appointments-table.resource';
+import { editAppointment, weekdays, useServices } from '../appoinments-tabs/appointments-table.resource';
 
 interface EditAppointmentProps {
-  patientUuid: string;
+  appointment: MappedAppointment;
 }
-const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
+const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
   const { t } = useTranslation();
 
-  const { patient, isLoading } = usePatient(patientUuid);
+  const { patient } = usePatient(appointment.patientUuid);
   const locations = useLocations();
-  const sessionUser = useSession();
+  const session = useSession();
+  const { services } = useServices();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [frequency, setFrequency] = useState('');
@@ -44,15 +54,16 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
   const [visitDate, setVisitDate] = useState(new Date());
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState('');
+  const [appointmentKind, setAppointmentKind] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (locations && sessionUser?.sessionLocation?.uuid) {
-      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+    if (locations && session?.sessionLocation?.uuid) {
+      setSelectedLocation(session?.sessionLocation?.uuid);
     }
-  }, [locations, sessionUser]);
+  }, [locations, session]);
 
   const handleSubmit = () => {
-    const serviceUuid = mockServices.data.find((service) => service.name === selectedService)?.uuid;
     const [hours, minutes] = convertTime12to24(startDate, timeFormat);
 
     const startDatetime = new Date(
@@ -68,14 +79,14 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
     ).toDate();
 
     const appointmentPayload: AppointmentPayload = {
-      // appointmentKind: selectedAppointmentType,
-      serviceUuid: serviceUuid,
+      appointmentKind: appointmentKind,
+      serviceUuid: selectedService,
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
       providerUuid: selectedProvider,
       comments: appointmentComment,
       locationUuid: selectedLocation,
-      patientUuid: patientUuid,
+      patientUuid: appointment.patientUuid,
     };
 
     const abortController = new AbortController();
@@ -107,7 +118,7 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
         extensionSlotName="patient-info-banner-slot"
         state={{
           patient,
-          patientUuid: patientUuid,
+          patientUuid: appointment.patientUuid,
         }}
       />
 
@@ -249,9 +260,26 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
         onChange={(event) => setSelectedService(event.target.value)}
         value={selectedService}>
         {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
-        {mockServices.data?.length > 0 &&
-          mockServices.data.map((service) => (
+        {services?.length > 0 &&
+          services.map((service) => (
             <SelectItem key={service.uuid} text={service.name} value={service.name}>
+              {service.name}
+            </SelectItem>
+          ))}
+      </Select>
+
+      <Select
+        id="appointmentKind"
+        invalidText="Required"
+        labelText={t('selectServiceType', 'Select a service type')}
+        light
+        className={styles.inputContainer}
+        onChange={(event) => setAppointmentKind(event.target.value)}
+        value={selectedService}>
+        {!appointmentKind ? <SelectItem text={t('chooseServiceType', 'Select service type')} value="" /> : null}
+        {mockServiceTypes.data?.length > 0 &&
+          mockServiceTypes.data.map((service) => (
+            <SelectItem key={service.name} text={service.name} value={service.name}>
               {service.name}
             </SelectItem>
           ))}
@@ -279,10 +307,12 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
         defaultSelected="No"
         orientation="vertical"
         className={styles.inputContainer}
-        onChange={(event) => setReminder(event.toLocaleString)}
+        onChange={(event) => {
+          setReminder(event.toString());
+        }}
         name="appointment-reminder-radio-group">
-        <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value={reminder} />
-        <RadioButton className={styles.radioButton} id="No" labelText="No" value={reminder} />
+        <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
+        <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
       </RadioButtonGroup>
 
       <TextArea
@@ -302,6 +332,15 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ patientUuid }) => {
         labelText={t('reasonForChanges', 'Reason For Changes')}
         onChange={(event) => setReason(event.target.value)}
       />
+
+      <ButtonSet>
+        <Button className={styles.button} kind="secondary">
+          {t('discard', 'Discard')}
+        </Button>
+        <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {t('save', 'Save')}
+        </Button>
+      </ButtonSet>
     </div>
   );
 };

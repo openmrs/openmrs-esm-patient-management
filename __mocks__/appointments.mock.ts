@@ -268,17 +268,12 @@ export const mockServiceTypes = {
   data: [
     {
       name: 'HIV Clinic',
-      uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1',
-      duration: 15,
-    },
-    {
-      name: 'TB Clinic',
-      uuid: '4a228e52-0bfe-11ed-861d-0242ac120002',
+      uuid: '7bff050e-9a83-4fdb-9212-1a4c2cee349b',
       duration: 15,
     },
     {
       name: 'Drug Dispense',
-      uuid: '51a01ff0-0bfe-11ed-861d-0242ac120002',
+      uuid: '0e960ced-d35e-43de-b87f-bc08ef3b6ec3',
       duration: 15,
     },
   ],
@@ -289,14 +284,6 @@ export const mockFrequency = {
     { uuid: 'b127d100-bccb-4699-b30e-fe60a068ca46', display: 'Daily' },
     { uuid: 'dbc32cf4-e11d-4006-b398-c71204cfc0d0', display: 'Weekly' },
     { uuid: '6e263ecd-173e-4ee1-a9a5-df1f8d5b274b', display: 'Monthly' },
-  ],
-};
-
-export const mockServices = {
-  data: [
-    { duration: 15, name: 'Clinical Visit', uuid: '53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1' },
-    { duration: 15, name: 'Drug Refill', uuid: '2b5efa2d-d760-4454-a5be-1d970e8e8947' },
-    { duration: 15, name: 'Chemotherapy', uuid: '5059628c-bcd2-463c-993e-5ca20272fef6' },
   ],
 };
 

@@ -1,14 +1,10 @@
 import useSWR from 'swr';
 import { openmrsFetch, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { AppointmentsFetchResponse, AppointmentPayload } from '../types';
+import { AppointmentsFetchResponse, AppointmentPayload, AppointmentService } from '../types';
 
 export function useAppointments() {
-  const apiUrl = `/ws/rest/v1/appointments?v=full`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<AppointmentsFetchResponse> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const apiUrl = `/ws/rest/v1/appointment/all`;
+  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentsFetchResponse> }, Error>(apiUrl, openmrsFetch);
 
   const mappedAppointment = (appointment) => ({
     id: appointment.uuid,
@@ -26,10 +22,10 @@ export function useAppointments() {
     comments: appointment.comments ? appointment.comments : '--',
   });
 
-  const appointmentEntries = mockAppointmentsData.data?.map(mappedAppointment);
+  const appointmentEntries = data?.data?.map(mappedAppointment);
 
   return {
-    appointments: appointmentEntries ? appointmentEntries : null,
+    appointments: appointmentEntries ? appointmentEntries : [],
     isLoading: !data && !error,
     isError: error,
     isValidating,
@@ -47,16 +43,16 @@ export function editAppointment(appointment: AppointmentPayload, abortController
   });
 }
 
-export function usePatient(uuid: string) {
-  const apiUrl = `/ws/rest/v1/patient/${uuid}`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<fhir.Patient> } }, Error>(apiUrl, openmrsFetch);
+export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export function useServices() {
+  const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
+  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
 
   return {
-    patient: data ? data.data : null,
+    services: data ? data.data : [],
     isLoading: !data && !error,
     isError: error,
     isValidating,
   };
 }
-
-export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
