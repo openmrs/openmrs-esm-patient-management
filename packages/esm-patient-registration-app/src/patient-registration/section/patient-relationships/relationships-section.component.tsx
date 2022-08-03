@@ -1,7 +1,14 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
-import { Button, Select, SelectItem, InlineNotification, NotificationActionButton } from 'carbon-components-react';
+import {
+  Button,
+  Select,
+  SelectItem,
+  InlineNotification,
+  NotificationActionButton,
+  SkeletonText,
+} from 'carbon-components-react';
 import { FieldArray } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.component';
@@ -23,22 +30,32 @@ export const RelationshipsSection = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const tmp: RelationshipType[] = [];
-    relationshipTypes.results.forEach((type) => {
-      const aIsToB = {
-        display: type.aIsToB,
-        uuid: type.uuid,
-        direction: 'aIsToB',
-      };
-      const bIsToA = {
-        display: type.bIsToA,
-        uuid: type.uuid,
-        direction: 'bIsToA',
-      };
-      aIsToB.display === bIsToA.display ? tmp.push(aIsToB) : tmp.push(aIsToB, bIsToA);
-    });
-    setDisplayRelationshipTypes(tmp);
+    if (relationshipTypes) {
+      const tmp: RelationshipType[] = [];
+      relationshipTypes.results.forEach((type) => {
+        const aIsToB = {
+          display: type.aIsToB,
+          uuid: type.uuid,
+          direction: 'aIsToB',
+        };
+        const bIsToA = {
+          display: type.bIsToA,
+          uuid: type.uuid,
+          direction: 'bIsToA',
+        };
+        aIsToB.display === bIsToA.display ? tmp.push(aIsToB) : tmp.push(aIsToB, bIsToA);
+      });
+      setDisplayRelationshipTypes(tmp);
+    }
   }, [relationshipTypes]);
+
+  if (!relationshipTypes) {
+    return (
+      <section aria-label="Relationships Section">
+        <SkeletonText />
+      </section>
+    );
+  }
 
   return (
     <section aria-label="Relationships Section">
