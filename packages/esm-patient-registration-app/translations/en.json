@@ -52,6 +52,7 @@
   "negativeYears": "Years cannot be less than 0",
   "no": "No",
   "numberInNameDubious": "Name should not contain numbers",
+  "optional": "optional",
   "otherLabelText": "Other",
   "patient": "Patient",
   "patientNameKnown": "Is Patient's Name Known?",
