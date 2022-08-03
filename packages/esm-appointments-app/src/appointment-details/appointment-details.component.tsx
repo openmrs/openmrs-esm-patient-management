@@ -10,7 +10,7 @@ export default function AppointmentDetails({ appointment }: { appointment: Mappe
   return (
     <div className={styles.container}>
       <Grid>
-        <p className={styles.heading}>{appointment.visitType}</p>
+        <p className={styles.heading}>{appointment.serviceType}</p>
         <p className={styles.subHeading}>{appointment.dateTime}</p>
         <Tag type="red" size="sm" className={styles.tag}>
           {t('missedAppointment', 'Missed appointment')}

@@ -16,8 +16,8 @@ import {
   ButtonSet,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import styles from './edit-appointment.scss';
-import { mockFrequency, mockProviders, mockServiceTypes } from '../../../../__mocks__/appointments.mock';
+import styles from './appointment-form.scss';
+import { mockFrequency, mockProviders } from '../../../../__mocks__/appointments.mock';
 import {
   useLocations,
   useSession,
@@ -25,72 +25,68 @@ import {
   showNotification,
   ExtensionSlot,
   usePatient,
+  useConfig,
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { AppointmentPayload, MappedAppointment } from '../types';
 import { convertTime12to24, amPm } from '../helpers';
-import { editAppointment, weekdays, useServices } from '../appoinments-tabs/appointments-table.resource';
+import { saveAppointment, useServices } from '../appoinments-tabs/appointments-table.resource';
+import { ConfigObject } from '../config-schema';
 
-interface EditAppointmentProps {
+interface AppointmentFormProps {
   appointment: MappedAppointment;
 }
-const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   const { t } = useTranslation();
 
+  const { appointmentKinds } = useConfig() as ConfigObject;
+  const { daysOfTheWeek } = useConfig() as ConfigObject;
+  const { appointmentStatuses } = useConfig() as ConfigObject;
   const { patient } = usePatient(appointment.patientUuid);
   const locations = useLocations();
   const session = useSession();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(appointment.dateTime);
+  const [endDate, setEndDate] = useState(appointment.dateTime);
   const [frequency, setFrequency] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedService, setSelectedService] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(appointment.location);
+  const [selectedService, setSelectedService] = useState(appointment.serviceUuid);
+  const [selectedProvider, setSelectedProvider] = useState(session?.currentProvider?.uuid);
   const [reminder, setReminder] = useState('');
-  const [appointmentComment, setAppointmentComment] = useState('');
+  const [appointmentComment, setAppointmentComment] = useState(appointment.comments);
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = useState(new Date());
+  const [visitDate, setVisitDate] = useState(new Date(appointment.dateTime));
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
-  const [day, setDay] = useState('');
-  const [appointmentKind, setAppointmentKind] = useState('');
+  const [day, setDay] = useState(appointment.dateTime);
+  const [appointmentKind, setAppointmentKind] = useState(appointment.appointmentKind);
+  const [appointmentStatus, setAppointmentStatus] = useState(appointment.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (locations && session?.sessionLocation?.uuid) {
+    if (selectedLocation && session?.sessionLocation?.uuid) {
       setSelectedLocation(session?.sessionLocation?.uuid);
     }
-  }, [locations, session]);
+  }, [selectedLocation, session]);
 
   const handleSubmit = () => {
-    const [hours, minutes] = convertTime12to24(startDate, timeFormat);
-
-    const startDatetime = new Date(
-      dayjs(startDate).year(),
-      dayjs(startDate).month(),
-      dayjs(startDate).date(),
-      hours,
-      minutes,
-    );
-
-    const endDatetime = dayjs(
-      new Date(dayjs(startDate).year(), dayjs(startDate).month(), dayjs(startDate).date(), hours, minutes),
-    ).toDate();
-
+    const endDatetime = dayjs(visitDate).format('YYYY-MM-DD');
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: appointmentKind,
+      status: appointmentStatus,
       serviceUuid: selectedService,
-      startDateTime: dayjs(startDatetime).format(),
-      endDateTime: dayjs(endDatetime).format(),
+      startDateTime: dayjs(day).format(),
+      endDateTime: dayjs(day).format(),
       providerUuid: selectedProvider,
       comments: appointmentComment,
       locationUuid: selectedLocation,
       patientUuid: appointment.patientUuid,
+      appointmentNumber: appointment.appointmentNumber,
+      uuid: appointment.id,
     };
 
     const abortController = new AbortController();
-    editAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
           showToast({
@@ -132,7 +128,7 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
           id="visitDate"
           light
           style={{ paddingBottom: '1rem' }}
-          maxDate={new Date().toISOString()}
+          minDate={new Date().toISOString()}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
           <DatePickerInput
@@ -149,10 +145,10 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
           <div className={styles.row}>
             <TimePicker
               light
+              className={styles.timePickerInput}
               pattern="([\d]+:[\d]{2})"
               onChange={(event) => setStartDate(event.target.value)}
               value={startDate}
-              style={{ marginLeft: '0.125rem', flex: 'none' }}
               labelText={t('startTime', 'Start Time')}
               id="start-time-picker">
               <TimePickerSelect
@@ -168,10 +164,10 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
 
             <TimePicker
               light
+              className={styles.timePickerInput}
               pattern="([\d]+:[\d]{2})"
               onChange={(event) => setEndDate(event.target.value)}
               value={endDate}
-              style={{ marginLeft: '0.125rem', flex: 'none' }}
               labelText={t('endTime', 'End Time')}
               id="end-time-picker">
               <TimePickerSelect
@@ -212,8 +208,8 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
               value={day}
               onChange={(event) => setDay(event.target.value)}
               light>
-              {weekdays?.length > 0 &&
-                weekdays.map((day) => (
+              {daysOfTheWeek?.length > 0 &&
+                daysOfTheWeek.map((day) => (
                   <SelectItem key={day} text={day} value={day}>
                     {day}
                   </SelectItem>
@@ -259,10 +255,12 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
         className={styles.inputContainer}
         onChange={(event) => setSelectedService(event.target.value)}
         value={selectedService}>
-        {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
+        {!selectedService || selectedService == '--' ? (
+          <SelectItem text={t('chooseService', 'Select service')} value="" />
+        ) : null}
         {services?.length > 0 &&
           services.map((service) => (
-            <SelectItem key={service.uuid} text={service.name} value={service.name}>
+            <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
               {service.name}
             </SelectItem>
           ))}
@@ -271,16 +269,37 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
       <Select
         id="appointmentKind"
         invalidText="Required"
-        labelText={t('selectServiceType', 'Select a service type')}
+        labelText={t('selectAppointmentKind', 'Select an appointment kind')}
         light
         className={styles.inputContainer}
         onChange={(event) => setAppointmentKind(event.target.value)}
-        value={selectedService}>
-        {!appointmentKind ? <SelectItem text={t('chooseServiceType', 'Select service type')} value="" /> : null}
-        {mockServiceTypes.data?.length > 0 &&
-          mockServiceTypes.data.map((service) => (
-            <SelectItem key={service.name} text={service.name} value={service.name}>
-              {service.name}
+        value={appointmentKind}>
+        {!appointmentKind || appointmentKind == '--' ? (
+          <SelectItem text={t('selectAppointmentKind', 'Select an appointment kind')} value="" />
+        ) : null}
+        {appointmentKinds?.length > 0 &&
+          appointmentKinds.map((service) => (
+            <SelectItem key={service} text={service} value={service}>
+              {service}
+            </SelectItem>
+          ))}
+      </Select>
+
+      <Select
+        id="appointmentStatus"
+        invalidText="Required"
+        labelText={t('selectAppointmentStatus', 'Select status')}
+        light
+        className={styles.inputContainer}
+        onChange={(event) => setAppointmentStatus(event.target.value)}
+        value={appointmentStatus}>
+        {!appointmentStatus || appointmentStatus == '--' ? (
+          <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+        ) : null}
+        {appointmentStatuses?.length > 0 &&
+          appointmentStatuses.map((service) => (
+            <SelectItem key={service} text={service} value={service}>
+              {service}
             </SelectItem>
           ))}
       </Select>
@@ -345,4 +364,4 @@ const EditAppointment: React.FC<EditAppointmentProps> = ({ appointment }) => {
   );
 };
 
-export default EditAppointment;
+export default AppointmentForm;
