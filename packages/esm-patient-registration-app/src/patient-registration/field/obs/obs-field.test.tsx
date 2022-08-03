@@ -31,6 +31,12 @@ const textFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
+  customConceptAnswers: [
+    {
+      uuid: 'concept-uuid',
+      label: '',
+    },
+  ],
 };
 
 const numberFieldDef: FieldDefinition = {
@@ -44,6 +50,12 @@ const numberFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
+  customConceptAnswers: [
+    {
+      uuid: 'concept-uuid',
+      label: '',
+    },
+  ],
 };
 
 const codedFieldDef: FieldDefinition = {
@@ -57,6 +69,12 @@ const codedFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
+  customConceptAnswers: [
+    {
+      uuid: 'concept-uuid',
+      label: 'Kenya',
+    },
+  ],
 };
 
 describe('ObsField', () => {
@@ -94,6 +112,10 @@ describe('ObsField', () => {
   });
 
   it('select uses answerConcept for answers when it is provided', () => {
+    mockUseConfig.mockReturnValue({
+      registrationObs: { encounterTypeUuid: 'reg-enc-uuid' },
+      fieldDefinitions: [codedFieldDef],
+    });
     render(<ObsField fieldDefinition={{ ...codedFieldDef, answerConceptSetUuid: 'other-countries-uuid' }} />);
     // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
     const select = screen.getByRole('combobox');

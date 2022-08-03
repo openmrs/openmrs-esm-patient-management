@@ -43,7 +43,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const config = useConfig();
 
   const patientActionsSlotState = React.useMemo(
-    () => ({ patientUuid, onPatientSelect, onTransition }),
+    () => ({ patientUuid, onPatientSelect, onTransition, launchPatientChart: true }),
     [patientUuid, onPatientSelect, onTransition],
   );
 
