@@ -1,10 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableHeader,
-  OverflowMenu,
-  OverflowMenuItem,
   Table,
   TableBody,
   TableCell,
@@ -19,14 +17,10 @@ import {
   Button,
   Tag,
 } from 'carbon-components-react';
-import { navigate, showModal, ExtensionSlot, formatDatetime, usePagination } from '@openmrs/esm-framework';
-import { getOriginFromPathName } from '../active-visits/active-visits-table.resource';
+import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
 import { Filter16 } from '@carbon/icons-react';
-
-const currentPathName: string = window.location.pathname;
-const fromPage: string = getOriginFromPathName(currentPathName);
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -43,38 +37,6 @@ interface QueuePatientTableProps {
   rows: any;
   serviceType: string;
 }
-
-function ActionsMenu({ patientUuid }: { patientUuid: string }) {
-  const { t } = useTranslation();
-
-  const launchEndVisitModal = useCallback(() => {
-    const dispose = showModal('end-visit-dialog', {
-      closeModal: () => dispose(),
-      patientUuid,
-    });
-  }, [patientUuid]);
-
-  return (
-    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
-      <OverflowMenuItem className={styles.menuItem} id="#outreachFrom" itemText={t('outreachFrom', 'Outreach From')}>
-        {t('outreachFrom', 'Outreach From')}
-      </OverflowMenuItem>
-      <OverflowMenuItem className={styles.menuItem} id="#locatorFrom" itemText={t('locatorFrom', 'locatorFrom')}>
-        {t('locatorFrom', 'Locator From')}
-      </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#contactDetails"
-        hasDivider
-        isDelete
-        itemText={t('fullContactDetails', 'Full Contact Details')}>
-        {t('fullContactDetails', 'Full Contact Details')}
-      </OverflowMenuItem>
-    </OverflowMenu>
-  );
-}
-
-const pageSize = 20;
 
 const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   title,
@@ -153,8 +115,9 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
+              <TableToolbar
+                style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+                <TableToolbarContent className={styles.toolbarContent}>
                   <TableToolbarSearch
                     className={styles.search}
                     expanded
@@ -181,9 +144,6 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="bx--table-column-menu">
-                            <ActionsMenu patientUuid={rows?.[index]?.id} />
-                          </TableCell>
                         </TableRow>
                       </React.Fragment>
                     );

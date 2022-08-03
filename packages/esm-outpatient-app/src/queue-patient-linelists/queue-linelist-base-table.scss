@@ -67,34 +67,9 @@
     width: $spacing-01;
   }
 
-  :global(.bx--data-table-content) {
-    border: 1px solid $ui-03;
-    overflow: visible;
-  }
-
-  :global(.bx--data-table) {
-    background: $ui-03;
-  }
-
-  :global(.bx--data-table-header) {
-    padding: 0;
-  }
-
-  :global(.bx--table-toolbar) {
-    position: relative;
-    height: $spacing-07;
-    overflow: visible;
-    background-color: $ui-01;
-  }
-
-  :global(.bx--toolbar-content),
-  :global(.bx--toolbar-search-container-expandable) {
+  .toolbarContent {
     height: $spacing-07;
     margin-bottom: $spacing-02;
-  }
-
-  :global(.bx--data-table--zebra tbody tr[data-child-row]:hover td) {
-    background-color: $ui-02;
   }
 }
 
