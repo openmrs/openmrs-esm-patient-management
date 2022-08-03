@@ -95,7 +95,7 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Eric Test Ric',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
@@ -280,6 +280,41 @@ export const mockServiceTypes = {
       name: 'Drug Dispense',
       uuid: '51a01ff0-0bfe-11ed-861d-0242ac120002',
       duration: 15,
+    },
+  ],
+};
+
+export const mockMappedAppointmentsData = {
+  data: [
+    {
+      id: 'e10ce4e3-0e91-4b97-bc6c-9b5068e58428',
+      name: 'John Wilson',
+      age: '45',
+      gender: 'M',
+      phoneNumber: '0700123456',
+      dob: '1986-04-03T00:00:00.000+0000',
+      patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+      dateTime: '	30-Aug-2021, 03:35 PM',
+      serviceType: 'HIV Clinic',
+      visitType: 'HIV Clinic',
+      provider: 'Dr James Cook',
+      location: 'HIV Clinic',
+      comments: 'Some additional notes',
+    },
+    {
+      id: 'cdb0676f-0805-4c3e-bfef-7757a005e892',
+      name: 'Eric Test Ric',
+      age: '32',
+      gender: 'M',
+      phoneNumber: '0700987654',
+      dob: '1986-04-03T00:00:00.000+0000',
+      patientUuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+      dateTime: '10-Sept-2021, 03:50 PM',
+      serviceType: 'TB Clinic',
+      visitType: 'TB Clinic',
+      provider: 'Dr James Cook',
+      location: 'TB Clinic',
+      comments: 'Some additional notes here',
     },
   ],
 };

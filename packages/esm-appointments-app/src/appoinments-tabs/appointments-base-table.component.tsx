@@ -143,7 +143,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (appointments?.length) {
+  if (appointments?.length > 0) {
     return (
       <div className={styles.container} data-floating-menu-container>
         <div className={styles.headerContainer}>
@@ -158,6 +158,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           </Button>
         </div>
         <DataTable
+          data-floating-menu-container
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop ? true : false}
           rows={tableRows}
