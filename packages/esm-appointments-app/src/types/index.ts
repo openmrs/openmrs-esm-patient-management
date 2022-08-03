@@ -144,7 +144,32 @@ export interface AppointmentSummary {
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
 
+export interface Patient {
+  uuid: string;
+  display: string;
+  identifiers: Array<any>;
+  person: Person;
+}
+
 export interface Provider {
   uuid: string;
   display: string;
+  comments: string;
+  response?: string;
+}
+export interface Attribute {
+  attributeType: OpenmrsResource;
+  display: string;
+  uuid: string;
+  value: string | number;
+}
+
+export interface Person {
+  age: number;
+  attributes: Array<Attribute>;
+  birthDate: string;
+  gender: string;
+  display: string;
+  preferredAddress: OpenmrsResource;
+  uuid: string;
 }

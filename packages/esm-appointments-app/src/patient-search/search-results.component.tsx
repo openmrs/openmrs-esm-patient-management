@@ -7,7 +7,7 @@ import PatientScheduledVisits from './patient-scheduled-visits.component';
 interface SearchResultsProps {
   patients: Array<any>;
   hidePanel?: any;
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patient: fhir.Patient) => void;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
@@ -46,7 +46,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
       };
     });
   }, [patients]);
-  const onClickSearchResult = () => toggleSearchType(SearchTypes.SCHEDULED_VISITS);
+
+  const onClickSearchResult = (patient: fhir.Patient) => {
+    toggleSearchType(SearchTypes.SCHEDULED_VISITS, patient);
+  };
 
   return (
     <>
@@ -58,7 +61,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
               state={{
                 patient,
                 patientUuid: patient.id,
-                onClick: onClickSearchResult,
+                onClick: () => onClickSearchResult(patient),
                 // onTransition: hidePanel,
               }}
             />

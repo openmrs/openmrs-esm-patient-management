@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import { Search, Button, Tile } from 'carbon-components-react';
 import Search16 from '@carbon/icons-react/es/search/16';
+import UserFollow20 from '@carbon/icons-react/es/user--follow/20';
 import SearchIllustration from './search-illustration.component';
 import SearchResults from './search-results.component';
 import { findPatients } from './search.resource';
 import { SearchTypes } from '../types';
+import { navigate } from '@openmrs/esm-framework';
 import styles from './basic-search.scss';
 
 interface BasicSearchProps {
@@ -59,9 +61,26 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
           {t('search', 'Search')}
         </Button>
       </div>
-      {searchResults?.length ? (
+      {searchResults?.length > 0 ? (
         <div className={styles.resultsContainer}>
           {<SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />}
+        </div>
+      ) : searchTerm && searchResults?.length === 0 ? (
+        <div className={styles.addPatientTileContainer}>
+          <Tile className={styles.addPatientTile}>
+            <div className={styles.addPatientTileContent}>
+              <p className={styles.content}>{t('patientNotFound', 'No patient found')}</p>
+              <p className={styles.helper}>{t('checkSearch', 'Check the search term')}</p>
+            </div>
+            <p className={styles.addPatientSeparator}>{t('or', 'or')}</p>
+            <Button
+              kind="ghost"
+              size="small"
+              renderIcon={UserFollow20}
+              onClick={() => navigate({ to: '${openmrsSpaBase}/patient-registration' })}>
+              {t('addPatient', 'Add patient')}
+            </Button>
+          </Tile>
         </div>
       ) : (
         <div>

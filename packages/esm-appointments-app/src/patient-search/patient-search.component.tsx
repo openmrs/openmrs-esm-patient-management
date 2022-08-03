@@ -4,13 +4,16 @@ import BasicSearch from './basic-search.component';
 import AdvancedSearch from './advanced-search.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import SearchResults from './search-results.component';
+import PatientForm from '../appointments/appointment-form.component';
 import { SearchTypes } from '../types';
 
 const PatientSearch: React.FC = () => {
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
+  const [selectedPatient, setSelectedPatient] = useState<fhir.Patient>({});
 
-  const toggleSearchType = (searchType: SearchTypes) => {
+  const toggleSearchType = (searchType: SearchTypes, patient: fhir.Patient = {}) => {
     setSearchType(searchType);
+    setSelectedPatient(patient);
   };
 
   return (
@@ -23,7 +26,9 @@ const PatientSearch: React.FC = () => {
         ) : searchType === SearchTypes.SEARCH_RESULTS ? (
           <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
         ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
-          <PatientScheduledVisits toggleSearchType={toggleSearchType} />
+          <PatientScheduledVisits toggleSearchType={toggleSearchType} patient={selectedPatient} />
+        ) : searchType === SearchTypes.FORM ? (
+          <PatientForm patient={selectedPatient} patientUuid={selectedPatient.id} />
         ) : null}
       </div>
     </>

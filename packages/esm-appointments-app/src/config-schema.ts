@@ -10,6 +10,12 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
     },
+    contactAttributeType: {
+      _type: Type.UUID,
+      _description:
+        'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
+      _default: [],
+    },
   },
   appointmentKinds: {
     _type: Type.Array,
@@ -36,4 +42,5 @@ export interface ConfigObject {
   appointmentKinds: Array<string>;
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
+  contactAttributeType: Array<string>;
 }

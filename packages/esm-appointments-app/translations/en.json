@@ -1,5 +1,6 @@
 {
   "addNewAppointment": "Add new Appointment",
+  "create Appointment": "Create Appointment",
   "advancedSearch": "Advanced search",
   "all": "All",
   "anotherVisitType": "Start another visit type",
@@ -97,5 +98,10 @@
   "upcoming": "Upcoming",
   "view": "View",
   "viewCalendar": "View Calendar",
-  "vitals": "Vitals"
+  "vitals": "Vitals",
+  "appointmentPlace": "Select where appointment will take place",
+  "appointmentReminder": "Would Patient like to get a reminder about appointment",
+  "addPatient": "Add Patient",
+  "checkSearch": "Check the search term",
+  "patientNotFound": "No patient found"
 }
