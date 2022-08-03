@@ -260,3 +260,8 @@ export interface PatientProgram {
   dateCompleted: string;
   location: OpenmrsResource;
 }
+
+export enum filterType {
+  SHOW,
+  HIDE,
+}
