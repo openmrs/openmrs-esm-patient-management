@@ -1,6 +1,7 @@
 import { ComboBox, ComboBoxProps } from 'carbon-components-react';
 import { useField } from 'formik';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { performAdressHierarchyWithParentSearch } from '../../../resource';
 
 interface InputProps extends ComboBoxProps {
@@ -11,25 +12,28 @@ interface InputProps extends ComboBoxProps {
 }
 
 export const ComboInput: React.FC<InputProps> = ({ name, labeltext, setSelectedValue, selected }) => {
+  const { t } = useTranslation();
   const [field, Meta, helpers] = useField(name);
   const [comboboxlist, setcomboboxlist] = useState([]);
+  const [error, setError] = useState<Error>(null);
   const { setValue } = helpers;
   const comboboxevent = (text, id) => {
     if (text == '') {
     } else {
       performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text)
         .then((value) => {
-          var element = [];
-          value.data.forEach((parent1) => {
-            element.push({ id: parent1['uuid'], text: parent1['name'] });
-          });
-          setcomboboxlist(element);
+          setcomboboxlist(value.data.map((parent1) => ({ id: parent1['uuid'], text: parent1['name'] })));
         })
         .catch((err) => {
-          console.log(err);
+          setError(err);
         });
     }
   };
+
+  if (error) {
+    return <span>{t(`${error.message}`)}</span>;
+  }
+
   return (
     <ComboBox
       id={name}
