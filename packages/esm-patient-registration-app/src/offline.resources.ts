@@ -15,8 +15,8 @@ export interface Resources {
 
 export const ResourcesContext = React.createContext<Resources>(null);
 
-export async function fetchCurrentSession(abortController?: AbortController): Promise<FetchResponse<Session>> {
-  const { data } = await cacheAndFetch('/ws/rest/v1/session', abortController);
+export async function fetchCurrentSession(abortController?: AbortController): Promise<Session> {
+  const { data } = await cacheAndFetch<Session>('/ws/rest/v1/session', abortController);
   return data;
 }
 
