@@ -40,6 +40,14 @@ $openmrs-background-grey: #ededed;
   @extend .productiveHeading02;
 }
 
+.patientInfo {
+  position: sticky;
+  z-index: 1000;
+  background-color: $ui-02;
+  top: 3rem;
+  overflow-y: auto;
+}
+
 .dateTimeContainer {
   display: flex;
   margin: 1rem 0;

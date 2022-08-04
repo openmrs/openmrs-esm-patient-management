@@ -122,10 +122,14 @@ export interface AppointmentPayload {
   providerUuid: string;
   patientUuid: string;
   serviceUuid: string;
+  serviceTypeUuid: string;
   startDateTime: string;
   endDateTime: string;
+  frequency?: string;
+  dayOfWeek?: string;
   appointmentKind: string;
-  providers?: Array<{ uuid: string; comments: string; response?: string }>;
+  provider?: string;
+  providers?: [];
   locationUuid: string;
   comments: string;
   status: string;

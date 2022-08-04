@@ -20,7 +20,7 @@ const PatientSearch: React.FC = () => {
     <>
       <div className="omrs-main-content">
         {searchType === SearchTypes.BASIC ? (
-          <BasicSearch toggleSearchType={toggleSearchType} />
+          <BasicSearch patient={selectedPatient} toggleSearchType={toggleSearchType} />
         ) : searchType === SearchTypes.ADVANCED ? (
           <AdvancedSearch toggleSearchType={toggleSearchType} />
         ) : searchType === SearchTypes.SEARCH_RESULTS ? (

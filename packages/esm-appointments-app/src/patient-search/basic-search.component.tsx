@@ -12,10 +12,11 @@ import { navigate } from '@openmrs/esm-framework';
 import styles from './basic-search.scss';
 
 interface BasicSearchProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patient: fhir.Patient) => void;
+  patient: fhir.Patient;
 }
 
-const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
+const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType, patient }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
@@ -101,7 +102,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
               kind="ghost"
               iconDescription="Advanced search"
               renderIcon={Search16}
-              onClick={() => toggleSearchType(SearchTypes.ADVANCED)}>
+              onClick={() => toggleSearchType(SearchTypes.ADVANCED, patient)}>
               {t('advancedSearch', 'Advanced search')}
             </Button>
           </div>

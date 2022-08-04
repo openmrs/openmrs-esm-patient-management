@@ -48,7 +48,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
   }, [patients]);
 
   const onClickSearchResult = (patient: fhir.Patient) => {
-    toggleSearchType(SearchTypes.SCHEDULED_VISITS, patient);
+    toggleSearchType(SearchTypes.FORM, patient);
   };
 
   return (
