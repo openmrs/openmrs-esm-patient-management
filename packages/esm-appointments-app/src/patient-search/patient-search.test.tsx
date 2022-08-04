@@ -8,22 +8,11 @@ describe('PatientSearch: ', () => {
     renderPatientSearch();
 
     expect(screen.getByRole('button', { name: /^search$/i })).toBeInTheDocument();
-    const advancedSearchButton = screen.getByRole('button', { name: /advanced search/i });
-    expect(advancedSearchButton).toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: /search for a patient/i })).toBeInTheDocument();
-
-    userEvent.click(advancedSearchButton);
-
-    expect(advancedSearchButton).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /back to simple search/i })).toBeInTheDocument();
-
-    userEvent.click(screen.getByRole('button', { name: /back to simple search/i }));
-
-    expect(screen.getByRole('button', { name: /advanced search/i })).toBeInTheDocument();
   });
 });
 
 function renderPatientSearch() {
   const closePanel = jest.fn();
-  render(<PatientSearch closePanel={closePanel} />);
+  render(<PatientSearch />);
 }
