@@ -30,29 +30,31 @@ export const AddressHierarchy: React.FC = () => {
   };
 
   useEffect(() => {
-    const templateXmlDoc = parseString(addressTemplateXml);
-    const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
-    const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-    const properties = nameMappings.getElementsByTagName('entry');
-    const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-      const name = property.getElementsByTagName('string')[0].innerHTML;
-      /*
-        t('postalCode')
-        t('address1')
-        t('stateProvince')
-        t('cityVillage')
-        t('country')
-      */
-      const labelText = t(name, property.getElementsByTagName('string')[1].innerHTML);
-      const value = getFieldValue(name, elementDefaults);
-      return {
-        id: name,
-        name,
-        labelText,
-        value,
-      };
-    });
-    setaddressLayout(propertiesObj);
+    if (addressTemplateXml) {
+      const templateXmlDoc = parseString(addressTemplateXml);
+      const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
+      const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
+      const properties = nameMappings.getElementsByTagName('entry');
+      const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
+        const name = property.getElementsByTagName('string')[0].innerHTML;
+        /*
+          t('postalCode')
+          t('address1')
+          t('stateProvince')
+          t('cityVillage')
+          t('country')
+        */
+        const labelText = t(name, property.getElementsByTagName('string')[1].innerHTML);
+        const value = getFieldValue(name, elementDefaults);
+        return {
+          id: name,
+          name,
+          labelText,
+          value,
+        };
+      });
+      setaddressLayout(propertiesObj);
+    }
   }, [t, addressTemplateXml]);
 
   if (!addressTemplate) {

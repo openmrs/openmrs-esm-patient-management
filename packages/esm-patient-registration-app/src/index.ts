@@ -12,17 +12,6 @@ import { setupOffline } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const backendDependencies = {
-  'webservices.rest': '^2.24.0',
-};
-
-const resources = {
-  currentSession: fetchCurrentSession,
-  addressTemplate: fetchAddressTemplate,
-  relationshipTypes: fetchAllRelationshipTypes,
-  identifierTypes: fetchPatientIdentifierTypesWithSources,
-};
-
 function setupOpenMRS() {
   const options = {
     featureName: 'Patient Registration',
@@ -114,4 +103,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { importTranslation, setupOpenMRS };
