@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { homeDashboardMeta } from './dashboard.meta';
@@ -17,6 +17,14 @@ function setupOpenMRS() {
     moduleName,
   };
 
+  registerBreadcrumbs([
+    {
+      path: `${window.spaBase}/appointments-list/:value?`,
+      title: ([x]) => `Patient Lists / ${x}`,
+      parent: `${window.spaBase}`,
+    },
+  ]);
+
   defineConfigSchema(moduleName, configSchema);
 
   return {
@@ -33,6 +41,15 @@ function setupOpenMRS() {
           featureName: 'Visit Header',
           moduleName,
         }),
+        online: true,
+        offline: true,
+      },
+      {
+        load: getAsyncLifecycle(
+          () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
+          options,
+        ),
+        route: /^appointments-list/,
         online: true,
         offline: true,
       },
@@ -71,6 +88,13 @@ function setupOpenMRS() {
         id: 'edit-queue-entry-status-modal',
         load: getAsyncLifecycle(() => import('./active-visits/change-status-dialog.component'), {
           featureName: 'edit queue status',
+          moduleName,
+        }),
+      },
+      {
+        id: 'patient-info-banner-slot',
+        load: getAsyncLifecycle(() => import('./patient-info/patient-info.component'), {
+          featureName: 'patient info slot',
           moduleName,
         }),
       },

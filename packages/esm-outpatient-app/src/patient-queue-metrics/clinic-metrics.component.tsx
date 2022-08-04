@@ -30,11 +30,13 @@ function ClinicMetrics() {
           label={t('patients', 'Patients')}
           value={metrics ? metrics.scheduled_appointments : 0}
           headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          service="scheduled"
         />
         <MetricsCard
           label={t('patients', 'Patients')}
           value={serviceCount}
-          headerLabel={t('waitingFor', 'Waiting for:')}>
+          headerLabel={t('waitingFor', 'Waiting for:')}
+          service={selectedService}>
           <Dropdown
             style={{ marginTop: '1.5rem' }}
             id="inline"
