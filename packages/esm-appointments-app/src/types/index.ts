@@ -1,5 +1,4 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
-import { string } from 'yup';
 
 export enum SearchTypes {
   BASIC = 'basic',

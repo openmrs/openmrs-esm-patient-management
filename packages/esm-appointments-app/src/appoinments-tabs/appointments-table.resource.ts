@@ -6,8 +6,7 @@ import { getAppointment, startDate } from '../helpers';
 
 export function useAppointments(status: string) {
   const date = startDate;
-  // const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${date}&status=${status}`;
-  const apiUrl = `/ws/rest/v1/appointment/all`;
+  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${date}&status=${status}`;
 
   const { data, error, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
   const appointments = useMemo(() => data?.data?.map((appointment) => getAppointment(appointment)) ?? [], [data?.data]);
