@@ -121,3 +121,14 @@ export interface AppointmentPayload {
   locationUuid: string;
   comments: string;
 }
+export interface AppointmentCountMap {
+  allAppointmentsCount: number;
+  missedAppointmentsCount;
+  appointmentDate: number;
+  appointmentServiceUuid: string;
+}
+
+export interface AppointmentSummary {
+  appointmentService: { name: string };
+  appointmentCountMap: Record<string, AppointmentCountMap>;
+}

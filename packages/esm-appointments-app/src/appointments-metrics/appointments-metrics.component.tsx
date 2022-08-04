@@ -1,22 +1,22 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton } from 'carbon-components-react';
-import { useAppointmentsMetrics } from './appointment-metrics.resource';
+import { InlineLoading } from 'carbon-components-react';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 import { ErrorState } from '@openmrs/esm-framework';
+import { useClinicalMetrics } from '../hooks/useClinicalMetrics';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
-  const { metrics, isError, isLoading } = useAppointmentsMetrics();
+  const { totalAppointments, highestServiceLoad, isLoading, error } = useClinicalMetrics();
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return <InlineLoading description={t('loading', 'Loading...')} />;
   }
 
-  if (isError) {
-    <ErrorState headerTitle={t('errorAppoinmentMetric')} error={isError} />;
+  if (error) {
+    <ErrorState headerTitle={t('errorAppoinmentMetric')} error={error} />;
   }
 
   return (
@@ -24,18 +24,18 @@ const AppointmentsMetrics: React.FC = () => {
       <MetricsHeader />
       <div className={styles.cardContainer}>
         <MetricsCard
-          label={t('appointments', 'Appointments')}
-          value={metrics ? metrics.scheduleAppointments : 0}
+          label={t('patients', 'Patients')}
+          value={totalAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
         />
         <MetricsCard
-          label={t('appointments', 'Appointments')}
-          value={metrics ? metrics.missedAppointments : 0}
-          headerLabel={t('missedAppointments', 'Missed appts. today')}
+          label={t(highestServiceLoad?.serviceName)}
+          value={highestServiceLoad?.count ?? '--'}
+          headerLabel={t('highestServiceVolume', 'High volume Service.  today')}
         />
         <MetricsCard
           label={t('providers', 'Providers')}
-          value={metrics ? metrics.providersAvailableToday : 0}
+          value={0}
           headerLabel={t('providersAvailableToday', 'Providers available today')}
         />
       </div>
@@ -44,3 +44,6 @@ const AppointmentsMetrics: React.FC = () => {
 };
 
 export default AppointmentsMetrics;
+function useAppointmentsMetrics(): { metrics: any; isError: any; isLoading: any } {
+  throw new Error('Function not implemented.');
+}
