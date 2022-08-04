@@ -1,0 +1,108 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.container {
+  padding-bottom: $spacing-07;
+  background-color: $ui-01;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-05;
+  margin: $spacing-03;
+  border-top: 1px solid $text-03;
+  border-bottom: 1px solid $text-03;
+}
+
+.title {
+  @include carbon--type-style('body-short-02');
+  color: $text-01;
+  margin: 0 $spacing-04 $spacing-04;
+}
+
+.subTitle {
+  @include carbon--type-style('label-01');
+  color: $text-02;
+  margin: $spacing-01;
+  margin-left: $spacing-04;
+}
+
+.filterTile {
+  border-bottom: 1px solid $text-03;
+  margin-bottom: $spacing-04;
+}
+
+.actionsBtn {
+  float: right;
+}
+
+.tableContainer {
+  margin: 0 $spacing-05;
+  padding: 0;
+}
+
+.search {
+  max-width: 16rem;
+
+  input {
+    background-color: $ui-02 !important;
+  }
+}
+
+.tableContainer {
+  background-color: $ui-01;
+
+  a {
+    text-decoration: none;
+  }
+
+  tr {
+    width: $spacing-01;
+  }
+
+  .toolbarContent {
+    height: $spacing-07;
+    margin-bottom: $spacing-02;
+  }
+}
+
+.queueTable tr:last-of-type {
+  td {
+    border-bottom: none;
+  }
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: $spacing-11 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-02;
+  margin-bottom: $spacing-03;
+}
+
+.helper {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}

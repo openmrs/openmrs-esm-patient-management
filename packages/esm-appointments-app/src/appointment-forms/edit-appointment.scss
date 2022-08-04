@@ -1,0 +1,31 @@
+@import '../root.scss';
+
+.formContainer {
+  margin: $spacing-05;
+}
+
+.row {
+  display: flex;
+  margin: $spacing-03;
+}
+
+.select {
+  width: 90%;
+  margin-right: 90%;
+}
+
+.childRow {
+  margin-left: $spacing-05;
+}
+
+.inputContainer {
+  margin: $spacing-05;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
