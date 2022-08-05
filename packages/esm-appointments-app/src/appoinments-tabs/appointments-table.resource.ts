@@ -1,38 +1,25 @@
 import useSWR from 'swr';
-import { openmrsFetch, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { AppointmentsFetchResponse, AppointmentPayload, AppointmentService } from '../types';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { AppointmentPayload, AppointmentService, Appointment } from '../types';
+import { useMemo } from 'react';
+import { getAppointment, startDate } from '../helpers';
 
-export function useAppointments() {
-  const apiUrl = `/ws/rest/v1/appointment/all`;
-  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentsFetchResponse> }, Error>(apiUrl, openmrsFetch);
+export function useAppointments(status: string) {
+  const date = startDate;
+  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${date}&status=${status}`;
 
-  const mappedAppointment = (appointment) => ({
-    id: appointment.uuid,
-    name: appointment.patient.name,
-    age: appointment.patient.age,
-    gender: appointment.patient.gender,
-    phoneNumber: appointment.patient.phoneNumber,
-    dob: formatDate(parseDate(appointment.patient.birthdate), { mode: 'wide' }),
-    patientUuid: appointment.patient.uuid,
-    dateTime: formatDatetime(parseDate(appointment.startDateTime)),
-    serviceType: appointment.serviceType ? appointment.serviceType.display : '--',
-    visitType: appointment.serviceType ? appointment.serviceType.display : '--',
-    provider: appointment.provider ? appointment.provider.person.display : '--',
-    location: appointment.location ? appointment.location.name : '--',
-    comments: appointment.comments ? appointment.comments : '--',
-  });
-
-  const appointmentEntries = data?.data?.map(mappedAppointment);
+  const { data, error, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+  const appointments = useMemo(() => data?.data?.map((appointment) => getAppointment(appointment)) ?? [], [data?.data]);
 
   return {
-    appointments: appointmentEntries ? appointmentEntries : [],
+    appointments,
     isLoading: !data && !error,
     isError: error,
     isValidating,
   };
 }
 
-export function editAppointment(appointment: AppointmentPayload, abortController: AbortController) {
+export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,
@@ -42,8 +29,6 @@ export function editAppointment(appointment: AppointmentPayload, abortController
     body: appointment,
   });
 }
-
-export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;

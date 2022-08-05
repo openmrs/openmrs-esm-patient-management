@@ -31,7 +31,7 @@ import styles from './appointments-base-table.scss';
 import { MappedAppointment } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
-import EditAppointment from '../appointment-forms/edit-appointment.component';
+import AppointmentForm from '../appointment-forms/appointment-form.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -39,7 +39,11 @@ interface AppointmentsProps {
   tableHeading: String;
 }
 
-function ActionsMenu(appoinments) {
+interface ActionMenuProps {
+  appointment: MappedAppointment;
+}
+
+const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment }) => {
   const { t } = useTranslation();
 
   return (
@@ -48,10 +52,10 @@ function ActionsMenu(appoinments) {
         className={styles.menuItem}
         id="#editAppointment"
         onClick={() =>
-          launchOverlay(t('editAppointment', 'Edit Appointment'), <EditAppointment appointment={appoinments} />)
+          launchOverlay(t('editAppointment', 'Edit Appointment'), <AppointmentForm appointment={appointment} />)
         }
         itemText={t('editAppointment', 'Edit Appointment')}>
-        {t('editAppointment', 'EditAppointment')}
+        {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
       <OverflowMenuItem
         className={styles.menuItem}
@@ -61,7 +65,7 @@ function ActionsMenu(appoinments) {
       </OverflowMenuItem>
     </OverflowMenu>
   );
-}
+};
 
 function ServiceIcon({ service }) {
   switch (service) {
