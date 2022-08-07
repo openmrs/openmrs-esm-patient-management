@@ -4,7 +4,7 @@ import BasicSearch from './basic-search.component';
 import AdvancedSearch from './advanced-search.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import SearchResults from './search-results.component';
-import PatientForm from '../appointments/appointment-form.component';
+import PatientForm from '../appointment-forms/create-appointment-form.component';
 import { SearchTypes } from '../types';
 
 const PatientSearch: React.FC = () => {

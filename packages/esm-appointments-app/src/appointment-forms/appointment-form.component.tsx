@@ -67,6 +67,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate =
   const [appointmentStatus, setAppointmentStatus] = useState(appointment.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { data: providers } = useProviders();
+
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {
       setSelectedLocation(session?.sessionLocation?.uuid);

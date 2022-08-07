@@ -45,6 +45,9 @@ export interface Appointment {
   uuid: string;
 }
 
+export interface AppointmentsFetchResponse {
+  data: Array<Appointment>;
+}
 export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
@@ -119,22 +122,18 @@ export interface MappedAppointment {
 }
 
 export interface AppointmentPayload {
-  providerUuid: string;
   patientUuid: string;
   serviceUuid: string;
-  serviceTypeUuid: string;
   startDateTime: string;
   endDateTime: string;
-  frequency?: string;
-  dayOfWeek?: string;
   appointmentKind: string;
-  provider?: string;
-  providers?: [];
+  providers?: Array<{ uuid: string; comments: string; response?: string }>;
   locationUuid: string;
   comments: string;
-  status: string;
-  appointmentNumber: string;
-  uuid: string;
+  status?: string;
+  appointmentNumber?: string;
+  uuid?: string;
+  provider?: string;
 }
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
@@ -147,33 +146,9 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
-
-export interface Patient {
-  uuid: string;
-  display: string;
-  identifiers: Array<any>;
-  person: Person;
-}
-
 export interface Provider {
   uuid: string;
   display: string;
   comments: string;
   response?: string;
-}
-export interface Attribute {
-  attributeType: OpenmrsResource;
-  display: string;
-  uuid: string;
-  value: string | number;
-}
-
-export interface Person {
-  age: number;
-  attributes: Array<Attribute>;
-  birthDate: string;
-  gender: string;
-  display: string;
-  preferredAddress: OpenmrsResource;
-  uuid: string;
 }

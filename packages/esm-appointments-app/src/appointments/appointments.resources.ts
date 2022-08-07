@@ -1,7 +1,6 @@
-import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse, Provider } from '../types';
+import { AppointmentService, AppointmentsFetchResponse, Provider } from '../types';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -50,17 +49,6 @@ export function useAppointmentService() {
   };
 }
 
-export function createAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
-    method: 'POST',
-    signal: abortController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: appointment,
-  });
-}
-
 export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
     signal: abortController.signal,
@@ -71,22 +59,6 @@ export function getAppointmentService(abortController: AbortController, uuid) {
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,
   });
-}
-
-export function getProviders(abortController: AbortController) {
-  return openmrsFetch('/ws/rest/v1/provider', {
-    signal: abortController.signal,
-  });
-}
-
-export function useProviders() {
-  const { data, error } = useSWR<{ data: { results: Array<Provider> } }, Error>(`/ws/rest/v1/provider`, openmrsFetch);
-
-  return {
-    data: data ? data.data.results : null,
-    isError: error,
-    isLoading: !data && !error,
-  };
 }
 
 export function getTimeSlots(abortController: AbortController) {

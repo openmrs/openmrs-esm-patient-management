@@ -19,25 +19,26 @@ import {
   RadioButton,
   Toggle,
 } from 'carbon-components-react';
-import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
 import {
-  appointmentsSearchUrl,
-  createAppointment,
-  useAppointmentService,
-  useProviders,
-} from './appointments.resources';
-import { AppointmentPayload, AppointmentService } from '../types';
+  useLocations,
+  useSession,
+  showToast,
+  showNotification,
+  useLayoutType,
+  ExtensionSlot,
+} from '@openmrs/esm-framework';
+import { appointmentsSearchUrl, saveAppointment, useServices, useProviders } from './appointment-forms.resource';
+import { AppointmentPayload } from '../types';
 import { convertTime12to24, amPm } from '../helpers/time.helpers';
-import PatientInfo from '../patient-info/patient-info.component';
-import styles from './appointment-form.scss';
+import styles from './create-appointment-form.scss';
 
 interface AppointmentFormProps {
   patientUuid: string;
   patient: fhir.Patient;
-  closeWorkspace: () => void;
+  // closeWorkspace: () => void;
 }
 
-const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient, closeWorkspace }) => {
+const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { mutate } = useSWRConfig();
@@ -65,7 +66,7 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
     setUserLocation(session?.sessionLocation?.uuid);
   }
 
-  const { data: services, isLoading } = useAppointmentService();
+  const { services, isLoading } = useServices();
   const { data: providers } = useProviders();
 
   const defaultServices = [
@@ -114,22 +115,20 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: appointmentKindValues[contentSwitcherValue],
       serviceUuid,
-      serviceTypeUuid,
       startDateTime: dayjs(startDateTime).format(),
       endDateTime: dayjs(endDateTime).format(),
-      providerUuid: session?.currentProvider?.uuid,
       provider: selectedProvider,
       locationUuid: userLocation,
       patientUuid: patientUuid,
-      notes: appointmentNote,
       providers: [],
+      comments: appointmentNote,
     };
 
     const abortController = new AbortController();
-    createAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
-          closeWorkspace();
+          // closeWorkspace();
 
           showToast({
             critical: true,
@@ -159,7 +158,13 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
     <div>
       {patient ? (
         <div className={styles.patientInfo}>
-          <PatientInfo patient={patient} handlePatientInfoClick={() => {}} />
+          <ExtensionSlot
+            extensionSlotName="patient-info-banner-slot"
+            state={{
+              patient,
+              patientUuid: patient.id,
+            }}
+          />
         </div>
       ) : null}
       <div className={styles.formWrapper}>
@@ -347,7 +352,7 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
           />
         </section>
         <section className={styles.buttonGroup}>
-          <Button onClick={closeWorkspace} kind="secondary">
+          <Button onClick={() => {}} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button disabled={!selectedService} onClick={handleSubmit}>

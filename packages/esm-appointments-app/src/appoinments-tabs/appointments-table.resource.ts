@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, Appointment } from '../types';
+import { AppointmentService, Appointment } from '../types';
 import { useMemo } from 'react';
 import { getAppointment, startDate } from '../helpers';
 
@@ -16,17 +16,6 @@ export function useAppointments(status: string) {
     isValidating,
     mutate,
   };
-}
-
-export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
-    method: 'POST',
-    signal: abortController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: appointment,
-  });
 }
 
 export function useServices() {
