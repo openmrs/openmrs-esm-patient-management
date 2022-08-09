@@ -75,7 +75,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   useEffect(() => {
     if (addressTemplate) {
       const addressTemplateXml = addressTemplate?.results[0].value;
-      if (addressTemplateXml) {
+      if (!addressTemplateXml) {
         return;
       }
       const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);

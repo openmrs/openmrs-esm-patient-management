@@ -38,6 +38,7 @@ export const AddressHierarchy: React.FC = () => {
       const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
         const name = property.getElementsByTagName('string')[0].innerHTML;
         /*
+          Please do not remove this comment. It exists to force the translation keys to be generated.
           t('postalCode')
           t('address1')
           t('stateProvince')
