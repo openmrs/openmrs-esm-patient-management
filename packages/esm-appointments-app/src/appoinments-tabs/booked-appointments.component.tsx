@@ -3,8 +3,11 @@ import AppointmentsBaseTable from './appointments-base-table.component';
 import { useAppointments } from './appointments-table.resource';
 import { useTranslation } from 'react-i18next';
 
-const BookedAppointments: React.FC = () => {
-  const { appointments, isLoading } = useAppointments();
+interface BookedAppointmentsProps {
+  status: string;
+}
+const BookedAppointments: React.FC<BookedAppointmentsProps> = ({ status }) => {
+  const { appointments, isLoading } = useAppointments(status);
   const { t } = useTranslation();
 
   return (

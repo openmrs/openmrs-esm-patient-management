@@ -20,17 +20,22 @@ interface ObsData {
   obsDatetime: string;
 }
 
-export interface AppointmentsFetchResponse {
-  data: Array<Appointment>;
-}
-
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
   comments: string;
   endDateTime: Date | number;
   location: OpenmrsResource;
-  patient: fhir.Patient;
+  patient: {
+    identifer: string;
+    name: string;
+    uuid: string;
+    age: string;
+    dob: string;
+    birthDate: string;
+    gender: string;
+    contact: string;
+  };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   recurring: boolean;
@@ -104,10 +109,13 @@ export interface MappedAppointment {
   patientUuid: string;
   dateTime: string;
   serviceType: string;
-  visitType: string;
+  serviceUuid: string;
+  appointmentKind: string;
   provider: string;
   location: string;
   comments: string;
+  status: string;
+  appointmentNumber: string;
 }
 
 export interface AppointmentPayload {
@@ -120,4 +128,18 @@ export interface AppointmentPayload {
   providers?: Array<{ uuid: string; comments: string; response?: string }>;
   locationUuid: string;
   comments: string;
+  status: string;
+  appointmentNumber: string;
+  uuid: string;
+}
+export interface AppointmentCountMap {
+  allAppointmentsCount: number;
+  missedAppointmentsCount;
+  appointmentDate: number;
+  appointmentServiceUuid: string;
+}
+
+export interface AppointmentSummary {
+  appointmentService: { name: string };
+  appointmentCountMap: Record<string, AppointmentCountMap>;
 }

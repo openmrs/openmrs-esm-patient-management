@@ -338,9 +338,9 @@ describe('patient registration', () => {
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
-    const weight = within(customSection).getByLabelText('Weight (kg)');
+    const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     userEvent.type(weight, '50');
-    const complaint = within(customSection).getByLabelText('Chief Complaint');
+    const complaint = within(customSection).getByLabelText('Chief Complaint (optional)');
     userEvent.type(complaint, 'sad');
     const nationality = within(customSection).getByLabelText('Nationality');
     userEvent.selectOptions(nationality, 'USA');
@@ -379,7 +379,7 @@ describe('patient registration', () => {
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
-    const weight = within(customSection).getByLabelText('Weight (kg)');
+    const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     userEvent.type(weight, '-999');
 
     mockSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });

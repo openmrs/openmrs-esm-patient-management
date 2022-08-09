@@ -1,11 +1,14 @@
 import React from 'react';
 import AppointmentsBaseTable from './appointments-base-table.component';
-import { useAppointments } from './appointments-table.resource';
 import { useTranslation } from 'react-i18next';
+import { useAppointments } from './appointments-table.resource';
 
-const CancelledAppointment: React.FC = () => {
-  const { appointments, isLoading } = useAppointments();
+interface CancelledAppointmentProps {
+  status: string;
+}
+const CancelledAppointment: React.FC<CancelledAppointmentProps> = ({ status }) => {
   const { t } = useTranslation();
+  const { appointments, isLoading } = useAppointments(status);
 
   return (
     <div>
