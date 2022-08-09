@@ -67,11 +67,12 @@ const VisitHeader: React.FC = () => {
 
   const originPage = localStorage.getItem('fromPage');
 
-  const onClosePatientChart = () => {
+  const onClosePatientChart = useCallback(() => {
     originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
-  };
+  }, [originPage]);
+
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
@@ -137,6 +138,7 @@ const VisitHeader: React.FC = () => {
     showVisitHeader,
     t,
     toggleSideMenu,
+    onClosePatientChart,
   ]);
 
   return <HeaderContainer render={render} />;

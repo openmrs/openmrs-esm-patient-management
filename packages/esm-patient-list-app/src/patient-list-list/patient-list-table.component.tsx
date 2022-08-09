@@ -57,7 +57,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   const userId = useSession()?.user.uuid;
   const isDesktop = useLayoutType() === 'desktop';
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), [search]);
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
       await updatePatientList(patientListId, { isStarred });

@@ -18,7 +18,7 @@ export const DemographicsSection: React.FC<DemographicsSectionProps> = ({ fields
       setFieldValue('additionalMiddleName', '');
       setFieldValue('additionalFamilyName', '');
     }
-  }, [field.value, meta.touched]);
+  }, [field.value, meta.touched, setFieldValue]);
 
   return (
     <section className={styles.formSection} aria-label="Demographics Section">

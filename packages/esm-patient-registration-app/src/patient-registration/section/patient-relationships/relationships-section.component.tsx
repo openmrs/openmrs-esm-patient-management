@@ -101,19 +101,25 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 
   const newRelationship = !relationship.uuid;
 
-  const handleRelationshipTypeChange = useCallback((event) => {
-    const { target } = event;
-    const field = target.name;
-    const value = target.options[target.selectedIndex].value;
-    setFieldValue(field, value);
-    if (!relationship?.action) {
-      setFieldValue(`relationships[${index}].action`, 'UPDATE');
-    }
-  }, []);
+  const handleRelationshipTypeChange = useCallback(
+    (event) => {
+      const { target } = event;
+      const field = target.name;
+      const value = target.options[target.selectedIndex].value;
+      setFieldValue(field, value);
+      if (!relationship?.action) {
+        setFieldValue(`relationships[${index}].action`, 'UPDATE');
+      }
+    },
+    [index, relationship?.action, setFieldValue],
+  );
 
-  const handleSuggestionSelected = useCallback((field: string, selectedSuggestion: string) => {
-    setFieldValue(field, selectedSuggestion);
-  }, []);
+  const handleSuggestionSelected = useCallback(
+    (field: string, selectedSuggestion: string) => {
+      setFieldValue(field, selectedSuggestion);
+    },
+    [setFieldValue],
+  );
 
   const searchPerson = async (query: string) => {
     const abortController = new AbortController();
@@ -127,7 +133,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     } else {
       setFieldValue(`relationships[${index}].action`, 'DELETE');
     }
-  }, [relationship, index]);
+  }, [relationship, index, remove, setFieldValue]);
 
   const restoreRelationship = useCallback(() => {
     setFieldValue(`relationships[${index}]`, {
@@ -135,7 +141,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
       action: undefined,
       relationshipType: relationship.initialrelationshipTypeValue,
     });
-  }, [index]);
+  }, [index, relationship, setFieldValue]);
 
   return relationship.action !== 'DELETE' ? (
     <div className={styles.relationship}>

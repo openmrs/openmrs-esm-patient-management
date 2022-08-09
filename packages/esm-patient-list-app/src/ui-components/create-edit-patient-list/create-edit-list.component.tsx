@@ -86,7 +86,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           }),
         );
     }
-  }, [close, user, cohortDetails]);
+  }, [close, cohortDetails, edit, onSuccess, patientListDetails.uuid, t]);
 
   const handleChange = useCallback(
     ({ currentTarget }: SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>) => {

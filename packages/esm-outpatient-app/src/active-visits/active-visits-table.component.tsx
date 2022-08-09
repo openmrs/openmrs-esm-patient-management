@@ -269,7 +269,7 @@ function ActiveVisitsTable() {
         ),
       },
     }));
-  }, [filteredRows, visitQueueEntries]);
+  }, [filteredRows, visitQueueEntries, fromPage]);
 
   const handleServiceChange = ({ selectedItem }) => {
     setFilter(selectedItem.display);

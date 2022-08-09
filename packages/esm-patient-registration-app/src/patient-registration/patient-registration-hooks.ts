@@ -56,12 +56,12 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   useEffect(() => {
     (async () => {
       if (patientToEdit) {
-        setInitialFormValues({
+        setInitialFormValues((initialFormValues) => ({
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patientToEdit),
           ...getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
-        });
+        }));
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
 
@@ -121,16 +121,16 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
   useEffect(() => {
     (async () => {
       if (patient) {
-        setInitialAddressFieldValues({
+        setInitialAddressFieldValues((initialAddressFieldValues) => ({
           ...initialAddressFieldValues,
           ...getAddressFieldValuesFromFhirPatient(patient),
-        });
+        }));
       } else if (!isLoading && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
         setInitialAddressFieldValues(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback);
       }
     })();
-  }, [isLoading, patient, patientUuid]);
+  }, [isLoading, patient, patientUuid, fallback]);
 
   return [initialAddressFieldValues, setInitialAddressFieldValues];
 }
@@ -144,13 +144,16 @@ export function usePatientUuidMap(
 
   useEffect(() => {
     if (patientToEdit) {
-      setPatientUuidMap({ ...patientUuidMap, ...getPatientUuidMapFromFhirPatient(patientToEdit) });
+      setPatientUuidMap((patientUuidMap) => ({
+        ...patientUuidMap,
+        ...getPatientUuidMapFromFhirPatient(patientToEdit),
+      }));
     } else if (!isLoadingPatientToEdit && patientUuid) {
       getPatientRegistration(patientUuid).then((registration) =>
         setPatientUuidMap(registration?._patientRegistrationData.initialAddressFieldValues ?? fallback),
       );
     }
-  }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+  }, [isLoadingPatientToEdit, patientToEdit, patientUuid, fallback]);
 
   return [patientUuidMap, setPatientUuidMap];
 }

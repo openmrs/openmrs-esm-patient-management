@@ -98,7 +98,13 @@ export const Identifiers: React.FC = () => {
         });
       }
     }
-  }, [identifierTypes, setFieldValue, initializeIdentifier, defaultPatientIdentifierTypes, values.identifiers]);
+  }, [
+    identifierTypes,
+    setFieldValue,
+    defaultPatientIdentifierTypes,
+    values.identifiers,
+    initialFormValues.identifiers,
+  ]);
 
   if (isLoading) {
     return (

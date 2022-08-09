@@ -80,7 +80,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     if (currentPage !== 1) {
       goTo(1);
     }
-  }, [searchValue]);
+  }, [currentPage, goTo]);
 
   return (
     <div className={styles.modalContent}>

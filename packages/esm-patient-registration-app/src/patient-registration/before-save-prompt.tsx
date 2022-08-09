@@ -18,15 +18,18 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
   const ref = useRef<boolean>(false);
   const [localTarget, setTarget] = useState<string | undefined>();
   const target = localTarget || redirect;
-  const cancelUnload = useCallback((e: BeforeUnloadEvent) => {
-    const message = t(
-      'discardModalBody',
-      "The changes you made to this patient's details have not been saved. Discard changes?",
-    );
-    e.preventDefault();
-    e.returnValue = message;
-    return message;
-  }, []);
+  const cancelUnload = useCallback(
+    (e: BeforeUnloadEvent) => {
+      const message = t(
+        'discardModalBody',
+        "The changes you made to this patient's details have not been saved. Discard changes?",
+      );
+      e.preventDefault();
+      e.returnValue = message;
+      return message;
+    },
+    [t],
+  );
 
   const cancelNavigation = useCallback((evt: CustomEvent) => {
     if (!evt.detail.navigationIsCanceled && !ref.current) {
@@ -63,7 +66,7 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
     if (typeof target === 'string') {
       history.push(`/${getUrlWithoutPrefix(target)}`);
     }
-  }, [target]);
+  }, [target, history]);
 
   return null;
 };

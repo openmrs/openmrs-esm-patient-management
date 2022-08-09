@@ -50,7 +50,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       selectedSource: null,
       autoGeneration: false,
     } as PatientIdentifierValue);
-  }, [initialValue, setHideInputField]);
+  }, [initialValue, setHideInputField, setFieldValue, patientIdentifier, fieldName]);
 
   const handleEdit = () => {
     setHideInputField(false);
