@@ -13,7 +13,7 @@
     "debug": "npm run serve",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
-    "lint": "eslint src --ext tsx",
+    "lint": "eslint src --ext tsx --fix --max-warnings=0",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx'"
   },
