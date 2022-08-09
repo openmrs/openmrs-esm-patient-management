@@ -182,7 +182,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
           className={styles.button}
           kind="primary"
           type="submit"
-          onClick={() => toggleSearchType(SearchTypes.FORM, patient)}>
+          onClick={() => toggleSearchType(SearchTypes.ADVANCED, patient)}>
           {t('search', 'Search')}
         </Button>
       </ButtonSet>

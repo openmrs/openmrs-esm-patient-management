@@ -38,7 +38,7 @@ interface AppointmentFormProps {
   // closeWorkspace: () => void;
 }
 
-const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient }) => {
+const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { mutate } = useSWRConfig();
@@ -88,8 +88,6 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
     }
 
     const service = servicesData.find((service) => service.name === selectedService);
-
-    const serviceTypeUuid = serviceTypes[0]?.uuid;
 
     const serviceUuid = servicesData.find((service) => service.name === selectedService)?.uuid;
 
@@ -364,4 +362,4 @@ const AppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient
   );
 };
 
-export default AppointmentsForm;
+export default CreateAppointmentsForm;

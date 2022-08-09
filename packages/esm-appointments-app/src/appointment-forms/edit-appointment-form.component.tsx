@@ -16,8 +16,9 @@ import {
   ButtonSet,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import styles from './appointment-form.scss';
+import styles from './edit-appointment-form.scss';
 import { mockFrequency } from '../../../../__mocks__/appointments.mock';
+
 import {
   useLocations,
   useSession,

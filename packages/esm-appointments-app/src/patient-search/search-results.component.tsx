@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './search-results.scss';
 import { SearchTypes } from '../types';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
+import { launchOverlay } from '../hooks/useOverlay';
+import CreateAppointmentsForm from '../appointment-forms/create-appointment-form.component';
 
 interface SearchResultsProps {
   patients: Array<any>;
@@ -48,7 +49,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
   }, [patients]);
 
   const onClickSearchResult = (patient: fhir.Patient) => {
-    toggleSearchType(SearchTypes.FORM, patient);
+    launchOverlay('Create Appointment', <CreateAppointmentsForm patient={patient} patientUuid={patient.id} />);
   };
 
   return (
@@ -62,7 +63,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
                 patient,
                 patientUuid: patient.id,
                 onClick: () => onClickSearchResult(patient),
-                // onTransition: hidePanel,
               }}
             />
           </div>
