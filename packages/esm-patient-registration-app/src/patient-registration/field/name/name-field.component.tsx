@@ -75,12 +75,13 @@ export const NameField = () => {
                 labelText={t('givenNameLabelText', 'First Name')}
                 light
                 checkWarning={checkNumber}
+                required
               />
               {fieldConfigs.displayMiddleName && (
                 <Input
                   id="middleName"
                   name="middleName"
-                  labelText={t('middleNameLabelText', 'Middle Name (optional)')}
+                  labelText={t('middleNameLabelText', 'Middle Name')}
                   light
                   checkWarning={checkNumber}
                 />
@@ -91,6 +92,7 @@ export const NameField = () => {
                 labelText={t('familyNameLabelText', 'Family Name')}
                 light
                 checkWarning={checkNumber}
+                required
               />
             </>
           )}
