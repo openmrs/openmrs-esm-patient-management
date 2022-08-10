@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../__mocks__/appointments-data.mock';
 import { useAppointments } from './queue-linelist.resource';
 
 const pageSize = 20;
@@ -10,7 +9,7 @@ const pageSize = 20;
 const AppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
   const { appointmentQueueEntries, isLoading } = useAppointments();
-  const { results: paginatedAppointments } = usePagination(mockAppointmentsData.data, pageSize);
+  const { results: paginatedAppointments } = usePagination(appointmentQueueEntries, pageSize);
 
   const tableHeaders = useMemo(
     () => [
@@ -61,10 +60,10 @@ const AppointmentsTable: React.FC = () => {
             ),
           },
           returnDate: formatDatetime(parseDate(appointment.startDateTime.toString()), { mode: 'wide' }),
-          gender: appointment.patient.gender,
+          gender: appointment.patient?.gender,
           age: appointment.patient.age,
           visitType: appointment.appointmentKind,
-          phoneNumber: appointment.patient.phone_number,
+          phoneNumber: appointment.patient?.phoneNumber,
         };
       }),
     [paginatedAppointments],

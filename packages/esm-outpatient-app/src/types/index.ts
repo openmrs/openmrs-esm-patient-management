@@ -41,7 +41,14 @@ export interface Appointment {
   comments: string;
   endDateTime: Date | number;
   location: OpenmrsResource;
-  patient: fhir.Patient;
+  patient: {
+    uuid: string;
+    name: string;
+    identifier: string;
+    gender: string;
+    age: string;
+    phoneNumber: string;
+  };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   // recurring: boolean;
@@ -259,4 +266,16 @@ export interface PatientProgram {
   dateEnrolled: string;
   dateCompleted: string;
   location: OpenmrsResource;
+}
+
+export interface AppointmentCountMap {
+  allAppointmentsCount: number;
+  missedAppointmentsCount;
+  appointmentDate: number;
+  appointmentServiceUuid: string;
+}
+
+export interface AppointmentSummary {
+  appointmentService: { name: string };
+  appointmentCountMap: Record<string, AppointmentCountMap>;
 }

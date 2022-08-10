@@ -37,7 +37,6 @@ describe('Clinic metrics', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Scheduled appts. today/i)).toBeInTheDocument();
-    expect(screen.getByText(/100/i)).toBeInTheDocument();
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();
     expect(screen.getByText(/minutes/i)).toBeInTheDocument();
     expect(screen.getByText(/28/i)).toBeInTheDocument();

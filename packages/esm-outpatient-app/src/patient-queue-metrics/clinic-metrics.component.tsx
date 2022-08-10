@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from '@carbon/react';
-import { useMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
+import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
@@ -9,6 +9,7 @@ import styles from './clinic-metrics.scss';
 function ClinicMetrics() {
   const { t } = useTranslation();
   const { metrics, isLoading } = useMetrics();
+  const { totalScheduledAppointments } = useAppointmentMetrics();
   const { services } = useServices();
   const [selectedService, setSelectedService] = useState('Triage');
   const { serviceCount } = useServiceMetricsCount(selectedService);
@@ -27,7 +28,7 @@ function ClinicMetrics() {
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={metrics ? metrics.scheduled_appointments : 0}
+          value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
           service="scheduled"
         />

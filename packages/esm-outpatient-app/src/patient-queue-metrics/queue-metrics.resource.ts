@@ -1,6 +1,9 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import { AppointmentSummary } from '../types';
+import { getServiceCountByAppointmentType } from '../helpers/helpers';
 
 interface ConceptMetadataResponse {
   setMembers: Array<{
@@ -51,3 +54,21 @@ export function useServiceMetricsCount(service: string) {
     serviceCount: data ? data?.data?.count : 0,
   };
 }
+
+export const useAppointmentMetrics = () => {
+  const startDate = dayjs(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  const endDate = dayjs(new Date().setHours(23, 59, 59, 59)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+
+  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const { data, error, mutate } = useSWR<{
+    data: Array<AppointmentSummary>;
+  }>(url, openmrsFetch);
+
+  const totalScheduledAppointments = getServiceCountByAppointmentType(data?.data ?? [], 'allAppointmentsCount');
+
+  return {
+    isLoading: !data && !error,
+    error,
+    totalScheduledAppointments,
+  };
+};
