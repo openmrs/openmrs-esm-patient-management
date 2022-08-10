@@ -147,8 +147,4 @@ export interface AppointmentSummary {
 export interface Provider {
   uuid: string;
   display: string;
-  link?: {
-    rel: string;
-    uri: string;
-  };
 }
