@@ -28,18 +28,13 @@ import {
   ExtensionSlot,
   useConfig,
 } from '@openmrs/esm-framework';
-import {
-  appointmentsSearchUrl,
-  saveAppointment,
-  useServices,
-  useProviders,
-  fetchAppointments,
-} from './appointment-forms.resource';
+import { appointmentsSearchUrl, saveAppointment, useServices, fetchAppointments } from './appointment-forms.resource';
 import { AppointmentPayload } from '../types';
 import { convertTime12to24, amPm } from '../helpers/time.helpers';
 import { ConfigObject } from '../config-schema';
 import { mockFrequency } from '../../../../__mocks__/appointments.mock';
 import { closeOverlay } from '../hooks/useOverlay';
+import { useProviders } from '../hooks/useProviders';
 
 import styles from './create-appointment-form.scss';
 
@@ -55,6 +50,7 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
   const isTablet = useLayoutType() === 'tablet';
   const { mutate } = useSWRConfig();
   const locations = useLocations();
+  const { providers } = useProviders();
   const session = useSession();
   const [appointmentNote, setAppointmentNote] = useState('');
   const [selectedProvider, setSelectedProvider] = useState('');
@@ -76,13 +72,13 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
   }
 
   const { services, isLoading } = useServices();
-  const { data: providers } = useProviders();
 
   const handleSubmit = () => {
     if (!selectedService) {
       return;
     }
 
+    const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
     const service = services.find((service) => service.name === selectedService);
 
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
@@ -111,7 +107,7 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
       serviceUuid,
       startDateTime: dayjs(startDateTime).format(),
       endDateTime: dayjs(endDateTime).format(),
-      providerUuid: selectedProvider,
+      providerUuid: providerUuid,
       locationUuid: userLocation,
       patientUuid: patientUuid,
       providers: [],
@@ -153,7 +149,7 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
       {patient ? (
         <div className={styles.patientInfo}>
           <ExtensionSlot
-            extensionSlotName="patient-info-banner-slot"
+            extensionSlotName="patient-header-slot"
             state={{
               patient,
               patientUuid: patient.id,

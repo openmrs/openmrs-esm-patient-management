@@ -13,8 +13,6 @@ $color-blue-30: #a6c8ff;
   @include carbon--type-style('productive-heading-02');
 }
 
-$openmrs-background-grey: #ededed;
-
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
   background-color: $openmrs-background-grey;
 }
