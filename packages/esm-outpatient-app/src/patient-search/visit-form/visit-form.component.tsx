@@ -37,13 +37,16 @@ import {
   showToast,
   useConfig,
 } from '@openmrs/esm-framework';
+import styles from './visit-form.scss';
+import { SearchTypes, PatientProgram, QueueEntryPayload } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { OutpatientConfig } from '../../config-schema';
-import { PatientProgram, SearchTypes } from '../../types/index';
-import styles from './visit-form.scss';
+import { saveQueueEntry } from './queue.resource';
+import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
+import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -69,6 +72,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
+  const [priority, setPriority] = useState('');
+  const { priorities } = usePriority();
+  const { statuses } = useStatus();
+  const { allServices } = useServices(selectedLocation);
+
   const config = useConfig() as OutpatientConfig;
 
   useEffect(() => {
@@ -107,16 +115,56 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         .subscribe(
           (response) => {
             if (response.status === 201) {
-              showToast({
-                kind: 'success',
-                title: t('startVisit', 'Start a visit'),
-                description: t(
-                  'startVisitSuccessfully',
-                  'Patient has been added to active visits list.',
-                  `${hours} : ${minutes}`,
-                ),
-              });
-              closePanel();
+              const service = [...allServices].shift().uuid;
+              const status = [...statuses].shift().uuid;
+
+              const queuePayload: QueueEntryPayload = {
+                visit: {
+                  uuid: response.data.uuid,
+                },
+                queueEntry: {
+                  status: {
+                    uuid: status,
+                  },
+                  priority: {
+                    uuid: priority,
+                  },
+                  queue: {
+                    uuid: service,
+                  },
+                  patient: {
+                    uuid: patientUuid,
+                  },
+                  startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+                },
+              };
+
+              saveQueueEntry(queuePayload, abortController)
+                .pipe(first())
+                .subscribe(
+                  (response) => {
+                    if (response.status === 201) {
+                      showToast({
+                        kind: 'success',
+                        title: t('startVisit', 'Start a visit'),
+                        description: t(
+                          'startVisitQueueSuccessfully',
+                          'Patient has been added to active visits list and queue.',
+                          `${hours} : ${minutes}`,
+                        ),
+                      });
+                      closePanel();
+                    }
+                  },
+                  (error) => {
+                    showNotification({
+                      title: t('queueEntryError', 'Error adding patient to the queue'),
+                      kind: 'error',
+                      critical: true,
+                      description: error?.message,
+                    });
+                  },
+                );
             }
           },
           (error) => {
@@ -129,7 +177,19 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           },
         );
     },
-    [patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType, closePanel],
+    [
+      visitType,
+      visitTime,
+      timeFormat,
+      patientUuid,
+      visitDate,
+      selectedLocation,
+      allServices,
+      statuses,
+      priority,
+      t,
+      closePanel,
+    ],
   );
 
   const handleOnChange = () => {
@@ -337,6 +397,27 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               />
             </section>
           )}
+
+          <section className={styles.section}>
+            <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+            <ContentSwitcher
+              size="sm"
+              onChange={(event) => {
+                setPriority(event.name as any);
+              }}>
+              {priorities?.length > 0 ? (
+                priorities.map(({ uuid, display }) => {
+                  return <Switch name={uuid} text={display} value={uuid} />;
+                })
+              ) : (
+                <Switch
+                  name={t('noPriorityFound', 'No priority found')}
+                  text={t('noPriorityFound', 'No priority found')}
+                  value={null}
+                />
+              )}
+            </ContentSwitcher>
+          </section>
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

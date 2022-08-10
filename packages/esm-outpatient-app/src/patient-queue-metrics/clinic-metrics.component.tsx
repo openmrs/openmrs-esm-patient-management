@@ -5,14 +5,21 @@ import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices 
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
+import { useSession } from '@openmrs/esm-framework';
 
 function ClinicMetrics() {
   const { t } = useTranslation();
   const { metrics, isLoading } = useMetrics();
   const { totalScheduledAppointments } = useAppointmentMetrics();
-  const { services } = useServices();
+  const [userLocation, setUserLocation] = useState('');
+  const { services } = useServices(userLocation);
+  const session = useSession();
   const [selectedService, setSelectedService] = useState('Triage');
   const { serviceCount } = useServiceMetricsCount(selectedService);
+
+  if (!userLocation && session?.sessionLocation?.uuid) {
+    setUserLocation(session?.sessionLocation?.uuid);
+  }
 
   const handleServiceCountChange = ({ selectedItem }: { selectedItem: string }) => {
     setSelectedService(selectedItem);

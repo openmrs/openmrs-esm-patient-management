@@ -279,3 +279,21 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
+export interface QueueEntryPayload {
+  visit: { uuid: string };
+  queueEntry: {
+    status: { uuid: string };
+    priority: { uuid: string };
+    queue: { uuid: string };
+    patient: { uuid: string };
+    startedAt: Date;
+  };
+}
+
+export interface QueueService {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+}

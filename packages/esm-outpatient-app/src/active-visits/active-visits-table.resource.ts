@@ -109,6 +109,34 @@ export function useServices() {
   };
 }
 
+export function useStatus() {
+  const config = useConfig();
+  const {
+    concepts: { statusConceptSetUuid },
+  } = config;
+
+  const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
+  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    statuses: data ? data?.data?.setMembers : [],
+  };
+}
+
+export function usePriority() {
+  const config = useConfig();
+  const {
+    concepts: { priorityConceptSetUuid },
+  } = config;
+
+  const apiUrl = `/ws/rest/v1/concept/${priorityConceptSetUuid}`;
+  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    priorities: data ? data?.data?.setMembers : [],
+  };
+}
+
 export function useVisitQueueEntries(): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
