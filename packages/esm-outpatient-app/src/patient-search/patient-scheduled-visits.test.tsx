@@ -16,7 +16,7 @@ describe('ScheduledVisits', () => {
     renderScheduledVisits();
 
     expect(screen.getAllByText(/Cardiology Consultation 1/));
-    expect(screen.getAllByText(/Today, 02:56 PM/));
+    expect(screen.getAllByText(/08-Aug-2022, 02:56 PM/));
   });
 });
 

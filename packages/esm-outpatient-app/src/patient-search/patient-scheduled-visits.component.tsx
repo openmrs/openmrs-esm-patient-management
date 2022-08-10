@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  ButtonSet,
-  Switch,
-  ContentSwitcher,
-  RadioTile,
-  TileGroup,
-  DataTableSkeleton,
-} from 'carbon-components-react';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import { formatDatetime, useLayoutType, parseDate } from '@openmrs/esm-framework';
+import { Button, ButtonSet, Switch, ContentSwitcher, RadioTile, TileGroup, DataTableSkeleton } from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
+import { formatDatetime, useLayoutType, parseDate, ErrorState } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
-import { useRecentScheduledVisits, useFutureScheduledVisits } from './hooks/useScheduledVisits';
+import { useScheduledVisits } from './hooks/useScheduledVisits';
+import StartVisitForm from './visit-form/visit-form.component';
+import isNil from 'lodash-es/isNil';
 interface PatientSearchProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
@@ -30,10 +24,8 @@ enum visitType {
   FUTURE = 'Future',
 }
 
-const ScheduledVisits: React.FC<{ visits; isLoading; visitType; scheduledVisitHeader }> = ({
+export const ScheduledVisits: React.FC<{ visits; visitType; scheduledVisitHeader }> = ({
   visits,
-  isLoading,
-  visitType,
   scheduledVisitHeader,
 }) => {
   const { t } = useTranslation();
@@ -41,80 +33,94 @@ const ScheduledVisits: React.FC<{ visits; isLoading; visitType; scheduledVisitHe
   const [visitsIndex, setVisitsIndex] = useState(0);
   const [hasPriority, setHasPriority] = useState(false);
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
   if (visits) {
     return (
-      <div>
-        {visits.length > 0 ? (
-          <div className={styles.row}>
-            <p className={styles.heading}>{scheduledVisitHeader} </p>
-            <TileGroup name="tile-group" defaultSelected="default-selected">
-              {visits.map((visit, ind) => (
-                <RadioTile
-                  value={visit.id}
-                  key={visit.id}
-                  className={styles.visitTile}
-                  onClick={() => {
-                    setHasPriority(true);
-                    setVisitsIndex(ind);
-                  }}>
-                  <div className={styles.helperText}>
-                    <p className={styles.primaryText}>{visit.visit_type}</p>
-                    <p className={styles.secondaryText}>
-                      {' '}
-                      {formatDatetime(parseDate(visit?.visit_date))} · {visit.clinic}{' '}
-                    </p>
+      <div className={styles.row}>
+        <p className={styles.heading}>{scheduledVisitHeader} </p>
+        {visits?.length > 0 ? (
+          <TileGroup name="tile-group" defaultSelected="default-selected">
+            {visits?.map((visit, ind) => (
+              <RadioTile
+                value={visit.uuid}
+                key={visit.uuid}
+                className={styles.visitTile}
+                onClick={() => {
+                  setHasPriority(true);
+                  setVisitsIndex(ind);
+                }}>
+                <div className={styles.helperText}>
+                  <p className={styles.primaryText}>{visit.service?.name}</p>
+                  <p className={styles.secondaryText}>
+                    {' '}
+                    {formatDatetime(parseDate(visit?.startDateTime))} · {visit.service?.name}{' '}
+                  </p>
 
-                    {hasPriority && ind == visitsIndex ? (
-                      <ContentSwitcher
-                        size="sm"
-                        className={styles.prioritySwitcher}
-                        onChange={({ index }) => setSwitcherValue(index)}>
-                        <Switch
-                          name={priority.NOT_URGENT}
-                          text={t('notUrgent', 'Not Urgent')}
-                          value={prioritySwitcherValue}
-                        />
-                        <Switch
-                          name={priority.PRIORITY}
-                          text={t('priority', 'Priority')}
-                          value={prioritySwitcherValue}
-                        />
-                        <Switch
-                          name={priority.EMERGENCY}
-                          text={t('emergency', 'Emergency')}
-                          value={prioritySwitcherValue}
-                        />
-                      </ContentSwitcher>
-                    ) : null}
-                  </div>
-                </RadioTile>
-              ))}
-            </TileGroup>
-          </div>
+                  {hasPriority && ind == visitsIndex ? (
+                    <ContentSwitcher
+                      size="sm"
+                      className={styles.prioritySwitcher}
+                      onChange={({ index }) => setSwitcherValue(index)}>
+                      <Switch
+                        name={priority.NOT_URGENT}
+                        text={t('notUrgent', 'Not Urgent')}
+                        value={prioritySwitcherValue}
+                      />
+                      <Switch name={priority.PRIORITY} text={t('priority', 'Priority')} value={prioritySwitcherValue} />
+                      <Switch
+                        name={priority.EMERGENCY}
+                        text={t('emergency', 'Emergency')}
+                        value={prioritySwitcherValue}
+                      />
+                    </ContentSwitcher>
+                  ) : null}
+                </div>
+              </RadioTile>
+            ))}
+          </TileGroup>
         ) : (
-          '--'
+          <div className={styles.emptyAppointment}>
+            <p>{t('noAppointmentsFound', 'No appointements found')} </p>
+          </div>
         )}
       </div>
     );
   }
+  return (
+    <div className={styles.emptyAppointment}>
+      <p className={styles.heading}> {scheduledVisitHeader} </p>
+    </div>
+  );
 };
 
 const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { recentVisits, isLoading } = useRecentScheduledVisits(patientUuid);
-  const { futureVisits, loading } = useFutureScheduledVisits(patientUuid);
+  const { appointments, isLoading, isError } = useScheduledVisits(patientUuid, new AbortController());
+
+  if (isError) {
+    <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;
+  }
+
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
+  if (isNil(appointments.futureVisits) && isNil(appointments.recentVisits)) {
+    return (
+      <StartVisitForm
+        toggleSearchType={() => SearchTypes.VISIT_FORM}
+        patientUuid={patientUuid}
+        closePanel={() => false}
+      />
+    );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.backButton}>
         <Button
           kind="ghost"
-          renderIcon={ArrowLeft24}
+          renderIcon={ArrowLeft}
           iconDescription="Back to search results"
           size="sm"
           onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
@@ -124,15 +130,13 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
 
       <ScheduledVisits
         visitType={visitType.RECENT}
-        visits={recentVisits}
-        scheduledVisitHeader={t('recentScheduledVisits', { count: recentVisits.length })}
-        isLoading={isLoading}
+        visits={appointments?.recentVisits}
+        scheduledVisitHeader={t('recentScheduledVisits', { count: appointments?.recentVisits?.length })}
       />
       <ScheduledVisits
         visitType={visitType.FUTURE}
-        visits={futureVisits}
-        scheduledVisitHeader={t('futureScheduledVisits', { count: futureVisits.length })}
-        isLoading={loading}
+        visits={appointments?.futureVisits}
+        scheduledVisitHeader={t('futureScheduledVisits', { count: appointments?.futureVisits?.length })}
       />
 
       <div className={styles['text-divider']}>{t('or', 'Or')}</div>
