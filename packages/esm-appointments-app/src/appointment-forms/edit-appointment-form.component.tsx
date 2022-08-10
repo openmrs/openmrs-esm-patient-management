@@ -31,8 +31,8 @@ import {
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { convertTime12to24, amPm, startDate as startFilterDate } from '../helpers';
-import { saveAppointment, useServices } from '../appoinments-tabs/appointments-table.resource';
+import { amPm } from '../helpers';
+import { saveAppointment, useServices } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
@@ -67,8 +67,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate =
   const [appointmentKind, setAppointmentKind] = useState(appointment.appointmentKind);
   const [appointmentStatus, setAppointmentStatus] = useState(appointment.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { data: providers } = useProviders();
 
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {

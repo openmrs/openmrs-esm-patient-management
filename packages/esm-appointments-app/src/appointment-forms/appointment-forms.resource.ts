@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentPayload, AppointmentService, Provider } from '../types';
+import { startDate } from '../helpers';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -28,6 +29,14 @@ export function getProviders(abortController: AbortController) {
   });
 }
 
+export function fetchAppointments(abortController: AbortController) {
+  const date = startDate;
+  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${date}&status=Scheduled`;
+  return openmrsFetch(apiUrl, {
+    signal: abortController.signal,
+  });
+}
+
 export function useProviders() {
   const { data, error } = useSWR<{ data: { results: Array<Provider> } }, Error>(`/ws/rest/v1/provider`, openmrsFetch);
 
@@ -36,17 +45,6 @@ export function useProviders() {
     isError: error,
     isLoading: !data && !error,
   };
-}
-
-export function editAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
-    method: 'POST',
-    signal: abortController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: appointment,
-  });
 }
 
 export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {

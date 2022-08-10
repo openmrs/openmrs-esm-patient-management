@@ -13,7 +13,7 @@ interface SearchResultsProps {
 
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const fhirPatients = useMemo(() => {
-    return patients.map((patient) => {
+    return patients?.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
       return {
         id: patient.uuid,
@@ -29,7 +29,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
         deceasedBoolean: patient.person.death,
         identifier: [
           {
-            value: patient.patientIdentifier.identifier,
+            value: patient.patientIdentifier?.identifier, // PatientIdentifier can be null sometimes
           },
         ],
         address: preferredAddress
@@ -54,7 +54,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
 
   return (
     <>
-      {fhirPatients.map((patient) => (
+      {fhirPatients?.map((patient) => (
         <div key={patient.id} className={styles.patientChart}>
           <div className={styles.container}>
             <ExtensionSlot

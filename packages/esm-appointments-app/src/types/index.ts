@@ -133,7 +133,7 @@ export interface AppointmentPayload {
   status?: string;
   appointmentNumber?: string;
   uuid?: string;
-  provider?: string;
+  providerUuid: string;
 }
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
