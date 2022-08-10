@@ -32,6 +32,7 @@ import { MappedAppointment } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import AppointmentForm from '../appointment-forms/appointment-form.component';
+import CancelAppointment from '../appointment-forms/cancel-appointment.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -39,13 +40,13 @@ interface AppointmentsProps {
   tableHeading: String;
   mutate?: () => void;
 }
-
-interface ActionMenuProps {
+interface ActionsMenuProps {
   appointment: MappedAppointment;
   mutate?: () => void;
 }
 
-const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
+
+const ActionsMenu: React.FC<ActionsMenuProps> = ({ appointment, mutate }) => {
   const { t } = useTranslation();
 
   return (
@@ -65,6 +66,9 @@ const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
       <OverflowMenuItem
         className={styles.menuItem}
         id="#cancelAppointment"
+        onClick={() =>
+          launchOverlay(t('cancelAppointment', 'Cancel Appointment'), <CancelAppointment appointment={appointment} />)
+        }
         itemText={t('cancelAppointment', 'Cancel Appointment')}>
         {t('cancelAppointment', 'Cancel Appointment')}
       </OverflowMenuItem>
