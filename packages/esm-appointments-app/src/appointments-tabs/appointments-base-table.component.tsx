@@ -32,28 +32,24 @@ import AppointmentDetails from '../appointment-details/appointment-details.compo
 import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
-import { useServices } from './appointments-table.resource';
+import { MappedAppointment } from '../types';
+import { launchOverlay } from '../hooks/useOverlay';
+import AppointmentDetails from '../appointment-details/appointment-details.component';
+import AppointmentForm from '../appointment-forms/appointment-form.component';
+import CancelAppointment from '../appointment-forms/cancel-appointment.component';
+
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
   isLoading: Boolean;
   tableHeading: String;
   mutate?: () => void;
 }
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
-
-interface ActionMenuProps {
+interface ActionsMenuProps {
   appointment: MappedAppointment;
   mutate?: () => void;
 }
 
-const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
+const ActionsMenu: React.FC<ActionsMenuProps> = ({ appointment, mutate }) => {
   const { t } = useTranslation();
 
   return (
@@ -67,13 +63,18 @@ const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
             <AppointmentForm mutate={mutate} appointment={appointment} />,
           )
         }
-        itemText={t('editAppointment', 'Edit Appointment')}>
+        itemText={t('editAppointment', 'Edit Appointment')}
+      >
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
       <OverflowMenuItem
         className={styles.menuItem}
         id="#cancelAppointment"
-        itemText={t('cancelAppointment', 'Cancel Appointment')}>
+        onClick={() =>
+          launchOverlay(t('cancelAppointment', 'Cancel Appointment'), <CancelAppointment appointment={appointment} />)
+        }
+        itemText={t('cancelAppointment', 'Cancel Appointment')}
+      >
         {t('cancelAppointment', 'Cancel Appointment')}
       </OverflowMenuItem>
     </OverflowMenu>
@@ -214,7 +215,8 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
               kind="ghost"
               size="sm"
               renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
+              onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+            >
               {t('addNewAppointment', 'Add new Appointment')}
             </Button>
           </Tile>
@@ -232,7 +234,8 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           kind="secondary"
           renderIcon={(props) => <Add size={16} {...props} />}
           onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-          iconDescription={t('addNewAppointment', 'Add new Appointment')}>
+          iconDescription={t('addNewAppointment', 'Add new Appointment')}
+        >
           {t('addNewAppointment', 'Add new Appointment')}
         </Button>
       </div>
@@ -242,7 +245,8 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         overflowMenuOnHover={isDesktop(layout) ? true : false}
         rows={tableRows}
         size="sm"
-        useZebraStyles>
+        useZebraStyles
+      >
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
             <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
@@ -315,7 +319,8 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
+                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+                    >
                       {t('addNewAppointment', 'Add new Appointment')}
                     </Button>
                   </Tile>

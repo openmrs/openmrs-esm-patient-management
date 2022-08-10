@@ -2,6 +2,12 @@
   "addNewAppointment": "Add new Appointment",
   "addNewClinicDay": "Add new clinic day",
   "anotherVisitType": "Start another visit type",
+<<<<<<< HEAD
+=======
+  "any": "Any",
+  "appointmentCancelError": "Error cancelling appointment",
+  "appointmentCancelled": "Appointment Cancelled",
+>>>>>>> 1adbcfd (cancel appoint component)
   "appointmentDateAndTime": "Appointments Date and Time",
   "appointmentDateTime": "Appointment Date and Time",
   "appointmentForm": "Appointments Form",
@@ -74,6 +80,7 @@
   "provider": "Provider",
   "providers": "Providers",
   "providersAvailableToday": "Providers available today",
+  "reasonForCancelling": "Reason For Cancelling",
   "reasonForChanges": "Reason For Changes",
   "recentScheduledVisits": "{count, plural, one{{count} visit} other{{count} visits}} scheduled for +/- 7 days",
   "recentScheduledVisits_plural": "",
