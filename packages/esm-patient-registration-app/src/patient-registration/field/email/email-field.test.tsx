@@ -15,7 +15,7 @@ describe('email field', () => {
       </Formik>,
     );
 
-    const email = await findByLabelText('Email');
+    const email = await findByLabelText('Email (optional)');
     expect(email).toBeInTheDocument();
   });
 });

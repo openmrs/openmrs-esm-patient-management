@@ -143,3 +143,8 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
+export interface Provider {
+  uuid: string;
+  display: string;
+}

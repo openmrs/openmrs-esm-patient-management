@@ -3,6 +3,7 @@ import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
 import { ComboInput } from '../../input/combo-input/combo-input.component';
+import { SkeletonText } from 'carbon-components-react';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -22,7 +23,7 @@ export const AddressHierarchy: React.FC = () => {
   const [addressLayout, setAddressLayout] = useState([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
-  const addressTemplateXml = addressTemplate.results[0].value;
+  const addressTemplateXml = addressTemplate?.results[0].value;
 
   const setSelectedValue = (value: string) => {
     setSelected(value);
@@ -55,6 +56,15 @@ export const AddressHierarchy: React.FC = () => {
     });
     setAddressLayout(propertiesObj);
   }, [t, addressTemplateXml]);
+
+  if (!addressTemplate) {
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+        <SkeletonText />
+      </div>
+    );
+  }
 
   return (
     <div>
