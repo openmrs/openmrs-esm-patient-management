@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
-import { ComboInput } from '../../input/comboinput/comboinput.component';
+import { ComboInput } from '../../input/combo-input/combo-input.component';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -19,7 +19,7 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 
 export const AddressHierarchy: React.FC = () => {
   const [selected, setSelected] = useState('');
-  const [addressLayout, setaddressLayout] = useState([]);
+  const [addressLayout, setAddressLayout] = useState([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate.results[0].value;
@@ -32,10 +32,19 @@ export const AddressHierarchy: React.FC = () => {
     const templateXmlDoc = parseString(addressTemplateXml);
     const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
     const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-    const properties = nameMappings.getElementsByTagName('entry');
+    const properties = nameMappings.getElementsByTagName('property');
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-      const name = property.getElementsByTagName('string')[0].innerHTML;
-      const labelText = t(name, property.getElementsByTagName('string')[1].innerHTML);
+      const name = property.getAttribute('name');
+      /*
+        DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+
+        t('postalCode')
+        t('address1')
+        t('stateProvince')
+        t('cityVillage')
+        t('country')
+      */
+      const labelText = t(name, property.getAttribute('value'));
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
@@ -44,7 +53,7 @@ export const AddressHierarchy: React.FC = () => {
         value,
       };
     });
-    setaddressLayout(propertiesObj);
+    setAddressLayout(propertiesObj);
   }, [t, addressTemplateXml]);
 
   return (
@@ -55,13 +64,11 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {addressLayout.map((attributes) => (
+        {addressLayout.map((attributes, idx) => (
           <ComboInput
+            id={attributes.name + '_' + idx}
             name={attributes.name}
-            labeltext={attributes.labelText}
-            items={[]}
-            id={attributes.name}
-            placeholder={attributes.labelText}
+            labelText={attributes.labelText}
             setSelectedValue={setSelectedValue}
             selected={selected}
           />
