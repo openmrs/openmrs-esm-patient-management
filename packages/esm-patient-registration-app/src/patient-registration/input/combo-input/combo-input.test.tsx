@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
-import { ComboInput } from './comboinput.component';
+import { ComboInput } from './combo-input.component';
 import React from 'react';
 
 describe('Combo box input', () => {
@@ -11,11 +11,10 @@ describe('Combo box input', () => {
       <Formik initialValues={{ text: '' }} onSubmit={null}>
         <Form>
           <ComboInput
-            items={[]}
-            selected={selected}
+            selected={''}
             setSelectedValue={setSelectedValue}
             id="text"
-            labeltext="Text"
+            labelText="Text"
             name="text"
             placeholder="Enter text"
             light

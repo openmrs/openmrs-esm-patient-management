@@ -38,12 +38,15 @@ export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
     return undefined;
   }, [checkWarning, invalidText, value, t]);
 
+  const labelText = props.required ? props.labelText : `${props.labelText} (${t('optional', 'optional')})`;
+
   return (
     <div style={{ marginBottom: '1rem' }}>
       <Layer>
         <TextInput
           {...props}
           {...field}
+          labelText={labelText}
           invalid={!!(meta.touched && meta.error)}
           invalidText={invalidText}
           warn={!!warnText}

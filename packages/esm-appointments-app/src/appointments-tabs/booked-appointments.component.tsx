@@ -7,7 +7,7 @@ interface BookedAppointmentsProps {
   status: string;
 }
 const BookedAppointments: React.FC<BookedAppointmentsProps> = ({ status }) => {
-  const { appointments, isLoading } = useAppointments(status);
+  const { appointments, isLoading, mutate } = useAppointments(status);
   const { t } = useTranslation();
 
   return (
@@ -15,6 +15,7 @@ const BookedAppointments: React.FC<BookedAppointmentsProps> = ({ status }) => {
       <AppointmentsBaseTable
         appointments={appointments}
         isLoading={isLoading}
+        mutate={mutate}
         tableHeading={t('bookedAppointments', 'Booked appointments')}
       />
     </div>

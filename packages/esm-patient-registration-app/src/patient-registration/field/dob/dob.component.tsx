@@ -5,6 +5,7 @@ import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { generateFormatting } from '../../date-util';
 import styles from '../field.scss';
+import { Input } from '../../input/basic-input/input/input.component';
 
 const calcBirthdate = (yearDelta, monthDelta) => {
   const startDate = new Date();
@@ -88,7 +89,7 @@ export const DobField: React.FC = () => {
         </div>
       ) : (
         <div className={styles.grid}>
-          <TextInput
+          <Input
             id="yearsEstimated"
             type="number"
             onChange={onEstimatedYearsChange}
@@ -97,19 +98,19 @@ export const DobField: React.FC = () => {
             invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
             value={yearsEstimated.value}
             min={0}
+            required
           />
-          <Layer>
-            <TextInput
-              id="monthsEstimated"
-              type="number"
-              onChange={onEstimatedMonthsChange}
-              labelText={t('estimatedMonthsLabelText', 'Estimated Months')}
-              invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-              invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-              value={monthsEstimated.value}
-              min={0}
-            />
-          </Layer>
+          <Input
+            id="monthsEstimated"
+            type="number"
+            light
+            onChange={onEstimatedMonthsChange}
+            labelText={t('estimatedMonthsLabelText', 'Estimated Months')}
+            invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+            invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+            value={monthsEstimated.value}
+            min={0}
+          />
         </div>
       )}
     </div>

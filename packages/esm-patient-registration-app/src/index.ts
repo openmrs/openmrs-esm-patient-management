@@ -1,11 +1,5 @@
 import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
-import FormManager from './patient-registration/form-manager';
-import {
-  fetchCurrentSession,
-  fetchAddressTemplate,
-  fetchPatientIdentifierTypesWithSources,
-  fetchAllRelationshipTypes,
-} from './offline.resources';
+import { FormManager } from './patient-registration/form-manager';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
@@ -14,13 +8,6 @@ const importTranslation = require.context('../translations', false, /.json$/, 'l
 
 const backendDependencies = {
   'webservices.rest': '^2.24.0',
-};
-
-const resources = {
-  currentSession: fetchCurrentSession,
-  addressTemplate: fetchAddressTemplate,
-  relationshipTypes: fetchAllRelationshipTypes,
-  identifierTypes: fetchPatientIdentifierTypesWithSources,
 };
 
 function setupOpenMRS() {
@@ -54,7 +41,6 @@ function setupOpenMRS() {
           savePatientForm: FormManager.savePatientFormOffline,
           isOffline: true,
         },
-        resources,
       },
       {
         load: getAsyncLifecycle(() => import('./root.component'), {
@@ -68,7 +54,6 @@ function setupOpenMRS() {
         offline: {
           savePatientForm: FormManager.savePatientFormOffline,
         },
-        resources,
       },
     ],
     extensions: [

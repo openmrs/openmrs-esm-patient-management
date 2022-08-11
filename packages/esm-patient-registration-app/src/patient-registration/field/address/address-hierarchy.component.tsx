@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ComboInput } from '../../input/comboinput/comboinput.component';
 import { ResourcesContext } from '../../../offline.resources';
+import { ComboInput } from '../../input/combo-input/combo-input.component';
+import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
@@ -19,10 +20,10 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 
 export const AddressHierarchy: React.FC = () => {
   const [selected, setSelected] = useState('');
-  const [addressLayout, setaddressLayout] = useState([]);
+  const [addressLayout, setAddressLayout] = useState([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
-  const addressTemplateXml = addressTemplate.results[0].value;
+  const addressTemplateXml = addressTemplate?.results[0].value;
 
   const setSelectedValue = (value: string) => {
     setSelected(value);
@@ -32,10 +33,19 @@ export const AddressHierarchy: React.FC = () => {
     const templateXmlDoc = parseString(addressTemplateXml);
     const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
     const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-    const properties = nameMappings.getElementsByTagName('entry');
+    const properties = nameMappings.getElementsByTagName('property');
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-      const name = property.getElementsByTagName('string')[0].innerHTML;
-      const labelText = t(name, property.getElementsByTagName('string')[1].innerHTML);
+      const name = property.getAttribute('name');
+      /*
+        DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+
+        t('postalCode')
+        t('address1')
+        t('stateProvince')
+        t('cityVillage')
+        t('country')
+      */
+      const labelText = t(name, property.getAttribute('value'));
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
@@ -44,8 +54,17 @@ export const AddressHierarchy: React.FC = () => {
         value,
       };
     });
-    setaddressLayout(propertiesObj);
+    setAddressLayout(propertiesObj);
   }, [t, addressTemplateXml]);
+
+  if (!addressTemplate) {
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+        <SkeletonText />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -59,10 +78,7 @@ export const AddressHierarchy: React.FC = () => {
           <ComboInput
             key={`combo_input_${index}`}
             name={attributes.name}
-            labeltext={attributes.labelText}
-            // @ts-ignore
-            // Fix this more conclusively
-            items={[]}
+            labelText={attributes.labelText}
             id={attributes.name}
             placeholder={attributes.labelText}
             setSelectedValue={setSelectedValue}

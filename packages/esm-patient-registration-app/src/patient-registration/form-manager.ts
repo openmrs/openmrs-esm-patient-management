@@ -40,8 +40,7 @@ export type SavePatientForm = (
   savePatientTransactionManager: SavePatientTransactionManager,
   abortController?: AbortController,
 ) => Promise<string | void>;
-
-export default class FormManager {
+export class FormManager {
   static savePatientFormOffline: SavePatientForm = async (
     isNewPatient,
     values,

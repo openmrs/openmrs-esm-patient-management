@@ -1,23 +1,21 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { AddressHierarchy } from './address-hierarchy.component';
 import { Formik, Form } from 'formik';
-import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/jest-dom';
 import { Resources, ResourcesContext } from '../../../offline.resources';
 
 const mockResponse = {
   results: [
     {
       value:
-        '<org.openmrs.layout.address.AddressTemplate>\r\n<nameMappings>\r\n<entry>\r\n<string>country</string>\r\n<string>Location.country</string>\r\n</entry>\r\n<entry>\r\n<string>stateProvince</string>\r\n<string>Location.province</string>\r\n</entry>\r\n<entry>\r\n<string>countyDistrict</string>\r\n<string>Location.district</string>\r\n</entry>\r\n<entry>\r\n<string>cityVillage</string>\r\n<string>Location.village</string>\r\n</entry>\r\n</nameMappings></org.openmrs.layout.address.AddressTemplate>',
+        '<org.openmrs.layout.address.AddressTemplate>     <nameMappings class="properties">       <property name="postalCode" value="Location.postalCode"/>       <property name="address2" value="Location.address2"/>       <property name="address1" value="Location.address1"/>       <property name="country" value="Location.country"/>       <property name="stateProvince" value="Location.stateProvince"/>       <property name="cityVillage" value="Location.cityVillage"/>     </nameMappings>     <sizeMappings class="properties">       <property name="postalCode" value="10"/>       <property name="address2" value="40"/>       <property name="address1" value="40"/>       <property name="country" value="10"/>       <property name="stateProvince" value="10"/>       <property name="cityVillage" value="10"/>     </sizeMappings>     <lineByLineFormat>       <string>address1</string>       <string>address2</string>       <string>cityVillage stateProvince country postalCode</string>     </lineByLineFormat>    <requiredElements></requiredElements> </org.openmrs.layout.address.AddressTemplate>',
     },
   ],
 };
 
 describe('address hierarchy', () => {
   it('renders input fields matching addressTemplate config', async () => {
-    const { findByLabelText } = render(
+    await render(
       <ResourcesContext.Provider value={{ addressTemplate: mockResponse } as Resources}>
         <Formik initialValues={{}} onSubmit={null}>
           <Form>
@@ -27,14 +25,8 @@ describe('address hierarchy', () => {
       </ResourcesContext.Provider>,
     );
 
-    const country = await findByLabelText('Location.country');
-    const stateProvince = await findByLabelText('Location.province');
-    const cityVillage = await findByLabelText('Location.village');
-    const countyDistrict = await findByLabelText('Location.district');
-
-    expect(country).toBeInTheDocument();
-    expect(stateProvince).toBeInTheDocument();
-    expect(cityVillage).toBeInTheDocument();
-    expect(countyDistrict).toBeInTheDocument();
+    expect(screen.getByText('Location.country')).toBeInTheDocument();
+    expect(screen.getByText('Location.stateProvince')).toBeInTheDocument();
+    expect(screen.getByText('Location.cityVillage')).toBeInTheDocument();
   });
 });
