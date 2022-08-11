@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import styles from './search-results.scss';
 import { SearchTypes } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
 import CreateAppointmentsForm from '../appointment-forms/create-appointment-form.component';
-
+import styles from './search-results.scss';
 interface SearchResultsProps {
   patients: Array<any>;
   hidePanel?: any;

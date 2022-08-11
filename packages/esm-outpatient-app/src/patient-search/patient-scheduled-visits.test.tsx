@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import { mockPatient } from '../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockRecentVisits } from '../../__mocks__/patient-scheduled-visits.mock';
 import { openmrsFetch } from '@openmrs/esm-framework';

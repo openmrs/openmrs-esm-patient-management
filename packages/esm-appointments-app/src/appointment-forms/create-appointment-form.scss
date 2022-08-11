@@ -1,8 +1,6 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
-@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
 // TO DO Move this styles to style - guide
 // https://github.com/openmrs/openmrs-esm-core/blob/master/packages/framework/esm-styleguide/src/_vars.scss
@@ -10,7 +8,7 @@ $color-blue-30: #a6c8ff;
 
 .productiveHeading02 {
   color: $color-gray-70;
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('productive-heading-02');
 }
 
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
@@ -23,8 +21,8 @@ $color-blue-30: #a6c8ff;
 
 .formGroup {
   display: flex;
-  margin-bottom: $spacing-02;
-  padding: $spacing-05;
+  margin-bottom: spacing.$spacing-02;
+  padding: spacing.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .formGroup > span {
@@ -83,14 +81,14 @@ $color-blue-30: #a6c8ff;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .buttonGroup {
-  padding: $spacing-05 $spacing-06;
+  padding: spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-02;
 }
 
 .buttonGroup button {
   max-width: none;
   width: 50%;
-  height: $spacing-10;
+  height: spacing.$spacing-10;
   align-items: flex-start;
 }
 
@@ -111,7 +109,7 @@ $color-blue-30: #a6c8ff;
   border-bottom: 1px solid $color-blue-30;
   border-left: 1px solid $color-blue-30;
   border-right: none;
-  border-radius: $spacing-02 0 0px $spacing-02;
+  border-radius: spacing.$spacing-02 0 0px spacing.$spacing-02;
 }
 
 .contentSwitcherWrapper > div button:last-child {
@@ -119,7 +117,7 @@ $color-blue-30: #a6c8ff;
   border-bottom: 1px solid $color-blue-30;
   border-right: 1px solid $color-blue-30;
   border-left: none;
-  border-radius: 0px $spacing-02 $spacing-02 0px;
+  border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
 }
 
 .contentSwitcherWrapper > div > button[aria-selected='true'],

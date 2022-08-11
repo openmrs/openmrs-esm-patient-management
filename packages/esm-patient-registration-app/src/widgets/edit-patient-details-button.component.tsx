@@ -16,14 +16,14 @@ const EditPatientDetailsButton: React.FC<EditPatientDetailsButtonProps> = ({ pat
   }, [onTransition, patientUuid]);
 
   return (
-    <li className="bx--overflow-menu-options__option">
+    <li className="cds--overflow-menu-options__option">
       <button
-        className="bx--overflow-menu-options__btn"
+        className="cds--overflow-menu-options__btn"
         role="menuitem"
         title={t('editPatientDetails', 'Edit patient details')}
         data-floating-menu-primary-focus
         onClick={handleClick}>
-        <span className="bx--overflow-menu-options__option-content">
+        <span className="cds--overflow-menu-options__option-content">
           {t('editPatientDetails', 'Edit patient details')}
         </span>
       </button>

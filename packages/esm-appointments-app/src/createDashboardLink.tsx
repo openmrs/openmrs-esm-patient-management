@@ -1,7 +1,7 @@
 import React from 'react';
+import { SideNavLink } from '@carbon/react';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from './constants';
-import { SideNavLink } from 'carbon-components-react';
 
 export interface DashboardLinkConfig {
   name: string;

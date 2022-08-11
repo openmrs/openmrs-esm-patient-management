@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { RadioButton, RadioButtonGroup } from 'carbon-components-react';
+import { RadioButton, RadioButtonGroup } from '@carbon/react';
 import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
@@ -18,7 +18,7 @@ export const GenderField: React.FC = () => {
     <div className={styles.halfWidthInDesktopView}>
       <h4 className={styles.productiveHeading02Light}>{t('sexFieldLabelText', 'Sex')}</h4>
       <div className={styles.sexField}>
-        <p className="bx--label">{t('genderLabelText', 'Sex')}</p>
+        <p className="cds--label">{t('genderLabelText', 'Sex')}</p>
         <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
           <RadioButton id="male" labelText={t('maleLabelText', 'Male')} value="Male" />
           <RadioButton id="female" labelText={t('femaleLabelText', 'Female')} value="Female" />

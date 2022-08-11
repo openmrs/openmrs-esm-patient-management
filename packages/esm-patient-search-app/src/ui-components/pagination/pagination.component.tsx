@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback } from 'react';
+import { Button } from '@carbon/react';
+import { CaretLeft, CaretRight } from '@carbon/react/icons';
 import styles from './pagination.scss';
-import CaretLeft24 from '@carbon/icons-react/es/caret--left/24';
-import CaretRight24 from '@carbon/icons-react/es/caret--right/24';
-import { Button } from 'carbon-components-react';
 
 interface PaginationProps {
   hasMore: boolean;
@@ -29,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
         kind="ghost"
         hasIconOnly
         iconDescription=""
-        renderIcon={CaretLeft24}
+        renderIcon={<CaretLeft size={24} />}
         onClick={decrementPage}
         disabled={currentPage == 1}
       />
@@ -48,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
         kind="ghost"
         hasIconOnly
         iconDescription=""
-        renderIcon={CaretRight24}
+        renderIcon={<CaretRight size={24} />}
         onClick={incrementPage}
         disabled={!hasMore && currentPage === totalPages}
       />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, SelectItem } from 'carbon-components-react';
+import { Layer, Select, SelectItem } from '@carbon/react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
@@ -11,7 +11,7 @@ interface SelectInputProps {
 }
 
 export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label, required }) => {
-  const [field, meta] = useField(name);
+  const [field] = useField(name);
   const { t } = useTranslation();
   const selectOptions = [
     <SelectItem disabled hidden text={`Select ${label}`} key="" value="" />,
@@ -22,9 +22,11 @@ export const SelectInput: React.FC<SelectInputProps> = ({ name, options, label, 
 
   return (
     <div style={{ marginBottom: '1rem' }}>
-      <Select id="identifier" {...field} labelText={labelText} light>
-        {selectOptions}
-      </Select>
+      <Layer>
+        <Select id="identifier" {...field} labelText={labelText}>
+          {selectOptions}
+        </Select>
+      </Layer>
     </div>
   );
 };

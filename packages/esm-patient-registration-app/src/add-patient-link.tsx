@@ -1,8 +1,8 @@
 import React from 'react';
-import UserFollow20 from '@carbon/icons-react/es/user--follow/20';
-import styles from './add-patient-link.scss';
+import { HeaderGlobalAction } from '@carbon/react';
+import { UserFollow } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
-import { HeaderGlobalAction } from 'carbon-components-react';
+import styles from './add-patient-link.scss';
 
 export default function Root() {
   const addPatient = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
@@ -14,7 +14,7 @@ export default function Root() {
       name="AddPatientIcon"
       onClick={addPatient}
       className={styles.slotStyles}>
-      <UserFollow20 />
+      <UserFollow size={20} />
     </HeaderGlobalAction>
   );
 }

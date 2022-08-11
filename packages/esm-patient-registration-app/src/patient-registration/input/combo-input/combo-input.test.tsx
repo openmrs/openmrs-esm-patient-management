@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Form, Formik } from 'formik';
 import { ComboInput } from './combo-input.component';
 import React from 'react';
@@ -37,6 +37,6 @@ describe('Combo box input', () => {
     fireEvent.change(input, { target: { value: expected } });
     fireEvent.blur(input);
 
-    expect(input.value).toEqual(expected);
+    await waitFor(() => expect(input.value).toEqual(expected));
   });
 });

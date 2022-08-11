@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Switch } from 'carbon-components-react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
@@ -73,29 +73,25 @@ export const DobField: React.FC = () => {
       </div>
       {dobKnown ? (
         <div className={styles.dobField}>
-          <DatePicker
-            dateFormat={dateFormat}
-            datePickerType="single"
-            light
-            onChange={onDateChange}
-            maxDate={format(today)}>
-            <DatePickerInput
-              id="birthdate"
-              {...birthdate}
-              placeholder={placeHolder}
-              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
-              value={format(birthdate.value)}
-            />
-          </DatePicker>
+          <Layer>
+            <DatePicker dateFormat={dateFormat} datePickerType="simple" onChange={onDateChange} maxDate={format(today)}>
+              <DatePickerInput
+                id="birthdate"
+                {...birthdate}
+                placeholder={placeHolder}
+                labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+                invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+                invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+                value={format(birthdate.value)}
+              />
+            </DatePicker>
+          </Layer>
         </div>
       ) : (
         <div className={styles.grid}>
           <Input
             id="yearsEstimated"
             type="number"
-            light
             onChange={onEstimatedYearsChange}
             labelText={t('estimatedYearsLabelText', 'Estimated Years')}
             invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}

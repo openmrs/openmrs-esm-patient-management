@@ -1,9 +1,9 @@
-import { PatientUuid } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PatientUuid } from '@openmrs/esm-framework';
+import Overlay from '../ui-components/overlay';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import PatientSearchComponent from '../patient-search-page/patient-search-lg.component';
-import Overlay from '../ui-components/overlay';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -13,8 +13,8 @@ interface PatientSearchOverlayProps {
 }
 
 const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query, header, onPatientSelect }) => {
-  const [searchTerm, setSearchTerm] = useState(query);
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState(query);
   const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
   useEffect(() => {

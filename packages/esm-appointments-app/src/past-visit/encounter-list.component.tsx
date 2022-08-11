@@ -5,7 +5,7 @@ import {
   StructuredListRow,
   StructuredListBody,
   StructuredListWrapper,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { FormattedEncounter } from './past-visit.component';

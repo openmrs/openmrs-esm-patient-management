@@ -1,9 +1,10 @@
 import React, { useMemo, CSSProperties } from 'react';
-import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
+
 import {
   DataTable,
   DataTableSkeleton,
   InlineLoading,
+  Layer,
   Pagination,
   Search,
   SearchProps,
@@ -14,8 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import debounce from 'lodash-es/debounce';
+import { ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import styles from './patient-table.scss';
 
 interface PatientTableProps {
@@ -60,7 +62,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
   autoFocus,
   isFetching,
 }) => {
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const rows: Array<any> = useMemo(
     () =>
       patients.map((patient, index) => {
@@ -94,17 +96,18 @@ const PatientTable: React.FC<PatientTableProps> = ({
       <div id="table-tool-bar" className={styles.searchContainer}>
         <div>{isFetching && <InlineLoading />}</div>
         <div>
-          <Search
-            id="patient-list-search"
-            placeholder={search.placeHolder}
-            labelText=""
-            size={isDesktop ? 'sm' : 'xl'}
-            className={styles.searchOverrides}
-            light
-            onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={search.currentSearchTerm}
-            {...otherSearchProps}
-          />
+          <Layer>
+            <Search
+              id="patient-list-search"
+              placeholder={search.placeHolder}
+              labelText=""
+              size={isDesktop(layout) ? 'sm' : 'xl'}
+              className={styles.searchOverrides}
+              onChange={(evnt) => handleSearch(evnt.target.value)}
+              defaultValue={search.currentSearchTerm}
+              {...otherSearchProps}
+            />
+          </Layer>
         </div>
       </div>
       <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
@@ -119,7 +122,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
                         header,
                         isSortable: header.isSortable,
                       })}
-                      className={isDesktop ? styles.desktopHeader : styles.tabletHeader}>
+                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
@@ -129,7 +132,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
                 {rows.map((row) => (
                   <TableRow
                     {...getRowProps({ row })}
-                    className={isDesktop ? styles.desktopRow : styles.tabletRow}
+                    className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
                     key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>

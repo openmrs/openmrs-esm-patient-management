@@ -3,6 +3,7 @@ import {
   DataTable,
   DataTableSkeleton,
   InlineLoading,
+  Layer,
   Pagination,
   Search,
   Table,
@@ -16,10 +17,12 @@ import {
   TableToolbarContent,
   TableExpandRow,
   TableExpandHeader,
+  TableExpandedRow,
   Tile,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import {
   useLayoutType,
+  isDesktop,
   useConfig,
   usePagination,
   ExtensionSlot,
@@ -61,13 +64,12 @@ const ActiveVisitsTable = () => {
   const config = useConfig();
   const layout = useLayoutType();
   const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
-  const desktopView = layout === 'desktop';
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
 
-  const currentPathName: string = window.location.pathname;
-  const fromPage: string = getOriginFromPathName(currentPathName);
+  const currentPathName = window.location.pathname;
+  const fromPage = getOriginFromPathName(currentPathName);
 
   const headerData = useMemo(
     () => [
@@ -147,7 +149,7 @@ const ActiveVisitsTable = () => {
     return (
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
-          <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
             <h4>{t('activeVisits', 'Active Visits')}</h4>
           </div>
           <div className={styles.backgroundDataFetchingIndicator}>
@@ -157,8 +159,8 @@ const ActiveVisitsTable = () => {
         <DataTable
           rows={paginatedActiveVisits}
           headers={headerData}
-          size={desktopView ? 'compact' : 'normal'}
-          useZebraStyles>
+          size={isDesktop(layout) ? 'xs' : 'md'}
+          useZebraStyles={activeVisits?.length > 1 ? true : false}>
           {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar>
@@ -212,7 +214,7 @@ const ActiveVisitsTable = () => {
                           </th>
                         </TableRow>
                       ) : (
-                        <div />
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                       )}
                     </React.Fragment>
                   ))}
@@ -220,9 +222,12 @@ const ActiveVisitsTable = () => {
               </Table>
               {rows.length === 0 && (
                 <p
-                  style={{ height: desktopView ? '2rem' : '3rem', marginLeft: desktopView ? '2rem' : '3rem' }}
+                  style={{
+                    height: isDesktop(layout) ? '2rem' : '3rem',
+                    margin: '1rem 1.5rem',
+                  }}
                   className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                  {t('noVisitsFound', 'No visits found')}
+                  {t('noVisitsFound', 'No matching visits found')}
                 </p>
               )}
               <Pagination
@@ -250,15 +255,17 @@ const ActiveVisitsTable = () => {
   }
   return (
     <div className={styles.activeVisitsContainer}>
-      <Tile light className={styles.tile}>
-        <div className={!desktopView ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('activeVisits', 'Active Visits')}</h4>
-        </div>
-        <EmptyDataIllustration />
-        <p className={styles.content}>
-          {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
-        </p>
-      </Tile>
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('activeVisits', 'Active Visits')}</h4>
+          </div>
+          <EmptyDataIllustration />
+          <p className={styles.content}>
+            {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
+          </p>
+        </Tile>
+      </Layer>
     </div>
   );
 };

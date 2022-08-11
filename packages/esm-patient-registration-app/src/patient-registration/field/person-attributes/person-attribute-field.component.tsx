@@ -1,5 +1,5 @@
-import { InlineNotification } from 'carbon-components-react';
 import React from 'react';
+import { InlineNotification } from '@carbon/react';
 import { FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';

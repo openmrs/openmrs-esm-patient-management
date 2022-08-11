@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText } from 'carbon-components-react';
+import { SkeletonText } from '@carbon/react';
 import { useRelationships } from './relationships.resource';
-import styles from './contact-details.scss';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { Address as AddressType } from '../../../types';
+import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
   address: Array<AddressType>;

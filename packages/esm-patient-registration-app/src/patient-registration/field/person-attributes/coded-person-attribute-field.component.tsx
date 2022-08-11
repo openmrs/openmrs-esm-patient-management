@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './../field.scss';
+import { Layer, Select, SelectItem } from '@carbon/react';
 import { Input } from '../../input/basic-input/input/input.component';
-import { Select, SelectItem } from 'carbon-components-react';
-import { useConceptAnswers } from '../field.resource';
 import { PersonAttributeTypeResponse } from '../../patient-registration-types';
+import { useConceptAnswers } from '../field.resource';
+import styles from './../field.scss';
 
 export interface CodedPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
@@ -21,22 +21,22 @@ export function CodedPersonAttributeField({
   return (
     <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
-        <Select
-          id={`person-attribute-${personAttributeType.uuid}`}
-          name={`attributes.${personAttributeType.uuid}`}
-          labelText={label ?? personAttributeType?.display}
-          light>
-          <SelectItem value="" text="" />
-          {conceptAnswers.map((answer) => (
-            <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
-          ))}
-        </Select>
+        <Layer>
+          <Select
+            id={`person-attribute-${personAttributeType.uuid}`}
+            name={`attributes.${personAttributeType.uuid}`}
+            labelText={label ?? personAttributeType?.display}>
+            <SelectItem value="" text="" />
+            {conceptAnswers.map((answer) => (
+              <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+            ))}
+          </Select>
+        </Layer>
       ) : (
         <Input
           id={`person-attribute-${personAttributeType.uuid}`}
           labelText={label ?? personAttributeType?.display}
           name={`attributes.${personAttributeType.uuid}`}
-          light
         />
       )}
     </div>

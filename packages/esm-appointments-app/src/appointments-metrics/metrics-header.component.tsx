@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './metrics-header.scss';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'carbon-components-react';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Button } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
+import styles from './metrics-header.scss';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -10,7 +10,7 @@ const MetricsHeader: React.FC = () => {
   return (
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
-      <Button kind="ghost" renderIcon={ArrowRight16} iconDescription={t('moreMetrics', 'See more metrics')}>
+      <Button kind="ghost" renderIcon={<ArrowRight size={16} />} iconDescription={t('moreMetrics', 'See more metrics')}>
         {t('moreMetrics', 'See more metrics')}
       </Button>
     </div>

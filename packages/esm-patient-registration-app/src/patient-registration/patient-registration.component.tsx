@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
-import XAxis16 from '@carbon/icons-react/es/x-axis/16';
-import { Button, Link } from 'carbon-components-react';
-import BeforeSavePrompt from './before-save-prompt';
-import styles from './patient-registration.scss';
-import { useLocation } from 'react-router-dom';
+import { Button, Link } from '@carbon/react';
+import { XAxis } from '@carbon/react/icons';
+import { Router, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
 import {
   createErrorHandler,
@@ -13,7 +12,6 @@ import {
   interpolateUrl,
   usePatient,
 } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
 import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
@@ -30,22 +28,23 @@ import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap }
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
+import BeforeSavePrompt from './before-save-prompt';
+import styles from './patient-registration.scss';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
-  match: any;
   isOffline: boolean;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, match, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
-  const { patientUuid: uuidOfPatientToEdit } = match.params;
+  const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
@@ -191,7 +190,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 {sections.map((section) => (
                   <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
                     <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                      <XAxis16 /> {section.name}
+                      <XAxis size={16} /> {section.name}
                     </Link>
                   </div>
                 ))}

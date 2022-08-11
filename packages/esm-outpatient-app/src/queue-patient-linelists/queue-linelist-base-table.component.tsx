@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Button,
   DataTable,
   DataTableHeader,
+  Layer,
   Table,
   TableBody,
   TableCell,
@@ -13,14 +15,12 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tile,
-  Button,
   Tag,
-} from 'carbon-components-react';
+  Tile,
+} from '@carbon/react';
+import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
-import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
-import { Filter16 } from '@carbon/icons-react';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -87,22 +87,24 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </p>
         </div>
 
-        <Button kind="ghost" size="small" renderIcon={OverflowMenuVertical16}>
+        <Button kind="ghost" size="small" renderIcon={<OverflowMenuVertical size={16} />}>
           {t('actions', 'Actions')}
         </Button>
       </div>
 
-      <Tile className={styles.filterTile}>
-        <Tag size="md" title="Clear Filter" type="blue">
-          {t('today', 'Today')}
-        </Tag>
+      <Layer>
+        <Tile className={styles.filterTile}>
+          <Tag size="md" title="Clear Filter" type="blue">
+            {t('today', 'Today')}
+          </Tag>
 
-        <div className={styles.actionsBtn}>
-          <Button renderIcon={Filter16} kind="ghost">
-            {t('filter', 'Filter (1)')}
-          </Button>
-        </div>
-      </Tile>
+          <div className={styles.actionsBtn}>
+            <Button renderIcon={<Filter size={16} />} kind="ghost">
+              {t('filter', 'Filter (1)')}
+            </Button>
+          </div>
+        </Tile>
+      </Layer>
 
       {patientData?.length ? (
         <DataTable
@@ -152,21 +154,25 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
               </Table>
               {rows.length === 0 ? (
                 <div className={styles.tileContainer}>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                  </Tile>
+                  <Layer>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      </div>
+                    </Tile>
+                  </Layer>
                 </div>
               ) : null}
             </TableContainer>
           )}
         </DataTable>
       ) : (
-        <Tile className={styles.tile}>
-          <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-        </Tile>
+        <Layer>
+          <Tile className={styles.tile}>
+            <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+          </Tile>
+        </Layer>
       )}
     </div>
   );

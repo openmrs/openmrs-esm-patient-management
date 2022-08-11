@@ -26,6 +26,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.setTimeout(20000);
+
 describe('ActiveVisitsTable: ', () => {
   beforeEach(() =>
     mockedUseConfig.mockReturnValue({
@@ -49,6 +51,8 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
+    const user = userEvent.setup();
+
     mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitQueueEntries } });
 
     renderActiveVisitsTable();
@@ -59,11 +63,10 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.getByText(/active visits/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
-
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
-    expect(screen.getByRole('tooltip', { name: /needs triage/i })).toBeInTheDocument();
-    expect(screen.getByRole('tooltip', { name: /needs immediate assistance/i })).toBeInTheDocument();
+    expect(screen.getByText(/needs triage/i)).toBeInTheDocument();
+    expect(screen.getByText(/needs immediate assistance/i)).toBeInTheDocument();
 
     const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time \(mins\)/];
     expectedColumnHeaders.forEach((header) => {
@@ -81,29 +84,28 @@ describe('ActiveVisitsTable: ', () => {
 
     // filter table to only show patients waiting for `Triage`
     const serviceFilter = screen.getByRole('button', { name: /show patients waiting for/i });
-    userEvent.click(serviceFilter);
-    expect(screen.getByRole('listbox', { name: /show patients waiting for/i }));
-    userEvent.click(screen.getByRole('option', { name: /Triage/i }));
+    await user.click(serviceFilter);
+    await user.click(screen.getByRole('option', { name: /Triage/i }));
 
     expect(screen.queryByText(/waiting for clinical consultation/i)).not.toBeInTheDocument();
     expect(screen.getByText(/waiting for triage/i)).toBeInTheDocument();
 
     // show patients waiting for all services
-    userEvent.click(serviceFilter);
-    userEvent.click(screen.getByRole('option', { name: /all/i }));
+    await user.click(serviceFilter);
+    await user.click(screen.getByRole('option', { name: /all/i }));
 
     expect(screen.getByText(/waiting for triage/i)).toBeInTheDocument();
     expect(screen.getByText(/waiting for clinical consultation/i)).toBeInTheDocument();
 
     // filter table by typing in the searchbox
     const searchbox = screen.getByRole('searchbox');
-    userEvent.type(searchbox, 'Eric');
+    await user.type(searchbox, 'Eric');
 
     expect(screen.getByText(/eric test ric/i)).toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
 
-    userEvent.clear(searchbox);
-    userEvent.type(searchbox, 'gibberish');
+    await user.clear(searchbox);
+    await user.type(searchbox, 'gibberish');
 
     expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();

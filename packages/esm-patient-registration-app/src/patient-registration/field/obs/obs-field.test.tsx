@@ -1,10 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
-import { ObsField } from './obs-field.component';
-import { useConfig } from '@openmrs/esm-framework';
-import { useConcept, useConceptAnswers } from '../field.resource';
 import userEvent from '@testing-library/user-event';
+import { useConfig } from '@openmrs/esm-framework';
+import { FieldDefinition } from '../../../config-schema';
+import { ObsField } from './obs-field.component';
 
 const mockUseConfig = useConfig as jest.Mock;
 
@@ -111,15 +110,18 @@ describe('ObsField', () => {
     expect(select).toHaveDisplayValue('');
   });
 
-  it('select uses answerConcept for answers when it is provided', () => {
+  it('select uses answerConcept for answers when it is provided', async () => {
     mockUseConfig.mockReturnValue({
       registrationObs: { encounterTypeUuid: 'reg-enc-uuid' },
       fieldDefinitions: [codedFieldDef],
     });
+
+    const user = userEvent.setup();
+
     render(<ObsField fieldDefinition={{ ...codedFieldDef, answerConceptSetUuid: 'other-countries-uuid' }} />);
     // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
-    userEvent.selectOptions(select, 'Kenya');
+    await user.selectOptions(select, 'Kenya');
   });
 });

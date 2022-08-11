@@ -1,4 +1,4 @@
-import { ComboBox, ComboBoxProps } from 'carbon-components-react';
+import { ComboBox, ComboBoxProps } from '@carbon/react';
 import { useField } from 'formik';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

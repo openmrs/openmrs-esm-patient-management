@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import dayjs from 'dayjs';
+import { first } from 'rxjs/operators';
 import {
   Button,
   ButtonSet,
@@ -8,16 +9,19 @@ import {
   DatePickerInput,
   Form,
   InlineNotification,
+  Layer,
   Row,
   Select,
   SelectItem,
+  Stack,
   Switch,
   TimePicker,
   TimePickerSelect,
   FormGroup,
   RadioButton,
   RadioButtonGroup,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   useLocations,
@@ -33,15 +37,13 @@ import {
   showToast,
   useConfig,
 } from '@openmrs/esm-framework';
-import styles from './visit-form.scss';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import { SearchTypes, PatientProgram } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
-import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { OutpatientConfig } from '../../config-schema';
+import { PatientProgram, SearchTypes } from '../../types/index';
+import styles from './visit-form.scss';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -142,73 +144,130 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <div className={styles.container}>
-          <div className={styles.backButton}>
-            <Button
-              kind="ghost"
-              renderIcon={ArrowLeft24}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-            </Button>
-          </div>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+            iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
+            size="sm"
+            onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
+            <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
+          </Button>
+        </div>
+        <Stack gap={8} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              <DatePicker
-                dateFormat="d/m/Y"
-                datePickerType="single"
-                id="visitDate"
-                light={isTablet}
-                style={{ paddingBottom: '1rem' }}
-                maxDate={new Date().toISOString()}
-                onChange={([date]) => setVisitDate(date)}
-                value={visitDate}>
-                <DatePickerInput
-                  id="visitStartDateInput"
-                  labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
-                  style={{ width: '100%' }}
-                />
-              </DatePicker>
-              <TimePicker
-                id="visitStartTime"
-                labelText={t('time', 'Time')}
-                light={isTablet}
-                onChange={(event) => setVisitTime(event.target.value as amPm)}
-                pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                style={{ marginLeft: '0.125rem', flex: 'none' }}
-                value={visitTime}>
-                <TimePickerSelect
-                  id="visitStartTimeSelect"
-                  onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                  value={timeFormat}
+              {isTablet ? (
+                <Layer>
+                  <DatePicker
+                    dateFormat="d/m/Y"
+                    datePickerType="single"
+                    id="visitDate"
+                    style={{ paddingBottom: '1rem' }}
+                    maxDate={new Date().toISOString()}
+                    onChange={([date]) => setVisitDate(date)}
+                    value={visitDate}>
+                    <DatePickerInput
+                      id="visitStartDateInput"
+                      labelText={t('date', 'Date')}
+                      placeholder="dd/mm/yyyy"
+                      style={{ width: '100%' }}
+                    />
+                  </DatePicker>
+                </Layer>
+              ) : (
+                <DatePicker
+                  dateFormat="d/m/Y"
+                  datePickerType="single"
+                  id="visitDate"
+                  style={{ paddingBottom: '1rem' }}
+                  maxDate={new Date().toISOString()}
+                  onChange={([date]) => setVisitDate(date)}
+                  value={visitDate}>
+                  <DatePickerInput
+                    id="visitStartDateInput"
+                    labelText={t('date', 'Date')}
+                    placeholder="dd/mm/yyyy"
+                    style={{ width: '100%' }}
+                  />
+                </DatePicker>
+              )}
+              {isTablet ? (
+                <Layer>
+                  <TimePicker
+                    id="visitStartTime"
+                    labelText={t('time', 'Time')}
+                    onChange={(event) => setVisitTime(event.target.value as amPm)}
+                    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                    style={{ marginLeft: '0.125rem', flex: 'none' }}
+                    value={visitTime}>
+                    <TimePickerSelect
+                      id="visitStartTimeSelect"
+                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                      value={timeFormat}
+                      labelText={t('time', 'Time')}
+                      aria-label={t('time', 'Time')}>
+                      <SelectItem value="AM" text="AM" />
+                      <SelectItem value="PM" text="PM" />
+                    </TimePickerSelect>
+                  </TimePicker>
+                </Layer>
+              ) : (
+                <TimePicker
+                  id="visitStartTime"
                   labelText={t('time', 'Time')}
-                  aria-label={t('time', 'Time')}>
-                  <SelectItem value="AM" text="AM" />
-                  <SelectItem value="PM" text="PM" />
-                </TimePickerSelect>
-              </TimePicker>
+                  onChange={(event) => setVisitTime(event.target.value as amPm)}
+                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                  style={{ marginLeft: '0.125rem', flex: 'none' }}
+                  value={visitTime}>
+                  <TimePickerSelect
+                    id="visitStartTimeSelect"
+                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                    value={timeFormat}
+                    labelText={t('time', 'Time')}
+                    aria-label={t('time', 'Time')}>
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                </TimePicker>
+              )}
             </div>
           </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <Select
-              labelText={t('selectLocation', 'Select a location')}
-              id="location"
-              invalidText="Required"
-              value={selectedLocation}
-              onChange={(event) => setSelectedLocation(event.target.value)}
-              light={isTablet}>
-              {locations?.length > 0 &&
-                locations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
-                  </SelectItem>
-                ))}
-            </Select>
+            {isTablet ? (
+              <Layer>
+                <Select
+                  labelText={t('selectLocation', 'Select a location')}
+                  id="location"
+                  invalidText="Required"
+                  value={selectedLocation}
+                  onChange={(event) => setSelectedLocation(event.target.value)}>
+                  {locations?.length > 0 &&
+                    locations.map((location) => (
+                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                        {location.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              </Layer>
+            ) : (
+              <Select
+                labelText={t('selectLocation', 'Select a location')}
+                id="location"
+                invalidText="Required"
+                value={selectedLocation}
+                onChange={(event) => setSelectedLocation(event.target.value)}>
+                {locations?.length > 0 &&
+                  locations.map((location) => (
+                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                      {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
           </section>
 
           {config.showRecommendedVisitTypeTab && (
@@ -241,7 +300,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <ContentSwitcher
               selectedIndex={contentSwitcherIndex}
               className={styles.contentSwitcher}
-              size="lg"
               onChange={({ index }) => setContentSwitcherIndex(index)}>
               <Switch name="recommended" text={t('recommended', 'Recommended')} />
               <Switch name="all" text={t('all', 'All')} />
@@ -279,7 +337,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               />
             </section>
           )}
-        </div>
+        </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={closePanel}>

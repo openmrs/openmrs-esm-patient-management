@@ -6,6 +6,15 @@ import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { FormValues } from '../../patient-registration-types';
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
+
 jest.mock('../../field/name/name-field.component', () => {
   return {
     NameField: () => (
@@ -45,6 +54,7 @@ describe('demographics section', () => {
         <Form>
           <PatientRegistrationContext.Provider
             value={{
+              initialFormValues: null,
               identifierTypes: [],
               validationSchema: {},
               setValidationSchema: () => {},

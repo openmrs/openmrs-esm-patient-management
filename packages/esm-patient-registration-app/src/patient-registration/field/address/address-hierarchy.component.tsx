@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
 import { ComboInput } from '../../input/combo-input/combo-input.component';
-import { SkeletonText } from 'carbon-components-react';
+import { SkeletonText } from '@carbon/react';
+import styles from '../field.scss';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -74,11 +74,13 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {addressLayout.map((attributes, idx) => (
+        {addressLayout.map((attributes, index) => (
           <ComboInput
-            id={attributes.name + '_' + idx}
+            key={`combo_input_${index}`}
             name={attributes.name}
             labelText={attributes.labelText}
+            id={attributes.name}
+            placeholder={attributes.labelText}
             setSelectedValue={setSelectedValue}
             selected={selected}
           />

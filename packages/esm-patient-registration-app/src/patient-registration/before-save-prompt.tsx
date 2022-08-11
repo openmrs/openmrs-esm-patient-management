@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
@@ -13,20 +13,23 @@ interface BeforeSavePromptProps {
 }
 
 const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const ref = useRef<boolean>(false);
   const [localTarget, setTarget] = useState<string | undefined>();
   const target = localTarget || redirect;
-  const cancelUnload = useCallback((e: BeforeUnloadEvent) => {
-    const message = t(
-      'discardModalBody',
-      "The changes you made to this patient's details have not been saved. Discard changes?",
-    );
-    e.preventDefault();
-    e.returnValue = message;
-    return message;
-  }, []);
+  const cancelUnload = useCallback(
+    (e: BeforeUnloadEvent) => {
+      const message = t(
+        'discardModalBody',
+        "The changes you made to this patient's details have not been saved. Discard changes?",
+      );
+      e.preventDefault();
+      e.returnValue = message;
+      return message;
+    },
+    [t],
+  );
 
   const cancelNavigation = useCallback((evt: CustomEvent) => {
     if (!evt.detail.navigationIsCanceled && !ref.current) {
@@ -61,9 +64,9 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
 
   useEffect(() => {
     if (typeof target === 'string') {
-      history.push(`/${getUrlWithoutPrefix(target)}`);
+      navigate(`/${getUrlWithoutPrefix(target)}`);
     }
-  }, [target]);
+  }, [navigate, target]);
 
   return null;
 };

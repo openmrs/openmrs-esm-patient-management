@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid, Row, Column, InlineLoading } from 'carbon-components-react';
-import styles from './contact-details.scss';
+import { Grid, Row, Column, InlineLoading } from '@carbon/react';
 import { usePatientContactAttributes } from './hooks/usePatientAttributes';
+import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
   patientId: string;
@@ -15,7 +15,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
 
   return (
     <div>
-      <p className={styles.heading}>{t('placeOfResidence', 'Place Of Residence')}</p>
+      <p className={styles.heading}>{t('placeOfResidence', 'Place of Residence')}</p>
       <ul>
         {address ? (
           <>

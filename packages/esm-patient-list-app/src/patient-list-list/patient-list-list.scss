@@ -1,3 +1,5 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '../style.scss';
 
 title {
@@ -35,8 +37,8 @@ title {
 .patientListHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-left: $spacing-05;
+  align-items: center;
+  margin-left: spacing.$spacing-05;
 }
 
 .newListButton {
@@ -47,7 +49,7 @@ title {
 
 .tabs {
   grid-column: 'span 2';
-  padding: 0 $spacing-05;
+  padding: 0 spacing.$spacing-05;
 }
 
 .hiddenTabsContent,
@@ -59,7 +61,7 @@ title {
   grid-row: 3 / 4;
   grid-column: 1 / 2;
   height: 100%;
-  padding: $spacing-05;
+  padding: spacing.$spacing-05;
   background-color: $ui-01;
 }
 
@@ -94,12 +96,12 @@ title {
 
 .desktopRow,
 .desktopHeader {
-  height: $spacing-07 !important;
+  height: spacing.$spacing-07 !important;
 }
 
 .tabletRow,
 .tabletHeader {
-  height: $spacing-09 !important;
+  height: spacing.$spacing-09 !important;
 }
 
 // Search Overlay
@@ -117,18 +119,18 @@ title {
   grid-row: 2 / 4;
   grid-column: 1 / 2;
   background-color: $ui-01;
-  padding: $spacing-05;
+  padding: spacing.$spacing-05;
 }
 
 // Results Overlay
 
 .resultCount {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
   border-bottom: solid 1px #e0e0e0;
-  padding: $spacing-04 0;
+  padding: spacing.$spacing-04 0;
 }
 
 .patientListResultsTableContainer {
-  margin: $spacing-03;
+  margin: spacing.$spacing-03;
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { mockPatient } from '../../__mocks__/patient.mock';
-import { mockAppointments } from '../../__mocks__/patient-appointments.mock';
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPastAndUpcomingAppointments } from '../../__mocks__/appointments-data.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AppointmentDetails from './appointment-details.component';
 
@@ -14,7 +14,7 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('RecentandUpcomingAppointments', () => {
   it('renders recent and upcoming appointment if available', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockAppointments });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockPastAndUpcomingAppointments });
     renderAppointments();
 
     await waitForLoadingToFinish();

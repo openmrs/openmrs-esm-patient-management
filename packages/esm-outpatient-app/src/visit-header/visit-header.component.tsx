@@ -1,16 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import capitalize from 'lodash-es/capitalize';
 import {
   Button,
+  DefinitionTooltip,
   Header,
   HeaderContainer,
   HeaderGlobalAction,
   HeaderGlobalBar,
   HeaderMenuButton,
-  TooltipDefinition,
-} from 'carbon-components-react';
-import CloseFilled20 from '@carbon/icons-react/es//close--filled/20';
-import { useTranslation } from 'react-i18next';
-import styles from './visit-header.scss';
+} from '@carbon/react';
+import { CloseFilled } from '@carbon/react/icons';
 import {
   age,
   ConfigurableLink,
@@ -20,9 +20,9 @@ import {
   useVisit,
   navigate,
 } from '@openmrs/esm-framework';
-import capitalize from 'lodash-es/capitalize';
 import { launchPatientWorkspace } from './workspaces';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
+import styles from './visit-header.scss';
 
 const PatientInfo = ({ patient, isTabletView }) => {
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
@@ -31,9 +31,9 @@ const PatientInfo = ({ patient, isTabletView }) => {
   const truncate = !isTabletView && name.trim().length > 25;
 
   return truncate ? (
-    <TooltipDefinition className={styles.tooltip} align="start" direction="bottom" tooltipText={tooltipText}>
+    <DefinitionTooltip className={styles.tooltip} align="bottom-left" direction="bottom" definition={tooltipText}>
       <span className={styles.patientName}>{name.slice(0, 25) + '...'}</span>
-    </TooltipDefinition>
+    </DefinitionTooltip>
   ) : (
     <>
       <span className={styles.patientName}>{name} </span>
@@ -118,8 +118,8 @@ const VisitHeader: React.FC = () => {
               <HeaderGlobalAction
                 className={styles.headerGlobalBarCloseButton}
                 aria-label={t('close', 'Close')}
-                onClick={onClosePatientChart}>
-                <CloseFilled20 />
+                onClick={() => setShowVisitHeader((prevState) => !prevState)}>
+                <CloseFilled size={20} />
               </HeaderGlobalAction>
             </HeaderGlobalBar>
             <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />

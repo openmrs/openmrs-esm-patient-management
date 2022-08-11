@@ -1,7 +1,9 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
 
-:global(.bx--side-nav) {
+:global(.cds--side-nav) {
   z-index: 0;
 }
 
@@ -16,15 +18,15 @@
 .resultsHeader {
   display: flex;
   justify-content: space-between;
-  margin: $spacing-03 0;
+  margin: spacing.$spacing-03 0;
 }
 
 .leftPaddedResultHeader {
-  margin-left: $spacing-05;
+  margin-left: spacing.$spacing-05;
 }
 
 .productiveHeading02 {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-02');
   align-self: center;
 }
 
@@ -35,28 +37,27 @@
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
-  padding: $spacing-09 0rem;
-  background-color: $ui-02;
+  padding: spacing.$spacing-09 0rem;
 }
 
 .paddedEmptySearchResultsTile {
-  margin: 0 $spacing-05;
+  margin: 0 spacing.$spacing-05;
 }
 
 .emptyResultText {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: $spacing-05;
+  margin-top: spacing.$spacing-05;
   margin-bottom: 0.313rem;
 }
 
 .actionText {
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
 .pagination {
-  padding: $spacing-05 0;
+  padding: spacing.$spacing-05 0;
   background: $ui-01;
 }
 
@@ -68,14 +69,13 @@
 }
 
 .errorMessage {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
+  @include type.type-style('heading-compact-02');
   margin-top: 2.25rem;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .errorCopy {
-  margin-bottom: $spacing-03;
-  @include carbon--type-style('body-long-01');
+  margin-bottom: spacing.$spacing-03;
+  @include type.type-style('body-01');
   color: $text-02;
 }

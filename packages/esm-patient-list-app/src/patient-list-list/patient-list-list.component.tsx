@@ -1,13 +1,13 @@
 import React, { ReactNode, useMemo, useState } from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import { Button, DataTableHeader, Tab, Tabs } from 'carbon-components-react';
-import PatientListTable from './patient-list-table.component';
-import CreateNewList from '../ui-components/create-edit-patient-list/create-edit-list.component';
 import { useTranslation } from 'react-i18next';
+import { Button, DataTableHeader, Tab, Tabs, TabList } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import styles from './patient-list-list.scss';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
+import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
+import PatientListTable from './patient-list-table.component';
+import styles from './patient-list-list.scss';
 
 enum TabTypes {
   STARRED,
@@ -28,7 +28,11 @@ function createLabels() {
   const res: Array<ReactNode> = [];
 
   for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
-    res.push(<Tab label={labelMap[index]} key={index} id={'tab-' + index} />);
+    res.push(
+      <Tab key={index} id={'tab-' + index}>
+        {labelMap[index]}
+      </Tab>,
+    );
   }
 
   return res;
@@ -97,18 +101,16 @@ const PatientListList: React.FC = () => {
           <Button
             className={styles.newListButton}
             kind="ghost"
-            renderIcon={Add16}
+            renderIcon={(props) => <Add {...props} size={16} />}
             iconDescription="Add"
             onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
             {t('newList', 'New List')}
           </Button>
         </div>
-        <Tabs
-          className={styles.tabs}
-          type="container"
-          tabContentClassName={styles.hiddenTabsContent}
-          onSelectionChange={setSelectedTab}>
-          {createLabels()}
+        <Tabs className={styles.tabs} tabContentClassName={styles.hiddenTabsContent} onSelectionChange={setSelectedTab}>
+          <TabList aria-label="List tabs" contained>
+            {createLabels()}
+          </TabList>
         </Tabs>
         <div className={styles.patientListTableContainer}>
           <PatientListTable

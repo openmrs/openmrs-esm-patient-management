@@ -1,14 +1,15 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
+import { useConfig } from '@openmrs/esm-framework';
 import { validationSchema } from './patient-registration-validation';
 import { NameField } from '../field/name/name-field.component';
 import { PatientRegistrationContext } from '../patient-registration-context';
 import { initialFormValues } from '../patient-registration.component';
 import { FormValues } from '../patient-registration-types';
-import * as openmrsFramework from '@openmrs/esm-framework';
-import userEvent from '@testing-library/user-event';
 
+const mockUseConfig = useConfig as jest.Mock;
 const mockFieldConfigs = {
   fieldConfigurations: {
     name: {
@@ -17,7 +18,17 @@ const mockFieldConfigs = {
   },
 };
 
-describe('name input', () => {
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    useConfig: jest.fn(),
+    validator: jest.fn(),
+  };
+});
+
+describe('Name input', () => {
   const formValues: FormValues = initialFormValues;
 
   const testValidName = (givenNameValue: string, middleNameValue: string, familyNameValue: string) => {
@@ -57,7 +68,10 @@ describe('name input', () => {
   };
 
   const updateNameAndReturnError = async (givenNameValue: string, middleNameValue: string, familyNameValue: string) => {
-    spyOn(openmrsFramework, 'useConfig').and.returnValue(mockFieldConfigs);
+    const user = userEvent.setup();
+
+    mockUseConfig.mockReturnValue(mockFieldConfigs);
+
     render(
       <Formik
         initialValues={{
@@ -70,6 +84,7 @@ describe('name input', () => {
         <Form>
           <PatientRegistrationContext.Provider
             value={{
+              initialFormValues: null,
               identifierTypes: [],
               validationSchema,
               setValidationSchema: () => {},
@@ -89,7 +104,7 @@ describe('name input', () => {
     const middleNameInput = screen.getByLabelText(/Middle Name/i) as HTMLInputElement;
     const familyNameInput = screen.getByLabelText('Family Name') as HTMLInputElement;
 
-    userEvent.click(givenNameInput);
+    await user.click(givenNameInput);
 
     fireEvent.change(givenNameInput, { target: { value: givenNameValue } });
     fireEvent.blur(givenNameInput);

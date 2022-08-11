@@ -1,6 +1,6 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .contactDetails {
   color: $text-02;
@@ -9,12 +9,12 @@
 }
 
 .heading {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
 }
 
 .row {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   display: flex;
 
   &:first-child {

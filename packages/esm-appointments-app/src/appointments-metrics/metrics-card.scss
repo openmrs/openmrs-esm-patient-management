@@ -1,39 +1,39 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .tileContainer {
   border: 0.0625rem solid $ui-03;
   flex-grow: 1;
   height: 7.875rem;
-  padding: 0 $spacing-05;
-  margin: $spacing-03 $spacing-03;
+  padding: 0 spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-03;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-03;  
+  margin-bottom: spacing.$spacing-03;
 }
 
 .headerLabel {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style('heading-compact-01');
   color: $text-02;
 }
 
 .totalsLabel {
-  @include carbon--type-style("label-01");
+  @include type.type-style('label-01');
   color: $text-02;
 }
 
 .totalsValue {
-  @include carbon--type-style("productive-heading-04");
+  @include type.type-style('heading-04');
   color: $ui-05;
 }
 
 .headerLabelContainer {
   display: flex;
   align-items: center;
-  height: $spacing-07;
+  height: spacing.$spacing-07;
 }

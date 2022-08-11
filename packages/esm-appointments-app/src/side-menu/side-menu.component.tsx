@@ -1,5 +1,5 @@
 import React from 'react';
-import { SideNav, SideNavItems } from 'carbon-components-react/lib/components/UIShell';
+import { SideNav, SideNavItems } from '@carbon/react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './side-menu.scss';
 

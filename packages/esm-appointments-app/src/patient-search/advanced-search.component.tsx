@@ -13,8 +13,8 @@ import {
   Row,
   Switch,
   TextInput,
-} from 'carbon-components-react';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+} from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import styles from './advanced-search.scss';
@@ -60,7 +60,7 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
         <div className={styles.backButton}>
           <Button
             kind="ghost"
-            renderIcon={ArrowLeft24}
+            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
             iconDescription="Back to simple search"
             size="sm"
             onClick={() => toggleSearchType(SearchTypes.BASIC)}>

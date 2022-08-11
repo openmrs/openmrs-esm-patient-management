@@ -1,11 +1,13 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import PatientSearchPageComponent from './patient-search-page/patient-search-page.component';
 
 const PatientSearchRootComponent: React.FC = () => {
   return (
     <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}search`}>
-      <Route path="/:query" component={PatientSearchPageComponent} />
+      <Routes>
+        <Route path="/:query" element={<PatientSearchPageComponent />} />
+      </Routes>
     </BrowserRouter>
   );
 };

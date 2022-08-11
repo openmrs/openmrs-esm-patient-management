@@ -18,7 +18,7 @@ import {
   RadioButtonGroup,
   RadioButton,
   Toggle,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import {
   useLocations,
   useSession,

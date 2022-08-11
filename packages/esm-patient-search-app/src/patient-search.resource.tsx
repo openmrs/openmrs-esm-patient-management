@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { SearchedPatient, FHIRPatientSearchResponse, FHIRPatientType, PatientSearchResponse } from './types';
+import { openmrsFetch, useConfig, FetchResponse } from '@openmrs/esm-framework';
+import { PatientSearchResponse, SearchedPatient } from './types';
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +

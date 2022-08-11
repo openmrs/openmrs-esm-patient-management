@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from 'carbon-components-react';
-import Search20 from '@carbon/icons-react/es/search/20';
-import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
-import Overlay from '../ui-components/overlay';
 import { useTranslation } from 'react-i18next';
-import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
-import PatientSearchComponent from '../patient-search-page/patient-search-lg.component';
+import { Button } from '@carbon/react';
+import { Search } from '@carbon/react/icons';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 
 interface PatientSearchButtonProps {
@@ -21,8 +17,8 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   onPatientSelect,
   buttonProps,
 }) => {
-  const [showSearchOverlay, setShowSearchOverlay] = useState<boolean>(false);
   const { t } = useTranslation();
+  const [showSearchOverlay, setShowSearchOverlay] = useState<boolean>(false);
 
   return (
     <>
@@ -38,7 +34,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
         onClick={() => setShowSearchOverlay(true)}
         aria-label="Search Patient Button"
         aria-labelledby="Search Patient Button"
-        renderIcon={Search20}
+        renderIcon={(props) => <Search size={20} {...props} />}
         {...buttonProps}>
         {buttonText ? buttonText : t('searchPatient', 'Search Patient')}
       </Button>

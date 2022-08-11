@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
-import { Grid, Row } from 'carbon-components-react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Grid, Row } from '@carbon/react';
 import { ExtensionSlot, useSession } from '@openmrs/esm-framework';
 import {
   Resources,
@@ -12,6 +12,7 @@ import {
 import { SavePatientForm } from './patient-registration/form-manager';
 import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
 import useSWR from 'swr';
+import styles from './root.scss';
 export interface RootProps extends PatientRegistrationProps, Resources {
   savePatientForm: SavePatientForm;
   isOffline: boolean;
@@ -35,25 +36,17 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
         currentSession,
       }}>
       <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
-        <main className="omrs-main-content" style={{ backgroundColor: 'white' }}>
-          <Grid>
+        <main className={`omrs-main-content ${styles.root}`}>
+          <Grid className={styles.grid}>
             <Row>
               <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             </Row>
-            <Route
-              exact
-              path="/patient-registration"
-              render={(props) => (
-                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
-              )}
-            />
-            <Route
-              exact
-              path="/patient/:patientUuid/edit"
-              render={(props) => (
-                <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} {...props} />
-              )}
-            />
+            <Route path="/patient-registration">
+              <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />
+            </Route>
+            <Route path="/patient/:patientUuid/edit">
+              <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />
+            </Route>
           </Grid>
         </main>
       </BrowserRouter>

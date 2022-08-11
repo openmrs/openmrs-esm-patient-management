@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 
 interface OverlayStore {
   isOverlayOpen: boolean;
-  component?: Function;
+  // TODO: Fix this more conclusively
+  component?: any;
   header: string;
 }
 

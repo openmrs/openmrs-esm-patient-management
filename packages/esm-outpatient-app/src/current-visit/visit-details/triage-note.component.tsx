@@ -1,9 +1,9 @@
 import React from 'react';
-import { Tag, Button } from 'carbon-components-react';
+import { Tag, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { DiagnosisItem, Note } from '../../types/index';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { ArrowRight } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
+import { DiagnosisItem, Note } from '../../types/index';
 import styles from './triage-note.scss';
 
 interface TriageNoteProps {
@@ -39,7 +39,7 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }
           <Button
             size="small"
             kind="ghost"
-            renderIcon={ArrowRight16}
+            renderIcon={(props) => <ArrowRight size={16} {...props} />}
             onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}
             iconDescription={t('triageForm', 'Triage form')}>
             {t('triageForm', 'Triage form')}

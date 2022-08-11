@@ -26,7 +26,6 @@ import {
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
-import _ from 'lodash';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -41,8 +40,7 @@ export type SavePatientForm = (
   savePatientTransactionManager: SavePatientTransactionManager,
   abortController?: AbortController,
 ) => Promise<string | void>;
-
-export default class FormManager {
+export class FormManager {
   static savePatientFormOffline: SavePatientForm = async (
     isNewPatient,
     values,

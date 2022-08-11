@@ -1,7 +1,8 @@
-import { Button } from 'carbon-components-react';
+import { Button } from '@carbon/react';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 interface CustomOverflowMenuComponentProps {
+  children?: React.ReactNode;
   menuTitle: React.ReactNode;
   dropDownMenu: boolean;
 }
@@ -44,7 +45,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   return (
     <div
       data-overflow-menu
-      className="bx--overflow-menu"
+      className="cds--overflow-menu"
       style={{
         width: 'auto',
         height: 'auto',
@@ -52,7 +53,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
       ref={wrapperRef}>
       <Button
         kind="ghost"
-        className={`bx--overflow-menu__trigger ${showMenu && 'bx--overflow-menu--open'}`}
+        className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'}`}
         aria-haspopup="true"
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
@@ -69,7 +70,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         {menuTitle}
       </Button>
       <div
-        className="bx--overflow-menu-options bx--overflow-menu--flip"
+        className="cds--overflow-menu-options cds--overflow-menu--flip"
         tabIndex={0}
         data-floating-menu-direction="bottom"
         role="menu"
@@ -85,7 +86,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           marginRight: '0.2rem',
           boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
         }}>
-        <ul className="bx--overflow-menu-options__content">{children}</ul>
+        <ul className="cds--overflow-menu-options__content">{children}</ul>
         <span />
       </div>
     </div>

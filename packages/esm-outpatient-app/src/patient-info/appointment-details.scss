@@ -1,0 +1,38 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.widgetCard {
+  border: 1px solid colors.$blue-20;
+  border-left: none;
+  border-right: none;
+  background-color: $color-blue-10;
+  padding: spacing.$spacing-05;
+
+  &:last-of-type {
+    border: none;
+  }
+}
+
+.title {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-02;
+}
+
+.subtitle {
+  color: $text-02;
+  @include type.type-style('body-compact-01');
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.tile {
+  text-align: center;
+}

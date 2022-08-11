@@ -1,8 +1,17 @@
 import React from 'react';
-import { render, fireEvent, wait, screen, waitFor } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
 import { initialFormValues } from '../../patient-registration.component';
 import { FormValues } from '../../patient-registration-types';
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
 
 describe('dummy data input', () => {
   let formValues: FormValues = initialFormValues;

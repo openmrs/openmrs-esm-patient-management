@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import styles from './base-visit-type.scss';
+import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Search, RadioButtonGroup, RadioButton, Tile } from 'carbon-components-react';
-import EmptyDataIllustration from '../empty-data-illustration.component';
-import { useTranslation } from 'react-i18next';
+import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import EmptyDataIllustration from '../empty-data-illustration.component';
+import styles from './base-visit-type.scss';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;
@@ -34,12 +34,22 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
       {results.length ? (
         <>
-          <Search
-            onChange={(event) => handleSearch(event.target.value)}
-            placeholder={t('searchForAVisitType', 'Search for a visit type')}
-            labelText=""
-            light={isTablet}
-          />
+          {isTablet ? (
+            <Layer>
+              <Search
+                onChange={(event) => handleSearch(event.target.value)}
+                placeholder={t('searchForAVisitType', 'Search for a visit type')}
+                labelText=""
+              />
+            </Layer>
+          ) : (
+            <Search
+              onChange={(event) => handleSearch(event.target.value)}
+              placeholder={t('searchForAVisitType', 'Search for a visit type')}
+              labelText=""
+            />
+          )}
+
           <RadioButtonGroup
             className={styles.radioButtonGroup}
             defaultSelected="default-selected"
@@ -53,13 +63,17 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
           </RadioButtonGroup>
         </>
       ) : (
-        <Tile light className={styles.tile}>
-          <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('visitType', 'Visit type')}</h4>
-          </div>
-          <EmptyDataIllustration />
-          <p className={styles.content}>{t('noVisitTypes', 'There are no visit types to display for this patient')}</p>
-        </Tile>
+        <Layer>
+          <Tile className={styles.tile}>
+            <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+              <h4>{t('visitType', 'Visit type')}</h4>
+            </div>
+            <EmptyDataIllustration />
+            <p className={styles.content}>
+              {t('noVisitTypes', 'There are no visit types to display for this patient')}
+            </p>
+          </Tile>
+        </Layer>
       )}
     </div>
   );

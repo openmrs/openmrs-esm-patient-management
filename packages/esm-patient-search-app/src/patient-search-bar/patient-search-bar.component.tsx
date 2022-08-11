@@ -1,25 +1,24 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Search } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { Button, Search } from '@carbon/react';
 import styles from './patient-search-bar.scss';
+
 interface PatientSearchBarProps {
   buttonProps?: Object;
   initialSearchTerm?: string;
-  small?: boolean;
   onChange?: (searchTerm) => void;
   onClear: () => void;
   onSubmit: (searchTerm) => void;
+  small?: boolean;
 }
 
-const searchTimeout = 300;
-
 const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
-  small,
   buttonProps,
   initialSearchTerm,
-  onSubmit,
-  onClear,
   onChange,
+  onClear,
+  onSubmit,
+  small,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -45,17 +44,17 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   return (
     <form onSubmit={handleSubmit} className={styles.searchArea}>
       <Search
+        autoFocus
         className={styles.patientSearchInput}
-        size={small ? 'sm' : 'xl'}
-        placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-        labelText=""
         closeButtonLabelText={t('clearSearch', 'Clear')}
+        labelText=""
         onChange={(event) => handleChange(event.target.value)}
         onClear={onClear}
-        autoFocus
+        placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
+        size={small ? 'sm' : 'lg'}
         value={searchTerm}
       />
-      <Button type="submit" kind={'secondary'} size={small ? 'sm' : 'md'} onClick={handleSubmit} {...buttonProps}>
+      <Button type="submit" kind="secondary" size={small ? 'sm' : 'lg'} onClick={handleSubmit} {...buttonProps}>
         {t('search', 'Search')}
       </Button>
     </form>

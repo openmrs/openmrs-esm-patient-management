@@ -1,5 +1,4 @@
 import { FetchResponse } from '@openmrs/esm-framework';
-
 export interface SearchedPatient {
   uuid: string;
   identifiers: Array<{ identifier: string }>;
@@ -18,7 +17,6 @@ export interface SearchedPatient {
   };
   attributes: Array<{ value: string; attributeType: { name: string } }>;
 }
-
 export interface Address {
   preferred: boolean;
   address1: string;
@@ -27,7 +25,6 @@ export interface Address {
   postalCode: string;
   stateProvince: string;
 }
-
 export interface FHIRPatientType {
   id: string;
   identifier: Array<{
@@ -52,7 +49,6 @@ export interface FHIRPatientType {
     country: string;
   }>;
 }
-
 export interface FHIRPatientSearchResponse {
   total: number;
   link?: Array<{
@@ -63,7 +59,6 @@ export interface FHIRPatientSearchResponse {
     resource: FHIRPatientType;
   }>;
 }
-
 export interface PatientSearchResponse {
   data?: Array<SearchedPatient>;
   isLoading: boolean;

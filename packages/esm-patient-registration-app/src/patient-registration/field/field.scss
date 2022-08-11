@@ -1,29 +1,30 @@
-@import '~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles';
-@import '~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading02 {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   margin-bottom: 1rem;
 }
 
 .productiveHeading02Light {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   margin-bottom: 1rem;
   color: #525252;
 }
 
 .label01 {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: $spacing-05;
+  column-gap: spacing.$spacing-05;
 }
 
 .halfWidthInDesktopView {
-  width: calc(50% - $spacing-05);
+  width: calc(50% - spacing.$spacing-05);
 }
 
 .patientPhoto {
@@ -36,7 +37,7 @@
   grid-column: 1;
 }
 
-.nameField > :global(.bx--content-switcher) {
+.nameField > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
@@ -47,7 +48,7 @@
   margin-bottom: 1rem;
 }
 
-.dobField > :global(.bx--content-switcher) {
+.dobField > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
@@ -63,11 +64,11 @@
 
 .sexField,
 .dobField {
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }
 
 .dobContentSwitcherLabel {
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .identifierLabelText {
@@ -76,15 +77,19 @@
 }
 
 .setIDNumberButton {
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }
 
 .setIDNumberButton > svg {
-  margin-left: $spacing-03;
+  margin-left: spacing.$spacing-03;
 }
 
 .customField {
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
+}
+
+.attributeField {
+  margin-bottom: spacing.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -102,7 +107,7 @@
     justify-self: start;
   }
   .radioButton label {
-    height: $spacing-09 !important;
+    height: spacing.$spacing-09 !important;
   }
   .halfWidthInDesktopView {
     width: 100%;

@@ -1,10 +1,10 @@
 import React from 'react';
-import VisitHeader from './visit-header.component';
 import { render, screen } from '@testing-library/react';
-import { mockPatient, mockPatientWithLongName } from '../../__mocks__/patient.mock';
-import { useAssignedExtensions, useLayoutType, useOnClickOutside, usePatient, useVisit } from '@openmrs/esm-framework';
 import userEvent from '@testing-library/user-event';
+import { useAssignedExtensions, useLayoutType, useOnClickOutside, usePatient, useVisit } from '@openmrs/esm-framework';
+import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from './workspaces';
+import VisitHeader from './visit-header.component';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -38,12 +38,10 @@ jest.mock('./workspaces', () => {
   };
 });
 
-describe('VisitHeader', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+describe('Visit Header', () => {
+  xtest('should display visit header and left nav bar hamburger icon', async () => {
+    const user = userEvent.setup();
 
-  test('should display visit header and left nav bar hamburger icon', () => {
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
@@ -54,7 +52,8 @@ describe('VisitHeader', () => {
     });
     mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
     mockUseLayoutType.mockReturnValue('tablet');
-    render(<VisitHeader />);
+
+    renderVisitHeader();
 
     const headerBanner = screen.getByRole('banner', { name: /OpenMRS/i });
     expect(headerBanner).toBeInTheDocument();
@@ -67,19 +66,19 @@ describe('VisitHeader', () => {
     expect(homeLink).toHaveAttribute('href', '/openmrs/spa/home');
 
     // Should display the leftNavMenu
-    userEvent.click(hamburgerButton);
+    await user.click(hamburgerButton);
     const linkElement = screen.getByText(/Left Nav Menu/i);
     expect(linkElement).toBeInTheDocument();
 
     // Should close the leftNavMenu
-    userEvent.click(linkElement);
+    await user.click(linkElement);
     expect(useOnClickOutside).toHaveBeenCalled();
 
     // Should be able to start a visit
     const startVisitButton = screen.getByRole('button', { name: /Start a visit/i });
     expect(startVisitButton).toBeInTheDocument();
 
-    userEvent.click(startVisitButton);
+    await user.click(startVisitButton);
     expect(launchPatientWorkspace).toHaveBeenCalled();
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
 
@@ -87,11 +86,11 @@ describe('VisitHeader', () => {
     expect(closeButton).toBeInTheDocument();
 
     // Should close the visit-header
-    userEvent.click(closeButton);
+    await user.click(closeButton);
     expect(screen.queryByRole('banner', { name: /OpenMRS/i })).not.toBeInTheDocument();
   });
 
-  test('should display truncated name, when patient name is very long', () => {
+  test('should display a truncated name when the patient name is very long', async () => {
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
     mockUsePatient.mockReturnValue({
       patient: mockPatientWithLongName,
@@ -101,10 +100,15 @@ describe('VisitHeader', () => {
     });
     mockUseVisit.mockReturnValue({ isValidating: null, currentVisit: null });
     mockUseLayoutType.mockReturnValue('desktop');
-    render(<VisitHeader />);
+
+    renderVisitHeader();
 
     const longNameText = screen.getByText(/^Some very long given name...$/i);
     expect(longNameText).toBeInTheDocument();
     expect(screen.getByText(/^Some very long given name family name 20, male$/i)).toBeInTheDocument();
   });
 });
+
+function renderVisitHeader() {
+  render(<VisitHeader />);
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, wait, screen } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { SelectInput } from './select-input.component';
 
@@ -27,8 +27,6 @@ describe.skip('select input', () => {
     fireEvent.change(input, { target: { value: expected } });
     fireEvent.blur(input);
 
-    await wait();
-
-    expect(input.value).toEqual(expected);
+    await waitFor(() => expect(input.value).toEqual(expected));
   });
 });

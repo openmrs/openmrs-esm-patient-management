@@ -1,16 +1,21 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import 'carbon-components/scss/globals/scss/typography.scss';
 
 .searchboxContainer {
   display: flex;
   align-items: center;
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
+}
+
+.searchboxLayer {
+  flex-grow: 1;
 }
 
 .searchInput {
   input:focus {
     outline: none;
-    border: $spacing-01 solid var(--omrs-color-brand-orange);
+    border: spacing.$spacing-01 solid var(--omrs-color-brand-orange);
   }
 }
 
@@ -40,18 +45,18 @@
   color: $text-02;
 
   .primaryText {
-    @include carbon--type-style('productive-heading-01');
+    @include type.type-style('heading-compact-01');
   }
 
   .secondaryText {
     width: 12rem;
     margin-top: 0.25rem;
-    @include carbon--type-style('body-long-01');
+    @include type.type-style('body-01');
   }
 }
 
 .separator {
-  @include carbon--type-style('productive-heading-03');
+  @include type.type-style('heading-03');
   color: $text-02;
   width: 12rem;
   margin: 3rem auto;
@@ -112,35 +117,30 @@
 }
 
 .resultsText {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
   color: $text-02;
   border-bottom: 0.063rem solid $ui-03;
-  padding: $spacing-03 0rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .resultsText {
-  margin: $spacing-05;
+  padding: spacing.$spacing-03 0rem;
 }
 
 .emptyResultText {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: $spacing-05;
+  margin-top: spacing.$spacing-05;
   margin-bottom: 0.313rem;
 }
 
 .actionText {
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
 .emptySearchResultsTile {
   text-align: center;
-  margin-top: $spacing-05;
-  padding: $spacing-09 0rem;
+  margin-top: spacing.$spacing-05;
+  padding: spacing.$spacing-09 0rem;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
-  margin: $spacing-05;
   background-color: $ui-02;
 }

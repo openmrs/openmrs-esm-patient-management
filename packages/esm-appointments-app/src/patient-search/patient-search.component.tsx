@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-
 import BasicSearch from './basic-search.component';
 import AdvancedSearch from './advanced-search.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import SearchResults from './search-results.component';
 import { SearchTypes } from '../types';
 
-const PatientSearch: React.FC = () => {
+const PatientSearch = () => {
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
   const [selectedPatient, setSelectedPatient] = useState<fhir.Patient>({});
 

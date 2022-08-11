@@ -1,0 +1,18 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../style.scss';
+
+.header {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: spacing.$spacing-05;
+}
+
+.input {
+  margin-top: spacing.$spacing-07;
+}
+
+.buttonsGroup {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

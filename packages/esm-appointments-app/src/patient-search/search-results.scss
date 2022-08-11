@@ -1,5 +1,6 @@
-@import "carbon-components/scss/globals/scss/typography.scss";
-@import "~@openmrs/esm-styleguide/src/vars";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .patientChart {
   text-decoration: none;
@@ -25,8 +26,7 @@
 }
 
 .patientName {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
+  @include type.type-style('heading-03');
 }
 
 .patientAvatar {
@@ -45,13 +45,13 @@
 }
 
 .demographics {
-  @include carbon--type-style("body-short-02");
+  @include type.type-style('body-compact-02');
   color: $text-02;
   margin: 0.3rem 0;
 }
 
 .identifiers {
-  @include carbon--type-style("body-short-02");
+  @include type.type-style('body-compact-02');
   color: $ui-04;
 }
 
