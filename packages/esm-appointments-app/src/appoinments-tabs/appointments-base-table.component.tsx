@@ -37,13 +37,15 @@ interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
   isLoading: Boolean;
   tableHeading: String;
+  mutate?: () => void;
 }
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
+  mutate?: () => void;
 }
 
-const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment }) => {
+const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
   const { t } = useTranslation();
 
   return (
@@ -52,7 +54,10 @@ const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment }) => {
         className={styles.menuItem}
         id="#editAppointment"
         onClick={() =>
-          launchOverlay(t('editAppointment', 'Edit Appointment'), <AppointmentForm appointment={appointment} />)
+          launchOverlay(
+            t('editAppointment', 'Edit Appointment'),
+            <AppointmentForm mutate={mutate} appointment={appointment} />,
+          )
         }
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
@@ -80,7 +85,7 @@ function ServiceIcon({ service }) {
   }
 }
 
-const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
+const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading, mutate }) => {
   const { t } = useTranslation();
   const isDesktop = useLayoutType() === 'desktop';
 

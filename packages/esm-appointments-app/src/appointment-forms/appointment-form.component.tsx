@@ -17,7 +17,7 @@ import {
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import styles from './appointment-form.scss';
-import { mockFrequency, mockProviders } from '../../../../__mocks__/appointments.mock';
+import { mockFrequency } from '../../../../__mocks__/appointments.mock';
 import {
   useLocations,
   useSession,
@@ -26,17 +26,20 @@ import {
   ExtensionSlot,
   usePatient,
   useConfig,
+  parseDate,
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { convertTime12to24, amPm } from '../helpers';
+import { convertTime12to24, amPm, startDate as startFilterDate } from '../helpers';
 import { saveAppointment, useServices } from '../appoinments-tabs/appointments-table.resource';
 import { ConfigObject } from '../config-schema';
-
+import { useProviders } from '../hooks/useProviders';
+import { closeOverlay } from '../hooks/useOverlay';
 interface AppointmentFormProps {
   appointment: MappedAppointment;
+  mutate: () => void;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate = () => {} }) => {
   const { t } = useTranslation();
 
   const { appointmentKinds } = useConfig() as ConfigObject;
@@ -45,6 +48,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   const { patient } = usePatient(appointment.patientUuid);
   const locations = useLocations();
   const session = useSession();
+  const { providers } = useProviders();
   const { services } = useServices();
   const [startDate, setStartDate] = useState(appointment.dateTime);
   const [endDate, setEndDate] = useState(appointment.dateTime);
@@ -56,7 +60,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   const [appointmentComment, setAppointmentComment] = useState(appointment.comments);
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = useState(new Date(appointment.dateTime));
+  const [visitDate, setVisitDate] = React.useState<Date>(appointment.dateTime ? parseDate(appointment.dateTime) : null);
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointment.dateTime);
   const [appointmentKind, setAppointmentKind] = useState(appointment.appointmentKind);
@@ -70,14 +74,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   }, [selectedLocation, session]);
 
   const handleSubmit = () => {
-    const endDatetime = dayjs(visitDate).format('YYYY-MM-DD');
+    const visitDatetime = dayjs(visitDate.setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+    const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
+
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: appointmentKind,
       status: appointmentStatus,
       serviceUuid: selectedService,
-      startDateTime: dayjs(day).format(),
-      endDateTime: dayjs(day).format(),
-      providerUuid: selectedProvider,
+      startDateTime: dayjs(visitDatetime).format(),
+      endDateTime: dayjs(visitDatetime).format(),
+      providerUuid: providerUuid,
       comments: appointmentComment,
       locationUuid: selectedLocation,
       patientUuid: appointment.patientUuid,
@@ -86,6 +92,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
     };
 
     const abortController = new AbortController();
+    setIsSubmitting(true);
     saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
@@ -95,6 +102,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
             description: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
+          setIsSubmitting(false);
+          mutate();
+          closeOverlay();
         }
       },
       (error) => {
@@ -104,6 +114,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
           critical: true,
           description: error?.message,
         });
+        setIsSubmitting(false);
       },
     );
   };
@@ -111,7 +122,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   return (
     <div className={styles.formContainer}>
       <ExtensionSlot
-        extensionSlotName="patient-info-banner-slot"
+        extensionSlotName="patient-header-slot"
         state={{
           patient,
           patientUuid: appointment.patientUuid,
@@ -313,10 +324,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
         onChange={(event) => setSelectedProvider(event.target.value)}
         value={selectedProvider}>
         {!selectedProvider ? <SelectItem text={t('chooseProvider', 'Select Provider')} value="" /> : null}
-        {mockProviders.data?.length > 0 &&
-          mockProviders.data.map((provider) => (
-            <SelectItem key={provider.person.uuid} text={provider.person.display} value={provider.person.display}>
-              {provider.person.display}
+        {providers?.length > 0 &&
+          providers.map((provider) => (
+            <SelectItem key={provider.uuid} text={provider.display} value={provider.display}>
+              {provider.display}
             </SelectItem>
           ))}
       </Select>
