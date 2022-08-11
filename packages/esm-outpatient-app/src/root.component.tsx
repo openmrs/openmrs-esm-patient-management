@@ -22,7 +22,7 @@ const Root: React.FC = () => {
       <SWRConfig value={swrConfiguration}>
         <BrowserRouter basename={spaBasePath}>
           <Routes>
-            <Route path="/:view?" element={<OutpatientDashboard />} />
+            <Route path="" element={<OutpatientDashboard />} />
             <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
           </Routes>
         </BrowserRouter>

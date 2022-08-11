@@ -32,7 +32,7 @@ function setupOpenMRS() {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./root.component'), options),
-        route: '^patient-registration',
+        route: 'patient-registration',
         online: {
           savePatientForm: FormManager.savePatientFormOnline,
           isOffline: false,
@@ -42,19 +42,20 @@ function setupOpenMRS() {
           isOffline: true,
         },
       },
-      {
-        load: getAsyncLifecycle(() => import('./root.component'), {
-          featureName: 'edit-patient-details-form',
-          moduleName,
-        }),
-        route: /patient\/([a-zA-Z0-9\-]+)\/edit/,
-        online: {
-          savePatientForm: FormManager.savePatientFormOnline,
-        },
-        offline: {
-          savePatientForm: FormManager.savePatientFormOffline,
-        },
-      },
+      // TODO: Check in with Manuel about whether this bit is still required
+      // {
+      //   load: getAsyncLifecycle(() => import('./root.component'), {
+      //     featureName: 'edit-patient-details-form',
+      //     moduleName,
+      //   }),
+      //   route: /patient\-registration\/patient\/([a-zA-Z0-9\-]+)\/edit/,
+      //   online: {
+      //     savePatientForm: FormManager.savePatientFormOnline,
+      //   },
+      //   offline: {
+      //     savePatientForm: FormManager.savePatientFormOffline,
+      //   },
+      // },
     ],
     extensions: [
       {
