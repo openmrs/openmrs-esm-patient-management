@@ -7,7 +7,8 @@ import { SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 
 interface PatientSearchProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patient: fhir.Patient) => void;
+  patient: fhir.Patient;
 }
 
 enum priority {
@@ -16,7 +17,7 @@ enum priority {
   EMERGENCY = 'Emergency',
 }
 
-const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
+const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType, patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [showRecentPriority, setShowRecentPriority] = useState(false);
@@ -65,7 +66,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
           renderIcon={ArrowLeft24}
           iconDescription="Back to search results"
           size="sm"
-          onClick={() => toggleSearchType(SearchTypes.BASIC)}>
+          onClick={() => toggleSearchType(SearchTypes.BASIC, {})}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
       </div>
@@ -174,10 +175,14 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
       </div>
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.BASIC)}>
+        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.BASIC, {})}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          type="submit"
+          onClick={() => toggleSearchType(SearchTypes.ADVANCED, patient)}>
           {t('search', 'Search')}
         </Button>
       </ButtonSet>

@@ -45,6 +45,9 @@ export interface Appointment {
   uuid: string;
 }
 
+export interface AppointmentsFetchResponse {
+  data: Array<Appointment>;
+}
 export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
@@ -119,7 +122,6 @@ export interface MappedAppointment {
 }
 
 export interface AppointmentPayload {
-  providerUuid: string;
   patientUuid: string;
   serviceUuid: string;
   startDateTime: string;
@@ -128,9 +130,10 @@ export interface AppointmentPayload {
   providers?: Array<{ uuid: string; comments: string; response?: string }>;
   locationUuid: string;
   comments: string;
-  status: string;
-  appointmentNumber: string;
-  uuid: string;
+  status?: string;
+  appointmentNumber?: string;
+  uuid?: string;
+  providerUuid: string;
 }
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
@@ -143,8 +146,9 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
-
 export interface Provider {
   uuid: string;
   display: string;
+  comments: string;
+  response?: string;
 }

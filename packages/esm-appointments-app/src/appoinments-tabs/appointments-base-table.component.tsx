@@ -31,7 +31,7 @@ import styles from './appointments-base-table.scss';
 import { MappedAppointment } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
-import AppointmentForm from '../appointment-forms/appointment-form.component';
+import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
