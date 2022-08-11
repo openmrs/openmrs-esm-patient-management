@@ -7,29 +7,27 @@ import { SearchTypes } from '../types';
 
 const PatientSearch = () => {
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
+  const [selectedPatient, setSelectedPatient] = useState<fhir.Patient>({});
 
-  const toggleSearchType = (searchType: SearchTypes) => setSearchType(searchType);
+  const toggleSearchType = (searchType: SearchTypes, patient: fhir.Patient = {}) => {
+    setSearchType(searchType);
+    setSelectedPatient(patient);
+  };
 
   return (
-    <div className="omrs-main-content">
-      {(() => {
-        if (searchType === SearchTypes.BASIC) {
-          return <BasicSearch toggleSearchType={toggleSearchType} />;
-        }
-
-        if (searchType === SearchTypes.ADVANCED) {
-          return <AdvancedSearch toggleSearchType={toggleSearchType} />;
-        }
-
-        if (searchType === SearchTypes.SEARCH_RESULTS) {
-          return <SearchResults patients={[]} toggleSearchType={toggleSearchType} />;
-        }
-
-        if (searchType === SearchTypes.SCHEDULED_VISITS) {
-          return <PatientScheduledVisits toggleSearchType={toggleSearchType} />;
-        }
-      })()}
-    </div>
+    <>
+      <div className="omrs-main-content">
+        {searchType === SearchTypes.BASIC ? (
+          <BasicSearch patient={selectedPatient} toggleSearchType={toggleSearchType} />
+        ) : searchType === SearchTypes.ADVANCED ? (
+          <AdvancedSearch toggleSearchType={toggleSearchType} />
+        ) : searchType === SearchTypes.SEARCH_RESULTS ? (
+          <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
+        ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
+          <PatientScheduledVisits toggleSearchType={toggleSearchType} patient={selectedPatient} />
+        ) : null}
+      </div>
+    </>
   );
 };
 

@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
 import { SearchTypes } from '../types';
+import { launchOverlay } from '../hooks/useOverlay';
+import CreateAppointmentsForm from '../appointment-forms/create-appointment-form.component';
 import styles from './search-results.scss';
-
 interface SearchResultsProps {
   patients: Array<any>;
   hidePanel?: any;
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patient: fhir.Patient) => void;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchType }) => {
   const fhirPatients = useMemo(() => {
-    return patients.map((patient) => {
+    return patients?.map((patient) => {
       const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
       return {
         id: patient.uuid,
@@ -28,7 +28,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
         deceasedBoolean: patient.person.death,
         identifier: [
           {
-            value: patient.patientIdentifier.identifier,
+            value: patient.patientIdentifier?.identifier, // PatientIdentifier can be null sometimes
           },
         ],
         address: preferredAddress
@@ -46,11 +46,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
       };
     });
   }, [patients]);
-  const onClickSearchResult = () => toggleSearchType(SearchTypes.SCHEDULED_VISITS);
+
+  const onClickSearchResult = (patient: fhir.Patient) => {
+    launchOverlay('Create Appointment', <CreateAppointmentsForm patient={patient} patientUuid={patient.id} />);
+  };
 
   return (
     <>
-      {fhirPatients.map((patient) => (
+      {fhirPatients?.map((patient) => (
         <div key={patient.id} className={styles.patientChart}>
           <div className={styles.container}>
             <ExtensionSlot
@@ -58,8 +61,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
               state={{
                 patient,
                 patientUuid: patient.id,
-                onClick: onClickSearchResult,
-                // onTransition: hidePanel,
+                onClick: () => onClickSearchResult(patient),
               }}
             />
           </div>

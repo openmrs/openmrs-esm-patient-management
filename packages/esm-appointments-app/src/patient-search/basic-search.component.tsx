@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import { Search as SearchIcon } from '@carbon/react/icons';
+import { UserFollow } from '@carbon/react/icons';
 import { Button, Layer, Search, Tile } from '@carbon/react';
 import SearchIllustration from './search-illustration.component';
 import SearchResults from './search-results.component';
 import { findPatients } from './search.resource';
 import { SearchTypes } from '../types';
+import { navigate } from '@openmrs/esm-framework';
 import styles from './basic-search.scss';
 
 interface BasicSearchProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
+  toggleSearchType: (searchMode: SearchTypes, patient: fhir.Patient) => void;
+  patient: fhir.Patient;
 }
 
-const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
+const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType, patient }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
@@ -60,9 +62,26 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
           {t('search', 'Search')}
         </Button>
       </div>
-      {searchResults?.length ? (
+      {searchResults?.length > 0 ? (
         <div className={styles.resultsContainer}>
           {<SearchResults toggleSearchType={toggleSearchType} patients={searchResults} />}
+        </div>
+      ) : searchTerm && searchResults?.length === 0 ? (
+        <div className={styles.addPatientTileContainer}>
+          <Tile className={styles.addPatientTile}>
+            <div className={styles.addPatientTileContent}>
+              <p className={styles.content}>{t('patientNotFound', 'No patient found')}</p>
+              <p className={styles.helper}>{t('checkSearch', 'Check the search term')}</p>
+            </div>
+            <p className={styles.addPatientSeparator}>{t('or', 'or')}</p>
+            <Button
+              kind="ghost"
+              size="small"
+              renderIcon={UserFollow}
+              onClick={() => navigate({ to: '${openmrsSpaBase}/patient-registration' })}>
+              {t('addPatient', 'Add patient')}
+            </Button>
+          </Tile>
         </div>
       ) : (
         <div>
@@ -84,9 +103,9 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
             <Button
               kind="ghost"
               iconDescription="Advanced search"
-              renderIcon={(props) => <SearchIcon size={16} {...props} />}
-              onClick={() => toggleSearchType(SearchTypes.ADVANCED)}>
-              <span>{t('advancedSearch', 'Advanced search')}</span>
+              renderIcon={Search}
+              onClick={() => toggleSearchType(SearchTypes.ADVANCED, patient)}>
+              {t('advancedSearch', 'Advanced search')}
             </Button>
           </div>
         </div>

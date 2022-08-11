@@ -29,12 +29,12 @@ import {
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
 import { amPm } from '../helpers';
-import { saveAppointment, useServices } from '../appointments-tabs/appointments-table.resource';
+import { saveAppointment, useServices } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
-import styles from './appointment-form.scss';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
+import styles from './edit-appointment-form.scss';
 
 interface AppointmentFormProps {
   appointment: MappedAppointment;

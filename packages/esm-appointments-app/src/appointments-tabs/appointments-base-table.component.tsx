@@ -25,12 +25,11 @@ import {
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
-import { MappedAppointment, Appointment } from '../types';
+import { MappedAppointment } from '../types';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
-import AppointmentForm from '../appointment-forms/appointment-form.component';
+import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
-
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
   isLoading: Boolean;

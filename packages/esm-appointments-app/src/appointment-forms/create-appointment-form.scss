@@ -1,0 +1,141 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+// TO DO Move this styles to style - guide
+// https://github.com/openmrs/openmrs-esm-core/blob/master/packages/framework/esm-styleguide/src/_vars.scss
+$color-blue-30: #a6c8ff;
+
+.productiveHeading02 {
+  color: $color-gray-70;
+  @include type.type-style('productive-heading-02');
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formWrapper {
+  background-color: $openmrs-background-grey;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formWrapper {
+  background-color: $ui-02;
+}
+
+.formGroup {
+  display: flex;
+  margin-bottom: spacing.$spacing-02;
+  padding: spacing.$spacing-05;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup > span {
+  flex: 1;
+}
+:global(.omrs-breakpoint-lt-desktop) .formGroup > div {
+  flex: 3;
+}
+
+.formGroup span {
+  @extend .productiveHeading02;
+}
+
+.patientInfo {
+  position: sticky;
+  z-index: 1000;
+  background-color: $ui-02;
+  top: 3rem;
+  overflow-y: auto;
+}
+
+.dateTimeContainer {
+  display: flex;
+  margin: 1rem 0;
+}
+.timePickersContainer,
+.frequencyAndDay {
+  display: flex;
+  > div {
+    margin-right: 0.5rem;
+  }
+}
+
+.datePickerControl {
+  display: flex;
+  flex-direction: column;
+
+  > div {
+    margin-bottom: 1rem;
+  }
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup {
+  flex-direction: row;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formGroup {
+  flex-direction: column;
+}
+
+.buttonGroup {
+  display: flex;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .buttonGroup {
+  padding: spacing.$spacing-05 spacing.$spacing-06;
+  background-color: $ui-02;
+}
+
+.buttonGroup button {
+  max-width: none;
+  width: 50%;
+  height: spacing.$spacing-10;
+  align-items: flex-start;
+}
+
+.contentSwitcherWrapper {
+  display: flex;
+  width: fit-content;
+  justify-content: flex-end;
+  align-items: center;
+  width: 60%;
+}
+
+.contentSwitcherWrapper > div > button {
+  background-color: $ui-02;
+}
+
+.contentSwitcherWrapper > div button:first-child {
+  border-top: 1px solid $color-blue-30;
+  border-bottom: 1px solid $color-blue-30;
+  border-left: 1px solid $color-blue-30;
+  border-right: none;
+  border-radius: spacing.$spacing-02 0 0px spacing.$spacing-02;
+}
+
+.contentSwitcherWrapper > div button:last-child {
+  border-top: 1px solid $color-blue-30;
+  border-bottom: 1px solid $color-blue-30;
+  border-right: 1px solid $color-blue-30;
+  border-left: none;
+  border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true'],
+.contentSwitcherWrapper > div > button[aria-selected='true']:first-child {
+  background-color: $color-blue-10;
+  color: $color-blue-60-2;
+  border-color: $color-blue-60-2;
+  border-right: 1px solid $color-blue-60-2;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true'],
+.contentSwitcherWrapper > div > button[aria-selected='true']:last-child {
+  background-color: $color-blue-10;
+  color: $color-blue-60-2;
+  border-color: $color-blue-60-2;
+  border-left: 1px solid $color-blue-60-2;
+}
+
+.contentSwitcherWrapper > div > button[aria-selected='true']:focus {
+  box-shadow: none;
+}
