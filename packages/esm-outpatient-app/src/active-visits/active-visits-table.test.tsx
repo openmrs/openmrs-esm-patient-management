@@ -26,6 +26,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.setTimeout(20000);
+
 describe('ActiveVisitsTable: ', () => {
   beforeEach(() =>
     mockedUseConfig.mockReturnValue({
