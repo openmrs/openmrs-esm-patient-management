@@ -28,28 +28,32 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
   );
 
   return (
-    <ResourcesContext.Provider
-      value={{
-        addressTemplate,
-        relationshipTypes,
-        identifierTypes,
-        currentSession,
-      }}>
-      <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
-        <main className={`omrs-main-content ${styles.root}`}>
-          <Grid className={styles.grid}>
-            <Row>
-              <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-            </Row>
-            <Route path="/patient-registration">
-              <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />
-            </Route>
-            <Route path="/patient/:patientUuid/edit">
-              <PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />
-            </Route>
-          </Grid>
-        </main>
-      </BrowserRouter>
-    </ResourcesContext.Provider>
+    <main className={`omrs-main-content ${styles.root}`}>
+      <Grid className={styles.grid}>
+        <Row>
+          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+        </Row>
+        <ResourcesContext.Provider
+          value={{
+            addressTemplate,
+            relationshipTypes,
+            identifierTypes,
+            currentSession,
+          }}>
+          <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}patient-registration`}>
+            <Routes>
+              <Route
+                path=""
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+              />
+              <Route
+                path="/patient/:patientUuid/edit"
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+              />
+            </Routes>
+          </BrowserRouter>
+        </ResourcesContext.Provider>
+      </Grid>
+    </main>
   );
 }
