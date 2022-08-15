@@ -1,24 +1,10 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { screen, render } from '@testing-library/react';
 import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
 import AppointmentDetails from './appointment-details.component';
-import { renderWithSwr } from '../../../../tools/test-helpers';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-  };
-});
-
-describe('AppointmentTablePatientDetails: ', () => {
-  it('renders a tabular view of the patient details', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockMappedAppointmentsData } });
-
+describe('AppointmentTablePatientDetails ', () => {
+  it('renders a tabular view of the patient details', () => {
     renderPatientDetailsExpansionSlot();
 
     expect(screen.getByText(/patient details/i)).toBeInTheDocument();
@@ -31,6 +17,6 @@ describe('AppointmentTablePatientDetails: ', () => {
   });
 });
 
-function renderPatientDetailsExpansionSlot() {
-  renderWithSwr(<AppointmentDetails appointment={mockMappedAppointmentsData.data[0]} />);
-}
+const renderPatientDetailsExpansionSlot = () => {
+  render(<AppointmentDetails appointment={mockMappedAppointmentsData.data[0]} />);
+};
