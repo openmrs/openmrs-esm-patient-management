@@ -38,7 +38,7 @@ const AppointmentList: React.FC = () => {
       <Button
         className={styles.calendarButton}
         kind="primary"
-        renderIcon={<Calendar size={16} />}
+        renderIcon={(props) => <Calendar size={16} {...props} />}
         data-floating-menu-primary-focus
         iconDescription={t('viewCalendar', 'View Calendar')}>
         {t('viewCalendar', 'View Calendar')}
@@ -57,9 +57,7 @@ const AppointmentList: React.FC = () => {
           <TabPanel>
             <CancelledAppointment status={selectedStatus} />
           </TabPanel>
-          <TabPanel>
-            <CompletedAppointments status={selectedStatus} />
-          </TabPanel>
+          <TabPanel>{<CompletedAppointments status={selectedStatus} />}</TabPanel>
         </TabPanels>
       </Tabs>
     </div>

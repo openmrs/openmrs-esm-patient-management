@@ -10,7 +10,10 @@ const MetricsHeader: React.FC = () => {
   return (
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
-      <Button kind="ghost" renderIcon={<ArrowRight size={16} />} iconDescription={t('moreMetrics', 'See more metrics')}>
+      <Button
+        renderIcon={(props) => <ArrowRight size={16} {...props} />}
+        kind="ghost"
+        iconDescription={t('moreMetrics', 'See more metrics')}>
         {t('moreMetrics', 'See more metrics')}
       </Button>
     </div>
