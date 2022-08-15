@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-import { useMatch } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { attach, detach, ExtensionSlot, isDesktop, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
-import { spaBasePath } from '../constants';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
 import PatientQueueHeader from '../appointments-header/appointments-header.component';
 import styles from './appointments-dashboard.scss';
@@ -13,9 +12,7 @@ export interface DashboardConfig {
 }
 
 const AppointmentsDashboard: React.FC = () => {
-  const {
-    params: { view },
-  } = useMatch(spaBasePath);
+  const { view } = useParams();
   const { navGroups } = useNavGroups();
   const extensionStore = useExtensionStore();
   const layout = useLayoutType();

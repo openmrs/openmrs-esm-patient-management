@@ -21,7 +21,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           <label className={styles.headerLabel}>{headerLabel}</label>
           {children}
         </div>
-        <Button kind="ghost" renderIcon={<ArrowRight size={16} />} iconDescription={t('view', 'View')}>
+        <Button renderIcon={ArrowRight} kind="ghost" iconDescription={t('view', 'View')}>
           {t('view', 'View')}
         </Button>
       </div>

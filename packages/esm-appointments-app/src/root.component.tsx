@@ -1,6 +1,6 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { spaBasePath } from './constants';
 import AppointmentsDashboard from './dashboard/appointments-dashboard.component';
 import Overlay from './overlay.component';
@@ -14,7 +14,9 @@ const Root: React.FC = () => {
     <main>
       <SWRConfig value={swrConfiguration}>
         <BrowserRouter basename={spaBasePath}>
-          <Route path="/:view?" element={<AppointmentsDashboard />} />
+          <Routes>
+            <Route path="" element={<AppointmentsDashboard />} />
+          </Routes>
           <Overlay />
         </BrowserRouter>
       </SWRConfig>

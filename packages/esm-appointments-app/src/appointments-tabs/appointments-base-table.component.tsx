@@ -162,7 +162,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
             <Button
               kind="ghost"
               size="sm"
-              renderIcon={<Add size={16} />}
+              renderIcon={(props) => <Add size={16} {...props} />}
               onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
               {t('addNewAppointment', 'Add new Appointment')}
             </Button>
@@ -179,7 +179,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         <Button
           size="sm"
           kind="secondary"
-          renderIcon={<Add size={16} />}
+          renderIcon={(props) => <Add size={16} {...props} />}
           onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
           iconDescription={t('addNewAppointment', 'Add new Appointment')}>
           {t('addNewAppointment', 'Add new Appointment')}
@@ -251,7 +251,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                     <Button
                       kind="ghost"
                       size="sm"
-                      renderIcon={<Add size={16} />}
+                      renderIcon={(props) => <Add size={16} {...props} />}
                       onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
                       {t('addNewAppointment', 'Add new Appointment')}
                     </Button>
