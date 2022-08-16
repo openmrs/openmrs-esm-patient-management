@@ -279,7 +279,6 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
-
 export interface QueueEntryPayload {
   visit: { uuid: string };
   queueEntry: {
@@ -291,7 +290,7 @@ export interface QueueEntryPayload {
   };
 }
 
-export interface QueueService {
+export interface QueueServiceInfo {
   uuid: string;
   display: string;
   name: string;

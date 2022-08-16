@@ -8,9 +8,11 @@ import {
   FormGroup,
   RadioButton,
   RadioButtonGroup,
+  ContentSwitcher,
+  Switch,
 } from '@carbon/react';
-import { showNotification, showToast, useVisit, openmrsFetch } from '@openmrs/esm-framework';
-import { useServices } from './active-visits-table.resource';
+import { showNotification, showToast, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
+import { updateQueueEntry, usePriority, useStatus } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 
@@ -18,38 +20,44 @@ interface ChangeStatusDialogProps {
   patientUuid: string;
   queueUuid: string;
   queueEntryUuid: string;
+  visitUuid: string;
   closeModal: () => void;
 }
 
-const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUuid, queueEntryUuid, closeModal }) => {
+const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
+  patientUuid,
+  queueUuid,
+  queueEntryUuid,
+  visitUuid,
+  closeModal,
+}) => {
   const { t } = useTranslation();
-  const { currentVisit, mutate } = useVisit(patientUuid);
   const [status, setStatus] = useState('');
-  const { services } = useServices();
+  const [priority, setPriority] = useState();
+  const { priorities } = usePriority();
+  const { statuses } = useStatus();
 
   const changeQueueStatus = useCallback(() => {
-    const payload = {
-      status: { uuid: status },
-      endedAt: new Date(),
-      visitUuid: currentVisit.uuid,
-      patientUuid: patientUuid,
-    };
-
-    openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
-      headers: {
-        'Content-type': 'application/json',
-      },
-      method: 'POST',
-      body: payload,
-    }).then(
-      () => {
-        mutate();
-        showToast({
-          title: t('updateEntry', 'Update entry'),
-          kind: 'success',
-          description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
-        });
-        closeModal();
+    const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
+    updateQueueEntry(
+      visitUuid,
+      queueUuid,
+      queueEntryUuid,
+      patientUuid,
+      priority,
+      status,
+      endDate,
+      new AbortController(),
+    ).then(
+      ({ status }) => {
+        if (status === 201) {
+          showToast({
+            title: t('updateEntry', 'Update entry'),
+            kind: 'success',
+            description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
+          });
+          closeModal();
+        }
       },
       (error) => {
         showNotification({
@@ -60,7 +68,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
         });
       },
     );
-  }, [status, currentVisit, patientUuid, queueEntryUuid, t, queueUuid, closeModal, mutate]);
+  }, [visitUuid, queueUuid, queueEntryUuid, patientUuid, priority, status, t, closeModal]);
 
   return (
     <div>
@@ -75,11 +83,32 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ patientUuid, queueUui
               onChange={(event) => setStatus(event.toString())}
               name="radio-button-group"
               valueSelected="default-selected">
-              {services.map(({ uuid, display, name }) => (
+              {statuses.map(({ uuid, display, name }) => (
                 <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
               ))}
             </RadioButtonGroup>
           </FormGroup>
+
+          <section className={styles.section}>
+            <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+            <ContentSwitcher
+              size="sm"
+              onChange={(event) => {
+                setPriority(event.name as any);
+              }}>
+              {priorities?.length > 0 ? (
+                priorities.map(({ uuid, display }) => {
+                  return <Switch name={uuid} text={display} value={uuid} />;
+                })
+              ) : (
+                <Switch
+                  name={t('noPriorityFound', 'No priority found')}
+                  text={t('noPriorityFound', 'No priority found')}
+                  value={null}
+                />
+              )}
+            </ContentSwitcher>
+          </section>
         </Form>
       </ModalBody>
       <ModalFooter>

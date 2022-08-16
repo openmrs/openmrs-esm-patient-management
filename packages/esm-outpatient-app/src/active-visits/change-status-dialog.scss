@@ -16,3 +16,13 @@
   padding: spacing.$spacing-02 spacing.$spacing-02;
   margin: spacing.$spacing-03 0;
 }
+
+section {
+  margin: spacing.$spacing-03;
+}
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-04;
+}

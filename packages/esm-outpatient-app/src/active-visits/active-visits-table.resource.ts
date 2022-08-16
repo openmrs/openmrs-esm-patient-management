@@ -1,8 +1,16 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, Visit } from '@openmrs/esm-framework';
+import {
+  FetchResponse,
+  openmrsFetch,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  Visit,
+} from '@openmrs/esm-framework';
 import last from 'lodash-es/last';
+import { QueueEntryPayload, QueueServiceInfo } from '../types';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -95,17 +103,12 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-export function useServices() {
-  const config = useConfig();
-  const {
-    concepts: { serviceConceptSetUuid },
-  } = config;
-
-  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
-  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+export function useServices(location: string) {
+  const apiUrl = `/ws/rest/v1/queue?location=${location}`;
+  const { data } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(apiUrl, openmrsFetch);
 
   return {
-    services: data ? data?.data?.setMembers : [],
+    services: data ? data?.data?.results : [],
   };
 }
 
@@ -191,3 +194,60 @@ export const getOriginFromPathName = (pathname = '') => {
   const from = pathname.split('/');
   return last(from);
 };
+
+export async function updateQueueEntry(
+  visitUuid: string,
+  queueUuid: string,
+  queueEntryUuid: string,
+  patientUuid: string,
+  priority: string,
+  status: string,
+  endedAt: Date,
+  abortController: AbortController,
+) {
+  await Promise.all([endPatientStatus(queueUuid, abortController, queueEntryUuid, endedAt)]);
+
+  return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      visit: { uuid: visitUuid },
+      queueEntry: {
+        status: {
+          uuid: status,
+        },
+        priority: {
+          uuid: priority,
+        },
+        queue: {
+          uuid: queueUuid,
+        },
+        patient: {
+          uuid: patientUuid,
+        },
+        startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+      },
+    },
+  });
+}
+
+async function endPatientStatus(
+  queueUuid: string,
+  abortController: AbortController,
+  queueEntryUuid: string,
+  endedAt: Date,
+) {
+  await openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      endedAt: endedAt,
+    },
+  });
+}
