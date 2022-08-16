@@ -6,11 +6,15 @@ export const configSchema = {
   concepts: {
     priorityConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
+      _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
     },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '34bd0bbf-855f-4aeb-9b47-76fbd463861d',
+      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
+    },
+    statusConceptSetUuid: {
+      _type: Type.ConceptUuid,
+      _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
@@ -67,6 +71,7 @@ export interface ConfigObject {
   concepts: {
     priorityConceptSetUuid: string;
     serviceConceptSetUuid: string;
+    statusConceptSetUuid: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
     pulseUuid: string;

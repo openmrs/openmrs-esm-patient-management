@@ -1,8 +1,8 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { AppointmentSummary } from '../types';
+import { AppointmentSummary, QueueService } from '../types';
 import { getServiceCountByAppointmentType } from '../helpers/helpers';
 
 interface ConceptMetadataResponse {
@@ -24,17 +24,13 @@ export function useMetrics() {
   };
 }
 
-export function useServices() {
-  const config = useConfig();
-  const {
-    concepts: { serviceConceptSetUuid },
-  } = config;
-
-  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
-  const { data } = useSWRImmutable<{ data: ConceptMetadataResponse }, Error>(apiUrl, openmrsFetch);
+export function useServices(location: string) {
+  const apiUrl = `/ws/rest/v1/queue?location=${location}`;
+  const { data } = useSWRImmutable<{ data: { results: Array<QueueService> } }, Error>(apiUrl, openmrsFetch);
 
   return {
-    services: data ? data?.data?.setMembers?.map((setMember) => setMember?.display) : [],
+    services: data ? data?.data?.results?.map((service) => service.display) : [],
+    allServices: data ? data?.data.results : [],
   };
 }
 
