@@ -29,7 +29,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit, Group, InProgress } from '@carbon/react/icons';
-import { useLayoutType, navigate, showModal, interpolateUrl, isDesktop } from '@openmrs/esm-framework';
+import { useLayoutType, navigate, showModal, interpolateUrl, isDesktop, useSession } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -119,10 +119,12 @@ function EditMenu({
   patientUuid,
   queueUuid,
   queueEntryUuid,
+  visitUuid,
 }: {
   patientUuid: string;
   queueEntryUuid: string;
   queueUuid: string;
+  visitUuid: string;
 }) {
   const { t } = useTranslation();
   const launchEditPriorityModal = useCallback(() => {
@@ -131,8 +133,9 @@ function EditMenu({
       patientUuid,
       queueEntryUuid,
       queueUuid,
+      visitUuid,
     });
-  }, [patientUuid, queueEntryUuid, queueUuid]);
+  }, [patientUuid, queueEntryUuid, queueUuid, visitUuid]);
 
   return (
     <Button
@@ -159,7 +162,9 @@ function StatusIcon({ status }) {
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
-  const { services } = useServices();
+  const [userLocation, setUserLocation] = useState('');
+  const session = useSession();
+  const { services } = useServices(userLocation);
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
   const [filter, setFilter] = useState('');
@@ -168,6 +173,10 @@ function ActiveVisitsTable() {
 
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
+
+  if (!userLocation && session?.sessionLocation?.uuid) {
+    setUserLocation(session?.sessionLocation?.uuid);
+  }
 
   useEffect(() => {
     if (filter) {
@@ -375,6 +384,7 @@ function ActiveVisitsTable() {
                               queueEntryUuid={tableRows?.[index]?.id}
                               queueUuid={tableRows?.[index]?.queueUuid}
                               patientUuid={tableRows?.[index]?.patientUuid}
+                              visitUuid={tableRows?.[index]?.visitUuid}
                             />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
