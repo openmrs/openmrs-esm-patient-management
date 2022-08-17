@@ -155,6 +155,8 @@ function StatusIcon({ status }) {
       return <InProgress size={16} />;
     case 'In Service':
       return <Group size={16} />;
+    case 'Finished Service':
+      return <Group size={16} />;
     default:
       return null;
   }
@@ -231,6 +233,8 @@ function ActiveVisitsTable() {
       return `${status} for ${service}`;
     } else if (status === 'In Service') {
       return `Attending ${service}`;
+    } else if (status === 'Finished Service') {
+      return `Finished ${service}`;
     }
   };
 

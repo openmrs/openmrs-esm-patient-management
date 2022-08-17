@@ -47,6 +47,7 @@ import { OutpatientConfig } from '../../config-schema';
 import { saveQueueEntry } from './queue.resource';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
+import { useSWRConfig } from 'swr';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -76,6 +77,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const { priorities } = usePriority();
   const { statuses } = useStatus();
   const { allServices } = useServices(selectedLocation);
+  const { mutate } = useSWRConfig();
 
   const config = useConfig() as OutpatientConfig;
 
@@ -116,7 +118,10 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           (response) => {
             if (response.status === 201) {
               const service = [...allServices].shift().uuid;
-              const status = [...statuses].shift().uuid;
+              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+              if (priority === '') {
+                setPriority([...priorities].shift().uuid);
+              }
 
               const queuePayload: QueueEntryPayload = {
                 visit: {
@@ -154,6 +159,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                         ),
                       });
                       closePanel();
+                      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
                     }
                   },
                   (error) => {
@@ -187,8 +193,10 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       allServices,
       statuses,
       priority,
+      priorities,
       t,
       closePanel,
+      mutate,
     ],
   );
 

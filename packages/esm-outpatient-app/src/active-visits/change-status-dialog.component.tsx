@@ -41,6 +41,12 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
   const { mutate } = useSWRConfig();
 
   const changeQueueStatus = useCallback(() => {
+    if (priority === '') {
+      setPriority([...priorities].shift().uuid);
+    }
+    if (status === '') {
+      statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+    }
     const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
     updateQueueEntry(
       visitUuid,
@@ -72,7 +78,19 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
         });
       },
     );
-  }, [visitUuid, queueUuid, queueEntryUuid, patientUuid, priority, status, t, closeModal]);
+  }, [
+    priority,
+    status,
+    visitUuid,
+    queueUuid,
+    queueEntryUuid,
+    patientUuid,
+    priorities,
+    statuses,
+    t,
+    closeModal,
+    mutate,
+  ]);
 
   return (
     <div>
