@@ -1,29 +1,31 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { ScheduledVisits } from './patient-scheduled-visits.component';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import { mockRecentVisits } from '../../__mocks__/patient-scheduled-visits.mock';
-import { openmrsFetch } from '@openmrs/esm-framework';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-
-const mockToggleSearchType = jest.fn();
-
-describe('Scheduled visits', () => {
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    openmrsFetch: jest.fn(),
+  };
+});
+describe('ScheduledVisits', () => {
   it('should display recent and future scheduled visits', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockRecentVisits });
     renderScheduledVisits();
-    await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Adult diabetes return visit/)).toBeInTheDocument();
-    expect(screen.getByText(/NCD clinic/)).toBeInTheDocument();
-    expect(screen.getAllByText(/Adult HIV return visit/));
-    expect(screen.getAllByText(/ HIV clinic/));
-    expect(screen.getAllByText(/23-Feb-2022, 10:44 PM/));
+    expect(screen.getAllByText(/Cardiology Consultation 1/));
+    expect(screen.getAllByText(/08-Aug-2022, 02:56 PM/));
   });
 });
 
-const renderScheduledVisits = () => {
-  renderWithSwr(<PatientScheduledVisits patientUuid={mockPatient.id} toggleSearchType={mockToggleSearchType} />);
-};
+function renderScheduledVisits() {
+  renderWithSwr(
+    <ScheduledVisits
+      visits={mockRecentVisits.recentVisits}
+      visitType="WalkIn"
+      scheduledVisitHeader="1 visit scheduled for +/- 7 days"
+    />,
+  );
+}

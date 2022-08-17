@@ -1,52 +1,46 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import { AppointmentsFetchResponse } from '../../types';
 
-export function useRecentScheduledVisits(patientUuid: string) {
-  const recentVisits = [
-    {
-      id: '1',
-      visit_type: 'Adult diabetes return visit',
-      clinic: 'NCD clinic',
-      visit_date: '2022-02-23T22:44:32.000+0000',
-    },
-    {
-      id: '2',
-      visit_type: 'Adult HIV return visit',
-      clinic: 'HIV clinic',
-      visit_date: '2022-02-23T22:44:32.000+0000',
-    },
-    {
-      id: '3',
-      visit_type: 'Adult HIV return visit',
-      clinic: 'HIV clinic',
-      visit_date: '2022-02-23T22:44:32.000+0000',
-    },
-  ];
+export function useScheduledVisits(patientUuid: string, abortController: AbortController) {
+  let startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+  const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
-  const { data, error } = useSWR<{ data: { results: {} } }, Error>(`endpoint?patient=${patientUuid}`, openmrsFetch);
+  const fetcher = () =>
+    openmrsFetch(appointmentsSearchUrl, {
+      method: 'POST',
+      signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        patientUuid: patientUuid,
+        startDate: startDate,
+      },
+    });
+
+  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
+
+  const appointments = data?.data?.length
+    ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
+    : null;
+
+  // visits + or - 7 days before visit date
+  const recentVisits = appointments?.filter(
+    (appointment) =>
+      dayjs((appointment.startDateTime / 1000) * 1000).isBefore(dayjs().add(7, 'day')) ||
+      dayjs((appointment.startDateTime / 1000) * 1000).isBefore(dayjs().subtract(7, 'day')),
+  );
+
+  // visits past 7 days
+  const futureVisits = appointments?.filter((appointment) =>
+    dayjs((appointment.startDateTime / 1000) * 1000).isAfter(dayjs().add(7, 'day')),
+  );
 
   return {
-    recentVisits: recentVisits,
+    appointments: data ? { recentVisits, futureVisits } : null,
     isError: error,
     isLoading: !data && !error,
-  };
-}
-
-export function useFutureScheduledVisits(patientUuid: string) {
-  const futureVisits = [
-    {
-      id: '1',
-      visit_type: 'Adult HIV return visit',
-      clinic: 'HIV clinic',
-      visit_date: '2022-02-23T22:44:32.000+0000',
-    },
-  ];
-
-  const { data, error } = useSWR<{ data: { results: {} } }, Error>(`endpoint?patient=${patientUuid}`, openmrsFetch);
-
-  return {
-    futureVisits: futureVisits,
-    error: error,
-    loading: !data && !error,
   };
 }
