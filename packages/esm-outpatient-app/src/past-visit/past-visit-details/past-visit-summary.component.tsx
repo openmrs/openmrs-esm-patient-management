@@ -5,6 +5,10 @@ import { formatTime, parseDate, useLayoutType, formatDatetime } from '@openmrs/e
 import { Encounter, OrderItem, Order, Note, DiagnosisItem, Observation } from '../../types/index';
 import EncounterList from './encounter-list.component';
 import styles from '../past-visit.scss';
+import Vitals from '../../current-visit/visit-details/vitals.component';
+import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
+import Notes from './notes-list.component';
+import Medications from './medications-list.component';
 
 interface PastVisitSummaryProps {
   encounters: Array<any>;
@@ -110,7 +114,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     <div className={styles.wrapper}>
       <div className={styles.visitContainer}>
         <Tabs className={`${styles.verticalTabs} ${isTablet ? styles.tabletTabs : styles.desktopTabs}`}>
-          <TabList aria-label="Past visits tabs">
+          <TabList className={styles.verticalTabList} aria-label="Past visits tabs">
             <Tab
               className={`${styles.tab} ${styles.bodyLong01} ${selectedTabIndex === 0 && styles.selectedTab}`}
               id="vitals-tab"
@@ -138,7 +142,20 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
           </TabList>
           <TabPanels>
             <TabPanel>
-              <EncounterList encounters={encounters} />
+              <Vitals
+                vitals={useVitalsFromObs(vitalsToRetrieve)}
+                patientUuid={patientUuid}
+                visitType={visitTypes.PAST}
+              />
+            </TabPanel>
+            <TabPanel>
+              <Notes notes={notes} diagnoses={diagnoses} />
+            </TabPanel>
+            <TabPanel>
+              <Medications medications={medications} />
+            </TabPanel>
+            <TabPanel>
+              <EncounterList encounters={encountersToDisplay} />
             </TabPanel>
           </TabPanels>
         </Tabs>

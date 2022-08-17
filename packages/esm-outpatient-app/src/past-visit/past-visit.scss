@@ -26,7 +26,6 @@
 
 .container {
   background-color: $ui-background;
-  border: 1px solid $grey-2;
   padding: spacing.$spacing-05;
   margin: spacing.$spacing-05 0rem spacing.$spacing-05;
   width: 100%;
@@ -48,6 +47,7 @@
   background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
+  min-height: spacing.$spacing-13;
 }
 
 .flexSections {
@@ -60,10 +60,18 @@
   &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
     margin-left: 0rem;
   }
+
+  > ul {
+    flex-direction: column !important;
+  }
 }
 
-.verticalTabs > ul {
-  flex-direction: column !important;
+.verticalTabList {
+  :global(.cds--tab--list) {
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-x: visible;
+  }
 }
 
 .desktopTabs {
@@ -78,16 +86,27 @@
   }
 }
 
-.tab > button {
-  border-bottom: 0 !important;
-  border-left: 3px solid $ui-03 !important;
-}
+.tab {
+  outline: 0;
+  outline-offset: 0;
 
-.tab > button,
-.tab > button:focus,
-.tab > button:active {
-  outline: 0 !important;
-  outline-offset: 0 !important;
+  &:active,
+  &:focus {
+    outline: 2px solid var(--brand-03) !important;
+  }
+
+  &[aria-selected='true'] {
+    border-left: 3px solid var(--brand-03);
+    border-bottom: none;
+    font-weight: 600;
+    margin-left: 0rem !important;
+  }
+
+  &[aria-selected='false'] {
+    border-bottom: none;
+    border-left: 2px solid $ui-03;
+    margin-left: 0rem !important;
+  }
 }
 
 .selectedTab > button {
