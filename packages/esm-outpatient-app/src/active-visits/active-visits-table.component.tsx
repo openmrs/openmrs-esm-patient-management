@@ -25,6 +25,9 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tabs,
+  TabPanels,
+  TabPanel,
+  TabList,
   Tag,
   Tile,
 } from '@carbon/react';
@@ -395,15 +398,21 @@ function ActiveVisitsTable() {
                           <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
                             <>
                               <Tabs>
-                                <Tab label={t('currentVisit', 'Current visit')}>
-                                  <CurrentVisit
-                                    patientUuid={tableRows?.[index]?.patientUuid}
-                                    visitUuid={tableRows?.[index]?.visitUuid}
-                                  />
-                                </Tab>
-                                <Tab label={t('previousVisit', 'Previous visit')}>
-                                  <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />
-                                </Tab>
+                                <TabList>
+                                  <Tab>{t('currentVisit', 'Current visit')}</Tab>
+                                  <Tab>{t('previousVisit', 'Previous visit')} </Tab>
+                                </TabList>
+                                <TabPanels>
+                                  <TabPanel>
+                                    <CurrentVisit
+                                      patientUuid={tableRows?.[index]?.patientUuid}
+                                      visitUuid={tableRows?.[index]?.visitUuid}
+                                    />
+                                  </TabPanel>
+                                  <TabPanel>
+                                    <PastVisit patientUuid={tableRows?.[index]?.patientUuid} />
+                                  </TabPanel>
+                                </TabPanels>
                               </Tabs>
                             </>
                           </TableExpandedRow>
