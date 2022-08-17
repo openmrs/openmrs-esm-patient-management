@@ -316,6 +316,10 @@ export const mockMappedAppointmentsData = {
       provider: 'Dr James Cook',
       location: 'HIV Clinic',
       comments: 'Some additional notes',
+      appointmentNumber: '0001',
+      serviceUuid: 'ce03060e-1cbe-11ed-861d-0242ac120002',
+      appointmentKind: 'Scheduled',
+      status: 'Cancelled',
     },
     {
       id: 'cdb0676f-0805-4c3e-bfef-7757a005e892',
@@ -331,6 +335,10 @@ export const mockMappedAppointmentsData = {
       provider: 'Dr James Cook',
       location: 'TB Clinic',
       comments: 'Some additional notes here',
+      appointmentNumber: '0001',
+      serviceUuid: 'c674bc34-1cbe-11ed-861d-0242ac120002',
+      appointmentKind: 'WalkIn',
+      status: 'Scheduled',
     },
   ],
 };

@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Row, Grid, Column, Tag } from '@carbon/react';
 import { MappedAppointment } from '../types/index';
 import styles from './appointment-details.scss';
+import { usePatientAppointmentHistory } from '../hooks/usePatientAppointmentHistory';
 
 export default function AppointmentDetails({ appointment }: { appointment: MappedAppointment }) {
   const { t } = useTranslation();
+  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid, new AbortController());
 
   return (
     <div className={styles.container}>
@@ -33,15 +35,15 @@ export default function AppointmentDetails({ appointment }: { appointment: Mappe
             <Row>
               <Column>
                 <span>{t('completed', 'Completed')}</span>
-                <p className={styles.appointmentHistoryLabel}>50</p>
+                <p className={styles.appointmentHistoryLabel}> {appointmentsCount.completededAppointments}</p>
                 <span>{t('cancelled', 'Cancelled')}</span>
-                <p className={styles.appointmentHistoryLabel}>10</p>
+                <p className={styles.appointmentHistoryLabel}> {appointmentsCount.cancelledAppointments} </p>
               </Column>
               <Column>
                 <span>{t('missed', 'Missed')}</span>
-                <p className={styles.appointmentHistoryMissedLabel}>20</p>
+                <p className={styles.appointmentHistoryMissedLabel}> {appointmentsCount.missedAppointments}</p>
                 <span>{t('upcoming', 'Upcoming')}</span>
-                <p className={styles.appointmentHistoryLabel}>6</p>
+                <p className={styles.appointmentHistoryLabel}> {appointmentsCount.upcomingAppointments}</p>
               </Column>
             </Row>
           </Column>
