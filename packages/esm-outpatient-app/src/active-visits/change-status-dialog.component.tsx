@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import {
   Button,
+  InlineLoading,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -36,7 +37,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState();
   const { priorities } = usePriority();
-  const { statuses } = useStatus();
+  const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
 
   const changeQueueStatus = useCallback(() => {
@@ -86,9 +87,13 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
               onChange={(event) => setStatus(event.toString())}
               name="radio-button-group"
               valueSelected="default-selected">
-              {statuses.map(({ uuid, display, name }) => (
-                <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-              ))}
+              {isLoading ? (
+                <InlineLoading description={t('loading', 'Loading...')} />
+              ) : (
+                statuses.map(({ uuid, display, name }) => (
+                  <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+                ))
+              )}
             </RadioButtonGroup>
           </FormGroup>
 
