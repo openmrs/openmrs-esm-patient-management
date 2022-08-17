@@ -15,6 +15,7 @@ import { showNotification, showToast, toDateObjectStrict, toOmrsIsoString } from
 import { updateQueueEntry, usePriority, useStatus } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
+import { useSWRConfig } from 'swr';
 
 interface ChangeStatusDialogProps {
   patientUuid: string;
@@ -36,6 +37,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
   const [priority, setPriority] = useState();
   const { priorities } = usePriority();
   const { statuses } = useStatus();
+  const { mutate } = useSWRConfig();
 
   const changeQueueStatus = useCallback(() => {
     const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
@@ -57,6 +59,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
             description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
           });
           closeModal();
+          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
         }
       },
       (error) => {
