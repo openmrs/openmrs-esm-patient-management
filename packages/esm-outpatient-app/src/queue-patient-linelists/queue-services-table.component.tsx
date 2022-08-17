@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
-import { useAppointments } from './queue-linelist.resource';
+import { formatDatetime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { useServiceQueueEntries } from '../active-visits/active-visits-table.resource';
 
-const pageSize = 20;
-
-const AppointmentsTable: React.FC = () => {
+const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
-  const { appointmentQueueEntries, isLoading } = useAppointments();
-  const { results: paginatedAppointments } = usePagination(appointmentQueueEntries, pageSize);
+  const { serviceQueueEntries, isLoading } = useServiceQueueEntries();
+
+  const currentPathName: string = window.location.pathname;
+  let service = currentPathName.split('/')[4];
 
   const tableHeaders = useMemo(
     () => [
@@ -49,38 +49,38 @@ const AppointmentsTable: React.FC = () => {
 
   const tableRows = useMemo(
     () =>
-      paginatedAppointments?.map((appointment) => {
+      serviceQueueEntries?.map((entry) => {
         return {
-          id: appointment.uuid,
+          id: entry.id,
           name: {
             content: (
-              <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patient.uuid}/chart`}>
-                {appointment.patient.name}
+              <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>
+                {entry.name}
               </ConfigurableLink>
             ),
           },
-          returnDate: formatDatetime(parseDate(appointment.startDateTime.toString()), { mode: 'wide' }),
-          gender: appointment.patient?.gender,
-          age: appointment.patient.age,
-          visitType: appointment.appointmentKind,
-          phoneNumber: appointment.patient?.phoneNumber,
+          returnDate: formatDatetime(parseDate(entry.returnDate), { mode: 'wide' }),
+          gender: entry.gender,
+          age: entry.age,
+          visitType: entry.visitType,
+          phoneNumber: entry.phoneNumber,
         };
       }),
-    [paginatedAppointments],
+    [serviceQueueEntries],
   );
 
   return (
     <div>
       <QueuePatientBaseTable
-        title={t('scheduledAppointmentsList', 'Scheduled appointments patient list')}
+        title={t('alistOfClients', 'A list of clients waiting for ')}
         headers={tableHeaders}
         rows={tableRows}
-        patientData={paginatedAppointments}
-        serviceType=""
+        patientData={serviceQueueEntries}
+        serviceType={service}
         isLoading={isLoading}
       />
     </div>
   );
 };
 
-export default AppointmentsTable;
+export default ServicesTable;

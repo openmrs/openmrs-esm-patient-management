@@ -10,7 +10,7 @@ import {
   Visit,
 } from '@openmrs/esm-framework';
 import last from 'lodash-es/last';
-import { QueueEntryPayload, QueueServiceInfo } from '../types';
+import { MappedServiceQueueEntry, QueueEntryPayload, QueueServiceInfo } from '../types';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -29,6 +29,9 @@ interface VisitQueueEntry {
   locationWaitingFor: string | null;
   patient: {
     uuid: string;
+    age: string;
+    phoneNumber: string;
+    gender: string;
   };
   priority: {
     display: QueuePriority;
@@ -251,4 +254,32 @@ async function endPatientStatus(
       endedAt: endedAt,
     },
   });
+}
+
+export function useServiceQueueEntries() {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+
+  const mapServiceQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedServiceQueueEntry => ({
+    id: visitQueueEntry.queueEntry.uuid,
+    name: visitQueueEntry.queueEntry.display,
+    age: visitQueueEntry.patient ? visitQueueEntry.patient?.age : '--',
+    returnDate: visitQueueEntry.visit?.visitStartDateTime,
+    visitType: visitQueueEntry.visit?.visitType?.display,
+    phoneNumber: visitQueueEntry.patient ? visitQueueEntry.patient?.phoneNumber : '--',
+    gender: visitQueueEntry.patient ? visitQueueEntry.patient?.gender : '--',
+    patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
+  });
+
+  const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
+
+  return {
+    serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : null,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
 }

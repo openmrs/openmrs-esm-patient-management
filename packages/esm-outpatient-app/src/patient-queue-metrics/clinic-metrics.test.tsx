@@ -1,23 +1,33 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 
 import ClinicMetrics from './clinic-metrics.component';
-import { mockMetrics, mockServices } from '../../__mocks__/metrics.mock';
+import { mockMetrics } from '../../__mocks__/metrics.mock';
 import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockLocations } from '../../../../__mocks__/locations.mock';
+import { mockServiceTypes } from '../../../../__mocks__/appointments.mock';
+import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
 
 jest.mock('./queue-metrics.resource.ts', () => {
   const originalModule = jest.requireActual('./queue-metrics.resource.ts');
 
   return {
     ...originalModule,
-    useServices: jest.fn().mockImplementation(() => ({
-      services: mockServices,
-    })),
+    useServices: jest.fn().mockImplementation(() => ({ services: mockServiceTypes.data })),
+  };
+});
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    useLocations: jest.fn().mockImplementation(() => mockLocations.data),
+    useSession: jest.fn().mockImplementation(() => mockSession.data),
   };
 });
 
@@ -25,11 +35,6 @@ describe('Clinic metrics', () => {
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     const user = userEvent.setup();
 
-    mockedUseConfig.mockReturnValue({
-      concepts: {
-        serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-      },
-    });
     mockedOpenmrsFetch.mockReturnValueOnce({ data: mockMetrics });
 
     renderMetrics();
@@ -44,13 +49,8 @@ describe('Clinic metrics', () => {
     expect(screen.getAllByText(/patient list/i));
 
     // Select a different service to show metrics for
-    const serviceDropdown = screen.getByRole('button', { name: /triage open menu/i });
-
-    await user.click(serviceDropdown);
-    await user.click(screen.getByRole('option', { name: /clinical consultation/i }));
-
-    expect(screen.getByRole('button', { name: /clinical consultation/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /triage/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Select a service/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open menu/i }));
   });
 });
 

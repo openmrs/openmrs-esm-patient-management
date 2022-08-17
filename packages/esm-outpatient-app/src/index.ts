@@ -23,6 +23,11 @@ function setupOpenMRS() {
       title: ([x]) => `Patient Lists / ${x}`,
       parent: `${window.spaBase}`,
     },
+    {
+      path: `${window.spaBase}/queue-list/:value?`,
+      title: ([x]) => `Patient Lists / ${x}`,
+      parent: `${window.spaBase}`,
+    },
   ]);
 
   defineConfigSchema(moduleName, configSchema);
@@ -50,6 +55,12 @@ function setupOpenMRS() {
           options,
         ),
         route: /^appointments-list/,
+        online: true,
+        offline: true,
+      },
+      {
+        load: getAsyncLifecycle(() => import('./queue-patient-linelists/queue-services-table.component'), options),
+        route: /^queue-list/,
         online: true,
         offline: true,
       },
