@@ -97,6 +97,7 @@
   "selectAppointmentKind": "Select an appointment kind",
   "selectAppointmentLocation": "Select where the appointment will take place",
   "selectAppointmentStatus": "Select status",
+  "selectedService": "Selected service ",
   "selectLocation": "Select a location",
   "selectProvider": "Select a provider",
   "selectService": "Select a service",

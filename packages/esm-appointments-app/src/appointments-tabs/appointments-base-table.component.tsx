@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -21,6 +21,8 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  DataTableHeader,
+  Dropdown,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
@@ -30,12 +32,21 @@ import AppointmentDetails from '../appointment-details/appointment-details.compo
 import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
+import { useServices } from './appointments-table.resource';
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
   isLoading: Boolean;
   tableHeading: String;
   mutate?: () => void;
 }
+
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
@@ -85,6 +96,46 @@ function ServiceIcon({ service }) {
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading, mutate }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
+  const [filter, setFilter] = useState('');
+  const { services } = useServices();
+
+  useEffect(() => {
+    if (filter) {
+      setFilteredRows(appointments?.filter((entry) => entry.serviceType === filter));
+      setFilter('');
+    }
+  }, [filter, filteredRows, appointments]);
+
+  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
+    return rowIds.filter((rowId) =>
+      headers.some(({ key }) => {
+        const cellId = getCellId(rowId, key);
+        const filterableValue = cellsById[cellId].value;
+        const filterTerm = inputValue.toLowerCase();
+
+        if (typeof filterableValue === 'boolean') {
+          return false;
+        }
+        if (filterableValue.hasOwnProperty('content')) {
+          if (Array.isArray(filterableValue.content.props.children)) {
+            return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
+          }
+          if (typeof filterableValue.content.props.children === 'object') {
+            return ('' + filterableValue.content.props.children.props.children.props.children)
+              .toLowerCase()
+              .includes(filterTerm);
+          }
+          return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
+        }
+        return ('' + filterableValue).toLowerCase().includes(filterTerm);
+      }),
+    );
+  };
+
+  const handleServiceTypeChange = ({ selectedItem }) => {
+    setFilter(selectedItem.name);
+  };
 
   const tableHeaders = useMemo(
     () => [
@@ -123,7 +174,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
   );
 
   const tableRows = useMemo(() => {
-    return appointments?.map((appointment) => ({
+    return (filteredRows.length ? filteredRows : appointments)?.map((appointment) => ({
       ...appointment,
       name: {
         content: (
@@ -147,7 +198,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         content: <Button kind="ghost">Start</Button>,
       },
     }));
-  }, [appointments]);
+  }, [filteredRows, appointments]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -186,6 +237,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         </Button>
       </div>
       <DataTable
+        filterRows={handleFilter}
         headers={tableHeaders}
         overflowMenuOnHover={isDesktop(layout) ? true : false}
         rows={tableRows}
@@ -193,8 +245,19 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
           <TableContainer className={styles.tableContainer}>
-            <TableToolbar>
-              <TableToolbarContent>
+            <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+              <TableToolbarContent className={styles.toolbarContent}>
+                <Dropdown
+                  id="serviceFilter"
+                  initialSelectedItem={{ name: 'All' }}
+                  label=""
+                  titleText={t('selectedService', 'Selected service ') + ':'}
+                  type="inline"
+                  items={[{ name: 'All' }, ...services]}
+                  itemToString={(item) => (item ? item.name : '')}
+                  onChange={handleServiceTypeChange}
+                  size="sm"
+                />
                 <TableToolbarSearch
                   className={styles.search}
                   expanded
