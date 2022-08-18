@@ -118,7 +118,7 @@ const VisitHeader: React.FC = () => {
               <HeaderGlobalAction
                 className={styles.headerGlobalBarCloseButton}
                 aria-label={t('close', 'Close')}
-                onClick={() => setShowVisitHeader((prevState) => !prevState)}>
+                onClick={onClosePatientChart}>
                 <CloseFilled size={20} />
               </HeaderGlobalAction>
             </HeaderGlobalBar>
@@ -137,6 +137,7 @@ const VisitHeader: React.FC = () => {
     showVisitHeader,
     t,
     toggleSideMenu,
+    onClosePatientChart,
   ]);
 
   return <HeaderContainer render={render} />;
