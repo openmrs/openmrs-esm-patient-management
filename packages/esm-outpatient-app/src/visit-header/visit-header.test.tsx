@@ -1,7 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useAssignedExtensions, useLayoutType, useOnClickOutside, usePatient, useVisit } from '@openmrs/esm-framework';
+
+import {
+  useAssignedExtensions,
+  useLayoutType,
+  useOnClickOutside,
+  usePatient,
+  useVisit,
+  navigate,
+} from '@openmrs/esm-framework';
 import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from './workspaces';
 import VisitHeader from './visit-header.component';
@@ -35,11 +43,12 @@ jest.mock('./workspaces', () => {
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
+    navigate: jest.fn(),
   };
 });
 
 describe('Visit Header', () => {
-  xtest('should display visit header and left nav bar hamburger icon', async () => {
+  test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
@@ -87,7 +96,7 @@ describe('Visit Header', () => {
 
     // Should close the visit-header
     await user.click(closeButton);
-    expect(screen.queryByRole('banner', { name: /OpenMRS/i })).not.toBeInTheDocument();
+    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
   });
 
   test('should display a truncated name when the patient name is very long', async () => {
