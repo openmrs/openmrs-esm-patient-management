@@ -9,7 +9,7 @@ import { useScheduledVisits } from './hooks/useScheduledVisits';
 import StartVisitForm from './visit-form/visit-form.component';
 import isNil from 'lodash-es/isNil';
 interface PatientSearchProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
+  toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
 }
 
@@ -106,13 +106,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
   }
 
   if (isNil(appointments.futureVisits) && isNil(appointments.recentVisits)) {
-    return (
-      <StartVisitForm
-        toggleSearchType={() => SearchTypes.VISIT_FORM}
-        patientUuid={patientUuid}
-        closePanel={() => false}
-      />
-    );
+    toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, true);
   }
 
   return (
@@ -123,7 +117,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
           renderIcon={ArrowLeft}
           iconDescription="Back to search results"
           size="sm"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
+          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid, false)}>
           <span>{t('backToSearchResults', 'Back to search results')}</span>
         </Button>
       </div>
@@ -145,7 +139,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
         <Button
           kind="ghost"
           iconDescription="Start another visit type"
-          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid)}>
+          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, false)}>
           {t('anotherVisitType', 'Start another visit type')}
         </Button>
       </div>
@@ -154,7 +148,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
         <Button
           className={styles.button}
           kind="secondary"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
+          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid, false)}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">
