@@ -53,9 +53,10 @@ interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
   closePanel: () => void;
+  mode: boolean;
 }
 
-const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel }) => {
+const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -213,14 +214,25 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           </Row>
         )}
         <div className={styles.backButton}>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-            iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-            size="sm"
-            onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-            <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-          </Button>
+          {mode === true ? (
+            <Button
+              kind="ghost"
+              renderIcon={ArrowLeft}
+              iconDescription="Back to search results"
+              size="sm"
+              onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
+              <span>{t('backToSearchResults', 'Back to search results')}</span>
+            </Button>
+          ) : (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
+              size="sm"
+              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
+              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
+            </Button>
+          )}
         </div>
         <Stack gap={8} className={styles.container}>
           <section className={styles.section}>

@@ -16,10 +16,12 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
   const [selectedPatientUuid, setSelectedPatientUuid] = useState('');
+  const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
 
-  const toggleSearchType = (searchType: SearchTypes, patientUuid: string = '') => {
+  const toggleSearchType = (searchType: SearchTypes, patientUuid: string = '', mode: boolean = false) => {
     setSearchType(searchType);
     setSelectedPatientUuid(patientUuid);
+    setNewVisitMode(mode);
   };
 
   return (
@@ -35,7 +37,12 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
           ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
           ) : searchType === SearchTypes.VISIT_FORM ? (
-            <VisitForm patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} closePanel={closePanel} />
+            <VisitForm
+              patientUuid={selectedPatientUuid}
+              toggleSearchType={toggleSearchType}
+              closePanel={closePanel}
+              mode={newVisitMode}
+            />
           ) : null}
         </div>
       </Overlay>
