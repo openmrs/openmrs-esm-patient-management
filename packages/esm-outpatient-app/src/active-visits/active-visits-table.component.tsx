@@ -118,27 +118,14 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
   );
 }
 
-function EditMenu({
-  patientUuid,
-  queueUuid,
-  queueEntryUuid,
-  visitUuid,
-}: {
-  patientUuid: string;
-  queueEntryUuid: string;
-  queueUuid: string;
-  visitUuid: string;
-}) {
+function EditMenu({ queueEntry }: { queueEntry: MappedVisitQueueEntry }) {
   const { t } = useTranslation();
   const launchEditPriorityModal = useCallback(() => {
     const dispose = showModal('edit-queue-entry-status-modal', {
       closeModal: () => dispose(),
-      patientUuid,
-      queueEntryUuid,
-      queueUuid,
-      visitUuid,
+      queueEntry,
     });
-  }, [patientUuid, queueEntryUuid, queueUuid, visitUuid]);
+  }, [queueEntry]);
 
   return (
     <Button
@@ -387,12 +374,7 @@ function ActiveVisitsTable() {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            <EditMenu
-                              queueEntryUuid={tableRows?.[index]?.id}
-                              queueUuid={tableRows?.[index]?.queueUuid}
-                              patientUuid={tableRows?.[index]?.patientUuid}
-                              visitUuid={tableRows?.[index]?.visitUuid}
-                            />
+                            <EditMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu patientUuid={tableRows?.[index]?.patientUuid} />

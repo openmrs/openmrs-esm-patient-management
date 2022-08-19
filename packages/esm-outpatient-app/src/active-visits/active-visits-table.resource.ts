@@ -32,6 +32,7 @@ interface VisitQueueEntry {
   };
   priority: {
     display: QueuePriority;
+    uuid: string;
   };
   priorityComment: string | null;
   providerWaitingFor: null;
@@ -47,6 +48,7 @@ interface VisitQueueEntry {
   startedAt: string;
   status: {
     display: QueueStatus;
+    uuid: string;
   };
   uuid: string;
   visit: Visit;
@@ -59,13 +61,16 @@ export interface MappedVisitQueueEntry {
   patientUuid: string;
   priority: MappedQueuePriority;
   priorityComment: string;
+  priorityUuid: string;
   service: QueueService;
   status: QueueStatus;
+  statusUuid: string;
   visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
   waitTime: string;
   queueUuid: string;
+  queueEntryUuid: string;
 }
 
 interface UseVisitQueueEntries {
@@ -170,8 +175,10 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
         ? 'Priority'
         : visitQueueEntry.queueEntry.priority.display,
     priorityComment: visitQueueEntry.queueEntry.priorityComment,
+    priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
     service: visitQueueEntry.queueEntry.queue.service.display,
     status: visitQueueEntry.queueEntry.status.display,
+    statusUuid: visitQueueEntry.queueEntry.status.uuid,
     waitTime: visitQueueEntry.queueEntry.startedAt
       ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
       : '--',
@@ -179,6 +186,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     visitType: visitQueueEntry.visit?.visitType?.display,
     visitUuid: visitQueueEntry.visit?.uuid,
     queueUuid: visitQueueEntry.queueEntry.queue.uuid,
+    queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
   const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
