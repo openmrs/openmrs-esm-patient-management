@@ -13,29 +13,25 @@ import {
   Switch,
 } from '@carbon/react';
 import { showNotification, showToast, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
-import { updateQueueEntry, usePriority, useStatus } from './active-visits-table.resource';
+import { MappedVisitQueueEntry, updateQueueEntry, usePriority, useStatus } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 import { useSWRConfig } from 'swr';
 
 interface ChangeStatusDialogProps {
-  patientUuid: string;
-  queueUuid: string;
-  queueEntryUuid: string;
-  visitUuid: string;
+  queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
 }
 
-const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
-  patientUuid,
-  queueUuid,
-  queueEntryUuid,
-  visitUuid,
-  closeModal,
-}) => {
+const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState();
+
+  const [status, setStatus] = useState(queueEntry.statusUuid);
+  const [priority, setPriority] = useState(queueEntry.priorityUuid);
+  const [visitUuid, setVisitUuid] = useState(queueEntry.visitUuid);
+  const [queueUuid, setQueueUuid] = useState(queueEntry.queueUuid);
+  const [queueEntryUuid, setQueueEntryUuid] = useState(queueEntry.queueEntryUuid);
+  const [patientUuid, setPatientUuid] = useState(queueEntry.patientUuid);
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
@@ -100,13 +96,14 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
           <FormGroup legendText="">
             <RadioButtonGroup
               className={styles.radioButtonGroup}
-              defaultSelected="default-selected"
+              valueSelected={status}
               orientation="vertical"
               onChange={(event) => setStatus(event.toString())}
-              name="radio-button-group"
-              valueSelected="default-selected">
+              name="radio-button-group">
               {isLoading ? (
                 <InlineLoading description={t('loading', 'Loading...')} />
+              ) : statuses?.length === 0 ? (
+                <p>{t('noStatusAvailable', 'No Status Available')}</p>
               ) : (
                 statuses.map(({ uuid, display, name }) => (
                   <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
@@ -119,6 +116,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({
             <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
             <ContentSwitcher
               size="sm"
+              selectedIndex={1}
               onChange={(event) => {
                 setPriority(event.name as any);
               }}>
