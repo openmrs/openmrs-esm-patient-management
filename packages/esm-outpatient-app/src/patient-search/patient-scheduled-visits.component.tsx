@@ -105,7 +105,7 @@ const PatientScheduledVisits: React.FC<PatientSearchProps> = ({ toggleSearchType
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (isNil(appointments.futureVisits) && isNil(appointments.recentVisits)) {
+  if (isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits)) {
     toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, true);
   }
 
