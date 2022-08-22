@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeaderGlobalAction } from '@carbon/react';
 import { Close, Search } from '@carbon/react/icons';
@@ -6,18 +6,15 @@ import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import styles from './patient-search-icon.scss';
+import { useLocation, useParams } from 'react-router-dom';
 
-interface PatientSearchLaunchProps {
-  location?: {
-    pathname: string;
-  };
-}
+interface PatientSearchLaunchProps {}
 
-const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
+const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const page = props?.location?.pathname?.split('/')?.[1];
-  const query = page === 'search' ? props?.location?.pathname?.split('/')?.[2] : '';
+  const { pathname } = useLocation();
+  const page = useMemo(() => pathname?.split('/')[1], [pathname]);
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [canClickOutside, setCanClickOutside] = useState(false);
 
@@ -59,11 +56,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = (props) => {
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
       {showSearchInput &&
-        (isDesktop(layout) ? (
-          <CompactPatientSearchComponent query={query} searchPage={page === 'search'} />
-        ) : (
-          <PatientSearchOverlay onClose={handleGlobalAction} query={query} />
-        ))}
+        (isDesktop(layout) ? <CompactPatientSearchComponent /> : <PatientSearchOverlay onClose={handleGlobalAction} />)}
 
       <div className={`${showSearchInput && styles.closeButton}`}>
         <HeaderGlobalAction
