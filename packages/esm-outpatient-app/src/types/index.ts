@@ -296,3 +296,14 @@ export interface QueueServiceInfo {
   name: string;
   description: string;
 }
+
+export interface MappedServiceQueueEntry {
+  id: string;
+  name: string;
+  age: string;
+  gender: string;
+  phoneNumber: string;
+  visitType: string;
+  returnDate: string;
+  patientUuid: string;
+}

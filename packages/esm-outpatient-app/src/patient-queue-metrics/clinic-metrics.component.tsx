@@ -1,28 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DataTableSkeleton } from '@carbon/react';
 import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
-import { useSession } from '@openmrs/esm-framework';
+import { useSession, useLocations } from '@openmrs/esm-framework';
+
+export interface Service {
+  uuid: string;
+  display: string;
+}
 
 function ClinicMetrics() {
   const { t } = useTranslation();
+  const locations = useLocations();
+  const session = useSession();
+
   const { metrics, isLoading } = useMetrics();
   const { totalScheduledAppointments } = useAppointmentMetrics();
   const [userLocation, setUserLocation] = useState('');
-  const { services } = useServices(userLocation);
-  const session = useSession();
-  const [selectedService, setSelectedService] = useState('Triage');
+  const { allServices } = useServices(userLocation);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedServiceUuid, setSelectedServiceUuid] = useState('');
   const { serviceCount } = useServiceMetricsCount(selectedService);
 
-  if (!userLocation && session?.sessionLocation?.uuid) {
-    setUserLocation(session?.sessionLocation?.uuid);
-  }
+  useEffect(() => {
+    if (!userLocation && session?.sessionLocation !== null) {
+      setUserLocation(session?.sessionLocation?.uuid);
+    } else if (!userLocation && locations) {
+      setUserLocation([...locations].shift()?.uuid);
+    }
+  }, [session, locations, userLocation]);
 
-  const handleServiceCountChange = ({ selectedItem }: { selectedItem: string }) => {
-    setSelectedService(selectedItem);
+  const handleServiceCountChange = ({ selectedItem }: { selectedItem: Service }) => {
+    setSelectedService(selectedItem.display);
+    setSelectedServiceUuid(selectedItem.uuid);
   };
 
   if (isLoading) {
@@ -43,20 +56,22 @@ function ClinicMetrics() {
           label={t('patients', 'Patients')}
           value={serviceCount}
           headerLabel={t('waitingFor', 'Waiting for:')}
-          service={selectedService}>
+          service={selectedService}
+          serviceUuid={selectedServiceUuid}>
           <Dropdown
             id="inline"
-            initialSelectedItem={t('triage', 'Triage')}
-            label=""
             type="inline"
-            items={[...services]}
+            items={allServices?.length ? [...allServices] : []}
+            itemToString={(item) => (item ? item.display : '')}
             onChange={handleServiceCountChange}
+            label={t('selectService', 'Select a service')}
           />
         </MetricsCard>
         <MetricsCard
           label={t('minutes', 'Minutes')}
           value={metrics ? metrics.average_wait_time : 0}
           headerLabel={t('averageWaitTime', 'Average wait time today')}
+          service="waitTime"
         />
       </div>
     </>

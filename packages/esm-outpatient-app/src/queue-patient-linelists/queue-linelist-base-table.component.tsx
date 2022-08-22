@@ -17,6 +17,7 @@ import {
   TableToolbarSearch,
   Tag,
   Tile,
+  DataTableSkeleton,
 } from '@carbon/react';
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
@@ -36,6 +37,7 @@ interface QueuePatientTableProps {
   headers: Array<any>;
   rows: any;
   serviceType: string;
+  isLoading: boolean;
 }
 
 const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
@@ -44,6 +46,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   headers,
   rows,
   serviceType,
+  isLoading,
 }) => {
   const { t } = useTranslation();
 
@@ -73,6 +76,10 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
     );
   };
 
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+
   return (
     <div className={styles.container}>
       <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
@@ -87,7 +94,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </p>
         </div>
 
-        <Button kind="ghost" size="small" renderIcon={<OverflowMenuVertical size={16} />}>
+        <Button kind="ghost" size="small" renderIcon={(props) => <OverflowMenuVertical size={16} {...props} />}>
           {t('actions', 'Actions')}
         </Button>
       </div>
@@ -99,7 +106,11 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </Tag>
 
           <div className={styles.actionsBtn}>
-            <Button renderIcon={<Filter size={16} />} kind="ghost">
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Filter size={16} {...props} />}
+              iconDescription={t('filter', 'Filter (1)')}
+              size="sm">
               {t('filter', 'Filter (1)')}
             </Button>
           </div>
