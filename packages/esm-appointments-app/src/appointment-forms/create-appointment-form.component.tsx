@@ -27,6 +27,7 @@ import {
   useLayoutType,
   ExtensionSlot,
   useConfig,
+  usePatient,
 } from '@openmrs/esm-framework';
 import { appointmentsSearchUrl, saveAppointment, useServices, fetchAppointments } from './appointment-forms.resource';
 import { AppointmentPayload } from '../types';
@@ -40,10 +41,10 @@ import styles from './create-appointment-form.scss';
 
 interface AppointmentFormProps {
   patientUuid: string;
-  patient: fhir.Patient;
 }
 
-const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, patient }) => {
+const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid }) => {
+  const { patient } = usePatient(patientUuid);
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { t } = useTranslation();
@@ -141,22 +142,21 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
     );
   };
 
-  if (isLoading) {
+  if (isLoading && !patient) {
     return <SearchSkeleton role="progressbar" />;
   }
   return (
     <div>
-      {patient ? (
-        <div className={styles.patientInfo}>
-          <ExtensionSlot
-            extensionSlotName="patient-header-slot"
-            state={{
-              patient,
-              patientUuid: patient.id,
-            }}
-          />
-        </div>
-      ) : null}
+      <div className={styles.patientInfo}>
+        <ExtensionSlot
+          extensionSlotName="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: patientUuid,
+          }}
+        />
+      </div>
+
       <div className={styles.formWrapper}>
         <section className={styles.formGroup}>
           <span>{t('appointmentDateTime', 'Appointment Date and Time')}</span>
@@ -364,7 +364,7 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid, p
           />
         </section>
         <section className={styles.buttonGroup}>
-          <Button onClick={() => {}} kind="secondary">
+          <Button onClick={() => closeOverlay()} kind="secondary">
             {t('discard', 'Discard')}
           </Button>
           <Button disabled={!selectedService} onClick={handleSubmit}>
