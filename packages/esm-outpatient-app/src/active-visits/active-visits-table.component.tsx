@@ -32,7 +32,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit, Group, InProgress } from '@carbon/react/icons';
-import { useLayoutType, navigate, showModal, interpolateUrl, isDesktop, useSession } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  navigate,
+  showModal,
+  interpolateUrl,
+  isDesktop,
+  useSession,
+  useLocations,
+} from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -156,6 +164,7 @@ function ActiveVisitsTable() {
   const { t } = useTranslation();
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
+  const locations = useLocations();
   const { services } = useServices(userLocation);
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
@@ -166,9 +175,13 @@ function ActiveVisitsTable() {
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
 
-  if (!userLocation && session?.sessionLocation?.uuid) {
-    setUserLocation(session?.sessionLocation?.uuid);
-  }
+  useEffect(() => {
+    if (!userLocation && session?.sessionLocation !== null) {
+      setUserLocation(session?.sessionLocation?.uuid);
+    } else if (!userLocation && locations) {
+      setUserLocation([...locations].shift()?.uuid);
+    }
+  }, [session, locations, userLocation]);
 
   useEffect(() => {
     if (filter) {
@@ -329,13 +342,13 @@ function ActiveVisitsTable() {
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
+              <TableToolbar
+                style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+                <TableToolbarContent className={styles.toolbarContent}>
                   <div className={styles.filterContainer}>
                     <Dropdown
                       id="serviceFilter"
-                      initialSelectedItem={'All'}
-                      label=""
+                      initialSelectedItem={{ display: 'All' }}
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
                       items={[{ display: 'All' }, ...services]}
