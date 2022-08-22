@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { Button } from '@carbon/react';
 import { CaretLeft, CaretRight } from '@carbon/react/icons';
 import styles from './pagination.scss';
+import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   hasMore: boolean;
@@ -10,6 +11,7 @@ interface PaginationProps {
   totalPages?: number;
 }
 const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCurrentPage, hasMore }) => {
+  const { t } = useTranslation();
   const decrementPage = useCallback(() => {
     setCurrentPage(Math.max(0, currentPage - 1));
   }, [currentPage, setCurrentPage]);
@@ -25,10 +27,11 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
   return (
     <div className={styles.paginationBar}>
       <Button
+        type="button"
         kind="ghost"
         hasIconOnly
-        iconDescription=""
-        renderIcon={<CaretLeft size={24} />}
+        iconDescription={t('previousPage', 'Previous page')}
+        renderIcon={CaretLeft}
         onClick={decrementPage}
         disabled={currentPage == 1}
       />
@@ -38,7 +41,8 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
             key={indx}
             kind="ghost"
             onClick={() => setCurrentPage(indx + 1)}
-            className={`${styles.paginationButton} ${indx + 1 === currentPage && styles.activeButton}`}>
+            className={`${styles.paginationButton} ${indx + 1 === currentPage && styles.activeButton}`}
+            type="button">
             {indx + 1}
           </Button>
         ))}
@@ -46,10 +50,11 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
       <Button
         kind="ghost"
         hasIconOnly
-        iconDescription=""
-        renderIcon={<CaretRight size={24} />}
+        iconDescription={t('nextPage', 'Next page')}
+        renderIcon={CaretRight}
         onClick={incrementPage}
         disabled={!hasMore && currentPage === totalPages}
+        type="button"
       />
     </div>
   );

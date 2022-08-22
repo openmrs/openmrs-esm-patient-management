@@ -85,3 +85,10 @@
 :global(.cds--tooltip--definition .cds--tooltip__trigger) {
   border-bottom: none;
 }
+
+.buttonCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
