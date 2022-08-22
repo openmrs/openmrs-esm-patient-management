@@ -6,7 +6,7 @@ import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import styles from './patient-search-icon.scss';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface PatientSearchLaunchProps {}
 

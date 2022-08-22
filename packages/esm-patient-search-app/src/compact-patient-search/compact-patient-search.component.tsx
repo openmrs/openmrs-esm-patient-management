@@ -11,20 +11,20 @@ interface CompactPatientSearchProps {
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ selectPatientAction }) => {
   const { pathname } = useLocation();
-  const searchPage = pathname.split('/')[1] === 'search';
+  const isSearchPage = pathname.split('/')[1] === 'search';
   const query = pathname.split('/')?.[2];
   const [searchTerm, setSearchTerm] = useState(query);
 
   const onSubmit = useCallback(
     (searchTerm) => {
-      if (!searchPage) {
+      if (!isSearchPage) {
         window.localStorage.setItem('searchReturnUrl', window.location.pathname);
       }
       navigate({
         to: `\${openmrsSpaBase}/search/${searchTerm}`,
       });
     },
-    [searchPage],
+    [isSearchPage],
   );
 
   const onClear = useCallback(() => {
@@ -40,7 +40,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ se
         onSubmit={onSubmit}
         onClear={onClear}
       />
-      {!!searchTerm && !searchPage && (
+      {!!searchTerm && !isSearchPage && (
         <div className={styles.floatingSearchResultsContainer}>
           <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} />
         </div>
