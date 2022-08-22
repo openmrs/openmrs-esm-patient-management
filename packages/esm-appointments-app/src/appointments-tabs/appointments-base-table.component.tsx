@@ -224,7 +224,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
   }
 
   return (
-    <div className={styles.container} data-floating-menu-container>
+    <div className={styles.container}>
       <div className={styles.headerContainer}>
         <span className={styles.heading}>{tableHeading}</span>
         <Button

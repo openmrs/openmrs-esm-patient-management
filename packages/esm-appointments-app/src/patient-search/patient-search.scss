@@ -1,0 +1,25 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.padded {
+  padding: spacing.$spacing-05;
+}
+
+[data-extension-id='patient-search-bar'] {
+  & > div {
+    width: 100%;
+    & form {
+      margin: 0.0125rem;
+    }
+    & input {
+      background-color: $ui-02;
+      border-bottom: none;
+      min-height: spacing.$spacing-09;
+    }
+
+    & button {
+      height: spacing.$spacing-09;
+    }
+  }
+}

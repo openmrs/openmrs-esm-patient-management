@@ -364,7 +364,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate =
       />
 
       <ButtonSet>
-        <Button className={styles.button} kind="secondary">
+        <Button onClick={closeOverlay} className={styles.button} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
         <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
