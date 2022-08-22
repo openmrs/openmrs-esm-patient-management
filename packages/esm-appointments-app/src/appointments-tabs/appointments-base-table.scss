@@ -56,6 +56,8 @@
 
 .tableContainer {
   background-color: $ui-01;
+  margin: 0 spacing.$spacing-05;
+  padding: 0;
 
   a {
     text-decoration: none;
@@ -65,30 +67,9 @@
     color: $text-02;
   }
 
-  :global(.cds--data-table-content) {
-    border: 1px solid $ui-03;
-    overflow: visible;
-  }
-
-  :global(.cds--data-table-header) {
-    padding: 0;
-  }
-
-  :global(.cds--table-toolbar) {
-    position: relative;
-    height: 2rem;
-    overflow: visible;
-    background-color: $ui-01;
-  }
-
-  :global(.cds--toolbar-content),
-  :global(.cds--toolbar-search-container-expandable) {
-    height: 2rem;
-    margin-bottom: 0.25rem;
-  }
-
-  :global(.cds--data-table--zebra tbody tr[data-child-row]:hover td) {
-    background-color: $ui-02;
+  .toolbarContent {
+    height: spacing.$spacing-07;
+    margin-bottom: spacing.$spacing-02;
   }
 }
 
