@@ -7,19 +7,6 @@ export enum SearchTypes {
   SCHEDULED_VISITS = 'scheduled-visits',
 }
 
-interface ObsData {
-  concept: {
-    display: string;
-    uuid: string;
-  };
-  value?: string | any;
-  groupMembers?: Array<{
-    concept: { uuid: string; display: string };
-    value?: string | any;
-  }>;
-  obsDatetime: string;
-}
-
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
@@ -151,4 +138,10 @@ export interface Provider {
   display: string;
   comments: string;
   response?: string;
+}
+
+export enum DurationPeriod {
+  monthly,
+  weekly,
+  daily,
 }

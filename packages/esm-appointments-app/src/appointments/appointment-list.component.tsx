@@ -6,6 +6,8 @@ import BookedAppointments from '../appointments-tabs/booked-appointments.compone
 import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
 import CancelledAppointment from '../appointments-tabs/cancelled-appointments.component';
 import styles from './appointment-list.scss';
+import { navigate } from '@openmrs/esm-framework';
+import { spaBasePath } from '../constants';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -38,6 +40,7 @@ const AppointmentList: React.FC = () => {
       <Button
         className={styles.calendarButton}
         kind="primary"
+        onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
         renderIcon={(props) => <Calendar size={16} {...props} />}
         data-floating-menu-primary-focus
         iconDescription={t('viewCalendar', 'View Calendar')}>
