@@ -6,7 +6,7 @@ const PatientSearchRootComponent: React.FC = () => {
   return (
     <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}search`}>
       <Routes>
-        <Route path="/:query" element={<PatientSearchPageComponent />} />
+        <Route path="" element={<PatientSearchPageComponent />} />
       </Routes>
     </BrowserRouter>
   );

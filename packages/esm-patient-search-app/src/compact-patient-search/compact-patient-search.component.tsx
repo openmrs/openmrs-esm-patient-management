@@ -5,28 +5,32 @@ import PatientSearchBar from '../patient-search-bar/patient-search-bar.component
 import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
-  query: string;
-  searchPage: boolean;
+  isSearchPage: boolean;
+  initialSearchTerm: string;
   selectPatientAction?: (patientUuid: string) => undefined;
+  shouldNavigateToPatientSearchPage?: boolean;
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
-  query,
-  searchPage = false,
   selectPatientAction,
+  initialSearchTerm,
+  isSearchPage,
+  shouldNavigateToPatientSearchPage,
 }) => {
-  const [searchTerm, setSearchTerm] = useState(query);
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   const onSubmit = useCallback(
     (searchTerm) => {
-      if (!searchPage) {
-        window.localStorage.setItem('searchReturnUrl', window.location.pathname);
+      if (shouldNavigateToPatientSearchPage) {
+        if (!isSearchPage) {
+          window.localStorage.setItem('searchReturnUrl', window.location.pathname);
+        }
+        navigate({
+          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(searchTerm)}`,
+        });
       }
-      navigate({
-        to: `\${openmrsSpaBase}/search/${searchTerm}`,
-      });
     },
-    [searchPage],
+    [isSearchPage, shouldNavigateToPatientSearchPage],
   );
 
   const onClear = useCallback(() => {
@@ -37,12 +41,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     <div className={styles.patientSearchBar}>
       <PatientSearchBar
         small
-        initialSearchTerm={query ?? ''}
+        initialSearchTerm={initialSearchTerm ?? ''}
         onChange={setSearchTerm}
         onSubmit={onSubmit}
         onClear={onClear}
       />
-      {!!searchTerm && !searchPage && (
+      {!!searchTerm && !isSearchPage && (
         <div className={styles.floatingSearchResultsContainer}>
           <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} />
         </div>

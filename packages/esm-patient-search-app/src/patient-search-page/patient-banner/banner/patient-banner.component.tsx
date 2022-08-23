@@ -139,7 +139,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             <Button
               ref={showContactDetailsRef}
               kind="ghost"
-              renderIcon={showContactDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              renderIcon={showContactDetails ? ChevronUp : ChevronDown}
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}>
