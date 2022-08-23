@@ -6,7 +6,7 @@ const PatientSearchIconWrapper = () => {
   return (
     <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
       <Routes>
-        <Route path="*" element={<PatientSearchLaunch />} />
+        <Route path=":page/*" element={<PatientSearchLaunch />} />
       </Routes>
     </BrowserRouter>
   );

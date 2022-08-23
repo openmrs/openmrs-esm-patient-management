@@ -3,28 +3,34 @@ import { navigate } from '@openmrs/esm-framework';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import styles from './compact-patient-search.scss';
-import { useLocation, useParams } from 'react-router-dom';
 
 interface CompactPatientSearchProps {
+  isSearchPage: boolean;
+  initialSearchTerm: string;
   selectPatientAction?: (patientUuid: string) => undefined;
+  shouldNavigateToPatientSearchPage?: boolean;
 }
 
-const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ selectPatientAction }) => {
-  const { pathname } = useLocation();
-  const isSearchPage = pathname.split('/')[1] === 'search';
-  const query = pathname.split('/')?.[2];
-  const [searchTerm, setSearchTerm] = useState(query);
+const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
+  selectPatientAction,
+  initialSearchTerm,
+  isSearchPage,
+  shouldNavigateToPatientSearchPage,
+}) => {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   const onSubmit = useCallback(
     (searchTerm) => {
-      if (!isSearchPage) {
-        window.localStorage.setItem('searchReturnUrl', window.location.pathname);
+      if (shouldNavigateToPatientSearchPage) {
+        if (!isSearchPage) {
+          window.localStorage.setItem('searchReturnUrl', window.location.pathname);
+        }
+        navigate({
+          to: `\${openmrsSpaBase}/search?query=${encodeURIComponent(searchTerm)}`,
+        });
       }
-      navigate({
-        to: `\${openmrsSpaBase}/search/${searchTerm}`,
-      });
     },
-    [isSearchPage],
+    [isSearchPage, shouldNavigateToPatientSearchPage],
   );
 
   const onClear = useCallback(() => {
@@ -35,7 +41,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({ se
     <div className={styles.patientSearchBar}>
       <PatientSearchBar
         small
-        initialSearchTerm={query ?? ''}
+        initialSearchTerm={initialSearchTerm ?? ''}
         onChange={setSearchTerm}
         onSubmit={onSubmit}
         onClear={onClear}

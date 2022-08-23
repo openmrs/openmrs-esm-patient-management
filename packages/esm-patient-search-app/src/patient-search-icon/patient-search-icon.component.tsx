@@ -6,30 +6,33 @@ import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import styles from './patient-search-icon.scss';
-import { useLocation } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 interface PatientSearchLaunchProps {}
 
 const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { pathname } = useLocation();
-  const page = useMemo(() => pathname?.split('/')[1], [pathname]);
+  const { page } = useParams();
+  const isSearchPage = useMemo(() => page === 'search', [page]);
+  const [searchParams] = useSearchParams();
+  const initialSearchTerm = isSearchPage ? searchParams.get('query') : '';
+
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [canClickOutside, setCanClickOutside] = useState(false);
 
   const handleCloseSearchInput = useCallback(() => {
     // Clicking outside of the search input when "/search" page is open should not close the search input.
-    if (page !== 'search') {
+    if (!isSearchPage) {
       setShowSearchInput(false);
     }
-  }, [setShowSearchInput, page]);
+  }, [setShowSearchInput, isSearchPage]);
 
   const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
 
   const handleGlobalAction = useCallback(() => {
     if (showSearchInput) {
-      if (page === 'search') {
+      if (isSearchPage) {
         navigate({
           to: window.localStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
         });
@@ -39,15 +42,15 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     } else {
       setShowSearchInput(true);
     }
-  }, [page, setShowSearchInput, showSearchInput]);
+  }, [isSearchPage, setShowSearchInput, showSearchInput]);
 
   useEffect(() => {
     // Search input should always be open when we direct to the search page.
-    setShowSearchInput(page === 'search');
-    if (page === 'search') {
+    setShowSearchInput(isSearchPage);
+    if (isSearchPage) {
       setCanClickOutside(false);
     }
-  }, [page]);
+  }, [isSearchPage]);
 
   useEffect(() => {
     showSearchInput ? setCanClickOutside(true) : setCanClickOutside(false);
@@ -56,7 +59,15 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
       {showSearchInput &&
-        (isDesktop(layout) ? <CompactPatientSearchComponent /> : <PatientSearchOverlay onClose={handleGlobalAction} />)}
+        (isDesktop(layout) ? (
+          <CompactPatientSearchComponent
+            isSearchPage={isSearchPage}
+            initialSearchTerm={initialSearchTerm}
+            shouldNavigateToPatientSearchPage
+          />
+        ) : (
+          <PatientSearchOverlay onClose={handleGlobalAction} />
+        ))}
 
       <div className={`${showSearchInput && styles.closeButton}`}>
         <HeaderGlobalAction
