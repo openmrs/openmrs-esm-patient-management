@@ -28,10 +28,17 @@
   right: 0;
   z-index: 9999;
   background-color: $ui-01;
-  overflow: hidden;
-  padding-top: spacing.$spacing-09;
-  display: grid;
-  grid-template-rows: 1fr auto;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+
+  & > div {
+    margin-top: spacing.$spacing-09;
+  }
 }
 
 .tabletOverlayHeader {
