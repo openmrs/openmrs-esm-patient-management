@@ -1,6 +1,10 @@
 import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { setupOffline } from './offline';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
 };
@@ -88,4 +92,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS, version };
