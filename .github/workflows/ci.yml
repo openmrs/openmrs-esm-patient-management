@@ -338,19 +338,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "16"
+          node-version: "16.15"
           registry-url: "https://registry.npmjs.org"
-      
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
+
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
@@ -359,9 +359,15 @@ jobs:
       - run: yarn turbo run build --color
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
       - run: git add . && git commit -m "Prerelease version" --no-verify
-        run: yarn run ci:prepublish
+      - run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: |
+            packages/**/dist
 
   release:
     runs-on: ubuntu-latest
@@ -372,23 +378,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "16.15"
           registry-url: "https://registry.npmjs.org"
-          
+
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
+
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
-      
+
       - run: yarn turbo run build --color
       - run: yarn run ci:publish
         env:
