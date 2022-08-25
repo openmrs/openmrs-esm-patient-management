@@ -6,10 +6,10 @@ import { useServiceQueueEntries } from '../active-visits/active-visits-table.res
 
 const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
-  const { serviceQueueEntries, isLoading } = useServiceQueueEntries();
 
   const currentPathName: string = window.location.pathname;
   let service = currentPathName.split('/')[4];
+  const { serviceQueueEntries, isLoading } = useServiceQueueEntries(service);
 
   const tableHeaders = useMemo(
     () => [

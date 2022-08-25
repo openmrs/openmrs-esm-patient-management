@@ -29,9 +29,11 @@ interface VisitQueueEntry {
   locationWaitingFor: string | null;
   patient: {
     uuid: string;
-    age: string;
+    person: {
+      age: string;
+      gender: string;
+    };
     phoneNumber: string;
-    gender: string;
   };
   priority: {
     display: QueuePriority;
@@ -264,8 +266,8 @@ async function endPatientStatus(
   });
 }
 
-export function useServiceQueueEntries() {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+export function useServiceQueueEntries(service: string) {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?status=waiting&service=${service}&v=full`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -274,11 +276,11 @@ export function useServiceQueueEntries() {
   const mapServiceQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedServiceQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
     name: visitQueueEntry.queueEntry.display,
-    age: visitQueueEntry.patient ? visitQueueEntry.patient?.age : '--',
+    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age : '--',
     returnDate: visitQueueEntry.visit?.visitStartDateTime,
     visitType: visitQueueEntry.visit?.visitType?.display,
     phoneNumber: visitQueueEntry.patient ? visitQueueEntry.patient?.phoneNumber : '--',
-    gender: visitQueueEntry.patient ? visitQueueEntry.patient?.gender : '--',
+    gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
     patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
   });
 
