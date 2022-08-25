@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: "16"
           check-latest: true
-      - run: npx lerna bootstrap
+      - run: yarn install --immutable
       - name: Report changes
         run: node ./tools/size-reporter.mjs
         env:
