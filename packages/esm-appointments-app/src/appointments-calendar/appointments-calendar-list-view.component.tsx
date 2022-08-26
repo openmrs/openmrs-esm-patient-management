@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useAppointment } from '../hooks/useAppointments';
+import { useAppointmentsByDurationPeriod, useDailyAppointments } from '../hooks/useAppointments';
 import {
   StructuredListSkeleton,
   StructuredListWrapper,
@@ -26,9 +26,10 @@ interface AppointmentsCalendarListViewProps {}
 const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> = () => {
   const { t } = useTranslation();
   const currentDate = useMemo(() => dayjs(new Date().setHours(0, 0)).format(omrsDateFormat), []);
-  const { appointments, isLoading } = useAppointment(currentDate);
   const [selectedDurationIndex, setSelectedDurationIndex] = useState(DurationPeriod.weekly);
-
+  const { isLoading, appointments } = (
+    selectedDurationIndex !== DurationPeriod.daily ? useDailyAppointments : useAppointmentsByDurationPeriod
+  )(currentDate, selectedDurationIndex);
   if (isLoading) {
     return <StructuredListSkeleton role="progressbar" />;
   }
