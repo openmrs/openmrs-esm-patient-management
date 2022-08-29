@@ -54,13 +54,13 @@ const AppointmentList: React.FC = () => {
           <Tab>{t('completed', 'Completed')}</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel style={{ padding: 0 }}>
-            <BookedAppointments status={selectedStatus} />
+          <TabPanel>
+            <BookedAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>
-            <CancelledAppointment status={selectedStatus} />
+          <TabPanel>
+            <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={selectedStatus} />}</TabPanel>
+          <TabPanel>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
         </TabPanels>
       </Tabs>
     </div>
