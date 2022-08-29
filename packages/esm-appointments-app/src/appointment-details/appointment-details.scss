@@ -1,16 +1,28 @@
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '../root.scss';
 
 .container {
-  padding: spacing.$spacing-03;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  & > section {
+    display: flex;
+
+    & > div {
+      width: fit-content;
+      margin: 0 spacing.$spacing-07 0 0;
+    }
+  }
 }
 
 .heading {
-  @include type.type-style('body-compact-02');
+  @include type.type-style('body-compact-01');
   color: $ui-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-bottom: spacing.$spacing-06;
+  color: $text-02;
 }
 
 .subHeading {
@@ -20,22 +32,39 @@
 }
 
 .label {
-  margin-bottom: spacing.$spacing-03;
-  font: inherit;
+  color: $text-02;
+  @include type.type-style('legal-02');
+  margin: spacing.$spacing-04 0;
 }
 
-.appointmentHistoryLabel {
-  @include type.type-style('heading-compact-01');
-  color: $color-blue-60-2;
-  margin-bottom: spacing.$spacing-03;
+.labelPrimary {
+  color: colors.$blue-60;
+  @include type.type-style('body-compact-02');
+  margin: spacing.$spacing-05 0;
 }
 
-.appointmentHistoryMissedLabel {
-  @include type.type-style('heading-compact-01');
-  color: $danger;
-  margin-bottom: spacing.$spacing-03;
+.labelDanger {
+  color: colors.$red-60;
+  @include type.type-style('body-compact-02');
+  margin: spacing.$spacing-05 0;
+}
+
+.historyTitle {
+  color: $text-02;
+  @include type.type-style('legal-01');
 }
 
 .tag {
   margin-bottom: spacing.$spacing-05;
+}
+
+.appointmentHistory {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(auto, auto);
+
+  & > div {
+    display: flex;
+    flex-direction: column;
+  }
 }

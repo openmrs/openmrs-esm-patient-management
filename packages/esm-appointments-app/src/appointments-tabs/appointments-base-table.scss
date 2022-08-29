@@ -42,7 +42,6 @@
 }
 
 .tableContainer {
-  margin: 0 1rem;
   padding: 0;
 }
 
@@ -68,8 +67,9 @@
   }
 
   .toolbarContent {
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
+    height: spacing.$spacing-09;
+    display: flex;
+    align-items: center;
   }
 }
 

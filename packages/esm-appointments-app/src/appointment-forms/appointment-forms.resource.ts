@@ -23,12 +23,6 @@ export function getAppointmentService(abortController: AbortController, uuid) {
   });
 }
 
-export function getProviders(abortController: AbortController) {
-  return openmrsFetch('/ws/rest/v1/provider', {
-    signal: abortController.signal,
-  });
-}
-
 export function fetchAppointments(abortController: AbortController) {
   const date = startDate;
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${date}&status=Scheduled`;

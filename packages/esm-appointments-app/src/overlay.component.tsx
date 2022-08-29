@@ -1,19 +1,18 @@
 import React from 'react';
 import { Button, Header } from '@carbon/react';
 import { ArrowLeft, Close } from '@carbon/react/icons';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { closeOverlay, useOverlay } from './hooks/useOverlay';
 import styles from './overlay.scss';
 
 const Overlay: React.FC = () => {
   const { header, component, isOverlayOpen } = useOverlay();
   const layout = useLayoutType();
-
   return (
     <>
       {isOverlayOpen && (
-        <div className={isDesktop(layout) ? styles.desktopOverlay : styles.tabletOverlay}>
-          {isDesktop ? (
+        <div className={layout !== 'tablet' ? styles.desktopOverlay : styles.tabletOverlay}>
+          {layout !== 'tablet' ? (
             <div className={styles.desktopHeader}>
               <div className={styles.headerContent}>{header}</div>
               <Button className={styles.closePanelButton} onClick={() => closeOverlay()} kind="ghost" hasIconOnly>

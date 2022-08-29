@@ -114,13 +114,13 @@ export interface AppointmentPayload {
   startDateTime: string;
   endDateTime: string;
   appointmentKind: string;
-  providers?: Array<{ uuid: string; comments: string; response?: string }>;
+  providers?: Array<OpenmrsResource>;
   locationUuid: string;
   comments: string;
   status?: string;
   appointmentNumber?: string;
   uuid?: string;
-  providerUuid: string;
+  providerUuid?: string | OpenmrsResource;
 }
 export interface AppointmentCountMap {
   allAppointmentsCount: number;
@@ -138,6 +138,7 @@ export interface Provider {
   display: string;
   comments: string;
   response?: string;
+  person: OpenmrsResource;
 }
 
 export enum DurationPeriod {

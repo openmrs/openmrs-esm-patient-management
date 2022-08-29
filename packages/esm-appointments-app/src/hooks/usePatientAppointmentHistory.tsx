@@ -24,7 +24,7 @@ export function usePatientAppointmentHistory(patientUuid: string, abortControlle
   const missedAppointments = data?.data?.length
     ? data.data.filter((appointment) => appointment.status === 'Missed').length
     : 0;
-  const completededAppointments = data?.data?.length
+  const completedAppointments = data?.data?.length
     ? data.data.filter((appointment) => appointment.status === 'Completed').length
     : 0;
   const cancelledAppointments = data?.data?.length
@@ -35,7 +35,7 @@ export function usePatientAppointmentHistory(patientUuid: string, abortControlle
     : 0;
 
   return {
-    appointmentsCount: { missedAppointments, completededAppointments, cancelledAppointments, upcomingAppointments },
+    appointmentsCount: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
     isError: error,
     isLoading: !data && !error,
     isValidating,
