@@ -59,7 +59,8 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [endTime, setEndTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
+  const [startTimeFormat, setStartTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
+  const [endTimeFormat, setEndTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const [appointmentReminder, setAppointmentReminder] = useState(null);
@@ -84,8 +85,8 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
 
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
 
-    const [startHours, startMinutes] = convertTime12to24(startTime, timeFormat);
-    const [endHours, endMinutes] = convertTime12to24(startTime, timeFormat);
+    const [startHours, startMinutes] = convertTime12to24(startTime, startTimeFormat);
+    const [endHours, endMinutes] = convertTime12to24(endTime, endTimeFormat);
 
     const startDateTime = new Date(
       dayjs(startDate).year(),
@@ -192,11 +193,11 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
                     value={startTime}
                     style={{ marginLeft: '0.125rem', flex: 'none' }}
                     labelText={t('startTime', 'Start Time')}
-                    id="time-picker">
+                    id="start-time-picker">
                     <TimePickerSelect
                       id="time-picker-select-1"
-                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                      value={timeFormat}
+                      onChange={(event) => setStartTimeFormat(event.target.value as amPm)}
+                      value={startTimeFormat}
                       labelText={t('time', 'Time')}
                       aria-label={t('time', 'Time')}>
                       <SelectItem value="AM" text="AM" />
@@ -210,11 +211,11 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
                     value={endTime}
                     style={{ marginLeft: '0.125rem', flex: 'none' }}
                     labelText={t('endTime', 'End Time')}
-                    id="time-picker">
+                    id="end-time-picker">
                     <TimePickerSelect
-                      id="time-picker-select-1"
-                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                      value={timeFormat}
+                      id="time-picker-select-2"
+                      onChange={(event) => setEndTimeFormat(event.target.value as amPm)}
+                      value={endTimeFormat}
                       labelText={t('time', 'Time')}
                       aria-label={t('time', 'Time')}>
                       <SelectItem value="AM" text="AM" />
