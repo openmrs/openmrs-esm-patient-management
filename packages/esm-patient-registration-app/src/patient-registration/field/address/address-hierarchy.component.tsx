@@ -24,7 +24,6 @@ export const AddressHierarchy: React.FC = () => {
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate?.results[0].value;
-
   const setSelectedValue = (value: string) => {
     setSelected(value);
   };
@@ -33,9 +32,14 @@ export const AddressHierarchy: React.FC = () => {
     const templateXmlDoc = parseString(addressTemplateXml);
     const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
     const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-    const properties = nameMappings.getElementsByTagName('property');
+    const properties =
+      Array.from(nameMappings.getElementsByTagName('property')).length > 0
+        ? nameMappings.getElementsByTagName('property')
+        : nameMappings.getElementsByTagName('entry');
+
     const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-      const name = property.getAttribute('name');
+      const name = property.getAttribute('name') ?? property.getElementsByTagName('string')[0].innerHTML;
+      const label = property.getAttribute('value') ?? property.getElementsByTagName('string')[1].innerHTML;
       /*
         DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
 
@@ -45,7 +49,7 @@ export const AddressHierarchy: React.FC = () => {
         t('cityVillage')
         t('country')
       */
-      const labelText = t(name, property.getAttribute('value'));
+      const labelText = t(name, label);
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
