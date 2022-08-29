@@ -55,12 +55,12 @@ const AppointmentList: React.FC = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <BookedAppointments status={selectedStatus} />
+            <BookedAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
           <TabPanel>
-            <CancelledAppointment status={selectedStatus} />
+            <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
-          <TabPanel>{<CompletedAppointments status={selectedStatus} />}</TabPanel>
+          <TabPanel>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
         </TabPanels>
       </Tabs>
     </div>
