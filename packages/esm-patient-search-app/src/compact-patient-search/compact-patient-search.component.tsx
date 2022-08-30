@@ -3,6 +3,7 @@ import { navigate } from '@openmrs/esm-framework';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import styles from './compact-patient-search.scss';
+import debounce from 'lodash-es/debounce';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
@@ -40,17 +41,21 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     setSearchTerm('');
   }, [setSearchTerm]);
 
-  const handleCloseSearchResults = () => {
+  const handleCloseSearchResults = useCallback(() => {
     setSearchTerm('');
     onPatientSelect?.();
-  };
+  }, []);
+  const handleSearchQueryChange = useCallback(
+    debounce((val) => setSearchTerm(val), 300),
+    [],
+  );
 
   return (
     <div className={styles.patientSearchBar}>
       <PatientSearchBar
         small
         initialSearchTerm={initialSearchTerm ?? ''}
-        onChange={setSearchTerm}
+        onChange={handleSearchQueryChange}
         onSubmit={onSubmit}
         onClear={onClear}
       />

@@ -19,8 +19,6 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, qu
   const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
   const showSearchResults = useCallback(() => !!searchTerm.trim(), [searchTerm]);
 
-  console.log(searchTerm);
-
   useEffect(() => {
     if (query) {
       setSearchTerm(query);
