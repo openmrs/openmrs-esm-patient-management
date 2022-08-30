@@ -42,7 +42,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const handleCloseSearchResults = () => {
     setSearchTerm('');
-    // onPatientSelect?.();
+    onPatientSelect?.();
   };
 
   return (

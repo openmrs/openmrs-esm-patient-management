@@ -72,7 +72,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             onPatientSelect={resetToInitialState}
           />
         ) : (
-          <PatientSearchOverlay onClose={handleGlobalAction} />
+          <PatientSearchOverlay onClose={handleGlobalAction} query={initialSearchTerm} />
         ))}
 
       <div className={`${showSearchInput && styles.closeButton}`}>
