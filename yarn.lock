@@ -3608,6 +3608,7 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.8.0
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     dayjs: 1.x
@@ -3665,6 +3666,7 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.8.0
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     react: 18.x
@@ -3774,6 +3776,7 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.8.0
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     react: ^18.1.0
@@ -3790,6 +3793,7 @@ __metadata:
     d3: ^5.16.0
     dexie: ^3.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     react: 18.x
@@ -3867,6 +3871,7 @@ __metadata:
     lodash-es: ^4.17.15
     react-avatar: ^4.0.0
     uuid: ^8.3.2
+    webpack: ^5.74.0
     yup: ^0.29.1
   peerDependencies:
     "@openmrs/esm-framework": 4.x
@@ -3884,6 +3889,7 @@ __metadata:
     "@carbon/colors": ^11.2.0
     "@carbon/react": ^1.8.0
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     react: ^18.1.0
