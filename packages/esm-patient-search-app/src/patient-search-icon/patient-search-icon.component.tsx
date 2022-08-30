@@ -44,6 +44,11 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     }
   }, [isSearchPage, setShowSearchInput, showSearchInput]);
 
+  const resetToInitialState = useCallback(() => {
+    setShowSearchInput(false);
+    setCanClickOutside(false);
+  }, [setShowSearchInput, setCanClickOutside]);
+
   useEffect(() => {
     // Search input should always be open when we direct to the search page.
     setShowSearchInput(isSearchPage);
@@ -64,6 +69,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
             isSearchPage={isSearchPage}
             initialSearchTerm={initialSearchTerm}
             shouldNavigateToPatientSearchPage
+            onPatientSelect={resetToInitialState}
           />
         ) : (
           <PatientSearchOverlay onClose={handleGlobalAction} />
