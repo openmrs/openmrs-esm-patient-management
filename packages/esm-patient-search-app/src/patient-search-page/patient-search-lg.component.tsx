@@ -54,16 +54,16 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         selectPatientAction(patientUuid);
       } else {
         navigate({
-          to: interpolateString(config.search.patientResultUrl, {
+          to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          }),
+          })}/${encodeURIComponent('Patient Summary')}`,
         });
       }
       if (hidePanel) {
         hidePanel();
       }
     },
-    [config, selectPatientAction],
+    [config, selectPatientAction, hidePanel],
   );
 
   if (!query) {

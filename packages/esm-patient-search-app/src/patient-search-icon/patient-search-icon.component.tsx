@@ -23,7 +23,8 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
 
   const handleCloseSearchInput = useCallback(() => {
     // Clicking outside of the search input when "/search" page is open should not close the search input.
-    if (!isSearchPage) {
+    // In tabletView, the overlay should be closed when the overlay's back button (<-) is clicked
+    if (isDesktop(layout) && !isSearchPage) {
       setShowSearchInput(false);
     }
   }, [setShowSearchInput, isSearchPage]);

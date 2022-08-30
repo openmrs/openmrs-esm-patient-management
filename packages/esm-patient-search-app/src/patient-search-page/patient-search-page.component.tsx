@@ -11,11 +11,12 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
   const [searchParams] = useSearchParams();
   const layout = useLayoutType();
 
+  // If a user directly falls on openmrs/spa/search?query= in a tablet view.
+  // On clicking the <- on the overlay should take the user on the home page.
+  // Else the user will never be directed to the patient search page (above URL) in a tablet view.
   const handleCloseOverlay = useCallback(() => {
-    const returnUrl = window.localStorage.getItem('searchReturnUrl');
-    if (returnUrl) window.localStorage.removeItem('searchReturnUrl');
     navigate({
-      to: returnUrl ?? window['getOpenmrsSpaBase'](),
+      to: window['getOpenmrsSpaBase'](),
     });
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PatientUuid } from '@openmrs/esm-framework';
 import Overlay from '../ui-components/overlay';
@@ -13,11 +13,16 @@ interface PatientSearchOverlayProps {
   selectPatientAction?: (PatientUuid) => void;
 }
 
-const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query, header, selectPatientAction }) => {
+const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
+  onClose,
+  query = '',
+  header,
+  selectPatientAction,
+}) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState(query);
   const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
-  const showSearchResults = useCallback(() => !!searchTerm.trim(), [searchTerm]);
+  const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
 
   useEffect(() => {
     if (query) {
@@ -25,12 +30,9 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, qu
     }
   }, [query]);
 
-  const onSearchQueryChange = useCallback(
-    debounce((val) => {
-      setSearchTerm(val);
-    }, 300),
-    [searchTerm],
-  );
+  const onSearchQueryChange = debounce((val) => {
+    setSearchTerm(val);
+  }, 300);
 
   return (
     <Overlay header={header ?? t('searchResults', 'Search results')} close={onClose}>

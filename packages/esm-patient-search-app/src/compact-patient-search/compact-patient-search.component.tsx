@@ -25,7 +25,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
   const onSubmit = useCallback(
     (searchTerm) => {
-      if (shouldNavigateToPatientSearchPage && searchTerm) {
+      if (shouldNavigateToPatientSearchPage && searchTerm.trim()) {
         if (!isSearchPage) {
           window.localStorage.setItem('searchReturnUrl', window.location.pathname);
         }
@@ -44,11 +44,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleCloseSearchResults = useCallback(() => {
     setSearchTerm('');
     onPatientSelect?.();
-  }, []);
-  const handleSearchQueryChange = useCallback(
-    debounce((val) => setSearchTerm(val), 300),
-    [],
-  );
+  }, [onPatientSelect, setSearchTerm]);
+
+  const handleSearchQueryChange = debounce((val) => setSearchTerm(val), 300);
 
   return (
     <div className={styles.patientSearchBar}>
