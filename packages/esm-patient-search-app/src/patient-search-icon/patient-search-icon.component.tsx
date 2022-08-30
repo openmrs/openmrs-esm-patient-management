@@ -27,7 +27,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     if (isDesktop(layout) && !isSearchPage) {
       setShowSearchInput(false);
     }
-  }, [setShowSearchInput, isSearchPage]);
+  }, [setShowSearchInput, isSearchPage, layout]);
 
   const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
 
