@@ -31,14 +31,14 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   };
 
   const onClickSearchResult = useCallback(
-    (evt, patientUuid) => {
+    (evt, patient: SearchedPatient) => {
       evt.preventDefault();
       if (selectPatientAction) {
-        selectPatientAction(patientUuid);
+        selectPatientAction(patient);
       } else {
         navigate({
           to: interpolateString(config.search.patientResultUrl, {
-            patientUuid: patientUuid,
+            patientUuid: patient.uuid,
           }),
         });
       }

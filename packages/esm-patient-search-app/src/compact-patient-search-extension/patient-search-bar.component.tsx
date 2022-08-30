@@ -9,7 +9,6 @@ interface PatientSearchBarProps {
   onChange?: (searchTerm) => void;
   onClear: () => void;
   onSubmit: (searchTerm) => void;
-  small?: boolean;
 }
 
 const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
@@ -18,7 +17,6 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   onChange,
   onClear,
   onSubmit,
-  small,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -50,10 +48,9 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
         onChange={(event) => handleChange(event.target.value)}
         onClear={onClear}
         placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
-        size={small ? 'sm' : 'lg'}
         value={searchTerm}
       />
-      <Button type="submit" kind="secondary" size={small ? 'sm' : 'lg'} onClick={handleSubmit} {...buttonProps}>
+      <Button type="submit" onClick={handleSubmit} {...buttonProps}>
         {t('search', 'Search')}
       </Button>
     </form>
