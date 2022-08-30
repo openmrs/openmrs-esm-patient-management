@@ -8,7 +8,7 @@ import styles from './compact-patient-banner.scss';
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
   hidePanel?: any;
-  selectPatientAction?: (patientUuid: string) => void;
+  selectPatientAction?: (patient: SearchedPatient) => void;
 }
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel, selectPatientAction }) => {
@@ -87,9 +87,9 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
 
   return (
     <>
-      {fhirPatients.map((patient) => (
+      {fhirPatients.map((patient, indx) => (
         <ConfigurableLink
-          onClick={(evt) => onClickSearchResult(evt, patient.id)}
+          onClick={(evt) => onClickSearchResult(evt, patients[indx])}
           to={interpolateString(config.search.patientResultUrl, {
             patientUuid: patient.id,
           })}
