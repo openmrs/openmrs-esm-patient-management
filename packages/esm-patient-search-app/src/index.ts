@@ -7,6 +7,7 @@ import {
   setupDynamicOfflineDataHandler,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import CompactPatientSearch from './compact-patient-search/compact-patient-search.component';
 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
@@ -85,4 +86,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS, version };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS, version, CompactPatientSearch };
