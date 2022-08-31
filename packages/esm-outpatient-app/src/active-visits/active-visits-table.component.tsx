@@ -54,6 +54,7 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
+import first from 'lodash-es/first';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -179,7 +180,7 @@ function ActiveVisitsTable() {
     if (!userLocation && session?.sessionLocation !== null) {
       setUserLocation(session?.sessionLocation?.uuid);
     } else if (!userLocation && locations) {
-      setUserLocation([...locations].shift()?.uuid);
+      setUserLocation(first(locations)?.uuid);
     }
   }, [session, locations, userLocation]);
 
@@ -348,10 +349,10 @@ function ActiveVisitsTable() {
                   <div className={styles.filterContainer}>
                     <Dropdown
                       id="serviceFilter"
-                      initialSelectedItem={{ display: 'All' }}
+                      initialSelectedItem={{ display: `${t('all', 'All')}` }}
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
-                      items={[{ display: 'All' }, ...services]}
+                      items={[{ display: `${t('all', 'All')}` }, ...services]}
                       itemToString={(item) => (item ? item.display : '')}
                       onChange={handleServiceChange}
                       size="sm"
