@@ -11,7 +11,7 @@ const MetricsHeader: React.FC = () => {
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments/missed`}>
-        {t('seeMissedAppointments', 'See Missed Appointments')} <ArrowRight size={16} className={styles.viewListBtn} />
+        {t('seeMissedAppointments', 'See missed appointments')} <ArrowRight size={16} className={styles.viewListBtn} />
       </ConfigurableLink>
     </div>
   );

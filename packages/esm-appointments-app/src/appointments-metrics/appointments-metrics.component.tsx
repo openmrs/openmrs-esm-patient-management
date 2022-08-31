@@ -27,17 +27,20 @@ const AppointmentsMetrics: React.FC = () => {
           label={t('patients', 'Patients')}
           value={totalAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
+          view="patients"
         />
         <MetricsCard
           label={t(highestServiceLoad?.serviceName)}
           value={highestServiceLoad?.count ?? '--'}
           // FIX: Strange translation string
           headerLabel={t('highestServiceVolume', 'High volume Service.  today')}
+          view="highVolume"
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={0}
           headerLabel={t('providersAvailableToday', 'Providers available today')}
+          view="providers"
         />
       </div>
     </>
