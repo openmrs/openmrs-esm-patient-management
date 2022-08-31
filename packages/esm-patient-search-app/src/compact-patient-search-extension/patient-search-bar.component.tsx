@@ -49,6 +49,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
         onClear={onClear}
         placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
         value={searchTerm}
+        size="lg"
       />
       <Button type="submit" onClick={handleSubmit} {...buttonProps}>
         {t('search', 'Search')}
