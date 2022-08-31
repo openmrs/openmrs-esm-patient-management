@@ -45,15 +45,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        route: /^patient\/.+\/chart/,
-        load: getAsyncLifecycle(() => import('./visit-header/visit-header.component'), {
-          featureName: 'Visit Header',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
         load: getAsyncLifecycle(
           () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
           options,
