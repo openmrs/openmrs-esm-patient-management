@@ -5,6 +5,7 @@ import { spaBasePath, spaRoot } from './constants';
 import AppointmentsDashboard from './dashboard/appointments-dashboard.component';
 import Overlay from './overlay.component';
 import AppointmentsCalendarListView from './appointments-calendar/appointments-calendar-list-view.component';
+import MissedAppointmentList from './appointments/missed-appointment-list.component';
 
 const swrConfiguration = {
   errorRetryCount: 3,
@@ -18,6 +19,7 @@ const Root: React.FC = () => {
           <Routes>
             <Route path="" element={<AppointmentsDashboard />} />
             <Route path="/calendar" element={<AppointmentsCalendarListView />} />
+            <Route path="/missed" element={<MissedAppointmentList />} />
           </Routes>
           <Overlay />
         </BrowserRouter>
