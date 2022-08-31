@@ -21,12 +21,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
 
-  const handleSubmit = useCallback(
-    (evt) => {
-      evt.preventDefault();
-    },
-    [searchTerm, handleChange],
-  );
+  const handleSubmit = useCallback((evt) => {
+    evt.preventDefault();
+  }, []);
 
   const handleClear = useCallback(() => {
     setSearchTerm('');
