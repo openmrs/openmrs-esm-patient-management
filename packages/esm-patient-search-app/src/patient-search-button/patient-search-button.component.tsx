@@ -7,14 +7,14 @@ import PatientSearchOverlay from '../patient-search-overlay/patient-search-overl
 interface PatientSearchButtonProps {
   buttonText?: string;
   overlayHeader?: string;
-  onPatientSelect?: (patientUuid: string) => {};
+  patientSelectAction?: (patientUuid: string) => {};
   buttonProps?: Object;
 }
 
 const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   buttonText,
   overlayHeader,
-  onPatientSelect,
+  patientSelectAction,
   buttonProps,
 }) => {
   const { t } = useTranslation();
@@ -26,7 +26,7 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
         <PatientSearchOverlay
           onClose={() => setShowSearchOverlay(false)}
           header={overlayHeader}
-          onPatientSelect={onPatientSelect}
+          selectPatientAction={patientSelectAction}
         />
       )}
 

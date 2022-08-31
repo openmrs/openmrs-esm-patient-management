@@ -13,14 +13,16 @@ interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  onPatientSelect?: (patientUuid: string) => void;
+  selectPatientAction?: (patientUuid: string) => void;
+  hidePanel?: () => void;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   query,
   stickyPagination,
-  onPatientSelect,
+  selectPatientAction,
   inTabletOrOverlay,
+  hidePanel,
 }) => {
   const { t } = useTranslation();
   const config = useConfig();
@@ -48,17 +50,20 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
       evt.preventDefault();
-      if (onPatientSelect) {
-        onPatientSelect(patientUuid);
+      if (selectPatientAction) {
+        selectPatientAction(patientUuid);
       } else {
         navigate({
-          to: interpolateString(config.search.patientResultUrl, {
+          to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          }),
+          })}/${encodeURIComponent('Patient Summary')}`,
         });
       }
+      if (hidePanel) {
+        hidePanel();
+      }
     },
-    [config, onPatientSelect],
+    [config, selectPatientAction, hidePanel],
   );
 
   if (!query) {
@@ -175,7 +180,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         </h2>
         <div className={styles.results}>
           {searchResults.map((patient) => (
-            <PatientBanner onPatientSelect={handlePatientSelection} patientUuid={patient.uuid} patient={patient} />
+            <PatientBanner selectPatientAction={handlePatientSelection} patientUuid={patient.uuid} patient={patient} />
           ))}
         </div>
       </div>
