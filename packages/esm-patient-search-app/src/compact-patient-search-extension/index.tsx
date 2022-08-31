@@ -18,7 +18,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const handleSearchTerm = debounce((val) => setSearchTerm(val), 300);
-  const showSearchResults = useMemo(() => !!searchTerm.trim(), [searchTerm]);
+  const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
 
   const onClear = useCallback(() => {
     setSearchTerm('');
