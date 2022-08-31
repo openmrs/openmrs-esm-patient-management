@@ -8,7 +8,7 @@ import styles from './compact-patient-banner.scss';
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
   hidePanel?: any;
-  selectPatientAction?: (patientUuid: string) => void;
+  selectPatientAction?: (patient: SearchedPatient) => void;
 }
 
 const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel, selectPatientAction }) => {
@@ -31,22 +31,22 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
   };
 
   const onClickSearchResult = useCallback(
-    (evt, patientUuid) => {
+    (evt, patient: SearchedPatient) => {
       evt.preventDefault();
       if (selectPatientAction) {
-        selectPatientAction(patientUuid);
+        selectPatientAction(patient);
       } else {
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
-            patientUuid: patientUuid,
-          })}/${encodeURIComponent('Patient Summary')}`,
+            patientUuid: patient.uuid,
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
         });
       }
       if (hidePanel) {
         hidePanel();
       }
     },
-    [config.search.patientResultUrl, hidePanel, selectPatientAction],
+    [config.search, hidePanel, selectPatientAction],
   );
 
   const fhirPatients = useMemo(() => {
@@ -87,12 +87,12 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
 
   return (
     <>
-      {fhirPatients.map((patient) => (
+      {fhirPatients.map((patient, indx) => (
         <ConfigurableLink
-          onClick={(evt) => onClickSearchResult(evt, patient.id)}
-          to={interpolateString(config.search.patientResultUrl, {
+          onClick={(evt) => onClickSearchResult(evt, patients[indx])}
+          to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patient.id,
-          })}
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
           key={patient.id}
           className={styles.patientSearchResult}>
           <div className={styles.patientAvatar} role="img">

@@ -78,7 +78,7 @@ function setupOpenMRS() {
         // P.S. This extension is not compatible with the tablet view.
         id: 'patient-search-bar',
         slot: 'patient-search-bar-slot',
-        load: getAsyncLifecycle(() => import('./compact-patient-search/compact-patient-search.component'), options),
+        load: getAsyncLifecycle(() => import('./compact-patient-search-extension'), options),
         offline: true,
       },
     ],

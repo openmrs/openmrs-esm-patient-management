@@ -7,11 +7,12 @@ import { usePatientSearchInfinite } from '../patient-search.resource';
 import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import styles from './patient-search.scss';
+import { SearchedPatient } from '../types';
 
 interface PatientSearchProps {
   hidePanel?: () => void;
   query: string;
-  selectPatientAction?: (patientUuid: string) => void;
+  selectPatientAction?: (patient: SearchedPatient) => void;
 }
 
 const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', selectPatientAction }) => {
