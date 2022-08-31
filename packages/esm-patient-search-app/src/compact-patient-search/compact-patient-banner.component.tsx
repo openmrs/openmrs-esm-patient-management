@@ -37,9 +37,9 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         selectPatientAction(patientUuid);
       } else {
         navigate({
-          to: interpolateString(config.search.patientResultUrl, {
+          to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          }),
+          })}/${encodeURIComponent('Patient Summary')}`,
         });
       }
       if (hidePanel) {

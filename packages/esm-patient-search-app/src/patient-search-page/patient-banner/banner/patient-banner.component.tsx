@@ -22,7 +22,7 @@ interface PatientBannerProps {
   patientUuid: string;
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
-  onPatientSelect: (evt: any, patientUuid: string) => void;
+  selectPatientAction: (evt: any, patientUuid: string) => void;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
@@ -30,7 +30,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   patientUuid,
   onTransition,
   hideActionsOverflow,
-  onPatientSelect,
+  selectPatientAction,
 }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
@@ -41,8 +41,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const config = useConfig();
 
   const patientActionsSlotState = React.useMemo(
-    () => ({ patientUuid, onPatientSelect, onTransition, launchPatientChart: true }),
-    [patientUuid, onPatientSelect, onTransition],
+    () => ({ patientUuid, selectPatientAction, onTransition, launchPatientChart: true }),
+    [patientUuid, selectPatientAction, onTransition],
   );
 
   const patientName = patient.person.personName.display;
@@ -87,8 +87,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           to={interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
           })}
-          onClick={(evt) => onPatientSelect(evt, patientUuid)}
-          className={`${styles.patientBanner} ${onPatientSelect && styles.patientAvatarButton}`}>
+          onClick={(evt) => selectPatientAction(evt, patientUuid)}
+          className={`${styles.patientBanner} ${selectPatientAction && styles.patientAvatarButton}`}>
           {patientAvatar}
           <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
             <div className={styles.flexRow}>
