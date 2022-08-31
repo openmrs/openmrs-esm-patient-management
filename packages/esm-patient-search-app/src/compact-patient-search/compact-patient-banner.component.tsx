@@ -39,14 +39,14 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patient.uuid,
-          })}/${encodeURIComponent('Patient Summary')}`,
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
         });
       }
       if (hidePanel) {
         hidePanel();
       }
     },
-    [config.search.patientResultUrl, hidePanel, selectPatientAction],
+    [config.search, hidePanel, selectPatientAction],
   );
 
   const fhirPatients = useMemo(() => {
@@ -90,9 +90,9 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
       {fhirPatients.map((patient, indx) => (
         <ConfigurableLink
           onClick={(evt) => onClickSearchResult(evt, patients[indx])}
-          to={interpolateString(config.search.patientResultUrl, {
+          to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patient.id,
-          })}
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
           key={patient.id}
           className={styles.patientSearchResult}>
           <div className={styles.patientAvatar} role="img">

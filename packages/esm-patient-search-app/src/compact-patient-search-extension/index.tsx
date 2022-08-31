@@ -1,9 +1,9 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import PatientSearch from '../compact-patient-search/patient-search.component';
-import PatientSearchBar from './patient-search-bar.component';
-import styles from './compact-patient-search.scss';
 import { SearchedPatient } from '../types';
-import debounce from 'lodash-es/debounce';
+import { Search, Button } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
@@ -16,26 +16,46 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   initialSearchTerm = '',
   buttonProps,
 }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const handleSearchTerm = debounce((val) => setSearchTerm(val), 300);
+  const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
 
-  const onClear = useCallback(() => {
+  const handleSubmit = useCallback(
+    (evt) => {
+      evt.preventDefault();
+    },
+    [searchTerm, handleChange],
+  );
+
+  const handleClear = useCallback(() => {
+    setSearchTerm('');
+  }, [setSearchTerm]);
+
+  const handleReset = useCallback(() => {
     setSearchTerm('');
   }, [setSearchTerm]);
 
   return (
     <div className={styles.patientSearchBar}>
-      <PatientSearchBar
-        initialSearchTerm={initialSearchTerm ?? ''}
-        onChange={handleSearchTerm}
-        onSubmit={handleSearchTerm}
-        onClear={onClear}
-        buttonProps={buttonProps}
-      />
+      <form onSubmit={handleSubmit} className={styles.searchArea}>
+        <Search
+          className={styles.patientSearchInput}
+          closeButtonLabelText={t('clearSearch', 'Clear')}
+          labelText=""
+          onChange={(event) => handleChange(event.target.value)}
+          onClear={handleClear}
+          placeholder={t('searchForPatient', 'Search for a patient by name or identifier number')}
+          value={searchTerm}
+          size="lg"
+        />
+        <Button type="submit" onClick={handleSubmit} {...buttonProps}>
+          {t('search', 'Search')}
+        </Button>
+      </form>
       {showSearchResults && (
         <div className={styles.floatingSearchResultsContainer}>
-          <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} />
+          <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} hidePanel={handleReset} />
         </div>
       )}
     </div>

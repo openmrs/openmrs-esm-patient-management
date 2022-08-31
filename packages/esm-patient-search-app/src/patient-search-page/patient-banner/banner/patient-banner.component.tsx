@@ -84,9 +84,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     <>
       <div className={styles.container} role="banner">
         <ConfigurableLink
-          to={interpolateString(config.search.patientResultUrl, {
+          to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          })}
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
           onClick={(evt) => selectPatientAction(evt, patientUuid)}
           className={`${styles.patientBanner} ${selectPatientAction && styles.patientAvatarButton}`}>
           {patientAvatar}

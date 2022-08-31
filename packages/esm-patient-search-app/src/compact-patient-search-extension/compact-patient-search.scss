@@ -1,4 +1,6 @@
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 .patientSearchBar {
@@ -14,4 +16,20 @@
   border: 0 1px 1px 1px solid $ui-03;
   width: 100%;
   background-color: $ui-02;
+}
+
+.searchArea {
+  width: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid $ui-04;
+}
+
+.patientSearchInput {
+  border: none;
+}
+
+.patientSearchInput input:focus {
+  outline: 1px solid 1px solid colors.$orange-40;
 }
