@@ -9,10 +9,6 @@
   border-right: none;
   background-color: $color-blue-10;
   padding: spacing.$spacing-05;
-
-  &:last-of-type {
-    border: none;
-  }
 }
 
 .title {
@@ -28,9 +24,9 @@
 
 .content {
   @include type.type-style('heading-compact-01');
-  color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  background-color: $color-blue-10;
+  padding: spacing.$spacing-05;
+  border: 1px solid colors.$blue-20;
 }
 
 .tile {
