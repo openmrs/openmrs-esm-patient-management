@@ -26,11 +26,6 @@ export const configSchema = {
     _description: 'Configurable days of the week',
     _default: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   },
-  scheduledAppointmentListUrl: {
-    _type: Type.String,
-    _default: 'appointments-list/scheduled',
-    _description: 'URL to load the scheduled appointment list',
-  },
 };
 
 export interface ConfigObject {
@@ -41,5 +36,4 @@ export interface ConfigObject {
   appointmentKinds: Array<string>;
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
-  scheduledAppointmentListUrl: string;
 }

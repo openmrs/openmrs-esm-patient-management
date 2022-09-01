@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import styles from './metrics-card.scss';
-import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 interface MetricsCardProps {
   label: string;
@@ -16,7 +15,11 @@ interface MetricsCardProps {
 
 const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, children, view }) => {
   const { t } = useTranslation();
-  const { scheduledAppointmentListUrl } = useConfig() as ConfigObject;
+  const metricsLink = {
+    patients: 'appointments-list/scheduled',
+    highVolume: 'high-volume-service',
+    providers: 'providers-link',
+  };
 
   return (
     <Tile className={styles.tileContainer} light={true}>
@@ -25,19 +28,9 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           <label className={styles.headerLabel}>{headerLabel}</label>
           {children}
         </div>
-        {view === 'patients' ? (
-          <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/${scheduledAppointmentListUrl}`}>
-            {t('view', 'View')} <ArrowRight size={16} className={styles.viewListBtn} />
-          </ConfigurableLink>
-        ) : view === 'providers' ? (
-          <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/providers/`}>
-            {t('view', 'View')} <ArrowRight size={16} className={styles.viewListBtn} />
-          </ConfigurableLink>
-        ) : view === 'highVolume' ? (
-          <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/high-volume-service/`}>
-            {t('view', 'View')} <ArrowRight size={16} className={styles.viewListBtn} />
-          </ConfigurableLink>
-        ) : null}
+        <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/${metricsLink[view]}`}>
+          {t('view', 'View')} <ArrowRight size={16} className={styles.viewListBtn} />
+        </ConfigurableLink>
       </div>
       <div>
         <label className={styles.totalsLabel}>{label}</label>
