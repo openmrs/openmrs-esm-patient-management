@@ -2,10 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import styles from './missed-appointment-list.scss';
-import MissedAppointments from '../appointments-tabs/missed-appointments.component';
-import DefaulterAppointments from '../appointments-tabs/defaulter-appointments.component';
-import LTFUAppointments from '../appointments-tabs/ltfu-appointments.component';
-import PromisedAppointments from '../appointments-tabs/promised-appointments.component';
+import MissedAppointmentsList from '../appointments-tabs/missed-appointments.component';
 
 enum MissedAppointmentTypes {
   MISSED = 'Scheduled',
@@ -31,13 +28,33 @@ const MissedAppointmentList: React.FC = () => {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <MissedAppointments status={MissedAppointmentTypes.MISSED} />
+              <MissedAppointmentsList
+                status={MissedAppointmentTypes.MISSED}
+                title={t('missedAppointmentsList', 'Missed Appointments List')}
+              />
             </TabPanel>
             <TabPanel>
-              <DefaulterAppointments status={MissedAppointmentTypes.DEFAULTERS} />
+              <MissedAppointmentsList
+                status={MissedAppointmentTypes.DEFAULTERS}
+                title={t('defaulters', 'Defaulters')}
+              />
             </TabPanel>
-            <TabPanel>{<LTFUAppointments status={MissedAppointmentTypes.LTFU} />}</TabPanel>
-            <TabPanel>{<PromisedAppointments status={MissedAppointmentTypes.PROMISED} />}</TabPanel>
+            <TabPanel>
+              {
+                <MissedAppointmentsList
+                  status={MissedAppointmentTypes.LTFU}
+                  title={t('lostToFollowupAppointments', 'Lost To Followup Appointments')}
+                />
+              }
+            </TabPanel>
+            <TabPanel>
+              {
+                <MissedAppointmentsList
+                  status={MissedAppointmentTypes.PROMISED}
+                  title={t('promisedPateints', 'Promised Pateints')}
+                />
+              }
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </div>
