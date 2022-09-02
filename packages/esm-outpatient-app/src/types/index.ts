@@ -308,7 +308,7 @@ export interface MappedServiceQueueEntry {
   patientUuid: string;
 }
 
-export enum filterType {
+export enum FilterTypes {
   SHOW,
   HIDE,
 }

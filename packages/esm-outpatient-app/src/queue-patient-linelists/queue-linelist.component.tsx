@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overlay from '../overlay.component';
 import QueueLinelistFilter from './queue-linelist-filter.component';
-import { filterType } from '../types/index';
+import { FilterTypes } from '../types/index';
 
 interface QueueLinelistProps {
   closePanel: () => void;
@@ -10,8 +10,8 @@ interface QueueLinelistProps {
 
 const QueueLinelist: React.FC<QueueLinelistProps> = ({ closePanel }) => {
   const { t } = useTranslation();
-  const [showFilter, setShowFilter] = useState<filterType>(filterType.SHOW);
-  const toggleFilter = (filterType: filterType) => {
+  const [showFilter, setShowFilter] = useState<FilterTypes>(FilterTypes.SHOW);
+  const toggleFilter = (filterType: FilterTypes) => {
     setShowFilter(filterType);
   };
 
@@ -19,9 +19,7 @@ const QueueLinelist: React.FC<QueueLinelistProps> = ({ closePanel }) => {
     <>
       <Overlay header={t('filters', 'Filters')} closePanel={closePanel}>
         <div className="omrs-main-content">
-          {showFilter === filterType.SHOW ? (
-            <QueueLinelistFilter toggleFilter={toggleFilter} closePanel={closePanel} />
-          ) : null}
+          {showFilter === FilterTypes.SHOW ? <QueueLinelistFilter closePanel={closePanel} /> : null}
         </div>
       </Overlay>
     </>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -22,7 +22,8 @@ import {
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
-import { filterType } from '../types';
+import { FilterTypes } from '../types';
+import QueueLinelist from './queue-linelist.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -39,7 +40,7 @@ interface QueuePatientTableProps {
   rows: any;
   serviceType: string;
   isLoading: boolean;
-  toggleFilter?: (filterMode: filterType) => void;
+  toggleFilter?: (filterMode: FilterTypes) => void;
 }
 
 const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
@@ -52,6 +53,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   toggleFilter,
 }) => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -113,7 +115,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
               kind="ghost"
               renderIcon={(props) => <Filter size={16} {...props} />}
               iconDescription={t('filter', 'Filter (1)')}
-              onClick={toggleFilter}
+              onClick={() => setShowOverlay(true)}
               size="sm">
               {t('filter', 'Filter (1)')}
             </Button>
@@ -189,6 +191,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </Tile>
         </Layer>
       )}
+      {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 };

@@ -3,15 +3,10 @@ import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
 import { useAppointments } from './queue-linelist.resource';
-import { filterType } from '../types';
 
 const pageSize = 20;
 
-interface AppointmentsTableProps {
-  toggleFilter?: (filterMode: filterType) => void;
-}
-
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ toggleFilter }) => {
+const AppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
   const { appointmentQueueEntries, isLoading } = useAppointments();
   const { results: paginatedAppointments } = usePagination(appointmentQueueEntries, pageSize);
@@ -83,7 +78,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ toggleFilter }) =
         patientData={paginatedAppointments}
         serviceType=""
         isLoading={isLoading}
-        toggleFilter={() => toggleFilter(filterType.SHOW)}
       />
     </div>
   );

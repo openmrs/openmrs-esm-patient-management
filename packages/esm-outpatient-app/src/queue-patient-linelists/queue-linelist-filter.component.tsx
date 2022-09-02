@@ -4,8 +4,8 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
-  Grid,
-  Row,
+  Layer,
+  Stack,
   RadioButtonGroup,
   RadioButton,
   Dropdown,
@@ -13,16 +13,13 @@ import {
   Button,
   ButtonSet,
   NumberInput,
-  ToggleSmall,
+  Toggle,
 } from '@carbon/react';
-import { filterType } from '../types/index';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
 import dayjs from 'dayjs';
-import { toDateObjectStrict, toOmrsIsoString, useLayoutType } from '@openmrs/esm-framework';
+import { toDateObjectStrict, toOmrsIsoString, useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import styles from './queue-linelist-filter.scss';
 
 interface QueueLinelistFilterProps {
-  toggleFilter: (filterMode: filterType) => void;
   closePanel: () => void;
 }
 
@@ -34,6 +31,7 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
   const [returnDate, setReturnDate] = useState(new Date());
   const [visitType, setVisitType] = useState('');
   const isTablet = useLayoutType() === 'tablet';
+  const allVisitTypes = useVisitTypes();
 
   const handleFilter = useCallback(
     (event) => {
@@ -59,8 +57,8 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
   return (
     <>
       <Form onSubmit={handleFilter}>
-        <Grid className={styles.grid}>
-          <Row className={styles.row}>
+        <div className={styles.wrapper}>
+          <Stack gap={4} className={styles.grid}>
             <Column>
               <p className={styles.heading}> {t('gender', 'Gender')}</p>
               <RadioButtonGroup name="gender" orientation="vertical" onChange={(event) => setGender(event.toString())}>
@@ -78,41 +76,51 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
                 />
               </RadioButtonGroup>
             </Column>
-          </Row>
+          </Stack>
 
-          <Row className={styles.row}>
-            <Column>
+          <Stack gap={4} className={styles.grid}>
+            <Column md={2}>
               <p className={styles.heading}> {t('age', 'Age')}</p>
-              <ToggleSmall aria-label={t('age', 'Age')} defaultToggled id="age" labelA="Off" labelB="On" labelText="" />
-
-              <NumberInput
-                id="startAge"
-                light
-                invalidText="Start age range is not valid"
-                label={t('between', 'Between')}
-                max={100}
-                min={0}
-                onChange={(event) => setStartAge(event.target.value)}
-                size="md"
-                value={startAge}
-              />
-
-              <NumberInput
-                id="endAge"
-                light
-                invalidText="End age range is not valid"
-                label={t('end', 'End')}
-                max={100}
-                min={0}
-                onChange={(event) => setEndAge(event.target.value)}
-                size="md"
-                value={endAge}
-              />
+              <Layer>
+                <Toggle
+                  size="sm"
+                  aria-label={t('age', 'Age')}
+                  defaultToggled
+                  id="age"
+                  labelA="Off"
+                  labelB="On"
+                  labelText=""
+                />
+              </Layer>
+              <Layer className={styles.numberInputs}>
+                <NumberInput
+                  id="startAge"
+                  light
+                  invalidText={t('startAgeRangeInvalid', 'Start age range is not valid')}
+                  label={t('between', 'Between')}
+                  max={100}
+                  min={0}
+                  onChange={(event) => setStartAge(event.target.value)}
+                  size="md"
+                  value={startAge}
+                />
+                <NumberInput
+                  id="endAge"
+                  light
+                  invalidText={t('endAgeRangeInvalid', 'End age range is not valid')}
+                  label={t('and', 'And')}
+                  max={100}
+                  min={0}
+                  onChange={(event) => setEndAge(event.target.value)}
+                  size="md"
+                  value={endAge}
+                />
+              </Layer>
             </Column>
-          </Row>
+          </Stack>
 
-          <Row className={styles.row}>
-            <Column>
+          <Stack gap={4} className={styles.grid}>
+            <Column md={2}>
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <DatePicker datePickerType="single" value={returnDate} onChange={([date]) => setReturnDate(date)} light>
                 <DatePickerInput id="returnDate" placeholder="mm/dd/yyyy" labelText={t('date', 'Date')} type="date" />
@@ -125,23 +133,23 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
                 {t('useTodaysDate', "Use today's date")}
               </Button>
             </Column>
-          </Row>
+          </Stack>
 
-          <Row className={styles.row}>
+          <Stack gap={4} className={styles.grid}>
             <Column>
               <p className={styles.heading}>{t('visitType', 'Visit Type')}</p>
               <Dropdown
                 id="visitType"
                 light
-                label="Select visit type"
-                items={mockVisitTypes}
+                label={t('selectVisitTyoe', 'Select visit type')}
+                items={allVisitTypes}
                 onChange={(event) => setVisitType(event.selectedItem.toString)}
                 size="sm"
                 itemToElement={(item) => (item ? <span>{item.display}</span> : null)}
               />
             </Column>
-          </Row>
-        </Grid>
+          </Stack>
+        </div>
 
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={closePanel}>
