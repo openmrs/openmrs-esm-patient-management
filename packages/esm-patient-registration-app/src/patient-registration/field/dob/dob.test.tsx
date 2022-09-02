@@ -1,54 +1,62 @@
-import React, { useContext } from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
+import { Formik, Form } from 'formik';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
-import { Formik, Form, useField } from 'formik';
 import { DobField } from './dob.component';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import { initialFormValues } from '../../patient-registration.component';
+import { FormValues } from '../../patient-registration-types';
 
-jest.mock('formik', () => {
-  const originalModule = jest.requireActual('formik');
-  return {
-    ...originalModule,
-    useField: jest.fn(() => [{}, {}]),
-  };
-});
-
-jest.mock('react', () => {
-  const originalModule = jest.requireActual('react');
-  return {
-    ...originalModule,
-    useContext: jest.fn(() => ({
-      setFieldValue: jest.fn(),
-    })),
-  };
-});
-
-describe('dob', () => {
-  it('renders the date of birth component', () => {
+describe('Dob', () => {
+  it('renders the fields in the birth section of the registration form', async () => {
     renderDob();
 
     expect(screen.getByRole('heading', { name: /birth/i })).toBeInTheDocument();
+    expect(screen.getByText(/date of birth known?/i)).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /no/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /yes/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /yes/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /no/i })).toHaveAttribute('aria-selected', 'false');
     expect(screen.getByRole('textbox', { name: /date of birth/i })).toBeInTheDocument();
-    expect(screen.getByText(/date of birth known?/i)).toBeInTheDocument();
   });
 
-  it('changes value of datepicker', () => {
+  it('typing in the date picker input sets the date of birth', async () => {
+    const user = userEvent.setup();
+
     renderDob();
 
-    fireEvent.change(screen.getByPlaceholderText('dd/mm/YYYY'), {
-      target: { value: '01/01/2020' },
-    });
-    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('01/01/2020');
+    const dateInput = screen.getByRole('textbox', { name: /date of birth/i });
+    expect(dateInput).toBeInTheDocument();
+
+    await user.type(dateInput, '10/10/2022');
+
+    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
   });
 });
 
 function renderDob() {
+  let formValues: FormValues = initialFormValues;
+
   render(
-    <Formik initialValues={{}} onSubmit={null}>
+    <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
       <Form>
-        <DobField />
+        <PatientRegistrationContext.Provider
+          value={{
+            identifierTypes: [],
+            values: formValues,
+            validationSchema: null,
+            setValidationSchema: (value) => {},
+            inEditMode: false,
+            setFieldValue: () => {},
+            setCapturePhotoProps: (value) => {},
+            currentPhoto: '',
+            isOffline: false,
+            initialFormValues: formValues,
+          }}>
+          <DobField />
+        </PatientRegistrationContext.Provider>
       </Form>
     </Formik>,
   );

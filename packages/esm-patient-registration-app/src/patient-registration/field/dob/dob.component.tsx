@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 import { generateFormatting } from '../../date-util';
-import styles from '../field.scss';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 import { Input } from '../../input/basic-input/input/input.component';
+import styles from '../field.scss';
 
 const calcBirthdate = (yearDelta, monthDelta) => {
   const startDate = new Date();
@@ -73,19 +73,17 @@ export const DobField: React.FC = () => {
       </div>
       {dobKnown ? (
         <div className={styles.dobField}>
-          <Layer>
-            <DatePicker dateFormat={dateFormat} datePickerType="simple" onChange={onDateChange} maxDate={format(today)}>
-              <DatePickerInput
-                id="birthdate"
-                {...birthdate}
-                placeholder={placeHolder}
-                labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-                invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-                invalidText={birthdateMeta.error && t(birthdateMeta.error)}
-                value={format(birthdate.value)}
-              />
-            </DatePicker>
-          </Layer>
+          <DatePicker dateFormat={dateFormat} datePickerType="simple" onChange={onDateChange} maxDate={format(today)}>
+            <DatePickerInput
+              id="birthdate"
+              {...birthdate}
+              placeholder={placeHolder}
+              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+              value={format(birthdate.value)}
+            />
+          </DatePicker>
         </div>
       ) : (
         <div className={styles.grid}>
