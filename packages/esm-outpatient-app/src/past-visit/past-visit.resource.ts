@@ -16,7 +16,7 @@ export function usePastVisits(patientUuid: string) {
     openmrsFetch,
   );
 
-  let previousVisit = data?.data?.results?.filter((result) => result.stopDatetime !== null)[0];
+  const previousVisit = data?.data?.results?.find((result) => result.stopDatetime !== null);
 
   return {
     visits: data ? previousVisit : null,

@@ -1,23 +1,31 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import AppointmentDetails from './appointment-details.component';
+import { usePastVisits } from './../past-visit/past-visit.resource';
+import { useAppointments } from './appointments.resource';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseAppointments = useAppointments as jest.Mock;
+const mockUsePastVisits = usePastVisits as jest.Mock;
+
+jest.mock('./../past-visit/past-visit.resource', () => ({
+  usePastVisits: jest.fn(),
+}));
+
+jest.mock('./appointments.resource', () => ({
+  useAppointments: jest.fn(),
+}));
 
 describe('RecentandUpcomingAppointments', () => {
   it('renders no data if past and upcoming visit is empty', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockUseAppointments.mockReturnValueOnce({ data: [] });
+    mockUsePastVisits.mockReturnValueOnce({ data: [] });
     renderAppointments();
-
-    await waitForLoadingToFinish();
 
     expect(screen.getByText(/there is no last encounter to display for this patient/i)).toBeInTheDocument();
     expect(screen.getByText(/there is no return date to display for this patient/i)).toBeInTheDocument();
