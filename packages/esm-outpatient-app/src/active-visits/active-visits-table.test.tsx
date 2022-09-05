@@ -5,6 +5,8 @@ import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
+import { mockLocations } from '../../../../__mocks__/locations.mock';
+import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
@@ -23,6 +25,8 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
+    useLocations: jest.fn().mockImplementation(() => mockLocations.data),
+    useSession: jest.fn().mockImplementation(() => mockSession.data),
   };
 });
 

@@ -32,7 +32,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit, Group, InProgress } from '@carbon/react/icons';
-import { useLayoutType, navigate, showModal, interpolateUrl, isDesktop, useSession } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  navigate,
+  showModal,
+  interpolateUrl,
+  isDesktop,
+  useSession,
+  useLocations,
+} from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
   useServices,
@@ -46,6 +54,7 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
+import first from 'lodash-es/first';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -156,6 +165,7 @@ function ActiveVisitsTable() {
   const { t } = useTranslation();
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
+  const locations = useLocations();
   const { services } = useServices(userLocation);
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
@@ -166,9 +176,13 @@ function ActiveVisitsTable() {
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
 
-  if (!userLocation && session?.sessionLocation?.uuid) {
-    setUserLocation(session?.sessionLocation?.uuid);
-  }
+  useEffect(() => {
+    if (!userLocation && session?.sessionLocation !== null) {
+      setUserLocation(session?.sessionLocation?.uuid);
+    } else if (!userLocation && locations) {
+      setUserLocation(first(locations)?.uuid);
+    }
+  }, [session, locations, userLocation]);
 
   useEffect(() => {
     if (filter) {
@@ -329,16 +343,16 @@ function ActiveVisitsTable() {
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
+              <TableToolbar
+                style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+                <TableToolbarContent className={styles.toolbarContent}>
                   <div className={styles.filterContainer}>
                     <Dropdown
                       id="serviceFilter"
-                      initialSelectedItem={'All'}
-                      label=""
+                      initialSelectedItem={{ display: `${t('all', 'All')}` }}
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
-                      items={[{ display: 'All' }, ...services]}
+                      items={[{ display: `${t('all', 'All')}` }, ...services]}
                       itemToString={(item) => (item ? item.display : '')}
                       onChange={handleServiceChange}
                       size="sm"
