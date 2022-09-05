@@ -1,46 +1,35 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { render, screen } from '@testing-library/react';
 import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
+import { MappedAppointment } from '../types';
 import AppointmentsBaseTable from './appointments-base-table.component';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+describe('AppointmentsBaseTable', () => {
+  const tableHeading = 'Booked appointments';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-  };
-});
+  it('renders a loading state when appointments data is being fetched', () => {
+    renderAppointmentsBaseTable([], true, tableHeading);
 
-describe('AppointmentsBaseTable: ', () => {
-  // TODO Dennis please fix this
-  it.skip('renders an empty state view if data is unavailable', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
-
-    renderAppointmentsBaseTable();
-    expect(screen.queryByText(/no appointments to display/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).toBeInTheDocument();
   });
 
-  // TODO Dennis please fix this
-  it.skip('renders a tabular overview of appointment data when available', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockMappedAppointmentsData } });
+  it('renders an error state view if appointments data is unavailable', () => {
+    renderAppointmentsBaseTable([], false, tableHeading);
 
-    renderAppointmentsBaseTable();
+    expect(screen.getByRole('button', { name: /add new appointment/i })).toBeInTheDocument();
+    expect(screen.getByText(/no appointments to display/i)).toBeInTheDocument();
+  });
 
-    // await waitForLoadingToFinish();
-    expect(screen.getByText(/add new appointment/i)).toBeInTheDocument();
+  it('renders a tabular overview of appointments data when available', async () => {
+    renderAppointmentsBaseTable(mockMappedAppointmentsData.data, false, tableHeading);
+
+    expect(screen.getByRole('button', { name: /add new appointment/i })).toBeInTheDocument();
     expect(screen.queryByText(/no appointments to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
-
+    expect(screen.getByText(/booked appointments/i)).toBeInTheDocument();
+    expect(screen.getByRole('listbox', { name: /selected service/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john wilson/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/hiv clinic/i));
-    expect(screen.getAllByText(/tb clinic/i));
-    expect(screen.getAllByText(/start/i));
 
     const expectedColumnHeaders = [/name/, /date & time/, /service type/, /provider/, /location/];
     expectedColumnHeaders.forEach((header) => {
@@ -56,44 +45,12 @@ describe('AppointmentsBaseTable: ', () => {
       expect(screen.queryByRole('row', { name: new RegExp(row, 'i') })).not.toBeInTheDocument();
     });
 
-    expect(screen.getAllByText(/HIV Clinic/i));
-    expect(screen.getAllByText(/TB Clinic/i));
+    expect(screen.getByRole('searchbox')).toBeInTheDocument();
 
-    // filter table by typing in the searchbox
-    const searchbox = screen.getByRole('searchbox');
-    userEvent.type(searchbox, 'John');
-
-    expect(screen.queryByText(/eric test/i)).not.toBeInTheDocument();
-
-    userEvent.clear(searchbox);
-    userEvent.type(searchbox, 'gibberish');
-
-    expect(screen.queryByText(/john wilson/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/eric test/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
+    // TODO: Add tests for the filtering functionality and the service type dropdown
   });
 });
 
-describe('AppointmentsBaseTableLoader: ', () => {
-  it('renders loader when data is loading', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
-
-    renderAppointmentsBaseTableLoader();
-
-    expect(screen.queryByRole('progressbar')).toBeInTheDocument();
-  });
-});
-
-function renderAppointmentsBaseTable() {
-  renderWithSwr(
-    <AppointmentsBaseTable
-      appointments={mockMappedAppointmentsData.data}
-      isLoading={false}
-      tableHeading={'Booked appointments'}
-    />,
-  );
-}
-
-function renderAppointmentsBaseTableLoader() {
-  renderWithSwr(<AppointmentsBaseTable appointments={[]} isLoading={true} tableHeading={'Completed appointments'} />);
+function renderAppointmentsBaseTable(appointments: Array<MappedAppointment>, isLoading = false, tableHeading = '') {
+  render(<AppointmentsBaseTable appointments={appointments} isLoading={isLoading} tableHeading={tableHeading} />);
 }

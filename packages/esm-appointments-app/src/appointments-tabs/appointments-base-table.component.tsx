@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
+  DataTableHeader,
   DataTableSkeleton,
+  Dropdown,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -21,22 +23,26 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-  DataTableHeader,
-  Dropdown,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
+import { useServices } from './appointments-table.resource';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
-import { useServices } from './appointments-table.resource';
+
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
   isLoading: Boolean;
   tableHeading: String;
+  mutate?: () => void;
+}
+
+interface ActionMenuProps {
+  appointment: MappedAppointment;
   mutate?: () => void;
 }
 
@@ -48,37 +54,34 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-interface ActionMenuProps {
-  appointment: MappedAppointment;
-  mutate?: () => void;
-}
-
-const ActionsMenu: React.FC<ActionMenuProps> = ({ appointment, mutate }) => {
+function ActionsMenu({ appointment, mutate }: ActionMenuProps) {
   const { t } = useTranslation();
 
   return (
-    <OverflowMenu light selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#editAppointment"
-        onClick={() =>
-          launchOverlay(
-            t('editAppointment', 'Edit Appointment'),
-            <AppointmentForm mutate={mutate} appointment={appointment} />,
-          )
-        }
-        itemText={t('editAppointment', 'Edit Appointment')}>
-        {t('editAppointment', 'Edit Appointment')}
-      </OverflowMenuItem>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#cancelAppointment"
-        itemText={t('cancelAppointment', 'Cancel Appointment')}>
-        {t('cancelAppointment', 'Cancel Appointment')}
-      </OverflowMenuItem>
-    </OverflowMenu>
+    <Layer>
+      <OverflowMenu ariaLabel="Edit appointment" selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="#editAppointment"
+          onClick={() =>
+            launchOverlay(
+              t('editAppointment', 'Edit Appointment'),
+              <AppointmentForm mutate={mutate} appointment={appointment} />,
+            )
+          }
+          itemText={t('editAppointment', 'Edit Appointment')}>
+          {t('editAppointment', 'Edit Appointment')}
+        </OverflowMenuItem>
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="#cancelAppointment"
+          itemText={t('cancelAppointment', 'Cancel Appointment')}>
+          {t('cancelAppointment', 'Cancel Appointment')}
+        </OverflowMenuItem>
+      </OverflowMenu>
+    </Layer>
   );
-};
+}
 
 function ServiceIcon({ service }) {
   switch (service) {
@@ -93,12 +96,12 @@ function ServiceIcon({ service }) {
   }
 }
 
-const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading, mutate }) => {
+const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const { services } = useServices();
   const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
   const [filter, setFilter] = useState('');
-  const { services } = useServices();
 
   useEffect(() => {
     if (filter) {
@@ -106,6 +109,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       setFilter('');
     }
   }, [filter, filteredRows, appointments]);
+
+  const handleServiceTypeChange = ({ selectedItem }) => {
+    setFilter(selectedItem.name);
+  };
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -131,10 +138,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         return ('' + filterableValue).toLowerCase().includes(filterTerm);
       }),
     );
-  };
-
-  const handleServiceTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem.name);
   };
 
   const tableHeaders = useMemo(
@@ -215,7 +218,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
               size="sm"
               renderIcon={(props) => <Add size={16} {...props} />}
               onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-              {t('addNewAppointment', 'Add new Appointment')}
+              {t('addNewAppointment', 'Add new appointment')}
             </Button>
           </Tile>
         </div>
@@ -232,11 +235,12 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           kind="secondary"
           renderIcon={(props) => <Add size={16} {...props} />}
           onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-          iconDescription={t('addNewAppointment', 'Add new Appointment')}>
-          {t('addNewAppointment', 'Add new Appointment')}
+          iconDescription={t('addNewAppointment', 'Add new appointment')}>
+          {t('addNewAppointment', 'Add new appointment')}
         </Button>
       </div>
       <DataTable
+        data-floating-menu-container
         filterRows={handleFilter}
         headers={tableHeaders}
         overflowMenuOnHover={isDesktop(layout) ? true : false}
@@ -258,14 +262,15 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                   onChange={handleServiceTypeChange}
                   size="sm"
                 />
-                <TableToolbarSearch
-                  className={styles.search}
-                  expanded
-                  light
-                  onChange={onInputChange}
-                  placeholder={t('searchThisList', 'Search this list')}
-                  size="sm"
-                />
+                <Layer>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    expanded
+                    onChange={onInputChange}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
+                </Layer>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} className={styles.appointmentsTable}>
@@ -316,7 +321,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
                       onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-                      {t('addNewAppointment', 'Add new Appointment')}
+                      {t('addNewAppointment', 'Add new appointment')}
                     </Button>
                   </Tile>
                 </Layer>
