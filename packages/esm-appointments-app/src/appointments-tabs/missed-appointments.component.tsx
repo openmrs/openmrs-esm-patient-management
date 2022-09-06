@@ -7,7 +7,8 @@ interface MissedAppointmentsProps {
   status: string;
   title: string;
 }
-const MissedAppointmentsList: React.FC<MissedAppointmentsProps> = ({ status, title }) => {
+
+const MissedAppointments: React.FC<MissedAppointmentsProps> = ({ status, title }) => {
   const { appointments, isLoading, mutate } = useAppointments(status);
   const { t } = useTranslation();
 
@@ -18,4 +19,4 @@ const MissedAppointmentsList: React.FC<MissedAppointmentsProps> = ({ status, tit
   );
 };
 
-export default MissedAppointmentsList;
+export default MissedAppointments;

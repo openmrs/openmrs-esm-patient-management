@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
+import MissedAppointments from '../appointments-tabs/missed-appointments.component';
 import styles from './missed-appointment-list.scss';
-import MissedAppointmentsList from '../appointments-tabs/missed-appointments.component';
 
 enum MissedAppointmentTypes {
   MISSED = 'Scheduled',
@@ -28,20 +28,17 @@ const MissedAppointmentList: React.FC = () => {
           </TabList>
           <TabPanels>
             <TabPanel>
-              <MissedAppointmentsList
+              <MissedAppointments
                 status={MissedAppointmentTypes.MISSED}
                 title={t('missedAppointmentsList', 'Missed Appointments List')}
               />
             </TabPanel>
             <TabPanel>
-              <MissedAppointmentsList
-                status={MissedAppointmentTypes.DEFAULTERS}
-                title={t('defaulters', 'Defaulters')}
-              />
+              <MissedAppointments status={MissedAppointmentTypes.DEFAULTERS} title={t('defaulters', 'Defaulters')} />
             </TabPanel>
             <TabPanel>
               {
-                <MissedAppointmentsList
+                <MissedAppointments
                   status={MissedAppointmentTypes.LTFU}
                   title={t('lostToFollowupAppointments', 'Lost To Followup Appointments')}
                 />
@@ -49,9 +46,9 @@ const MissedAppointmentList: React.FC = () => {
             </TabPanel>
             <TabPanel>
               {
-                <MissedAppointmentsList
+                <MissedAppointments
                   status={MissedAppointmentTypes.PROMISED}
-                  title={t('promisedPateints', 'Promised Pateints')}
+                  title={t('promisedPateints', 'Promised Patients')}
                 />
               }
             </TabPanel>

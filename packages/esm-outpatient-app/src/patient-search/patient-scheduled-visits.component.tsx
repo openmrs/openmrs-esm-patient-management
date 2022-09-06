@@ -79,7 +79,7 @@ export const ScheduledVisits: React.FC<{ visits; visitType; scheduledVisitHeader
           </TileGroup>
         ) : (
           <div className={styles.emptyAppointment}>
-            <p>{t('noAppointmentsFound', 'No appointements found')} </p>
+            <p>{t('noAppointmentsFound', 'No appointments found')} </p>
           </div>
         )}
       </div>
