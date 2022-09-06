@@ -1,28 +1,34 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockPastAndUpcomingAppointments } from '../../__mocks__/appointments-data.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import AppointmentDetails from './appointment-details.component';
+import { usePastVisits } from './../past-visit/past-visit.resource';
+import { useAppointments } from './appointments.resource';
 
 const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseAppointments = useAppointments as jest.Mock;
+const mockUsePastVisits = usePastVisits as jest.Mock;
+
+jest.mock('./../past-visit/past-visit.resource', () => ({
+  usePastVisits: jest.fn(),
+}));
+
+jest.mock('./appointments.resource', () => ({
+  useAppointments: jest.fn(),
+}));
 
 describe('RecentandUpcomingAppointments', () => {
-  it('renders recent and upcoming appointment if available', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockPastAndUpcomingAppointments });
+  it('renders no data if past and upcoming visit is empty', async () => {
+    mockUseAppointments.mockReturnValueOnce({ data: [] });
+    mockUsePastVisits.mockReturnValueOnce({ data: [] });
     renderAppointments();
 
-    await waitForLoadingToFinish();
-
-    expect(screen.getByText(/Last encounter/)).toBeInTheDocument();
-    expect(screen.getByText(/28-Oct-2021, 11:14 AM · HIV return visit · Outpatient Clinic/)).toBeInTheDocument();
-    expect(screen.getByText(/Return date/)).toBeInTheDocument();
-    expect(screen.getByText(/14-Apr-2022, 11:00 AM · Clinical observation · Outpatient Clinic/)).toBeInTheDocument();
+    expect(screen.getByText(/there is no last encounter to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/there is no return date to display for this patient/i)).toBeInTheDocument();
   });
 });
 
