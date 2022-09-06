@@ -51,7 +51,7 @@ export const Autosuggest: React.FC<any> = ({
   const handleClick = (index: number) => {
     const display = getDisplayValue(suggestions[index]);
     const value = getFieldValue(suggestions[index]);
-    searchBox.current.input.value = display;
+    searchBox.current.value = display;
     onSuggestionSelected(name, value);
     setSuggestions([]);
   };
