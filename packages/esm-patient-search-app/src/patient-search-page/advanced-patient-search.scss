@@ -1,0 +1,20 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '../root.scss';
+
+.advancedPatientSearch {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 spacing.$spacing-05;
+}
+
+.refineSearch {
+  margin-right: spacing.$spacing-09;
+  width: 16rem;
+}
+
+.patientSearchResults {
+  min-width: 37.5rem;
+  margin-right: 4rem;
+}

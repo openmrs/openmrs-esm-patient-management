@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
-import { Layer, Tile } from '@carbon/react';
 import { interpolateString, navigate, useConfig } from '@openmrs/esm-framework';
 import { usePatientSearchPaginated } from '../patient-search.resource';
-import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Pagination from '../ui-components/pagination/pagination.component';
-import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
 import styles from './patient-search-lg.scss';
+import {
+  EmptyQueryIllustration,
+  EmptySearchResultsIllustration,
+  FetchErrorIllustration,
+  LoadingSearchResults,
+  PatientSearchResults,
+} from './patient-search-views';
 
 interface PatientSearchComponentProps {
   query: string;
@@ -66,127 +70,44 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     [config, selectPatientAction, hidePanel],
   );
 
-  if (!query) {
-    return (
-      <>
-        <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
-          <span className={styles.productiveHeading02}>0 {t('seachResultsSmall', 'search results')}</span>
-        </h2>
-        <Layer>
-          <Tile
-            className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
-            <EmptyDataIllustration />
-            <p className={styles.emptyResultText}>
-              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
-            </p>
-            <p className={styles.actionText}>
-              <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
-              <br />
-              <span>{t('orPatientName', "OR the patient's name(s)")}</span>
-            </p>
-          </Tile>
-        </Layer>
-      </>
-    );
-  }
+  const searchResultsView = useMemo(() => {
+    if (!query) {
+      return <EmptyQueryIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+    }
 
-  if (isLoading) {
-    return (
-      <div className={styles.searchResultsContainer}>
-        <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
-          <div>
-            <h2
-              className={`${styles.resultsHeader} ${styles.paddedResultsHeader} ${
-                inTabletOrOverlay && styles.leftPaddedResultHeader
-              }`}>
-              <span className={styles.productiveHeading02}>
-                {totalResults
-                  ? `${totalResults} ${t('seachResultsSmall', 'search results')}`
-                  : t('searchingText', 'Searching...')}
-              </span>
-            </h2>
-            <div className={styles.results}>
-              <PatientBannerSkeleton />
-              <PatientBannerSkeleton />
-              <PatientBannerSkeleton />
-              <PatientBannerSkeleton />
-              <PatientBannerSkeleton />
-            </div>
-          </div>
-          <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-            <Pagination
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-              hasMore={hasMore}
-              totalPages={pages}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+    if (isLoading) {
+      return <LoadingSearchResults />;
+    }
 
-  if (fetchError) {
-    return (
-      <Layer>
-        <Tile
-          className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
-          <EmptyDataIllustration />
-          <div>
-            <p className={styles.errorMessage}>{t('error', 'Error')}</p>
-            <p className={styles.errorCopy}>
-              {t(
-                'errorCopy',
-                'Sorry, there was an error. You can try to reload this page, or contact the site administrator and quote the error code above.',
-              )}
-            </p>
-          </div>
-        </Tile>
-      </Layer>
-    );
-  }
+    if (fetchError) {
+      return <FetchErrorIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+    }
 
-  if (isEmpty(searchResults)) {
-    return (
-      <>
-        <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
-          <span className={styles.productiveHeading02}>0 {t('seachResultsSmall', 'search results')}</span>
-        </h2>
-        <Layer>
-          <Tile
-            className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
-            <EmptyDataIllustration />
-            <p className={styles.emptyResultText}>
-              {t('noPatientChartsFoundMessage', 'Sorry, no patient charts have been found')}
-            </p>
-            <p className={styles.actionText}>
-              <span>{t('trySearchWithPatientUniqueID', "Try searching with the patient's unique ID number")}</span>
-              <br />
-              <span>{t('orPatientName', "OR the patient's name(s)")}</span>
-            </p>
-          </Tile>
-        </Layer>
-      </>
-    );
-  }
+    if (isEmpty(searchResults)) {
+      return <EmptySearchResultsIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+    }
+
+    return <PatientSearchResults searchResults={searchResults} handlePatientSelection={handlePatientSelection} />;
+  }, [query, isLoading, inTabletOrOverlay, searchResults, handlePatientSelection, fetchError]);
 
   return (
-    <div>
-      <div className={`${styles.searchResults} ${stickyPagination && styles.broadBottomMargin}`}>
-        <h2 className={`${styles.resultsHeader} ${inTabletOrOverlay && styles.leftPaddedResultHeader}`}>
-          <span className={styles.productiveHeading02}>
-            {totalResults} {t('seachResultsSmall', 'search results')}
-          </span>
+    <div className={styles.searchResults}>
+      <div className={`${stickyPagination && styles.broadBottomMargin}`}>
+        <h2
+          className={`${styles.resultsHeader} ${styles.productiveHeading02} ${
+            inTabletOrOverlay && styles.leftPaddedResultHeader
+          }`}>
+          {!isLoading
+            ? `${totalResults ?? 0} ${t('seachResultsSmall', 'search results')}`
+            : t('searchingText', 'Searching...')}
         </h2>
-        <div className={styles.results}>
-          {searchResults.map((patient) => (
-            <PatientBanner selectPatientAction={handlePatientSelection} patientUuid={patient.uuid} patient={patient} />
-          ))}
+        {searchResultsView}
+      </div>
+      {pages && (
+        <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+          <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
         </div>
-      </div>
-      <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-        <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
-      </div>
+      )}
     </div>
   );
 };

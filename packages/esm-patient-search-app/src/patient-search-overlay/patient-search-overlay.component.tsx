@@ -5,6 +5,7 @@ import Overlay from '../ui-components/overlay';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import PatientSearchComponent from '../patient-search-page/patient-search-lg.component';
 import debounce from 'lodash-es/debounce';
+import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -43,7 +44,7 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
         onClear={handleClear}
       />
       {showSearchResults && (
-        <PatientSearchComponent
+        <AdvancedPatientSearchComponent
           selectPatientAction={selectPatientAction}
           query={searchTerm}
           inTabletOrOverlay

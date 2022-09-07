@@ -12,3 +12,7 @@
 .bodyLong01 {
   @include type.type-style('body-01');
 }
+
+.label01 {
+  @include type.type-style('label-01');
+}

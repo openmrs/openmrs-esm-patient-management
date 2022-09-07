@@ -1,6 +1,5 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 :global(.cds--side-nav) {
@@ -8,7 +7,10 @@
 }
 
 .searchResults {
-  width: 100%;
+  height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .broadBottomMargin {
@@ -16,8 +18,6 @@
 }
 
 .resultsHeader {
-  display: flex;
-  justify-content: space-between;
   margin: spacing.$spacing-03 0;
 }
 
@@ -61,12 +61,12 @@
   background: $ui-01;
 }
 
-.stickyPagination {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
+// .stickyPagination {
+//   position: fixed;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+// }
 
 .errorMessage {
   @include type.type-style('heading-compact-02');
@@ -78,4 +78,20 @@
   margin-bottom: spacing.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
+}
+
+// Refine Search Params
+
+.advancedSearchPage {
+  width: 100%;
+  display: flex;
+  // grid-template-columns: auto 1fr;
+  grid-column-gap: spacing.$spacing-09;
+}
+
+.dobFields {
+  display: flex;
+  input {
+    margin-left: spacing.$spacing-05;
+  }
 }

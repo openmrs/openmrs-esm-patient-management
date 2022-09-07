@@ -1,0 +1,36 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../root.scss';
+
+.refineSeachContainer {
+  h2 {
+    margin: spacing.$spacing-03 0;
+  }
+}
+
+.field {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.dobFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-gap: spacing.$spacing-03;
+  // display: flex;
+  // justify-content: space-between;
+  // .dobField {
+  //   margin-right: spacing.$spacing-03;
+  // }
+  // .dobField:last-child {
+  //   margin-right: 0;
+  // }
+}
+
+.button {
+  width: 100%;
+  max-width: unset;
+}
+
+.sexLabelText {
+  margin-bottom: spacing.$spacing-03;
+}
