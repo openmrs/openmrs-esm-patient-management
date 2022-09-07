@@ -28,20 +28,20 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm } from '../helpers';
+import { amPm, startDate } from '../helpers';
 import { saveAppointment, useServices } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
 import styles from './edit-appointment-form.scss';
-
+import { useSWRConfig } from 'swr';
 interface AppointmentFormProps {
   appointment: MappedAppointment;
-  mutate: () => void;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate = () => {} }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
@@ -103,7 +103,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, mutate =
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
-          mutate();
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
           closeOverlay();
         }
       },
