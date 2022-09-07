@@ -1,3 +1,4 @@
+import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { AdvancedPatientSearchState } from '../types';
 import styles from './advanced-patient-search.scss';
@@ -14,15 +15,29 @@ interface AdvancedPatientSearchProps {
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = (props) => {
+  const { inTabletOrOverlay } = props;
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialState);
   return (
-    <div className={styles.advancedPatientSearch}>
-      <div className={styles.refineSearch}>
-        <RefineSearch setFilters={setFilters} />
-      </div>
-      <div className={styles.patientSearchResults}>
+    <div
+      className={`${
+        !inTabletOrOverlay ? styles.advancedPatientSearchDesktop : styles.advancedPatientSearchTabletOrOverlay
+      }`}>
+      {!inTabletOrOverlay && (
+        <div className={styles.refineSearchDesktop}>
+          <RefineSearch setFilters={setFilters} inTabletOrOverlay={props.inTabletOrOverlay} />
+        </div>
+      )}
+      <div
+        className={`${
+          !inTabletOrOverlay ? styles.patientSearchResultsDesktop : styles.patientSearchResultsTabletOrOverlay
+        }`}>
         <PatientSearchComponent {...props} />
       </div>
+      {inTabletOrOverlay && (
+        <div className={styles.refineSearchTabletOrOverlay}>
+          <RefineSearch setFilters={setFilters} inTabletOrOverlay={props.inTabletOrOverlay} />
+        </div>
+      )}
     </div>
   );
 };

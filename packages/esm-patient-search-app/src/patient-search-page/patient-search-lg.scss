@@ -6,11 +6,16 @@
   z-index: 0;
 }
 
-.searchResults {
+.searchResultsDesktop {
   height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.searchResultsTabletOrOverlay {
+  height: 100%;
+  margin-bottom: spacing.$spacing-09;
 }
 
 .broadBottomMargin {

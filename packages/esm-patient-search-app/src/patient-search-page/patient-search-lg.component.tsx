@@ -91,7 +91,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   }, [query, isLoading, inTabletOrOverlay, searchResults, handlePatientSelection, fetchError]);
 
   return (
-    <div className={styles.searchResults}>
+    <div className={`${!inTabletOrOverlay ? styles.searchResultsDesktop : styles.searchResultsTabletOrOverlay}`}>
       <div className={`${stickyPagination && styles.broadBottomMargin}`}>
         <h2
           className={`${styles.resultsHeader} ${styles.productiveHeading02} ${

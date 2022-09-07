@@ -1,17 +1,22 @@
 import React, { useCallback, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch, TextInput, DatePicker, DatePickerInput, Button } from '@carbon/react';
+import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import styles from './refine-search.scss';
 import reducer, { initialState } from './advanced-search-reducer';
 import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface RefineSearchProps {
+  inTabletOrOverlay: boolean;
   setFilters: React.Dispatch<React.SetStateAction<AdvancedPatientSearchState>>;
 }
 
-const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters }) => {
+const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverlay }) => {
   const [formState, formDispatch] = useReducer(reducer, initialState);
+  const [showRefineSearchDialog, setShowRefineSearchDialog] = useState(false);
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   const handleGenderChange = useCallback(
     (evt: { name: 'any' | 'male' | 'female' }) => {
@@ -117,23 +122,158 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters }) => {
     [formDispatch, formState],
   );
 
-  const handleResetFields = useCallback(
-    (evt) => {
-      formDispatch({
-        type: AdvancedPatientSearchActionTypes.RESET_FIELDS,
-      });
-      setFilters(initialState);
-    },
-    [formDispatch, initialState],
-  );
+  const handleResetFields = useCallback(() => {
+    formDispatch({
+      type: AdvancedPatientSearchActionTypes.RESET_FIELDS,
+    });
+    setFilters(initialState);
+  }, [formDispatch, initialState]);
+
+  const toggleShowRefineSearchDialog = useCallback(() => {
+    setShowRefineSearchDialog((prevState) => !prevState);
+  }, []);
+
+  if (inTabletOrOverlay) {
+    return (
+      <>
+        <div className={styles.refineSearchBanner}>
+          <p className={styles.bodyShort01}>{t('refineSearchTabletText', "Can't find who you're looking for?")}</p>
+          <Button
+            kind="ghost"
+            onClick={toggleShowRefineSearchDialog}
+            renderIcon={!showRefineSearchDialog ? ChevronUp : ChevronDown}
+            className={styles.refineSearchDialogOpener}
+            size="sm">
+            {t('refineSearch', 'Refine search')}
+          </Button>
+        </div>
+        {showRefineSearchDialog && (
+          <div className={styles.refineSearchDialogContainer}>
+            <div className={styles.refineSearchDialog}>
+              <div className={styles.refineSearchDialogHeader}>
+                <p className={styles.bodyShort01}>{t('refineSearchHeaderText', 'Add additional search criteria')}</p>
+                <Button
+                  kind="ghost"
+                  onClick={toggleShowRefineSearchDialog}
+                  renderIcon={ChevronDown}
+                  className={styles.refineSearchDialogOpener}
+                  size="sm">
+                  {t('refineSearch', 'Refine search')}
+                </Button>
+              </div>
+              <form onSubmit={handleSubmit}>
+                <div className={`${styles.padded} ${isTablet && styles.refineSearchDialogGenderSexRow}`}>
+                  <div className={styles.fieldTabletOrOverlay}>
+                    <div className={styles.labelText}>
+                      <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">
+                        {t('sex', 'Sex')}
+                      </label>
+                    </div>
+                    <ContentSwitcher
+                      id="gender"
+                      onChange={handleGenderChange}
+                      size={isTablet ? 'lg' : 'md'}
+                      selectedIndex={formState.gender === 'any' ? 0 : formState.gender === 'male' ? 1 : 2}>
+                      <Switch name="any" text={t('any', 'Any')} />
+                      <Switch name="male" text={t('male', 'Male')} />
+                      <Switch name="female" text={t('female', 'Female')} />
+                    </ContentSwitcher>
+                  </div>
+                  <div className={`${styles.fieldTabletOrOverlay} ${styles.dobFields}`}>
+                    <TextInput
+                      id="dateOfBirth"
+                      placeholder="DD"
+                      value={formState.dateOfBirth ?? ''}
+                      onChange={handleDateOfBirthChange}
+                      className={styles.dobField}
+                      type="number"
+                      size={isTablet ? 'lg' : 'md'}
+                      labelText={t('day', 'Day')}
+                    />
+                    <TextInput
+                      id="monthOfBirth"
+                      placeholder="MM"
+                      value={formState.monthOfBirth ?? ''}
+                      onChange={handleMonthOfBirthChange}
+                      className={styles.dobField}
+                      size={isTablet ? 'lg' : 'md'}
+                      type="number"
+                      labelText={t('month', 'Month')}
+                    />
+                    <TextInput
+                      id="yearOfBirth"
+                      placeholder="YYYY"
+                      value={formState.yearOfBirth ?? ''}
+                      onChange={handleYearOfBirthChange}
+                      className={styles.dobField}
+                      type="number"
+                      size={isTablet ? 'lg' : 'md'}
+                      labelText={t('year', 'Year')}
+                    />
+                  </div>
+                </div>
+                <div className={`${styles.padded} ${isTablet && styles.phoneLastVisitRow}`}>
+                  <div className={styles.phonePostcode}>
+                    <div className={styles.fieldTabletOrOverlay}>
+                      <TextInput
+                        id="phoneNumber"
+                        labelText={t('phoneNumber', 'Phone number')}
+                        onChange={handlePhoneNumberChange}
+                        value={formState.phoneNumber ?? ''}
+                        type="number"
+                        size={isTablet ? 'lg' : 'md'}
+                      />
+                    </div>
+                    <div className={styles.fieldTabletOrOverlay}>
+                      <TextInput
+                        id="postcode"
+                        labelText={t('postcode', 'Postcode')}
+                        onChange={handlePostCodeChange}
+                        value={formState.postcode ?? ''}
+                        type="number"
+                        size={isTablet ? 'lg' : 'md'}
+                      />
+                    </div>
+                  </div>
+                  <DatePicker
+                    id="dateOfVisit"
+                    labelText={t('dateOfVisit', 'Date of last visit')}
+                    type="single"
+                    onChange={handleDateOfVisitChange}
+                    size={isTablet ? 'lg' : 'md'}
+                    value={formState.dateOfVisit ?? ''}>
+                    <DatePickerInput
+                      placeholder="mm/dd/yyyy"
+                      size={isTablet ? 'lg' : 'md'}
+                      labelText={t('dateOfVisit', 'Date of last visit')}
+                    />
+                  </DatePicker>
+                </div>
+                <div className={`${isTablet && styles.paddedButtons} ${styles.buttonSet}`}>
+                  <Button kind="secondary" size="xl" onClick={handleResetFields} className={styles.button}>
+                    {t('resetFields', 'Reset fields')}
+                  </Button>
+                  <Button type="submit" kind="primary" size="xl" className={styles.button}>
+                    {t('apply', 'Apply')}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className={styles.refineSeachContainer}>
       <h2 className={styles.productiveHeading02}>{t('refineSearch', 'Refine search')}</h2>
       <div className={styles.field}>
-        <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">
-          {t('sex', 'Sex')}
-        </label>
+        <div className={styles.labelText}>
+          <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">
+            {t('sex', 'Sex')}
+          </label>
+        </div>
         <ContentSwitcher
           id="gender"
           onChange={handleGenderChange}
@@ -203,7 +343,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters }) => {
           light
           onChange={handleDateOfVisitChange}
           value={formState.dateOfVisit ?? ''}>
-          <DatePickerInput labelText={t('dateOfVisit', 'Date of last visit')} />
+          <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('dateOfVisit', 'Date of last visit')} />
         </DatePicker>
       </div>
       <hr className={`${styles.field} ${styles.horizontalDivider}`} />
@@ -211,7 +351,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters }) => {
         {t('apply', 'Apply')}
       </Button>
       <Button kind="secondary" size="md" onClick={handleResetFields} className={`${styles.field} ${styles.button}`}>
-        {t('resetFields', 'ResetFields')}
+        {t('resetFields', 'Reset fields')}
       </Button>
     </form>
   );

@@ -3,18 +3,35 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
-.advancedPatientSearch {
+.advancedPatientSearchDesktop {
   display: flex;
   justify-content: space-between;
   padding: 0 spacing.$spacing-05;
 }
 
-.refineSearch {
+.advancedPatientSearchTabletOrOverlay {
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: calc(100vh - 9rem - 3px);
+  overflow-y: hidden;
+}
+
+.refineSearchDesktop {
   margin-right: spacing.$spacing-09;
   width: 16rem;
 }
 
-.patientSearchResults {
+.patientSearchResultsDesktop {
   min-width: 37.5rem;
   margin-right: 4rem;
+}
+
+.patientSearchResultsTabletOrOverlay {
+  width: 100%;
+  overflow-y: auto;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .advancedPatientSearchTabletOrOverlay {
+  height: calc(100vh - 6rem - 2px);
 }
