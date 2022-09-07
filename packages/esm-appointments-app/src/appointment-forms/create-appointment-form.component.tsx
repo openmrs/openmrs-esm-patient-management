@@ -36,6 +36,7 @@ import { ConfigObject } from '../config-schema';
 import { mockFrequency } from '../../../../__mocks__/appointments.mock';
 import { closeOverlay } from '../hooks/useOverlay';
 import { useProviders } from '../hooks/useProviders';
+import { startDate as fromDate } from '../helpers';
 
 import styles from './create-appointment-form.scss';
 
@@ -61,7 +62,6 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
   const [endTime, setEndTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
-  const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const [appointmentReminder, setAppointmentReminder] = useState(null);
   const [appointmentKind, setAppointmentKind] = useState('');
   const [frequency, setFrequency] = useState('');
@@ -129,7 +129,7 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
           });
         }
 
-        mutate(`${appointmentsSearchUrl}`);
+        mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${fromDate}&status=Scheduled`);
       },
       (error) => {
         showNotification({

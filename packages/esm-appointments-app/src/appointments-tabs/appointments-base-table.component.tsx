@@ -64,10 +64,7 @@ function ActionsMenu({ appointment, mutate }: ActionMenuProps) {
           className={styles.menuItem}
           id="#editAppointment"
           onClick={() =>
-            launchOverlay(
-              t('editAppointment', 'Edit Appointment'),
-              <AppointmentForm mutate={mutate} appointment={appointment} />,
-            )
+            launchOverlay(t('editAppointment', 'Edit Appointment'), <AppointmentForm appointment={appointment} />)
           }
           itemText={t('editAppointment', 'Edit Appointment')}>
           {t('editAppointment', 'Edit Appointment')}
