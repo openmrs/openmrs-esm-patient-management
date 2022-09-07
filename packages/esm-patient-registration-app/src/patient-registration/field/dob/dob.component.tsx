@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Switch } from '@carbon/react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Input } from '../../input/basic-input/input/input.component';
 import styles from '../field.scss';
 
 const calcBirthdate = (yearDelta, monthDelta) => {
@@ -87,9 +86,11 @@ export const DobField: React.FC = () => {
         </div>
       ) : (
         <div className={styles.grid}>
-          <Input
+          <TextInput
             id="yearsEstimated"
             type="number"
+            name={yearsEstimated.name}
+            light
             onChange={onEstimatedYearsChange}
             labelText={t('estimatedYearsLabelText', 'Estimated Years')}
             invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
@@ -98,9 +99,10 @@ export const DobField: React.FC = () => {
             min={0}
             required
           />
-          <Input
+          <TextInput
             id="monthsEstimated"
             type="number"
+            name={monthsEstimated.name}
             light
             onChange={onEstimatedMonthsChange}
             labelText={t('estimatedMonthsLabelText', 'Estimated Months')}
