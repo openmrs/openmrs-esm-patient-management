@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -25,7 +25,14 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, ConfigurableLink, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import {
+  isDesktop,
+  useLayoutType,
+  ConfigurableLink,
+  formatDatetime,
+  parseDate,
+  showModal,
+} from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
 import { useServices } from './appointments-table.resource';
@@ -144,6 +151,13 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     );
   };
 
+  const launchAppointmentStatusModal = (appointments: MappedAppointment) => {
+    const dispose = showModal('change-appointment-status-modal', {
+      closeModal: () => dispose(),
+      appointments,
+    });
+  };
+
   const tableHeaders = useMemo(
     () => [
       {
@@ -202,7 +216,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         ),
       },
       startButton: {
-        content: <Button kind="ghost">Start</Button>,
+        content: (
+          <Button onClick={() => launchAppointmentStatusModal(appointment)} kind="ghost">
+            Start
+          </Button>
+        ),
       },
     }));
   }, [filteredRows, appointments]);
