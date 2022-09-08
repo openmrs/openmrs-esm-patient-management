@@ -95,7 +95,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
         if (filters.phoneNumber) {
           if (
             !(
-              patient.attributes.find((attr) => attr.attributeType.display === 'Telephone Number').value ===
+              patient.attributes.find((attr) => attr.attributeType.display === 'Telephone Number')?.value ===
               filters.phoneNumber.toString()
             )
           ) {
