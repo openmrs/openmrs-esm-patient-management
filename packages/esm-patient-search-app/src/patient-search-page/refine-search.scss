@@ -106,3 +106,20 @@
 .paddedButtons {
   margin: spacing.$spacing-07 spacing.$spacing-05;
 }
+
+.filtersAppliedCount {
+  padding: 0 spacing.$spacing-03;
+  background-color: $color-blue-60-2;
+  color: $ui-01;
+}
+
+.refineSearchBannerFilterInfo {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  color: $ui-02;
+
+  p {
+    margin-left: spacing.$spacing-03;
+  }
+}

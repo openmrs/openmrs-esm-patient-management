@@ -32,7 +32,6 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
   const handleDateOfBirthChange = useCallback(
     (evt: { target: { value: string } }) => {
       const date = parseInt(evt.target.value);
-      console.log(date, typeof date);
       if (!date) {
         formDispatch({
           type: AdvancedPatientSearchActionTypes.SET_DATE_OF_BIRTH,
@@ -119,8 +118,9 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
     (evt) => {
       evt.preventDefault();
       setFilters(formState);
+      setShowRefineSearchDialog(false);
     },
-    [formDispatch, formState],
+    [formState, setShowRefineSearchDialog, setFilters],
   );
 
   const handleResetFields = useCallback(() => {
@@ -128,7 +128,8 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       type: AdvancedPatientSearchActionTypes.RESET_FIELDS,
     });
     setFilters(initialState);
-  }, [formDispatch, initialState]);
+    setShowRefineSearchDialog(false);
+  }, [formDispatch, setShowRefineSearchDialog, setFilters]);
 
   const toggleShowRefineSearchDialog = useCallback(() => {
     setShowRefineSearchDialog((prevState) => !prevState);
@@ -138,7 +139,19 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
     return (
       <>
         <div className={styles.refineSearchBanner}>
-          <p className={styles.bodyShort01}>{t('refineSearchTabletText', "Can't find who you're looking for?")}</p>
+          {!filtersApplied ? (
+            <p className={styles.bodyShort01}>
+              {t('refineSearchTabletBannerText', "Can't find who you're looking for?")}
+            </p>
+          ) : (
+            <div className={styles.refineSearchBannerFilterInfo}>
+              <span className={`${styles.filtersAppliedCount} ${styles.bodyShort01}`}>{filtersApplied}</span>{' '}
+              <p className={styles.bodyShort01}>{t('filtersAppliedText', 'search queries added')}</p>
+              <Button kind="ghost" onClick={handleResetFields} className={styles.refineSearchDialogOpener} size="sm">
+                {t('clear', 'Clear')}
+              </Button>
+            </div>
+          )}
           <Button
             kind="ghost"
             onClick={toggleShowRefineSearchDialog}
@@ -348,7 +361,8 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       </div>
       <hr className={`${styles.field} ${styles.horizontalDivider}`} />
       <Button type="submit" kind="primary" size="md" className={`${styles.field} ${styles.button}`}>
-        {t('apply', 'Apply')} {filtersApplied ? `(${filtersApplied})` : null}
+        {t('apply', 'Apply')}{' '}
+        {filtersApplied ? `(${filtersApplied} ${t('countOfFiltersApplied', 'filters applied')})` : null}
       </Button>
       <Button kind="secondary" size="md" onClick={handleResetFields} className={`${styles.field} ${styles.button}`}>
         {t('resetFields', 'Reset fields')}

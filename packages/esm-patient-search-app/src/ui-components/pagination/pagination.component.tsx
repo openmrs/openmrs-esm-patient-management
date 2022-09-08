@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Button } from '@carbon/react';
 import { CaretLeft, CaretRight } from '@carbon/react/icons';
 import styles from './pagination.scss';
@@ -20,6 +20,22 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
     setCurrentPage(Math.min(totalPages, currentPage + 1));
   }, [currentPage, setCurrentPage, totalPages]);
 
+  const pageButtons = useMemo(() => {
+    const left = currentPage > 2 ? currentPage - 2 : 1;
+    const right = totalPages - currentPage < 2 ? totalPages : currentPage + 2;
+    const totalButtons = right - left + 1;
+    return [...Array(totalButtons).keys()].map((indx) => (
+      <Button
+        key={indx}
+        kind="ghost"
+        onClick={() => setCurrentPage(indx + left)}
+        className={`${styles.paginationButton} ${indx + left === currentPage && styles.activeButton}`}
+        type="button">
+        {indx + left}
+      </Button>
+    ));
+  }, [currentPage, totalPages, setCurrentPage]);
+
   if (totalPages <= 1) {
     return <></>;
   }
@@ -35,18 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
         onClick={decrementPage}
         disabled={currentPage == 1}
       />
-      <div className={styles.pageNumbers}>
-        {[...Array(totalPages).keys()].map((indx) => (
-          <Button
-            key={indx}
-            kind="ghost"
-            onClick={() => setCurrentPage(indx + 1)}
-            className={`${styles.paginationButton} ${indx + 1 === currentPage && styles.activeButton}`}
-            type="button">
-            {indx + 1}
-          </Button>
-        ))}
-      </div>
+      <div className={styles.pageNumbers}>{pageButtons}</div>
       <Button
         kind="ghost"
         hasIconOnly

@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
-import { interpolateString, navigate, useConfig } from '@openmrs/esm-framework';
-import { usePatientSearchPaginated } from '../patient-search.resource';
+import { interpolateString, navigate, useConfig, usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
 import styles from './patient-search-lg.scss';
 import {
@@ -12,6 +11,7 @@ import {
   LoadingSearchResults,
   PatientSearchResults,
 } from './patient-search-views';
+import { SearchedPatient } from '../types';
 
 interface PatientSearchComponentProps {
   query: string;
@@ -19,6 +19,9 @@ interface PatientSearchComponentProps {
   stickyPagination?: boolean;
   selectPatientAction?: (patientUuid: string) => void;
   hidePanel?: () => void;
+  searchResults: Array<SearchedPatient>;
+  isLoading: boolean;
+  fetchError: Error;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -27,29 +30,23 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   selectPatientAction,
   inTabletOrOverlay,
   hidePanel,
+  searchResults,
+  isLoading,
+  fetchError,
 }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState(1);
   const resultsToShow = inTabletOrOverlay ? 15 : 5;
-  const {
-    isLoading,
-    data: searchResults,
-    fetchError,
-    hasMore,
-    totalResults,
-  } = usePatientSearchPaginated(query, !!query, resultsToShow, currentPage);
+  const totalResults = searchResults.length;
+
+  const { results, goTo, totalPages, currentPage, showNextButton, showPreviousButton, paginated } = usePagination(
+    searchResults,
+    resultsToShow,
+  );
 
   useEffect(() => {
-    if (!isLoading) {
-      setPages(Math.ceil(totalResults / resultsToShow));
-    }
-  }, [isLoading, totalResults, resultsToShow]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [query]);
+    goTo(1);
+  }, [query, goTo]);
 
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
@@ -83,12 +80,12 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <FetchErrorIllustration inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
-    if (isEmpty(searchResults)) {
+    if (isEmpty(results)) {
       return <EmptySearchResultsIllustration inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
-    return <PatientSearchResults searchResults={searchResults} handlePatientSelection={handlePatientSelection} />;
-  }, [query, isLoading, inTabletOrOverlay, searchResults, handlePatientSelection, fetchError]);
+    return <PatientSearchResults searchResults={results} handlePatientSelection={handlePatientSelection} />;
+  }, [query, isLoading, inTabletOrOverlay, results, handlePatientSelection, fetchError]);
 
   return (
     <div className={`${!inTabletOrOverlay ? styles.searchResultsDesktop : styles.searchResultsTabletOrOverlay}`}>
@@ -103,9 +100,14 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         </h2>
         {searchResultsView}
       </div>
-      {pages && (
+      {paginated && (
         <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
-          <Pagination setCurrentPage={setCurrentPage} currentPage={currentPage} hasMore={hasMore} totalPages={pages} />
+          <Pagination
+            setCurrentPage={goTo}
+            currentPage={currentPage}
+            hasMore={showNextButton}
+            totalPages={totalPages}
+          />
         </div>
       )}
     </div>
