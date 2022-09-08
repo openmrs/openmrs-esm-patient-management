@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { usePatientSearchInfinite } from '../patient-search.resource';
+import { useGetPatientAttributePhoneUuid, usePatientSearchInfinite } from '../patient-search.resource';
 import { AdvancedPatientSearchState } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
@@ -91,6 +91,18 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
             return false;
           }
         }
+
+        if (filters.phoneNumber) {
+          if (
+            !(
+              patient.attributes.find((attr) => attr.attributeType.display === 'Telephone Number').value ===
+              filters.phoneNumber.toString()
+            )
+          ) {
+            return false;
+          }
+        }
+
         return true;
       });
     }

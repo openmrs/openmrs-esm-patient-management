@@ -1,14 +1,16 @@
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, useConfig, FetchResponse } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import { openmrsFetch, useConfig, FetchResponse, openmrsObservableFetch, showToast } from '@openmrs/esm-framework';
 import { PatientSearchResponse, SearchedPatient } from './types';
+import { useTranslation } from 'react-i18next';
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +
   'patientIdentifier:(uuid,identifier),' +
   'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
-  'attributes:(value,attributeType:(name)))';
+  'attributes:(value,attributeType:(uuid,display)))';
 
 export function usePatientSearchPaginated(
   searchTerm: string,
@@ -96,4 +98,22 @@ export function usePatientSearchInfinite(
   );
 
   return results;
+}
+
+export function useGetPatientAttributePhoneUuid(): string {
+  const { t } = useTranslation();
+  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<{ uuid: string }> }>>(
+    '/ws/rest/v1/personattributetype?q=Telephone Number',
+    openmrsFetch,
+  );
+  if (error) {
+    showToast({
+      description: `${t(
+        'fetchingPhoneNumberUuidFailed',
+        'Fetching Phone number attribute type UUID failed with error',
+      )}: ${error?.message}`,
+      kind: 'error',
+    });
+  }
+  return data?.data?.results?.[0]?.uuid;
 }

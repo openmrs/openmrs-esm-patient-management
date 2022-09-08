@@ -16,7 +16,7 @@ export interface SearchedPatient {
       middleName: string;
     };
   };
-  attributes: Array<{ value: string; attributeType: { name: string } }>;
+  attributes: Array<{ value: string; attributeType: { uuid: string; display: string } }>;
 }
 export interface Address {
   preferred: boolean;
