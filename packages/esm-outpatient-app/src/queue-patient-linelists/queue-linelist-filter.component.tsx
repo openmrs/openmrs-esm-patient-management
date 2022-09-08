@@ -156,7 +156,7 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit">
-            {t('applyFilters', 'Apply Filters')}
+            {t('applyFilters', 'Apply filters')}
           </Button>
         </ButtonSet>
       </Form>
