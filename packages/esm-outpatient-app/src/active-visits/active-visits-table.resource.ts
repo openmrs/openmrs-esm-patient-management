@@ -11,6 +11,7 @@ import {
 } from '@openmrs/esm-framework';
 import last from 'lodash-es/last';
 import { MappedServiceQueueEntry, QueueEntryPayload, QueueServiceInfo } from '../types';
+import isEmpty from 'lodash-es/isEmpty';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -211,7 +212,8 @@ export const getOriginFromPathName = (pathname = '') => {
 
 export async function updateQueueEntry(
   visitUuid: string,
-  queueUuid: string,
+  previousQueueUuid: string,
+  newQueueUuid: string,
   queueEntryUuid: string,
   patientUuid: string,
   priority: string,
@@ -219,7 +221,9 @@ export async function updateQueueEntry(
   endedAt: Date,
   abortController: AbortController,
 ) {
-  await Promise.all([endPatientStatus(queueUuid, abortController, queueEntryUuid, endedAt)]);
+  const queueServiceUuid = isEmpty(newQueueUuid) ? previousQueueUuid : newQueueUuid;
+
+  await Promise.all([endPatientStatus(previousQueueUuid, abortController, queueEntryUuid, endedAt)]);
 
   return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
     method: 'POST',
@@ -237,7 +241,7 @@ export async function updateQueueEntry(
           uuid: priority,
         },
         queue: {
-          uuid: queueUuid,
+          uuid: queueServiceUuid,
         },
         patient: {
           uuid: patientUuid,
@@ -249,12 +253,12 @@ export async function updateQueueEntry(
 }
 
 async function endPatientStatus(
-  queueUuid: string,
+  previousQueueUuid: string,
   abortController: AbortController,
   queueEntryUuid: string,
   endedAt: Date,
 ) {
-  await openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
+  await openmrsFetch(`/ws/rest/v1/queue/${previousQueueUuid}/entry/${queueEntryUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
