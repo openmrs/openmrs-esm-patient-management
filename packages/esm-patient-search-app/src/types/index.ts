@@ -83,7 +83,7 @@ export interface AdvancedPatientSearchState {
   monthOfBirth: number;
   yearOfBirth: number;
   phoneNumber: number;
-  postcode: number;
+  postcode: string;
   dateOfVisit: string | Date;
 }
 
@@ -105,6 +105,6 @@ export interface AdvancedPatientSearchAction {
   monthOfBirth?: number;
   yearOfBirth?: number;
   phoneNumber?: number;
-  postcode?: number;
+  postcode?: string;
   dateOfVisit?: string | Date;
 }

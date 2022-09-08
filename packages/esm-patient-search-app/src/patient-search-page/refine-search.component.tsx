@@ -10,9 +10,10 @@ import { useLayoutType } from '@openmrs/esm-framework';
 interface RefineSearchProps {
   inTabletOrOverlay: boolean;
   setFilters: React.Dispatch<React.SetStateAction<AdvancedPatientSearchState>>;
+  filtersApplied: number;
 }
 
-const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverlay }) => {
+const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverlay, filtersApplied }) => {
   const [formState, formDispatch] = useReducer(reducer, initialState);
   const [showRefineSearchDialog, setShowRefineSearchDialog] = useState(false);
   const { t } = useTranslation();
@@ -95,7 +96,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
   );
 
   const handlePostCodeChange = useCallback(
-    (evt: { target: { value: number } }) => {
+    (evt: { target: { value: string } }) => {
       formDispatch({
         type: AdvancedPatientSearchActionTypes.SET_POSTCODE,
         postcode: evt.target.value,
@@ -230,7 +231,6 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                         labelText={t('postcode', 'Postcode')}
                         onChange={handlePostCodeChange}
                         value={formState.postcode ?? ''}
-                        type="number"
                         size={isTablet ? 'lg' : 'md'}
                       />
                     </div>
@@ -254,7 +254,8 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                     {t('resetFields', 'Reset fields')}
                   </Button>
                   <Button type="submit" kind="primary" size="xl" className={styles.button}>
-                    {t('apply', 'Apply')}
+                    {t('apply', 'Apply')}{' '}
+                    {filtersApplied ? `(${filtersApplied} ${t('countOfFiltersApplied', 'filters applied')})` : null}
                   </Button>
                 </div>
               </form>
@@ -331,7 +332,6 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           labelText={t('postcode', 'Postcode')}
           onChange={handlePostCodeChange}
           value={formState.postcode ?? ''}
-          type="number"
           light
         />
       </div>
@@ -348,7 +348,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       </div>
       <hr className={`${styles.field} ${styles.horizontalDivider}`} />
       <Button type="submit" kind="primary" size="md" className={`${styles.field} ${styles.button}`}>
-        {t('apply', 'Apply')}
+        {t('apply', 'Apply')} {filtersApplied ? `(${filtersApplied})` : null}
       </Button>
       <Button kind="secondary" size="md" onClick={handleResetFields} className={`${styles.field} ${styles.button}`}>
         {t('resetFields', 'Reset fields')}
