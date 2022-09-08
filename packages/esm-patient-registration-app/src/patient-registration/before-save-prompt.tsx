@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 function getUrlWithoutPrefix(url: string) {
@@ -13,7 +12,6 @@ interface BeforeSavePromptProps {
 }
 
 const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const ref = useRef<boolean>(false);
   const [localTarget, setTarget] = useState<string | undefined>();
@@ -64,9 +62,9 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
 
   useEffect(() => {
     if (typeof target === 'string') {
-      navigate(`/${getUrlWithoutPrefix(target)}`);
+      navigate({ to: `\${openmrsSpaBase}/${getUrlWithoutPrefix(target)}` });
     }
-  }, [navigate, target]);
+  }, [target]);
 
   return null;
 };
