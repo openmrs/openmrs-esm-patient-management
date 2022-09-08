@@ -109,12 +109,6 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
         </OverflowMenuItem>
         <OverflowMenuItem
           className={styles.menuItem}
-          id="#setWaitTimeManually"
-          itemText={t('setWaitTimeManually', 'Set wait time manually')}>
-          {t('setWaitTimeManually', 'Set wait time manually')}
-        </OverflowMenuItem>
-        <OverflowMenuItem
-          className={styles.menuItem}
           id="#endVisit"
           onClick={launchEndVisitModal}
           hasDivider
