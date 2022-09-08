@@ -13,7 +13,7 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCurrentPage, hasMore }) => {
   const { t } = useTranslation();
   const decrementPage = useCallback(() => {
-    setCurrentPage(Math.max(0, currentPage - 1));
+    setCurrentPage(Math.max(1, currentPage - 1));
   }, [currentPage, setCurrentPage]);
 
   const incrementPage = useCallback(() => {
