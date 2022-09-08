@@ -33,6 +33,7 @@ import AppointmentDetails from '../appointment-details/appointment-details.compo
 import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
+import CancelAppointment from '../appointment-forms/cancel-appointment.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -72,6 +73,9 @@ function ActionsMenu({ appointment, mutate }: ActionMenuProps) {
         <OverflowMenuItem
           className={styles.menuItem}
           id="#cancelAppointment"
+          onClick={() =>
+            launchOverlay(t('cancelAppointment', 'Cancel Appointment'), <CancelAppointment appointment={appointment} />)
+          }
           itemText={t('cancelAppointment', 'Cancel Appointment')}>
           {t('cancelAppointment', 'Cancel Appointment')}
         </OverflowMenuItem>

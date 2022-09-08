@@ -2,6 +2,8 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentPayload, AppointmentService, Provider } from '../types';
 import { startDate } from '../helpers';
+import dayjs from 'dayjs';
+import { omrsDateFormat } from '../constants';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -53,3 +55,14 @@ export function saveAppointment(appointment: AppointmentPayload, abortController
 }
 
 export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export const cancelAppointment = async (toStatus: string, appointmentUuid: string, ac: AbortController) => {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
+  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  return await openmrsFetch(url, {
+    body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
