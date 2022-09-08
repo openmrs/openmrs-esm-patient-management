@@ -85,6 +85,12 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
             return false;
           }
         }
+
+        if (filters.age) {
+          if (patient.person.age !== filters.age) {
+            return false;
+          }
+        }
         return true;
       });
     }

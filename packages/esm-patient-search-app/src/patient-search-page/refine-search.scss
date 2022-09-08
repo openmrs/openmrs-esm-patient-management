@@ -10,16 +10,28 @@
 
 .field {
   margin-bottom: spacing.$spacing-05;
+
+  input {
+    min-width: unset !important;
+  }
 }
 
 .fieldTabletOrOverlay {
   margin-bottom: spacing.$spacing-07;
+
+  input {
+    min-width: unset !important;
+  }
 }
 
 .dobFields {
   display: grid;
   grid-template-columns: 1fr 1fr 1.25fr;
   grid-gap: spacing.$spacing-03;
+  input {
+    min-width: unset !important;
+    padding-right: spacing.$spacing-02 !important;
+  }
 }
 
 .button {

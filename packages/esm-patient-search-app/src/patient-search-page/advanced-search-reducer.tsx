@@ -3,12 +3,12 @@ import { AdvancedPatientSearchAction, AdvancedPatientSearchActionTypes, Advanced
 
 export const initialState: AdvancedPatientSearchState = {
   gender: 'any',
-  dateOfBirth: undefined,
-  monthOfBirth: undefined,
-  yearOfBirth: undefined,
-  phoneNumber: undefined,
-  postcode: undefined,
-  dateOfVisit: '',
+  dateOfBirth: 0,
+  monthOfBirth: 0,
+  yearOfBirth: 0,
+  phoneNumber: 0,
+  postcode: '',
+  age: 0,
 };
 
 const reducer: (
@@ -46,10 +46,10 @@ const reducer: (
         ...state,
         postcode: action.postcode,
       };
-    case AdvancedPatientSearchActionTypes.SET_DATE_OF_VISIT:
+    case AdvancedPatientSearchActionTypes.SET_AGE:
       return {
         ...state,
-        dateOfVisit: action.dateOfVisit,
+        age: action.age,
       };
     case AdvancedPatientSearchActionTypes.RESET_FIELDS:
       return initialState;

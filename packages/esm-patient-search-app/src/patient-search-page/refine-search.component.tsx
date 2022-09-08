@@ -1,6 +1,6 @@
 import React, { useCallback, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch, TextInput, DatePicker, DatePickerInput, Button } from '@carbon/react';
+import { ContentSwitcher, Switch, TextInput, DatePicker, DatePickerInput, Button, NumberInput } from '@carbon/react';
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import styles from './refine-search.scss';
 import reducer, { initialState } from './advanced-search-reducer';
@@ -31,64 +31,43 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
 
   const handleDateOfBirthChange = useCallback(
     (evt: { target: { value: string } }) => {
-      const date = parseInt(evt.target.value);
-      if (!date) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_DATE_OF_BIRTH,
-          dateOfBirth: undefined,
-        });
-      } else if (date <= 31) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_DATE_OF_BIRTH,
-          dateOfBirth: date ?? undefined,
-        });
-      }
+      const date = parseInt(evt.target.value) || 0;
+      formDispatch({
+        type: AdvancedPatientSearchActionTypes.SET_DATE_OF_BIRTH,
+        dateOfBirth: date,
+      });
     },
     [formDispatch],
   );
 
   const handleMonthOfBirthChange = useCallback(
     (evt: { target: { value: string } }) => {
-      const month = parseInt(evt.target.value);
-      if (!month) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_MONTH_OF_BIRTH,
-          monthOfBirth: undefined,
-        });
-      } else if (month <= 12) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_MONTH_OF_BIRTH,
-          monthOfBirth: month,
-        });
-      }
+      const month = parseInt(evt.target.value) || 0;
+      formDispatch({
+        type: AdvancedPatientSearchActionTypes.SET_MONTH_OF_BIRTH,
+        monthOfBirth: month,
+      });
     },
     [formDispatch],
   );
 
   const handleYearOfBirthChange = useCallback(
     (evt: { target: { value: string } }) => {
-      const year = parseInt(evt.target.value);
-      const currentYear = new Date().getFullYear();
-      if (!year) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_YEAR_OF_BIRTH,
-          monthOfBirth: undefined,
-        });
-      } else if (year <= currentYear) {
-        formDispatch({
-          type: AdvancedPatientSearchActionTypes.SET_YEAR_OF_BIRTH,
-          yearOfBirth: year,
-        });
-      }
+      const year = parseInt(evt.target.value) || 0;
+      formDispatch({
+        type: AdvancedPatientSearchActionTypes.SET_YEAR_OF_BIRTH,
+        yearOfBirth: year,
+      });
     },
     [formDispatch],
   );
 
   const handlePhoneNumberChange = useCallback(
-    (evt: { target: { value: number } }) => {
+    (evt: { target: { value: string } }) => {
+      const phoneNumber = parseInt(evt.target.value) || 0;
       formDispatch({
         type: AdvancedPatientSearchActionTypes.SET_PHONE_NUMBER,
-        phoneNumber: evt.target.value,
+        phoneNumber,
       });
     },
     [formDispatch],
@@ -104,11 +83,12 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
     [formDispatch],
   );
 
-  const handleDateOfVisitChange = useCallback(
-    (evt) => {
+  const handleAgeChange = useCallback(
+    (evt: { target: { value: string } }) => {
+      const age = parseInt(evt.target.value) || 0;
       formDispatch({
-        type: AdvancedPatientSearchActionTypes.SET_DATE_OF_VISIT,
-        dateOfVisit: evt.target.value,
+        type: AdvancedPatientSearchActionTypes.SET_AGE,
+        age: age,
       });
     },
     [formDispatch],
@@ -194,48 +174,63 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                     </ContentSwitcher>
                   </div>
                   <div className={`${styles.fieldTabletOrOverlay} ${styles.dobFields}`}>
-                    <TextInput
+                    <NumberInput
                       id="dateOfBirth"
                       placeholder="DD"
-                      value={formState.dateOfBirth ?? ''}
+                      value={formState.dateOfBirth || ''}
                       onChange={handleDateOfBirthChange}
                       className={styles.dobField}
                       type="number"
+                      label={t('day', 'Day')}
+                      min={1}
+                      max={31}
+                      allowEmpty
+                      hideSteppers
                       size={isTablet ? 'lg' : 'md'}
-                      labelText={t('day', 'Day')}
                     />
-                    <TextInput
+                    <NumberInput
                       id="monthOfBirth"
                       placeholder="MM"
-                      value={formState.monthOfBirth ?? ''}
+                      value={formState.monthOfBirth || ''}
                       onChange={handleMonthOfBirthChange}
                       className={styles.dobField}
-                      size={isTablet ? 'lg' : 'md'}
                       type="number"
-                      labelText={t('month', 'Month')}
+                      label={t('month', 'Month')}
+                      min={1}
+                      max={12}
+                      allowEmpty
+                      hideSteppers
+                      size={isTablet ? 'lg' : 'md'}
                     />
-                    <TextInput
+                    <NumberInput
                       id="yearOfBirth"
                       placeholder="YYYY"
-                      value={formState.yearOfBirth ?? ''}
+                      value={formState.yearOfBirth || ''}
                       onChange={handleYearOfBirthChange}
                       className={styles.dobField}
                       type="number"
+                      label={t('year', 'Year')}
+                      allowEmpty
+                      hideSteppers
+                      min={1800}
+                      max={new Date().getFullYear()}
                       size={isTablet ? 'lg' : 'md'}
-                      labelText={t('year', 'Year')}
                     />
                   </div>
                 </div>
                 <div className={`${styles.padded} ${isTablet && styles.phoneLastVisitRow}`}>
                   <div className={styles.phonePostcode}>
                     <div className={styles.fieldTabletOrOverlay}>
-                      <TextInput
+                      <NumberInput
                         id="phoneNumber"
-                        labelText={t('phoneNumber', 'Phone number')}
+                        label={t('phoneNumber', 'Phone number')}
                         onChange={handlePhoneNumberChange}
-                        value={formState.phoneNumber ?? ''}
                         type="number"
+                        value={formState.phoneNumber || ''}
                         size={isTablet ? 'lg' : 'md'}
+                        allowEmpty
+                        hideSteppers
+                        min={1}
                       />
                     </div>
                     <div className={styles.fieldTabletOrOverlay}>
@@ -243,24 +238,23 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                         id="postcode"
                         labelText={t('postcode', 'Postcode')}
                         onChange={handlePostCodeChange}
-                        value={formState.postcode ?? ''}
+                        value={formState.postcode}
                         size={isTablet ? 'lg' : 'md'}
                       />
                     </div>
                   </div>
-                  <DatePicker
-                    id="dateOfVisit"
-                    labelText={t('dateOfVisit', 'Date of last visit')}
-                    type="single"
-                    onChange={handleDateOfVisitChange}
-                    size={isTablet ? 'lg' : 'md'}
-                    value={formState.dateOfVisit ?? ''}>
-                    <DatePickerInput
-                      placeholder="mm/dd/yyyy"
+                  <div className={styles.fieldTabletOrOverlay}>
+                    <NumberInput
+                      id="age"
+                      value={formState.age || ''}
+                      onChange={handleAgeChange}
                       size={isTablet ? 'lg' : 'md'}
-                      labelText={t('dateOfVisit', 'Date of last visit')}
+                      label={t('age', 'Age')}
+                      min={0}
+                      allowEmpty
+                      hideSteppers
                     />
-                  </DatePicker>
+                  </div>
                 </div>
                 <div className={`${isTablet && styles.paddedButtons} ${styles.buttonSet}`}>
                   <Button kind="secondary" size="xl" onClick={handleResetFields} className={styles.button}>
@@ -298,45 +292,73 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
         </ContentSwitcher>
       </div>
       <div className={`${styles.field} ${styles.dobFields}`}>
-        <TextInput
+        <NumberInput
           id="dateOfBirth"
           placeholder="DD"
-          value={formState.dateOfBirth ?? ''}
+          value={formState.dateOfBirth || ''}
           onChange={handleDateOfBirthChange}
           className={styles.dobField}
           type="number"
-          labelText={t('day', 'Day')}
+          label={t('day', 'Day')}
+          min={1}
+          max={31}
           light
+          allowEmpty
+          hideSteppers
         />
-        <TextInput
+        <NumberInput
           id="monthOfBirth"
           placeholder="MM"
-          value={formState.monthOfBirth ?? ''}
+          value={formState.monthOfBirth || ''}
           onChange={handleMonthOfBirthChange}
           className={styles.dobField}
           type="number"
-          labelText={t('month', 'Month')}
+          label={t('month', 'Month')}
+          min={1}
+          max={12}
+          allowEmpty
+          hideSteppers
           light
         />
-        <TextInput
+        <NumberInput
           id="yearOfBirth"
           placeholder="YYYY"
-          value={formState.yearOfBirth ?? ''}
+          value={formState.yearOfBirth || ''}
           onChange={handleYearOfBirthChange}
           className={styles.dobField}
           type="number"
-          labelText={t('year', 'Year')}
+          label={t('year', 'Year')}
+          allowEmpty
+          hideSteppers
           light
+          min={1800}
+          max={new Date().getFullYear()}
         />
       </div>
       <div className={styles.field}>
-        <TextInput
-          id="phoneNumber"
-          labelText={t('phoneNumber', 'Phone number')}
-          onChange={handlePhoneNumberChange}
-          value={formState.phoneNumber ?? ''}
-          type="number"
+        <NumberInput
+          id="age"
+          value={formState.age || ''}
+          onChange={handleAgeChange}
+          size={isTablet ? 'lg' : 'md'}
+          label={t('age', 'Age')}
+          min={0}
           light
+          allowEmpty
+          hideSteppers
+        />
+      </div>
+      <div className={styles.field}>
+        <NumberInput
+          id="phoneNumber"
+          label={t('phoneNumber', 'Phone number')}
+          onChange={handlePhoneNumberChange}
+          type="number"
+          value={formState.phoneNumber || ''}
+          light
+          allowEmpty
+          hideSteppers
+          min={1}
         />
       </div>
       <div className={styles.field}>
@@ -344,20 +366,9 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           id="postcode"
           labelText={t('postcode', 'Postcode')}
           onChange={handlePostCodeChange}
-          value={formState.postcode ?? ''}
+          value={formState.postcode}
           light
         />
-      </div>
-      <div className={styles.field}>
-        <DatePicker
-          id="dateOfVisit"
-          labelText={t('dateOfVisit', 'Date of last visit')}
-          type="single"
-          light
-          onChange={handleDateOfVisitChange}
-          value={formState.dateOfVisit ?? ''}>
-          <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('dateOfVisit', 'Date of last visit')} />
-        </DatePicker>
       </div>
       <hr className={`${styles.field} ${styles.horizontalDivider}`} />
       <Button type="submit" kind="primary" size="md" className={`${styles.field} ${styles.button}`}>

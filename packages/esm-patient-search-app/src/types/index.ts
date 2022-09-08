@@ -4,6 +4,7 @@ export interface SearchedPatient {
   identifiers: Array<{ identifier: string }>;
   person: {
     addresses: Array<Address>;
+    age: number;
     birthdate: string;
     gender: string;
     death: boolean;
@@ -84,7 +85,7 @@ export interface AdvancedPatientSearchState {
   yearOfBirth: number;
   phoneNumber: number;
   postcode: string;
-  dateOfVisit: string | Date;
+  age: number;
 }
 
 export enum AdvancedPatientSearchActionTypes {
@@ -94,7 +95,7 @@ export enum AdvancedPatientSearchActionTypes {
   SET_YEAR_OF_BIRTH = 'SET_YEAR_OF_BIRTH',
   SET_PHONE_NUMBER = 'SET_PHONE_NUMBER',
   SET_POSTCODE = 'SET_POSTCODE',
-  SET_DATE_OF_VISIT = 'SET_DATE_OF_VISIT',
+  SET_AGE = 'SET_AGE',
   RESET_FIELDS = 'RESET_FIELDS',
 }
 
@@ -106,5 +107,5 @@ export interface AdvancedPatientSearchAction {
   yearOfBirth?: number;
   phoneNumber?: number;
   postcode?: string;
-  dateOfVisit?: string | Date;
+  age?: number;
 }
