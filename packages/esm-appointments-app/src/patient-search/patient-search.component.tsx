@@ -10,7 +10,10 @@ const PatientSearch: React.FC = () => {
   const { t } = useTranslation();
   const launchCreateAppointmentForm = (patient) => {
     closeOverlay();
-    launchOverlay(t('appointmentForm', 'Appointments Form'), <AppointmentForm patientUuid={patient.uuid} />);
+    launchOverlay(
+      t('appointmentForm', 'Create Appointment'),
+      <AppointmentForm patientUuid={patient.uuid} context="creating" />,
+    );
   };
 
   return (

@@ -42,8 +42,9 @@ import styles from './appointments-form.scss';
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
   patientUuid?: string;
+  context: string;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid, context }) => {
   const initialState = {
     patientUuid,
     dateTime: dayjs(new Date()).format('hh:mm'),
@@ -164,7 +165,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           datePickerType="single"
           id="visitDate"
           light
-          style={{ paddingBottom: '1rem' }}
+          style={{ paddingBottom: '1rem', marginLeft: '12.5rem' }}
           minDate={new Date().toISOString()}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
@@ -380,14 +381,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
         onChange={(event) => setAppointmentComment(event.target.value)}
       />
 
-      <TextArea
-        id="reason"
-        light
-        value={reason}
-        className={styles.inputContainer}
-        labelText={t('reasonForChanges', 'Reason For Changes')}
-        onChange={(event) => setReason(event.target.value)}
-      />
+      {context === 'editing' ? (
+        <TextArea
+          id="reason"
+          light
+          value={reason}
+          className={styles.inputContainer}
+          labelText={t('reasonForChanges', 'Reason For Changes')}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      ) : null}
 
       <ButtonSet>
         <Button onClick={closeOverlay} className={styles.button} kind="secondary">
