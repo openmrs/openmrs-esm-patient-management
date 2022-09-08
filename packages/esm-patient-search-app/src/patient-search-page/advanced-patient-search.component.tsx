@@ -43,7 +43,6 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {
-      console.log('check');
       setPage((page) => page + 1);
     }
   }, [searchResults, currentPage, hasMore, setPage]);

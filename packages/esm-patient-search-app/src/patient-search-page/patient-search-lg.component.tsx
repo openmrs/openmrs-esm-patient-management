@@ -45,19 +45,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   );
 
   useEffect(() => {
-    console.log('resetting');
     goTo(1);
   }, [query]);
-
-  console.log('currentPage', currentPage);
-
-  const mockGoTo = useCallback(
-    (indx) => {
-      console.log('goto', indx);
-      goTo(indx);
-    },
-    [goTo],
-  );
 
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
@@ -114,7 +103,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       {paginated && (
         <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
           <Pagination
-            setCurrentPage={mockGoTo}
+            setCurrentPage={goTo}
             currentPage={currentPage}
             hasMore={showNextButton}
             totalPages={totalPages}
