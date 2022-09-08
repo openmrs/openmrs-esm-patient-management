@@ -30,7 +30,7 @@ import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
 import { useServices } from './appointments-table.resource';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
-import AppointmentForm from '../appointment-forms/edit-appointment-form.component';
+import AppointmentForm from '../appointment-forms/appointments-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';

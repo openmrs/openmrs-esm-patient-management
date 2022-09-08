@@ -3,13 +3,14 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './patient-search.scss';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import { useTranslation } from 'react-i18next';
-import CreateAppointmentsForm from '../appointment-forms/create-appointment-form.component';
+
+import AppointmentForm from '../appointment-forms/appointments-form.component';
 
 const PatientSearch: React.FC = () => {
   const { t } = useTranslation();
-  const launchCreateAppointmentForm = (patientUuid: string) => {
+  const launchCreateAppointmentForm = (patient) => {
     closeOverlay();
-    launchOverlay(t('appointmentForm', 'Appointments Form'), <CreateAppointmentsForm patientUuid={patientUuid} />);
+    launchOverlay(t('appointmentForm', 'Appointments Form'), <AppointmentForm patientUuid={patient.uuid} />);
   };
 
   return (

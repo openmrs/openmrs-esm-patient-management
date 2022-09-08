@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useSWRConfig } from 'swr';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   ButtonSet,
@@ -16,6 +18,7 @@ import {
   TimePicker,
   TimePickerSelect,
   Toggle,
+  SkeletonText,
 } from '@carbon/react';
 import {
   useLocations,
@@ -28,43 +31,62 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm, startDate } from '../helpers';
+import { amPm } from '../helpers';
 import { saveAppointment, useServices } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
-import styles from './edit-appointment-form.scss';
-import { useSWRConfig } from 'swr';
+import styles from './appointments-form.scss';
+
 interface AppointmentFormProps {
-  appointment: MappedAppointment;
+  appointment?: MappedAppointment;
+  patientUuid?: string;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid }) => {
+  const initialState = {
+    patientUuid,
+    dateTime: dayjs(new Date()).format('hh:mm'),
+    location: '',
+    serviceUuid: '',
+    comments: '',
+    appointmentKind: '',
+    status: '',
+    id: undefined,
+    gender: '',
+    serviceType: '',
+    provider: '',
+    appointmentNumber: undefined,
+  };
+  const appointmentState = !isEmpty(appointment) ? appointment : initialState;
+
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
-  const { patient } = usePatient(appointment.patientUuid);
+  const { patient } = usePatient(appointmentState.patientUuid);
   const locations = useLocations();
   const session = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState(appointment.dateTime);
-  const [endDate, setEndDate] = useState(appointment.dateTime);
+  const [startDate, setStartDate] = useState(appointmentState.dateTime);
+  const [endDate, setEndDate] = useState(appointmentState.dateTime);
   const [frequency, setFrequency] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(appointment.location);
-  const [selectedService, setSelectedService] = useState(appointment.serviceUuid);
+  const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
+  const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
   const [selectedProvider, setSelectedProvider] = useState(session?.currentProvider?.uuid);
   const [reminder, setReminder] = useState('');
-  const [appointmentComment, setAppointmentComment] = useState(appointment.comments);
+  const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = React.useState<Date>(appointment.dateTime ? parseDate(appointment.dateTime) : null);
+  const [visitDate, setVisitDate] = React.useState<Date>(
+    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : new Date(),
+  );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
-  const [day, setDay] = useState(appointment.dateTime);
-  const [appointmentKind, setAppointmentKind] = useState(appointment.appointmentKind);
-  const [appointmentStatus, setAppointmentStatus] = useState(appointment.status);
+  const [day, setDay] = useState(appointmentState.dateTime);
+  const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
+  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -86,9 +108,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
       providerUuid: providerUuid,
       comments: appointmentComment,
       locationUuid: selectedLocation,
-      patientUuid: appointment.patientUuid,
-      appointmentNumber: appointment.appointmentNumber,
-      uuid: appointment.id,
+      patientUuid: appointmentState.patientUuid,
+      appointmentNumber: appointmentState.appointmentNumber,
+      uuid: appointmentState.id,
     };
 
     const abortController = new AbortController();
@@ -121,13 +143,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
 
   return (
     <div className={styles.formContainer}>
-      <ExtensionSlot
-        extensionSlotName="patient-header-slot"
-        state={{
-          patient,
-          patientUuid: appointment.patientUuid,
-        }}
-      />
+      {patient === null ? (
+        <SkeletonText />
+      ) : (
+        <ExtensionSlot
+          extensionSlotName="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: appointmentState.patientUuid,
+          }}
+        />
+      )}
 
       <p>{t('appointmentDateAndTime', 'Appointments Date and Time')}</p>
 
