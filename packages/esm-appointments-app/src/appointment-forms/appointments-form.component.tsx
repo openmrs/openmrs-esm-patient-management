@@ -47,7 +47,7 @@ interface AppointmentFormProps {
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid, context }) => {
   const initialState = {
     patientUuid,
-    dateTime: dayjs(new Date()).format('hh:mm'),
+    dateTime: undefined,
     location: '',
     serviceUuid: '',
     comments: '',
@@ -71,8 +71,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const session = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState(appointmentState.dateTime);
-  const [endDate, setEndDate] = useState(appointmentState.dateTime);
+  const [startDate, setStartDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
+  const [endDate, setEndDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
   const [frequency, setFrequency] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
   const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
@@ -81,8 +81,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = React.useState<Date>(
-    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : new Date(),
+  const [visitDate, setVisitDate] = React.useState(
+    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : parseDate(new Date().toISOString()),
   );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
@@ -166,7 +166,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           id="visitDate"
           light
           style={{ paddingBottom: '1rem', marginLeft: '12.5rem' }}
-          minDate={new Date().toISOString()}
+          minDate={visitDate}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
           <DatePickerInput
