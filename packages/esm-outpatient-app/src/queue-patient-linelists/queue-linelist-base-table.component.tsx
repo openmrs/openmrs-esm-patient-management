@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -22,6 +22,8 @@ import {
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
+import { FilterTypes } from '../types';
+import QueueLinelist from './queue-linelist.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -38,6 +40,7 @@ interface QueuePatientTableProps {
   rows: any;
   serviceType: string;
   isLoading: boolean;
+  toggleFilter?: (filterMode: FilterTypes) => void;
 }
 
 const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
@@ -47,8 +50,10 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   rows,
   serviceType,
   isLoading,
+  toggleFilter,
 }) => {
   const { t } = useTranslation();
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -94,7 +99,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </p>
         </div>
 
-        <Button kind="ghost" size="small" renderIcon={(props) => <OverflowMenuVertical size={16} {...props} />}>
+        <Button kind="ghost" size="sm" renderIcon={(props) => <OverflowMenuVertical size={16} {...props} />}>
           {t('actions', 'Actions')}
         </Button>
       </div>
@@ -110,6 +115,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
               kind="ghost"
               renderIcon={(props) => <Filter size={16} {...props} />}
               iconDescription={t('filter', 'Filter (1)')}
+              onClick={() => setShowOverlay(true)}
               size="sm">
               {t('filter', 'Filter (1)')}
             </Button>
@@ -124,7 +130,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           headers={headers}
           overflowMenuOnHover={false}
           rows={rows}
-          size="compact"
+          size="md"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
@@ -185,6 +191,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
           </Tile>
         </Layer>
       )}
+      {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 };

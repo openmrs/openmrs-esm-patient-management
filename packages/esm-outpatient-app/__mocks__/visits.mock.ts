@@ -22,3 +22,21 @@ export const mockPastVisit = {
     ],
   },
 };
+
+export const mockVisitTypes = [
+  {
+    uuid: 'some-uuid1',
+    name: 'Outpatient Visit',
+    display: 'Outpatient Visit',
+  },
+  {
+    uuid: 'some-uuid2',
+    name: 'HIV Return Visit',
+    display: 'HIV Return Visit',
+  },
+  {
+    uuid: 'some-uuid3',
+    name: 'Diabetes Clinic Visit',
+    display: 'Diabetes Clinic Visit',
+  },
+];
