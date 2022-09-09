@@ -29,7 +29,7 @@ import {
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
-import { appointmentsSearchUrl, saveAppointment, useServices, fetchAppointments } from './appointment-forms.resource';
+import { useAppointmentSummary, saveAppointment, useServices, fetchAppointments } from './appointment-forms.resource';
 import { AppointmentPayload } from '../types';
 import { convertTime12to24, amPm } from '../helpers/time.helpers';
 import { ConfigObject } from '../config-schema';
@@ -39,6 +39,8 @@ import { useProviders } from '../hooks/useProviders';
 import { startDate as fromDate } from '../helpers';
 
 import styles from './create-appointment-form.scss';
+import WorkloadCard from './workload.component';
+import first from 'lodash-es/first';
 
 interface AppointmentFormProps {
   patientUuid: string;
@@ -73,6 +75,8 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
   }
 
   const { services, isLoading } = useServices();
+  const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
+  const appointmentSummary = useAppointmentSummary(new Date().toString(), serviceUuid);
 
   const handleSubmit = () => {
     if (!selectedService) {
@@ -80,9 +84,6 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
     }
 
     const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
-    const service = services.find((service) => service.name === selectedService);
-
-    const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
 
     const [startHours, startMinutes] = convertTime12to24(startTime, timeFormat);
     const [endHours, endMinutes] = convertTime12to24(startTime, timeFormat);
@@ -289,6 +290,26 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
               ))}
           </Select>
         </section>
+
+        <div className={styles.workLoadContainer}>
+          {appointmentSummary.length > 0 && (
+            <>
+              <p className={styles.workLoadTitle}>
+                {t(
+                  'serviceWorkloadTitle',
+                  `${selectedService} clinic work load on the week of ${dayjs(first(appointmentSummary).date).format(
+                    'DD/MM',
+                  )}`,
+                )}
+              </p>
+              <div className={styles.workLoadCard}>
+                {appointmentSummary?.map(({ date, count }, index) => (
+                  <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
         <section className={styles.formGroup}>
           <Select

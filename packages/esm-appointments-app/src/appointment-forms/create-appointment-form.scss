@@ -25,10 +25,11 @@ $color-blue-30: #a6c8ff;
   padding: spacing.$spacing-05;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .formGroup > span {
+:global(.omrs-breakpoint-lt-desktop) .formGroup>span {
   flex: 1;
 }
-:global(.omrs-breakpoint-lt-desktop) .formGroup > div {
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup>div {
   flex: 3;
 }
 
@@ -48,10 +49,12 @@ $color-blue-30: #a6c8ff;
   display: flex;
   margin: 1rem 0;
 }
+
 .timePickersContainer,
 .frequencyAndDay {
   display: flex;
-  > div {
+
+  >div {
     margin-right: 0.5rem;
   }
 }
@@ -60,7 +63,7 @@ $color-blue-30: #a6c8ff;
   display: flex;
   flex-direction: column;
 
-  > div {
+  >div {
     margin-bottom: 1rem;
   }
 }
@@ -100,11 +103,11 @@ $color-blue-30: #a6c8ff;
   width: 60%;
 }
 
-.contentSwitcherWrapper > div > button {
+.contentSwitcherWrapper>div>button {
   background-color: $ui-02;
 }
 
-.contentSwitcherWrapper > div button:first-child {
+.contentSwitcherWrapper>div button:first-child {
   border-top: 1px solid $color-blue-30;
   border-bottom: 1px solid $color-blue-30;
   border-left: 1px solid $color-blue-30;
@@ -112,7 +115,7 @@ $color-blue-30: #a6c8ff;
   border-radius: spacing.$spacing-02 0 0px spacing.$spacing-02;
 }
 
-.contentSwitcherWrapper > div button:last-child {
+.contentSwitcherWrapper>div button:last-child {
   border-top: 1px solid $color-blue-30;
   border-bottom: 1px solid $color-blue-30;
   border-right: 1px solid $color-blue-30;
@@ -120,22 +123,41 @@ $color-blue-30: #a6c8ff;
   border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
 }
 
-.contentSwitcherWrapper > div > button[aria-selected='true'],
-.contentSwitcherWrapper > div > button[aria-selected='true']:first-child {
+.contentSwitcherWrapper>div>button[aria-selected='true'],
+.contentSwitcherWrapper>div>button[aria-selected='true']:first-child {
   background-color: $color-blue-10;
   color: $color-blue-60-2;
   border-color: $color-blue-60-2;
   border-right: 1px solid $color-blue-60-2;
 }
 
-.contentSwitcherWrapper > div > button[aria-selected='true'],
-.contentSwitcherWrapper > div > button[aria-selected='true']:last-child {
+.contentSwitcherWrapper>div>button[aria-selected='true'],
+.contentSwitcherWrapper>div>button[aria-selected='true']:last-child {
   background-color: $color-blue-10;
   color: $color-blue-60-2;
   border-color: $color-blue-60-2;
   border-left: 1px solid $color-blue-60-2;
 }
 
-.contentSwitcherWrapper > div > button[aria-selected='true']:focus {
+.contentSwitcherWrapper>div>button[aria-selected='true']:focus {
   box-shadow: none;
+}
+
+
+.workLoadCard {
+  display: flex;
+  margin: 0 1rem;
+  color: #525252;
+}
+
+.workLoadContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.workLoadTitle {
+  color: #525252;
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+  @include type.type-style('legal-01');
+  font-weight: 400;
 }

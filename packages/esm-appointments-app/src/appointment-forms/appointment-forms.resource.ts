@@ -1,9 +1,10 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, Provider } from '../types';
+import { AppointmentPayload, AppointmentService, AppointmentSummary, Provider } from '../types';
 import { startDate } from '../helpers';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from '../constants';
+import first from 'lodash-es/first';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -65,4 +66,19 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   });
+};
+
+export const useAppointmentSummary = (fromDate: string, serviceUuid: string) => {
+  const startDate = dayjs(fromDate).startOf('week').format(omrsDateFormat);
+  const endDate = dayjs(fromDate).endOf('week').format(omrsDateFormat);
+  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const { data, error } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
+  const results = first(data?.data.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
+  const appointmentCountMap = results?.appointmentCountMap;
+  return Object.entries(appointmentCountMap ?? [])
+    .map(([key, value]) => ({
+      date: key,
+      count: value.allAppointmentsCount,
+    }))
+    .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
