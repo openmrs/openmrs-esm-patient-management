@@ -165,12 +165,20 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                     </div>
                     <ContentSwitcher
                       id="gender"
-                      onChange={handleGenderChange}
                       size={isTablet ? 'lg' : 'md'}
-                      selectedIndex={formState.gender === 'any' ? 0 : formState.gender === 'male' ? 1 : 2}>
+                      onChange={handleGenderChange}
+                      selectedIndex={['any', 'male', 'female'].indexOf(formState.gender)}>
                       <Switch name="any" text={t('any', 'Any')} />
                       <Switch name="male" text={t('male', 'Male')} />
                       <Switch name="female" text={t('female', 'Female')} />
+                    </ContentSwitcher>
+                    <ContentSwitcher
+                      id="gender"
+                      size={isTablet ? 'lg' : 'md'}
+                      onChange={handleGenderChange}
+                      selectedIndex={['other', 'unknown'].indexOf(formState.gender)}>
+                      <Switch name="other" text={t('other', 'Other')} />
+                      <Switch name="unknown" text={t('unknown', 'Unknown')} />
                     </ContentSwitcher>
                   </div>
                   <div className={`${styles.fieldTabletOrOverlay} ${styles.dobFields}`}>
@@ -285,10 +293,17 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
         <ContentSwitcher
           id="gender"
           onChange={handleGenderChange}
-          selectedIndex={formState.gender === 'any' ? 0 : formState.gender === 'male' ? 1 : 2}>
+          selectedIndex={['any', 'male', 'female'].indexOf(formState.gender)}>
           <Switch name="any" text={t('any', 'Any')} />
           <Switch name="male" text={t('male', 'Male')} />
           <Switch name="female" text={t('female', 'Female')} />
+        </ContentSwitcher>
+        <ContentSwitcher
+          id="gender"
+          onChange={handleGenderChange}
+          selectedIndex={['other', 'unknown'].indexOf(formState.gender)}>
+          <Switch name="other" text={t('other', 'Other')} />
+          <Switch name="unknown" text={t('unknown', 'Unknown')} />
         </ContentSwitcher>
       </div>
       <div className={`${styles.field} ${styles.dobFields}`}>

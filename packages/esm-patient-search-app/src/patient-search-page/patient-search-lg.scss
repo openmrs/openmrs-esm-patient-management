@@ -66,13 +66,6 @@
   background: $ui-01;
 }
 
-// .stickyPagination {
-//   position: fixed;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-// }
-
 .errorMessage {
   @include type.type-style('heading-compact-02');
   margin-top: 2.25rem;

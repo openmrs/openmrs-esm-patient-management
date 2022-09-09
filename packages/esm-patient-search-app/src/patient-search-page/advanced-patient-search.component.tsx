@@ -50,11 +50,17 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   const filteredResults = useMemo(() => {
     if (searchResults && filtersApplied) {
       return searchResults.filter((patient) => {
-        if (filters.gender !== 'any' && patient.person.gender !== 'O' && patient.person.gender !== 'U') {
+        if (filters.gender !== 'any') {
           if (filters.gender === 'male' && patient.person.gender !== 'M') {
             return false;
           }
           if (filters.gender === 'female' && patient.person.gender !== 'F') {
+            return false;
+          }
+          if (filters.gender === 'other' && patient.person.gender !== 'O') {
+            return false;
+          }
+          if (filters.gender === 'unknown' && patient.person.gender !== 'U') {
             return false;
           }
         }
@@ -113,7 +119,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   return (
     <div
       className={`${
-        !inTabletOrOverlay ? styles.advancedPatientSearchDesktop : styles.advancedPatientSearchTabletOrOverlay
+        inTabletOrOverlay ? styles.advancedPatientSearchTabletOrOverlay : styles.advancedPatientSearchDesktop
       }`}>
       {!inTabletOrOverlay && (
         <div className={styles.refineSearchDesktop}>
@@ -122,7 +128,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
       )}
       <div
         className={`${
-          !inTabletOrOverlay ? styles.patientSearchResultsDesktop : styles.patientSearchResultsTabletOrOverlay
+          inTabletOrOverlay ? styles.patientSearchResultsTabletOrOverlay : styles.patientSearchResultsDesktop
         }`}>
         <PatientSearchComponent
           query={query}

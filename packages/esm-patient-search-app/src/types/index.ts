@@ -79,7 +79,7 @@ export interface PatientSearchResponse {
 }
 
 export interface AdvancedPatientSearchState {
-  gender: 'any' | 'male' | 'female';
+  gender: 'any' | 'male' | 'female' | 'other' | 'unknown';
   dateOfBirth: number;
   monthOfBirth: number;
   yearOfBirth: number;
@@ -89,19 +89,19 @@ export interface AdvancedPatientSearchState {
 }
 
 export enum AdvancedPatientSearchActionTypes {
-  SET_GENDER = 'SET_GENDER',
-  SET_DATE_OF_BIRTH = 'SET_DATE_OF_BIRTH',
-  SET_MONTH_OF_BIRTH = 'SET_MONTH_OF_BIRTH',
-  SET_YEAR_OF_BIRTH = 'SET_YEAR_OF_BIRTH',
-  SET_PHONE_NUMBER = 'SET_PHONE_NUMBER',
-  SET_POSTCODE = 'SET_POSTCODE',
-  SET_AGE = 'SET_AGE',
-  RESET_FIELDS = 'RESET_FIELDS',
+  SET_GENDER,
+  SET_DATE_OF_BIRTH,
+  SET_MONTH_OF_BIRTH,
+  SET_YEAR_OF_BIRTH,
+  SET_PHONE_NUMBER,
+  SET_POSTCODE,
+  SET_AGE,
+  RESET_FIELDS,
 }
 
 export interface AdvancedPatientSearchAction {
   type: AdvancedPatientSearchActionTypes;
-  gender?: 'any' | 'male' | 'female';
+  gender?: 'any' | 'male' | 'female' | 'other' | 'unknown';
   dateOfBirth?: number;
   monthOfBirth?: number;
   yearOfBirth?: number;

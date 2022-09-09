@@ -24,14 +24,14 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
     const left = currentPage > 2 ? currentPage - 2 : 1;
     const right = totalPages - currentPage < 2 ? totalPages : currentPage + 2;
     const totalButtons = right - left + 1;
-    return [...Array(totalButtons).keys()].map((indx) => (
+    return [...Array(totalButtons).keys()].map((index) => (
       <Button
-        key={indx}
+        key={index}
         kind="ghost"
-        onClick={() => setCurrentPage(indx + left)}
-        className={`${styles.paginationButton} ${indx + left === currentPage && styles.activeButton}`}
+        onClick={() => setCurrentPage(index + left)}
+        className={`${styles.paginationButton} ${index + left === currentPage && styles.activeButton}`}
         type="button">
-        {indx + left}
+        {index + left}
       </Button>
     ));
   }, [currentPage, totalPages, setCurrentPage]);
