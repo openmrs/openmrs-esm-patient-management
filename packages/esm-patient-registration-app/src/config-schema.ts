@@ -18,10 +18,16 @@ export interface FieldDefinition {
   };
   answerConceptSetUuid: string | null;
   customConceptAnswers: Array<CustomConceptAnswer>;
+  gender: Array<Gender>;
 }
 export interface CustomConceptAnswer {
   label: string | null;
   uuid: string;
+}
+export interface Gender {
+  label: string | null;
+  value: string;
+  id: string;
 }
 
 export interface RegistrationConfig {
@@ -154,6 +160,27 @@ export const esmPatientRegistrationSchema = {
         },
         _default: [],
         _description: 'For coded questions only. Provide ability to add custom concept answers.',
+      },
+      gender: {
+        _type: Type.Array,
+        _elements: {
+          value: {
+            _type: Type.String,
+            _description: 'The value for sex option',
+          },
+          label: {
+            _type: Type.String,
+            _default: null,
+            _description: 'The label displayed for sex option.',
+          },
+          id: {
+            _type: Type.String,
+            _default: null,
+            _description: 'The id for sex option.',
+          },
+        },
+        _default: [],
+        _description: 'Provide ability to configure sex options.',
       },
     },
     _default: [],
