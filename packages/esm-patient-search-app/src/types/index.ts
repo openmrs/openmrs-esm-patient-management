@@ -4,6 +4,7 @@ export interface SearchedPatient {
   identifiers: Array<{ identifier: string }>;
   person: {
     addresses: Array<Address>;
+    age: number;
     birthdate: string;
     gender: string;
     death: boolean;
@@ -15,7 +16,7 @@ export interface SearchedPatient {
       middleName: string;
     };
   };
-  attributes: Array<{ value: string; attributeType: { name: string } }>;
+  attributes: Array<{ value: string; attributeType: { uuid: string; display: string } }>;
 }
 export interface Address {
   preferred: boolean;
@@ -75,4 +76,36 @@ export interface PatientSearchResponse {
       }>;
     }>[]
   >;
+}
+
+export interface AdvancedPatientSearchState {
+  gender: 'any' | 'male' | 'female' | 'other' | 'unknown';
+  dateOfBirth: number;
+  monthOfBirth: number;
+  yearOfBirth: number;
+  phoneNumber: number;
+  postcode: string;
+  age: number;
+}
+
+export enum AdvancedPatientSearchActionTypes {
+  SET_GENDER,
+  SET_DATE_OF_BIRTH,
+  SET_MONTH_OF_BIRTH,
+  SET_YEAR_OF_BIRTH,
+  SET_PHONE_NUMBER,
+  SET_POSTCODE,
+  SET_AGE,
+  RESET_FIELDS,
+}
+
+export interface AdvancedPatientSearchAction {
+  type: AdvancedPatientSearchActionTypes;
+  gender?: 'any' | 'male' | 'female' | 'other' | 'unknown';
+  dateOfBirth?: number;
+  monthOfBirth?: number;
+  yearOfBirth?: number;
+  phoneNumber?: number;
+  postcode?: string;
+  age?: number;
 }

@@ -1,0 +1,137 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../root.scss';
+
+.refineSeachContainer {
+  h2 {
+    margin: spacing.$spacing-03 0;
+  }
+}
+
+.field {
+  margin-bottom: spacing.$spacing-05;
+
+  input {
+    min-width: unset !important;
+  }
+}
+
+.fieldTabletOrOverlay {
+  margin-bottom: spacing.$spacing-07;
+
+  input {
+    min-width: unset !important;
+  }
+}
+
+.dobFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-gap: spacing.$spacing-03;
+  input {
+    min-width: unset !important;
+    padding-right: spacing.$spacing-02 !important;
+  }
+}
+
+.button {
+  width: 100%;
+  max-width: unset;
+}
+
+.refineSearchBanner {
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #343a3f;
+
+  p {
+    color: $ui-02;
+  }
+}
+
+.padded {
+  padding: 0 spacing.$spacing-05;
+}
+
+.refineSearchDialogOpener {
+  color: $inverse-link;
+}
+
+.refineSearchDialogContainer {
+  position: absolute;
+  top: spacing.$spacing-09;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-color: #393939cc;
+  z-index: 99;
+}
+
+.refineSearchDialog {
+  background-color: $ui-02;
+  width: 100%;
+}
+
+.refineSearchDialogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-05;
+}
+
+.refineSearchDialogGenderSexRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  grid-gap: 5rem;
+  padding: 0 spacing.$spacing-05;
+}
+
+.labelText {
+  margin-bottom: spacing.$spacing-03;
+}
+
+.phoneLastVisitRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-gap: 5rem;
+  padding: 0 spacing.$spacing-05;
+}
+
+.phonePostcode {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  grid-gap: spacing.$spacing-05;
+}
+
+.buttonSet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: spacing.$spacing-05;
+}
+
+.paddedButtons {
+  margin: spacing.$spacing-07 spacing.$spacing-05;
+}
+
+.filtersAppliedCount {
+  padding: 0 spacing.$spacing-03;
+  background-color: $color-blue-60-2;
+  color: $ui-01;
+}
+
+.refineSearchBannerFilterInfo {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  color: $ui-02;
+
+  p {
+    margin-left: spacing.$spacing-03;
+  }
+}

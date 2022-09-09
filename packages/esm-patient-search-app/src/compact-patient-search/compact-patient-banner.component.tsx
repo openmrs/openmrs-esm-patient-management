@@ -80,7 +80,7 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
               },
             ]
           : [],
-        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.name == 'Telephone Number'),
+        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display == 'Telephone Number'),
       };
     });
   }, [patients]);
