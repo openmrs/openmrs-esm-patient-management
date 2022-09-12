@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   InlineLoading,
@@ -11,12 +11,29 @@ import {
   RadioButtonGroup,
   ContentSwitcher,
   Switch,
+  Dropdown,
+  Select,
+  SelectItem,
 } from '@carbon/react';
-import { showNotification, showToast, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
-import { MappedVisitQueueEntry, updateQueueEntry, usePriority, useStatus } from './active-visits-table.resource';
+import {
+  showNotification,
+  showToast,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useLocations,
+  useSession,
+} from '@openmrs/esm-framework';
+import {
+  MappedVisitQueueEntry,
+  updateQueueEntry,
+  usePriority,
+  useServices,
+  useStatus,
+} from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 import { useSWRConfig } from 'swr';
+import first from 'lodash-es/first';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedVisitQueueEntry;
@@ -29,12 +46,29 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const [status, setStatus] = useState(queueEntry.statusUuid);
   const [priority, setPriority] = useState(queueEntry.priorityUuid);
   const [visitUuid, setVisitUuid] = useState(queueEntry.visitUuid);
-  const [queueUuid, setQueueUuid] = useState(queueEntry.queueUuid);
+  const [previousQueueUuid, setPreviousQueueUuid] = useState(queueEntry.queueUuid);
+  const [newQueueUuid, setNewQueueUuid] = useState('');
   const [queueEntryUuid, setQueueEntryUuid] = useState(queueEntry.queueEntryUuid);
   const [patientUuid, setPatientUuid] = useState(queueEntry.patientUuid);
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
+  const [userLocation, setUserLocation] = useState('');
+  const session = useSession();
+  const locations = useLocations();
+  const { services } = useServices(userLocation);
+
+  useEffect(() => {
+    setNewQueueUuid(previousQueueUuid);
+  }, [previousQueueUuid]);
+
+  useEffect(() => {
+    if (!userLocation && session?.sessionLocation !== null) {
+      setUserLocation(session?.sessionLocation?.uuid);
+    } else if (!userLocation && locations) {
+      setUserLocation(first(locations)?.uuid);
+    }
+  }, [session, locations, userLocation]);
 
   const changeQueueStatus = useCallback(() => {
     if (priority === '') {
@@ -46,7 +80,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
     updateQueueEntry(
       visitUuid,
-      queueUuid,
+      previousQueueUuid,
+      newQueueUuid,
       queueEntryUuid,
       patientUuid,
       priority,
@@ -78,7 +113,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     priority,
     status,
     visitUuid,
-    queueUuid,
+    previousQueueUuid,
+    newQueueUuid,
     queueEntryUuid,
     patientUuid,
     priorities,
@@ -93,6 +129,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       <ModalHeader closeModal={closeModal} title={t('changePatientStatus', 'Change patient status?')} />
       <ModalBody>
         <Form onSubmit={changeQueueStatus}>
+          <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
           <FormGroup legendText="">
             <RadioButtonGroup
               className={styles.radioButtonGroup}
@@ -111,6 +148,24 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               )}
             </RadioButtonGroup>
           </FormGroup>
+
+          <section className={styles.section}>
+            <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+            <Select
+              labelText={t('selectService', 'Select a service')}
+              id="service"
+              invalidText="Required"
+              value={newQueueUuid}
+              onChange={(event) => setNewQueueUuid(event.target.value)}>
+              {!newQueueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+              {services?.length > 0 &&
+                services.map((service) => (
+                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                    {service.display}
+                  </SelectItem>
+                ))}
+            </Select>
+          </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
