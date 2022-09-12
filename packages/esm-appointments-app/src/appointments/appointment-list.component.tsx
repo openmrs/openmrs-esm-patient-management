@@ -18,23 +18,6 @@ enum AppointmentTypes {
 const AppointmentList: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedStatus, setSelectedStatus] = useState(AppointmentTypes.SCHEDULED);
-  const handleStatusChange = (index: number) => {
-    switch (index) {
-      case 0:
-        setSelectedStatus(AppointmentTypes.SCHEDULED);
-        setSelectedTab(0);
-        break;
-      case 1:
-        setSelectedStatus(AppointmentTypes.CANCELLED);
-        setSelectedTab(1);
-        break;
-      case 2:
-        setSelectedStatus(AppointmentTypes.COMPLETED);
-        setSelectedTab(2);
-        break;
-    }
-  };
   return (
     <div className={styles.appointmentList}>
       <Button
@@ -47,7 +30,10 @@ const AppointmentList: React.FC = () => {
         {t('viewCalendar', 'View Calendar')}
       </Button>
 
-      <Tabs className={styles.tabs}>
+      <Tabs
+        selectedIndex={selectedTab}
+        onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
+        className={styles.tabs}>
         <TabList aria-label="Appointment tabs" contained>
           <Tab>{t('bookedForToday', 'Booked for today')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
@@ -55,12 +41,12 @@ const AppointmentList: React.FC = () => {
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>
-            <BookedAppointments status={selectedStatus} />
+            <BookedAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
-            <CancelledAppointment status={selectedStatus} />
+            <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={selectedStatus} />}</TabPanel>
+          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
         </TabPanels>
       </Tabs>
     </div>
