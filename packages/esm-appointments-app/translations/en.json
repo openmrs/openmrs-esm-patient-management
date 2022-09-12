@@ -11,6 +11,8 @@
   "appointmentList": "Appointments list",
   "appointmentMetrics": "Appointment metrics",
   "appointmentNotes": "Appointment Notes",
+  "appointmentNoteLabel": "Write an additional note",
+  "appointmentNotePlaceholder": "Write any additional points here",
   "appointmentNowVisible": "It is now visible on the Appointments page",
   "appointments": "Appointments",
   "appointmentScheduled": "Appointment scheduled",

@@ -165,7 +165,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           datePickerType="single"
           id="visitDate"
           light
-          style={{ paddingBottom: '1rem', marginLeft: '12.5rem' }}
+          className={styles.datePickerInput}
           minDate={visitDate}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
@@ -359,25 +359,29 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           ))}
       </Select>
 
-      <p>{t('getAppointmentReminder', 'Would you like to get a remider about this appointment?')}</p>
-      <RadioButtonGroup
-        defaultSelected="No"
-        orientation="vertical"
-        className={styles.inputContainer}
-        onChange={(event) => {
-          setReminder(event.toString());
-        }}
-        name="appointment-reminder-radio-group">
-        <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
-        <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
-      </RadioButtonGroup>
+      <div className={styles.inputContainer}>
+        <label className="cds--label">
+          {t('getAppointmentReminder', 'Would you like to get a remider about this appointment?')}
+        </label>
+        <RadioButtonGroup
+          defaultSelected="No"
+          orientation="vertical"
+          onChange={(event) => {
+            setReminder(event.toString());
+          }}
+          name="appointment-reminder-radio-group">
+          <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
+          <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
+        </RadioButtonGroup>
+      </div>
 
       <TextArea
         id="appointmentComment"
         light
         value={appointmentComment}
         className={styles.inputContainer}
-        labelText={t('comments', 'Comments')}
+        labelText={t('appointmentNoteLabel', 'Write an additional note')}
+        placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
         onChange={(event) => setAppointmentComment(event.target.value)}
       />
 
