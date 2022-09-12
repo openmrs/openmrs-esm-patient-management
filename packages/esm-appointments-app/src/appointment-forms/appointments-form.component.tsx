@@ -32,11 +32,14 @@ import {
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
 import { amPm } from '../helpers';
-import { saveAppointment, useServices } from './appointment-forms.resource';
+import { saveAppointment, useServices, useAppointmentSummary } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
+import WorkloadCard from './workload.component';
+import first from 'lodash-es/first';
+
 import styles from './appointments-form.scss';
 
 interface AppointmentFormProps {
@@ -89,6 +92,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
   const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const appointmentSummary = useAppointmentSummary(new Date().toString(), selectedService);
 
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {
@@ -176,6 +181,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             style={{ width: '100%' }}
           />
         </DatePicker>
+      </div>
+
+      <div className={styles.workLoadContainer}>
+        {appointmentSummary.length > 0 && (
+          <>
+            <p className={styles.workLoadTitle}>
+              {t(
+                'serviceWorkloadTitle',
+                `${selectedService} clinic work load on the week of ${dayjs(first(appointmentSummary).date).format(
+                  'DD/MM',
+                )}`,
+              )}
+            </p>
+            <div className={styles.workLoadCard}>
+              {appointmentSummary?.map(({ date, count }, index) => (
+                <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className={styles.childRow}>
