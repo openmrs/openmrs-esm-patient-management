@@ -130,7 +130,7 @@ export interface AppointmentCountMap {
 }
 
 export interface AppointmentSummary {
-  appointmentService: { name: string };
+  appointmentService: OpenmrsResource;
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
 export interface Provider {
