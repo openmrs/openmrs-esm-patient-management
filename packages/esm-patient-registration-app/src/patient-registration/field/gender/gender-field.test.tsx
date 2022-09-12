@@ -6,6 +6,27 @@ import { Formik, Form } from 'formik';
 
 import { GenderField } from './gender-field.component';
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...(jest.requireActual('@openmrs/esm-framework') as any),
+  useConfig: jest.fn(() => ({
+    fieldConfigurations: {
+      gender: [
+        {
+          value: 'Male',
+          label: 'Male',
+          id: 'male',
+        },
+      ],
+      name: {
+        displayMiddleName: false,
+        unidentifiedPatient: false,
+        defaultUnknownGivenName: '',
+        defaultUnknownFamilyName: '',
+      },
+    },
+  })),
+}));
+
 jest.mock('react', () => ({
   ...(jest.requireActual('react') as any),
   useContext: jest.fn(() => ({
