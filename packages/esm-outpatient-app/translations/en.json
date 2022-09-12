@@ -4,6 +4,7 @@
   "addPatientList": "Add patient to list",
   "addPatientToList": "Add patient to list",
   "addPatientToQueue": "Add patient to queue",
+  "addQueueSuccessfully": "Patient has been added to queue.",
   "advancedSearch": "Advanced search",
   "age": "Age",
   "alistOfClients": "A list of clients waiting for ",

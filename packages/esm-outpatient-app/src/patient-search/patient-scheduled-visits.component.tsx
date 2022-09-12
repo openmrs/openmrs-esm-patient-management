@@ -37,7 +37,7 @@ import { saveQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
-
+import head from 'lodash-es/head';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
@@ -60,7 +60,6 @@ export const ScheduledVisits: React.FC<{
   const [visitsIndex, setVisitsIndex] = useState(0);
   const [hasPriority, setHasPriority] = useState(false);
   const [priority, setPriority] = useState('');
-  const [p, setP] = useState('');
   const { priorities } = usePriority();
   const { statuses } = useStatus();
   const [userLocation, setUserLocation] = useState('');
@@ -74,19 +73,23 @@ export const ScheduledVisits: React.FC<{
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
+  const [visitUuid, setVisitUuid] = useState('');
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
       setUserLocation(session?.sessionLocation?.uuid);
     } else if (!userLocation && locations) {
-      setUserLocation([...locations].shift()?.uuid);
+      setUserLocation(head(locations)?.uuid);
     }
   }, [session, locations, userLocation]);
+
+  useEffect(() => {
+    setVisitUuid(currentVisit?.uuid);
+  }, [currentVisit]);
 
   const handleSubmit = useCallback(
     (event) => {
       setIsSubmitting(true);
-      setP(event?.name);
 
       const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
       const visitType = [...allVisitTypes].shift().uuid;
@@ -102,35 +105,34 @@ export const ScheduledVisits: React.FC<{
         location: userLocation,
       };
 
+      const service = head(services)?.uuid;
+      const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+      if (priority === '' || priority === null) {
+        setPriority([...priorities].shift().uuid);
+      }
+      const queuePayload: QueueEntryPayload = {
+        visit: {
+          uuid: visitUuid,
+        },
+        queueEntry: {
+          status: {
+            uuid: status,
+          },
+          priority: {
+            uuid: priority,
+          },
+          queue: {
+            uuid: service,
+          },
+          patient: {
+            uuid: patientUuid,
+          },
+          startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        },
+      };
+
       const abortController = new AbortController();
       if (currentVisit) {
-        const service = [...services].shift().uuid;
-        const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-        if (priority === '' || priority === null) {
-          setPriority([...priorities].shift().uuid);
-        }
-
-        const queuePayload: QueueEntryPayload = {
-          visit: {
-            uuid: currentVisit?.uuid,
-          },
-          queueEntry: {
-            status: {
-              uuid: status,
-            },
-            priority: {
-              uuid: priority,
-            },
-            queue: {
-              uuid: service,
-            },
-            patient: {
-              uuid: patientUuid,
-            },
-            startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
-          },
-        };
-
         saveQueueEntry(queuePayload, abortController)
           .pipe(first())
           .subscribe(
@@ -139,11 +141,7 @@ export const ScheduledVisits: React.FC<{
                 showToast({
                   kind: 'success',
                   title: t('startVisit', 'Start a visit'),
-                  description: t(
-                    'startVisitQueueSuccessfully',
-                    'Patient has been added to active visits list and queue.',
-                    `${hours} : ${minutes}`,
-                  ),
+                  description: t('addQueueSuccessfully', 'Patient has been added to queue.', `${hours} : ${minutes}`),
                 });
                 closePanel();
                 setIsSubmitting(false);
@@ -166,32 +164,7 @@ export const ScheduledVisits: React.FC<{
           .subscribe(
             (response) => {
               if (response.status === 201) {
-                const service = [...services].shift().uuid;
-                const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-                if (priority === '' || priority === null) {
-                  setPriority([...priorities].shift().uuid);
-                }
-
-                const queuePayload: QueueEntryPayload = {
-                  visit: {
-                    uuid: response.data.uuid,
-                  },
-                  queueEntry: {
-                    status: {
-                      uuid: status,
-                    },
-                    priority: {
-                      uuid: priority,
-                    },
-                    queue: {
-                      uuid: service,
-                    },
-                    patient: {
-                      uuid: patientUuid,
-                    },
-                    startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
-                  },
-                };
+                setVisitUuid(response.data.uuid);
 
                 saveQueueEntry(queuePayload, abortController)
                   .pipe(first())
@@ -243,10 +216,11 @@ export const ScheduledVisits: React.FC<{
       patientUuid,
       visitDate,
       userLocation,
-      priority,
-      currentVisit,
       services,
       statuses,
+      priority,
+      visitUuid,
+      currentVisit,
       priorities,
       t,
       closePanel,
@@ -278,20 +252,17 @@ export const ScheduledVisits: React.FC<{
                     </p>
 
                     {hasPriority && ind == visitsIndex ? (
-                      <ContentSwitcher size="sm" selectedIndex={1} className={styles.prioritySwitcher}>
+                      <ContentSwitcher
+                        size="sm"
+                        selectedIndex={1}
+                        className={styles.prioritySwitcher}
+                        onChange={(e) => {
+                          setPriority(e.name as any);
+                          handleSubmit(e);
+                        }}>
                         {priorities?.length > 0 ? (
                           priorities.map(({ uuid, display }) => {
-                            return (
-                              <Switch
-                                name={uuid}
-                                text={display}
-                                value={uuid}
-                                onClick={(e) => {
-                                  setPriority(e.name);
-                                  handleSubmit(e);
-                                }}
-                              />
-                            );
+                            return <Switch name={uuid} text={display} value={uuid} />;
                           })
                         ) : (
                           <Switch
