@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import '../root.scss';
 
 .formContainer {
@@ -12,7 +13,7 @@
 
 .select {
   width: 90%;
-  margin-right: 90%;
+  margin-right: 60%;
 }
 
 .childRow {
@@ -33,4 +34,27 @@
 
 .timePickerInput {
   width: 8rem;
+}
+
+.datePickerInput {
+  padding-bottom: 1rem;
+  margin-left: 12.5rem;
+}
+
+.workLoadCard {
+  display: flex;
+  margin: 0 1rem;
+  color: #525252;
+}
+
+.workLoadContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.workLoadTitle {
+  color: #525252;
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+  @include type.type-style('legal-01');
+  font-weight: 400;
 }

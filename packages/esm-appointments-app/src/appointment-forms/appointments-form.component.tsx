@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { useSWRConfig } from 'swr';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   ButtonSet,
@@ -16,6 +18,7 @@ import {
   TimePicker,
   TimePickerSelect,
   Toggle,
+  SkeletonText,
 } from '@carbon/react';
 import {
   useLocations,
@@ -28,44 +31,69 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm, startDate } from '../helpers';
-import { saveAppointment, useServices } from './appointment-forms.resource';
+import { amPm } from '../helpers';
+import { saveAppointment, useServices, useAppointmentSummary } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
-import styles from './edit-appointment-form.scss';
-import { useSWRConfig } from 'swr';
+import WorkloadCard from './workload.component';
+import first from 'lodash-es/first';
+
+import styles from './appointments-form.scss';
+
 interface AppointmentFormProps {
-  appointment: MappedAppointment;
+  appointment?: MappedAppointment;
+  patientUuid?: string;
+  context: string;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid, context }) => {
+  const initialState = {
+    patientUuid,
+    dateTime: undefined,
+    location: '',
+    serviceUuid: '',
+    comments: '',
+    appointmentKind: '',
+    status: '',
+    id: undefined,
+    gender: '',
+    serviceType: '',
+    provider: '',
+    appointmentNumber: undefined,
+  };
+  const appointmentState = !isEmpty(appointment) ? appointment : initialState;
+
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
-  const { patient } = usePatient(appointment.patientUuid);
+  const { patient } = usePatient(appointmentState.patientUuid);
   const locations = useLocations();
   const session = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState(appointment.dateTime);
-  const [endDate, setEndDate] = useState(appointment.dateTime);
+  const [startDate, setStartDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
+  const [endDate, setEndDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
   const [frequency, setFrequency] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(appointment.location);
-  const [selectedService, setSelectedService] = useState(appointment.serviceUuid);
+  const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
+  const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
   const [selectedProvider, setSelectedProvider] = useState(session?.currentProvider?.uuid);
   const [reminder, setReminder] = useState('');
-  const [appointmentComment, setAppointmentComment] = useState(appointment.comments);
+  const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = React.useState<Date>(appointment.dateTime ? parseDate(appointment.dateTime) : null);
+  const [visitDate, setVisitDate] = React.useState(
+    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : parseDate(new Date().toISOString()),
+  );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
-  const [day, setDay] = useState(appointment.dateTime);
-  const [appointmentKind, setAppointmentKind] = useState(appointment.appointmentKind);
-  const [appointmentStatus, setAppointmentStatus] = useState(appointment.status);
+  const [day, setDay] = useState(appointmentState.dateTime);
+  const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
+  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const appointmentSummary = useAppointmentSummary(new Date().toString(), selectedService);
 
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {
@@ -86,9 +114,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
       providerUuid: providerUuid,
       comments: appointmentComment,
       locationUuid: selectedLocation,
-      patientUuid: appointment.patientUuid,
-      appointmentNumber: appointment.appointmentNumber,
-      uuid: appointment.id,
+      patientUuid: appointmentState.patientUuid,
+      appointmentNumber: appointmentState.appointmentNumber,
+      uuid: appointmentState.id,
     };
 
     const abortController = new AbortController();
@@ -121,13 +149,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
 
   return (
     <div className={styles.formContainer}>
-      <ExtensionSlot
-        extensionSlotName="patient-header-slot"
-        state={{
-          patient,
-          patientUuid: appointment.patientUuid,
-        }}
-      />
+      {patient === null ? (
+        <SkeletonText />
+      ) : (
+        <ExtensionSlot
+          extensionSlotName="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: appointmentState.patientUuid,
+          }}
+        />
+      )}
 
       <p>{t('appointmentDateAndTime', 'Appointments Date and Time')}</p>
 
@@ -138,8 +170,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
           datePickerType="single"
           id="visitDate"
           light
-          style={{ paddingBottom: '1rem' }}
-          minDate={new Date().toISOString()}
+          className={styles.datePickerInput}
+          minDate={visitDate}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
           <DatePickerInput
@@ -149,6 +181,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
             style={{ width: '100%' }}
           />
         </DatePicker>
+      </div>
+
+      <div className={styles.workLoadContainer}>
+        {appointmentSummary.length > 0 && (
+          <>
+            <p className={styles.workLoadTitle}>
+              {t(
+                'serviceWorkloadTitle',
+                `${selectedService} clinic work load on the week of ${dayjs(first(appointmentSummary).date).format(
+                  'DD/MM',
+                )}`,
+              )}
+            </p>
+            <div className={styles.workLoadCard}>
+              {appointmentSummary?.map(({ date, count }, index) => (
+                <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className={styles.childRow}>
@@ -332,36 +384,42 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment }) => {
           ))}
       </Select>
 
-      <p>{t('getAppointmentReminder', 'Would you like to get a remider about this appointment?')}</p>
-      <RadioButtonGroup
-        defaultSelected="No"
-        orientation="vertical"
-        className={styles.inputContainer}
-        onChange={(event) => {
-          setReminder(event.toString());
-        }}
-        name="appointment-reminder-radio-group">
-        <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
-        <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
-      </RadioButtonGroup>
+      <div className={styles.inputContainer}>
+        <label className="cds--label">
+          {t('getAppointmentReminder', 'Would you like to get a remider about this appointment?')}
+        </label>
+        <RadioButtonGroup
+          defaultSelected="No"
+          orientation="vertical"
+          onChange={(event) => {
+            setReminder(event.toString());
+          }}
+          name="appointment-reminder-radio-group">
+          <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
+          <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
+        </RadioButtonGroup>
+      </div>
 
       <TextArea
         id="appointmentComment"
         light
         value={appointmentComment}
         className={styles.inputContainer}
-        labelText={t('comments', 'Comments')}
+        labelText={t('appointmentNoteLabel', 'Write an additional note')}
+        placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
         onChange={(event) => setAppointmentComment(event.target.value)}
       />
 
-      <TextArea
-        id="reason"
-        light
-        value={reason}
-        className={styles.inputContainer}
-        labelText={t('reasonForChanges', 'Reason For Changes')}
-        onChange={(event) => setReason(event.target.value)}
-      />
+      {context === 'editing' ? (
+        <TextArea
+          id="reason"
+          light
+          value={reason}
+          className={styles.inputContainer}
+          labelText={t('reasonForChanges', 'Reason For Changes')}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      ) : null}
 
       <ButtonSet>
         <Button onClick={closeOverlay} className={styles.button} kind="secondary">
