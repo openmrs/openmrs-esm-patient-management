@@ -23,6 +23,11 @@ export interface CustomConceptAnswer {
   label: string | null;
   uuid: string;
 }
+export interface Gender {
+  label: string | null;
+  value: string;
+  id: string;
+}
 
 export interface RegistrationConfig {
   sections: Array<string>;
@@ -35,6 +40,7 @@ export interface RegistrationConfig {
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
     };
+    gender: Array<Gender>;
   };
   links: {
     submitButton: string;
@@ -178,6 +184,48 @@ export const esmPatientRegistrationSchema = {
         _default: 'UNKNOWN',
         _description: 'The family/last name to record for unidentified patients.',
       },
+    },
+    gender: {
+      _type: Type.Array,
+      _elements: {
+        value: {
+          _type: Type.String,
+          _description: 'The value for sex option',
+        },
+        label: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The label displayed for sex option.',
+        },
+        id: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The id for sex option.',
+        },
+      },
+      _default: [
+        {
+          id: 'male',
+          value: 'Male',
+          label: 'Male',
+        },
+        {
+          id: 'female',
+          value: 'Female',
+          label: 'Female',
+        },
+        {
+          id: 'other',
+          value: 'Other',
+          label: 'Other',
+        },
+        {
+          id: 'unknown',
+          value: 'Unknown',
+          label: 'Unknown',
+        },
+      ],
+      _description: 'Provide ability to configure sex options.',
     },
   },
   links: {
