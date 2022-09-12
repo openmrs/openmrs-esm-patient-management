@@ -26,6 +26,11 @@ export const configSchema = {
     _description: 'Configurable days of the week',
     _default: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   },
+  appointmentsEnvironment: {
+    _type: Type.String,
+    _description: 'Choose which appointment environment for the widget',
+    _default: 'OpenMRS',
+  },
 };
 
 export interface ConfigObject {
@@ -36,4 +41,5 @@ export interface ConfigObject {
   appointmentKinds: Array<string>;
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
+  appointmentsEnvironment: string;
 }
