@@ -72,7 +72,7 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.getByText(/needs triage/i)).toBeInTheDocument();
     expect(screen.getByText(/needs immediate assistance/i)).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time \(mins\)/];
+    const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });

@@ -204,7 +204,7 @@ function ActiveVisitsTable() {
       },
       {
         id: 3,
-        header: t('waitTime', 'Wait time (mins)'),
+        header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
     ],
@@ -233,6 +233,19 @@ function ActiveVisitsTable() {
       return `Attending ${service}`;
     } else if (status === 'Finished Service') {
       return `Finished ${service}`;
+    }
+  };
+
+  const formatWaitTime = (waitTime: string) => {
+    const num = parseInt(waitTime);
+    const hours = num / 60;
+    const rhours = Math.floor(hours);
+    const minutes = (hours - rhours) * 60;
+    const rminutes = Math.round(minutes);
+    if (rhours > 0) {
+      return rhours + ' ' + `${t('hoursAnd', 'hours and ')}` + rminutes + ' ' + `${t('minutes', 'minutes')}`;
+    } else {
+      return rminutes + ' ' + `${t('minutes', 'minutes')}`;
     }
   };
 
@@ -275,6 +288,9 @@ function ActiveVisitsTable() {
             <span>{buildStatusString(entry.status, entry.service)}</span>
           </span>
         ),
+      },
+      waitTime: {
+        content: <span className={styles.statusContainer}>{formatWaitTime(entry.waitTime)}</span>,
       },
     }));
   }, [filteredRows, visitQueueEntries]);
