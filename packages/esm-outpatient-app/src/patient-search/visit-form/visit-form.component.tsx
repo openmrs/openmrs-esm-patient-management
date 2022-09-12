@@ -48,6 +48,8 @@ import { saveQueueEntry } from './queue.resource';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 import { useSWRConfig } from 'swr';
+import isNull from 'lodash-es/isNull';
+import head from 'lodash-es/head';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -79,6 +81,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const { statuses } = useStatus();
   const { allServices } = useServices(selectedLocation);
   const { mutate } = useSWRConfig();
+  const [service, setSelectedService] = useState('');
 
   const config = useConfig() as OutpatientConfig;
 
@@ -118,11 +121,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         .subscribe(
           (response) => {
             if (response.status === 201) {
-              const service = [...allServices].shift().uuid;
-              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-              if (priority === '') {
-                setPriority([...priorities].shift().uuid);
+              if (isNull(service)) {
+                setSelectedService(head(allServices)?.uuid);
               }
+              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+              const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
 
               const queuePayload: QueueEntryPayload = {
                 visit: {
@@ -133,7 +136,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     uuid: status,
                   },
                   priority: {
-                    uuid: priority,
+                    uuid: priority ? priority : defaultPriority,
                   },
                   queue: {
                     uuid: service,
@@ -191,9 +194,10 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       patientUuid,
       visitDate,
       selectedLocation,
-      allServices,
+      service,
       statuses,
       priority,
+      allServices,
       priorities,
       t,
       closePanel,
@@ -419,15 +423,34 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           )}
 
           <section className={styles.section}>
+            <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+            <Select
+              labelText={t('selectService', 'Select a service')}
+              id="service"
+              invalidText="Required"
+              value={service}
+              onChange={(event) => setSelectedService(event.target.value)}>
+              {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+              {allServices?.length > 0 &&
+                allServices.map((service) => (
+                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                    {service.display}
+                  </SelectItem>
+                ))}
+            </Select>
+          </section>
+
+          <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
             <ContentSwitcher
               size="sm"
+              selectionMode="manual"
               onChange={(event) => {
                 setPriority(event.name as any);
               }}>
               {priorities?.length > 0 ? (
                 priorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} value={uuid} />;
+                  return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
                 })
               ) : (
                 <Switch

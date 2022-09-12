@@ -4,6 +4,7 @@
 
 .container {
   margin: spacing.$spacing-05 0rem;
+  background-color: $ui-background;
 
   & section {
     margin: spacing.$spacing-02 spacing.$spacing-05 0;
@@ -46,7 +47,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - 6rem);
 }
 
 .button {
