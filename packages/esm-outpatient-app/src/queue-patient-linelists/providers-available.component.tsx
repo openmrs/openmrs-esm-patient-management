@@ -6,7 +6,7 @@ import { useProviders } from './queue-linelist.resource';
 
 const pageSize = 20;
 
-const ProvidersTable: React.FC = () => {
+const AvailableProvidersTable: React.FC = () => {
   const { t } = useTranslation();
   const { providers, isLoading } = useProviders();
   const { results: paginatedProviders } = usePagination(providers, pageSize);
@@ -59,4 +59,4 @@ const ProvidersTable: React.FC = () => {
   );
 };
 
-export default ProvidersTable;
+export default AvailableProvidersTable;
