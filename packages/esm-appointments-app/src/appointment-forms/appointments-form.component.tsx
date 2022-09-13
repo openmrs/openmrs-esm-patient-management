@@ -63,13 +63,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     appointmentNumber: undefined,
   };
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
-
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
-  const { patient } = usePatient(appointmentState.patientUuid);
+  const { patient, isLoading } = usePatient(patientUuid ?? appointmentState.patientUuid);
   const locations = useLocations();
   const session = useSession();
   const { providers } = useProviders();
@@ -149,7 +148,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
 
   return (
     <div className={styles.formContainer}>
-      {patient === null ? (
+      {isLoading ? (
         <SkeletonText />
       ) : (
         <ExtensionSlot
