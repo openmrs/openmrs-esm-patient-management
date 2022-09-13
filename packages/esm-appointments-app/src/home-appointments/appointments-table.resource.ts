@@ -2,9 +2,8 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
 import { useMemo } from 'react';
-import { startDate } from '../helpers';
-import { appointmentsData } from './appointments-data';
-import { getTodaysAppointment } from '../helpers/helper';
+import { startDate, getTodaysAppointment } from '../helpers';
+import { appointmentsData } from './mock-appointments-data';
 
 export function useTodayAppointments() {
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;

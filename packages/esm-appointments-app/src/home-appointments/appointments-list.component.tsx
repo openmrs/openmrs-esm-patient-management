@@ -40,6 +40,33 @@ interface AppointmentsProps {
 
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
+const AddAppointmentLink = () => {
+  const { appointmentsEnvironment } = useConfig();
+
+  const { t } = useTranslation();
+
+  return appointmentsEnvironment === 'OpenMRS' ? (
+    <Button
+      kind="ghost"
+      renderIcon={(props) => <Add size={16} {...props} />}
+      onClick={() => {
+        navigate({ to: `${spaBasePath}` });
+        launchOverlay(t('search', 'Search'), <PatientSearch />);
+      }}>
+      {t('addNewAppointment', 'Add new appointment')}
+    </Button>
+  ) : (
+    <Link
+      size="md"
+      target="_blank"
+      className="cds--btn cds--btn--ghost"
+      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
+      renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
+      {t('addNewAppointment', 'Add new appointment')}
+    </Link>
+  );
+};
+
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
   const { appointmentsEnvironment } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
@@ -56,7 +83,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
       },
       {
         id: 1,
-        header: t('name', 'Name / HSU'),
+        header: t('name', 'Patient Name'),
         key: 'name',
       },
       {
@@ -71,7 +98,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
       },
       {
         id: 4,
-        header: 'Actions',
+        header: t('actions', 'Actions'),
         key: 'actionButton',
       },
     ],
@@ -94,7 +121,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
           <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
             {appointment.name}
           </ConfigurableLink>
-          <span className={styles.identfier}>{appointment.identifier}</span>
+          <span className={styles.identifier}>{appointment.identifier}</span>
         </div>
       ),
     },
@@ -114,14 +141,14 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
         <span className={styles.serviceContainer}>
           {appointment.status === 'Completed' ? (
             <div className={styles.completeIcon}>
-              <WatsonHealthStatusResolved /> Completed
+              Completed <WatsonHealthStatusResolved />
             </div>
           ) : appointment.status === 'CheckedIn' ? (
-            <Button kind="primary" className={styles.actionButton}>
-              COMPLETED
+            <Button kind="ghost" className={styles.actionButton}>
+              COMPLETE
             </Button>
           ) : (
-            <Button kind="primary" className={styles.actionButton}>
+            <Button kind="ghost" className={styles.actionButton}>
               CHECK IN
             </Button>
           )}
@@ -130,28 +157,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
       ),
     },
   }));
-
-  const AddAppointmentLink = () =>
-    appointmentsEnvironment === 'OpenMRS' ? (
-      <Button
-        kind="ghost"
-        renderIcon={(props) => <Add size={16} {...props} />}
-        onClick={() => {
-          navigate({ to: `${spaBasePath}` });
-          launchOverlay(t('search', 'Search'), <PatientSearch />);
-        }}>
-        {t('addNewAppointment', 'Add new appointment')}
-      </Button>
-    ) : (
-      <Link
-        size="sm"
-        target="_blank"
-        className={styles.buttonLink}
-        href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
-        renderIcon={(props) => <Add size={16} {...props} />}>
-        {t('addNewAppointment', 'Add new appointment')}
-      </Link>
-    );
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -195,8 +200,8 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
         headers={tableHeaders}
         overflowMenuOnHover={isDesktop(layout) ? true : false}
         rows={tableRows}
-        size="sm"
-        useZebraStyles>
+        size={isDesktop(layout) ? 'xs' : 'md'}
+        useZebraStyles={appointments?.length > 1 ? true : false}>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer className={styles.tableContainer}>
             <Table {...getTableProps()} className={styles.appointmentsTable}>
@@ -231,16 +236,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
                 })}
               </TableBody>
             </Table>
-            {rows.length === 0 && (
-              <p
-                style={{
-                  height: isDesktop(layout) ? '2rem' : '3rem',
-                  margin: '1rem 1.5rem',
-                }}
-                className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                {t('noAppointmentsToDisplay', 'No appointments to display')}
-              </p>
-            )}
           </TableContainer>
         )}
       </DataTable>

@@ -1,5 +1,5 @@
 import { AppointmentSummary, Appointment } from '../types';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, formatDatetime } from '@openmrs/esm-framework';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
   const groupedAppointments = appointmentSummary?.map(({ countMap, serviceName }) => ({
@@ -28,7 +28,7 @@ export const getServiceCountByAppointmentType = (
 function getAppointmentDuration(startTime = 0, endTime = 0) {
   const diff = endTime - startTime;
   var minutes = Math.floor(diff / 60000);
-  return minutes + 'Mins';
+  return minutes + 'min';
 }
 
 function formatAMPM(date) {
@@ -65,6 +65,28 @@ export const getTodaysAppointment = (appointment: Appointment) => {
     identifier: appointment.patient?.identifier,
     duration: getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
     recurring: appointment.recurring,
+  };
+  return formattedAppointment;
+};
+
+export const getAppointment = (appointment: Appointment) => {
+  let formattedAppointment = {
+    id: appointment.uuid,
+    name: appointment.patient.name,
+    age: appointment.patient?.birthDate,
+    gender: appointment.patient?.gender,
+    phoneNumber: appointment.patient?.contact,
+    dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
+    patientUuid: appointment.patient.uuid,
+    dateTime: formatDatetime(parseDate(appointment.startDateTime)),
+    serviceType: appointment.service ? appointment.service.name : '--',
+    serviceUuid: appointment.service ? appointment.service.uuid : null,
+    appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
+    status: appointment.status,
+    provider: appointment.provider ? appointment.provider.person.display : '--',
+    location: appointment.location ? appointment.location.name : '--',
+    comments: appointment.comments ? appointment.comments : '--',
+    appointmentNumber: appointment.appointmentNumber,
   };
   return formattedAppointment;
 };
