@@ -18,7 +18,7 @@ import {
   Tile,
   Link,
 } from '@carbon/react';
-import { Add, WatsonHealthStatusResolved } from '@carbon/react/icons';
+import { Add, CheckmarkOutline } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, ConfigurableLink, useConfig, navigate } from '@openmrs/esm-framework';
 import { MappedAppointment } from '../types';
 import { useTodayAppointments } from './appointments-table.resource';
@@ -41,11 +41,20 @@ interface AppointmentsProps {
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
 const AddAppointmentLink = () => {
-  const { appointmentsEnvironment } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
 
   const { t } = useTranslation();
 
-  return appointmentsEnvironment === 'OpenMRS' ? (
+  return useBahmniUI ? (
+    <Link
+      size="md"
+      target="_blank"
+      className="cds--btn cds--btn--ghost"
+      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
+      renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
+      {t('addNewAppointment', 'Add new appointment')}
+    </Link>
+  ) : (
     <Button
       kind="ghost"
       renderIcon={(props) => <Add size={16} {...props} />}
@@ -55,20 +64,11 @@ const AddAppointmentLink = () => {
       }}>
       {t('addNewAppointment', 'Add new appointment')}
     </Button>
-  ) : (
-    <Link
-      size="md"
-      target="_blank"
-      className="cds--btn cds--btn--ghost"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
-      renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
-      {t('addNewAppointment', 'Add new appointment')}
-    </Link>
   );
 };
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
-  const { appointmentsEnvironment } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
   const { t } = useTranslation();
@@ -141,18 +141,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
         <span className={styles.serviceContainer}>
           {appointment.status === 'Completed' ? (
             <div className={styles.completeIcon}>
-              Completed <WatsonHealthStatusResolved />
+              Completed <CheckmarkOutline />
             </div>
           ) : appointment.status === 'CheckedIn' ? (
             <Button kind="ghost" className={styles.actionButton}>
-              COMPLETE
+              Complete
             </Button>
           ) : (
             <Button kind="ghost" className={styles.actionButton}>
-              CHECK IN
+              Check In
             </Button>
           )}
-          <ActionsMenu appointment={appointment} environment={appointmentsEnvironment} />
+          <ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />
         </span>
       ),
     },
@@ -168,11 +168,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
         <Layer>
           <Tile className={styles.tile}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>
-                {appointmentsEnvironment === 'OpenMRS'
-                  ? t('clinicalAppointments', 'Clinical Appointments')
-                  : t('todaysAppointments', "Today's Appointments")}
-              </h4>
+              <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
             </div>
             <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
             <EmptyDataIllustration />
@@ -187,11 +183,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
     <div className={styles.homeAppointmentsContainer}>
       <div className={styles.headerContainer}>
         <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>
-            {appointmentsEnvironment === 'OpenMRS'
-              ? t('clinicalAppointments', 'Clinical Appointments')
-              : t('todaysAppointments', "Today's Appointments")}
-          </h4>
+          <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
         </div>
         <AddAppointmentLink />
       </div>
@@ -207,7 +199,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
             <Table {...getTableProps()} className={styles.appointmentsTable}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
                   {headers.map((header) => (
                     <TableHeader {...getHeaderProps({ header })} key={header.id}>
                       {header.header}
@@ -219,18 +210,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
                 {rows.map((row, index) => {
                   return (
                     <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
+                      <TableRow {...getRowProps({ row })}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 1}>
-                          <AppointmentDetails appointment={appointments?.[index]} />
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 1} />
-                      )}
+                      </TableRow>
                     </React.Fragment>
                   );
                 })}

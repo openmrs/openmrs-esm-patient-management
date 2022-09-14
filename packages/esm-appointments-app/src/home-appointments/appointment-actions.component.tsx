@@ -12,15 +12,24 @@ import { spaBasePath } from '../constants';
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
-  environment?: string;
+  useBahmniUI?: string;
   mutate?: () => void;
 }
 
-export const ActionsMenu = ({ appointment, environment }: ActionMenuProps) => {
+export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   const { t } = useTranslation();
 
   const EditOverflowItem = () =>
-    environment === 'OpenMRS' ? (
+    useBahmniUI ? (
+      <OverflowMenuItem
+        className={styles.menuItemLink}
+        id="#editAppointment"
+        target="_blank"
+        href={`https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
+        itemText={t('editAppointment', 'Edit Appointment')}>
+        {t('editAppointment', 'Edit Appointment')}
+      </OverflowMenuItem>
+    ) : (
       <OverflowMenuItem
         className={styles.menuItem}
         id="#editAppointment"
@@ -34,19 +43,19 @@ export const ActionsMenu = ({ appointment, environment }: ActionMenuProps) => {
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
-    ) : (
-      <OverflowMenuItem
-        className={styles.menuItemLink}
-        id="#editAppointment"
-        target="_blank"
-        href={`https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
-        itemText={t('editAppointment', 'Edit Appointment')}>
-        {t('editAppointment', 'Edit Appointment')}
-      </OverflowMenuItem>
     );
 
   const AddOverflowItem = () =>
-    environment === 'OpenMRS' ? (
+    useBahmniUI ? (
+      <OverflowMenuItem
+        className={styles.menuItemLink}
+        id="#createAppointment"
+        target="_blank"
+        href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
+        itemText={t('addNewAppointment', 'Add new appointment')}>
+        {t('addNewAppointment', 'Add new appointment')}
+      </OverflowMenuItem>
+    ) : (
       <OverflowMenuItem
         className={styles.menuItem}
         id="#createAppointment"
@@ -54,15 +63,6 @@ export const ActionsMenu = ({ appointment, environment }: ActionMenuProps) => {
           navigate({ to: `${spaBasePath}` });
           launchOverlay(t('search', 'Search'), <PatientSearch />);
         }}
-        itemText={t('addNewAppointment', 'Add new appointment')}>
-        {t('addNewAppointment', 'Add new appointment')}
-      </OverflowMenuItem>
-    ) : (
-      <OverflowMenuItem
-        className={styles.menuItemLink}
-        id="#createAppointment"
-        target="_blank"
-        href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
         itemText={t('addNewAppointment', 'Add new appointment')}>
         {t('addNewAppointment', 'Add new appointment')}
       </OverflowMenuItem>
