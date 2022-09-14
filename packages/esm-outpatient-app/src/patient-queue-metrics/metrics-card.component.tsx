@@ -18,21 +18,27 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
   const { t } = useTranslation();
 
   return (
-    <Layer className={styles.container}>
-      <Tile className={styles.tileContainer}>
+    <Layer className={`${children && styles.cardWithChildren} ${styles.container}`}>
+      <Tile className={`${styles.tileContainer}`}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
             <label className={styles.headerLabel}>{headerLabel}</label>
             {children}
           </div>
           {service == 'scheduled' ? (
-            <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments-list/${service}`}>
-              {t('patientList', 'Patient list')} <ArrowRight size={16} className={styles.patientListBtn} />
-            </ConfigurableLink>
+            <div className={styles.link}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments-list/${service}`}>
+                {t('patientList', 'Patient list')}
+              </ConfigurableLink>
+              <ArrowRight size={16} />
+            </div>
           ) : service == 'waitTime' ? null : (
-            <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/queue-list/${service}/${serviceUuid}/`}>
-              {t('patientList', 'Patient list')} <ArrowRight size={16} className={styles.patientListBtn} />
-            </ConfigurableLink>
+            <div className={styles.link}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/queue-list/${service}/${serviceUuid}/`}>
+                {t('patientList', 'Patient list')}
+              </ConfigurableLink>
+              <ArrowRight size={16} />
+            </div>
           )}
         </div>
         <div>
