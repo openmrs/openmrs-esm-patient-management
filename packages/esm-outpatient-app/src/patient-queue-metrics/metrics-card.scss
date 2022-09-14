@@ -6,17 +6,25 @@
   flex-grow: 1;
 }
 
+/* Tablet viewport */
+:global(.omrs-breakpoint-lt-desktop) {
+  // The card containing the dropdown element should be the first to overflow on tablet
+  .cardWithChildren {
+    order: 3;
+  }
+}
+
 .tileContainer {
   border: 0.0625rem solid $ui-03;
   height: 7.875rem;
-  padding: 0 spacing.$spacing-05;
+  padding: spacing.$spacing-05;
   margin: spacing.$spacing-03 spacing.$spacing-03;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   margin-bottom: spacing.$spacing-03;
 }
 
@@ -37,14 +45,25 @@
 
 .headerLabelContainer {
   display: flex;
-  align-items: center;
   height: spacing.$spacing-07;
+
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+    margin-top: -0.75rem;
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: 1rem;
+  }
 }
 
 .link {
   text-decoration: none;
-}
+  display: flex;
+  align-items: center;
+  color: $interactive-01;
 
-.patientListBtn {
-  margin: spacing.$spacing-04 0 0 spacing.$spacing-03;
+  svg {
+    margin-left: spacing.$spacing-03;
+  }
 }

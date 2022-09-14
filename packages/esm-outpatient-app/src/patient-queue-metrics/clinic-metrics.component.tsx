@@ -55,7 +55,7 @@ function ClinicMetrics() {
         <MetricsCard
           label={t('patients', 'Patients')}
           value={serviceCount}
-          headerLabel={t('waitingFor', 'Waiting for:')}
+          headerLabel={`${t('waitingFor', 'Waiting for')}:`}
           service={selectedService}
           serviceUuid={selectedServiceUuid}>
           <Dropdown
