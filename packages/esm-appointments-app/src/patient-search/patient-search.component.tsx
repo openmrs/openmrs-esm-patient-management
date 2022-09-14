@@ -8,11 +8,11 @@ import AppointmentForm from '../appointment-forms/appointments-form.component';
 
 const PatientSearch: React.FC = () => {
   const { t } = useTranslation();
-  const launchCreateAppointmentForm = (patient) => {
+  const launchCreateAppointmentForm = (patientUuid: string) => {
     closeOverlay();
     launchOverlay(
       t('appointmentForm', 'Create Appointment'),
-      <AppointmentForm patientUuid={patient.uuid} context="creating" />,
+      <AppointmentForm patientUuid={patientUuid} context="creating" />,
     );
   };
 
