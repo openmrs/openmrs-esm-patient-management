@@ -304,7 +304,13 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
               </p>
               <div className={styles.workLoadCard}>
                 {appointmentSummary?.map(({ date, count }, index) => (
-                  <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
+                  <WorkloadCard
+                    onDateSelected={(date) => setStartDate(dayjs(date).toDate)}
+                    key={date}
+                    date={dayjs(date).format('DD/MM')}
+                    count={count}
+                    isActive={dayjs(date).toDate() === startDate}
+                  />
                 ))}
               </div>
             </>
