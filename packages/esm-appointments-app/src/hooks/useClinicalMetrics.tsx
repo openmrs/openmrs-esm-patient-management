@@ -6,7 +6,7 @@ import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
-} from '../helpers/helper';
+} from '../helpers';
 import { omrsDateFormat } from '../constants';
 
 export const useClinicalMetrics = () => {

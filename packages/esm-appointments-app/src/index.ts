@@ -41,6 +41,11 @@ function setupOpenMRS() {
         offline: false,
       },
       {
+        id: 'home-appointments',
+        slot: 'homepage-widgets-slot',
+        load: getAsyncLifecycle(() => import('./home-appointments/appointments-list.component'), options),
+      },
+      {
         name: 'appointments-side-nav',
         slot: 'appointments-sidebar-slot',
         load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),

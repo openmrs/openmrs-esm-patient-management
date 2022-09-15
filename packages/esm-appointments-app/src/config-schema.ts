@@ -26,6 +26,11 @@ export const configSchema = {
     _description: 'Configurable days of the week',
     _default: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   },
+  useBahmniAppointmentsUI: {
+    _type: Type.Boolean,
+    _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
@@ -36,4 +41,5 @@ export interface ConfigObject {
   appointmentKinds: Array<string>;
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
+  useBahmniAppointmentsUI: boolean;
 }

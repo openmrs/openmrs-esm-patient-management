@@ -1,0 +1,131 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../root.scss';
+
+.homeAppointmentsContainer {
+  background-color: $ui-background;
+  border: 1px solid $ui-03;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 95vw;
+  margin-top: 3rem;
+  margin-bottom: 6rem;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  background-color: $ui-background;
+}
+
+.backgroundDataFetchingIndicator {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: center;
+}
+
+.tableContainer section {
+  position: relative;
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.tableContainer a {
+  text-decoration: none;
+}
+
+.startTime {
+  font-weight: 700;
+  margin-right: spacing.$spacing-03;
+}
+.nameContainer {
+  display: flex;
+}
+.serviceContainer {
+  display: flex;
+}
+.identifier {
+  font-weight: 700;
+  margin-left: spacing.$spacing-03;
+}
+.actionButton {
+  width: 8rem;
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+}
+.serviceColor {
+  border-radius: 50%;
+  margin-right: spacing.$spacing-03;
+  width: spacing.$spacing-05;
+  height: spacing.$spacing-05;
+}
+.pagination {
+  overflow: hidden;
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.emptyRow {
+  padding: 0 spacing.$spacing-05;
+  display: flex;
+  align-items: center;
+}
+
+.expandedAppointmentsRow > td > div {
+  max-height: max-content;
+}
+
+.expandedAppointmentsRow td {
+  padding: 0 spacing.$spacing-07;
+}
+
+.expandedAppointmentsRow th[colspan] td[colspan] > div:first-child {
+  padding: 0 spacing.$spacing-05;
+}
+
+.completeIcon {
+  width: 8rem;
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+  color: $support-02;
+  display: flex;
+  align-items: center;
+  svg {
+    fill: $support-02;
+    margin-left: spacing.$spacing-03;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
+
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+
+    &:after {
+      content: '';
+      display: block;
+      width: spacing.$spacing-07;
+      padding-top: spacing.$spacing-02;
+      border-bottom: 0.375rem solid;
+      @include brand-03(border-bottom-color);
+    }
+  }
+}
+
+.tile {
+  text-align: center;
+}
+
+.menuItemLink {
+  text-decoration: none;
+}

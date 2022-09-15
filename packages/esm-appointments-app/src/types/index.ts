@@ -11,25 +11,30 @@ export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
   comments: string;
-  endDateTime: Date | number;
+  endDateTime: Date | number | any;
   location: OpenmrsResource;
   patient: {
-    identifer: string;
+    identifier: string;
     name: string;
     uuid: string;
-    age: string;
-    dob: string;
-    birthDate: string;
-    gender: string;
-    contact: string;
+    age?: string;
+    dob?: string;
+    birthDate?: string;
+    gender?: string;
+    contact?: string;
   };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   recurring: boolean;
   service: AppointmentService;
-  startDateTime: string;
+  startDateTime: string | any;
   status: string;
   uuid: string;
+  additionalInfo?: string | null;
+  serviceTypes?: Array<ServiceTypes> | null;
+  voided: boolean;
+  extensions: {};
+  teleconsultationLink: string | null;
 }
 
 export interface AppointmentsFetchResponse {
@@ -39,16 +44,17 @@ export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
   description: string;
-  durationMins: string;
+  durationMins: string | null;
   endTime: string;
   initialAppointmentStatus: string;
-  location: OpenmrsResource;
+  location?: OpenmrsResource | {};
   maxAppointmentsLimit: number | null;
   name: string;
-  speciality: OpenmrsResource;
+  speciality: OpenmrsResource | {};
   startTime: string;
   uuid: string;
-  serviceTypes: Array<ServiceTypes>;
+  serviceTypes?: Array<ServiceTypes>;
+  color?: string;
 }
 
 export interface ServiceTypes {
@@ -106,8 +112,30 @@ export interface MappedAppointment {
   comments: string;
   status: string;
   appointmentNumber: string;
+  recurring?: boolean;
+  uuid?: string;
 }
 
+export interface MappedHomeAppointment {
+  id: string;
+  name: string;
+  age: string;
+  gender: string;
+  phoneNumber: string;
+  dob: string;
+  patientUuid: string;
+  dateTime: string;
+  serviceType: string;
+  serviceUuid: string;
+  appointmentKind: string;
+  provider: string;
+  location: string;
+  comments: string;
+  status: string;
+  appointmentNumber: string;
+  recurring?: boolean;
+  uuid?: string;
+}
 export interface AppointmentPayload {
   patientUuid: string;
   serviceUuid: string;
