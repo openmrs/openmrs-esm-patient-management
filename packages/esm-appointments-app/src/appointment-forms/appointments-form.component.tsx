@@ -94,6 +94,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
 
   const appointmentSummary = useAppointmentSummary(new Date().toString(), selectedService);
 
+  const isMissingRequirements = !selectedService || !appointmentKind.length;
+
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {
       setSelectedLocation(session?.sessionLocation?.uuid);
@@ -424,7 +426,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
         <Button onClick={closeOverlay} className={styles.button} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+        <Button
+          onClick={handleSubmit}
+          className={styles.button}
+          disabled={isSubmitting || isMissingRequirements}
+          kind="primary"
+          type="submit">
           {t('save', 'Save')}
         </Button>
       </ButtonSet>
