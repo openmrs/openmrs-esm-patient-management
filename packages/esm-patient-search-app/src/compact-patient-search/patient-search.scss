@@ -30,6 +30,11 @@
 
 .searchResults {
   width: 100%;
+
+  a {
+    margin: 0;
+    color: $text-02;
+  }
 }
 
 .loadingIcon {

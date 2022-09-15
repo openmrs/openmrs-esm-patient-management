@@ -66,7 +66,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ query = '', selectPatient
   }
 
   return (
-    <div className={styles.searchResultsContainer}>
+    <div
+      className={styles.searchResultsContainer}
+      style={{
+        maxHeight: '22rem',
+      }}>
       {!fetchError ? (
         !isEmpty(searchResults) ? (
           <div className={styles.searchResults}>
@@ -74,7 +78,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ query = '', selectPatient
               {totalResults} {t('searchResultsText', 'search result(s)')}
             </p>
             {searchResults.map((patient) => (
-              <CompactPatientBanner key={patient.uuid} patient={patient} />
+              <CompactPatientBanner key={patient.uuid} patient={patient} selectPatientAction={selectPatientAction} />
             ))}
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>

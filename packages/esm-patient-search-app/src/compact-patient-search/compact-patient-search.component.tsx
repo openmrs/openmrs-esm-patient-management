@@ -5,6 +5,7 @@ import PatientSearchBar from '../patient-search-bar/patient-search-bar.component
 import styles from './compact-patient-search.scss';
 import { SearchedPatient } from '../types';
 import debounce from 'lodash-es/debounce';
+import RecentSearch from '../recent-patient-charts/recent-patient-charts.component';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
@@ -76,15 +77,16 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         onSubmit={onSubmit}
         onClear={onClear}
       />
-      {!isSearchPage && showSearchResults && (
-        <div
-          className={styles.floatingSearchResultsContainer}
-          style={{
-            maxHeight: '22rem',
-          }}>
-          <PatientSearch query={searchTerm} selectPatientAction={onSearchResultClick} />
-        </div>
-      )}
+      {!isSearchPage &&
+        (showSearchResults ? (
+          <div className={styles.floatingSearchResultsContainer}>
+            <PatientSearch query={searchTerm} selectPatientAction={onSearchResultClick} />
+          </div>
+        ) : (
+          <div className={styles.floatingSearchResultsContainer}>
+            <RecentSearch selectPatientAction={onSearchResultClick} />
+          </div>
+        ))}
     </div>
   );
 };
