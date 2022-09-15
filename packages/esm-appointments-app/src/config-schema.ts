@@ -28,7 +28,7 @@ export const configSchema = {
   },
   useBahmniAppointmentsUI: {
     _type: Type.Boolean,
-    _description: 'Open links in Bahmni Appointments UI instead of O3 UI,
+    _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
     _default: false,
   },
 };
