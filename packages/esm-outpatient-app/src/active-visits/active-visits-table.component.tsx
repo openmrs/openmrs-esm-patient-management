@@ -314,9 +314,7 @@ function ActiveVisitsTable() {
             return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
           }
           if (typeof filterableValue.content.props.children === 'object') {
-            return ('' + filterableValue.content.props.children.props.children.props.children)
-              .toLowerCase()
-              .includes(filterTerm);
+            return ('' + filterableValue.content.props.children.props.children).toLowerCase().includes(filterTerm);
           }
           return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
         }
