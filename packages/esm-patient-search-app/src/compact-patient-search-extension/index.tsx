@@ -4,6 +4,7 @@ import { SearchedPatient } from '../types';
 import { Search, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './compact-patient-search.scss';
+import { navigate, interpolateString, useConfig } from '@openmrs/esm-framework';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
@@ -20,6 +21,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
+  const config = useConfig();
 
   const handleSubmit = useCallback((evt) => {
     evt.preventDefault();
@@ -32,6 +34,23 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleReset = useCallback(() => {
     setSearchTerm('');
   }, [setSearchTerm]);
+
+  const onSearchResultClick = useCallback(
+    (evt, patient: SearchedPatient) => {
+      evt.preventDefault();
+      if (selectPatientAction) {
+        selectPatientAction(patient);
+      } else {
+        navigate({
+          to: `${interpolateString(config.search.patientResultUrl, {
+            patientUuid: patient.uuid,
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+        });
+      }
+      handleReset();
+    },
+    [config.search, handleReset, selectPatientAction],
+  );
 
   return (
     <div className={styles.patientSearchBar}>
@@ -52,7 +71,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       </form>
       {showSearchResults && (
         <div className={styles.floatingSearchResultsContainer}>
-          <PatientSearch query={searchTerm} selectPatientAction={selectPatientAction} hidePanel={handleReset} />
+          <PatientSearch query={searchTerm} selectPatientAction={onSearchResultClick} />
         </div>
       )}
     </div>

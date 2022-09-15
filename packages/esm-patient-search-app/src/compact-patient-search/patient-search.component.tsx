@@ -4,18 +4,17 @@ import { Layer, Loading, Tile } from '@carbon/react';
 import isEmpty from 'lodash-es/isEmpty';
 import { useConfig } from '@openmrs/esm-framework';
 import { usePatientSearchInfinite } from '../patient-search.resource';
-import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
+import CompactPatientBanner, { SearchResultSkeleton } from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import styles from './patient-search.scss';
 import { SearchedPatient } from '../types';
 
 interface PatientSearchProps {
-  hidePanel?: () => void;
   query: string;
-  selectPatientAction?: (patient: SearchedPatient) => void;
+  selectPatientAction: (evt, patient: SearchedPatient) => void;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', selectPatientAction }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ query = '', selectPatientAction }) => {
   const { t } = useTranslation();
   const config = useConfig();
   const {
@@ -70,19 +69,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ hidePanel, query = '', se
     <div className={styles.searchResultsContainer}>
       {!fetchError ? (
         !isEmpty(searchResults) ? (
-          <div
-            className={styles.searchResults}
-            style={{
-              maxHeight: '22rem',
-            }}>
+          <div className={styles.searchResults}>
             <p className={styles.resultsText}>
               {totalResults} {t('searchResultsText', 'search result(s)')}
             </p>
-            <PatientSearchResults
-              hidePanel={hidePanel}
-              patients={searchResults}
-              selectPatientAction={selectPatientAction}
-            />
+            {searchResults.map((patient) => (
+              <CompactPatientBanner key={patient.uuid} patient={patient} />
+            ))}
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />

@@ -5,13 +5,12 @@ import { ExtensionSlot, useConfig, interpolateString, navigate, ConfigurableLink
 import { SearchedPatient } from '../types/index';
 import styles from './compact-patient-banner.scss';
 
-interface PatientSearchResultsProps {
-  patients: Array<SearchedPatient>;
-  hidePanel?: any;
-  selectPatientAction?: (patient: SearchedPatient) => void;
+interface CompactPatientBannerProps {
+  patient: SearchedPatient;
+  selectPatientAction?: (evt, patient: SearchedPatient) => void;
 }
 
-const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, hidePanel, selectPatientAction }) => {
+const CompactPatientBanner: React.FC<CompactPatientBannerProps> = ({ patient, selectPatientAction }) => {
   const config = useConfig();
   const { t } = useTranslation();
 
@@ -30,93 +29,33 @@ const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ patients, h
     }
   };
 
-  const onClickSearchResult = useCallback(
-    (evt, patient: SearchedPatient) => {
-      evt.preventDefault();
-      if (selectPatientAction) {
-        selectPatientAction(patient);
-      } else {
-        navigate({
-          to: `${interpolateString(config.search.patientResultUrl, {
-            patientUuid: patient.uuid,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
-        });
-      }
-      if (hidePanel) {
-        hidePanel();
-      }
-    },
-    [config.search, hidePanel, selectPatientAction],
-  );
-
-  const fhirPatients = useMemo(() => {
-    // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
-    // be removed. In fact, it could maybe be done at this point already, but doing it when the
-    // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
-    // doesn't have to be touched then.
-    return patients.map((patient) => {
-      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
-      return {
-        id: patient.uuid,
-        name: [
-          {
-            given: [patient.person.personName.givenName, patient.person.personName.middleName],
-            family: patient.person.personName.familyName,
-          },
-        ],
-        gender: patient.person.gender,
-        birthDate: patient.person.birthdate,
-        deceasedDateTime: patient.person.deathDate,
-        deceasedBoolean: patient.person.death,
-        identifier: patient.identifiers,
-        address: preferredAddress
-          ? [
-              {
-                city: preferredAddress.cityVillage,
-                country: preferredAddress.country,
-                postalCode: preferredAddress.postalCode,
-                state: preferredAddress.stateProvince,
-                use: 'home',
-              },
-            ]
-          : [],
-        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display == 'Telephone Number'),
-      };
-    });
-  }, [patients]);
-
   return (
-    <>
-      {fhirPatients.map((patient, indx) => (
-        <ConfigurableLink
-          onClick={(evt) => onClickSearchResult(evt, patients[indx])}
-          to={`${interpolateString(config.search.patientResultUrl, {
-            patientUuid: patient.id,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
-          key={patient.id}
-          className={styles.patientSearchResult}>
-          <div className={styles.patientAvatar} role="img">
-            <ExtensionSlot
-              extensionSlotName="patient-photo-slot"
-              state={{
-                patientUuid: patient.id,
-                patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
-                size: 'small',
-              }}
-            />
-          </div>
-          <div>
-            <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
-              patient.name?.[0]?.family
-            }`}</h2>
-            <p className={styles.demographics}>
-              {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
-              <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
-            </p>
-          </div>
-        </ConfigurableLink>
-      ))}
-    </>
+    <ConfigurableLink
+      onClick={(evt) => selectPatientAction(evt, patient)}
+      to={`${interpolateString(config.search.patientResultUrl, {
+        patientUuid: patient.uuid,
+      })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
+      key={patient.uuid}
+      className={styles.patientSearchResult}>
+      <div className={styles.patientAvatar} role="img">
+        <ExtensionSlot
+          extensionSlotName="patient-photo-slot"
+          state={{
+            patientUuid: patient.uuid,
+            patientName: patient.person.personName.display,
+            size: 'small',
+          }}
+        />
+      </div>
+      <div>
+        <h2 className={styles.patientName}>{patient.person.personName.display}</h2>
+        <p className={styles.demographics}>
+          {getGender(patient.person.gender)} <span className={styles.middot}>&middot;</span>{' '}
+          {age(patient.person.birthdate)} <span className={styles.middot}>&middot;</span>{' '}
+          {patient.identifiers?.[0]?.identifier}
+        </p>
+      </div>
+    </ConfigurableLink>
   );
 };
 
@@ -144,4 +83,4 @@ export const SearchResultSkeleton = () => {
   );
 };
 
-export default PatientSearchResults;
+export default CompactPatientBanner;

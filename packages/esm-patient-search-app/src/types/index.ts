@@ -109,3 +109,11 @@ export interface AdvancedPatientSearchAction {
   postcode?: string;
   age?: number;
 }
+
+export interface User {
+  uuid: string;
+  userProperties: {
+    [x: string]: string;
+    patientsVisited: string;
+  };
+}

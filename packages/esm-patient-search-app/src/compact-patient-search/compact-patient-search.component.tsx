@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, useConfig, interpolateString } from '@openmrs/esm-framework';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import styles from './compact-patient-search.scss';
@@ -23,6 +23,29 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const showSearchResults = useMemo(() => !!searchTerm.trim(), [searchTerm]);
+  const config = useConfig();
+
+  const handleCloseSearchResults = useCallback(() => {
+    setSearchTerm('');
+    onPatientSelect?.();
+  }, [onPatientSelect, setSearchTerm]);
+
+  const onSearchResultClick = useCallback(
+    (evt, patient: SearchedPatient) => {
+      evt.preventDefault();
+      if (selectPatientAction) {
+        selectPatientAction(patient);
+      } else {
+        navigate({
+          to: `${interpolateString(config.search.patientResultUrl, {
+            patientUuid: patient.uuid,
+          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+        });
+      }
+      handleCloseSearchResults();
+    },
+    [config.search, handleCloseSearchResults, selectPatientAction],
+  );
 
   const onSubmit = useCallback(
     (searchTerm) => {
@@ -42,11 +65,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     setSearchTerm('');
   }, [setSearchTerm]);
 
-  const handleCloseSearchResults = useCallback(() => {
-    setSearchTerm('');
-    onPatientSelect?.();
-  }, [onPatientSelect, setSearchTerm]);
-
   const handleSearchQueryChange = debounce((val) => setSearchTerm(val), 300);
 
   return (
@@ -59,12 +77,12 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         onClear={onClear}
       />
       {!isSearchPage && showSearchResults && (
-        <div className={styles.floatingSearchResultsContainer}>
-          <PatientSearch
-            query={searchTerm}
-            selectPatientAction={selectPatientAction}
-            hidePanel={handleCloseSearchResults}
-          />
+        <div
+          className={styles.floatingSearchResultsContainer}
+          style={{
+            maxHeight: '22rem',
+          }}>
+          <PatientSearch query={searchTerm} selectPatientAction={onSearchResultClick} />
         </div>
       )}
     </div>

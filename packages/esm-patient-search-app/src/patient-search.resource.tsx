@@ -117,3 +117,30 @@ export function useGetPatientAttributePhoneUuid(): string {
   }
   return data?.data?.results?.[0]?.uuid;
 }
+
+export function useUserUuid() {
+  const { t } = useTranslation();
+  const { data, error } = useSWRImmutable<FetchResponse<{ user: { uuid: string } }>, Error>(
+    '/ws/rest/v1/session',
+    openmrsFetch,
+  );
+
+  if (error) {
+    showToast({
+      kind: 'error',
+      title: t('fetchingSessionFailed', 'Fetching session details failed'),
+      description: error.message,
+    });
+  }
+
+  const result = useMemo(
+    () => ({
+      isLoadingUser: !data && !error,
+      user: data?.data?.user,
+      userUuid: data?.data?.user,
+    }),
+    [data, error],
+  );
+
+  return result;
+}

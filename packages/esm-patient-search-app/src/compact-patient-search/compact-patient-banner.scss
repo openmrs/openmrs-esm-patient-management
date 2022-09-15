@@ -39,7 +39,6 @@
 }
 
 .demographics {
-  margin-top: spacing.$spacing-03;
   @include type.type-style('body-compact-02');
   color: $text-02;
 }
