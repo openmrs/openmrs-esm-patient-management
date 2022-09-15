@@ -35,7 +35,11 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
           ) : searchType === SearchTypes.SEARCH_RESULTS ? (
             <SearchResults patients={[]} toggleSearchType={toggleSearchType} />
           ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
-            <PatientScheduledVisits patientUuid={selectedPatientUuid} toggleSearchType={toggleSearchType} />
+            <PatientScheduledVisits
+              patientUuid={selectedPatientUuid}
+              toggleSearchType={toggleSearchType}
+              closePanel={closePanel}
+            />
           ) : searchType === SearchTypes.VISIT_FORM ? (
             <VisitForm
               patientUuid={selectedPatientUuid}
