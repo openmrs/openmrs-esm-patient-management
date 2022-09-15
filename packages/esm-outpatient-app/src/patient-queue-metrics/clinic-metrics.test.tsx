@@ -4,10 +4,9 @@ import { render, screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 
 import ClinicMetrics from './clinic-metrics.component';
-import { mockMetrics } from '../../__mocks__/metrics.mock';
+import { mockMetrics, mockServiceTypes } from '../../../../__mocks__/metrics.mock';
 import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { mockServiceTypes } from '../../../../__mocks__/appointments.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -17,7 +16,7 @@ jest.mock('./queue-metrics.resource.ts', () => {
 
   return {
     ...originalModule,
-    useServices: jest.fn().mockImplementation(() => ({ services: mockServiceTypes.data })),
+    useServices: jest.fn().mockImplementation(() => ({ allServices: mockServiceTypes.data })),
   };
 });
 
@@ -49,7 +48,7 @@ describe('Clinic metrics', () => {
     expect(screen.getAllByText(/patient list/i));
 
     // Select a different service to show metrics for
-    expect(screen.getByLabelText(/Select a service/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/triage/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open menu/i }));
   });
 });

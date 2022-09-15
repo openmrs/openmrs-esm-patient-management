@@ -33,6 +33,14 @@ function ClinicMetrics() {
     }
   }, [session, locations, userLocation]);
 
+  useEffect(() => {
+    if (!selectedService && !selectedServiceUuid) {
+      const service = allServices.find((s) => s.display.toLowerCase() === 'triage');
+      setSelectedService(service?.display);
+      setSelectedServiceUuid(service?.uuid);
+    }
+  }, [allServices, selectedService, selectedServiceUuid]);
+
   const handleServiceCountChange = ({ selectedItem }: { selectedItem: Service }) => {
     setSelectedService(selectedItem.display);
     setSelectedServiceUuid(selectedItem.uuid);
@@ -61,10 +69,11 @@ function ClinicMetrics() {
           <Dropdown
             id="inline"
             type="inline"
+            initialSelectedItem={{ display: `${t('triage', 'Triage')}` }}
+            label={selectedService}
             items={allServices?.length ? [...allServices] : []}
             itemToString={(item) => (item ? item.display : '')}
             onChange={handleServiceCountChange}
-            label={t('selectService', 'Select a service')}
           />
         </MetricsCard>
         <MetricsCard
