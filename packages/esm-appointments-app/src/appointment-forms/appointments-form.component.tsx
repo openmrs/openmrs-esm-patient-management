@@ -31,7 +31,7 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm } from '../helpers';
+import { amPm, convertTime12to24 } from '../helpers';
 import { saveAppointment, useServices, useAppointmentSummary } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
@@ -62,6 +62,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     provider: '',
     appointmentNumber: undefined,
   };
+
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
@@ -84,7 +85,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = React.useState(
-    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : parseDate(new Date().toISOString()),
+    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : new Date(),
   );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
@@ -103,15 +104,25 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   }, [selectedLocation, session]);
 
   const handleSubmit = () => {
-    const visitDatetime = dayjs(visitDate.setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+    const [hours, minutes] = convertTime12to24(startDate, timeFormat);
     const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
+    const startDatetime = new Date(
+      dayjs(visitDate).year(),
+      dayjs(visitDate).month(),
+      dayjs(visitDate).date(),
+      hours,
+      minutes,
+    );
 
+    const endDatetime = dayjs(
+      new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
+    );
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: appointmentKind,
       status: appointmentStatus,
       serviceUuid: selectedService,
-      startDateTime: dayjs(visitDatetime).format(),
-      endDateTime: dayjs(visitDatetime).format(),
+      startDateTime: dayjs(startDatetime).format(),
+      endDateTime: dayjs(endDatetime).format(),
       providerUuid: providerUuid,
       comments: appointmentComment,
       locationUuid: selectedLocation,
@@ -125,6 +136,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
           showToast({
             critical: true,
             kind: 'success',
@@ -132,7 +144,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
           closeOverlay();
         }
       },

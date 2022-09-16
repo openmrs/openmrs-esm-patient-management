@@ -16,7 +16,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   return (
     <div className={styles.container}>
       <div className="header">
-        <p className={styles.heading}>{appointment.serviceType}</p>
+        <p className={styles.title}>{appointment.serviceType}</p>
         <p className={styles.subHeading}>{appointment.dateTime}</p>
         <Tag type="red" size="sm" className={styles.tag}>
           {t('missedAppointment', 'Missed appointment')}

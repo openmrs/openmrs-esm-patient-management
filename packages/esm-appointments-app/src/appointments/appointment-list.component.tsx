@@ -20,24 +20,23 @@ const AppointmentList: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   return (
     <div className={styles.appointmentList}>
-      <Button
-        className={styles.calendarButton}
-        kind="primary"
-        onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
-        renderIcon={(props) => <Calendar size={16} {...props} />}
-        data-floating-menu-primary-focus
-        iconDescription={t('viewCalendar', 'View Calendar')}>
-        {t('viewCalendar', 'View Calendar')}
-      </Button>
-
       <Tabs
         selectedIndex={selectedTab}
         onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
         className={styles.tabs}>
-        <TabList aria-label="Appointment tabs" contained>
-          <Tab>{t('bookedForToday', 'Booked for today')}</Tab>
+        <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
+          <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
+          <Button
+            className={styles.calendarButton}
+            kind="primary"
+            onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
+            renderIcon={(props) => <Calendar size={16} {...props} />}
+            data-floating-menu-primary-focus
+            iconDescription={t('viewCalendar', 'View Calendar')}>
+            {t('viewCalendar', 'View Calendar')}
+          </Button>
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>

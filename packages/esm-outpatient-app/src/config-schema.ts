@@ -4,17 +4,14 @@ import biometricsConfigSchema, { BiometricsConfigObject } from './current-visit/
 
 export const configSchema = {
   concepts: {
-    priorityConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
-    },
+    priorityConceptSetUuid: { _type: Type.ConceptUuid, _default: '3e1583a1-e8b5-4576-afa6-c07f19bba341' },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
+      _default: '94788037-eec3-4336-aaf0-6052435811e9',
     },
     statusConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
+      _default: '386988e5-ff48-43cf-9d3b-81dc19452faf',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,

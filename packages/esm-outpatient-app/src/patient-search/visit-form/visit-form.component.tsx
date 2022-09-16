@@ -59,6 +59,7 @@ interface VisitFormProps {
 }
 
 const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
+  console.log('patientUuid');
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();

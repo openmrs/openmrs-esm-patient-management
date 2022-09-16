@@ -104,6 +104,14 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'add-patient-to-queue',
+        slot: 'add-patient-to-queue-slot',
+        load: getAsyncLifecycle(() => import('./patient-search/visit-form/visit-form.component'), {
+          featureName: 'patient info slot',
+          moduleName,
+        }),
+      },
     ],
   };
 }
