@@ -7,14 +7,18 @@ import PatientScheduledVisits from './patient-scheduled-visits.component';
 import SearchResults from './search-results.component';
 import VisitForm from './visit-form/visit-form.component';
 import { SearchTypes } from '../types';
+import QueueServiceForm from '../queue-services/queue-service-form.component';
 
 interface PatientSearchProps {
   closePanel: () => void;
+  view?: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view }) => {
   const { t } = useTranslation();
-  const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.BASIC);
+  const [searchType, setSearchType] = useState<SearchTypes>(
+    view == 'queue_service_form' ? SearchTypes.QUEUE_SERVICE_FORM : SearchTypes.BASIC,
+  );
   const [selectedPatientUuid, setSelectedPatientUuid] = useState('');
   const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
 
@@ -47,6 +51,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel }) => {
               closePanel={closePanel}
               mode={newVisitMode}
             />
+          ) : searchType === SearchTypes.QUEUE_SERVICE_FORM ? (
+            <QueueServiceForm toggleSearchType={toggleSearchType} closePanel={closePanel} />
           ) : null}
         </div>
       </Overlay>

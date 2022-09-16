@@ -1,0 +1,54 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.heading {
+  @include type.type-style('productive-heading-01');
+  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+}
+
+.warningContainer {
+  background-color: $carbon--red-50;
+  padding: spacing.$spacing-04;
+  margin: spacing.$spacing-03 0 spacing.$spacing-03;
+  display: flex;
+  justify-content: space-between;
+  .warning {
+    @include type.type-style('heading-compact-01');
+    color: $ui-05;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+.grid {
+  margin: 0 spacing.$spacing-05;
+  padding: 0rem;
+}
+
+.input {
+  margin-top: spacing.$spacing-04;
+}
+
+.button {
+  height: spacing.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: spacing.$spacing-06 spacing.$spacing-05;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+  margin-top: spacing.$spacing-05;
+}
