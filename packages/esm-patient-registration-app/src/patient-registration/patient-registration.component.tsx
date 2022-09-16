@@ -56,6 +56,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const showDummyData = useMemo(() => localStorage.getItem('openmrs:devtools') === 'true' && !inEditMode, [inEditMode]);
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
+  const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -88,6 +89,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             initialAddressFieldValues[name] = defaultValue;
           }
         }
+        fieldDefinition?.map((field) => (initialAddressFieldValues[field.id] = ''));
 
         setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
       }
@@ -99,7 +101,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     helpers.setSubmitting(true);
 
     const updatedFormValues = { ...values, identifiers: filterUndefinedPatientIdenfier(values.identifiers) };
-
     try {
       await savePatientForm(
         !inEditMode,
