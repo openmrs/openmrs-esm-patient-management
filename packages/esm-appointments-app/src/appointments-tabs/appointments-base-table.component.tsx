@@ -137,12 +137,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         }
         if (filterableValue.hasOwnProperty('content')) {
           if (Array.isArray(filterableValue.content.props.children)) {
-            return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
+            return ('' + filterableValue.content.props.children[1]).toLowerCase().includes(filterTerm);
           }
           if (typeof filterableValue.content.props.children === 'object') {
-            return ('' + filterableValue.content.props.children.props.children.props.children)
-              .toLowerCase()
-              .includes(filterTerm);
+            return ('' + filterableValue.content.props.children.props.children).toLowerCase().includes(filterTerm);
           }
           return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
         }
