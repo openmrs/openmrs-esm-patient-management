@@ -47,7 +47,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         },
         (error) => {
           showNotification({
-            title: t('queueAddFailed', 'Error adding queue'),
+            title: t('errorAddingQueue', 'Error adding queue'),
             kind: 'error',
             critical: true,
             description: error?.message,
@@ -73,7 +73,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
             <TextInput
               id="queueName"
               invalidText="Required"
-              labelText={t('queueName', 'Queue Name')}
+              labelText={t('queueName', 'Queue name')}
               onChange={(event) => setQueueName(event.target.value)}
               value={queueName}
             />
@@ -83,7 +83,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               rows={3}
               id="queueDescription"
               invalidText="Required"
-              labelText={t('queueDescriptione', 'Queue Description')}
+              labelText={t('queueDescription', 'Queue description')}
               onChange={(event) => setQueueDescription(event.target.value)}
               value={queueDescription}
             />
