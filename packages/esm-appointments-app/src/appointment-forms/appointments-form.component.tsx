@@ -194,8 +194,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
               )}
             </p>
             <div className={styles.workLoadCard}>
-              {appointmentSummary?.map(({ date, count }, index) => (
-                <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
+              {appointmentSummary?.map(({ date, count }) => (        
+                  <WorkloadCard
+                    key={date}
+                    date={date}
+                    count={count}
+                    isActive={date === dayjs(visitDate).format('YYYY-MM-DD')}
+                    onDateSelected={(date) => setVisitDate(new Date(date))}
+                  />
               ))}
             </div>
           </>

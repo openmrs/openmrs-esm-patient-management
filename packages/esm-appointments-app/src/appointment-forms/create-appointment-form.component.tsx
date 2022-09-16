@@ -31,12 +31,11 @@ import {
 } from '@openmrs/esm-framework';
 import { useAppointmentSummary, saveAppointment, useServices, fetchAppointments } from './appointment-forms.resource';
 import { AppointmentPayload } from '../types';
-import { convertTime12to24, amPm } from '../helpers/time.helpers';
 import { ConfigObject } from '../config-schema';
 import { mockFrequency } from '../../../../__mocks__/appointments.mock';
 import { closeOverlay } from '../hooks/useOverlay';
 import { useProviders } from '../hooks/useProviders';
-import { startDate as fromDate } from '../helpers';
+import { amPm, convertTime12to24, startDate as fromDate } from '../helpers';
 
 import styles from './create-appointment-form.scss';
 import WorkloadCard from './workload.component';
@@ -303,15 +302,15 @@ const CreateAppointmentsForm: React.FC<AppointmentFormProps> = ({ patientUuid })
                 )}
               </p>
               <div className={styles.workLoadCard}>
-                {appointmentSummary?.map(({ date, count }, index) => (
+              {appointmentSummary?.map(({ date, count }) => (        
                   <WorkloadCard
-                    onDateSelected={(date) => setStartDate(dayjs(date).toDate)}
                     key={date}
-                    date={dayjs(date).format('DD/MM')}
+                    date={date}
                     count={count}
-                    isActive={dayjs(date).toDate() === startDate}
+                    isActive={date === dayjs(startDate).format('YYYY-MM-DD')}
+                    onDateSelected={(date) => setStartDate(new Date(date))}
                   />
-                ))}
+              ))}
               </div>
             </>
           )}
