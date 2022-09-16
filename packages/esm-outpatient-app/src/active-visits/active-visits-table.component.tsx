@@ -351,7 +351,10 @@ function ActiveVisitsTable() {
             size="sm"
             kind="secondary"
             renderIcon={(props) => <Add size={16} {...props} />}
-            onClick={() => setShowOverlay(true)}
+            onClick={() => {
+              setShowOverlay(true);
+              setView('');
+            }}
             iconDescription={t('addPatientList', 'Add patient to list')}>
             {t('addPatientList', 'Add patient to list')}
           </Button>
