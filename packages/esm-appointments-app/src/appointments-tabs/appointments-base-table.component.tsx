@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   DataTableHeader,
   DataTableSkeleton,
-  Dropdown,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -25,14 +24,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import {
-  isDesktop,
-  useLayoutType,
-  ConfigurableLink,
-  formatDatetime,
-  parseDate,
-  showModal,
-} from '@openmrs/esm-framework';
+import { useLayoutType, ConfigurableLink, showModal } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
 import { useServices } from './appointments-table.resource';
@@ -41,7 +33,6 @@ import AppointmentForm from '../appointment-forms/appointments-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
-import EmptyState from '../empty-state/empty-state.component';
 import AddPatientToQueue from '../patient-queue/add-patient-queue.component';
 
 interface AppointmentsProps {
@@ -222,7 +213,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                 )
               }
               kind="ghost">
-              Start
+              {t('checkedIn', 'CheckedIn')}
             </Button>
 
             <ActionsMenu appointment={appointments?.[index]} />

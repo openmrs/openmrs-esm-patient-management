@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { useSWRConfig } from 'swr';
 import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
@@ -32,15 +31,20 @@ import {
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
 import { amPm, convertTime12to24 } from '../helpers';
-import { saveAppointment, useServices, useAppointmentSummary } from './appointment-forms.resource';
+import {
+  saveAppointment,
+  useServices,
+  useAppointmentSummary,
+  checkAppointmentConflict,
+} from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
 import WorkloadCard from './workload.component';
 import first from 'lodash-es/first';
-
 import styles from './appointments-form.scss';
+import { useSWRConfig } from 'swr';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -103,7 +107,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     }
   }, [selectedLocation, session]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const [hours, minutes] = convertTime12to24(startDate, timeFormat);
     const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
     const startDatetime = new Date(
@@ -131,12 +135,29 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       uuid: appointmentState.id,
     };
 
+    const { data, status } = await checkAppointmentConflict(appointmentPayload);
+    const [bookingStatus] = Object.keys(data);
+    const isPatientDoubleBooking = 'PATIENT_DOUBLE_BOOKING' === bookingStatus;
+
+    if (isPatientDoubleBooking) {
+      showToast({
+        critical: true,
+        kind: 'warning',
+        description: t(
+          'doublePatientBooking',
+          'There exist an appointment on the specified service and appointment date',
+        ),
+        title: t('doubleBooking', 'Appointment double booking'),
+      });
+      return;
+    }
+
     const abortController = new AbortController();
     setIsSubmitting(true);
     saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
+        mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
         if (status === 200) {
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
           showToast({
             critical: true,
             kind: 'success',

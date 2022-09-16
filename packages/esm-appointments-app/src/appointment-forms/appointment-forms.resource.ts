@@ -82,3 +82,19 @@ export const useAppointmentSummary = (fromDate: string, serviceUuid: string) => 
     }))
     .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
+
+export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
+  return await openmrsFetch('/ws/rest/v1/appointments/conflicts', {
+    method: 'POST',
+    body: {
+      patientUuid: appointmentPayload.patientUuid,
+      serviceUuid: appointmentPayload.serviceUuid,
+      startDateTime: appointmentPayload.startDateTime,
+      endDateTime: appointmentPayload.endDateTime,
+      providers: [],
+      locationUuid: appointmentPayload.locationUuid,
+      appointmentKind: appointmentPayload.appointmentKind,
+    },
+    headers: { 'Content-Type': 'application/json' },
+  });
+};
