@@ -18,14 +18,14 @@ import { useSWRConfig } from 'swr';
 import { startDate } from '../helpers';
 
 interface ChangeAppointmentStatusModalProps {
-  appointments: MappedAppointment;
+  appointment: MappedAppointment;
   closeModal: () => void;
 }
 
-const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> = ({ appointments, closeModal }) => {
+const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> = ({ appointment, closeModal }) => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
-  const { name, id, dateTime, serviceType, status } = appointments;
+  const { name, id, dateTime, serviceType, status } = appointment;
   const [selectedStatus, setSelectedStatus] = useState(status);
   const appointmentStatus = [
     { display: t('checkedIn', 'CheckedIn'), value: 'CheckedIn' },
@@ -33,26 +33,33 @@ const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> 
     { display: t('completed', 'Completed'), value: 'Completed' },
   ];
 
-  const handleChangeAppointmentStatus = async () => {
+  const handleChangeAppointmentStatus = () => {
     const ac = new AbortController();
-    const { status, statusText } = await changeAppointmentStatus(selectedStatus, id, ac);
-    status === 200
-      ? showToast({
-          critical: true,
-          kind: 'success',
-          description:
-            t('appointmentStatusChange', 'Appointment status successfully changed to') + ` ${selectedStatus}`,
-          title: t('appointmentStatusTitleMessage', 'Appointment status'),
-        })
-      : showNotification({
+    changeAppointmentStatus(selectedStatus, id, ac)
+      .then(({ status }) => {
+        if (status === 200) {
+          showToast({
+            critical: true,
+            kind: 'success',
+            description: t(
+              'appointmentStatusChange',
+              `Appointment status has been successfully changed to ${selectedStatus}`,
+            ),
+            title: t('appointmentStatusTitleMessage', 'Appointment status'),
+          });
+          selectedStatus === 'CheckedIn' && navigate({ to: `\${openmrsSpaBase}/outpatient` });
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+          closeModal();
+        }
+      })
+      .catch((error) => {
+        showNotification({
           title: t('appointmentFormError', 'Error updating appointment status'),
           kind: 'error',
           critical: true,
-          description: statusText,
+          description: error?.message,
         });
-    selectedStatus === 'CheckedIn' && navigate({ to: `\${openmrsSpaBase}/outpatient` });
-    mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
-    closeModal();
+      });
   };
 
   return (

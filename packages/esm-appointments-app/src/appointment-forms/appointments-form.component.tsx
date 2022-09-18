@@ -45,6 +45,7 @@ import WorkloadCard from './workload.component';
 import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
 import { useSWRConfig } from 'swr';
+import { startDate as appointmentStartDate } from '../helpers/time';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -135,7 +136,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       uuid: appointmentState.id,
     };
 
-    const { data, status } = await checkAppointmentConflict(appointmentPayload);
+    const { data } = await checkAppointmentConflict(appointmentPayload);
     const [bookingStatus] = Object.keys(data);
     const isPatientDoubleBooking = 'PATIENT_DOUBLE_BOOKING' === bookingStatus;
 
@@ -156,7 +157,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     setIsSubmitting(true);
     saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
-        mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
         if (status === 200) {
           showToast({
             critical: true,
@@ -165,6 +165,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
           closeOverlay();
         }
       },

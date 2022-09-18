@@ -140,10 +140,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     );
   };
 
-  const launchAppointmentStatusModal = (appointments: MappedAppointment) => {
+  const handleAppointmentActionButtonClick = (appointment: MappedAppointment) => {
+    if (appointment.status === 'Scheduled') {
+      launchOverlay(
+        t('AddPatientToQueue', 'Add patient to queue'),
+        <VisitForm patientUuid={appointment.patientUuid} appointment={appointment} />,
+      );
+      return;
+    }
+
     const dispose = showModal('change-appointment-status-modal', {
       closeModal: () => dispose(),
-      appointments,
+      appointment,
     });
   };
 
@@ -203,18 +211,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       startButton: {
         content: (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {appointment.status === 'Scheduled' && (
-              <Button
-                onClick={() =>
-                  launchOverlay(
-                    t('AddPatientToQueue', 'Add patient to queue'),
-                    <VisitForm patientUuid={appointment.patientUuid} appointment={appointment} />,
-                  )
-                }
-                kind="ghost">
-                {t('checkedIn', 'CheckedIn')}
-              </Button>
-            )}
+            <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
+              {appointment.status === 'Scheduled' ? t('checkedIn', 'CheckedIn') : t('changeStatus', 'Change status')}
+            </Button>
+
             <ActionsMenu appointment={appointments?.[index]} />
           </div>
         ),
