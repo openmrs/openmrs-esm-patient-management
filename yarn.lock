@@ -2502,164 +2502,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jsenv/cancellation@npm:2.0.3":
-  version: 2.0.3
-  resolution: "@jsenv/cancellation@npm:2.0.3"
-  dependencies:
-    "@jsenv/node-signals": 2.0.1
-  checksum: a108695d601eac4ca3a5b53702f77cbb0e5f7524192470906eb838e4597d1158076fa15bc8ae52b918f62bc615ccb60d0d38524da46f87baf8460bbb6042cef4
-  languageName: node
-  linkType: hard
-
-"@jsenv/cancellation@npm:2.0.4":
-  version: 2.0.4
-  resolution: "@jsenv/cancellation@npm:2.0.4"
-  dependencies:
-    "@jsenv/node-signals": 2.0.1
-  checksum: 279c779c8606e86ede7ab42c07b6759083fd70357c349116971008f07b9fb682df3e96a6f7cd32a545e8c79d4389f36dfd9e0c909f8fd5b27c44dcabf7f060f0
-  languageName: node
-  linkType: hard
-
-"@jsenv/cancellation@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@jsenv/cancellation@npm:3.0.0"
-  checksum: 4e49ee8d40ed0be9bd9b0752f9623a035ad9c8819c4bf4cb06e768300c1d1f6a6db89cd159e4f7d6538b2875a8acf44f73d3a0c74410be4465256d496f4727b9
-  languageName: node
-  linkType: hard
-
-"@jsenv/dynamic-import-worker@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@jsenv/dynamic-import-worker@npm:1.0.0"
-  checksum: dc05ae96f898cd0c7ab851efa9cb42a8142a17b68a9cc8927c5f8c822dcbf09a563c4791b43cda25ba0b87cdced44e546807c106778cc80b2bbf53ec40e7046e
-  languageName: node
-  linkType: hard
-
-"@jsenv/file-size-impact@npm:12.1.1":
-  version: 12.1.1
-  resolution: "@jsenv/file-size-impact@npm:12.1.1"
-  dependencies:
-    "@jsenv/dynamic-import-worker": 1.0.0
-    "@jsenv/filesystem": 2.3.1
-    "@jsenv/github-pull-request-impact": 1.6.4
-    "@jsenv/logger": 4.0.1
-    pretty-bytes: 5.6.0
-  checksum: 9ffe3eea481592099d561c8926d0591ccc78a1d6fcbc5c9f760e845f0e1a7a59c450cab629f43486ed84ccae10c011c4d631f3443dd30c10697ba8904543b7f6
-  languageName: node
-  linkType: hard
-
-"@jsenv/filesystem@npm:2.3.1":
-  version: 2.3.1
-  resolution: "@jsenv/filesystem@npm:2.3.1"
-  dependencies:
-    "@jsenv/cancellation": 3.0.0
-    "@jsenv/url-meta": 6.0.1
-  checksum: 3a4dbfdfe8f8631b3fee128ecf60cefeb068fb3473e7b858320f2d12173de09d13d5666e41b4dea619d5838e3e102c07f361fb884dd36b20c04f0bf0eb210943
-  languageName: node
-  linkType: hard
-
-"@jsenv/github-pull-request-impact@npm:1.6.4":
-  version: 1.6.4
-  resolution: "@jsenv/github-pull-request-impact@npm:1.6.4"
-  dependencies:
-    "@jsenv/cancellation": 3.0.0
-    "@jsenv/logger": 4.0.1
-    "@jsenv/server": 6.1.0
-    "@jsenv/util": 4.1.1
-  checksum: e0e4e343fecb6fbc8c5215859912d7f462b46d1be254c649e18ba44dcc8e8c837b6f7652e4df96534a2e6df3312b42673b594b4b14a37c0e0db5fdc72c26e8f5
-  languageName: node
-  linkType: hard
-
-"@jsenv/import-map@npm:6.13.2":
-  version: 6.13.2
-  resolution: "@jsenv/import-map@npm:6.13.2"
-  dependencies:
-    "@jsenv/logger": 4.0.0
-  checksum: 64a82e2abf16e5ddb1344a2ba69a968662df79e35d2c1770c2bd08bc249b69d2a5651510062ab56b3084971d75bf4fa73c7dd17d432168869866d1f4eb2a1d33
-  languageName: node
-  linkType: hard
-
-"@jsenv/importmap-eslint-resolver@npm:5.0.0":
-  version: 5.0.0
-  resolution: "@jsenv/importmap-eslint-resolver@npm:5.0.0"
-  dependencies:
-    "@jsenv/import-map": 6.13.2
-    "@jsenv/logger": 4.0.0
-    "@jsenv/util": 4.1.0
-  checksum: 8e16a0b9f3732e924873c66783b19750301565656b2a0fd86404b7c64033e9cf318878f460e84a9ec5eaf74cb063ab2cdd914f1694f7b9b4a537c51f07282361
-  languageName: node
-  linkType: hard
-
-"@jsenv/logger@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@jsenv/logger@npm:4.0.0"
-  checksum: ddc359b9270ecf3b2f802477f0f7cf80f038310cb3e67aa3c3d24b56157b355584af0acca2d177007dbdcde5ad47f9b198c40a3c69395e3520fc508f03237448
-  languageName: node
-  linkType: hard
-
-"@jsenv/logger@npm:4.0.1":
-  version: 4.0.1
-  resolution: "@jsenv/logger@npm:4.0.1"
-  checksum: a8f55f69a657d1febb39556b017719eb648c340dbaef9f7d3c7eca4da88940bff9a49e95b5ef6e551ef6c4fb7b1e076cde1fa3603f2c1df2839c5c52e34b0197
-  languageName: node
-  linkType: hard
-
-"@jsenv/node-signals@npm:2.0.1":
-  version: 2.0.1
-  resolution: "@jsenv/node-signals@npm:2.0.1"
-  checksum: fe6cf328a26e3b5f5cff8b5db47f01e904ab7409d45ea738fb017de601a9c1e6239dae00861198081c9042a76cf17bc86c7c4ef5974e7c94774c2a8b9633d3d0
-  languageName: node
-  linkType: hard
-
-"@jsenv/server@npm:6.1.0":
-  version: 6.1.0
-  resolution: "@jsenv/server@npm:6.1.0"
-  dependencies:
-    "@jsenv/cancellation": 2.0.4
-    "@jsenv/logger": 4.0.1
-    "@jsenv/node-signals": 2.0.1
-    "@jsenv/util": 4.1.1
-    abort-controller: 3.0.0
-    kill-port: 1.6.1
-    node-fetch: 2.6.1
-  checksum: 5d8e2ef882a49997ddb3b02bcd565c0706ff6af025f6938dff579c89ec3bd09b55e7e145a8603e0bf62aad6af0e67cb3729dfb7325e0c7d8996c3c95225e3450
-  languageName: node
-  linkType: hard
-
-"@jsenv/url-meta@npm:6.0.0":
-  version: 6.0.0
-  resolution: "@jsenv/url-meta@npm:6.0.0"
-  checksum: 3c98d475a0edbdf5fd763feeb10090c4a68e18a8355db553246f7effe7c2d8e49f1aab54c895e87fd6f6ce5afea76c8cd027a30c24b5457c0a56dc7b6214aadb
-  languageName: node
-  linkType: hard
-
-"@jsenv/url-meta@npm:6.0.1":
-  version: 6.0.1
-  resolution: "@jsenv/url-meta@npm:6.0.1"
-  checksum: 2583c5e3e0e11c920de23ac6d17ccf35c7061a5c1eb8c5271d5066c8d94b868abbd2ad7cc56b8e2d4b6048168e3f7280c02dafad56720e0c3c96811fdc5c7088
-  languageName: node
-  linkType: hard
-
-"@jsenv/util@npm:4.1.0":
-  version: 4.1.0
-  resolution: "@jsenv/util@npm:4.1.0"
-  dependencies:
-    "@jsenv/cancellation": 2.0.3
-    "@jsenv/url-meta": 6.0.0
-  checksum: 2672ee585bbccc09afeb72840d1d401e051fc2e7a723780248321efc5791f0d074b408d3287434a31f9d7bd842d822e552ac800038c66470539dc14e868d4061
-  languageName: node
-  linkType: hard
-
-"@jsenv/util@npm:4.1.1":
-  version: 4.1.1
-  resolution: "@jsenv/util@npm:4.1.1"
-  dependencies:
-    "@jsenv/cancellation": 2.0.4
-    "@jsenv/importmap-eslint-resolver": 5.0.0
-    "@jsenv/url-meta": 6.0.0
-  checksum: 4bf33e04f3470ed5db0c7f2115d7bb5c93ebca3425c9782028dfe5c68059216a0541d3142ff01db4e80f9015ec8fa4ea707a47a36a94db2a88a4070f4fbf0c1d
-  languageName: node
-  linkType: hard
-
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -3879,7 +3721,6 @@ __metadata:
   dependencies:
     "@babel/core": ^7.11.6
     "@carbon/react": ^1.12.0
-    "@jsenv/file-size-impact": 12.1.1
     "@openmrs/esm-framework": next
     "@swc/core": ^1.2.165
     "@swc/jest": ^0.2.20
@@ -5284,15 +5125,6 @@ __metadata:
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
   checksum: a4a97ec07d7ea112c517036882b2ac22f3109b7b19077dc656316d07d308438aac28e4d9746dc4d84bf6b1e75b4a7b0a5f3cb30592419f128ca9a8cee3bcfa17
-  languageName: node
-  linkType: hard
-
-"abort-controller@npm:3.0.0":
-  version: 3.0.0
-  resolution: "abort-controller@npm:3.0.0"
-  dependencies:
-    event-target-shim: ^5.0.0
-  checksum: 170bdba9b47b7e65906a28c8ce4f38a7a369d78e2271706f020849c1bfe0ee2067d4261df8bbb66eb84f79208fd5b710df759d64191db58cfba7ce8ef9c54b75
   languageName: node
   linkType: hard
 
@@ -9479,13 +9311,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"event-target-shim@npm:^5.0.0":
-  version: 5.0.1
-  resolution: "event-target-shim@npm:5.0.1"
-  checksum: 1ffe3bb22a6d51bdeb6bf6f7cf97d2ff4a74b017ad12284cc9e6a279e727dc30a5de6bb613e5596ff4dc3e517841339ad09a7eec44266eccb1aa201a30448166
-  languageName: node
-  linkType: hard
-
 "eventemitter3@npm:^3.1.0":
   version: 3.1.2
   resolution: "eventemitter3@npm:3.1.2"
@@ -10416,13 +10241,6 @@ __metadata:
     call-bind: ^1.0.2
     get-intrinsic: ^1.1.1
   checksum: 9ceff8fe968f9270a37a1f73bf3f1f7bda69ca80f4f80850670e0e7b9444ff99323f7ac52f96567f8b5f5fbe7ac717a0d81d3407c7313e82810c6199446a5247
-  languageName: node
-  linkType: hard
-
-"get-them-args@npm:1.3.2":
-  version: 1.3.2
-  resolution: "get-them-args@npm:1.3.2"
-  checksum: 5544dcec7faf0bc91656eb517a80d235f5bb42579bb50a119d0eafd9c6b6f3cc4a2c1291695caec941d6bdabee7962221206d0e31f6147374edbc0d95bf368ed
   languageName: node
   linkType: hard
 
@@ -13003,18 +12821,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kill-port@npm:1.6.1":
-  version: 1.6.1
-  resolution: "kill-port@npm:1.6.1"
-  dependencies:
-    get-them-args: 1.3.2
-    shell-exec: 1.0.2
-  bin:
-    kill-port: cli.js
-  checksum: fda3b20954002ed83c8d7e9d2ae64f5f9861c259ec0d80bb8480f46285cf44db15ae79d748c0c26d41ad55fc66e12ea4ba0355341971acd01c3c1d11886b9f11
-  languageName: node
-  linkType: hard
-
 "kind-of@npm:^3.0.2, kind-of@npm:^3.0.3, kind-of@npm:^3.2.0":
   version: 3.2.2
   resolution: "kind-of@npm:3.2.2"
@@ -14255,13 +14061,6 @@ __metadata:
     json-parse-better-errors: ^1.0.0
     safe-buffer: ^5.1.1
   checksum: 601cf96bcfff04995bb484a55cc9f354657c041013d0d5d92a48765df29d36a0df8a0b3ba26b76ffbe3eb824df743996c5a1806cd8e45a11da352e2904c4aaab
-  languageName: node
-  linkType: hard
-
-"node-fetch@npm:2.6.1":
-  version: 2.6.1
-  resolution: "node-fetch@npm:2.6.1"
-  checksum: 91075bedd57879117e310fbcc36983ad5d699e522edb1ebcdc4ee5294c982843982652925c3532729fdc86b2d64a8a827797a745f332040d91823c8752ee4d7c
   languageName: node
   linkType: hard
 
@@ -15818,7 +15617,7 @@ openmrs@next:
   languageName: node
   linkType: hard
 
-"pretty-bytes@npm:5.6.0, pretty-bytes@npm:^5.3.0, pretty-bytes@npm:^5.4.1":
+"pretty-bytes@npm:^5.3.0, pretty-bytes@npm:^5.4.1":
   version: 5.6.0
   resolution: "pretty-bytes@npm:5.6.0"
   checksum: 9c082500d1e93434b5b291bd651662936b8bd6204ec9fa17d563116a192d6d86b98f6d328526b4e8d783c07d5499e2614a807520249692da9ec81564b2f439cd
@@ -17320,13 +17119,6 @@ openmrs@next:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0"
   checksum: 1a2bcae50de99034fcd92ad4212d8e01eedf52c7ec7830eedcf886622804fe36884278f2be8be0ea5fde3fd1c23911643a4e0f726c8685b61871c8908af01222
-  languageName: node
-  linkType: hard
-
-"shell-exec@npm:1.0.2":
-  version: 1.0.2
-  resolution: "shell-exec@npm:1.0.2"
-  checksum: 0cae6f151165a96f2d3a5a5daf7c55888979ccfa379ada460269f618e95d7501018073cc3d53e6f942cbf7b36e92497d23dae281f3a2633b34ec489d8399ab11
   languageName: node
   linkType: hard
 
