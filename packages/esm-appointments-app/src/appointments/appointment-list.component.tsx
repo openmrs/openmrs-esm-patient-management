@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import { Calendar } from '@carbon/react/icons';
-import BookedAppointments from '../appointments-tabs/booked-appointments.component';
 import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
 import CancelledAppointment from '../appointments-tabs/cancelled-appointments.component';
 import styles from './appointment-list.scss';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
+import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -40,7 +40,7 @@ const AppointmentList: React.FC = () => {
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>
-            <BookedAppointments status={AppointmentTypes.SCHEDULED} />
+            <ScheduledAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
             <CancelledAppointment status={AppointmentTypes.CANCELLED} />

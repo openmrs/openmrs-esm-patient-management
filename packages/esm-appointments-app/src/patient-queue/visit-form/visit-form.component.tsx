@@ -17,11 +17,8 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
-  FormGroup,
-  RadioButton,
-  RadioButtonGroup,
+  SkeletonText,
 } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   useLocations,
@@ -35,35 +32,29 @@ import {
   toDateObjectStrict,
   showNotification,
   showToast,
-  useConfig,
+  usePatient,
 } from '@openmrs/esm-framework';
 import styles from './visit-form.scss';
-import { SearchTypes, PatientProgram, QueueEntryPayload } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
-import { convertTime12to24, amPm } from '../../helpers/time-helpers';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { OutpatientConfig } from '../../config-schema';
 import { saveQueueEntry } from './queue.resource';
-import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
-import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 import { useSWRConfig } from 'swr';
 import isNull from 'lodash-es/isNull';
-import head from 'lodash-es/head';
+import { amPm, convertTime12to24, startDate } from '../../helpers';
+import { closeOverlay } from '../../hooks/useOverlay';
+import { usePriority, useServices, useStatus } from './useVisit';
+import { MappedAppointment } from '../../types';
+import { changeAppointmentStatus } from '../../change-appointment-status/appointment-status.resource';
 
 interface VisitFormProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
-  closePanel: () => void;
-  mode: boolean;
+  appointment: MappedAppointment;
 }
 
-const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
+const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(0);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -73,17 +64,13 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
-  const [ignoreChanges, setIgnoreChanges] = useState(true);
-  const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
-  const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const [priority, setPriority] = useState('');
   const { priorities } = usePriority();
   const { statuses } = useStatus();
-  const { allServices } = useServices(selectedLocation);
+  const { services: allServices } = useServices(selectedLocation);
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
-
-  const config = useConfig() as OutpatientConfig;
+  const { isLoading, patient } = usePatient(patientUuid);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -122,12 +109,13 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           (response) => {
             if (response.status === 201) {
               if (isNull(service)) {
-                setSelectedService(head(allServices)?.uuid);
+                const [uuid] = allServices;
+                setSelectedService(uuid);
               }
-              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting')?.uuid;
               const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
 
-              const queuePayload: QueueEntryPayload = {
+              const queuePayload = {
                 visit: {
                   uuid: response.data.uuid,
                 },
@@ -151,7 +139,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               saveQueueEntry(queuePayload, abortController)
                 .pipe(first())
                 .subscribe(
-                  (response) => {
+                  async (response) => {
                     if (response.status === 201) {
                       showToast({
                         kind: 'success',
@@ -162,8 +150,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                           `${hours} : ${minutes}`,
                         ),
                       });
-                      closePanel();
-                      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+                      await changeAppointmentStatus('CheckedIn', appointment.id, new AbortController());
+                      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+                      closeOverlay();
                     }
                   },
                   (error) => {
@@ -200,44 +189,27 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       allServices,
       priorities,
       t,
-      closePanel,
-      mutate,
     ],
   );
 
-  const handleOnChange = () => {
-    setIgnoreChanges((prevState) => !prevState);
-  };
-
   return (
-    <Form className={styles.form} onChange={handleOnChange}>
+    <Form className={styles.form}>
       <div>
-        {isTablet && (
+        {isTablet ? (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
+        ) : isLoading ? (
+          <SkeletonText />
+        ) : (
+          <ExtensionSlot
+            extensionSlotName="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: appointment.patientUuid,
+            }}
+          />
         )}
-        <div className={styles.backButton}>
-          {mode === true ? (
-            <Button
-              kind="ghost"
-              renderIcon={ArrowLeft}
-              iconDescription="Back to search results"
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
-              <span>{t('backToSearchResults', 'Back to search results')}</span>
-            </Button>
-          ) : (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-            </Button>
-          )}
-        </div>
         <Stack gap={8} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
@@ -353,62 +325,19 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               </Select>
             )}
           </section>
-
-          {config.showRecommendedVisitTypeTab && (
-            <section>
-              <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
-              <FormGroup legendText={t('selectProgramType', 'Select program type')}>
-                <RadioButtonGroup
-                  defaultSelected={enrollment?.program?.uuid}
-                  orientation="vertical"
-                  onChange={(uuid) =>
-                    setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))
-                  }
-                  name="program-type-radio-group"
-                  valueSelected="default-selected">
-                  {activePatientEnrollment.map(({ uuid, display, program }) => (
-                    <RadioButton
-                      key={uuid}
-                      className={styles.radioButton}
-                      id={uuid}
-                      labelText={display}
-                      value={program.uuid}
-                    />
-                  ))}
-                </RadioButtonGroup>
-              </FormGroup>
-            </section>
-          )}
           <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
-            <ContentSwitcher
-              selectedIndex={contentSwitcherIndex}
-              className={styles.contentSwitcher}
-              onChange={({ index }) => setContentSwitcherIndex(index)}>
-              <Switch name="recommended" text={t('recommended', 'Recommended')} />
+            <ContentSwitcher className={styles.contentSwitcher}>
               <Switch name="all" text={t('all', 'All')} />
             </ContentSwitcher>
-            {contentSwitcherIndex === 0 && !isLoading && (
-              <MemoizedRecommendedVisitType
-                onChange={(visitType) => {
-                  setVisitType(visitType);
-                  setIsMissingVisitType(false);
-                }}
-                patientUuid={patientUuid}
-                patientProgramEnrollment={enrollment}
-                locationUuid={selectedLocation}
-              />
-            )}
-            {contentSwitcherIndex === 1 && (
-              <BaseVisitType
-                onChange={(visitType) => {
-                  setVisitType(visitType);
-                  setIsMissingVisitType(false);
-                }}
-                visitTypes={allVisitTypes}
-                patientUuid={patientUuid}
-              />
-            )}
+            <BaseVisitType
+              onChange={(visitType) => {
+                setVisitType(visitType);
+                setIsMissingVisitType(false);
+              }}
+              visitTypes={allVisitTypes}
+              patientUuid={patientUuid}
+            />
           </section>
           {isMissingVisitType && (
             <section>
@@ -464,15 +393,15 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closePanel}>
+        <Button className={styles.button} kind="secondary" onClick={closeOverlay}>
           {t('discard', 'Discard')}
         </Button>
         <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {t('startVisit', 'Start visit')}
+          {t('addPatientToQueue', 'Add patient to queue')}
         </Button>
       </ButtonSet>
     </Form>
   );
 };
 
-export default StartVisitForm;
+export default VisitForm;

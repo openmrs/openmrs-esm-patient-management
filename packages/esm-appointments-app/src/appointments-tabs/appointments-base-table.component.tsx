@@ -24,16 +24,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import { useLayoutType, ConfigurableLink, showModal } from '@openmrs/esm-framework';
+import { ConfigurableLink, showModal } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
-import { useServices } from './appointments-table.resource';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import AppointmentForm from '../appointment-forms/appointments-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
-import AddPatientToQueue from '../patient-queue/add-patient-queue.component';
+import VisitForm from '../patient-queue/visit-form/visit-form.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -102,8 +101,7 @@ function ServiceIcon({ service }) {
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { services } = useServices();
+
   const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
   const [filter, setFilter] = useState('');
 
@@ -205,17 +203,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       startButton: {
         content: (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Button
-              onClick={() =>
-                launchOverlay(
-                  t('AddPatientToQueue', 'Add patient to queue'),
-                  <AddPatientToQueue patientUuid={appointment.patientUuid} />,
-                )
-              }
-              kind="ghost">
-              {t('checkedIn', 'CheckedIn')}
-            </Button>
-
+            {appointment.status === 'Scheduled' && (
+              <Button
+                onClick={() =>
+                  launchOverlay(
+                    t('AddPatientToQueue', 'Add patient to queue'),
+                    <VisitForm patientUuid={appointment.patientUuid} appointment={appointment} />,
+                  )
+                }
+                kind="ghost">
+                {t('checkedIn', 'CheckedIn')}
+              </Button>
+            )}
             <ActionsMenu appointment={appointments?.[index]} />
           </div>
         ),
