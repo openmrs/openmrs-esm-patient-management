@@ -5,7 +5,7 @@ import { MappedAppointment } from '../types';
 import AppointmentsBaseTable from './appointments-base-table.component';
 
 describe('AppointmentsBaseTable', () => {
-  const tableHeading = 'Booked appointments';
+  const tableHeading = 'Scheduled';
 
   it('renders a loading state when appointments data is being fetched', () => {
     renderAppointmentsBaseTable([], true, tableHeading);
@@ -26,8 +26,6 @@ describe('AppointmentsBaseTable', () => {
     expect(screen.getByRole('button', { name: /add new appointment/i })).toBeInTheDocument();
     expect(screen.queryByText(/no appointments to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByText(/booked appointments/i)).toBeInTheDocument();
-    expect(screen.getByRole('listbox', { name: /selected service/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john wilson/i })).toBeInTheDocument();
 
