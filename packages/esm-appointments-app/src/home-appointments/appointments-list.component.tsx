@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -14,25 +14,13 @@ import {
   TableRow,
   Tile,
   Link,
-  NotificationActionButton,
-  InlineNotification,
 } from '@carbon/react';
-import { Add, CheckmarkOutline } from '@carbon/react/icons';
-import {
-  isDesktop,
-  useLayoutType,
-  ConfigurableLink,
-  useConfig,
-  navigate,
-  showToast,
-  showNotification,
-} from '@openmrs/esm-framework';
-import { MappedAppointment } from '../types';
+import { Add, CheckmarkOutline, SubtractAlt, CloseOutline } from '@carbon/react/icons';
+import { isDesktop, useLayoutType, ConfigurableLink, useConfig, navigate } from '@openmrs/esm-framework';
 import { useTodayAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
 import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
-import { showActionableNotification } from '../hooks/useActionableNotification';
 import { EmptyDataIllustration } from './emptyData';
 import { spaBasePath } from '../constants';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
@@ -41,6 +29,48 @@ import { useSWRConfig } from 'swr';
 import { ActionsMenu } from './appointment-actions.component';
 
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
+
+const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
+  switch (status) {
+    case 'Completed':
+      return (
+        <div className={styles.completeIcon}>
+          {t('completed', 'Completed')}
+          <CheckmarkOutline size={16} />
+        </div>
+      );
+    case 'Missed':
+      return (
+        <div className={styles.missedIcon}>
+          {t('missed', 'Missed')}
+          <SubtractAlt size={16} />
+        </div>
+      );
+    case 'Cancelled':
+      return (
+        <div className={styles.cancelIcon}>
+          {t('cancelled', 'Cancelled')}
+          <CloseOutline size={16} />
+        </div>
+      );
+    case 'CheckedIn':
+      return (
+        <Button kind="ghost" className={styles.actionButton} onClick={() => handleComplete(appointmentUuid, mutate, t)}>
+          {t('complete', 'Complete')}
+        </Button>
+      );
+    default:
+      return (
+        <Button
+          kind="ghost"
+          className={styles.actionButton}
+          disabled={status === 'CheckedIn'}
+          onClick={() => launchCheckInAppointmentModal(appointmentUuid)}>
+          {t('checkIn', 'Check In')}
+        </Button>
+      );
+  }
+};
 
 const AddAppointmentLink = () => {
   const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
@@ -153,26 +183,7 @@ const AppointmentsBaseTable = () => {
     actionButton: {
       content: (
         <span className={styles.serviceContainer}>
-          {appointment.status === 'Completed' ? (
-            <div className={styles.completeIcon}>
-              Completed <CheckmarkOutline />
-            </div>
-          ) : appointment.status === 'CheckedIn' ? (
-            <Button
-              kind="ghost"
-              className={styles.actionButton}
-              onClick={() => handleComplete(appointment.id, mutate, t)}>
-              Complete
-            </Button>
-          ) : (
-            <Button
-              kind="ghost"
-              className={styles.actionButton}
-              disabled={appointment.status === 'CheckedIn'}
-              onClick={() => launchCheckInAppointmentModal(appointment.id)}>
-              Check In
-            </Button>
-          )}
+          <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
           <ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />
         </span>
       ),

@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
 import { useMemo } from 'react';
@@ -8,11 +9,12 @@ import { appointmentsData } from './mock-appointments-data';
 import { omrsDateFormat } from '../constants';
 
 export function useTodayAppointments() {
+  const { t } = useTranslation();
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`; // this is not currently working for dates beyond 14/09/2022
   const apiUrlForAll = `/ws/rest/v1/appointment/all`;
   const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(apiUrlForAll, openmrsFetch);
 
-  const serverAppointments = data?.data?.map((appointment) => getTodaysAppointment(appointment)) ?? [];
+  const serverAppointments = data?.data?.map((appointment) => getTodaysAppointment(appointment, t)) ?? [];
 
   const results = useMemo(
     () => ({
