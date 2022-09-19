@@ -42,7 +42,7 @@ function formatAMPM(date) {
   return strTime;
 }
 
-export const getTodaysAppointment = (appointment: Appointment) => {
+export const getTodaysAppointment = (appointment: Appointment, t?: Function) => {
   let formattedAppointment = {
     id: appointment?.uuid,
     name: appointment.patient.name,
@@ -63,7 +63,9 @@ export const getTodaysAppointment = (appointment: Appointment) => {
     appointmentNumber: appointment.appointmentNumber,
     color: appointment.service.color,
     identifier: appointment.patient?.identifier,
-    duration: getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
+    duration: appointment.service?.durationMins
+      ? appointment?.service?.durationMins + t('minutes', 'min')
+      : getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
     recurring: appointment.recurring,
   };
   return formattedAppointment;

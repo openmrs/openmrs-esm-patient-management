@@ -9,6 +9,8 @@ import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
 import styles from './appointments-list.scss';
 import { spaBasePath } from '../constants';
+import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } from './common';
+import { useSWRConfig } from 'swr';
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
@@ -18,6 +20,27 @@ interface ActionMenuProps {
 
 export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
+
+  const { status } = appointment;
+  const disableActions = status === 'Completed' || status === 'Missed' || status === 'Cancelled';
+  const isScheduled = status === 'Scheduled' || status === 'Requested';
+
+  const onMissed = () => {
+    const successDescription = t('appointmentMarkedAsMissed', 'It has been successfully marked as Missed');
+    const successTitle = t('appointmentMissed', 'Appointment Missed');
+    const errorDescription = t('appointmentMissed', 'Appointment Missed');
+    const errorTitle = t('appointmentMissedError', 'Error marking appointment as Missed');
+    return handleUpdateStatus(
+      'Missed',
+      appointment.id,
+      successDescription,
+      errorDescription,
+      successTitle,
+      errorTitle,
+      mutate,
+    );
+  };
 
   const EditOverflowItem = () =>
     useBahmniUI ? (
@@ -74,24 +97,32 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         <EditOverflowItem />
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled
+          disabled={status === 'CheckedIn' || disableActions}
           id="#checkInAppointment"
-          onClick={() => {}}
+          onClick={() => launchCheckInAppointmentModal(appointment.id)}
           itemText={t('checkIn', 'Check In')}>
           {t('checkIn', 'Check In')}
         </OverflowMenuItem>
         <OverflowMenuItem
           className={styles.menuItem}
-          disabled
+          id="#completeAppointment"
+          disabled={isScheduled || disableActions}
+          onClick={() => handleComplete(appointment.id, mutate, t)}
+          itemText={t('complete', 'Complete')}>
+          {t('complete', 'Complete')}
+        </OverflowMenuItem>
+        <OverflowMenuItem
+          className={styles.menuItem}
+          disabled={disableActions}
           id="#missedAppointment"
-          onClick={() => {}}
+          onClick={onMissed}
           itemText={t('missed', 'Missed')}>
           {t('missed', 'Missed')}
         </OverflowMenuItem>
         <OverflowMenuItem
           className={styles.menuItem}
           id="#cancelAppointment"
-          disabled
+          disabled={disableActions}
           onClick={() => {
             navigate({ to: `${spaBasePath}` });
             launchOverlay(
@@ -101,13 +132,6 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
           }}
           itemText={t('cancel', 'Cancel')}>
           {t('cancel', 'Cancel')}
-        </OverflowMenuItem>
-        <OverflowMenuItem
-          className={styles.menuItem}
-          id="#deleteAppointment"
-          onClick={() => {}}
-          itemText={t('delete', 'Delete')}>
-          {t('delete', 'Delete')}
         </OverflowMenuItem>
         <AddOverflowItem />
       </OverflowMenu>

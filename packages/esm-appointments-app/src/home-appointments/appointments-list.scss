@@ -8,8 +8,8 @@
   width: 100%;
   margin: 0 auto;
   max-width: 95vw;
-  margin-top: 3rem;
-  margin-bottom: 6rem;
+  margin-top: spacing.$spacing-09;
+  margin-bottom: spacing.$spacing-12;
 }
 
 .headerContainer {
@@ -89,15 +89,31 @@
   padding: 0 spacing.$spacing-05;
 }
 
-.completeIcon {
+.completeIcon,
+.missedIcon,
+.cancelIcon {
   width: 8rem;
   padding: spacing.$spacing-03 spacing.$spacing-05;
-  color: $support-02;
   display: flex;
   align-items: center;
+  height: spacing.$spacing-09;
+
+  svg {
+    margin-left: spacing.$spacing-03;
+  }
+}
+
+.completeIcon {
+  color: $support-02;
   svg {
     fill: $support-02;
-    margin-left: spacing.$spacing-03;
+  }
+}
+
+.missedIcon {
+  color: $carbon--red-50;
+  svg {
+    fill: $carbon--red-50;
   }
 }
 
