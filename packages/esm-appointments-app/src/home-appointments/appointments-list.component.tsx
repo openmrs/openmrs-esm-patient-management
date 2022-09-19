@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -9,34 +9,36 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableExpandedRow,
-  TableExpandHeader,
-  TableExpandRow,
   TableHead,
   TableHeader,
   TableRow,
   Tile,
   Link,
+  NotificationActionButton,
+  InlineNotification,
 } from '@carbon/react';
 import { Add, CheckmarkOutline } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, ConfigurableLink, useConfig, navigate } from '@openmrs/esm-framework';
+import {
+  isDesktop,
+  useLayoutType,
+  ConfigurableLink,
+  useConfig,
+  navigate,
+  showToast,
+  showNotification,
+} from '@openmrs/esm-framework';
 import { MappedAppointment } from '../types';
 import { useTodayAppointments } from './appointments-table.resource';
-import AppointmentDetails from '../appointment-details/appointment-details.component';
 import styles from './appointments-list.scss';
 import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
+import { showActionableNotification } from '../hooks/useActionableNotification';
 import { EmptyDataIllustration } from './emptyData';
 import { spaBasePath } from '../constants';
+import { launchCheckInAppointmentModal, handleComplete } from './common';
+import { useSWRConfig } from 'swr';
 
 import { ActionsMenu } from './appointment-actions.component';
-
-interface AppointmentsProps {
-  appointments: Array<MappedAppointment>;
-  isLoading: Boolean;
-  tableHeading: String;
-  mutate?: () => void;
-}
 
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
@@ -67,12 +69,13 @@ const AddAppointmentLink = () => {
   );
 };
 
-const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
+const AppointmentsBaseTable = () => {
   const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const { mutate } = useSWRConfig();
 
   const tableHeaders = useMemo(
     () => [
@@ -88,16 +91,21 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
       },
       {
         id: 2,
+        header: t('identifier', 'Identifier'),
+        key: 'identifier',
+      },
+      {
+        id: 3,
         header: t('location', 'Location'),
         key: 'location',
       },
       {
-        id: 3,
+        id: 4,
         header: t('service', 'Service'),
         key: 'service',
       },
       {
-        id: 4,
+        id: 5,
         header: t('actions', 'Actions'),
         key: 'actionButton',
       },
@@ -121,6 +129,12 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
           <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
             {appointment.name}
           </ConfigurableLink>
+        </div>
+      ),
+    },
+    identifier: {
+      content: (
+        <div className={styles.nameContainer}>
           <span className={styles.identifier}>{appointment.identifier}</span>
         </div>
       ),
@@ -144,11 +158,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = () => {
               Completed <CheckmarkOutline />
             </div>
           ) : appointment.status === 'CheckedIn' ? (
-            <Button kind="ghost" className={styles.actionButton}>
+            <Button
+              kind="ghost"
+              className={styles.actionButton}
+              onClick={() => handleComplete(appointment.id, mutate, t)}>
               Complete
             </Button>
           ) : (
-            <Button kind="ghost" className={styles.actionButton}>
+            <Button
+              kind="ghost"
+              className={styles.actionButton}
+              disabled={appointment.status === 'CheckedIn'}
+              onClick={() => launchCheckInAppointmentModal(appointment.id)}>
               Check In
             </Button>
           )}

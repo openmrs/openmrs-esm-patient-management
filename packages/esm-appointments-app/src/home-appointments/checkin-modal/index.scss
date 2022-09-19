@@ -1,0 +1,13 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.checkInTime {
+  display: flex;
+  align-items: center;
+}
+
+.checkInLabel {
+  margin-right: spacing.$spacing-03;
+  font-weight: bold;
+}

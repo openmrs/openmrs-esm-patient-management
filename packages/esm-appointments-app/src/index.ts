@@ -43,7 +43,7 @@ function setupOpenMRS() {
       {
         id: 'home-appointments',
         slot: 'homepage-widgets-slot',
-        load: getAsyncLifecycle(() => import('./home-appointments/appointments-list.component'), options),
+        load: getAsyncLifecycle(() => import('./home-appointments'), options),
       },
       {
         name: 'appointments-side-nav',
@@ -73,6 +73,12 @@ function setupOpenMRS() {
           () => import('./change-appointment-status/change-appointment-status.component'),
           options,
         ),
+        online: true,
+        offline: false,
+      },
+      {
+        name: 'check-in-appointment-modal',
+        load: getAsyncLifecycle(() => import('./home-appointments/checkin-modal'), options),
         online: true,
         offline: false,
       },

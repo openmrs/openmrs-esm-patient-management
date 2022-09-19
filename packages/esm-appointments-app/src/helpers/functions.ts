@@ -63,7 +63,9 @@ export const getTodaysAppointment = (appointment: Appointment) => {
     appointmentNumber: appointment.appointmentNumber,
     color: appointment.service.color,
     identifier: appointment.patient?.identifier,
-    duration: getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
+    duration: appointment.service?.durationMins
+      ? appointment?.service?.durationMins + 'min'
+      : getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
     recurring: appointment.recurring,
   };
   return formattedAppointment;
