@@ -55,7 +55,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
       />
       <ModalBody>
         <div className={styles.checkInTime}>
-          <span className={styles.checkInLabel}>{t('checkinTime', 'CheckIn time')}:</span>
+          <span className={styles.checkInLabel}>{t('checkinTime', 'Check-in time')}:</span>
           <TimePicker
             required
             light

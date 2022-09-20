@@ -51,11 +51,10 @@
 }
 .identifier {
   font-weight: 700;
-  margin-left: spacing.$spacing-03;
 }
 .actionButton {
   width: 8rem;
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
 }
 .serviceColor {
   border-radius: 50%;
@@ -93,7 +92,7 @@
 .missedIcon,
 .cancelIcon {
   width: 8rem;
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
   display: flex;
   align-items: center;
   height: spacing.$spacing-09;
@@ -144,4 +143,12 @@
 
 .menuItemLink {
   text-decoration: none;
+}
+
+.seeAllLink {
+  position: relative;
+  left: 22rem;
+  top: -8.5rem;
+  min-height: 2rem;
+  padding: 0.5rem;
 }
