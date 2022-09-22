@@ -93,35 +93,6 @@ const AppointmentsBaseTable = () => {
   const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
-  const [filteredRows, setFilteredRows] = useState<Array<MappedHomeAppointment>>([]);
-  const [filters, setFilters] = useState(['CheckedIn', 'Scheduled']);
-
-  const filterItems = [
-    { id: 'checkedIn', label: 'CheckedIn' },
-    { id: 'scheduled', label: 'Scheduled' },
-    { id: 'completed', label: 'Completed' },
-    { id: 'missed', label: 'Missed' },
-    { id: 'cancelled', label: 'Cancelled' },
-  ];
-
-  const filterLabel = (
-    <div className={styles.filterLabelContainer}>
-      {filters.map((f) => (
-        <div className={styles.filterLabel}>{f}</div>
-      ))}
-    </div>
-  );
-
-  useEffect(() => {
-    if (filters) {
-      setFilteredRows(appointments?.filter((appointment) => filters.includes(appointment.status)));
-    }
-  }, [filters.length]);
-
-  const handleStatusChange = ({ selectedItems }) => {
-    setFilters(selectedItems.map((i) => i?.label));
-  };
-
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
 
@@ -129,7 +100,7 @@ const AppointmentsBaseTable = () => {
     goTo,
     results: paginatedAppointments,
     currentPage,
-  }: PaginationData = usePagination(filteredRows, currentPageSize);
+  }: PaginationData = usePagination(appointments, currentPageSize);
 
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -217,30 +188,6 @@ const AppointmentsBaseTable = () => {
     },
   }));
 
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
-
-        if (typeof filterableValue === 'boolean') {
-          return false;
-        }
-        if (filterableValue.hasOwnProperty('content')) {
-          if (Array.isArray(filterableValue.content.props.children)) {
-            return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
-          }
-          if (typeof filterableValue.content.props.children === 'object') {
-            return ('' + filterableValue.content.props.children.props.children).toLowerCase().includes(filterTerm);
-          }
-          return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
-        }
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
-
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
@@ -249,13 +196,13 @@ const AppointmentsBaseTable = () => {
     return (
       <div className={styles.homeAppointmentsContainer}>
         <Layer>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4 className={styles.emptyHeading}>{t('todaysAppointments', "Today's Appointments")}</h4>
+          </div>
           <Tile className={styles.tile}>
-            <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
-            </div>
-            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
             <EmptyDataIllustration />
             <AddAppointmentLink />
+            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
           </Tile>
         </Layer>
       </div>
@@ -276,38 +223,13 @@ const AppointmentsBaseTable = () => {
         </div>
         <DataTable
           data-floating-menu-container
-          filterRows={handleFilter}
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
           size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles={filteredRows?.length > 1}>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getBatchActionProps }) => (
+          useZebraStyles={appointments?.length > 1}>
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar
-                style={{
-                  minHeight: 0,
-                  top: '-12px',
-                  overflow: 'visible',
-                  backgroundColor: 'color',
-                }}>
-                <TableToolbarContent className={styles.tableToolbarContent}>
-                  <MultiSelect
-                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                    ariaLabel="Status MultiSelect"
-                    id="appointment-status-multiselect"
-                    itemToString={(item) => item.label}
-                    initialSelectedItems={filterItems.filter((i) => filters.includes(i.label))}
-                    compareItems={function noRefCheck() {}}
-                    onChange={handleStatusChange}
-                    items={filterItems}
-                    label={filters.length ? filterLabel : 'Filter by status'}
-                    useTitleInItem={true}
-                    type="inline"
-                    titleText={t('showAppointmentsThatAre', 'Show appointments that are') + ':'}
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
               <Table {...getTableProps()} className={styles.appointmentsTable}>
                 <TableHead>
                   <TableRow>
@@ -355,7 +277,7 @@ const AppointmentsBaseTable = () => {
                 page={currentPage}
                 pageSize={currentPageSize}
                 pageSizes={pageSizes}
-                totalItems={filteredRows.length}
+                totalItems={appointments.length}
                 className={styles.pagination}
                 onChange={({ pageSize, page }) => {
                   if (pageSize !== currentPageSize) {

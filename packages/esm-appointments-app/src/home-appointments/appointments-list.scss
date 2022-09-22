@@ -166,6 +166,10 @@
   }
 }
 
+.emptyHeading {
+  margin-left: 1rem;
+  margin-top: 1rem;
+}
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
@@ -233,19 +237,6 @@
   top: -8.5rem;
   min-height: 2rem;
   padding: 0.5rem;
-}
-
-.tableToolbarContent {
-  :global(.cds--list-box__menu) {
-    position: relative;
-  }
-
-  :global(.cds--list-box.cds--list-box--inline) {
-    background-color: $ui-03;
-    :hover {
-      background-color: $ui-03;
-    }
-  }
 }
 
 .filterLabelContainer {
