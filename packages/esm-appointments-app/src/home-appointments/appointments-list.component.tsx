@@ -116,7 +116,7 @@ const AppointmentsBaseTable = () => {
     if (filters) {
       setFilteredRows(appointments?.filter((appointment) => filters.includes(appointment.status)));
     }
-  }, [filters, filteredRows, appointments]);
+  }, [filters.length]);
 
   const handleStatusChange = ({ selectedItems }) => {
     setFilters(selectedItems.map((i) => i?.label));
@@ -287,7 +287,7 @@ const AppointmentsBaseTable = () => {
               <TableToolbar
                 style={{
                   minHeight: 0,
-                  top: '-22px',
+                  top: '-12px',
                   overflow: 'visible',
                   backgroundColor: 'color',
                 }}>
@@ -301,7 +301,7 @@ const AppointmentsBaseTable = () => {
                     compareItems={function noRefCheck() {}}
                     onChange={handleStatusChange}
                     items={filterItems}
-                    label={filterLabel || 'Filter by status'}
+                    label={filters.length ? filterLabel : 'Filter by status'}
                     useTitleInItem={true}
                     type="inline"
                     titleText={t('showAppointmentsThatAre', 'Show appointments that are') + ':'}
@@ -335,6 +335,20 @@ const AppointmentsBaseTable = () => {
                   })}
                 </TableBody>
               </Table>
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Layer>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      </div>
+                      <p className={styles.separator}>{t('or', 'or')}</p>
+                      <AddAppointmentLink />
+                    </Tile>
+                  </Layer>
+                </div>
+              ) : null}
               <Pagination
                 forwardText="Next page"
                 backwardText="Previous page"

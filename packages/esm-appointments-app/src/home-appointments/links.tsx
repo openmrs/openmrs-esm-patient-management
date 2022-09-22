@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Link } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { Add, Calendar } from '@carbon/react/icons';
 
 import { useConfig, navigate } from '@openmrs/esm-framework';
@@ -16,13 +16,13 @@ const SeeAllAppointmentsLink = () => {
   const { t } = useTranslation();
 
   return useBahmniUI ? (
-    <Link
+    <Button
+      kind="ghost"
       size="md"
       target="_blank"
-      className={'cds--btn cds--btn--ghost ' + styles.seeAllLink}
       href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar">
       {t('seeAllAppointments', 'See all appointments')}
-    </Link>
+    </Button>
   ) : (
     <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}/calendar` })}>
       {t('seeAllAppointments', 'See all appointments')}
@@ -36,14 +36,13 @@ const AddAppointmentLink = () => {
   const { t } = useTranslation();
 
   return useBahmniUI ? (
-    <Link
+    <Button
       size="md"
       target="_blank"
-      className="cds--btn cds--btn--ghost"
       href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
       renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
       {t('addNewAppointment', 'Add new appointment')}
-    </Link>
+    </Button>
   ) : (
     <Button
       kind="ghost"
@@ -63,14 +62,15 @@ const ViewCalendarLink = () => {
   const { t } = useTranslation();
 
   return useBahmniUI ? (
-    <Link
+    <Button
+      kind="ghost"
       size="md"
       target="_blank"
       className="cds--btn cds--btn--ghost"
       href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar"
       renderIcon={(props) => <Calendar size={16} {...props} className="cds--btn__icon" />}>
       {t('viewCalendar', 'View Calendar')}
-    </Link>
+    </Button>
   ) : (
     <Button
       className={styles.calendarButton}

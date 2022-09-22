@@ -81,7 +81,6 @@
   font-weight: 700;
 }
 .actionButton {
-  // width: 8rem;
   position: static;
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
 }
@@ -167,8 +166,61 @@
   }
 }
 
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
 .tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.separator {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  width: 80%;
+  margin: 1.5rem auto;
+  overflow: hidden;
   text-align: center;
+
+  &::before,
+  &::after {
+    background-color: $text-03;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: 0.5rem;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: 0.5rem;
+    margin-right: -50%;
+  }
 }
 
 .menuItemLink {
@@ -183,26 +235,28 @@
   padding: 0.5rem;
 }
 
-.tableToolbar {
-  display: flex;
-}
+.tableToolbarContent {
+  :global(.cds--list-box__menu) {
+    position: relative;
+  }
 
-.filterContainer {
-  width: 20%;
-  :global(.cds--multiselect__wrapper) {
-    gap: 0;
+  :global(.cds--list-box.cds--list-box--inline) {
+    background-color: $ui-03;
+    :hover {
+      background-color: $ui-03;
+    }
   }
 }
 
-:global(.cds--list-box__menu) {
-  position: relative;
-}
 .filterLabelContainer {
   display: flex;
 }
 .filterLabel {
-  background-color: $ui-03;
+  background-color: $ui-02;
   padding: 0.02rem 1rem;
   border-radius: 1rem;
   margin-right: 0.5rem;
+  :hover {
+    background-color: $ui-02;
+  }
 }
