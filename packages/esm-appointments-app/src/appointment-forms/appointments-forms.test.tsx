@@ -67,14 +67,16 @@ describe('AppointmentForm', () => {
       (content, element) => element.tagName.toLowerCase() === 'input',
     ) as Array<HTMLInputElement>;
     const allSelects = screen.queryAllByRole('combobox') as Array<HTMLInputElement>;
-    let inputAndSelectNames = [];
+    const allTabs = screen.queryAllByRole('tab') as Array<HTMLInputElement>;
+    let inputAndSelectNamesAndTabValues = [];
 
-    allInputs.forEach((input) => inputAndSelectNames.push(input.id));
-    allSelects.forEach((select) => inputAndSelectNames.push(select.id));
+    allInputs.forEach((input) => inputAndSelectNamesAndTabValues.push(input?.id));
+    allSelects.forEach((select) => inputAndSelectNamesAndTabValues.push(select?.id));
+    allTabs.forEach((tab) => inputAndSelectNamesAndTabValues.push(tab?.id));
 
     expect(screen.queryByLabelText('Reason For Changes')).not.toBeInTheDocument();
 
-    expect(inputAndSelectNames).toEqual([
+    expect(inputAndSelectNamesAndTabValues).toEqual([
       'visitStartDateInput',
       'start-time-picker',
       'end-time-picker',
@@ -89,6 +91,8 @@ describe('AppointmentForm', () => {
       'appointmentKind',
       'appointmentStatus',
       'providers',
+      'facility',
+      'community',
     ]);
   });
 
@@ -101,7 +105,6 @@ describe('AppointmentForm', () => {
   it('renders the expected appointment kinds', () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
     const appointmentKindSelect = screen.getByLabelText('Select an appointment kind');
-    screen.debug(screen.getByLabelText('Select an appointment kind'));
 
     expect((screen.getByRole('option', { name: 'Select an appointment kind' }) as HTMLOptionElement).selected).toBe(
       true,

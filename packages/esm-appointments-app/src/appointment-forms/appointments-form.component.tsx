@@ -283,9 +283,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
         </div>
       </div>
 
-      <div className={styles.inputContainer}>
+      <div className={styles.inputContainer} id="appointment-place">
         <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
-        <ContentSwitcher className={styles.inputContainer}>
+        <ContentSwitcher className={styles.inputContainer} data-testid="appointment-place">
           <Switch value="facility" id="facility" text={t('facility', 'Facility')}>
             {t('facility', 'Facility')}
           </Switch>
@@ -385,9 +385,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           ))}
       </Select>
 
-      <div className={styles.inputContainer}>
+      <div className={styles.inputContainer} id="radio-group">
         <label className="cds--label">
-          {t('getAppointmentReminder', 'Would you like to get a remider about this appointment?')}
+          {t('getAppointmentReminder', 'Would you like to get a reminder about this appointment?')}
         </label>
         <RadioButtonGroup
           defaultSelected="No"
