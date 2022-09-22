@@ -35,8 +35,36 @@
   display: none;
 }
 
-.tableContainer a {
-  text-decoration: none;
+.tableContainer {
+  a {
+    text-decoration: none;
+  }
+
+  th {
+    color: $text-02;
+  }
+
+  :global(.cds--data-table) {
+    background-color: $ui-03;
+  }
+
+  :global(.cds--table-column-menu) {
+    button {
+      position: static;
+    }
+  }
+  .tableToolbar {
+    min-height: 0;
+    top: -22px;
+  }
+  .tableToolbarContent {
+    height: spacing.$spacing-07;
+    margin-bottom: spacing.$spacing-02;
+  }
+}
+.tableToolbar {
+  min-height: 0;
+  top: -22px;
 }
 
 .startTime {
@@ -53,7 +81,8 @@
   font-weight: 700;
 }
 .actionButton {
-  width: 8rem;
+  // width: 8rem;
+  position: static;
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
 }
 .serviceColor {
@@ -61,6 +90,7 @@
   margin-right: spacing.$spacing-03;
   width: spacing.$spacing-05;
   height: spacing.$spacing-05;
+  background-color: $support-02;
 }
 .pagination {
   overflow: hidden;
@@ -151,4 +181,28 @@
   top: -8.5rem;
   min-height: 2rem;
   padding: 0.5rem;
+}
+
+.tableToolbar {
+  display: flex;
+}
+
+.filterContainer {
+  width: 20%;
+  :global(.cds--multiselect__wrapper) {
+    gap: 0;
+  }
+}
+
+:global(.cds--list-box__menu) {
+  position: relative;
+}
+.filterLabelContainer {
+  display: flex;
+}
+.filterLabel {
+  background-color: $ui-03;
+  padding: 0.02rem 1rem;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
 }

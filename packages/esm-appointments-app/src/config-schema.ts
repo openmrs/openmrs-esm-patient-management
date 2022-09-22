@@ -31,11 +31,6 @@ export const configSchema = {
     _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
     _default: false,
   },
-  excludeStatuses: {
-    _type: Type.Array,
-    _description: 'Configurable excluded appointment statuses',
-    _default: ['Completed', 'Missed', 'Cancelled'],
-  },
 };
 
 export interface ConfigObject {
@@ -47,5 +42,4 @@ export interface ConfigObject {
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
   useBahmniAppointmentsUI: boolean;
-  excludeStatuses: Array<string>;
 }

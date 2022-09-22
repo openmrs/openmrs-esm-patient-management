@@ -32,8 +32,8 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
         kind: 'success',
         actionButtonLabel: 'Undo',
         onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
-        subtitle: t('appointmentSuccessfullyCheckedIn', 'It has been checkedIn successfully'),
-        title: t('appointmentCheckedIn', 'Appointment CheckedIn'),
+        subtitle: t('appointmentSuccessfullyCheckedIn', 'It has been checked-in successfully'),
+        title: t('appointmentCheckedIn', 'Appointment Checked-in'),
       });
       mutate(`/ws/rest/v1/appointment/appointment/all`);
     } else {
@@ -51,7 +51,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
     <div>
       <ModalHeader
         closeModal={closeCheckInModal}
-        title={t('checkInAppointment', 'Are you sure, you want to mark appointment as CheckedIn?')}
+        title={t('checkInAppointment', 'Are you sure, you want to mark appointment as Checked-in?')}
       />
       <ModalBody>
         <div className={styles.checkInTime}>

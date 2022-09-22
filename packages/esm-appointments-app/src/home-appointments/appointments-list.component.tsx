@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   Layer,
   DataTableSkeleton,
+  DataTableHeader,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  MultiSelect,
   Tile,
   Pagination,
 } from '@carbon/react';
@@ -28,6 +32,13 @@ import { MappedHomeAppointment } from '../types';
 
 import styles from './appointments-list.scss';
 
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
 interface PaginationData {
   goTo: (page: number) => void;
   results: Array<MappedHomeAppointment>;
@@ -79,10 +90,37 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
 };
 
 const AppointmentsBaseTable = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI, excludeStatuses } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
-  const filteredAppointments = appointments.filter((appointment) => !excludeStatuses.includes(appointment.status));
+  const [filteredRows, setFilteredRows] = useState<Array<MappedHomeAppointment>>([]);
+  const [filters, setFilters] = useState(['CheckedIn', 'Scheduled']);
+
+  const filterItems = [
+    { id: 'checkedIn', label: 'CheckedIn' },
+    { id: 'scheduled', label: 'Scheduled' },
+    { id: 'completed', label: 'Completed' },
+    { id: 'missed', label: 'Missed' },
+    { id: 'cancelled', label: 'Cancelled' },
+  ];
+
+  const filterLabel = (
+    <div className={styles.filterLabelContainer}>
+      {filters.map((f) => (
+        <div className={styles.filterLabel}>{f}</div>
+      ))}
+    </div>
+  );
+
+  useEffect(() => {
+    if (filters) {
+      setFilteredRows(appointments?.filter((appointment) => filters.includes(appointment.status)));
+    }
+  }, [filters, filteredRows, appointments]);
+
+  const handleStatusChange = ({ selectedItems }) => {
+    setFilters(selectedItems.map((i) => i?.label));
+  };
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
@@ -91,7 +129,7 @@ const AppointmentsBaseTable = () => {
     goTo,
     results: paginatedAppointments,
     currentPage,
-  }: PaginationData = usePagination(filteredAppointments, currentPageSize);
+  }: PaginationData = usePagination(filteredRows, currentPageSize);
 
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -174,11 +212,34 @@ const AppointmentsBaseTable = () => {
       content: (
         <span className={styles.serviceContainer}>
           <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
-          <ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />
         </span>
       ),
     },
   }));
+
+  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
+    return rowIds.filter((rowId) =>
+      headers.some(({ key }) => {
+        const cellId = getCellId(rowId, key);
+        const filterableValue = cellsById[cellId].value;
+        const filterTerm = inputValue.toLowerCase();
+
+        if (typeof filterableValue === 'boolean') {
+          return false;
+        }
+        if (filterableValue.hasOwnProperty('content')) {
+          if (Array.isArray(filterableValue.content.props.children)) {
+            return ('' + filterableValue.content.props.children[1].props.children).toLowerCase().includes(filterTerm);
+          }
+          if (typeof filterableValue.content.props.children === 'object') {
+            return ('' + filterableValue.content.props.children.props.children).toLowerCase().includes(filterTerm);
+          }
+          return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
+        }
+        return ('' + filterableValue).toLowerCase().includes(filterTerm);
+      }),
+    );
+  };
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -215,13 +276,38 @@ const AppointmentsBaseTable = () => {
         </div>
         <DataTable
           data-floating-menu-container
+          filterRows={handleFilter}
           headers={tableHeaders}
-          overflowMenuOnHover={isDesktop(layout) ? true : false}
+          overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
           size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles={appointments?.length > 1 ? true : false}>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+          useZebraStyles={filteredRows?.length > 1}>
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getBatchActionProps }) => (
             <TableContainer className={styles.tableContainer}>
+              <TableToolbar
+                style={{
+                  minHeight: 0,
+                  top: '-22px',
+                  overflow: 'visible',
+                  backgroundColor: 'color',
+                }}>
+                <TableToolbarContent className={styles.tableToolbarContent}>
+                  <MultiSelect
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                    ariaLabel="Status MultiSelect"
+                    id="appointment-status-multiselect"
+                    itemToString={(item) => item.label}
+                    initialSelectedItems={filterItems.filter((i) => filters.includes(i.label))}
+                    compareItems={function noRefCheck() {}}
+                    onChange={handleStatusChange}
+                    items={filterItems}
+                    label={filterLabel || 'Filter by status'}
+                    useTitleInItem={true}
+                    type="inline"
+                    titleText={t('showAppointmentsThatAre', 'Show appointments that are') + ':'}
+                  />
+                </TableToolbarContent>
+              </TableToolbar>
               <Table {...getTableProps()} className={styles.appointmentsTable}>
                 <TableHead>
                   <TableRow>
@@ -240,6 +326,9 @@ const AppointmentsBaseTable = () => {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
+                          <TableCell className="cds--table-column-menu">
+                            <ActionsMenu appointment={appointments?.[index]} useBahmniUI={useBahmniUI} />
+                          </TableCell>
                         </TableRow>
                       </React.Fragment>
                     );
@@ -252,7 +341,7 @@ const AppointmentsBaseTable = () => {
                 page={currentPage}
                 pageSize={currentPageSize}
                 pageSizes={pageSizes}
-                totalItems={filteredAppointments.length}
+                totalItems={filteredRows.length}
                 className={styles.pagination}
                 onChange={({ pageSize, page }) => {
                   if (pageSize !== currentPageSize) {

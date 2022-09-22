@@ -53,7 +53,7 @@ export const getTodaysAppointment = (appointment: Appointment, t?: Function) => 
     patientUuid: appointment.patient.uuid,
     dateTime: formatAMPM(parseDate(appointment.startDateTime)),
     serviceType: appointment.service ? appointment.service.name : '--',
-    serviceColor: appointment.service?.color ? appointment.service.color : '#006400',
+    serviceColor: appointment.service?.color ? appointment.service.color : '__',
     serviceUuid: appointment.service ? appointment.service.uuid : null,
     appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
     status: appointment.status,
