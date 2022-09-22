@@ -20,11 +20,11 @@ const SeeAllAppointmentsLink = () => {
       kind="ghost"
       size="md"
       target="_blank"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar">
+      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/list">
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   ) : (
-    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}/calendar` })}>
+    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}` })}>
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   );

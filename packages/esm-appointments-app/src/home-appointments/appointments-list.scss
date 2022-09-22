@@ -167,13 +167,13 @@
 }
 
 .emptyHeading {
-  margin-left: 1rem;
-  margin-top: 1rem;
+  margin-left: spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
 }
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: spacing.$spacing-11 0;
 }
 
 .tile {
@@ -189,7 +189,7 @@
 .content {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: 0.5rem;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .helper {
@@ -201,7 +201,7 @@
   @include type.type-style('body-compact-02');
   color: $text-02;
   width: 80%;
-  margin: 1.5rem auto;
+  margin: spacing.$spacing-06 auto;
   overflow: hidden;
   text-align: center;
 
@@ -217,12 +217,12 @@
   }
 
   &::before {
-    right: 0.5rem;
+    right: spacing.$spacing-03;
     margin-left: -50%;
   }
 
   &::after {
-    left: 0.5rem;
+    left: spacing.$spacing-03;
     margin-right: -50%;
   }
 }
@@ -235,8 +235,8 @@
   position: relative;
   left: 22rem;
   top: -8.5rem;
-  min-height: 2rem;
-  padding: 0.5rem;
+  min-height: spacing.$spacing-07;
+  padding: spacing.$spacing-03;
 }
 
 .filterLabelContainer {
@@ -244,9 +244,9 @@
 }
 .filterLabel {
   background-color: $ui-02;
-  padding: 0.02rem 1rem;
-  border-radius: 1rem;
-  margin-right: 0.5rem;
+  padding: 0.02rem spacing.$spacing-05;
+  border-radius: spacing.$spacing-05;
+  margin-right: spacing.$spacing-03;
   :hover {
     background-color: $ui-02;
   }

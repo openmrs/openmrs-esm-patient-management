@@ -213,7 +213,7 @@ const AppointmentsBaseTable = () => {
     <>
       <div className={styles.homeAppointmentsContainer}>
         <div className={styles.headerContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+          <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
             <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
           </div>
           <div className={styles.actionLinks}>
