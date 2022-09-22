@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   Layer,
   DataTableSkeleton,
+  DataTableHeader,
   Table,
   TableBody,
   TableCell,
@@ -12,21 +13,37 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  MultiSelect,
   Tile,
-  Link,
+  Pagination,
 } from '@carbon/react';
-import { Add, CheckmarkOutline, SubtractAlt, CloseOutline } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, ConfigurableLink, useConfig, navigate } from '@openmrs/esm-framework';
+import { CheckmarkOutline, SubtractAlt, CloseOutline } from '@carbon/react/icons';
+import { isDesktop, useLayoutType, ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTodayAppointments } from './appointments-table.resource';
-import styles from './appointments-list.scss';
-import PatientSearch from '../patient-search/patient-search.component';
-import { launchOverlay } from '../hooks/useOverlay';
-import { EmptyDataIllustration } from './emptyData';
-import { spaBasePath } from '../constants';
-import { launchCheckInAppointmentModal, handleComplete } from './common';
-import { useSWRConfig } from 'swr';
 
+import { EmptyDataIllustration } from './emptyData';
+import { launchCheckInAppointmentModal, handleComplete } from './common';
+import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links';
+import { useSWRConfig } from 'swr';
 import { ActionsMenu } from './appointment-actions.component';
+import { MappedHomeAppointment } from '../types';
+
+import styles from './appointments-list.scss';
+
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
+interface PaginationData {
+  goTo: (page: number) => void;
+  results: Array<MappedHomeAppointment>;
+  currentPage: number;
+}
 
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
@@ -72,36 +89,18 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
   }
 };
 
-const AddAppointmentLink = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
-
-  const { t } = useTranslation();
-
-  return useBahmniUI ? (
-    <Link
-      size="md"
-      target="_blank"
-      className="cds--btn cds--btn--ghost"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
-      renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
-      {t('addNewAppointment', 'Add new appointment')}
-    </Link>
-  ) : (
-    <Button
-      kind="ghost"
-      renderIcon={(props) => <Add size={16} {...props} />}
-      onClick={() => {
-        navigate({ to: `${spaBasePath}` });
-        launchOverlay(t('search', 'Search'), <PatientSearch />);
-      }}>
-      {t('addNewAppointment', 'Add new appointment')}
-    </Button>
-  );
-};
-
 const AppointmentsBaseTable = () => {
   const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
+
+  const pageSizes = [10, 20, 30, 40, 50];
+  const [currentPageSize, setPageSize] = useState(10);
+
+  const {
+    goTo,
+    results: paginatedAppointments,
+    currentPage,
+  }: PaginationData = usePagination(appointments, currentPageSize);
 
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -143,7 +142,7 @@ const AppointmentsBaseTable = () => {
     [t],
   );
 
-  const tableRows = appointments?.map((appointment) => ({
+  const tableRows = paginatedAppointments?.map((appointment) => ({
     id: appointment.id,
     dateTime: {
       content: (
@@ -184,7 +183,6 @@ const AppointmentsBaseTable = () => {
       content: (
         <span className={styles.serviceContainer}>
           <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
-          <ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />
         </span>
       ),
     },
@@ -198,13 +196,13 @@ const AppointmentsBaseTable = () => {
     return (
       <div className={styles.homeAppointmentsContainer}>
         <Layer>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4 className={styles.emptyHeading}>{t('todaysAppointments', "Today's Appointments")}</h4>
+          </div>
           <Tile className={styles.tile}>
-            <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
-            </div>
-            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
             <EmptyDataIllustration />
             <AddAppointmentLink />
+            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
           </Tile>
         </Layer>
       </div>
@@ -212,50 +210,90 @@ const AppointmentsBaseTable = () => {
   }
 
   return (
-    <div className={styles.homeAppointmentsContainer}>
-      <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
+    <>
+      <div className={styles.homeAppointmentsContainer}>
+        <div className={styles.headerContainer}>
+          <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+            <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
+          </div>
+          <div className={styles.actionLinks}>
+            <ViewCalendarLink />
+            <AddAppointmentLink />
+          </div>
         </div>
-        <AddAppointmentLink />
+        <DataTable
+          data-floating-menu-container
+          headers={tableHeaders}
+          overflowMenuOnHover={isDesktop(layout)}
+          rows={tableRows}
+          size={isDesktop(layout) ? 'xs' : 'md'}
+          useZebraStyles={appointments?.length > 1}>
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+            <TableContainer className={styles.tableContainer}>
+              <Table {...getTableProps()} className={styles.appointmentsTable}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })} key={header.id}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => {
+                    return (
+                      <React.Fragment key={row.id}>
+                        <TableRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          ))}
+                          <TableCell className="cds--table-column-menu">
+                            <ActionsMenu appointment={appointments?.[index]} useBahmniUI={useBahmniUI} />
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Layer>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                      </div>
+                      <p className={styles.separator}>{t('or', 'or')}</p>
+                      <AddAppointmentLink />
+                    </Tile>
+                  </Layer>
+                </div>
+              ) : null}
+              <Pagination
+                forwardText="Next page"
+                backwardText="Previous page"
+                page={currentPage}
+                pageSize={currentPageSize}
+                pageSizes={pageSizes}
+                totalItems={appointments.length}
+                className={styles.pagination}
+                onChange={({ pageSize, page }) => {
+                  if (pageSize !== currentPageSize) {
+                    setPageSize(pageSize);
+                  }
+                  if (page !== currentPage) {
+                    goTo(page);
+                  }
+                }}
+              />
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
-      <DataTable
-        data-floating-menu-container
-        headers={tableHeaders}
-        overflowMenuOnHover={isDesktop(layout) ? true : false}
-        rows={tableRows}
-        size={isDesktop(layout) ? 'xs' : 'md'}
-        useZebraStyles={appointments?.length > 1 ? true : false}>
-        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-          <TableContainer className={styles.tableContainer}>
-            <Table {...getTableProps()} className={styles.appointmentsTable}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })} key={header.id}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => {
-                  return (
-                    <React.Fragment key={row.id}>
-                      <TableRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    </React.Fragment>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
-    </div>
+      <SeeAllAppointmentsLink />
+    </>
   );
 };
 

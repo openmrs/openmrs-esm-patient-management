@@ -135,6 +135,9 @@ export interface MappedHomeAppointment {
   appointmentNumber: string;
   recurring?: boolean;
   uuid?: string;
+  serviceColor?: string;
+  duration?: string;
+  identifier?: string;
 }
 export interface AppointmentPayload {
   patientUuid: string;
