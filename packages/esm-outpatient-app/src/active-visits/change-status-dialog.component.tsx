@@ -11,7 +11,6 @@ import {
   RadioButtonGroup,
   ContentSwitcher,
   Switch,
-  Dropdown,
   Select,
   SelectItem,
 } from '@carbon/react';
@@ -23,20 +22,15 @@ import {
   useLocations,
   useSession,
 } from '@openmrs/esm-framework';
-import {
-  MappedVisitQueueEntry,
-  updateQueueEntry,
-  usePriority,
-  useServices,
-  useStatus,
-} from './active-visits-table.resource';
+import { updateQueueEntry, usePriority, useServices, useStatus } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 import { useSWRConfig } from 'swr';
 import first from 'lodash-es/first';
+import { MappedQueueEntry } from '../types';
 
 interface ChangeStatusDialogProps {
-  queueEntry: MappedVisitQueueEntry;
+  queueEntry: MappedQueueEntry;
   closeModal: () => void;
 }
 
@@ -92,6 +86,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       ({ status }) => {
         if (status === 201) {
           showToast({
+            critical: true,
             title: t('updateEntry', 'Update entry'),
             kind: 'success',
             description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
@@ -138,7 +133,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               onChange={(event) => setStatus(event.toString())}
               name="radio-button-group">
               {isLoading ? (
-                <InlineLoading description={t('loading', 'Loading...')} />
+                <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />
               ) : statuses?.length === 0 ? (
                 <p>{t('noStatusAvailable', 'No Status Available')}</p>
               ) : (
@@ -177,7 +172,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               }}>
               {priorities?.length > 0 ? (
                 priorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} value={uuid} />;
+                  return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
                 })
               ) : (
                 <Switch
