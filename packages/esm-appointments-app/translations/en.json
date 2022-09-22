@@ -108,6 +108,7 @@
   "service": "Service",
   "serviceType": "Service Type",
   "serviceWorkloadTitle": "",
+  "showAppointmentsThatAre": "Show appointments that are",
   "startTime": "Start Time",
   "time": "Time",
   "todaysAppointments": "Today's Appointments",
