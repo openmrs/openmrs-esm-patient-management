@@ -13,14 +13,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  MultiSelect,
   Tile,
   Pagination,
 } from '@carbon/react';
 import { CheckmarkOutline, SubtractAlt, CloseOutline } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
+import {
+  isDesktop,
+  useLayoutType,
+  ConfigurableLink,
+  useConfig,
+  usePagination,
+  useSession,
+  userHasAccess,
+} from '@openmrs/esm-framework';
 import { useTodayAppointments } from './appointments-table.resource';
 
 import { EmptyDataIllustration } from './emptyData';
@@ -31,14 +36,6 @@ import { ActionsMenu } from './appointment-actions.component';
 import { MappedHomeAppointment } from '../types';
 
 import styles from './appointments-list.scss';
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
 interface PaginationData {
   goTo: (page: number) => void;
   results: Array<MappedHomeAppointment>;
@@ -90,8 +87,25 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
 };
 
 const AppointmentsBaseTable = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
+  const { user } = useSession();
+
+  const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
+
+  const [fullView, setFullView] = useState(false);
+
+  const filteredAppointments = !fullView
+    ? appointments.filter((appointment) => appointment.status === 'Scheduled')
+    : appointments;
+
+  const userHasFullAccess = useFullViewPrivilege && userHasAccess(fullViewPrivilege, user);
+  useEffect(() => {
+    if (!useFullViewPrivilege || userHasFullAccess) {
+      setFullView(true);
+    } else {
+      setFullView(false);
+    }
+  }, []);
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
@@ -100,7 +114,7 @@ const AppointmentsBaseTable = () => {
     goTo,
     results: paginatedAppointments,
     currentPage,
-  }: PaginationData = usePagination(appointments, currentPageSize);
+  }: PaginationData = usePagination(filteredAppointments, currentPageSize);
 
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -227,7 +241,7 @@ const AppointmentsBaseTable = () => {
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
           size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles={appointments?.length > 1}>
+          useZebraStyles={filteredAppointments?.length > 1}>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
               <Table {...getTableProps()} className={styles.appointmentsTable}>
@@ -248,9 +262,11 @@ const AppointmentsBaseTable = () => {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="cds--table-column-menu">
-                            <ActionsMenu appointment={appointments?.[index]} useBahmniUI={useBahmniUI} />
-                          </TableCell>
+                          {fullView && (
+                            <TableCell className="cds--table-column-menu">
+                              <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
+                            </TableCell>
+                          )}
                         </TableRow>
                       </React.Fragment>
                     );
@@ -277,7 +293,7 @@ const AppointmentsBaseTable = () => {
                 page={currentPage}
                 pageSize={currentPageSize}
                 pageSizes={pageSizes}
-                totalItems={appointments.length}
+                totalItems={filteredAppointments.length}
                 className={styles.pagination}
                 onChange={({ pageSize, page }) => {
                   if (pageSize !== currentPageSize) {

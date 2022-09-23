@@ -31,6 +31,18 @@ export const configSchema = {
     _description: 'Open links in Bahmni Appointments UI instead of O3 UI',
     _default: false,
   },
+
+  useFullViewPrivilege: {
+    _type: Type.Boolean,
+    _description: "if set to 'false', will always display the full view, disregarding any privilege",
+    _default: false,
+  },
+
+  fullViewPrivilege: {
+    _type: Type.String,
+    _description: 'Display for the privilege to view and manage appointments',
+    _default: "Today's Appointments Widget: Display Full View",
+  },
 };
 
 export interface ConfigObject {
@@ -42,4 +54,6 @@ export interface ConfigObject {
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
   useBahmniAppointmentsUI: boolean;
+  useFullViewPrivilege: boolean;
+  fullViewPrivilege: string;
 }
