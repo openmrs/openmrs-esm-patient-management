@@ -232,7 +232,7 @@ const AppointmentsBaseTable = () => {
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
           size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles={filteredAppointments?.length > 1}>
+          useZebraStyles={true}>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
               <Table {...getTableProps()} className={styles.appointmentsTable}>
