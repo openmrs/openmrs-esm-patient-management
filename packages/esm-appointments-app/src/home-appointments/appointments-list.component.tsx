@@ -1,11 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   Layer,
   DataTableSkeleton,
-  DataTableHeader,
   Table,
   TableBody,
   TableCell,
@@ -92,20 +91,12 @@ const AppointmentsBaseTable = () => {
   const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
-  const [fullView, setFullView] = useState(false);
+  const userHasFullAccess = useFullViewPrivilege && userHasAccess(fullViewPrivilege, user);
+  const fullView = userHasFullAccess || !useFullViewPrivilege;
 
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
     : appointments;
-
-  const userHasFullAccess = useFullViewPrivilege && userHasAccess(fullViewPrivilege, user);
-  useEffect(() => {
-    if (!useFullViewPrivilege || userHasFullAccess) {
-      setFullView(true);
-    } else {
-      setFullView(false);
-    }
-  }, []);
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
