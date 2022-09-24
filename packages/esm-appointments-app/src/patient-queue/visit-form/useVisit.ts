@@ -11,7 +11,7 @@ export function useStatus() {
   const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
-    statuses: data ? data?.data?.setMembers : [],
+    statuses: data?.data?.setMembers ?? [],
     isLoading: !data && !error,
   };
 }
@@ -26,7 +26,7 @@ export function usePriority() {
   const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
-    priorities: data ? data?.data?.setMembers : [],
+    priorities: data?.data?.setMembers ?? [],
   };
 }
 
@@ -35,6 +35,6 @@ export function useServices(location: string) {
   const { data } = useSWRImmutable<{ data: { results: Array<any> } }, Error>(location ? apiUrl : null, openmrsFetch);
 
   return {
-    services: data ? data?.data?.results : [],
+    services: data?.data?.results ?? [],
   };
 }

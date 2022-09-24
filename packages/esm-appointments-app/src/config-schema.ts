@@ -4,15 +4,15 @@ export const configSchema = {
   concepts: {
     priorityConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '3e1583a1-e8b5-4576-afa6-c07f19bba341',
+      _default: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
     },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '94788037-eec3-4336-aaf0-6052435811e9',
+      _default: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
     },
     statusConceptSetUuid: {
       _type: Type.ConceptUuid,
-      _default: '386988e5-ff48-43cf-9d3b-81dc19452faf',
+      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
     },
   },
   appointmentKinds: {

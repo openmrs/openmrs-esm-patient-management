@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
-import isEmpty from 'lodash-es/isEmpty';
 import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './base-visit-type.scss';
@@ -19,7 +18,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const searchResults = useMemo(() => {
-    if (!isEmpty(searchTerm)) {
+    if (searchTerm) {
       return visitTypes.filter((visitType) => visitType.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1);
     } else {
       return visitTypes;
@@ -32,24 +31,24 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
   return (
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
-      {results.length ? (
-        <>
-          {isTablet ? (
-            <Layer>
-              <Search
-                onChange={(event) => handleSearch(event.target.value)}
-                placeholder={t('searchForAVisitType', 'Search for a visit type')}
-                labelText=""
-              />
-            </Layer>
-          ) : (
+      <>
+        {isTablet ? (
+          <Layer>
             <Search
               onChange={(event) => handleSearch(event.target.value)}
               placeholder={t('searchForAVisitType', 'Search for a visit type')}
               labelText=""
             />
-          )}
+          </Layer>
+        ) : (
+          <Search
+            onChange={(event) => handleSearch(event.target.value)}
+            placeholder={t('searchForAVisitType', 'Search for a visit type')}
+            labelText=""
+          />
+        )}
 
+        {results.length > 0 && (
           <RadioButtonGroup
             className={styles.radioButtonGroup}
             defaultSelected="default-selected"
@@ -61,10 +60,13 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
               <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
             ))}
           </RadioButtonGroup>
-        </>
-      ) : (
-        <EmptyState headerTitle={t('')} displayMessage={t('')} />
-      )}
+        )}
+        {!results.length && (
+          <p className={styles.emptyVisitType}>
+            {t('noMatchingVisitTypeFound', `No visit type found matching ${searchTerm}`)}
+          </p>
+        )}
+      </>
     </div>
   );
 };

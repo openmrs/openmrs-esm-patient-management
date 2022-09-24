@@ -10,6 +10,12 @@
   & > div {
     background-color: $ui-01;
   }
+
+  & section {
+    display: flex;
+    align-items: center;
+    position: static;
+  }
 }
 
 .headerContainer {
@@ -56,9 +62,11 @@
   max-width: 18rem;
   margin-right: spacing.$spacing-05;
   height: spacing.$spacing-07;
+  min-height: 0;
   input {
-    background-color: $ui-02 !important;
-    height: spacing.$spacing-07 !important;
+    background-color: $ui-02;
+    height: spacing.$spacing-07;
+    min-height: none;
   }
 }
 

@@ -212,7 +212,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         content: (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-              {appointment.status === 'Scheduled' ? t('checkedIn', 'CheckedIn') : t('changeStatus', 'Change status')}
+              {appointment.status === 'Scheduled' ? t('checkedIn', 'Checked In') : t('changeStatus', 'Change status')}
             </Button>
 
             <ActionsMenu appointment={appointments?.[index]} />
@@ -247,7 +247,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
 
   return (
     <div className={styles.container}>
-      <DataTable rows={tableRows} headers={tableHeaders}>
+      <DataTable rows={tableRows} headers={tableHeaders} filterRows={handleFilter}>
         {({
           rows,
           headers,
@@ -259,20 +259,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           onInputChange,
         }) => (
           <TableContainer {...getTableContainerProps()}>
-            <TableToolbar
-              style={{
-                position: 'static',
-                height: '2rem',
-                overflow: 'visible',
-                backgroundColor: 'color',
-                display: 'flex',
-                alignItems: 'flex-end',
-              }}
-              size="sm"
-              {...getToolbarProps()}
-              aria-label="data table toolbar">
+            <TableToolbar size="sm" {...getToolbarProps()} aria-label="data table toolbar">
               <TableToolbarContent className={styles.tableToolBarContent}>
                 <TableToolbarSearch
+                  style={{ height: '2rem' }}
                   className={styles.search}
                   expanded
                   onChange={onInputChange}
