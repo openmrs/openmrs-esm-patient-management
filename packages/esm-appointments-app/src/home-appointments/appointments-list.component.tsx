@@ -91,8 +91,7 @@ const AppointmentsBaseTable = () => {
   const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
   const { isLoading, appointments } = useTodayAppointments();
 
-  const userHasFullAccess = useFullViewPrivilege && userHasAccess(fullViewPrivilege, user);
-  const fullView = userHasFullAccess || !useFullViewPrivilege;
+  const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
 
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
