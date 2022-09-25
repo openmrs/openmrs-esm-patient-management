@@ -35,8 +35,36 @@
   display: none;
 }
 
-.tableContainer a {
-  text-decoration: none;
+.tableContainer {
+  a {
+    text-decoration: none;
+  }
+
+  th {
+    color: $text-02;
+  }
+
+  :global(.cds--data-table) {
+    background-color: $ui-03;
+  }
+
+  :global(.cds--table-column-menu) {
+    button {
+      position: static;
+    }
+  }
+  .tableToolbar {
+    min-height: 0;
+    top: -22px;
+  }
+  .tableToolbarContent {
+    height: spacing.$spacing-07;
+    margin-bottom: spacing.$spacing-02;
+  }
+}
+.tableToolbar {
+  min-height: 0;
+  top: -22px;
 }
 
 .startTime {
@@ -51,17 +79,17 @@
 }
 .identifier {
   font-weight: 700;
-  margin-left: spacing.$spacing-03;
 }
 .actionButton {
-  width: 8rem;
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  position: static;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
 }
 .serviceColor {
   border-radius: 50%;
   margin-right: spacing.$spacing-03;
   width: spacing.$spacing-05;
   height: spacing.$spacing-05;
+  background-color: $support-02;
 }
 .pagination {
   overflow: hidden;
@@ -93,7 +121,7 @@
 .missedIcon,
 .cancelIcon {
   width: 8rem;
-  padding: spacing.$spacing-03 spacing.$spacing-05;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
   display: flex;
   align-items: center;
   height: spacing.$spacing-09;
@@ -138,10 +166,88 @@
   }
 }
 
+.emptyHeading {
+  margin-left: spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
+}
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: spacing.$spacing-11 0;
+}
+
 .tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.separator {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  width: 80%;
+  margin: spacing.$spacing-06 auto;
+  overflow: hidden;
   text-align: center;
+
+  &::before,
+  &::after {
+    background-color: $text-03;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: spacing.$spacing-03;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: spacing.$spacing-03;
+    margin-right: -50%;
+  }
 }
 
 .menuItemLink {
   text-decoration: none;
+}
+
+.seeAllLink {
+  position: relative;
+  left: 22rem;
+  top: -8.5rem;
+  min-height: spacing.$spacing-07;
+  padding: spacing.$spacing-03;
+}
+
+.filterLabelContainer {
+  display: flex;
+}
+.filterLabel {
+  background-color: $ui-02;
+  padding: 0.02rem spacing.$spacing-05;
+  border-radius: spacing.$spacing-05;
+  margin-right: spacing.$spacing-03;
+  :hover {
+    background-color: $ui-02;
+  }
 }

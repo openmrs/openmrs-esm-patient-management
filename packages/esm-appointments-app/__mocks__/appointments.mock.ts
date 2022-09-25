@@ -359,6 +359,21 @@
 //   ],
 // };
 
+export const mockPatient = {
+  identifier: '100GEJ',
+  name: 'John Wilson',
+  uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+  gender: 'M',
+  age: 35,
+  birthdate: '1986-04-03T00:00:00.000+0000',
+  phoneNumber: '0700000000',
+};
+
+export const mockServices = [
+  { uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'Clinical consultation' },
+  { uuid: 'd80ff12a-06a7-11ed-b939-0242ac120002', display: 'Triage' },
+];
+
 export const mockServiceTypes = {
   data: [
     {

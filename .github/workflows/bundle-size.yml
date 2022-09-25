@@ -14,4 +14,4 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           minimum-change-threshold: 100 # bytes
-          build-script: "lerna run build"
+          build-script: "turbo run build --color --no-cache"

@@ -40,10 +40,8 @@ const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> 
       ? showToast({
           critical: true,
           kind: 'success',
-          description: t(
-            'appointmentStatusChange',
-            `Appointment status has been successfuly changed to ${selectedStatus}`,
-          ),
+          description:
+            t('appointmentStatusChange', 'Appointment status successfully changed to') + ` ${selectedStatus}`,
           title: t('appointmentStatusTitleMessage', 'Appointment status'),
         })
       : showNotification({
