@@ -13,5 +13,5 @@ jobs:
       - uses: preactjs/compressed-size-action@v2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          minimum-change-threshold: 5 # bytes
-          build-script: "turbo run build --color"
+          minimum-change-threshold: 100 # bytes
+          build-script: "turbo run build --color --no-cache"
