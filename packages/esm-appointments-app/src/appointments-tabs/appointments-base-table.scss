@@ -6,6 +6,16 @@
 .container {
   padding-bottom: 2rem;
   background-color: $ui-01;
+
+  & > div {
+    background-color: $ui-01;
+  }
+
+  & section {
+    display: flex;
+    align-items: center;
+    position: static;
+  }
 }
 
 .headerContainer {
@@ -30,7 +40,6 @@
 .priorityTag {
   @extend .tag;
   @include type.type-style('label-01');
-  color: #943d00;
   background-color: #ffc9a3;
 }
 
@@ -43,13 +52,29 @@
 
 .tableContainer {
   padding: 0;
+
+  & > div > div {
+    background-color: $ui-01;
+  }
 }
 
 .search {
-  max-width: 16rem;
-
+  max-width: 18rem;
+  margin-right: spacing.$spacing-05;
+  height: spacing.$spacing-07;
+  min-height: 0;
   input {
-    background-color: $ui-02 !important;
+    background-color: $ui-02;
+    height: spacing.$spacing-07;
+    min-height: none;
+  }
+}
+
+.tableToolBarContent {
+  height: spacing.$spacing-07;
+
+  & button {
+    min-height: none;
   }
 }
 
@@ -149,7 +174,7 @@
 }
 
 .tileContainer {
-  background-color: $ui-02;
+  background-color: $ui-02 !important;
   border-top: 1px solid $ui-03;
   padding: 5rem 0;
 }

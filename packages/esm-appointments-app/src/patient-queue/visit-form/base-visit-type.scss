@@ -1,0 +1,95 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.visitTypeOverviewWrapper {
+  margin: spacing.$spacing-05 0;
+  border: 0.0625rem solid $grey-2;
+}
+
+.tablet {
+  background-color: $ui-02;
+}
+
+.desktop {
+  background-color: $ui-01;
+
+  .paginationContainer div {
+    background-color: $ui-01;
+  }
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+  position: relative;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) span * {
+  display: none;
+}
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: spacing.$spacing-03;
+  min-height: spacing.$spacing-10;
+  width: 100%;
+  @include type.type-style('body-compact-01');
+}
+
+.radioButton {
+  padding: spacing.$spacing-02 spacing.$spacing-05;
+  margin: spacing.$spacing-03 0;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.desktopHeading {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
+
+  h4:after {
+    content: '';
+    display: block;
+    width: spacing.$spacing-07;
+    padding-top: spacing.$spacing-04;
+    border-bottom: spacing.$spacing-02 solid var(--brand-03);
+  }
+}
+
+.heading:after {
+  content: '';
+  display: block;
+  width: spacing.$spacing-07;
+  padding-top: spacing.$spacing-04;
+  border-bottom: spacing.$spacing-02 solid var(--brand-03);
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+.emptyVisitType {
+  margin: spacing.$spacing-05;
+}

@@ -10,12 +10,18 @@
 
   & > section {
     display: flex;
-
+    gap: spacing.$spacing-09;
     & > div {
       width: fit-content;
       margin: 0 spacing.$spacing-07 0 0;
     }
   }
+}
+
+.title {
+  @include type.type-style('body-compact-01');
+  color: colors.$cool-gray-90-hover;
+  margin: spacing.$spacing-03 0;
 }
 
 .heading {

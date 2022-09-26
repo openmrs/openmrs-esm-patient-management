@@ -5,7 +5,10 @@
 .appointmentList {
   height: 100%;
   width: 100%;
-  background-color: $ui-02;
+
+  & > div {
+    background-color: $ui-02;
+  }
 }
 
 .tabs {
@@ -15,4 +18,9 @@
 .calendarButton {
   float: right;
   margin-right: spacing.$spacing-05;
+  position: absolute;
+  right: 0;
+  height: spacing.$spacing-07;
+  min-height: 0;
 }
+

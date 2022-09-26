@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import { Calendar } from '@carbon/react/icons';
-import BookedAppointments from '../appointments-tabs/booked-appointments.component';
 import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
 import CancelledAppointment from '../appointments-tabs/cancelled-appointments.component';
 import styles from './appointment-list.scss';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
+import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -20,28 +20,27 @@ const AppointmentList: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   return (
     <div className={styles.appointmentList}>
-      <Button
-        className={styles.calendarButton}
-        kind="primary"
-        onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
-        renderIcon={(props) => <Calendar size={16} {...props} />}
-        data-floating-menu-primary-focus
-        iconDescription={t('viewCalendar', 'View Calendar')}>
-        {t('viewCalendar', 'View Calendar')}
-      </Button>
-
       <Tabs
         selectedIndex={selectedTab}
         onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
         className={styles.tabs}>
-        <TabList aria-label="Appointment tabs" contained>
-          <Tab>{t('bookedForToday', 'Booked for today')}</Tab>
+        <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
+          <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
+          <Button
+            className={styles.calendarButton}
+            kind="primary"
+            onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
+            renderIcon={(props) => <Calendar size={16} {...props} />}
+            data-floating-menu-primary-focus
+            iconDescription={t('viewCalendar', 'View Calendar')}>
+            {t('viewCalendar', 'View Calendar')}
+          </Button>
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>
-            <BookedAppointments status={AppointmentTypes.SCHEDULED} />
+            <ScheduledAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
             <CancelledAppointment status={AppointmentTypes.CANCELLED} />

@@ -13,6 +13,7 @@
   background-color: $ui-01;
   overflow-y: auto;
   height: calc(100vh - 3rem);
+  z-index: 1;
 }
 
 .desktopOverlay::after {
@@ -31,6 +32,7 @@
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  z-index: 1;
 
   &::-webkit-scrollbar {
     width: 0;

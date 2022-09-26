@@ -10,6 +10,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
     },
+    statusConceptSetUuid: {
+      _type: Type.ConceptUuid,
+      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
+    },
   },
   appointmentKinds: {
     _type: Type.Array,

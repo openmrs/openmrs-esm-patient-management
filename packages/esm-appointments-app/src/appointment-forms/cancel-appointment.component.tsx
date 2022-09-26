@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
-import { Button, ButtonSet, TextArea } from '@carbon/react';
+import { Button, TextArea } from '@carbon/react';
 import { useSession, showToast, showNotification, ExtensionSlot, usePatient, parseDate } from '@openmrs/esm-framework';
-import { AppointmentPayload, MappedAppointment } from '../types';
-import { cancelAppointment, saveAppointment } from './appointment-forms.resource';
-import { useProviders } from '../hooks/useProviders';
+import { MappedAppointment } from '../types';
+import { cancelAppointment } from './appointment-forms.resource';
 import { closeOverlay } from '../hooks/useOverlay';
 import styles from './cancel-appointment.scss';
 import { useSWRConfig } from 'swr';

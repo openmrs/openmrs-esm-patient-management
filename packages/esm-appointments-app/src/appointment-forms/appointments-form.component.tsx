@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { useSWRConfig } from 'swr';
 import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
@@ -31,16 +30,22 @@ import {
   parseDate,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm } from '../helpers';
-import { saveAppointment, useServices, useAppointmentSummary } from './appointment-forms.resource';
+import { amPm, convertTime12to24 } from '../helpers';
+import {
+  saveAppointment,
+  useServices,
+  useAppointmentSummary,
+  checkAppointmentConflict,
+} from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
 import { mockFrequency } from '../../__mocks__/appointments.mock';
 import WorkloadCard from './workload.component';
 import first from 'lodash-es/first';
-
 import styles from './appointments-form.scss';
+import { useSWRConfig } from 'swr';
+import { startDate as appointmentStartDate } from '../helpers/time';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -62,6 +67,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     provider: '',
     appointmentNumber: undefined,
   };
+
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
@@ -84,7 +90,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = React.useState(
-    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : parseDate(new Date().toISOString()),
+    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : new Date(),
   );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
@@ -102,16 +108,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     }
   }, [selectedLocation, session]);
 
-  const handleSubmit = () => {
-    const visitDatetime = dayjs(visitDate.setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  const handleSubmit = async () => {
+    const [hours, minutes] = convertTime12to24(startDate, timeFormat);
     const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
+    const startDatetime = new Date(
+      dayjs(visitDate).year(),
+      dayjs(visitDate).month(),
+      dayjs(visitDate).date(),
+      hours,
+      minutes,
+    );
 
+    const endDatetime = dayjs(
+      new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
+    );
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: appointmentKind,
       status: appointmentStatus,
       serviceUuid: selectedService,
-      startDateTime: dayjs(visitDatetime).format(),
-      endDateTime: dayjs(visitDatetime).format(),
+      startDateTime: dayjs(startDatetime).format(),
+      endDateTime: dayjs(endDatetime).format(),
       providerUuid: providerUuid,
       comments: appointmentComment,
       locationUuid: selectedLocation,
@@ -119,6 +135,23 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       appointmentNumber: appointmentState.appointmentNumber,
       uuid: appointmentState.id,
     };
+
+    const { data } = await checkAppointmentConflict(appointmentPayload);
+    const [bookingStatus] = Object.keys(data);
+    const isPatientDoubleBooking = 'PATIENT_DOUBLE_BOOKING' === bookingStatus;
+
+    if (isPatientDoubleBooking) {
+      showToast({
+        critical: true,
+        kind: 'warning',
+        description: t(
+          'doublePatientBooking',
+          'There exist an appointment on the specified service and appointment date',
+        ),
+        title: t('doubleBooking', 'Appointment double booking'),
+      });
+      return;
+    }
 
     const abortController = new AbortController();
     setIsSubmitting(true);
@@ -132,7 +165,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
           closeOverlay();
         }
       },

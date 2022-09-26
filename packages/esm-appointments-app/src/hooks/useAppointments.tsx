@@ -49,9 +49,7 @@ const getStartAndEndDate = (durationPeriod: DurationPeriod, date: string) => {
     return { startDate, endDate };
   }
 
-  if (durationPeriod === DurationPeriod.monthly) {
-    const startDate = dayjs(new Date(date)).startOf('week').format(omrsDateFormat);
-    const endDate = dayjs(new Date(date)).endOf('week').format(omrsDateFormat);
-    return { startDate, endDate };
-  }
+  const startDate = dayjs(new Date(date)).startOf('week').format(omrsDateFormat);
+  const endDate = dayjs(new Date(date)).endOf('week').format(omrsDateFormat);
+  return { startDate, endDate };
 };

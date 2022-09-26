@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { omrsDateFormat } from '../constants';
 
 export type amPm = 'AM' | 'PM';
 
@@ -16,4 +17,4 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
   return [hours, minutes];
 };
 
-export const startDate = dayjs(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+export const startDate = dayjs(new Date().setHours(0, 0, 0, 0)).format(omrsDateFormat);

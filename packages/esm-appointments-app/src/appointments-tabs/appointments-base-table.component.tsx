@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   DataTableHeader,
   DataTableSkeleton,
-  Dropdown,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -25,22 +24,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import {
-  isDesktop,
-  useLayoutType,
-  ConfigurableLink,
-  formatDatetime,
-  parseDate,
-  showModal,
-} from '@openmrs/esm-framework';
+import { ConfigurableLink, showModal } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
-import { useServices } from './appointments-table.resource';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import AppointmentForm from '../appointment-forms/appointments-form.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
+import VisitForm from '../patient-queue/visit-form/visit-form.component';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -109,8 +101,7 @@ function ServiceIcon({ service }) {
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { services } = useServices();
+
   const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
   const [filter, setFilter] = useState('');
 
@@ -149,43 +140,45 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     );
   };
 
-  const launchAppointmentStatusModal = (appointments: MappedAppointment) => {
+  const handleAppointmentActionButtonClick = (appointment: MappedAppointment) => {
+    if (appointment.status === 'Scheduled') {
+      launchOverlay(
+        t('AddPatientToQueue', 'Add patient to queue'),
+        <VisitForm patientUuid={appointment.patientUuid} appointment={appointment} />,
+      );
+      return;
+    }
+
     const dispose = showModal('change-appointment-status-modal', {
       closeModal: () => dispose(),
-      appointments,
+      appointment,
     });
   };
 
   const tableHeaders = useMemo(
     () => [
       {
-        id: 0,
         header: t('name', 'Name'),
         key: 'name',
       },
       {
-        id: 1,
         header: t('dateTime', 'Date & Time'),
         key: 'dateTime',
       },
       {
-        id: 2,
         header: t('serviceType', 'Service Type'),
         key: 'serviceType',
       },
       {
-        id: 3,
         header: t('provider', 'Provider'),
         key: 'provider',
       },
       {
-        id: 4,
         header: t('location', 'Location'),
         key: 'location',
       },
       {
-        id: 5,
-        header: '',
+        header: 'Actions',
         key: 'startButton',
       },
     ],
@@ -193,11 +186,13 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
   );
 
   const tableRows = useMemo(() => {
-    return (filteredRows.length ? filteredRows : appointments)?.map((appointment) => ({
+    return (filteredRows.length ? filteredRows : appointments)?.map((appointment, index) => ({
       ...appointment,
       name: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+          <ConfigurableLink
+            style={{ textDecoration: 'none' }}
+            to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
             {appointment.name}
           </ConfigurableLink>
         ),
@@ -215,13 +210,17 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       },
       startButton: {
         content: (
-          <Button onClick={() => launchAppointmentStatusModal(appointment)} kind="ghost">
-            Start
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
+              {appointment.status === 'Scheduled' ? t('checkedIn', 'Checked In') : t('changeStatus', 'Change status')}
+            </Button>
+
+            <ActionsMenu appointment={appointments?.[index]} />
+          </div>
         ),
       },
     }));
-  }, [filteredRows, appointments]);
+  }, [filteredRows, appointments, t]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -248,105 +247,69 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <span className={styles.heading}>{tableHeading}</span>
-        <Button
-          size="sm"
-          kind="secondary"
-          renderIcon={(props) => <Add size={16} {...props} />}
-          onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-          iconDescription={t('addNewAppointment', 'Add new appointment')}>
-          {t('addNewAppointment', 'Add new appointment')}
-        </Button>
-      </div>
-      <DataTable
-        data-floating-menu-container
-        filterRows={handleFilter}
-        headers={tableHeaders}
-        overflowMenuOnHover={isDesktop(layout) ? true : false}
-        rows={tableRows}
-        size="sm"
-        useZebraStyles>
-        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
-          <TableContainer className={styles.tableContainer}>
-            <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
-              <TableToolbarContent className={styles.toolbarContent}>
-                <Dropdown
-                  id="serviceFilter"
-                  initialSelectedItem={{ name: 'All' }}
-                  label=""
-                  titleText={t('selectedService', 'Selected service ') + ':'}
-                  type="inline"
-                  items={[{ name: 'All' }, ...services]}
-                  itemToString={(item) => (item ? item.name : '')}
-                  onChange={handleServiceTypeChange}
+      <DataTable rows={tableRows} headers={tableHeaders} filterRows={handleFilter}>
+        {({
+          rows,
+          headers,
+          getHeaderProps,
+          getRowProps,
+          getTableProps,
+          getTableContainerProps,
+          getToolbarProps,
+          onInputChange,
+        }) => (
+          <TableContainer {...getTableContainerProps()}>
+            <TableToolbar size="sm" {...getToolbarProps()} aria-label="data table toolbar">
+              <TableToolbarContent className={styles.tableToolBarContent}>
+                <TableToolbarSearch
+                  style={{ height: '2rem' }}
+                  className={styles.search}
+                  expanded
+                  onChange={onInputChange}
+                  placeholder={t('searchAppointments', 'Search appointments')}
                   size="sm"
+                  id="toolBarSearch"
                 />
-                <Layer>
-                  <TableToolbarSearch
-                    className={styles.search}
-                    expanded
-                    onChange={onInputChange}
-                    placeholder={t('searchThisList', 'Search this list')}
-                    size="sm"
-                  />
-                </Layer>
+                <Button
+                  kind="secondary"
+                  style={{ minHeight: 0 }}
+                  renderIcon={(props) => <Add size={16} {...props} />}
+                  onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+                  iconDescription={t('addNewAppointment', 'Add new appointment')}>
+                  {t('addNewAppointment', 'Add new appointment')}
+                </Button>
               </TableToolbarContent>
             </TableToolbar>
-            <Table {...getTableProps()} className={styles.appointmentsTable}>
+            <Table useZebraStyles size="sm" {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  <TableExpandHeader id="expand" />
+                  {headers.map((header, i) => (
+                    <TableHeader key={i} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
                   ))}
-                  <TableExpandHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, index) => {
-                  return (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                        <TableCell className="cds--table-column-menu">
-                          <ActionsMenu appointment={appointments?.[index]} />
-                        </TableCell>
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow className={styles.expandedAppointmentsRow} colSpan={headers.length + 2}>
-                          <AppointmentDetails appointment={appointments?.[index]} />
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  );
-                })}
+                {rows.map((row, index) => (
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+                    {row.isExpanded ? (
+                      <TableExpandedRow colSpan={headers.length + 2}>
+                        <AppointmentDetails appointment={appointments?.[index]} />
+                      </TableExpandedRow>
+                    ) : (
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                    )}
+                  </React.Fragment>
+                ))}
               </TableBody>
             </Table>
-            {rows.length === 0 ? (
-              <div className={styles.tileContainer}>
-                <Layer>
-                  <Tile className={styles.tile}>
-                    <div className={styles.tileContent}>
-                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                    </div>
-                    <p className={styles.separator}>{t('or', 'or')}</p>
-                    <Button
-                      kind="ghost"
-                      size="sm"
-                      renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-                      {t('addNewAppointment', 'Add new appointment')}
-                    </Button>
-                  </Tile>
-                </Layer>
-              </div>
-            ) : null}
           </TableContainer>
         )}
       </DataTable>
