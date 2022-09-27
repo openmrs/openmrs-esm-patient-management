@@ -22,3 +22,13 @@ export const mockServiceTypes = {
     },
   ],
 };
+
+export const mockStatus = [
+  { uuid: '1b67146f-b23b-4492-94ef-6255c137a333', display: 'Finished service' },
+  { uuid: '5c6a7c68-d671-43a2-887a-0fa65c5f20c8', display: 'Waiting' },
+];
+
+export const mockPriorities = [
+  { uuid: '1ec10eee-330e-49b0-8ceb-c76af8e84c9e', display: 'Emergency' },
+  { uuid: 'bf92b64c-2fa4-44aa-93d0-40f17ec1b433', display: 'Not urgent' },
+];

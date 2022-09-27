@@ -322,3 +322,21 @@ export interface Provider {
   location: string;
   serviceType: string;
 }
+
+export interface MappedQueueEntry {
+  id: string;
+  name: string;
+  patientUuid: string;
+  priority: string;
+  priorityComment: string;
+  priorityUuid: string;
+  service: string;
+  status: string;
+  statusUuid: string;
+  visitStartDateTime: string;
+  visitType: string;
+  visitUuid: string;
+  waitTime: string;
+  queueUuid: string;
+  queueEntryUuid: string;
+}
