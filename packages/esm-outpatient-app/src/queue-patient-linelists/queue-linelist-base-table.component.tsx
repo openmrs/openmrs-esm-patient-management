@@ -140,7 +140,6 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
                   <TableToolbarSearch
                     className={styles.search}
                     expanded
-                    light
                     onChange={onInputChange}
                     placeholder={t('searchThisList', 'Search this list')}
                     size="sm"
