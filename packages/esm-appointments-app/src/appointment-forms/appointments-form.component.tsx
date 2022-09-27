@@ -45,7 +45,7 @@ import WorkloadCard from './workload.component';
 import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
 import { useSWRConfig } from 'swr';
-import { startDate as appointmentStartDate } from '../helpers/time';
+import { useAppointmentDate } from '../helpers/time';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -97,6 +97,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
   const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const appointmentStartDate = useAppointmentDate();
 
   const appointmentSummary = useAppointmentSummary(new Date().toString(), selectedService);
 

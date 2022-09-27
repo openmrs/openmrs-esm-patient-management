@@ -6,6 +6,7 @@ import AppointmentsIllustration from './appointments-illustration.component';
 import styles from './appointments-header.scss';
 import { DatePicker, DatePickerInput } from '@carbon/react';
 import dayjs from 'dayjs';
+import { changeStartDate } from '../helpers';
 
 const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
@@ -28,7 +29,12 @@ const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
           <Location size={16} />
           <span className={styles.value}>{location}</span>
           <span className={styles.middot}>&middot;</span>
-          <DatePicker light ref={datePickerRef} dateFormat="d-M-Y" datePickerType="single">
+          <DatePicker
+            onChange={([date]) => changeStartDate(new Date(date))}
+            light
+            ref={datePickerRef}
+            dateFormat="d-M-Y"
+            datePickerType="single">
             <DatePickerInput
               style={{ backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
               id="date-picker-calendar-id"

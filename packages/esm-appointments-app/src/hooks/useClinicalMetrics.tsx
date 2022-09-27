@@ -6,12 +6,13 @@ import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
+  useAppointmentDate,
 } from '../helpers';
 import { omrsDateFormat } from '../constants';
 
 export const useClinicalMetrics = () => {
-  const startDate = dayjs(new Date().setHours(0, 0, 0, 0)).format(omrsDateFormat);
-  const endDate = dayjs(new Date().setHours(23, 59, 59, 59)).format(omrsDateFormat);
+  const startDate = useAppointmentDate();
+  const endDate = dayjs(new Date(startDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
   const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
   const { data, error, mutate } = useSWR<{
     data: Array<AppointmentSummary>;

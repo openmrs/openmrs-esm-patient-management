@@ -7,7 +7,7 @@ import { cancelAppointment } from './appointment-forms.resource';
 import { closeOverlay } from '../hooks/useOverlay';
 import styles from './cancel-appointment.scss';
 import { useSWRConfig } from 'swr';
-import { startDate } from '../helpers';
+import { useAppointmentDate } from '../helpers';
 
 interface CancelAppointmentProps {
   appointment: MappedAppointment;
@@ -19,6 +19,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
   const session = useSession();
   const [selectedLocation, setSelectedLocation] = useState(appointment.location);
   const [reason, setReason] = useState('');
+  const startDate = useAppointmentDate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {

@@ -39,7 +39,7 @@ import BaseVisitType from './base-visit-type.component';
 import { saveQueueEntry } from './queue.resource';
 import { useSWRConfig } from 'swr';
 import isNull from 'lodash-es/isNull';
-import { amPm, convertTime12to24, startDate } from '../../helpers';
+import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { usePriority, useServices, useStatus } from './useVisit';
 import { MappedAppointment } from '../../types';
@@ -52,6 +52,7 @@ interface VisitFormProps {
 
 const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
+  const startDate = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();

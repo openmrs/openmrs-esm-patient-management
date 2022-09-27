@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentPayload, AppointmentService, AppointmentSummary, Provider } from '../types';
-import { startDate } from '../helpers';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from '../constants';
 import first from 'lodash-es/first';
@@ -22,14 +21,6 @@ export function useServices() {
 
 export function getAppointmentService(abortController: AbortController, uuid) {
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
-    signal: abortController.signal,
-  });
-}
-
-export function fetchAppointments(abortController: AbortController) {
-  const date = startDate;
-  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${date}&status=Scheduled`;
-  return openmrsFetch(apiUrl, {
     signal: abortController.signal,
   });
 }
