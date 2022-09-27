@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
 import { useMemo } from 'react';
-import { startDate, getTodaysAppointment } from '../helpers';
+import { useAppointmentDate, getTodaysAppointment } from '../helpers';
 import { omrsDateFormat } from '../constants';
 
 export function useTodayAppointments() {
   const { t } = useTranslation();
+  const startDate = useAppointmentDate();
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
   const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 

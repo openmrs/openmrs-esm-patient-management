@@ -15,7 +15,7 @@ import { MappedAppointment } from '../types';
 import { changeAppointmentStatus } from './appointment-status.resource';
 import { navigate, showNotification, showToast } from '@openmrs/esm-framework';
 import { useSWRConfig } from 'swr';
-import { startDate } from '../helpers';
+import { useAppointmentDate } from '../helpers';
 
 interface ChangeAppointmentStatusModalProps {
   appointment: MappedAppointment;
@@ -27,6 +27,7 @@ const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> 
   const { mutate } = useSWRConfig();
   const { name, id, dateTime, serviceType, status } = appointment;
   const [selectedStatus, setSelectedStatus] = useState(status);
+  const startDate = useAppointmentDate();
   const appointmentStatus = [
     { display: t('checkedIn', 'CheckedIn'), value: 'CheckedIn' },
     { display: t('missed', 'Missed'), value: 'Missed' },

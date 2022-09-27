@@ -2,9 +2,10 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
 import { useMemo } from 'react';
-import { getAppointment, startDate } from '../helpers';
+import { getAppointment, useAppointmentDate } from '../helpers';
 
 export function useAppointments(status: string) {
+  const startDate = useAppointmentDate();
   const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
