@@ -1,4 +1,4 @@
-export const mockRecentVisits = {
+export const mockPatientsVisits = {
   recentVisits: [
     {
       uuid: '6baa7963-68ea-497e-b258-6fb82382bd07',
@@ -52,7 +52,7 @@ export const mockRecentVisits = {
       recurring: false,
     },
   ],
-  pastVisits: [
+  futureVisits: [
     {
       uuid: '6baa7963-68ea-497e-b258-6fb82382bd07',
       appointmentNumber: '0000',

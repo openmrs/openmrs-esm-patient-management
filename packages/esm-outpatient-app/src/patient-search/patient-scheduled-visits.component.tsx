@@ -49,7 +49,7 @@ enum visitType {
   FUTURE = 'Future',
 }
 
-export const ScheduledVisits: React.FC<{
+const ScheduledVisits: React.FC<{
   visits;
   visitType;
   scheduledVisitHeader;
@@ -73,7 +73,6 @@ export const ScheduledVisits: React.FC<{
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
-  const [visitUuid, setVisitUuid] = useState('');
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -82,10 +81,6 @@ export const ScheduledVisits: React.FC<{
       setUserLocation(head(locations)?.uuid);
     }
   }, [session, locations, userLocation]);
-
-  useEffect(() => {
-    setVisitUuid(currentVisit?.uuid);
-  }, [currentVisit]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -107,64 +102,45 @@ export const ScheduledVisits: React.FC<{
 
       const service = head(services)?.uuid;
       const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-      if (priority === '' || priority === null) {
+      if (!priority) {
         setPriority([...priorities].shift().uuid);
       }
-      const queuePayload: QueueEntryPayload = {
-        visit: {
-          uuid: visitUuid,
-        },
-        queueEntry: {
-          status: {
-            uuid: status,
-          },
-          priority: {
-            uuid: priority,
-          },
-          queue: {
-            uuid: service,
-          },
-          patient: {
-            uuid: patientUuid,
-          },
-          startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
-        },
-      };
 
       const abortController = new AbortController();
       if (currentVisit) {
-        saveQueueEntry(queuePayload, abortController)
-          .pipe(first())
-          .subscribe(
-            (response) => {
-              if (response.status === 201) {
-                showToast({
-                  kind: 'success',
-                  title: t('startVisit', 'Start a visit'),
-                  description: t('addQueueSuccessfully', 'Patient has been added to queue.', `${hours} : ${minutes}`),
-                });
-                closePanel();
-                setIsSubmitting(false);
-                mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-              }
-            },
-            (error) => {
-              showNotification({
-                title: t('queueEntryError', 'Error adding patient to the queue'),
-                kind: 'error',
-                critical: true,
-                description: error?.message,
-              });
-              setIsSubmitting(false);
-            },
-          );
+        showNotification({
+          title: t('startVisitError', 'Error starting visit'),
+          kind: 'error',
+          critical: true,
+          description: t('patientHasActiveVisit', 'The patient already has an active visit'),
+        });
+        setIsSubmitting(false);
       } else {
         saveVisit(payload, abortController)
           .pipe(first())
           .subscribe(
             (response) => {
               if (response.status === 201) {
-                setVisitUuid(response.data.uuid);
+                const queuePayload: QueueEntryPayload = {
+                  visit: {
+                    uuid: response.data.uuid,
+                  },
+                  queueEntry: {
+                    status: {
+                      uuid: status,
+                    },
+                    priority: {
+                      uuid: priority,
+                    },
+                    queue: {
+                      uuid: service,
+                    },
+                    patient: {
+                      uuid: patientUuid,
+                    },
+                    startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+                  },
+                };
 
                 saveQueueEntry(queuePayload, abortController)
                   .pipe(first())
@@ -219,7 +195,6 @@ export const ScheduledVisits: React.FC<{
       services,
       statuses,
       priority,
-      visitUuid,
       currentVisit,
       priorities,
       t,
@@ -248,7 +223,7 @@ export const ScheduledVisits: React.FC<{
                     <p className={styles.primaryText}>{visit.service?.name}</p>
                     <p className={styles.secondaryText}>
                       {' '}
-                      {formatDatetime(parseDate(visit?.startDateTime))} · {visit.service?.name}{' '}
+                      {formatDatetime(parseDate(visit?.startDateTime))} · {visit.service?.location?.name}{' '}
                     </p>
 
                     {hasPriority && ind == visitsIndex ? (
@@ -306,7 +281,7 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
   const { appointments, isLoading, isError } = useScheduledVisits(patientUuid, new AbortController());
 
   if (isError) {
-    <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;
+    return <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;
   }
 
   if (isLoading) {
@@ -333,14 +308,18 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={appointments?.recentVisits}
-        scheduledVisitHeader={t('recentScheduledVisits', { count: appointments?.recentVisits?.length })}
+        scheduledVisitHeader={t('recentScheduledVisits', '{count} visit(s) scheduled for +/- 7 days', {
+          count: appointments?.recentVisits?.length,
+        })}
         patientUuid={patientUuid}
         closePanel={closePanel}
       />
       <ScheduledVisits
         visitType={visitType.FUTURE}
         visits={appointments?.futureVisits}
-        scheduledVisitHeader={t('futureScheduledVisits', { count: appointments?.futureVisits?.length })}
+        scheduledVisitHeader={t('futureScheduledVisits', '{count} visit(s) scheduled for dates in the future', {
+          count: appointments?.futureVisits?.length,
+        })}
         patientUuid={patientUuid}
         closePanel={closePanel}
       />
