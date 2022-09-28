@@ -20,17 +20,9 @@ jest.mock('../hooks/useClinicalMetrics', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-  };
-});
-
 describe('Appointment metrics', () => {
-  it('renders metrics from appointment list', async () => {
-    mockedOpenmrsFetch.mockResolvedValueOnce({ data: mockAppointmentMetrics });
+  it('renders metrics from appointment list', () => {
+    mockedOpenmrsFetch.mockResolvedValue({ data: mockAppointmentMetrics });
 
     renderAppointmentMetrics();
 
