@@ -18,6 +18,7 @@ const SeeAllAppointmentsLink = () => {
   return useBahmniUI ? (
     <Button
       kind="ghost"
+      className={styles.seeAllLink}
       size="md"
       target="_blank"
       href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/list">
@@ -39,6 +40,7 @@ const AddAppointmentLink = () => {
     <Button
       size="md"
       target="_blank"
+      kind="ghost"
       href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
       renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
       {t('addNewAppointment', 'Add new appointment')}
