@@ -342,3 +342,10 @@ export const mockMappedAppointmentsData = {
     },
   ],
 };
+
+export const mockAppointmentMetrics = {
+  totalAppointments: 16,
+  highestServiceLoad: 'HIV Consultation',
+  isLoading: false,
+  error: null,
+};

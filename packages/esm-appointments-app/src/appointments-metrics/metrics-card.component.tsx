@@ -22,7 +22,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
   };
 
   return (
-    <Tile className={styles.tileContainer} light={true}>
+    <Tile className={styles.tileContainer}>
       <div className={styles.tileHeader}>
         <div className={styles.headerLabelContainer}>
           <label className={styles.headerLabel}>{headerLabel}</label>
