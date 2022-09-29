@@ -64,6 +64,7 @@ describe('Change appointment status', () => {
       description: `Appointment status has been successfully changed to ${selectedStatus}`,
     });
   });
+
   it('should display error message when rest api call to update entry fails', async () => {
     const user = userEvent.setup();
 
