@@ -3,11 +3,8 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigurableLink, formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockedUseConfig = useConfig as jest.Mock;
 
 const tableRows = mockAppointmentsData.data?.map((appointment) => {
   return {
@@ -69,15 +66,6 @@ const testProps = {
   isLoading: false,
 };
 
-const emptyStateTestProp = {
-  title: 'Scheduled appointments',
-  patientData: [],
-  headers: tableHeaders,
-  rows: tableRows,
-  serviceType: '',
-  isLoading: false,
-};
-
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
@@ -86,9 +74,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.setTimeout(20000);
-
-describe('ActiveVisitsTable: ', () => {
+describe('QueuePatientBaseTable: ', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
 
@@ -131,7 +117,9 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.queryByText(/amos strong/i)).not.toBeInTheDocument();
   });
   it('renders an empty state view if data is unavailable', async () => {
-    renderEmptyQueueBaseTable();
+    testProps.patientData = [];
+
+    renderQueueBaseTable();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
@@ -141,8 +129,4 @@ describe('ActiveVisitsTable: ', () => {
 
 function renderQueueBaseTable() {
   renderWithSwr(<QueuePatientBaseTable {...testProps} />);
-}
-
-function renderEmptyQueueBaseTable() {
-  renderWithSwr(<QueuePatientBaseTable {...emptyStateTestProp} />);
 }
