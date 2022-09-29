@@ -16,7 +16,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ status })
       <AppointmentsBaseTable
         appointments={appointments}
         isLoading={isLoading}
-        tableHeading={t('completedAppointments', 'Completed appointments')}
+        tableHeading={t('scheduledAppointments', 'Scheduled appointments')}
       />
     </div>
   );
