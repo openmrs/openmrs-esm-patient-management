@@ -47,6 +47,21 @@ export const configSchema = {
     _description: 'Display for the privilege to view and manage appointments',
     _default: "Today's Appointments Widget: Display Full View",
   },
+  bahmniAppointmentsUiBaseUrl: {
+    _type: Type.String,
+    _description: 'Configurable BahmniUi base URL',
+    _default: 'https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments',
+  },
+  useAnotherBaseUrl: {
+    _type: Type.Boolean,
+    _description: 'Configurable another base URL',
+    _default: false,
+  },
+  alternativeBaseUrl: {
+    _type: Type.String,
+    _description: 'Configurable an alternative base URL to access the appointments page',
+    _default: '',
+  },
 };
 
 export interface ConfigObject {

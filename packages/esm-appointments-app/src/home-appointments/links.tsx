@@ -11,7 +11,7 @@ import { spaBasePath } from '../constants';
 import styles from './appointments-list.scss';
 
 const SeeAllAppointmentsLink = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI, bahmniAppointmentsUiBaseUrl } = useConfig();
 
   const { t } = useTranslation();
 
@@ -21,7 +21,7 @@ const SeeAllAppointmentsLink = () => {
       className={styles.seeAllLink}
       size="md"
       target="_blank"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/list">
+      href={`${bahmniAppointmentsUiBaseUrl}/list`}>
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   ) : (
@@ -32,7 +32,7 @@ const SeeAllAppointmentsLink = () => {
 };
 
 const AddAppointmentLink = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI, bahmniAppointmentsUiBaseUrl } = useConfig();
 
   const { t } = useTranslation();
 
@@ -41,7 +41,7 @@ const AddAppointmentLink = () => {
       size="md"
       target="_blank"
       kind="ghost"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
+      href={`${bahmniAppointmentsUiBaseUrl}/calendar/new`}
       renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
       {t('addNewAppointment', 'Add new appointment')}
     </Button>
@@ -59,7 +59,7 @@ const AddAppointmentLink = () => {
 };
 
 const ViewCalendarLink = () => {
-  const { useBahmniAppointmentsUI: useBahmniUI } = useConfig();
+  const { useBahmniAppointmentsUI: useBahmniUI, bahmniAppointmentsUiBaseUrl } = useConfig();
 
   const { t } = useTranslation();
 
@@ -69,7 +69,7 @@ const ViewCalendarLink = () => {
       size="md"
       target="_blank"
       className="cds--btn cds--btn--ghost"
-      href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar"
+      href={`${bahmniAppointmentsUiBaseUrl}/calendar`}
       renderIcon={(props) => <Calendar size={16} {...props} className="cds--btn__icon" />}>
       {t('viewCalendar', 'View Calendar')}
     </Button>

@@ -1,9 +1,11 @@
 import React from 'react';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { spaBasePath } from './constants';
+import { spaBasePath, basePath } from './constants';
 
-export default function AppointmentsLint() {
+export default function AppointmentsLink() {
+  const { useAnotherBaseUrl, alternativeBaseUrl } = useConfig();
+  const appointmentsUrl = useAnotherBaseUrl ? `${alternativeBaseUrl}${basePath}` : spaBasePath;
   const { t } = useTranslation();
-  return <ConfigurableLink to={spaBasePath}>{t('appointments', 'Appointments')}</ConfigurableLink>;
+  return <ConfigurableLink to={appointmentsUrl}>{t('appointments', 'Appointments')}</ConfigurableLink>;
 }
