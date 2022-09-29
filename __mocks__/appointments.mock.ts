@@ -50,12 +50,12 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Neil Amstrong',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
         birthdate: '1986-04-03T00:00:00.000+0000',
-        phoneNumber: '0700000000',
+        phoneNumber: '0700000002',
       },
       service: {
         appointmentServiceId: 1,
@@ -95,12 +95,12 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Charles Babbage',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
         birthdate: '1986-04-03T00:00:00.000+0000',
-        phoneNumber: '0700000000',
+        phoneNumber: '0700000001',
       },
       service: {
         appointmentServiceId: 1,
@@ -137,7 +137,7 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Elon Musketeer',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
@@ -179,7 +179,7 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Hopkins Derrick',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
@@ -224,7 +224,7 @@ export const mockAppointmentsData = {
       appointmentNumber: '0000',
       patient: {
         identifier: '100GEJ',
-        name: 'John Wilson',
+        name: 'Amos Strong',
         uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
         gender: 'M',
         age: 35,
