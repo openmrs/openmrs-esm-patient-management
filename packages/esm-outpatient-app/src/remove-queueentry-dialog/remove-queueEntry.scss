@@ -1,0 +1,7 @@
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.bodyShort02 {
+  @include type.type-style('body-compact-02');
+  color: $ui-05;
+}
