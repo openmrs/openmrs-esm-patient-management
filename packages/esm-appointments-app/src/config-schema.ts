@@ -39,7 +39,7 @@ export const configSchema = {
 
   useFullViewPrivilege: {
     _type: Type.Boolean,
-    _description: "if set to 'false', will always display the full view, disregarding any privilege",
+    _description: "If set to 'false', will always display the full view, disregarding any privilege",
     _default: false,
   },
 
@@ -55,7 +55,7 @@ export const configSchema = {
   },
   appointmentsBaseUrl: {
     _type: Type.String,
-    _description: 'Configurable alternative URL for the Appointments app. Eg, the Bahmni Appointments UI URL',
+    _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
     _default: `${spaBasePath}`,
   },
 };
