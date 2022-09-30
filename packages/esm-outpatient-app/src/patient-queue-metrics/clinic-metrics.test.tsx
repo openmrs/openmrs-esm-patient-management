@@ -48,7 +48,6 @@ describe('Clinic metrics', () => {
     expect(screen.getAllByText(/patient list/i));
 
     // Select a different service to show metrics for
-    expect(screen.getByLabelText(/triage/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open menu/i }));
   });
 });
