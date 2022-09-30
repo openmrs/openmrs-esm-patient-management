@@ -45,17 +45,17 @@ export const configSchema = {
 
   fullViewPrivilege: {
     _type: Type.String,
-    _description: 'Display for the privilege to view and manage appointments',
+    _description: 'Name of the privilege to display the full view of the Appointments dashboard widget.',
     _default: "Today's Appointments Widget: Display Full View",
   },
   bahmniAppointmentsUiBaseUrl: {
     _type: Type.String,
-    _description: 'Configurable BahmniUi base URL',
+    _description: 'Configurable base URL that points to the Bahmni Appointments UI',
     _default: '/appointments',
   },
   appointmentsBaseUrl: {
     _type: Type.String,
-    _description: 'Configurable an alternative URL for the appointments widget',
+    _description: 'Configurable alternative URL for the Appointments app. Eg, the Bahmni Appointments UI URL',
     _default: `${spaBasePath}`,
   },
 };
