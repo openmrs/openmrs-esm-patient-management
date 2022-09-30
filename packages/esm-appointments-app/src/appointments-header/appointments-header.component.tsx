@@ -31,7 +31,6 @@ const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
           <span className={styles.middot}>&middot;</span>
           <DatePicker
             onChange={([date]) => changeStartDate(new Date(date))}
-            light
             ref={datePickerRef}
             dateFormat="d-M-Y"
             datePickerType="single">
@@ -39,6 +38,7 @@ const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
               style={{ backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
               id="date-picker-calendar-id"
               placeholder="DD-MMM-YYYY"
+              labelText="DD-MMM-YYYY"
               type="text"
               value={dayjs(appointmentDate).format('DD MMM YYYY')}
             />
