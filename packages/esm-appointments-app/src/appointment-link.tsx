@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { spaBasePath, basePath } from './constants';
 
 export default function AppointmentsLink() {
-  const { useAnotherBaseUrl, alternativeBaseUrl } = useConfig();
-  const appointmentsUrl = useAnotherBaseUrl ? `${alternativeBaseUrl}${basePath}` : spaBasePath;
+  const { appointmentsBaseUrl } = useConfig();
   const { t } = useTranslation();
-  return <ConfigurableLink to={appointmentsUrl}>{t('appointments', 'Appointments')}</ConfigurableLink>;
+  return <ConfigurableLink to={appointmentsBaseUrl}>{t('appointments', 'Appointments')}</ConfigurableLink>;
 }

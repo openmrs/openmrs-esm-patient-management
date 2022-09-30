@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import { spaBase, spaBasePath } from './constants';
 
 export const configSchema = {
   concepts: {
@@ -50,17 +51,12 @@ export const configSchema = {
   bahmniAppointmentsUiBaseUrl: {
     _type: Type.String,
     _description: 'Configurable BahmniUi base URL',
-    _default: 'https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments',
+    _default: '/appointments',
   },
-  useAnotherBaseUrl: {
-    _type: Type.Boolean,
-    _description: 'Configurable another base URL',
-    _default: false,
-  },
-  alternativeBaseUrl: {
+  appointmentsBaseUrl: {
     _type: Type.String,
-    _description: 'Configurable an alternative base URL to access the appointments page',
-    _default: '',
+    _description: 'Configurable an alternative URL for the appointments widget',
+    _default: `${window.spaBase}${basePath}`,
   },
 };
 

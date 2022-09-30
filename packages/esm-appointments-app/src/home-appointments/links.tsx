@@ -21,7 +21,7 @@ const SeeAllAppointmentsLink = () => {
       className={styles.seeAllLink}
       size="md"
       target="_blank"
-      href={`${bahmniAppointmentsUiBaseUrl}/list`}>
+      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/list`}>
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   ) : (
@@ -41,7 +41,7 @@ const AddAppointmentLink = () => {
       size="md"
       target="_blank"
       kind="ghost"
-      href={`${bahmniAppointmentsUiBaseUrl}/calendar/new`}
+      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
       renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
       {t('addNewAppointment', 'Add new appointment')}
     </Button>
@@ -69,7 +69,7 @@ const ViewCalendarLink = () => {
       size="md"
       target="_blank"
       className="cds--btn cds--btn--ghost"
-      href={`${bahmniAppointmentsUiBaseUrl}/calendar`}
+      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar`}
       renderIcon={(props) => <Calendar size={16} {...props} className="cds--btn__icon" />}>
       {t('viewCalendar', 'View Calendar')}
     </Button>

@@ -49,7 +49,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         className={styles.menuItemLink}
         id="#editAppointment"
         target="_blank"
-        href={`${bahmniAppointmentsUiBaseUrl}/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
@@ -75,7 +75,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         className={styles.menuItemLink}
         id="#createAppointment"
         target="_blank"
-        href={`${bahmniAppointmentsUiBaseUrl}/calendar/new`}
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
         itemText={t('addNewAppointment', 'Add new appointment')}>
         {t('addNewAppointment', 'Add new appointment')}
       </OverflowMenuItem>
