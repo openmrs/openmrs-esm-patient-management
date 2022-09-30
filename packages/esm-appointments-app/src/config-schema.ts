@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import { spaBasePath } from './constants';
 
 export const configSchema = {
   concepts: {
@@ -38,14 +39,24 @@ export const configSchema = {
 
   useFullViewPrivilege: {
     _type: Type.Boolean,
-    _description: "if set to 'false', will always display the full view, disregarding any privilege",
+    _description: "If set to 'false', will always display the full view, disregarding any privilege",
     _default: false,
   },
 
   fullViewPrivilege: {
     _type: Type.String,
-    _description: 'Display for the privilege to view and manage appointments',
+    _description: 'Name of the privilege to display the full view of the Appointments dashboard widget.',
     _default: "Today's Appointments Widget: Display Full View",
+  },
+  bahmniAppointmentsUiBaseUrl: {
+    _type: Type.String,
+    _description: 'Configurable base URL that points to the Bahmni Appointments UI',
+    _default: '/appointments',
+  },
+  appointmentsBaseUrl: {
+    _type: Type.String,
+    _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
+    _default: `${spaBasePath}`,
   },
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, useConfig } from '@openmrs/esm-framework';
 import { MappedAppointment } from '../types';
 import AppointmentForm from '../appointment-forms/appointments-form.component';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
@@ -21,6 +21,7 @@ interface ActionMenuProps {
 export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
+  const { bahmniAppointmentsUiBaseUrl } = useConfig();
 
   const { status } = appointment;
   const disableActions = status === 'Completed' || status === 'Missed' || status === 'Cancelled';
@@ -48,7 +49,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         className={styles.menuItemLink}
         id="#editAppointment"
         target="_blank"
-        href={`https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
@@ -74,7 +75,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         className={styles.menuItemLink}
         id="#createAppointment"
         target="_blank"
-        href="https://demo.mybahmni.org/appointments-v2/#/home/manage/appointments/calendar/new"
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
         itemText={t('addNewAppointment', 'Add new appointment')}>
         {t('addNewAppointment', 'Add new appointment')}
       </OverflowMenuItem>
