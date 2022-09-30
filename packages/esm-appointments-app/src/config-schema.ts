@@ -1,5 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
-import { spaBase, spaBasePath } from './constants';
+import { spaBasePath } from './constants';
 
 export const configSchema = {
   concepts: {
@@ -56,7 +56,7 @@ export const configSchema = {
   appointmentsBaseUrl: {
     _type: Type.String,
     _description: 'Configurable an alternative URL for the appointments widget',
-    _default: `${window.spaBase}${basePath}`,
+    _default: `${spaBasePath}`,
   },
 };
 
