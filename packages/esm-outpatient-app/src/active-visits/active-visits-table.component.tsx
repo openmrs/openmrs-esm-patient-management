@@ -88,7 +88,7 @@ function ActionsMenu({ queueEntry }: { queueEntry: MappedVisitQueueEntry }) {
   const { t } = useTranslation();
 
   const launchEndVisitModal = useCallback(() => {
-    const dispose = showModal('remove-queue-entry-and-end-visit', {
+    const dispose = showModal('remove-queue-entry', {
       closeModal: () => dispose(),
       queueEntry,
     });

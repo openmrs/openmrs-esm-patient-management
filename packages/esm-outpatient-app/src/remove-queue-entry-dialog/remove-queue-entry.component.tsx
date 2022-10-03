@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MappedQueueEntry } from '../types';
-import styles from './remove-queueEntry.scss';
+import styles from './remove-queue-entry.scss';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import {
   parseDate,
@@ -12,7 +12,7 @@ import {
   updateVisit,
   useVisit,
 } from '@openmrs/esm-framework';
-import { voidQueueEntry } from './remove-queueEntry.resource';
+import { voidQueueEntry } from './remove-queue-entry.resource';
 import { first } from 'rxjs/operators';
 import { useSWRConfig } from 'swr';
 

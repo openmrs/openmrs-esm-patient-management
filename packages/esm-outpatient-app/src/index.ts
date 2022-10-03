@@ -113,8 +113,8 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'remove-queue-entry-and-end-visit',
-        load: getAsyncLifecycle(() => import('./remove-queueentry-dialog/remove-queueEntry.component'), {
+        id: 'remove-queue-entry',
+        load: getAsyncLifecycle(() => import('./remove-queue-entry-dialog/remove-queue-entry.component'), {
           featureName: 'remove queue entry and end visit',
           moduleName,
         }),
