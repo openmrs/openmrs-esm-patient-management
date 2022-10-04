@@ -103,6 +103,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
 
   const isMissingRequirements = !selectedService || !appointmentKind.length;
 
+  const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
+
+  useEffect(() => {
+    if (appointmentService) {
+      const [hours, minutes] = convertTime12to24(startDate, timeFormat);
+      const startDatetime = new Date(
+        dayjs(visitDate).year(),
+        dayjs(visitDate).month(),
+        dayjs(visitDate).date(),
+        hours,
+        minutes,
+      );
+      setEndDate(
+        dayjs(startDatetime)
+          .add(parseInt(appointmentService?.durationMins ?? '0'), 'minutes')
+          .format('hh:mm'),
+      );
+    }
+  }, [startDate, timeFormat, appointmentService, visitDate]);
+
   useEffect(() => {
     if (selectedLocation && session?.sessionLocation?.uuid) {
       setSelectedLocation(session?.sessionLocation?.uuid);
@@ -196,28 +216,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
         />
       )}
 
-      <p>{t('appointmentDateAndTime', 'Appointments Date and Time')}</p>
-
-      <div className={styles.row}>
-        <Toggle onToggle={(value) => setIsFullDay(value)} id="allDay" labelA="Off" labelB="On" labelText="All Day" />
-        <DatePicker
-          dateFormat="d/m/Y"
-          datePickerType="single"
-          id="visitDate"
-          light
-          className={styles.datePickerInput}
-          minDate={visitDate}
-          onChange={([date]) => setVisitDate(date)}
-          value={visitDate}>
-          <DatePickerInput
-            id="visitStartDateInput"
-            labelText={t('date', 'Date')}
-            placeholder="dd/mm/yyyy"
-            style={{ width: '100%' }}
-          />
-        </DatePicker>
-      </div>
-
       <div className={styles.workLoadContainer}>
         {appointmentSummary.length > 0 && (
           <>
@@ -239,48 +237,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       </div>
 
       <div className={styles.childRow}>
-        {!isFullDay ? (
-          <div className={styles.row}>
-            <TimePicker
-              light
-              className={styles.timePickerInput}
-              pattern="([\d]+:[\d]{2})"
-              onChange={(event) => setStartDate(event.target.value)}
-              value={startDate}
-              labelText={t('startTime', 'Start Time')}
-              id="start-time-picker">
-              <TimePickerSelect
-                id="start-time-picker"
-                onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                value={timeFormat}
-                labelText={t('time', 'Time')}
-                aria-label={t('time', 'Time')}>
-                <SelectItem value="AM" text="AM" />
-                <SelectItem value="PM" text="PM" />
-              </TimePickerSelect>
-            </TimePicker>
-
-            <TimePicker
-              light
-              className={styles.timePickerInput}
-              pattern="([\d]+:[\d]{2})"
-              onChange={(event) => setEndDate(event.target.value)}
-              value={endDate}
-              labelText={t('endTime', 'End Time')}
-              id="end-time-picker">
-              <TimePickerSelect
-                id="end-time-picker"
-                onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                value={timeFormat}
-                labelText={t('time', 'Time')}
-                aria-label={t('time', 'Time')}>
-                <SelectItem value="AM" text="AM" />
-                <SelectItem value="PM" text="PM" />
-              </TimePickerSelect>
-            </TimePicker>
-          </div>
-        ) : null}
-
         <div className={styles.row}>
           <Select
             labelText={t('frequency', 'Frequency')}
@@ -363,6 +319,73 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             </SelectItem>
           ))}
       </Select>
+
+      <p>{t('appointmentDateAndTime', 'Appointments Date and Time')}</p>
+
+      <div className={styles.row}>
+        <Toggle onToggle={(value) => setIsFullDay(value)} id="allDay" labelA="Off" labelB="On" labelText="All Day" />
+        <DatePicker
+          dateFormat="d/m/Y"
+          datePickerType="single"
+          id="visitDate"
+          light
+          className={styles.datePickerInput}
+          minDate={visitDate}
+          onChange={([date]) => setVisitDate(date)}
+          value={visitDate}>
+          <DatePickerInput
+            id="visitStartDateInput"
+            labelText={t('date', 'Date')}
+            placeholder="dd/mm/yyyy"
+            style={{ width: '100%' }}
+          />
+        </DatePicker>
+      </div>
+      {!isFullDay ? (
+        <div className={styles.row}>
+          <TimePicker
+            disabled={!appointmentService}
+            light
+            className={styles.timePickerInput}
+            pattern="([\d]+:[\d]{2})"
+            onChange={(event) => setStartDate(event.target.value)}
+            value={startDate}
+            labelText={t('startTime', 'Start Time')}
+            id="start-time-picker">
+            <TimePickerSelect
+              disabled={!appointmentService}
+              id="start-time-picker"
+              onChange={(event) => setTimeFormat(event.target.value as amPm)}
+              value={timeFormat}
+              labelText={t('time', 'Time')}
+              aria-label={t('time', 'Time')}>
+              <SelectItem value="AM" text="AM" />
+              <SelectItem value="PM" text="PM" />
+            </TimePickerSelect>
+          </TimePicker>
+
+          <TimePicker
+            disabled={!appointmentService}
+            light
+            className={styles.timePickerInput}
+            pattern="([\d]+:[\d]{2})"
+            onChange={(event) => setEndDate(event.target.value)}
+            value={endDate}
+            labelText={t('endTime', 'End Time')}
+            id="end-time-picker">
+            <TimePickerSelect
+              disabled={!appointmentService}
+              id="end-time-picker"
+              onChange={(event) => setTimeFormat(event.target.value as amPm)}
+              value={timeFormat}
+              labelText={t('time', 'Time')}
+              aria-label={t('time', 'Time')}>
+              <SelectItem value="AM" text="AM" />
+              <SelectItem value="PM" text="PM" />
+            </TimePickerSelect>
+          </TimePicker>
+        </div>
+      ) : null}
 
       <Select
         id="appointmentKind"
