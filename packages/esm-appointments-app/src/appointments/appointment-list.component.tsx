@@ -8,11 +8,13 @@ import styles from './appointment-list.scss';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
+import CheckInAppointments from '../appointments-tabs/checkedinappointments.component';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
+  CHECKEDIN = 'CheckedIn',
 }
 
 const AppointmentList: React.FC = () => {
@@ -28,6 +30,7 @@ const AppointmentList: React.FC = () => {
           <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
+          <Tab>{t('checkedIn', 'CheckedIn')}</Tab>
           <Button
             className={styles.calendarButton}
             kind="primary"
@@ -46,6 +49,7 @@ const AppointmentList: React.FC = () => {
             <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
+          <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
         </TabPanels>
       </Tabs>
     </div>
