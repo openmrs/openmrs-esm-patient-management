@@ -84,15 +84,15 @@ const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
   );
 };
 
-function ActionsMenu({ patientUuid }: { patientUuid: string }) {
+function ActionsMenu({ queueEntry }: { queueEntry: MappedVisitQueueEntry }) {
   const { t } = useTranslation();
 
   const launchEndVisitModal = useCallback(() => {
-    const dispose = showModal('end-visit-dialog', {
+    const dispose = showModal('remove-queue-entry', {
       closeModal: () => dispose(),
-      patientUuid,
+      queueEntry,
     });
-  }, [patientUuid]);
+  }, [queueEntry]);
 
   return (
     <Layer>
@@ -103,7 +103,7 @@ function ActionsMenu({ patientUuid }: { patientUuid: string }) {
           itemText={t('editPatientDetails', 'Edit patient details')}
           onClick={() =>
             navigate({
-              to: `\${openmrsSpaBase}/patient/${patientUuid}/edit`,
+              to: `\${openmrsSpaBase}/patient/${queueEntry.patientUuid}/edit`,
             })
           }>
           {t('editPatientDetails', 'Edit patient details')}
@@ -417,7 +417,7 @@ function ActiveVisitsTable() {
                             <EditMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            <ActionsMenu patientUuid={tableRows?.[index]?.patientUuid} />
+                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
