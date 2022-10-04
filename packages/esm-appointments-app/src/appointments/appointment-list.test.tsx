@@ -35,15 +35,16 @@ describe('AppointmentList', () => {
     expect(screen.getByRole('button', { name: /add new appointment/i })).toBeInTheDocument();
     expect(screen.getByText(/view calendar/i)).toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
-    const expectedColumnHeaders = [/name/, /date & time/, /service type/, /provider/, /location/];
+    const expectedColumnHeaders = [/name/, /date & time/, /service type/, /provider/, /location/, /actions/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
     const expectedTableRows = [
-      /John Wilson 10-Sept-2021, 12:50 PM Outpatient Dr James Cook HIV Clinic Checked In open and close list of options/,
-      /John Wilson 14-Sept-2021, 12:50 PM Outpatient Dr James Cook TB Clinic Checked In open and close list of options/,
-      /John Wilson 14-Sept-2021, 07:50 AM Outpatient -- HIV Clinic Checked In open and close list of options/,
+      /John Wilson 30-Aug-2021, 12:35 PM Outpatient Dr James Cook HIV Clinic Checked In open and close list of options/,
+      /Elon Musketeer 14-Sept-2021, 07:50 AM Outpatient -- HIV Clinic Checked In open and close list of options/,
+      /Hopkins Derrick 14-Sept-2021, 12:50 PM Outpatient Dr James Cook TB Clinic Checked In open and close list of options/,
+      /Amos Strong 15-Sept-2021, 01:32 PM Outpatient -- TB Clinic Checked In open and close list of options/,
     ];
 
     expectedTableRows.forEach((row) => {
