@@ -13,15 +13,7 @@ describe('PatientSearch: ', () => {
     const advancedSearchButton = screen.getByRole('button', { name: /advanced search/i });
     expect(advancedSearchButton).toBeInTheDocument();
     expect(screen.getByRole('searchbox', { name: /search for a patient/i })).toBeInTheDocument();
-
-    await user.click(advancedSearchButton);
-
-    expect(advancedSearchButton).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /back to simple search/i })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /back to simple search/i }));
-
-    expect(screen.getByRole('button', { name: /advanced search/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /advanced search/i })).toBeDisabled();
   });
 });
 

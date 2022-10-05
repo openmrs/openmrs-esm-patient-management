@@ -78,7 +78,7 @@ function ClinicMetrics() {
         </MetricsCard>
         <MetricsCard
           label={t('minutes', 'Minutes')}
-          value={metrics ? metrics.average_wait_time : 0}
+          value="--"
           headerLabel={t('averageWaitTime', 'Average wait time today')}
           service="waitTime"
         />

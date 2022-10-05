@@ -64,6 +64,7 @@ const BasicSearch: React.FC<BasicSearchProps> = ({ toggleSearchType }) => {
               <div className={styles.buttonContainer}>
                 <Button
                   kind="ghost"
+                  disabled
                   iconDescription="Advanced search"
                   renderIcon={(props) => <SearchIcon size={16} {...props} />}
                   onClick={() => toggleSearchType(SearchTypes.ADVANCED)}>

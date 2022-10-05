@@ -43,7 +43,7 @@ describe('Clinic metrics', () => {
     expect(screen.getByText(/Scheduled appts. today/i)).toBeInTheDocument();
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();
     expect(screen.getByText(/minutes/i)).toBeInTheDocument();
-    expect(screen.getByText(/28/i)).toBeInTheDocument();
+    expect(screen.getByText(/--/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /see more metrics/i })).toBeInTheDocument();
     expect(screen.getAllByText(/patient list/i));
 
