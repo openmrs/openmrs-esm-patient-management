@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { AppointmentTypes } from '../types';
 import AppointmentsBaseTable from './appointments-base-table.component';
 import { useAppointments } from './appointments-table.resource';
 
@@ -16,7 +17,7 @@ const CheckInAppointments: React.FC<checkedInAppointmentsProps> = ({ status }) =
       <AppointmentsBaseTable
         appointments={appointments}
         isLoading={isLoading}
-        tableHeading={t('checkedInAppointments', 'CheckedIn appointments')}
+        tableHeading={AppointmentTypes.CHECKEDIN}
       />
     </div>
   );

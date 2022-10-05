@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppointments } from './appointments-table.resource';
 import AppointmentsBaseTable from './appointments-base-table.component';
+import { AppointmentTypes } from '../types';
 
 interface CancelledAppointmentProps {
   status: string;
@@ -16,7 +17,7 @@ const CancelledAppointment: React.FC<CancelledAppointmentProps> = ({ status }) =
       <AppointmentsBaseTable
         appointments={appointments}
         isLoading={isLoading}
-        tableHeading={t('cancelAppointment', 'Cancelled Appointments')}
+        tableHeading={AppointmentTypes.CANCELLED}
       />
     </div>
   );
