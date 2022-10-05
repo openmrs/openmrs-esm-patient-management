@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-search-app",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Patient search microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-search-app.js",
   "main": "src/index.ts",
