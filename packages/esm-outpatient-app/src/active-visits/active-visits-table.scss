@@ -26,6 +26,10 @@
   :global(.cds--list-box__menu-icon) {
     height: 1rem;
   }
+
+  :global(.cds--dropdown--inline) :global(.cds--list-box__field) {
+    min-width: 12rem;
+  }
 }
 
 .tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
