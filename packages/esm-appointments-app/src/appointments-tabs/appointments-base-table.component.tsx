@@ -43,6 +43,7 @@ interface AppointmentsProps {
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
+  appointmentTitle: String;
   mutate?: () => void;
 }
 
@@ -54,7 +55,7 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-function ActionsMenu({ appointment, mutate }: ActionMenuProps) {
+function ActionsMenu({ appointmentTitle, appointment, mutate }: ActionMenuProps) {
   const { t } = useTranslation();
 
   return (
@@ -72,15 +73,20 @@ function ActionsMenu({ appointment, mutate }: ActionMenuProps) {
           itemText={t('editAppointment', 'Edit Appointment')}>
           {t('editAppointment', 'Edit Appointment')}
         </OverflowMenuItem>
-        <OverflowMenuItem
-          className={styles.menuItem}
-          id="#cancelAppointment"
-          onClick={() =>
-            launchOverlay(t('cancelAppointment', 'Cancel Appointment'), <CancelAppointment appointment={appointment} />)
-          }
-          itemText={t('cancelAppointment', 'Cancel Appointment')}>
-          {t('cancelAppointment', 'Cancel Appointment')}
-        </OverflowMenuItem>
+        {appointmentTitle === 'scheduled' ? (
+          <OverflowMenuItem
+            className={styles.menuItem}
+            id="#cancelAppointment"
+            onClick={() =>
+              launchOverlay(
+                t('cancelAppointment', 'Cancel Appointment'),
+                <CancelAppointment appointment={appointment} />,
+              )
+            }
+            itemText={t('cancelAppointment', 'Cancel Appointment')}>
+            {t('cancelAppointment', 'Cancel Appointment')}
+          </OverflowMenuItem>
+        ) : null}
       </OverflowMenu>
     </Layer>
   );
@@ -215,7 +221,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
               {appointment.status === 'Scheduled' ? t('checkedIn', 'Checked In') : t('changeStatus', 'Change status')}
             </Button>
 
-            <ActionsMenu appointment={appointments?.[index]} />
+            <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
           </div>
         ),
       },

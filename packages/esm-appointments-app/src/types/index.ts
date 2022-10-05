@@ -177,3 +177,11 @@ export enum DurationPeriod {
   weekly,
   daily,
 }
+
+export enum AppointmentTypes {
+  SCHEDULED = 'scheduled',
+  CANCELLED = 'cancelled',
+  MISSED = 'missed',
+  CHECKEDIN = 'checkedin',
+  COMPLETED = 'completed',
+}

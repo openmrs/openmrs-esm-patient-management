@@ -40,6 +40,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Cancelled`);
       closeOverlay();
     } else {
       showNotification({
