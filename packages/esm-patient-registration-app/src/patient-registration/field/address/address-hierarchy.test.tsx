@@ -4,6 +4,15 @@ import { AddressHierarchy } from './address-hierarchy.component';
 import { Formik, Form } from 'formik';
 import { Resources, ResourcesContext } from '../../../offline.resources';
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  useConfig: () => ({
+    fieldConfigurations: {
+      useAddressHierarchy: false,
+    },
+  }),
+}));
+
 const mockResponse = {
   results: [
     {
@@ -25,8 +34,8 @@ describe('address hierarchy', () => {
       </ResourcesContext.Provider>,
     );
 
-    expect(screen.getByText('Location.country')).toBeInTheDocument();
-    expect(screen.getByText('Location.stateProvince')).toBeInTheDocument();
-    expect(screen.getByText('Location.cityVillage')).toBeInTheDocument();
+    expect(screen.getByText('country (optional)')).toBeInTheDocument();
+    expect(screen.getByText('stateProvince (optional)')).toBeInTheDocument();
+    expect(screen.getByText('cityVillage (optional)')).toBeInTheDocument();
   });
 });
