@@ -326,7 +326,7 @@ export class FormManager {
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(values),
-        addresses: [address],
+        addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values),
       },
       identifiers,

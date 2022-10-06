@@ -29,6 +29,7 @@ const formValues: FormValues = {
   deathDate: 'string',
   deathCause: 'string',
   relationships: [],
+  address: {},
   identifiers: {
     foo: {
       identifierUuid: 'aUuid',

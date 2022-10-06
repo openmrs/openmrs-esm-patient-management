@@ -1,6 +1,7 @@
 import useSWR from 'swr';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration-types';
+import { useMemo } from 'react';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
@@ -217,4 +218,34 @@ export async function deletePatientIdentifier(
     },
     signal: abortController.signal,
   });
+}
+
+export function useAddressHierarchy(searchString): {
+  addresses: Array<{
+    address: string;
+  }>;
+  isLoading: boolean;
+  error: Error;
+} {
+  const { data, error } = useSWR<
+    FetchResponse<
+      Array<{
+        address: string;
+      }>
+    >,
+    Error
+  >(
+    searchString ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?searchString=${searchString}` : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      addresses: data?.data ?? [],
+      error,
+      isLoading: !data && !error,
+    }),
+    [data, error],
+  );
+  return results;
 }

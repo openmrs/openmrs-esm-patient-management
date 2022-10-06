@@ -6,6 +6,7 @@ import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
+import AddressSearchComponent from './address-search.component';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -52,16 +53,15 @@ export const AddressHierarchy: React.FC = () => {
         t('postalCode', 'Postal code')
         t('address1', 'Address line 1')
         t('address2', 'Address line 2')
+        t('countyDistrict', 'District')
         t('stateProvince', 'State')
         t('cityVillage', 'city')
         t('country', 'Country')
       */
-      const labelText = t(name, label);
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
         name,
-        labelText,
         value,
       };
     });
@@ -85,27 +85,17 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {useAddressHeirarchy
-          ? addressLayout.map((attributes, index) => (
-              <ComboInput
-                key={`combo_input_${index}`}
-                name={attributes.name}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))
-          : addressLayout.map((attributes, index) => (
-              <Input
-                key={`combo_input_${index}`}
-                name={attributes.name}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))}
+        {useAddressHeirarchy && <AddressSearchComponent />}
+        {addressLayout.map((attributes, index) => (
+          <Input
+            key={`combo_input_${index}`}
+            name={`address.${attributes.name}`}
+            labelText={t(attributes.name)}
+            id={attributes.name}
+            setSelectedValue={setSelectedValue}
+            selected={selected}
+          />
+        ))}
       </div>
     </div>
   );

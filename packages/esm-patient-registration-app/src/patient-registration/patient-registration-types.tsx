@@ -188,6 +188,9 @@ export interface FormValues {
   obs?: {
     [conceptUuid: string]: string;
   };
+  address: {
+    [addressField: string]: string;
+  };
 }
 
 export interface PatientUuidMapType {

@@ -34,6 +34,7 @@ export const dummyFormValues: FormValues = {
   deathCause: '',
   relationships: [],
   identifiers: {},
+  address: {},
 };
 
 export const DummyDataInput: React.FC<DummyDataInputProps> = ({ setValues }) => {

@@ -51,6 +51,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     deathCause: '',
     relationships: [],
     identifiers: {},
+    address: {},
   });
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         setInitialFormValues({
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patientToEdit),
-          ...getAddressFieldValuesFromFhirPatient(patientToEdit),
+          address: getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
         });
       } else if (!isLoadingPatientToEdit && patientUuid) {
