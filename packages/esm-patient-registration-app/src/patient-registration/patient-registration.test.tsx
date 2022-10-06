@@ -98,6 +98,9 @@ let mockOpenmrsConfig: RegistrationConfig = {
         id: 'male',
       },
     ],
+    address: {
+      useAddressHierarchy: true,
+    },
   },
   concepts: {
     patientPhotoUuid: '736e8771-e501-4615-bfa7-570c03f4bef5',

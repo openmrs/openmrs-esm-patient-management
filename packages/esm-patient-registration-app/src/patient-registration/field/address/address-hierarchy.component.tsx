@@ -5,7 +5,7 @@ import { ComboInput } from '../../input/combo-input/combo-input.component';
 import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { useConfig } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import AddressSearchComponent from './address-search.component';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
@@ -32,8 +32,12 @@ export const AddressHierarchy: React.FC = () => {
   };
   const config = useConfig();
   const {
-    fieldConfigurations: { useAddressHeirarchy },
+    fieldConfigurations: {
+      address: { useAddressHierarchy },
+    },
   } = config;
+
+  const layout = useLayoutType();
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
@@ -82,20 +86,35 @@ export const AddressHierarchy: React.FC = () => {
       <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
       <div
         style={{
-          width: '50%',
+          width: isDesktop(layout) ? '50%' : '100%',
           paddingBottom: '5%',
         }}>
-        {useAddressHeirarchy && <AddressSearchComponent />}
-        {addressLayout.map((attributes, index) => (
-          <Input
-            key={`combo_input_${index}`}
-            name={`address.${attributes.name}`}
-            labelText={t(attributes.name)}
-            id={attributes.name}
-            setSelectedValue={setSelectedValue}
-            selected={selected}
-          />
-        ))}
+        {useAddressHierarchy ? (
+          <>
+            <AddressSearchComponent addressLayout={addressLayout} />
+            {addressLayout.map((attributes, index) => (
+              <Input
+                key={`combo_input_${index}`}
+                name={`address.${attributes.name}`}
+                labelText={t(attributes.name)}
+                id={attributes.name}
+                setSelectedValue={setSelectedValue}
+                selected={selected}
+              />
+            ))}
+          </>
+        ) : (
+          addressLayout.map((attributes, index) => (
+            <ComboInput
+              key={`combo_input_${index}`}
+              name={`address.${attributes.name}`}
+              labelText={t(attributes.name)}
+              id={attributes.name}
+              setSelectedValue={setSelectedValue}
+              selected={selected}
+            />
+          ))
+        )}
       </div>
     </div>
   );

@@ -4,9 +4,11 @@ import { ComboBox, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 
-interface AddressSearchComponentProps {}
+interface AddressSearchComponentProps {
+  addressLayout: Array<any>;
+}
 
-const AddressSearchComponent: React.FC<AddressSearchComponentProps> = () => {
+const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ addressLayout }) => {
   const { t } = useTranslation();
   const [searchString, setSearchString] = useState<string>('');
   const { addresses, isLoading, error } = useAddressHierarchy(searchString);
@@ -17,12 +19,12 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = () => {
   };
 
   const handleChange = ({ selectedItem }) => {
-    const [country, stateProvince, countyDistrict, address1, cityVillage] = selectedItem.split(', ');
-    setFieldValue(`address.country`, country);
-    setFieldValue(`address.stateProvince`, stateProvince);
-    setFieldValue(`address.countyDistrict`, countyDistrict);
-    setFieldValue(`address.address1`, address1);
-    setFieldValue(`address.cityVillage`, cityVillage);
+    if (selectedItem) {
+      const values = selectedItem.split(', ');
+      addressLayout.map((address, index) => {
+        setFieldValue(`address.${address.name}`, values[index]);
+      });
+    }
   };
 
   return (
