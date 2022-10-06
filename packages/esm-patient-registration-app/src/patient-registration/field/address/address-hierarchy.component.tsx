@@ -4,8 +4,6 @@ import { ResourcesContext } from '../../../offline.resources';
 import { ComboInput } from '../../input/combo-input/combo-input.component';
 import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
-import { Input } from '../../input/basic-input/input/input.component';
-import { useConfig } from '@openmrs/esm-framework';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -29,10 +27,6 @@ export const AddressHierarchy: React.FC = () => {
   const setSelectedValue = (value: string) => {
     setSelected(value);
   };
-  const config = useConfig();
-  const {
-    fieldConfigurations: { useAddressHeirarchy },
-  } = config;
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
@@ -49,12 +43,11 @@ export const AddressHierarchy: React.FC = () => {
       /*
         DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
 
-        t('postalCode', 'Postal code')
-        t('address1', 'Address line 1')
-        t('address2', 'Address line 2')
-        t('stateProvince', 'State')
-        t('cityVillage', 'city')
-        t('country', 'Country')
+        t('postalCode')
+        t('address1')
+        t('stateProvince')
+        t('cityVillage')
+        t('country')
       */
       const labelText = t(name, label);
       const value = getFieldValue(name, elementDefaults);
@@ -85,27 +78,17 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {useAddressHeirarchy
-          ? addressLayout.map((attributes, index) => (
-              <ComboInput
-                key={`combo_input_${index}`}
-                name={attributes.name}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))
-          : addressLayout.map((attributes, index) => (
-              <Input
-                key={`combo_input_${index}`}
-                name={attributes.name}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))}
+        {addressLayout.map((attributes, index) => (
+          <ComboInput
+            key={`combo_input_${index}`}
+            name={attributes.name}
+            labelText={attributes.labelText}
+            id={attributes.name}
+            placeholder={attributes.labelText}
+            setSelectedValue={setSelectedValue}
+            selected={selected}
+          />
+        ))}
       </div>
     </div>
   );
