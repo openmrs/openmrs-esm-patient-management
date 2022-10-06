@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useAddressHierarchy } from '../../patient-registration.resource';
-import ComboBox from '@carbon/react/es/components/ComboBox/ComboBox.js';
-import { Layer } from '@carbon/react/es/components/Layer';
+import { ComboBox, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { add, debounce } from 'lodash-es';
 import { useFormikContext } from 'formik';
 
 interface AddressSearchComponentProps {}
@@ -19,16 +17,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = () => {
   };
 
   const handleChange = ({ selectedItem }) => {
-    console.log(selectedItem);
     const [country, stateProvince, countyDistrict, address1, cityVillage] = selectedItem.split(', ');
-    console.log({
-      country,
-      stateProvince,
-      countyDistrict,
-      address1,
-      cityVillage,
-    });
-
     setFieldValue(`address.country`, country);
     setFieldValue(`address.stateProvince`, stateProvince);
     setFieldValue(`address.countyDistrict`, countyDistrict);
