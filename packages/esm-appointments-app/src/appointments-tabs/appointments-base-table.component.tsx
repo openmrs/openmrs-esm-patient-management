@@ -24,7 +24,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import { ConfigurableLink, showModal } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDatetime, parseDate, showModal } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { MappedAppointment } from '../types';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
@@ -204,7 +204,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         ),
       },
       dateTime: {
-        content: <span className={styles.statusContainer}>{appointment.dateTime}</span>,
+        content: <span className={styles.statusContainer}>{formatDatetime(parseDate(appointment.dateTime))}</span>,
       },
       serviceType: {
         content: (

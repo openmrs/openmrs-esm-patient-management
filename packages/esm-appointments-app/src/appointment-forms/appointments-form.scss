@@ -50,9 +50,12 @@
 .workLoadContainer {
   display: flex;
   flex-direction: column;
+  background-color: white;
+  padding-bottom: 1rem;
 }
 
 .workLoadTitle {
+  padding-top: spacing.$spacing-05;
   color: #525252;
   margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
   @include type.type-style('legal-01');

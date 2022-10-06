@@ -67,7 +67,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
     provider: '',
     appointmentNumber: undefined,
   };
-
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
@@ -79,8 +78,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const session = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
-  const [endDate, setEndDate] = useState(appointmentState.dateTime || dayjs(new Date()).format('hh:mm'));
+  const [startDate, setStartDate] = useState(
+    dayjs(appointmentState.dateTime).format('hh:mm') || dayjs(new Date()).format('hh:mm'),
+  );
+  const [endDate, setEndDate] = useState(
+    dayjs(appointmentState.dateTime).format('hh:mm') || dayjs(new Date()).format('hh:mm'),
+  );
   const [frequency, setFrequency] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
   const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
@@ -90,7 +93,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [reason, setReason] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = React.useState(
-    appointmentState.dateTime ? parseDate(appointmentState.dateTime) : new Date(),
+    appointmentState.dateTime ? new Date(appointmentState.dateTime) : new Date(),
   );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
@@ -98,8 +101,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
-
-  const appointmentSummary = useAppointmentSummary(new Date().toString(), selectedService);
+  const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
 
   const isMissingRequirements = !selectedService || !appointmentKind.length;
 
@@ -216,26 +218,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
         />
       )}
 
-      <div className={styles.workLoadContainer}>
-        {appointmentSummary.length > 0 && (
-          <>
-            <p className={styles.workLoadTitle}>
-              {t(
-                'serviceWorkloadTitle',
-                `${selectedService} clinic work load on the week of ${dayjs(first(appointmentSummary).date).format(
-                  'DD/MM',
-                )}`,
-              )}
-            </p>
-            <div className={styles.workLoadCard}>
-              {appointmentSummary?.map(({ date, count }, index) => (
-                <WorkloadCard key={date} date={dayjs(date).format('DD/MM')} count={count} isActive={index === 0} />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
       <div className={styles.childRow}>
         <div className={styles.row}>
           <Select
@@ -329,8 +311,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           datePickerType="single"
           id="visitDate"
           light
-          className={styles.datePickerInput}
           minDate={visitDate}
+          className={styles.datePickerInput}
           onChange={([date]) => setVisitDate(date)}
           value={visitDate}>
           <DatePickerInput
@@ -386,6 +368,34 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
           </TimePicker>
         </div>
       ) : null}
+
+      {appointmentSummary.length > 0 && (
+        <div className={styles.workLoadContainer}>
+          <>
+            <p className={styles.workLoadTitle}>
+              {t(
+                'serviceWorkloadTitle',
+                `${appointmentService.name} clinic work load on the week of ${dayjs(
+                  first(appointmentSummary).date,
+                ).format('DD/MM')}`,
+              )}
+            </p>
+            <div className={styles.workLoadCard}>
+              {appointmentSummary?.map(({ date, count }, index) => {
+                return (
+                  <WorkloadCard
+                    onClick={() => setVisitDate(new Date(date))}
+                    key={date}
+                    date={dayjs(date).format('DD/MM')}
+                    count={count}
+                    isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
+                  />
+                );
+              })}
+            </div>
+          </>
+        </div>
+      )}
 
       <Select
         id="appointmentKind"
