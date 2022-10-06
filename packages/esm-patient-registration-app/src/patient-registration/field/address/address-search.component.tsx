@@ -47,7 +47,6 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = () => {
                 : null
               : null
           }
-          light
         />
       </Layer>
     </div>
