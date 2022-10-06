@@ -29,7 +29,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           {children}
         </div>
         <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/${metricsLink[view]}`}>
-          {t('view', 'View')} <ArrowRight size={16} className={styles.viewListBtn} />
+          <span>{t('view', 'View')}</span> <ArrowRight size={16} className={styles.viewListBtn} />
         </ConfigurableLink>
       </div>
       <div>
