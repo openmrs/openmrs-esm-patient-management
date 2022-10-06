@@ -80,7 +80,7 @@ export const getAppointment = (appointment: Appointment) => {
     phoneNumber: appointment.patient?.contact,
     dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
     patientUuid: appointment.patient?.uuid,
-    dateTime: formatDatetime(parseDate(appointment.startDateTime)),
+    dateTime: appointment.startDateTime,
     serviceType: appointment.service ? appointment.service.name : '--',
     serviceUuid: appointment.service ? appointment.service.uuid : null,
     appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',

@@ -6,7 +6,7 @@ import { omrsDateFormat } from '../constants';
 export type amPm = 'AM' | 'PM';
 
 export const convertTime12to24 = (time12h, timeFormat: amPm) => {
-  let [hours, minutes] = time12h.split(':');
+  let [hours, minutes] = time12h?.split(':');
 
   if (hours === '12' && timeFormat === 'AM') {
     hours = '00';
