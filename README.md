@@ -82,7 +82,7 @@ Note that this command will not create a new tag, nor publish the packages.
 After running it, make a PR or merge to `main` with the resulting changeset.
 
 Once the version bump is merged, go to GitHub and
-[draft a new release](https://github.com/openmrs/openmrs-esm-core/releases/new). 
+[draft a new release](https://github.com/openmrs/openmrs-esm-patient-management/releases/new). 
 The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
 should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
