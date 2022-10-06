@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentSummary } from '../types';
+import { Appointment, AppointmentSummary } from '../types';
 import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
@@ -33,3 +33,19 @@ export const useClinicalMetrics = () => {
     highestServiceLoad,
   };
 };
+
+export function useAllAppointmentsByDate() {
+  const startDate = useAppointmentDate();
+  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
+  const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+
+  let providersCount = data?.data?.map((appointment) => appointment.providers).flat()?.length;
+
+  return {
+    totalProviders: providersCount ? providersCount : 0,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+    mutate,
+  };
+}
