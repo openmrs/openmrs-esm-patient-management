@@ -41,6 +41,9 @@ export interface RegistrationConfig {
       defaultUnknownFamilyName: string;
     };
     gender: Array<Gender>;
+    address: {
+      useAddressHierarchy: boolean;
+    };
   };
   links: {
     submitButton: string;

@@ -8,7 +8,9 @@ jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: () => ({
     fieldConfigurations: {
-      useAddressHierarchy: false,
+      address: {
+        useAddressHierarchy: false,
+      },
     },
   }),
 }));
