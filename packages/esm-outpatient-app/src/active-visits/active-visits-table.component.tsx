@@ -164,6 +164,7 @@ function ActiveVisitsTable() {
   const { services } = useServices(userLocation);
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
+  const [allEntries, setAllEntries] = useState(true);
   const [filter, setFilter] = useState('');
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
@@ -182,8 +183,17 @@ function ActiveVisitsTable() {
 
   useEffect(() => {
     if (filter) {
-      setFilteredRows(visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)));
-      setFilter('');
+      if (filter === 'All') {
+        setFilteredRows(visitQueueEntries);
+        setFilter('');
+        setAllEntries(true);
+      } else {
+        setFilteredRows(
+          visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)),
+        );
+        setFilter('');
+        setAllEntries(false);
+      }
     }
   }, [filter, filteredRows, visitQueueEntries]);
 
@@ -252,7 +262,7 @@ function ActiveVisitsTable() {
   };
 
   const tableRows = useMemo(() => {
-    return (filteredRows.length ? filteredRows : visitQueueEntries)?.map((entry) => ({
+    return (filteredRows?.length || allEntries === false ? filteredRows : visitQueueEntries)?.map((entry) => ({
       ...entry,
       name: {
         content: (
@@ -377,6 +387,7 @@ function ActiveVisitsTable() {
                       id="serviceFilter"
                       initialSelectedItem={{ display: `${t('all', 'All')}` }}
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+                      label={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       type="inline"
                       items={[{ display: `${t('all', 'All')}` }, ...services]}
                       itemToString={(item) => (item ? item.display : '')}
