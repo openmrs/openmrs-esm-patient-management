@@ -1,4 +1,4 @@
-import { ComboBox, ComboBoxProps } from '@carbon/react';
+import { ComboBox, ComboBoxProps, Layer } from '@carbon/react';
 import { useField } from 'formik';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,27 +36,30 @@ export const ComboInput: React.FC<ComboInputProps> = ({ name, labelText, placeho
   }
 
   return (
-    <ComboBox
-      id={name}
-      onInputChange={(event) => {
-        comboBoxEvent(event, name);
-        setValue(event);
-      }}
-      items={listItems}
-      itemToString={(item) => item?.text ?? ''}
-      {...field}
-      onChange={(e) => {
-        if (Boolean(e.selectedItem)) {
-          setSelectedValue(e.selectedItem.id);
-          setValue(e.selectedItem.text);
-        } else {
-          setSelectedValue(undefined);
-          setValue(undefined);
-        }
-      }}
-      placeholder={placeholder}
-      titleText={labelText}
-      light
-    />
+    <div style={{ marginBottom: '1rem' }}>
+      <Layer>
+        <ComboBox
+          id={name}
+          onInputChange={(event) => {
+            comboBoxEvent(event, name);
+            setValue(event);
+          }}
+          items={listItems}
+          itemToString={(item) => item?.text ?? ''}
+          {...field}
+          onChange={(e) => {
+            if (Boolean(e.selectedItem)) {
+              setSelectedValue(e.selectedItem.id);
+              setValue(e.selectedItem.text);
+            } else {
+              setSelectedValue(undefined);
+              setValue(undefined);
+            }
+          }}
+          placeholder={placeholder}
+          titleText={labelText}
+        />
+      </Layer>
+    </div>
   );
 };

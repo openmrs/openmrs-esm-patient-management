@@ -41,6 +41,9 @@ export interface RegistrationConfig {
       defaultUnknownFamilyName: string;
     };
     gender: Array<Gender>;
+    address: {
+      useAddressHierarchy: boolean;
+    };
   };
   links: {
     submitButton: string;
@@ -228,7 +231,7 @@ export const esmPatientRegistrationSchema = {
       _description: 'Provide ability to configure sex options.',
     },
     address: {
-      useAddressHeirarchy: {
+      useAddressHierarchy: {
         _type: Type.Boolean,
         _description: 'Whether to use the Address heirarchy in the registration form or not',
         _default: false,

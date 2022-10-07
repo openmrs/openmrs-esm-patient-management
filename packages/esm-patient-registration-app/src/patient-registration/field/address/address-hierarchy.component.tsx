@@ -31,7 +31,9 @@ export const AddressHierarchy: React.FC = () => {
   };
   const config = useConfig();
   const {
-    fieldConfigurations: { useAddressHeirarchy },
+    fieldConfigurations: {
+      address: { useAddressHierarchy },
+    },
   } = config;
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export const AddressHierarchy: React.FC = () => {
           width: '50%',
           paddingBottom: '5%',
         }}>
-        {useAddressHeirarchy
+        {useAddressHierarchy
           ? addressLayout.map((attributes, index) => (
               <ComboInput
                 key={`combo_input_${index}`}
