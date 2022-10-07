@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration-types';
 import { useMemo } from 'react';
@@ -221,13 +222,11 @@ export async function deletePatientIdentifier(
 }
 
 export function useAddressHierarchy(searchString): {
-  addresses: Array<{
-    address: string;
-  }>;
+  addresses: Array<string>;
   isLoading: boolean;
   error: Error;
 } {
-  const { data, error } = useSWR<
+  const { data, error } = useSWRImmutable<
     FetchResponse<
       Array<{
         address: string;
@@ -235,17 +234,57 @@ export function useAddressHierarchy(searchString): {
     >,
     Error
   >(
-    searchString ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?searchString=${searchString}` : null,
+    searchString
+      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=%2C%20&searchString=${searchString}`
+      : null,
     openmrsFetch,
   );
 
   const results = useMemo(
     () => ({
-      addresses: data?.data ?? [],
+      addresses: data?.data?.map((address) => address.address) ?? [],
       error,
       isLoading: !data && !error,
     }),
     [data, error],
   );
+  return results;
+}
+
+export function useAdressHierarchyWithParentSearch(
+  addressField,
+  parentid,
+  query,
+): {
+  error: Error;
+  isLoading: boolean;
+  addresses: Array<{
+    uuid: string;
+    name: string;
+  }>;
+} {
+  const { data, error } = useSWRImmutable<
+    FetchResponse<
+      Array<{
+        uuid: string;
+        name: string;
+      }>
+    >
+  >(
+    query
+      ? `/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      error: error,
+      isLoading: !data && !error,
+      addresses: data?.data ?? [],
+    }),
+    [data, error],
+  );
+
   return results;
 }
