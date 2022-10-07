@@ -228,7 +228,7 @@ export const esmPatientRegistrationSchema = {
       _description: 'Provide ability to configure sex options.',
     },
     address: {
-      useAddressHeirarchy: {
+      useAddressHierarchy: {
         _type: Type.Boolean,
         _description: 'Whether to use the Address heirarchy in the registration form or not',
         _default: false,
