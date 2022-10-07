@@ -374,16 +374,6 @@ export class FormManager {
     return attributes;
   }
 
-  static getPatientAddressField(
-    values: FormValues,
-    initialAddressFieldValues: Record<string, any>,
-  ): Record<string, string> {
-    return Object.keys(initialAddressFieldValues).reduce(
-      (memo, fieldName) => ({ ...memo, [fieldName]: values[fieldName] }),
-      {},
-    );
-  }
-
   static getPatientDeathInfo(values: FormValues) {
     const { isDead, deathDate, deathCause } = values;
     return {
