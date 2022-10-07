@@ -1,9 +1,8 @@
-import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { ComboBoxProps } from '@carbon/react';
+import React, { useState } from 'react';
+import { ComboBox, ComboBoxProps, Layer } from '@carbon/react';
 import { useField } from 'formik';
-import { useAdressHierarchyWithParentSearch } from '../../patient-registration.resource';
-import { Input } from '../basic-input/input/input.component';
-import styles from './combo-input.scss';
+import { useTranslation } from 'react-i18next';
+import { performAdressHierarchyWithParentSearch } from '../../../resource';
 
 interface ComboInputProps extends Omit<ComboBoxProps, 'items'> {
   name: string;
@@ -14,57 +13,54 @@ interface ComboInputProps extends Omit<ComboBoxProps, 'items'> {
 }
 
 export const ComboInput: React.FC<ComboInputProps> = ({ name, labelText, placeholder, setSelectedValue, selected }) => {
-  const searchBox = useRef(null);
-  const wrapper = useRef(null);
+  const { t } = useTranslation();
   const [field, _, helpers] = useField(name);
-  const [showSuggestions, setShowSuggestions] = useState(true);
-  const { addresses } = useAdressHierarchyWithParentSearch(name.replace(' ', ''), selected, field.value);
-  const suggestions = useMemo(() => {
-    setShowSuggestions(addresses.length > 0);
-    return addresses.map((parent1) => ({ id: parent1['uuid'], text: parent1['name'] }));
-  }, [addresses, setShowSuggestions]);
+  const [listItems, setListItems] = useState([]);
+  const [error, setError] = useState<Error>();
   const { setValue } = helpers;
-
-  const handleClickOutsideComponent = (e) => {
-    if (wrapper.current) {
-      setShowSuggestions(wrapper.current.contains(e.target));
+  const comboBoxEvent = (text, id) => {
+    if (text == '') {
+    } else {
+      performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text)
+        .then((value) => {
+          setListItems(value.data.map((parent1) => ({ id: parent1['uuid'], text: parent1['name'] })));
+        })
+        .catch((err) => {
+          setError(err);
+        });
     }
   };
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutsideComponent);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutsideComponent);
-    };
-  }, [wrapper]);
-
-  const handleSelection = useCallback(
-    (suggestion) => {
-      setValue(suggestion?.text);
-      setSelectedValue(suggestion.id);
-      setShowSuggestions(false);
-    },
-    [setValue, setSelectedValue, setShowSuggestions],
-  );
+  if (error) {
+    return <span>{t(`${error.message}`)}</span>;
+  }
 
   return (
-    <div className={styles.autocomplete} ref={wrapper}>
-      <Input id={name} name={name} labelText={labelText} {...field} ref={searchBox} />
-      {showSuggestions && suggestions.length > 0 && (
-        /* Since the input has a marginBottom of 1rem */
-        <div style={{ marginTop: '-1rem' }}>
-          <ul className={styles.suggestions}>
-            {suggestions.map((suggestion, index) => (
-              <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
-                key={index}
-                onClick={(e) => handleSelection(suggestion)}>
-                {suggestion?.text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+    <div style={{ marginBottom: '1rem' }}>
+      <Layer>
+        <ComboBox
+          id={name}
+          onInputChange={(event) => {
+            comboBoxEvent(event, name);
+            setValue(event);
+          }}
+          items={listItems}
+          itemToString={(item) => item?.text ?? ''}
+          {...field}
+          onChange={(e) => {
+            if (Boolean(e.selectedItem)) {
+              setSelectedValue(e.selectedItem.id);
+              setValue(e.selectedItem.text);
+            } else {
+              setSelectedValue(undefined);
+              setValue(undefined);
+            }
+          }}
+          placeholder={placeholder}
+          titleText={labelText}
+          light
+        />
+      </Layer>
     </div>
   );
 };
