@@ -42,7 +42,11 @@ export interface RegistrationConfig {
     };
     gender: Array<Gender>;
     address: {
-      useAddressHierarchy: boolean;
+      useAddressHierarchy: {
+        enabled: boolean;
+        useQuickSearch: boolean;
+        searchAddressByLevel: boolean;
+      };
     };
   };
   links: {

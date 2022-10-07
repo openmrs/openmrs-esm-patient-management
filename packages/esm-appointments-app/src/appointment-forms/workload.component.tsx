@@ -6,11 +6,16 @@ interface WorkloadCardProp {
   date: string;
   count: number;
   isActive: boolean;
+  onClick: () => void;
 }
-const WorkloadCard: React.FC<WorkloadCardProp> = ({ date, count, isActive }) => {
+const WorkloadCard: React.FC<WorkloadCardProp> = ({ date, count, isActive, onClick }) => {
   const { t } = useTranslation();
   return (
-    <div className={`${styles.tileContainer}  ${isActive && styles.activeWorkloadCard}`}>
+    <div
+      tabIndex={0}
+      role="button"
+      onClick={onClick}
+      className={`${styles.tileContainer}  ${isActive && styles.activeWorkloadCard}`}>
       <div className={styles.tileHeader}>
         <label className={styles.headerLabel}>{date}</label>
       </div>

@@ -99,7 +99,11 @@ let mockOpenmrsConfig: RegistrationConfig = {
       },
     ],
     address: {
-      useAddressHierarchy: true,
+      useAddressHierarchy: {
+        enabled: true,
+        useQuickSearch: true,
+        searchAddressByLevel: true,
+      },
     },
   },
   concepts: {

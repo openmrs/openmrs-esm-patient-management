@@ -9,7 +9,11 @@ jest.mock('@openmrs/esm-framework', () => ({
   useConfig: () => ({
     fieldConfigurations: {
       address: {
-        useAddressHierarchy: true,
+        useAddressHierarchy: {
+          enabled: false,
+          useQuickSearch: false,
+          searchAddressByLevel: false,
+        },
       },
     },
   }),

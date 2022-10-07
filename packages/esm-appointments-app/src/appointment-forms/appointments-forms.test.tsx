@@ -75,7 +75,6 @@ describe('AppointmentForm', () => {
     allTabs.forEach((tab) => inputAndSelectNamesAndTabValues.push(tab?.id));
 
     expect(screen.queryByLabelText('Reason For Changes')).not.toBeInTheDocument();
-
     expect(inputAndSelectNamesAndTabValues).toEqual([
       'visitStartDateInput',
       'start-time-picker',
@@ -83,11 +82,11 @@ describe('AppointmentForm', () => {
       'Yes',
       'No',
       '',
-      'start-time-picker',
-      'end-time-picker',
       'frequency',
       'location',
       'service',
+      'start-time-picker',
+      'end-time-picker',
       'appointmentKind',
       'appointmentStatus',
       'providers',

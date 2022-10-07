@@ -349,3 +349,9 @@ export const mockAppointmentMetrics = {
   isLoading: false,
   error: null,
 };
+
+export const mockProvidersCount = {
+  totalProviders: 4,
+  isLoading: false,
+  error: null,
+};

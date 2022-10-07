@@ -65,3 +65,27 @@ The `main` branch of this repo is deployed in a [demo environment](https://openm
 ## Configuration
 
 This module is designed to be driven by configuration files.
+
+## Version and release
+
+To increment the version, run the following command:
+
+```sh
+yarn release
+```
+
+You will need to pick the next version number. We use minor changes (e.g. `3.2.0` → `3.3.0`)
+to indicate big new features and breaking changes, and patch changes (e.g. `3.2.0` → `3.2.1`)
+otherwise.
+
+Note that this command will not create a new tag, nor publish the packages.
+After running it, make a PR or merge to `main` with the resulting changeset.
+
+Once the version bump is merged, go to GitHub and
+[draft a new release](https://github.com/openmrs/openmrs-esm-patient-management/releases/new). 
+The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
+should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
+will cause GitHub Actions to publish the packages, completing the release process.
+
+> Don't run `npm publish`, `yarn publish`, or `lerna publish`. Use the above process.
+

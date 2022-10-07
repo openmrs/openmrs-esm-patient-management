@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { ComboBoxProps } from '@carbon/react';
 import { useField } from 'formik';
-import { useAddressHierarchy, useAdressHierarchyWithParentSearch } from '../../patient-registration.resource';
+import { useAdressHierarchyWithParentSearch } from '../../patient-registration.resource';
 import { Input } from '../basic-input/input/input.component';
 import styles from './combo-input.scss';
 
