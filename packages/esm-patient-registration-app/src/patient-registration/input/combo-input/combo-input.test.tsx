@@ -22,7 +22,7 @@ describe('Combo box input', () => {
         </Form>
       </Formik>,
     );
-    return screen.getByLabelText('Text (optional)') as HTMLInputElement;
+    return screen.getByLabelText('Text') as HTMLInputElement;
   };
 
   it('exists', async () => {
