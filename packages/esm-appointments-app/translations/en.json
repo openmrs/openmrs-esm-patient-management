@@ -117,6 +117,7 @@
   "selectVisitType": "Please select a Visit Type",
   "service": "Service",
   "serviceType": "Service Type",
+  "serviceWorkloadTitle": "",
   "startTime": "Start Time",
   "startVisit": "Start a visit",
   "startVisitError": "Error starting visit",

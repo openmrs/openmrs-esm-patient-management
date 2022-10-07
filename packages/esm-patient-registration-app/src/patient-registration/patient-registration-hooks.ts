@@ -40,16 +40,18 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     monthsEstimated: 0,
     birthdateEstimated: false,
     telephoneNumber: '',
-    address1: '',
-    address2: '',
-    cityVillage: '',
-    stateProvince: '',
-    country: '',
-    postalCode: '',
     isDead: false,
     deathDate: '',
     deathCause: '',
     relationships: [],
+    address: {
+      address1: '',
+      address2: '',
+      cityVillage: '',
+      stateProvince: '',
+      country: '',
+      postalCode: '',
+    },
     identifiers: {},
   });
 
@@ -59,7 +61,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
         setInitialFormValues({
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patientToEdit),
-          ...getAddressFieldValuesFromFhirPatient(patientToEdit),
+          address: getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
         });
       } else if (!isLoadingPatientToEdit && patientUuid) {
