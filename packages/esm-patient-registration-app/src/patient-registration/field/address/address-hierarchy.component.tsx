@@ -57,6 +57,7 @@ export const AddressHierarchy: React.FC = () => {
         t('stateProvince', 'State')
         t('cityVillage', 'city')
         t('country', 'Country')
+        t('countyDistrict', 'District')
       */
       const labelText = t(name, label);
       const value = getFieldValue(name, elementDefaults);
@@ -91,7 +92,7 @@ export const AddressHierarchy: React.FC = () => {
           ? addressLayout.map((attributes, index) => (
               <ComboInput
                 key={`combo_input_${index}`}
-                name={attributes.name}
+                name={`address.${attributes.name}`}
                 labelText={t(attributes.name)}
                 id={attributes.name}
                 setSelectedValue={setSelectedValue}
@@ -101,7 +102,7 @@ export const AddressHierarchy: React.FC = () => {
           : addressLayout.map((attributes, index) => (
               <Input
                 key={`combo_input_${index}`}
-                name={attributes.name}
+                name={`address.${attributes.name}`}
                 labelText={t(attributes.name)}
                 id={attributes.name}
                 setSelectedValue={setSelectedValue}
