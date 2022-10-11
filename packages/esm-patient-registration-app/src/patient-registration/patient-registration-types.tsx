@@ -169,12 +169,6 @@ export interface FormValues {
   monthsEstimated: number;
   birthdateEstimated: boolean;
   telephoneNumber: string;
-  address1: string;
-  address2: string;
-  cityVillage: string;
-  stateProvince: string;
-  country: string;
-  postalCode: string;
   isDead: boolean;
   deathDate: string;
   deathCause: string;

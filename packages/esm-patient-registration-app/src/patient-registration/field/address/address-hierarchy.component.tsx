@@ -63,6 +63,7 @@ export const AddressHierarchy: React.FC = () => {
         t('stateProvince', 'State')
         t('cityVillage', 'city')
         t('country', 'Country')
+        t('countyDistrict', 'District')
       */
       const value = getFieldValue(name, elementDefaults);
       return {

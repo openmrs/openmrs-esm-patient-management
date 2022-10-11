@@ -304,7 +304,6 @@ export class FormManager {
     initialAddressFieldValues: Record<string, any>,
     identifiers: Array<PatientIdentifier>,
   ): Patient {
-    let address = FormManager.getPatientAddressField(values, initialAddressFieldValues);
     let birthdate;
     if (values.birthdate instanceof Date) {
       birthdate = [values.birthdate.getFullYear(), values.birthdate.getMonth() + 1, values.birthdate.getDate()].join(
@@ -312,9 +311,6 @@ export class FormManager {
       );
     } else {
       birthdate = values.birthdate;
-    }
-    if (isEqual(initialAddressFieldValues, address)) {
-      address = {};
     }
 
     return {
@@ -376,16 +372,6 @@ export class FormManager {
     }
 
     return attributes;
-  }
-
-  static getPatientAddressField(
-    values: FormValues,
-    initialAddressFieldValues: Record<string, any>,
-  ): Record<string, string> {
-    return Object.keys(initialAddressFieldValues).reduce(
-      (memo, fieldName) => ({ ...memo, [fieldName]: values[fieldName] }),
-      {},
-    );
   }
 
   static getPatientDeathInfo(values: FormValues) {
