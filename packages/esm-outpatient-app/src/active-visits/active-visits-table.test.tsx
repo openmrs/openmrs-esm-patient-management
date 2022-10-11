@@ -50,7 +50,7 @@ describe('ActiveVisitsTable: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByText(/active visits/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
   });
 
@@ -64,7 +64,7 @@ describe('ActiveVisitsTable: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByText(/active visits/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();

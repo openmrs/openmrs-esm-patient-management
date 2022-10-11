@@ -356,7 +356,7 @@ function ActiveVisitsTable() {
           </Button>
         </div>
         <div className={styles.headerContainer}>
-          <span className={styles.heading}>{t('activeVisits', 'Active visits')}</span>
+          <span className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</span>
           <Button
             size="sm"
             kind="secondary"
@@ -490,7 +490,7 @@ function ActiveVisitsTable() {
   return (
     <div className={styles.container}>
       <div className={styles.headerContainer}>
-        <label className={styles.heading}>{t('activeVisits', 'Active visits')}</label>
+        <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
         <Button
           iconDescription={t('addPatientToList', 'Add patient to list')}
           kind="secondary"

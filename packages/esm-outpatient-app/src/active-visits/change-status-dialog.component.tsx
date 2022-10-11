@@ -44,6 +44,10 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const [newQueueUuid, setNewQueueUuid] = useState('');
   const [queueEntryUuid, setQueueEntryUuid] = useState(queueEntry.queueEntryUuid);
   const [patientUuid, setPatientUuid] = useState(queueEntry.patientUuid);
+  const [patientName, setPatientName] = useState(queueEntry.name);
+  const [patientAge, setPatientAge] = useState(queueEntry.patientAge);
+  const [patientDob, setPatientDob] = useState(queueEntry.patientDob);
+  const [patientSex, setPatientSex] = useState(queueEntry.patientSex);
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
@@ -121,10 +125,15 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
 
   return (
     <div>
-      <ModalHeader closeModal={closeModal} title={t('changePatientStatus', 'Change patient status?')} />
+      <ModalHeader closeModal={closeModal} title={t('changePatientQueueStatus', 'Change patient queue status?')} />
       <ModalBody>
         <Form onSubmit={changeQueueStatus}>
-          <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
+          <div className={styles.modalBody}>
+            <h5>
+              {patientName} &nbsp; · &nbsp;{patientSex} &nbsp; · &nbsp;{patientAge}&nbsp;{t('years', 'Years')}
+            </h5>
+          </div>
+          <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
           <FormGroup legendText="">
             <RadioButtonGroup
               className={styles.radioButtonGroup}
@@ -145,7 +154,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
           </FormGroup>
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+            <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
             <Select
               labelText={t('selectService', 'Select a service')}
               id="service"
@@ -163,7 +172,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
           </section>
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+            <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
             <ContentSwitcher
               size="sm"
               selectedIndex={1}

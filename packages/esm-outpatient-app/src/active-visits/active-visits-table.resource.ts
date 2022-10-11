@@ -3,7 +3,9 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import {
   FetchResponse,
+  formatDate,
   openmrsFetch,
+  parseDate,
   toDateObjectStrict,
   toOmrsIsoString,
   useConfig,
@@ -33,6 +35,7 @@ interface VisitQueueEntry {
     person: {
       age: string;
       gender: string;
+      birthdate: string;
     };
     phoneNumber: string;
   };
@@ -64,6 +67,9 @@ export interface MappedVisitQueueEntry {
   id: string;
   encounters: Array<MappedEncounter>;
   name: string;
+  patientAge: string;
+  patientSex: string;
+  patientDob: string;
   patientUuid: string;
   priority: MappedQueuePriority;
   priorityComment: string;
@@ -174,6 +180,11 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
     name: visitQueueEntry.queueEntry.display,
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
+    patientAge: visitQueueEntry.queueEntry.patient.person?.age,
+    patientSex: visitQueueEntry.queueEntry.patient.person?.gender === 'M' ? 'MALE' : 'FEMALE',
+    patientDob: visitQueueEntry?.queueEntry?.patient?.person?.birthdate
+      ? formatDate(parseDate(visitQueueEntry.queueEntry.patient.person.birthdate), { time: false })
+      : '--',
     // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
     // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
     priority:

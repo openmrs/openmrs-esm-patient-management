@@ -81,7 +81,7 @@ describe('Queue entry details', () => {
 
     renderUpdateQueueEntryDialog();
 
-    expect(screen.getByText(/change patient status/i)).toBeInTheDocument();
+    expect(screen.getByText(/change patient queue status/i)).toBeInTheDocument();
     await waitFor(() => user.click(screen.getByRole('radio', { name: /finished service/i })));
     await waitFor(() => user.click(screen.getByRole('button', { name: /exit and change status/i })));
 
