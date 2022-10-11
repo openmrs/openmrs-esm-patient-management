@@ -28,7 +28,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
 
   const removeQueueEntry = () => {
     const endCurrentVisitPayload = {
-      location: currentVisit?.location.uuid,
+      location: currentVisit?.location?.uuid,
       startDatetime: parseDate(currentVisit?.startDatetime),
       visitType: currentVisit?.visitType?.uuid,
       stopDatetime: new Date(),
@@ -94,14 +94,14 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
     <div>
       <ModalHeader
         closeModal={closeModal}
-        label={t('visit', 'Visit')}
-        title={t('removeFromQueueAndEndVisit', 'Remove patient from queue and end active visit')}
+        label={t('serviceQueue', 'Service queue')}
+        title={t('removeFromQueueAndEndVisit', 'Remove patient from queue and end active visit?')}
       />
       <ModalBody>
-        <p className={styles.bodyShort02}>
+        <p className={styles.subHeading} id="subHeading">
           {t(
             'endVisitWarningMessage',
-            'Ending this visit will not allow you to fill another encounter form for this patient',
+            'Ending this visit will remove this patient from the queue and will not allow you to fill another encounter form for this patient',
           )}
         </p>
       </ModalBody>
