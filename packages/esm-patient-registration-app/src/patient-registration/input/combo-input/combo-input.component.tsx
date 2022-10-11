@@ -10,9 +10,17 @@ interface ComboInputProps extends Omit<ComboBoxProps, 'items'> {
   placeholder?: string;
   setSelectedValue: any;
   selected: string;
+  textFieldName: string;
 }
 
-export const ComboInput: React.FC<ComboInputProps> = ({ name, labelText, placeholder, setSelectedValue, selected }) => {
+export const ComboInput: React.FC<ComboInputProps> = ({
+  name,
+  labelText,
+  placeholder,
+  setSelectedValue,
+  selected,
+  textFieldName,
+}) => {
   const { t } = useTranslation();
   const [field, _, helpers] = useField(name);
   const [listItems, setListItems] = useState([]);
@@ -21,7 +29,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({ name, labelText, placeho
   const comboBoxEvent = (text, id) => {
     if (text == '') {
     } else {
-      performAdressHierarchyWithParentSearch(id.replace(' ', ''), selected, text)
+      performAdressHierarchyWithParentSearch(textFieldName.replace(' ', ''), selected, text)
         .then((value) => {
           setListItems(value.data.map((parent1) => ({ id: parent1['uuid'], text: parent1['name'] })));
         })

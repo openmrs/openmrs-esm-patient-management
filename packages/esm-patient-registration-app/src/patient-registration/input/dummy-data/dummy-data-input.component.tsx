@@ -36,7 +36,6 @@ export const dummyFormValues: FormValues = {
     postalCode: '50030-310',
   },
   identifiers: {},
-  address: {},
 };
 
 export const DummyDataInput: React.FC<DummyDataInputProps> = ({ setValues }) => {

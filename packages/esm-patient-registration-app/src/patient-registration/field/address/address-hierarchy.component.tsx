@@ -98,6 +98,7 @@ export const AddressHierarchy: React.FC = () => {
               searchAddressByLevel ? (
                 <ComboInput
                   key={`combo_input_${index}`}
+                  textFieldName={attributes.name}
                   name={`address.${attributes.name}`}
                   labelText={t(attributes.name)}
                   id={attributes.name}

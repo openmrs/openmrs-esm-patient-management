@@ -44,14 +44,6 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     deathDate: '',
     deathCause: '',
     relationships: [],
-    address: {
-      address1: '',
-      address2: '',
-      cityVillage: '',
-      stateProvince: '',
-      country: '',
-      postalCode: '',
-    },
     identifiers: {},
     address: {},
   });
