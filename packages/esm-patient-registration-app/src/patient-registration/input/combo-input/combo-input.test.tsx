@@ -16,6 +16,7 @@ describe('Combo box input', () => {
             id="text"
             labelText="Text"
             name="text"
+            textFieldName="text"
             placeholder="Enter text"
             light
           />
