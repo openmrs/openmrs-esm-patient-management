@@ -206,17 +206,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
 
   return (
     <div className={styles.formContainer}>
-      {isLoading ? (
-        <SkeletonText />
-      ) : (
-        <ExtensionSlot
-          extensionSlotName="patient-header-slot"
-          state={{
-            patient,
-            patientUuid: appointmentState.patientUuid,
-          }}
-        />
-      )}
+      <div className={styles.navbar}>
+        {isLoading ? (
+          <SkeletonText />
+        ) : (
+          <ExtensionSlot
+            extensionSlotName="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: appointmentState.patientUuid,
+            }}
+          />
+        )}
+      </div>
 
       <div className={styles.childRow}>
         <div className={styles.row}>

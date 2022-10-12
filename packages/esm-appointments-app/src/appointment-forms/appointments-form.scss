@@ -53,6 +53,13 @@
   background-color: white;
   padding-bottom: 1rem;
 }
+.navbar {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 10;
+  padding: 2rem 1px;
+}
 
 .workLoadTitle {
   padding-top: spacing.$spacing-05;
