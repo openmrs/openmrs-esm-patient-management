@@ -87,7 +87,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [frequency, setFrequency] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
   const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
-  const [selectedProvider, setSelectedProvider] = useState(session?.currentProvider?.uuid);
+  const [selectedProvider, setSelectedProvider] = useState(appointmentState.provider);
   const [reminder, setReminder] = useState('');
   const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
   const [reason, setReason] = useState('');
@@ -103,7 +103,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
 
-  const isMissingRequirements = !selectedService || !appointmentKind.length;
+  const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
 
   const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
 
