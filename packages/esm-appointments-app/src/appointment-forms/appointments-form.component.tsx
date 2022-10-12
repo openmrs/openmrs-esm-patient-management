@@ -98,7 +98,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
   const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
-  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
+  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status ?? 'Scheduled');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
@@ -415,25 +415,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             </SelectItem>
           ))}
       </Select>
-
-      <Select
-        id="appointmentStatus"
-        invalidText="Required"
-        labelText={t('selectAppointmentStatus', 'Select status')}
-        light
-        className={styles.inputContainer}
-        onChange={(event) => setAppointmentStatus(event.target.value)}
-        value={appointmentStatus}>
-        {!appointmentStatus || appointmentStatus == '--' ? (
-          <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
-        ) : null}
-        {appointmentStatuses?.length > 0 &&
-          appointmentStatuses.map((service) => (
-            <SelectItem key={service} text={service} value={service}>
-              {service}
-            </SelectItem>
-          ))}
-      </Select>
+      {context !== 'creating' && (
+        <Select
+          id="appointmentStatus"
+          invalidText="Required"
+          labelText={t('selectAppointmentStatus', 'Select status')}
+          light
+          className={styles.inputContainer}
+          onChange={(event) => setAppointmentStatus(event.target.value)}
+          value={appointmentStatus}>
+          {!appointmentStatus || appointmentStatus == '--' ? (
+            <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+          ) : null}
+          {appointmentStatuses?.length > 0 &&
+            appointmentStatuses.map((service) => (
+              <SelectItem key={service} text={service} value={service}>
+                {service}
+              </SelectItem>
+            ))}
+        </Select>
+      )}
 
       <Select
         id="providers"
