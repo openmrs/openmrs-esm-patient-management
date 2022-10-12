@@ -42,7 +42,11 @@ export interface RegistrationConfig {
     };
     gender: Array<Gender>;
     address: {
-      useAddressHierarchy: boolean;
+      useAddressHierarchy: {
+        enabled: boolean;
+        useQuickSearch: boolean;
+        searchAddressByLevel: boolean;
+      };
     };
   };
   links: {
@@ -232,9 +236,23 @@ export const esmPatientRegistrationSchema = {
     },
     address: {
       useAddressHierarchy: {
-        _type: Type.Boolean,
-        _description: 'Whether to use the Address heirarchy in the registration form or not',
-        _default: false,
+        enabled: {
+          _type: Type.Boolean,
+          _description: 'Whether to use the Address heirarchy in the registration form or not',
+          _default: true,
+        },
+        useQuickSearch: {
+          _type: Type.Boolean,
+          _description:
+            'Whether to use the quick searching through the address saved in the database pre-fill the form.',
+          _default: true,
+        },
+        searchAddressByLevel: {
+          _type: Type.Boolean,
+          _description:
+            "Whether to fill the addresses by levels, i.e. County => subCounty, the current field is dependent on it's previous field.",
+          _default: true,
+        },
       },
     },
   },

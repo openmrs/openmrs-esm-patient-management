@@ -173,14 +173,6 @@ export interface FormValues {
   deathDate: string;
   deathCause: string;
   relationships: Array<RelationshipValue>;
-  address: {
-    address1?: string;
-    address2?: string;
-    cityVillage?: string;
-    stateProvince?: string;
-    country?: string;
-    postalCode?: string;
-  };
   identifiers: {
     [identifierFieldName: string]: PatientIdentifierValue;
   };
@@ -189,6 +181,9 @@ export interface FormValues {
   };
   obs?: {
     [conceptUuid: string]: string;
+  };
+  address: {
+    [addressField: string]: string;
   };
 }
 

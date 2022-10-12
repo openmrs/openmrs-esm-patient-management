@@ -5,7 +5,8 @@ import { ComboInput } from '../../input/combo-input/combo-input.component';
 import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { useConfig } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import AddressSearchComponent from './address-search.component';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -32,9 +33,13 @@ export const AddressHierarchy: React.FC = () => {
   const config = useConfig();
   const {
     fieldConfigurations: {
-      address: { useAddressHierarchy },
+      address: {
+        useAddressHierarchy: { enabled, useQuickSearch, searchAddressByLevel },
+      },
     },
   } = config;
+
+  const layout = useLayoutType();
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
@@ -54,17 +59,16 @@ export const AddressHierarchy: React.FC = () => {
         t('postalCode', 'Postal code')
         t('address1', 'Address line 1')
         t('address2', 'Address line 2')
+        t('countyDistrict', 'District')
         t('stateProvince', 'State')
         t('cityVillage', 'city')
         t('country', 'Country')
         t('countyDistrict', 'District')
       */
-      const labelText = t(name, label);
       const value = getFieldValue(name, elementDefaults);
       return {
         id: name,
         name,
-        labelText,
         value,
       };
     });
@@ -85,30 +89,46 @@ export const AddressHierarchy: React.FC = () => {
       <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
       <div
         style={{
-          width: '50%',
           paddingBottom: '5%',
         }}>
-        {useAddressHierarchy
-          ? addressLayout.map((attributes, index) => (
-              <ComboInput
-                key={`combo_input_${index}`}
-                name={`address.${attributes.name}`}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))
-          : addressLayout.map((attributes, index) => (
-              <Input
-                key={`combo_input_${index}`}
-                name={`address.${attributes.name}`}
-                labelText={t(attributes.name)}
-                id={attributes.name}
-                setSelectedValue={setSelectedValue}
-                selected={selected}
-              />
-            ))}
+        {enabled ? (
+          <>
+            {useQuickSearch && <AddressSearchComponent addressLayout={addressLayout} />}
+            {addressLayout.map((attributes, index) =>
+              searchAddressByLevel ? (
+                <ComboInput
+                  key={`combo_input_${index}`}
+                  textFieldName={attributes.name}
+                  name={`address.${attributes.name}`}
+                  labelText={t(attributes.name)}
+                  id={attributes.name}
+                  setSelectedValue={setSelectedValue}
+                  selected={selected}
+                />
+              ) : (
+                <Input
+                  key={`combo_input_${index}`}
+                  name={`address.${attributes.name}`}
+                  labelText={t(attributes.name)}
+                  id={attributes.name}
+                  setSelectedValue={setSelectedValue}
+                  selected={selected}
+                />
+              ),
+            )}
+          </>
+        ) : (
+          addressLayout.map((attributes, index) => (
+            <Input
+              key={`combo_input_${index}`}
+              name={`address.${attributes.name}`}
+              labelText={t(attributes.name)}
+              id={attributes.name}
+              setSelectedValue={setSelectedValue}
+              selected={selected}
+            />
+          ))
+        )}
       </div>
     </div>
   );
