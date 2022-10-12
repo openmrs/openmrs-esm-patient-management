@@ -69,7 +69,17 @@
     min-height: none;
   }
 }
-
+.appointmentButton {
+  max-width: 18rem;
+  margin-right: spacing.$spacing-05;
+  height: spacing.$spacing-07;
+  min-height: 0;
+  input {
+    background-color: $ui-02;
+    height: spacing.$spacing-07;
+    min-height: none;
+  }
+}
 .tableToolBarContent {
   height: spacing.$spacing-07;
 

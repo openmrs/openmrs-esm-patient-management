@@ -278,6 +278,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                 />
                 <Button
                   kind="secondary"
+                  className={styles.appointmentButton}
                   style={{ minHeight: 0 }}
                   renderIcon={(props) => <Add size={16} {...props} />}
                   onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
