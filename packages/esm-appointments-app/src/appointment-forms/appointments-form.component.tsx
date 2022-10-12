@@ -209,13 +209,15 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       {isLoading ? (
         <SkeletonText />
       ) : (
-        <ExtensionSlot
-          extensionSlotName="patient-header-slot"
-          state={{
-            patient,
-            patientUuid: appointmentState.patientUuid,
-          }}
-        />
+        <div className={styles.stickyFormHeader}>
+          <ExtensionSlot
+            extensionSlotName="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: appointmentState.patientUuid,
+            }}
+          />
+        </div>
       )}
 
       <div className={styles.childRow}>
