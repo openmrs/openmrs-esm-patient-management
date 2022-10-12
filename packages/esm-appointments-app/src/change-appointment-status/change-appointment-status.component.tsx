@@ -29,7 +29,7 @@ const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> 
   const [selectedStatus, setSelectedStatus] = useState(status);
   const startDate = useAppointmentDate();
   const appointmentStatus = [
-    { display: t('checkedIn', 'CheckedIn'), value: 'CheckedIn' },
+    { display: t('checkIn', 'Check In'), value: 'CheckedIn' },
     { display: t('missed', 'Missed'), value: 'Missed' },
     { display: t('completed', 'Completed'), value: 'Completed' },
   ];

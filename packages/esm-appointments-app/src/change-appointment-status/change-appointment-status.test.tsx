@@ -11,7 +11,7 @@ const testProps = {
   closeModal: () => false,
 };
 
-const selectedStatus = 'CheckedIn';
+const selectedStatus = 'Cancelled';
 
 const mockShowToast = showToast as jest.Mock;
 const mockChangeAppointmentStatus = changeAppointmentStatus as jest.Mock;
@@ -53,7 +53,6 @@ describe('Change appointment status', () => {
     expect(screen.getByText(/start time/i)).toBeInTheDocument();
     expect(screen.getByText(/30-Aug-2021, 03:35 PM/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /checkedin/i })));
     await waitFor(() => user.click(screen.getByRole('button', { name: /change status/i })));
 
     expect(mockShowToast).toHaveBeenCalledTimes(1);

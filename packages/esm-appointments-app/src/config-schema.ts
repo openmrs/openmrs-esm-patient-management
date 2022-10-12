@@ -19,7 +19,7 @@ export const configSchema = {
   appointmentKinds: {
     _type: Type.Array,
     _description: 'Configurable appointment kinds (types of appointments)',
-    _default: ['Scheduled', 'WalkIn', 'Virtual'],
+    _default: ['Scheduled'],
   },
   appointmentStatuses: {
     _type: Type.Array,

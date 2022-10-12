@@ -87,7 +87,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [frequency, setFrequency] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
   const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
-  const [selectedProvider, setSelectedProvider] = useState(session?.currentProvider?.uuid);
+  const [selectedProvider, setSelectedProvider] = useState(appointmentState.provider);
   const [reminder, setReminder] = useState('');
   const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
   const [reason, setReason] = useState('');
@@ -98,12 +98,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
   const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
-  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status);
+  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status ?? 'Scheduled');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
 
-  const isMissingRequirements = !selectedService || !appointmentKind.length;
+  const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
 
   const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
 
@@ -209,13 +209,15 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
       {isLoading ? (
         <SkeletonText />
       ) : (
-        <ExtensionSlot
-          extensionSlotName="patient-header-slot"
-          state={{
-            patient,
-            patientUuid: appointmentState.patientUuid,
-          }}
-        />
+        <div className={styles.stickyFormHeader}>
+          <ExtensionSlot
+            extensionSlotName="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: appointmentState.patientUuid,
+            }}
+          />
+        </div>
       )}
 
       <div className={styles.childRow}>
@@ -415,25 +417,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
             </SelectItem>
           ))}
       </Select>
-
-      <Select
-        id="appointmentStatus"
-        invalidText="Required"
-        labelText={t('selectAppointmentStatus', 'Select status')}
-        light
-        className={styles.inputContainer}
-        onChange={(event) => setAppointmentStatus(event.target.value)}
-        value={appointmentStatus}>
-        {!appointmentStatus || appointmentStatus == '--' ? (
-          <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
-        ) : null}
-        {appointmentStatuses?.length > 0 &&
-          appointmentStatuses.map((service) => (
-            <SelectItem key={service} text={service} value={service}>
-              {service}
-            </SelectItem>
-          ))}
-      </Select>
+      {context !== 'creating' && (
+        <Select
+          id="appointmentStatus"
+          invalidText="Required"
+          labelText={t('selectAppointmentStatus', 'Select status')}
+          light
+          className={styles.inputContainer}
+          onChange={(event) => setAppointmentStatus(event.target.value)}
+          value={appointmentStatus}>
+          {!appointmentStatus || appointmentStatus == '--' ? (
+            <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
+          ) : null}
+          {appointmentStatuses?.length > 0 &&
+            appointmentStatuses.map((service) => (
+              <SelectItem key={service} text={service} value={service}>
+                {service}
+              </SelectItem>
+            ))}
+        </Select>
+      )}
 
       <Select
         id="providers"

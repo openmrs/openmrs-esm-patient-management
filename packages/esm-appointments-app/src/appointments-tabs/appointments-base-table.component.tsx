@@ -218,7 +218,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
         content: (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-              {appointment.status === 'Scheduled' ? t('checkedIn', 'Checked In') : t('changeStatus', 'Change status')}
+              {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
             </Button>
 
             <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />

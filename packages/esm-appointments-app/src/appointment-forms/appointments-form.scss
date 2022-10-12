@@ -3,7 +3,13 @@
 @import '../root.scss';
 
 .formContainer {
-  margin: spacing.$spacing-05;
+  margin: 0 spacing.$spacing-05;
+}
+
+.stickyFormHeader {
+  position: sticky;
+  top: spacing.$spacing-09;
+  z-index: 10;
 }
 
 .row {

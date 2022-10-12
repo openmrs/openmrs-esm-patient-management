@@ -88,7 +88,6 @@ describe('AppointmentForm', () => {
       'start-time-picker',
       'end-time-picker',
       'appointmentKind',
-      'appointmentStatus',
       'providers',
       'facility',
       'community',
