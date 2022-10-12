@@ -102,9 +102,7 @@ const ScheduledVisits: React.FC<{
 
       const service = head(services)?.uuid;
       const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-      if (!priority) {
-        setPriority([...priorities].shift().uuid);
-      }
+      const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
 
       const abortController = new AbortController();
       if (currentVisit) {
@@ -130,7 +128,7 @@ const ScheduledVisits: React.FC<{
                       uuid: status,
                     },
                     priority: {
-                      uuid: priority,
+                      uuid: priority ? priority : defaultPriority,
                     },
                     queue: {
                       uuid: service,
