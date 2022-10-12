@@ -9,6 +9,8 @@ import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
 import CheckInAppointments from '../appointments-tabs/checkedinappointments.component';
+import { useAppointmentDate } from '../helpers';
+import dayjs from 'dayjs';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -19,6 +21,8 @@ enum AppointmentTypes {
 
 const AppointmentList: React.FC = () => {
   const { t } = useTranslation();
+  const startDate = useAppointmentDate();
+  const isToday = dayjs(new Date(startDate)).isSame(new Date(), 'date');
   const [selectedTab, setSelectedTab] = useState(0);
   return (
     <div className={styles.appointmentList}>
@@ -30,7 +34,7 @@ const AppointmentList: React.FC = () => {
           <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
-          <Tab>{t('checkedIn', 'CheckedIn')}</Tab>
+          <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
           <Button
             className={styles.calendarButton}
             kind="primary"
@@ -49,7 +53,9 @@ const AppointmentList: React.FC = () => {
             <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
+          {isToday && (
+            <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
+          )}
         </TabPanels>
       </Tabs>
     </div>
