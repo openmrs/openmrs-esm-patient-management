@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
@@ -46,6 +46,7 @@ import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../helpers/time';
+import { getWeeklyCalendarDistribution } from './workload-helper';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -103,8 +104,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
 
+  const weeklyDistribution = useMemo(
+    () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],
+    [appointmentStartDate, appointmentSummary],
+  );
   const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
-
   const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
 
   useEffect(() => {
@@ -383,7 +387,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
               )}
             </p>
             <div className={styles.workLoadCard}>
-              {appointmentSummary?.map(({ date, count }, index) => {
+              {weeklyDistribution?.map(({ date, count }, index) => {
                 return (
                   <WorkloadCard
                     onClick={() => setVisitDate(new Date(date))}
