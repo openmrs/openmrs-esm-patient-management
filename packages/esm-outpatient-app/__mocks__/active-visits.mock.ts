@@ -39,6 +39,10 @@ export const mockVisitQueueEntries = [
       patient: {
         uuid: 'cc75ad73-c24b-499c-8db9-a7ef4fc0b36d',
         display: '10000F1 - Eric Test Ric',
+        person: {
+          age: '32',
+          gender: 'F',
+        },
       },
       priority: {
         uuid: 'f9684018-a4d3-4d6f-9dd5-b4b1e89af3e7',
@@ -77,6 +81,10 @@ export const mockVisitQueueEntries = [
       patient: {
         uuid: '53568469-f652-470d-95e8-13131914286b',
         display: '10000JT - John Smith',
+        person: {
+          age: '27',
+          gender: 'M',
+        },
       },
       priority: {
         uuid: 'b6a84ad0-c5e6-4a37-896e-5b7a0bccfd6c',

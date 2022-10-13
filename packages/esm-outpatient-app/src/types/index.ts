@@ -326,6 +326,9 @@ export interface Provider {
 export interface MappedQueueEntry {
   id: string;
   name: string;
+  patientAge: string;
+  patientSex: string;
+  patientDob: string;
   patientUuid: string;
   priority: string;
   priorityComment: string;
