@@ -33,6 +33,7 @@ import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
 import VisitForm from '../patient-queue/visit-form/visit-form.component';
+import dayjs from 'dayjs';
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -216,17 +217,21 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
       },
       startButton: {
         content: (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-              {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
-            </Button>
+          <>
+            {dayjs(appointment.dateTime).format('DD-MM-YYYY') === dayjs(new Date()).format('DD-MM-YYYY') && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
+                  {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
+                </Button>
 
-            <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
-          </div>
+                <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
+              </div>
+            )}
+          </>
         ),
       },
     }));
-  }, [filteredRows, appointments, t]);
+  }, [filteredRows, appointments, t, tableHeading, handleAppointmentActionButtonClick]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
