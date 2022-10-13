@@ -41,12 +41,11 @@ describe('AppointmentList', () => {
     });
 
     const expectedTableRows = [
-      /John Wilson 30-Aug-2021, 12:35 PM Outpatient Dr James Cook HIV Clinic Check In open and close list of options/,
-      /Elon Musketeer 14-Sept-2021, 07:50 AM Outpatient -- HIV Clinic Check In open and close list of options/,
-      /Hopkins Derrick 14-Sept-2021, 12:50 PM Outpatient Dr James Cook TB Clinic Check In open and close list of options/,
-      /Amos Strong 15-Sept-2021, 01:32 PM Outpatient -- TB Clinic Check In open and close list of options/,
+      /John Wilson 30-Aug-2021, 12:35 PM Outpatient Dr James Cook HIV Clinic/,
+      /Elon Musketeer 14-Sept-2021, 07:50 AM Outpatient -- HIV Clinic/,
+      /Hopkins Derrick 14-Sept-2021, 12:50 PM Outpatient Dr James Cook TB Clinic/,
+      /Amos Strong 15-Sept-2021, 01:32 PM Outpatient -- TB Clinic/,
     ];
-
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
