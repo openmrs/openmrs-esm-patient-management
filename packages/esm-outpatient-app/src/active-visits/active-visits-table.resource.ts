@@ -8,6 +8,7 @@ import {
   parseDate,
   toDateObjectStrict,
   toOmrsIsoString,
+  updateVisit,
   useConfig,
   Visit,
 } from '@openmrs/esm-framework';
@@ -80,6 +81,8 @@ export interface MappedVisitQueueEntry {
   visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
+  visitLocation: string;
+  visitTypeUuid: string;
   waitTime: string;
   queueUuid: string;
   queueEntryUuid: string;
@@ -201,6 +204,8 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
       : '--',
     visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
     visitType: visitQueueEntry.visit?.visitType?.display,
+    visitLocation: visitQueueEntry.visit?.location?.uuid,
+    visitTypeUuid: visitQueueEntry.visit?.visitType?.uuid,
     visitUuid: visitQueueEntry.visit?.uuid,
     queueUuid: visitQueueEntry.queueEntry.queue.uuid,
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
@@ -263,7 +268,7 @@ export async function updateQueueEntry(
   });
 }
 
-async function endPatientStatus(
+export async function endPatientStatus(
   previousQueueUuid: string,
   abortController: AbortController,
   queueEntryUuid: string,
