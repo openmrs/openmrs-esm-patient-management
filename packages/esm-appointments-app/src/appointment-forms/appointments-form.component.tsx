@@ -46,7 +46,7 @@ import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../helpers/time';
-import { getWeelyCalendarDistribution } from './workload-helper';
+import { getWeeklyCalendarDistribution } from './workload-helper';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -104,14 +104,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, pat
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate?.toString(), selectedService);
 
-  const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
   const weeklyDistribution = useMemo(
-    () =>
-      (getWeelyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary as Array<any>) as Array<any>) ??
-      [],
+    () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],
     [appointmentStartDate, appointmentSummary],
   );
-
+  const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
   const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
 
   useEffect(() => {
