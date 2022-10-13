@@ -53,7 +53,7 @@ interface AppointmentFormProps {
   patientUuid?: string;
   context: string;
 }
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment = {}, patientUuid, context }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientUuid, context }) => {
   const initialState = {
     patientUuid,
     dateTime: undefined,
