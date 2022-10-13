@@ -102,7 +102,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status ?? 'Scheduled');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
-  const appointmentSummary = useAppointmentSummary(visitDate.toString(), selectedService);
+  const appointmentSummary = useAppointmentSummary(visitDate, selectedService);
 
   const weeklyDistribution = useMemo(
     () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],

@@ -59,10 +59,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
   });
 };
 
-export const useAppointmentSummary = (
-  fromDate: string,
-  serviceUuid: string,
-): Array<{ date: string; count: number }> => {
+export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Array<{ date: string; count: number }> => {
   const startDate = dayjs(fromDate).startOf('week').format(omrsDateFormat);
   const endDate = dayjs(startDate).add(2, 'week').format(omrsDateFormat);
   const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
