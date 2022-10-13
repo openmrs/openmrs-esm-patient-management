@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useAddressHierarchy } from '../../patient-registration.resource';
 import { Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +11,24 @@ interface AddressSearchComponentProps {
 
 const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ addressLayout }) => {
   const { t } = useTranslation();
+  const seprator = ', ';
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const [searchString, setSearchString] = useState<string>('');
   const { addresses, isLoading, error } = useAddressHierarchy(searchString);
+  const addressOptions: Array<string> = useMemo(() => {
+    const options: Set<string> = new Set();
+    addresses.forEach((address) => {
+      const values = address.split(seprator);
+      values.forEach((val, index) => {
+        if (val.toLowerCase().includes(searchString.toLowerCase())) {
+          options.add(values.slice(0, index + 1).join(seprator));
+        }
+      });
+    });
+    return [...options];
+  }, [addresses, searchString]);
+
   const { setFieldValue } = useFormikContext();
 
   const handleInputChange = (e) => {
@@ -23,9 +37,9 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
 
   const handleChange = (address) => {
     if (address) {
-      const values = address.split(', ');
-      addressLayout.map((address, index) => {
-        setFieldValue(`address.${address.name}`, values[index]);
+      const values = address.split(seprator);
+      values.map((value, index) => {
+        setFieldValue(`address.${addressLayout[index].name}`, value);
       });
       setSearchString('');
     }
@@ -67,10 +81,10 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
         value={searchString}
       />
       {/* </Layer> */}
-      {addresses.length > 0 && (
+      {addressOptions.length > 0 && (
         /* Since the input has a marginBottom of 1rem */
         <ul className={styles.suggestions}>
-          {addresses.map((address, index) => (
+          {addressOptions.map((address, index) => (
             <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
               key={index}
               onClick={(e) => handleChange(address)}>
