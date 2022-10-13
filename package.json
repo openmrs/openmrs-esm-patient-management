@@ -58,7 +58,6 @@
     "jest-environment-jsdom": "^28.1.0",
     "lerna": "^3.20.2",
     "openmrs": "latest",
-    "pinst": "^3.0.0",
     "prettier": "^2.4.1",
     "pretty-quick": "^2.0.2",
     "react": "^18.1.0",
