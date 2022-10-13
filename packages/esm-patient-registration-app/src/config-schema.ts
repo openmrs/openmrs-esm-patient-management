@@ -238,7 +238,7 @@ export const esmPatientRegistrationSchema = {
       useAddressHierarchy: {
         enabled: {
           _type: Type.Boolean,
-          _description: 'Whether to use the Address heirarchy in the registration form or not',
+          _description: 'Whether to use the Address hierarchy in the registration form or not',
           _default: true,
         },
         useQuickSearch: {
