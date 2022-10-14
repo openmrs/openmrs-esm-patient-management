@@ -13,6 +13,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: preactjs/compressed-size-action@v2
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          minimum-change-threshold: 100 # bytes
-          build-script: "turbo run build --color --no-cache"
+          build-script: "turbo run build --color"
