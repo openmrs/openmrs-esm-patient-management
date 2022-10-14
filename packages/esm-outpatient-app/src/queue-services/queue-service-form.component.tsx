@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Column, Form, Layer, Stack, TextInput, Select, SelectItem, TextArea, ButtonSet, Button } from '@carbon/react';
-import { showNotification, showToast, useLayoutType, useLocations } from '@openmrs/esm-framework';
+import { showNotification, showToast, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import styles from './queue-service.scss';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { SearchTypes } from '../types';
@@ -21,19 +21,26 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
   const [queueDescription, setQueueDescription] = useState('');
-  const [queueLocation, setQueueLocation] = useState('');
   const [isMissingAllFields, setMissingAllFields] = useState(false);
+  const [userLocation, setUserLocation] = useState('');
+  const session = useSession();
+
+  useEffect(() => {
+    if (!userLocation && session?.sessionLocation !== null) {
+      setUserLocation(session?.sessionLocation?.uuid);
+    }
+  }, [session, locations, userLocation]);
 
   const createQueue = useCallback(
     (event) => {
       event.preventDefault();
 
-      if (!queueName || !queueConcept || !queueDescription || !queueLocation) {
+      if (!queueName || !queueConcept || !queueDescription || !userLocation) {
         setMissingAllFields(true);
         return;
       }
       setMissingAllFields(false);
-      saveQueue(queueName, queueConcept, queueDescription, queueLocation, new AbortController()).then(
+      saveQueue(queueName, queueConcept, queueDescription, userLocation, new AbortController()).then(
         ({ status }) => {
           if (status === 201) {
             showToast({
@@ -42,7 +49,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               description: t('queueAddedSuccessfully', 'Queue addeded successfully'),
             });
             closePanel();
-            mutate(`/ws/rest/v1/queue?${queueLocation}`);
+            mutate(`/ws/rest/v1/queue?${userLocation}`);
           }
         },
         (error) => {
@@ -55,7 +62,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         },
       );
     },
-    [queueName, queueConcept, queueDescription, queueLocation, t, closePanel],
+    [queueName, queueConcept, queueDescription, userLocation, t, closePanel],
   );
 
   return (
@@ -113,10 +120,9 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               labelText={t('selectLocation', 'Select a location')}
               id="location"
               invalidText="Required"
-              value={queueLocation}
-              onChange={(event) => setQueueLocation(event.target.value)}
+              value={userLocation}
+              onChange={(event) => setUserLocation(event.target.value)}
               light>
-              {!queueLocation && <SelectItem text={t('selectLocation', 'Select a location')} />}
               {locations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
               {locations?.length > 0 &&
                 locations.map((location) => (
