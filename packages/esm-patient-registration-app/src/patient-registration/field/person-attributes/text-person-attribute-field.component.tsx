@@ -9,12 +9,14 @@ export interface TextPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
   validationRegex?: string;
   label?: string;
+  required?: boolean;
 }
 
 export function TextPersonAttributeField({
   personAttributeType,
   validationRegex,
   label,
+  required,
 }: TextPersonAttributeFieldProps) {
   const { t } = useTranslation();
 
@@ -42,6 +44,7 @@ export function TextPersonAttributeField({
               labelText={label ?? personAttributeType?.display}
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}
+              required={required}
             />
           );
         }}

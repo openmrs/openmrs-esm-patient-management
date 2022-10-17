@@ -22,6 +22,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
           personAttributeType={personAttributeType}
           validationRegex={fieldDefinition.validation.matches}
           label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
         />
       );
     case 'org.openmrs.Concept':
