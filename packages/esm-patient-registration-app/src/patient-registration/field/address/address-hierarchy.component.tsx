@@ -7,6 +7,7 @@ import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import AddressSearchComponent from './address-search.component';
+import isEmpty from 'lodash-es/isEmpty';
 
 export function getFieldValue(field: string, doc: XMLDocument) {
   const fieldElement = doc.getElementsByName(field)[0];
@@ -100,7 +101,11 @@ export const AddressHierarchy: React.FC = () => {
                   key={`combo_input_${index}`}
                   textFieldName={attributes.name}
                   name={`address.${attributes.name}`}
-                  labelText={t(attributes.name)}
+                  labelText={
+                    isEmpty(config.fieldConfigurations.address.useAddressHierarchy.useAddressHierarchyLabel)
+                      ? t(attributes.name)
+                      : config.fieldConfigurations.address.useAddressHierarchy.useAddressHierarchyLabel[attributes.name]
+                  }
                   id={attributes.name}
                   setSelectedValue={setSelectedValue}
                   selected={selected}

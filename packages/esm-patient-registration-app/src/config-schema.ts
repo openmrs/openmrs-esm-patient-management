@@ -253,6 +253,11 @@ export const esmPatientRegistrationSchema = {
             "Whether to fill the addresses by levels, i.e. County => subCounty, the current field is dependent on it's previous field.",
           _default: true,
         },
+        useAddressHierarchyLabel: {
+          _type: Type.Object,
+          _description: 'Whether to use custom labels for address hierarchy',
+          _default: {},
+        },
       },
     },
   },
