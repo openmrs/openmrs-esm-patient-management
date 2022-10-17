@@ -489,6 +489,19 @@ function ActiveVisitsTable() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.headerBtnContainer}>
+        <Button
+          size="sm"
+          kind="ghost"
+          renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          onClick={() => {
+            setShowOverlay(true);
+            setView(SearchTypes.QUEUE_SERVICE_FORM);
+          }}
+          iconDescription={t('addNewQueue', 'Add new queue')}>
+          {t('addNewService', 'Add new service')}
+        </Button>
+      </div>
       <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
         <Button
