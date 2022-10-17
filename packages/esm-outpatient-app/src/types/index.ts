@@ -343,3 +343,10 @@ export interface MappedQueueEntry {
   queueUuid: string;
   queueEntryUuid: string;
 }
+
+export interface EndVisitPayload {
+  location: string;
+  startDatetime: Date;
+  visitType: string;
+  stopDatetime: Date;
+}

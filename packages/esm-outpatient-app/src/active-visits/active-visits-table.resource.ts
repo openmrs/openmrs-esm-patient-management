@@ -263,7 +263,7 @@ export async function updateQueueEntry(
   });
 }
 
-async function endPatientStatus(
+export async function endPatientStatus(
   previousQueueUuid: string,
   abortController: AbortController,
   queueEntryUuid: string,
