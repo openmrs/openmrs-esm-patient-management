@@ -129,12 +129,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
     }
   }, [startDate, timeFormat, appointmentService, visitDate]);
 
-  useEffect(() => {
-    if (selectedLocation && session?.sessionLocation?.uuid) {
-      setSelectedLocation(session?.sessionLocation?.uuid);
-    }
-  }, [selectedLocation, session]);
-
   const handleSubmit = async () => {
     const [hours, minutes] = convertTime12to24(startDate, timeFormat);
     const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
