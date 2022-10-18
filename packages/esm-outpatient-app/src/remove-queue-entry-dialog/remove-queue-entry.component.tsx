@@ -9,12 +9,11 @@ import {
   showToast,
   toDateObjectStrict,
   toOmrsIsoString,
-  updateVisit,
   useVisit,
 } from '@openmrs/esm-framework';
-import { voidQueueEntry } from './remove-queue-entry.resource';
-import { first } from 'rxjs/operators';
+import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
 import { useSWRConfig } from 'swr';
+import { startOfDay } from '../constants';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;
@@ -25,6 +24,9 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
   const { t } = useTranslation();
   const { currentVisit } = useVisit(queueEntry.patientUuid);
   const { mutate } = useSWRConfig();
+  const abortController = new AbortController();
+
+  const { data: appointments } = useCheckedInAppointments(queueEntry.patientUuid, startOfDay, abortController);
 
   const removeQueueEntry = () => {
     const endCurrentVisitPayload = {
@@ -34,51 +36,25 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
       stopDatetime: new Date(),
     };
 
-    const abortController = new AbortController();
     const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
 
-    voidQueueEntry(queueEntry.queueUuid, abortController, queueEntry.queueEntryUuid, endedAt).then(({ status }) => {
-      if (status === 200) {
-        if (currentVisit) {
-          updateVisit(currentVisit.uuid, endCurrentVisitPayload, abortController)
-            .pipe(first())
-            .subscribe(
-              (response) => {
-                if (response.status === 200) {
-                  closeModal();
-                  mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-
-                  showToast({
-                    critical: true,
-                    kind: 'success',
-                    description: t(
-                      'queueEntryRemovedAndVisitEndedSuccessfully',
-                      `Queue entry removed and ${response?.data?.visitType?.display} ended successfully`,
-                    ),
-                    title: t('queueEntryRemoved', 'Queue entry removed'),
-                  });
-                }
-              },
-              (error) => {
-                showNotification({
-                  title: t('endVisitError', 'Error ending active visit'),
-                  kind: 'error',
-                  critical: true,
-                  description: error?.message,
-                });
-              },
-            );
-        } else {
-          closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-          showToast({
-            critical: true,
-            kind: 'success',
-            description: t('queueEntryRemovedSuccessfully', `Queue entry removed successfully`),
-            title: t('queueEntryRemoved', 'Queue entry removed'),
-          });
-        }
-      }
+    voidQueueEntry(
+      queueEntry.queueUuid,
+      abortController,
+      queueEntry.queueEntryUuid,
+      endedAt,
+      endCurrentVisitPayload,
+      queueEntry.visitUuid,
+      appointments,
+    ).then((response) => {
+      closeModal();
+      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+      showToast({
+        critical: true,
+        kind: 'success',
+        description: t('queueEntryRemovedSuccessfully', `Queue entry removed successfully`),
+        title: t('queueEntryRemoved', 'Queue entry removed'),
+      });
       (error) => {
         showNotification({
           title: t('removeQueueEntryError', 'Error removing queue entry'),
