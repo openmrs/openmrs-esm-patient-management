@@ -56,6 +56,7 @@ import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
 import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -357,6 +358,7 @@ function ActiveVisitsTable() {
         </div>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</span>
+          <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
           <Button
             size="sm"
             kind="secondary"

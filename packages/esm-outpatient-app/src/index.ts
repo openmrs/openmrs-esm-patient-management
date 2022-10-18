@@ -119,6 +119,13 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'clear-all-queue-entries',
+        load: getAsyncLifecycle(() => import('./clear-queue-entries-dialog/clear-queue-entries-dialog.component'), {
+          featureName: 'clear all queue entries and end visits',
+          moduleName,
+        }),
+      },
     ],
   };
 }
