@@ -1,8 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from '@carbon/react/icons';
+import { ArrowRight, Add } from '@carbon/react/icons';
 import styles from './metrics-header.scss';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, navigate } from '@openmrs/esm-framework';
+import { Button } from '@carbon/react';
+import { launchOverlay } from '../hooks/useOverlay';
+import AppointmentServices from '../admin/appointment-services/appointment-services.component';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -10,9 +13,22 @@ const MetricsHeader: React.FC = () => {
   return (
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
-      <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments/missed`}>
-        {t('seeMissedAppointments', 'See missed appointments')} <ArrowRight size={16} className={styles.viewListBtn} />
-      </ConfigurableLink>
+      <div className={styles.metricsContent}>
+        <Button
+          renderIcon={ArrowRight}
+          onClick={() => navigate({ to: `\${openmrsSpaBase}/appointments/missed` })}
+          kind="ghost">
+          {t('seeMissedAppointments', 'See missed appointments')}
+        </Button>
+        <Button
+          renderIcon={Add}
+          onClick={() =>
+            launchOverlay(t('createAppointmentService', 'Create appointment services'), <AppointmentServices />)
+          }
+          kind="ghost">
+          {t('createAppointmentService', 'Create appointment services')}
+        </Button>
+      </div>
     </div>
   );
 };
