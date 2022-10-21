@@ -1,16 +1,8 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
 import { AppointmentSummary, QueueServiceInfo } from '../types';
-import { getServiceCountByAppointmentType } from '../helpers/helpers';
-
-interface ConceptMetadataResponse {
-  setMembers: Array<{
-    display: string;
-    uuid: string;
-  }>;
-}
+import { startOfDay } from '../constants';
 
 export function useMetrics() {
   const metrics = { scheduled_appointments: 100, average_wait_time: 28, patients_waiting_for_service: 182 };
@@ -52,15 +44,13 @@ export function useServiceMetricsCount(service: string) {
 }
 
 export const useAppointmentMetrics = () => {
-  const startDate = dayjs(new Date().setHours(0, 0, 0, 0)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
-  const endDate = dayjs(new Date().setHours(23, 59, 59, 59)).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
+  const url = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=Scheduled`;
 
-  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
   const { data, error, mutate } = useSWR<{
     data: Array<AppointmentSummary>;
   }>(url, openmrsFetch);
 
-  const totalScheduledAppointments = getServiceCountByAppointmentType(data?.data ?? [], 'allAppointmentsCount');
+  const totalScheduledAppointments = data?.data.length ?? 0;
 
   return {
     isLoading: !data && !error,
