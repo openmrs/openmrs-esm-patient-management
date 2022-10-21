@@ -150,6 +150,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
       providerUuid: providerUuid,
+      providers: [{ uuid: providerUuid }],
       comments: appointmentComment,
       locationUuid: selectedLocation,
       patientUuid: appointmentState.patientUuid,
