@@ -6,6 +6,7 @@ import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
+import { RegistrationConfig } from '../../../config-schema';
 
 const containsNoNumbers = /^([^0-9]*)$/;
 
@@ -18,6 +19,11 @@ function checkNumber(value: string) {
 }
 
 export const NameField = () => {
+  const {
+    fieldConfigurations: {
+      name: { displayCapturePhoto },
+    },
+  } = useConfig() as RegistrationConfig;
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
   const { fieldConfigurations } = useConfig();
@@ -53,11 +59,13 @@ export const NameField = () => {
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
       <div className={styles.grid}>
-        <ExtensionSlot
-          className={styles.photoExtension}
-          extensionSlotName="capture-patient-photo-slot"
-          state={{ onCapturePhoto, initialState: currentPhoto }}
-        />
+        {displayCapturePhoto && (
+          <ExtensionSlot
+            className={styles.photoExtension}
+            extensionSlotName="capture-patient-photo-slot"
+            state={{ onCapturePhoto, initialState: currentPhoto }}
+          />
+        )}
 
         <div className={styles.nameField}>
           <div className={styles.dobContentSwitcherLabel}>

@@ -39,6 +39,7 @@ export interface RegistrationConfig {
       unidentifiedPatient: boolean;
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
+      displayCapturePhoto: boolean;
     };
     gender: Array<Gender>;
     address: {
@@ -190,6 +191,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.String,
         _default: 'UNKNOWN',
         _description: 'The family/last name to record for unidentified patients.',
+      },
+      displayCapturePhoto: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Whether to display capture patient photo slot on name field',
       },
     },
     gender: {
