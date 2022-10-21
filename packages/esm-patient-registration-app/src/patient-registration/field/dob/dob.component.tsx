@@ -92,7 +92,7 @@ export const DobField: React.FC = () => {
             name={yearsEstimated.name}
             light
             onChange={onEstimatedYearsChange}
-            labelText={t('estimatedYearsLabelText', 'Estimated Years')}
+            labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
             invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
             invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
             value={yearsEstimated.value}
@@ -105,7 +105,7 @@ export const DobField: React.FC = () => {
             name={monthsEstimated.name}
             light
             onChange={onEstimatedMonthsChange}
-            labelText={t('estimatedMonthsLabelText', 'Estimated Months')}
+            labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
             invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
             invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
             value={monthsEstimated.value}
