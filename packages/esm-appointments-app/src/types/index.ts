@@ -1,4 +1,5 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
+import { amPm } from '../helpers';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -44,17 +45,19 @@ export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
   description: string;
-  durationMins: string | null;
+  durationMins?: string | null;
   endTime: string;
   initialAppointmentStatus: string;
-  location?: OpenmrsResource | {};
+  location?: OpenmrsResource;
   maxAppointmentsLimit: number | null;
   name: string;
-  speciality: OpenmrsResource | {};
+  specialityUuid?: OpenmrsResource | {};
   startTime: string;
   uuid: string;
   serviceTypes?: Array<ServiceTypes>;
   color?: string;
+  startTimeTimeFormat?: amPm;
+  endTimeTimeFormat?: amPm;
 }
 
 export interface ServiceTypes {

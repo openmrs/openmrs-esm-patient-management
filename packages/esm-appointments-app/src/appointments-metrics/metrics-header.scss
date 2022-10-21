@@ -12,15 +12,20 @@
 }
 
 .metricsTitle {
-  @include type.type-style('heading-04');
-
+  // @include type.type-style('heading-04');
   color: $ui-05;
 }
 
 .link {
   text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
 .viewListBtn {
-  margin: spacing.$spacing-04 0 0 spacing.$spacing-03;
+  margin: 0 0 0 spacing.$spacing-03;
+}
+
+.metricsContent {
+  display: flex;
 }
