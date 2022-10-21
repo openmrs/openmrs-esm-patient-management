@@ -85,7 +85,7 @@ export const getAppointment = (appointment: Appointment) => {
     serviceUuid: appointment.service ? appointment.service.uuid : null,
     appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
     status: appointment.status,
-    provider: appointment.provider ? appointment.provider.person?.display : '--',
+    provider: appointment.providers ? appointment?.providers[0]?.name : '--',
     location: appointment.location ? appointment.location?.name : '--',
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,

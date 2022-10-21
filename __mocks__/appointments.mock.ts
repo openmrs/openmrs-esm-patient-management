@@ -42,7 +42,7 @@ export const mockAppointmentsData = {
       status: 'Scheduled',
       comments: 'Walk in appointments',
       additionalInfo: null,
-      providers: [],
+      providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
       recurring: false,
     },
     {
@@ -87,7 +87,7 @@ export const mockAppointmentsData = {
       status: 'Scheduled',
       comments: 'Some additional notes',
       additionalInfo: null,
-      providers: [],
+      providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
       recurring: false,
     },
     {
