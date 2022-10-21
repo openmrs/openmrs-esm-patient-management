@@ -12,7 +12,6 @@ jest.mock('../hooks/useClinicalMetrics', () => {
   return {
     ...originalModule,
     useClinicalMetrics: jest.fn().mockImplementation(() => ({
-      totalAppointments: mockAppointmentMetrics.totalAppointments,
       highestServiceLoad: mockAppointmentMetrics.highestServiceLoad,
       isLoading: mockAppointmentMetrics.isLoading,
       error: mockAppointmentMetrics.error,
@@ -21,6 +20,9 @@ jest.mock('../hooks/useClinicalMetrics', () => {
       totalProviders: mockProvidersCount.totalProviders,
       isLoading: mockProvidersCount.isLoading,
       error: mockProvidersCount.error,
+    })),
+    useScheduledAppointment: jest.fn().mockImplementation(() => ({
+      totalScheduledAppointments: mockAppointmentMetrics.totalAppointments,
     })),
   };
 });

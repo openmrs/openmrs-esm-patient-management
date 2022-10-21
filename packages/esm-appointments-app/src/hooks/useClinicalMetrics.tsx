@@ -49,3 +49,20 @@ export function useAllAppointmentsByDate() {
     mutate,
   };
 }
+
+export const useScheduledAppointment = () => {
+  const startDate = useAppointmentDate();
+  const url = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`;
+
+  const { data, error, mutate } = useSWR<{
+    data: Array<AppointmentSummary>;
+  }>(url, openmrsFetch);
+
+  const totalScheduledAppointments = data?.data.length ?? 0;
+
+  return {
+    isLoading: !data && !error,
+    error,
+    totalScheduledAppointments,
+  };
+};
