@@ -49,6 +49,13 @@ export interface RegistrationConfig {
         searchAddressByLevel: boolean;
       };
     };
+    dateOfBirth: {
+      useEstimatedDateOfBirth: {
+        enabled: boolean;
+        dayOfMonth: number;
+        month: number;
+      };
+    };
   };
   links: {
     submitButton: string;
@@ -263,6 +270,25 @@ export const esmPatientRegistrationSchema = {
           _type: Type.Object,
           _description: 'Whether to use custom labels for address hierarchy',
           _default: {},
+        },
+      },
+    },
+    dateOfBirth: {
+      useEstimatedDateOfBirth: {
+        enabled: {
+          _type: Type.Boolean,
+          _description: 'Whether to use custom day and month for estimated date of birth',
+          _default: false,
+        },
+        dayOfMonth: {
+          _type: Type.Number,
+          _description: 'The custom day of the month use on the estimated date of birth',
+          _default: 0,
+        },
+        month: {
+          _type: Type.Number,
+          _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan 11 = Dec',
+          _default: 0,
         },
       },
     },

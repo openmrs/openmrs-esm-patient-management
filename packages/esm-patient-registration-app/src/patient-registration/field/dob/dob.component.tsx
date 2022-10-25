@@ -5,8 +5,11 @@ import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
+import { useConfig } from '@openmrs/esm-framework';
+import { RegistrationConfig } from '../../../config-schema';
 
-const calcBirthdate = (yearDelta, monthDelta) => {
+const calcBirthdate = (yearDelta, monthDelta, dateOfBirth) => {
+  const { enabled, month, dayOfMonth } = dateOfBirth.useEstimatedDateOfBirth;
   const startDate = new Date();
   const resultMonth = new Date(startDate.getFullYear() - yearDelta, startDate.getMonth() - monthDelta, 1);
   const daysInResultMonth = new Date(resultMonth.getFullYear(), resultMonth.getMonth() + 1, 0).getDate();
@@ -15,11 +18,14 @@ const calcBirthdate = (yearDelta, monthDelta) => {
     resultMonth.getMonth(),
     Math.min(startDate.getDate(), daysInResultMonth),
   );
-  return resultDate;
+  return enabled ? new Date(resultDate.getFullYear(), month, dayOfMonth) : resultDate;
 };
 
 export const DobField: React.FC = () => {
   const { t } = useTranslation();
+  const {
+    fieldConfigurations: { dateOfBirth },
+  } = useConfig() as RegistrationConfig;
   const [dobUnknown] = useField('birthdateEstimated');
   const dobKnown = !dobUnknown.value;
   const [birthdate, birthdateMeta] = useField('birthdate');
@@ -45,7 +51,7 @@ export const DobField: React.FC = () => {
 
     if (!isNaN(years) && years < 140 && years >= 0) {
       setFieldValue('yearsEstimated', years);
-      setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value));
+      setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
     }
   };
 
@@ -54,7 +60,7 @@ export const DobField: React.FC = () => {
 
     if (!isNaN(months) && months <= 11 && months >= 0) {
       setFieldValue('monthsEstimated', months);
-      setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months));
+      setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
     }
   };
 
