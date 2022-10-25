@@ -4,6 +4,7 @@ import { Tag } from '@carbon/react';
 import { MappedAppointment } from '../types/index';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../hooks/usePatientAppointmentHistory';
+import { formatDate } from '@openmrs/esm-framework';
 
 interface AppointmentDetailsProps {
   appointment: MappedAppointment;
@@ -17,10 +18,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
     <div className={styles.container}>
       <div className="header">
         <p className={styles.title}>{appointment.serviceType}</p>
-        <p className={styles.subHeading}>{appointment.dateTime}</p>
-        <Tag type="red" size="sm" className={styles.tag}>
-          {t('missedAppointment', 'Missed appointment')}
-        </Tag>
+        <p className={styles.subHeading}>{formatDate(new Date(appointment.dateTime), { mode: 'standard' })}</p>
       </div>
       <section>
         <div>
