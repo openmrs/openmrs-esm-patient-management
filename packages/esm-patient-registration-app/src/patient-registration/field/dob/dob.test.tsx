@@ -9,6 +9,16 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { FormValues } from '../../patient-registration-types';
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    useConfig: jest.fn().mockImplementation(() => ({
+      fieldConfigurations: { dateOfBirth: { useEstimatedDateOfBirth: { enabled: true, dayOfMonth: 0, month: 0 } } },
+    })),
+  };
+});
+
 describe('Dob', () => {
   it('renders the fields in the birth section of the registration form', async () => {
     renderDob();
