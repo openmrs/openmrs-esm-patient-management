@@ -221,7 +221,10 @@ export async function deletePatientIdentifier(
   });
 }
 
-export function useAddressHierarchy(searchString): {
+export function useAddressHierarchy(
+  searchString,
+  separator,
+): {
   addresses: Array<string>;
   isLoading: boolean;
   error: Error;
@@ -235,7 +238,7 @@ export function useAddressHierarchy(searchString): {
     Error
   >(
     searchString
-      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=%2C%20&searchString=${searchString}`
+      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=${separator}&searchString=${searchString}`
       : null,
     openmrsFetch,
   );

@@ -11,18 +11,18 @@ interface AddressSearchComponentProps {
 
 const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ addressLayout }) => {
   const { t } = useTranslation();
-  const seprator = ', ';
+  const separator = ' > ';
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const [searchString, setSearchString] = useState<string>('');
-  const { addresses, isLoading, error } = useAddressHierarchy(searchString);
+  const { addresses, isLoading, error } = useAddressHierarchy(searchString, separator);
   const addressOptions: Array<string> = useMemo(() => {
     const options: Set<string> = new Set();
     addresses.forEach((address) => {
-      const values = address.split(seprator);
+      const values = address.split(separator);
       values.forEach((val, index) => {
         if (val.toLowerCase().includes(searchString.toLowerCase())) {
-          options.add(values.slice(0, index + 1).join(seprator));
+          options.add(values.slice(0, index + 1).join(separator));
         }
       });
     });
@@ -37,9 +37,9 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
 
   const handleChange = (address) => {
     if (address) {
-      const values = address.split(seprator);
-      values.map((value, index) => {
-        setFieldValue(`address.${addressLayout[index].name}`, value);
+      const values = address.split(separator);
+      addressLayout.map(({ name }, index) => {
+        setFieldValue(`address.${name}`, values?.[index] ?? '');
       });
       setSearchString('');
     }
@@ -61,7 +61,6 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
 
   return (
     <div className={styles.autocomplete} ref={wrapper} style={{ marginBottom: '1rem' }}>
-      {/* <Layer> */}
       <Search
         onChange={handleInputChange}
         labelText={t('searchAddress', 'Search address')}
@@ -80,7 +79,6 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
         }
         value={searchString}
       />
-      {/* </Layer> */}
       {addressOptions.length > 0 && (
         /* Since the input has a marginBottom of 1rem */
         <ul className={styles.suggestions}>
