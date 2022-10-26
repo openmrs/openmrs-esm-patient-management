@@ -355,3 +355,7 @@ export const mockProvidersCount = {
   isLoading: false,
   error: null,
 };
+
+export const mockStartTime = {
+  startTime: '2022-10-03T00:00:00.000+0000',
+};
