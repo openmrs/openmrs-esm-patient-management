@@ -29,6 +29,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           description: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
         mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+        mutate(`/ws/rest/v1/queue-entry-metrics?service=Triage&status=Waiting`);
       },
       (error) => {
         showNotification({

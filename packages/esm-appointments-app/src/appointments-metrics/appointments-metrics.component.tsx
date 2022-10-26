@@ -1,17 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
+import { useAppointmentDate } from '../helpers';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
   const { highestServiceLoad, isLoading, error } = useClinicalMetrics();
   const { totalProviders, isLoading: loading } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment();
+  const startDate = useAppointmentDate();
+  const formattedStartDate = formatDatetime(parseDate(startDate), { mode: 'standard' });
 
   if (isLoading || loading) {
     return <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />;
@@ -34,8 +37,7 @@ const AppointmentsMetrics: React.FC = () => {
         <MetricsCard
           label={t(highestServiceLoad?.serviceName)}
           value={highestServiceLoad?.count ?? '--'}
-          // FIX: Strange translation string
-          headerLabel={t('highestServiceVolume', 'High volume Service.  today')}
+          headerLabel={t('highestServiceVolume', 'High volume Service : {time}', { time: formattedStartDate })}
           view="highVolume"
         />
         <MetricsCard

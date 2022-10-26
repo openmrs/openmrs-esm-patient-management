@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import AppointmentsMetrics from './appointments-metrics.component';
-import { mockAppointmentMetrics, mockProvidersCount } from '../../../../__mocks__/appointments.mock';
+import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '../../../../__mocks__/appointments.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
@@ -24,6 +24,9 @@ jest.mock('../hooks/useClinicalMetrics', () => {
     useScheduledAppointment: jest.fn().mockImplementation(() => ({
       totalScheduledAppointments: mockAppointmentMetrics.totalAppointments,
     })),
+    useAppointmentDate: jest.fn().mockImplementation(() => ({
+      startDate: mockStartTime.startTime,
+    })),
   };
 });
 
@@ -38,7 +41,6 @@ describe('Appointment metrics', () => {
     expect(screen.getAllByText(/view/i));
     expect(screen.getByText(/patients/i)).toBeInTheDocument();
     expect(screen.getByText(/16/i)).toBeInTheDocument();
-    expect(screen.getByText(/high volume service. today/i)).toBeInTheDocument();
     expect(screen.getByText(/providers available today/i)).toBeInTheDocument();
     expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
