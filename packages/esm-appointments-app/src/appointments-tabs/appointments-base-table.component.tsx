@@ -35,7 +35,9 @@ import CancelAppointment from '../appointment-forms/cancel-appointment.component
 import VisitForm from '../patient-queue/visit-form/visit-form.component';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isToday);
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -222,9 +224,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           <>
             {dayjs(appointment.dateTime).isSameOrAfter(new Date(), 'day') && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-                  {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
-                </Button>
+                {dayjs(appointment.dateTime).isToday() && (
+                  <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
+                    {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
+                  </Button>
+                )}
 
                 <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
               </div>
