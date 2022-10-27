@@ -22,6 +22,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  Dropdown,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
 import { ConfigurableLink, formatDatetime, parseDate, showModal } from '@openmrs/esm-framework';
@@ -124,7 +125,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
   }, [filter, filteredRows, appointments]);
 
   const handleServiceTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem.name);
+    setFilter(selectedItem?.display);
   };
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
@@ -195,7 +196,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     ],
     [t],
   );
-
+  const services = appointments.map(({ serviceType }) => ({ display: serviceType })) ?? [];
   const tableRows = useMemo(() => {
     return (filteredRows.length ? filteredRows : appointments)?.map((appointment, index) => ({
       ...appointment,
@@ -286,6 +287,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                   placeholder={t('searchAppointments', 'Search appointments')}
                   size="sm"
                   id="toolBarSearch"
+                />
+                <Dropdown
+                  style={{ width: '18rem' }}
+                  id="serviceFilter"
+                  initialSelectedItem={{ display: `${t('all', 'All')}` }}
+                  titleText={t('filterByServiceType', '')}
+                  label={t('filterByServiceType', '')}
+                  type="inline"
+                  items={[{ display: t('all', 'All') }, ...services]}
+                  itemToString={(item) => (item ? item.display : '')}
+                  onChange={(event) => handleServiceTypeChange(event)}
+                  size="sm"
                 />
                 <Button
                   kind="secondary"

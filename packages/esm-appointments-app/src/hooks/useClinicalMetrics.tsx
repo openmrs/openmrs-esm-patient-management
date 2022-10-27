@@ -12,9 +12,9 @@ import { omrsDateFormat } from '../constants';
 import uniqBy from 'lodash-es/uniqBy';
 
 export const useClinicalMetrics = () => {
-  const startDate = useAppointmentDate();
-  const endDate = dayjs(new Date(startDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const appointmentDate = useAppointmentDate();
+  const endDate = dayjs(new Date(appointmentDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
+  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${appointmentDate}&endDate=${endDate}`;
   const { data, error, mutate } = useSWR<{
     data: Array<AppointmentSummary>;
   }>(url, openmrsFetch);
