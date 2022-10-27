@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
-import { showNotification } from '@openmrs/esm-framework';
+import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { updateAppointmentStatus } from '../appointments-table.resource';
-import { showActionableNotification } from '../../hooks/useActionableNotification';
 import { handleUndoAction } from '../common';
 import { useSWRConfig } from 'swr';
 
@@ -30,7 +29,8 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
       showActionableNotification({
         critical: true,
         kind: 'success',
-        actionButtonLabel: 'Undo',
+        actionButtonLabel: t('undo', 'Undo'),
+        progressActionLabel: t('revertingAppointmentStatus', 'Reverting appointment status'),
         onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
         subtitle: t('appointmentSuccessfullyCheckedIn', 'It has been checked-in successfully'),
         title: t('appointmentCheckedIn', 'Appointment Checked-in'),
