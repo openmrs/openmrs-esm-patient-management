@@ -106,7 +106,7 @@
   "reasonForChanges": "Reason For Changes",
   "recentScheduledVisits": "{count, plural, one{{count} visit} other{{count} visits}} scheduled for +/- 7 days",
   "recentScheduledVisits_plural": "",
-  "revertingAppointmentStatus": "Reverting Appointment status",
+  "revertingAppointmentStatus": "Reverting appointment status",
   "save": "Save",
   "scheduled": "Scheduled",
   "scheduledAppointments": "Scheduled appointments",

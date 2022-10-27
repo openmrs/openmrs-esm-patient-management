@@ -42,7 +42,7 @@ export const handleUpdateStatus = async (
       subtitle: successDescription,
       title: successTitle,
       actionButtonLabel: t('undo', 'Undo'),
-      progressActionLabel: t('revertingAppointmentStatus', 'Reverting Appointment status'),
+      progressActionLabel: t('revertingAppointmentStatus', 'Reverting appointment status'),
       onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
     });
     mutate(`/ws/rest/v1/appointment/appointment/all`);

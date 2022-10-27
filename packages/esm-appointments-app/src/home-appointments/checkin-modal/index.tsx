@@ -30,7 +30,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
         critical: true,
         kind: 'success',
         actionButtonLabel: t('undo', 'Undo'),
-        progressActionLabel: t('revertingAppointmentStatus', 'Reverting Appointment status'),
+        progressActionLabel: t('revertingAppointmentStatus', 'Reverting appointment status'),
         onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
         subtitle: t('appointmentSuccessfullyCheckedIn', 'It has been checked-in successfully'),
         title: t('appointmentCheckedIn', 'Appointment Checked-in'),
