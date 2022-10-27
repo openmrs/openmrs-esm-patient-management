@@ -1,10 +1,5 @@
-import { showModal, showNotification, showToast } from '@openmrs/esm-framework';
+import { showModal, showNotification, showActionableNotification } from '@openmrs/esm-framework';
 import { updateAppointmentStatus, undoAppointmentStatus } from './appointments-table.resource';
-import {
-  closeActionableNotification,
-  showActionableNotification,
-  onClickUndo,
-} from '../hooks/useActionableNotification';
 
 export const launchCheckInAppointmentModal = (appointmentUuid: string) => {
   const dispose = showModal('check-in-appointment-modal', {
@@ -14,14 +9,11 @@ export const launchCheckInAppointmentModal = (appointmentUuid: string) => {
 };
 
 export const handleUndoAction = async (appointmentUuid, mutate) => {
-  onClickUndo();
   const abortController = new AbortController();
   const { status } = await undoAppointmentStatus(appointmentUuid, abortController);
   if (status === 200) {
-    closeActionableNotification();
     mutate(`/ws/rest/v1/appointment/appointment/all`);
   } else {
-    closeActionableNotification();
     showNotification({
       title: 'Error Undoing',
       kind: 'error',
@@ -39,6 +31,7 @@ export const handleUpdateStatus = async (
   successTitle: string,
   errorTitle: string,
   mutate,
+  t,
 ) => {
   const abortController = new AbortController();
   const { status } = await updateAppointmentStatus(toStatus, appointmentUuid, abortController);
@@ -48,7 +41,8 @@ export const handleUpdateStatus = async (
       kind: 'success',
       subtitle: successDescription,
       title: successTitle,
-      actionButtonLabel: 'Undo',
+      actionButtonLabel: t('undo', 'Undo'),
+      progressActionLabel: t('revertingAppointmentStatus', 'Reverting Appointment status'),
       onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
     });
     mutate(`/ws/rest/v1/appointment/appointment/all`);
@@ -75,5 +69,6 @@ export const handleComplete = (appointmentId, mutate, t) => {
     successTitle,
     errorTitle,
     mutate,
+    t,
   );
 };

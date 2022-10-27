@@ -40,6 +40,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
       successTitle,
       errorTitle,
       mutate,
+      t,
     );
   };
 
