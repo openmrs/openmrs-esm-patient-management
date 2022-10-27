@@ -89,6 +89,7 @@ export const getAppointment = (appointment: Appointment) => {
     location: appointment.location ? appointment.location?.name : '--',
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
+    providers: appointment.providers,
   };
   return formattedAppointment;
 };

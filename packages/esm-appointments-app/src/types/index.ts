@@ -117,6 +117,7 @@ export interface MappedAppointment {
   appointmentNumber: string;
   recurring?: boolean;
   uuid?: string;
+  providers?: Array<OpenmrsResource>;
 }
 
 export interface MappedHomeAppointment {
