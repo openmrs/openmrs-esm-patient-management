@@ -131,7 +131,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
 
   const handleSubmit = async () => {
     const [hours, minutes] = convertTime12to24(startDate, timeFormat);
-    const providerUuid = providers.find((provider) => provider.display === selectedProvider)?.uuid;
+    const providerUuid =
+      providers.find((provider) => provider.display === selectedProvider)?.uuid ?? appointment.providers[0].uuid;
     const startDatetime = new Date(
       dayjs(visitDate).year(),
       dayjs(visitDate).month(),
@@ -188,6 +189,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           });
           setIsSubmitting(false);
           mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
+          mutate(`/ws/rest/v1/appointment/all?forDate=${appointmentStartDate}`);
           closeOverlay();
         }
       },

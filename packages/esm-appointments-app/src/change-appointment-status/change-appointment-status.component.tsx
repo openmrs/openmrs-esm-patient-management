@@ -50,6 +50,8 @@ const ChangeAppointmentStatusModal: React.FC<ChangeAppointmentStatusModalProps> 
           });
           selectedStatus === 'CheckedIn' && navigate({ to: `\${openmrsSpaBase}/outpatient` });
           mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Complete`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
           closeModal();
         }
       })

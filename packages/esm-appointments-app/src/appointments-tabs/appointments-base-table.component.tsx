@@ -22,6 +22,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  Dropdown,
 } from '@carbon/react';
 import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
 import { ConfigurableLink, formatDatetime, parseDate, showModal } from '@openmrs/esm-framework';
@@ -35,7 +36,9 @@ import CancelAppointment from '../appointment-forms/cancel-appointment.component
 import VisitForm from '../patient-queue/visit-form/visit-form.component';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isSameOrAfter);
+dayjs.extend(isToday);
 
 interface AppointmentsProps {
   appointments: Array<MappedAppointment>;
@@ -122,7 +125,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
   }, [filter, filteredRows, appointments]);
 
   const handleServiceTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem.name);
+    setFilter(selectedItem?.display);
   };
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
@@ -193,7 +196,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
     ],
     [t],
   );
-
+  const services = appointments.map(({ serviceType }) => ({ display: serviceType })) ?? [];
   const tableRows = useMemo(() => {
     return (filteredRows.length ? filteredRows : appointments)?.map((appointment, index) => ({
       ...appointment,
@@ -222,9 +225,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           <>
             {dayjs(appointment.dateTime).isSameOrAfter(new Date(), 'day') && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-                  {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
-                </Button>
+                {dayjs(appointment.dateTime).isToday() && (
+                  <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
+                    {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
+                  </Button>
+                )}
 
                 <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
               </div>
@@ -282,6 +287,18 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                   placeholder={t('searchAppointments', 'Search appointments')}
                   size="sm"
                   id="toolBarSearch"
+                />
+                <Dropdown
+                  style={{ width: '18rem' }}
+                  id="serviceFilter"
+                  initialSelectedItem={{ display: `${t('all', 'All')}` }}
+                  titleText={t('filterByServiceType', '')}
+                  label={t('filterByServiceType', '')}
+                  type="inline"
+                  items={[{ display: t('all', 'All') }, ...services]}
+                  itemToString={(item) => (item ? item.display : '')}
+                  onChange={(event) => handleServiceTypeChange(event)}
+                  size="sm"
                 />
                 <Button
                   kind="secondary"
