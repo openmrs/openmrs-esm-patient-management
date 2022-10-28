@@ -18,6 +18,11 @@ import {
   TimePickerSelect,
   Toggle,
   SkeletonText,
+  Tab,
+  TabList,
+  Tabs,
+  TabPanel,
+  TabPanels,
 } from '@carbon/react';
 import {
   useLocations,
@@ -36,6 +41,7 @@ import {
   useServices,
   useAppointmentSummary,
   checkAppointmentConflict,
+  useMonthlyAppointmentSummary,
 } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
@@ -46,7 +52,7 @@ import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../helpers/time';
-import { getWeeklyCalendarDistribution } from './workload-helper';
+import { getMonthlyCalendarDistribution, getWeeklyCalendarDistribution } from './workload-helper';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -103,6 +109,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
   const appointmentSummary = useAppointmentSummary(visitDate, selectedService);
+  const appointmentMonthly = useMonthlyAppointmentSummary(visitDate, selectedService);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const monthlyDistribution = useMemo(
+    () => getMonthlyCalendarDistribution(new Date(appointmentStartDate), appointmentMonthly) ?? [],
+    [appointmentStartDate, appointmentMonthly],
+  );
 
   const weeklyDistribution = useMemo(
     () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],
@@ -372,30 +384,58 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       ) : null}
 
-      {appointmentSummary.length > 0 && (
+      {selectedService && (
         <div className={styles.workLoadContainer}>
           <>
             <p className={styles.workLoadTitle}>
               {t(
                 'serviceWorkloadTitle',
-                `${appointmentService.name} clinic work load on the week of ${dayjs(
-                  first(appointmentSummary).date,
+                `${appointmentService?.name} clinic work load on the week of ${dayjs(
+                  first(appointmentSummary)?.date ?? new Date(),
                 ).format('DD/MM')}`,
               )}
             </p>
-            <div className={styles.workLoadCard}>
-              {weeklyDistribution?.map(({ date, count }, index) => {
-                return (
-                  <WorkloadCard
-                    onClick={() => setVisitDate(new Date(date))}
-                    key={date}
-                    date={dayjs(date).format('DD/MM')}
-                    count={count}
-                    isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
-                  />
-                );
-              })}
-            </div>
+            <Tabs
+              selectedIndex={selectedTab}
+              onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
+              className={styles.tabs}>
+              <TabList style={{ paddingLeft: '1rem' }}>
+                <Tab>{t('weekly', 'WeeKly')}</Tab>
+                <Tab>{t('monthly', 'Monthly')}</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel style={{ padding: 0 }}>
+                  <div className={styles.workLoadCard}>
+                    {weeklyDistribution?.map(({ date, count }, index) => {
+                      return (
+                        <WorkloadCard
+                          onClick={() => setVisitDate(new Date(date))}
+                          key={date}
+                          date={dayjs(date).format('DD/MM')}
+                          count={count}
+                          isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
+                        />
+                      );
+                    })}
+                  </div>
+                </TabPanel>
+                <TabPanel style={{ padding: 0 }}>
+                  <div className={styles.monthlyWorkLoadCard}>
+                    {monthlyDistribution?.map(({ date, count }) => {
+                      return (
+                        <WorkloadCard
+                          onClick={() => setVisitDate(new Date(date))}
+                          key={date}
+                          date={dayjs(date).format('DD/MM')}
+                          count={count}
+                          isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
+                        />
+                      );
+                    })}
+                  </div>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </>
         </div>
       )}
