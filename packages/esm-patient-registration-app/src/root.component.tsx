@@ -46,6 +46,10 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
                 path=""
                 element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
               />
+            </Routes>
+          </BrowserRouter>
+          <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}`}>
+            <Routes>
               <Route
                 path="/patient/:patientUuid/edit"
                 element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
