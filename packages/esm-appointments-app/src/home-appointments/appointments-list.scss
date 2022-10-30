@@ -2,7 +2,7 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
-.homeAppointmentsContainer {
+.container {
   background-color: $ui-background;
   border: 1px solid $ui-03;
   width: 100%;
@@ -62,6 +62,7 @@
     margin-bottom: spacing.$spacing-02;
   }
 }
+
 .tableToolbar {
   min-height: 0;
   top: -22px;
@@ -71,19 +72,24 @@
   font-weight: 700;
   margin-right: spacing.$spacing-03;
 }
+
 .nameContainer {
   display: flex;
 }
+
 .serviceContainer {
   display: flex;
 }
+
 .identifier {
   font-weight: 700;
 }
+
 .actionButton {
   position: static;
   padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
 }
+
 .serviceColor {
   border-radius: 50%;
   margin-right: spacing.$spacing-03;
@@ -91,6 +97,7 @@
   height: spacing.$spacing-05;
   background-color: $support-02;
 }
+
 .pagination {
   overflow: hidden;
 }
@@ -145,8 +152,18 @@
   }
 }
 
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
 .desktopHeading,
 .tabletHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   text-align: left;
   text-transform: capitalize;
   margin-bottom: spacing.$spacing-05;
@@ -158,18 +175,14 @@
     &:after {
       content: '';
       display: block;
-      width: spacing.$spacing-07;
-      padding-top: spacing.$spacing-02;
+      width: 2rem;
+      padding-top: 3px;
       border-bottom: 0.375rem solid;
       @include brand-03(border-bottom-color);
     }
   }
 }
 
-.emptyHeading {
-  margin-left: spacing.$spacing-05;
-  margin-top: spacing.$spacing-05;
-}
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
@@ -177,8 +190,7 @@
 }
 
 .tile {
-  margin: auto;
-  width: fit-content;
+  text-align: center;
 }
 
 .tileContent {
@@ -186,9 +198,11 @@
   flex-direction: column;
   align-items: center;
 }
+
 .content {
-  @include type.type-style('heading-compact-02');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
+  margin-top: spacing.$spacing-05;
   margin-bottom: spacing.$spacing-03;
 }
 
@@ -242,6 +256,7 @@
 .filterLabelContainer {
   display: flex;
 }
+
 .filterLabel {
   background-color: $ui-02;
   padding: 0.02rem spacing.$spacing-05;

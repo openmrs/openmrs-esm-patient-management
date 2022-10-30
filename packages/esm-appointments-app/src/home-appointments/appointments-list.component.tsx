@@ -198,18 +198,18 @@ const AppointmentsBaseTable = () => {
 
   if (appointments?.length === 0) {
     return (
-      <div className={styles.homeAppointmentsContainer}>
-        <Layer>
+      <Layer className={styles.container}>
+        <Tile className={styles.tile}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4 className={styles.emptyHeading}>{t('todaysAppointments', "Today's Appointments")}</h4>
-          </div>
-          <Tile className={styles.tile}>
-            <EmptyDataIllustration />
+            <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
             <AddAppointmentLink />
-            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-          </Tile>
-        </Layer>
-      </div>
+          </div>
+          <EmptyDataIllustration />
+          <p className={styles.content}>
+            {t('noAppointmentsToDisplay', 'There are no appointments to display for this location')}.
+          </p>
+        </Tile>
+      </Layer>
     );
   }
 
