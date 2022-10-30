@@ -85,7 +85,7 @@
   "missingVisitType": "Missing visit type",
   "monthly": "Monthly",
   "name": "Name",
-  "noAppointmentsToDisplay": "No appointments to display",
+  "noAppointmentsToDisplay": "There are no appointments to display for this location",
   "noEncountersFound": "No encounters found",
   "noMatchingVisitTypeFound": "",
   "noPreviousVisitFound": "No previous visit found",
