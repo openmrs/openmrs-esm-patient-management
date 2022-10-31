@@ -367,8 +367,8 @@ function ActiveVisitsTable() {
               setShowOverlay(true);
               setView('');
             }}
-            iconDescription={t('addPatientList', 'Add patient to list')}>
-            {t('addPatientList', 'Add patient to list')}
+            iconDescription={t('addPatientToQueue', 'Add patient to queue')}>
+            {t('addPatientToQueue', 'Add patient to queue')}
           </Button>
         </div>
         <DataTable
@@ -507,12 +507,12 @@ function ActiveVisitsTable() {
       <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
         <Button
-          iconDescription={t('addPatientToList', 'Add patient to list')}
+          iconDescription={t('addPatientToQueue', 'Add patient to queue')}
           kind="secondary"
           onClick={() => setShowOverlay(true)}
           renderIcon={(props) => <Add size={16} {...props} />}
           size="sm">
-          {t('addPatientList', 'Add patient to list')}
+          {t('addPatientToQueue', 'Add patient to queue')}
         </Button>
       </div>
       <div className={styles.tileContainer}>
@@ -523,7 +523,7 @@ function ActiveVisitsTable() {
             size="sm"
             renderIcon={(props) => <Add size={16} {...props} />}
             onClick={() => setShowOverlay(true)}>
-            {t('addPatientToList', 'Add patient to list')}
+            {t('addPatientToQueue', 'Add patient to queue')}
           </Button>
         </Tile>
       </div>
