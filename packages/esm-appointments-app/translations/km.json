@@ -1,7 +1,7 @@
 {
   "addNewAppointment": "បន្ថែមការណាត់ជួបថ្មី",
   "addNewClinicDay": "បន្ថែមថ្ងៃគ្លីនិកថ្មី",
-  "anotherVisitType": "ចាប់ផ្តើមប្រភេទជំងឺថ្មីផ្សេងទៀត",
+  "anotherVisitType": "ចាប់ផ្តើមប្រភេទពិនិត្យជំងឺផ្សេងៗទៀត",
   "appointmentCancelError": "កំហុសក្នុងការបោះបង់ការណាត់ជួប",
   "appointmentCancelled": "ការណាត់ជួបត្រូវបានលុបចោល",
   "appointmentDateAndTime": "កាលបរិច្ឆេទ និងពេលវេលាណាត់ជួប",
@@ -34,7 +34,7 @@
   "completedAppointments": "បានបញ្ចប់ការណាត់ជួប",
   "daily": "ប្រចាំថ្ងៃ",
   "date": "កាលបរិច្ឆេទ",
-  "dateTime": "ពេល​ណាត់ជួប",
+  "dateTime": "កាលបរិច្ឆេទ និងពេល​ណាត់ជួប",
   "day": "ថ្ងៃ",
   "defaulters": "លំនាំដើម",
   "discard": "បោះបង់",
@@ -55,8 +55,8 @@
   "highestServiceVolume": "សេវាច្រើនខ្លាំងថ្ងៃនេះ",
   "loading": "កំពុង​ផ្ទុក...",
   "location": "ទីតាំង",
-  "lostToFollowUp": "ចាញ់ដើម្បីតាមដាន",
-  "lostToFollowupAppointments": "បាត់បង់ដើម្បីតាមដានការណាត់ជួប",
+  "lostToFollowUp": "បាត់មកធ្វើការតាមដាន",
+  "lostToFollowupAppointments": "បាត់មកធ្វើការតាមដាន តាមការណាត់ជួប",
   "medications": "ថ្នាំ",
   "missed": "ខកខាន",
   "missedAppointment": "ខកខានការណាត់ជួប",
@@ -100,7 +100,7 @@
   "time": "ពេលវេលា",
   "upcoming": "នាពេលខាងមុខ",
   "view": "ពិនិត្យមើល",
-  "viewCalendar": "មើលប្រតិទិន",
+  "viewCalendar": "ពិនិត្យមើលប្រតិទិន",
   "vitals": "សញ្ញាជីវិត",
   "weekly": "ប្រចាំសប្តាហ៍"
 }
