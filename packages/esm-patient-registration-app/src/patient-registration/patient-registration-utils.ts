@@ -1,4 +1,4 @@
-import { navigate, openmrsFetch } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 import * as Yup from 'yup';
 import {
   AddressValidationSchemaType,
