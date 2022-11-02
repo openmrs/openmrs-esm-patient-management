@@ -358,18 +358,7 @@ function ActiveVisitsTable() {
         </div>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</span>
-          <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
-          <Button
-            size="sm"
-            kind="secondary"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            onClick={() => {
-              setShowOverlay(true);
-              setView('');
-            }}
-            iconDescription={t('addPatientToQueue', 'Add patient to queue')}>
-            {t('addPatientToQueue', 'Add patient to queue')}
-          </Button>
+          <div className={styles.headerButtons}></div>
         </div>
         <DataTable
           data-floating-menu-container
@@ -400,12 +389,24 @@ function ActiveVisitsTable() {
                   <Layer>
                     <TableToolbarSearch
                       className={styles.search}
-                      expanded
                       onChange={onInputChange}
                       placeholder={t('searchThisList', 'Search this list')}
                       size="sm"
                     />
                   </Layer>
+                  <Button
+                    size="sm"
+                    kind="secondary"
+                    className={styles.addPatientToListBtn}
+                    renderIcon={(props) => <Add size={16} {...props} />}
+                    onClick={() => {
+                      setShowOverlay(true);
+                      setView('');
+                    }}
+                    iconDescription={t('addPatientToQueue', 'Add patient to queue')}>
+                    {t('addPatientToQueue', 'Add patient to queue')}
+                  </Button>
+                  <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
                 </TableToolbarContent>
               </TableToolbar>
               <Table {...getTableProps()} className={styles.activeVisitsTable}>
