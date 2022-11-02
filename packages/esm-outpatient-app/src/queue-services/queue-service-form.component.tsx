@@ -50,6 +50,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
             });
             closePanel();
             mutate(`/ws/rest/v1/queue?${userLocation}`);
+            mutate(`/ws/rest/v1/queue?location=${userLocation}`);
           }
         },
         (error) => {
