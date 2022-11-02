@@ -11,7 +11,7 @@ import {
 } from './offline.resources';
 import { SavePatientForm } from './patient-registration/form-manager';
 import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
 export interface RootProps extends PatientRegistrationProps, Resources {
   savePatientForm: SavePatientForm;
@@ -20,9 +20,12 @@ export interface RootProps extends PatientRegistrationProps, Resources {
 
 export default function Root({ savePatientForm, isOffline }: RootProps) {
   const currentSession = useSession();
-  const { data: addressTemplate } = useSWR('patientRegistrationAddressTemplate', fetchAddressTemplate);
-  const { data: relationshipTypes } = useSWR('patientRegistrationRelationshipTypes', fetchAllRelationshipTypes);
-  const { data: identifierTypes } = useSWR(
+  const { data: addressTemplate } = useSWRImmutable('patientRegistrationAddressTemplate', fetchAddressTemplate);
+  const { data: relationshipTypes } = useSWRImmutable(
+    'patientRegistrationRelationshipTypes',
+    fetchAllRelationshipTypes,
+  );
+  const { data: identifierTypes } = useSWRImmutable(
     'patientRegistrationPatientIdentifiers',
     fetchPatientIdentifierTypesWithSources,
   );
@@ -40,7 +43,7 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
             identifierTypes,
             currentSession,
           }}>
-          <BrowserRouter basename={window['getOpenmrsSpaBase']()}>
+          <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}`}>
             <Routes>
               <Route
                 path="patient-registration"

@@ -41,7 +41,6 @@ describe('Appointment metrics', () => {
     expect(screen.getAllByText(/view/i));
     expect(screen.getByText(/patients/i)).toBeInTheDocument();
     expect(screen.getByText(/16/i)).toBeInTheDocument();
-    expect(screen.getByText(/providers available/i)).toBeInTheDocument();
     expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
 });
