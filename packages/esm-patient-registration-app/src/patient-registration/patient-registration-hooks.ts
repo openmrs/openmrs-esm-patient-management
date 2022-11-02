@@ -118,7 +118,7 @@ export function useInitialAddressFieldValues(patientUuid: string, fallback = {})
       if (patient) {
         setInitialAddressFieldValues({
           ...initialAddressFieldValues,
-          ...getAddressFieldValuesFromFhirPatient(patient),
+          address: getAddressFieldValuesFromFhirPatient(patient),
         });
       } else if (!isLoading && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
