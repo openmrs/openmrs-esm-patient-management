@@ -4,11 +4,11 @@ import { useAppointments } from './appointments-table.resource';
 import AppointmentsBaseTable from './appointments-base-table.component';
 import { AppointmentTypes } from '../types';
 
-interface CompletedAppointmentsProps {
+interface HonouredAppointmentsProps {
   status: string;
 }
 
-const CompletedAppointments: React.FC<CompletedAppointmentsProps> = ({ status }) => {
+const HonouredAppointments: React.FC<HonouredAppointmentsProps> = ({ status }) => {
   const { t } = useTranslation();
   const { appointments, isLoading } = useAppointments(status);
 
@@ -23,4 +23,4 @@ const CompletedAppointments: React.FC<CompletedAppointmentsProps> = ({ status })
   );
 };
 
-export default CompletedAppointments;
+export default HonouredAppointments;

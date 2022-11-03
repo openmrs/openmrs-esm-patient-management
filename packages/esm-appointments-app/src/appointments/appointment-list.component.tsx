@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import { Calendar } from '@carbon/react/icons';
-import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
+import HonouredAppointments from '../appointments-tabs/honoured-appointments.component';
 import CancelledAppointment from '../appointments-tabs/cancelled-appointments.component';
 import styles from './appointment-list.scss';
 import { navigate } from '@openmrs/esm-framework';
@@ -33,7 +33,7 @@ const AppointmentList: React.FC = () => {
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
           <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('cancelled', 'Cancelled')}</Tab>
-          <Tab>{t('completed', 'Completed')}</Tab>
+          <Tab>{t('honoured', 'Honoured')}</Tab>
           <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
           <Button
             className={styles.calendarButton}
@@ -52,7 +52,7 @@ const AppointmentList: React.FC = () => {
           <TabPanel style={{ padding: 0 }}>
             <CancelledAppointment status={AppointmentTypes.CANCELLED} />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
+          <TabPanel style={{ padding: 0 }}>{<HonouredAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
           {isToday && (
             <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
           )}
