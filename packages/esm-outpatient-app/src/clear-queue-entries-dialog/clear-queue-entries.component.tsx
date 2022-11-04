@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { Button } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
+import styles from './clear-queue-entries-dialog.scss';
 
 interface ClearQueueEntriesProps {
   visitQueueEntries: Array<MappedVisitQueueEntry>;
@@ -22,7 +23,8 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ visitQueueEntries
   return (
     <Button
       size="sm"
-      kind="danger"
+      kind="primary"
+      className={styles.clearBtn}
       renderIcon={(props) => <TrashCan size={16} {...props} />}
       onClick={launchClearAllQueueEntriesModal}
       iconDescription={t('clearQueue', 'Clear queue')}>
