@@ -18,6 +18,8 @@ import {
   TimePickerSelect,
   Toggle,
   SkeletonText,
+  Layer,
+  TextInput,
 } from '@carbon/react';
 import {
   useLocations,
@@ -73,6 +75,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { mutate } = useSWRConfig();
   const { appointmentKinds } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
+  const { appointmentComments } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
   const { patient, isLoading } = usePatient(patientUuid ?? appointmentState.patientUuid);
   const locations = useLocations();
@@ -472,27 +475,24 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </RadioButtonGroup>
       </div>
 
-      <TextArea
-        id="appointmentComment"
+      <Select
+        id="reason"
+        invalidText="Required"
+        labelText={t('reasonForChanges', 'Reason for change')}
         light
-        value={appointmentComment}
         className={styles.inputContainer}
-        labelText={t('appointmentNoteLabel', 'Write an additional note')}
-        placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
         onChange={(event) => setAppointmentComment(event.target.value)}
-      />
-
-      {context === 'editing' ? (
-        <TextArea
-          id="reason"
-          light
-          value={reason}
-          className={styles.inputContainer}
-          labelText={t('reasonForChanges', 'Reason For Changes')}
-          onChange={(event) => setReason(event.target.value)}
-        />
-      ) : null}
-
+        value={appointmentComment}>
+        {!appointmentComment || appointmentComment == '--' ? (
+          <SelectItem text={t('reasonForChanges', 'Reason for change')} value="" />
+        ) : null}
+        {appointmentComments?.length > 0 &&
+          appointmentComments.map((comments) => (
+            <SelectItem key={comments} text={comments} value={comments}>
+              {comments}
+            </SelectItem>
+          ))}
+      </Select>
       <ButtonSet>
         <Button onClick={closeOverlay} className={styles.button} kind="secondary">
           {t('discard', 'Discard')}
