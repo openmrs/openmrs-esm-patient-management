@@ -35,12 +35,11 @@ describe('Appointment metrics', () => {
     mockedOpenmrsFetch.mockResolvedValue({ data: mockAppointmentMetrics });
 
     renderAppointmentMetrics();
-
     expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     expect(screen.getAllByText(/view/i));
     expect(screen.getByText(/patients/i)).toBeInTheDocument();
-    expect(screen.getByText(/16/i)).toBeInTheDocument();
+    expect(screen.getByText(/0/i)).toBeInTheDocument();
     expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
 });

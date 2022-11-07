@@ -1,0 +1,153 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.tileContainer {
+  border: 0.0625rem solid $ui-03;
+  flex-grow: 1;
+  height: 7.875rem;
+  padding: 0 spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-03;
+}
+.tilelabelContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing.$spacing-03;
+}
+.testlabelContainer {
+  display: flex;
+  padding: 20px;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: spacing.$spacing-03;
+}
+.notArrived {
+  width: 53px;
+  height: 16px;
+  margin: 20px 17px 28px 43px;
+  font-family: Helvetica;
+  font-size: 10px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: 0.27px;
+  color: #525252;
+}
+.notArrivedNumber {
+  width: 21px;
+  height: 36px;
+  margin: 8px 17px 0 75px;
+  font-family: Helvetica;
+  font-size: 18px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 2;
+  letter-spacing: normal;
+  color: #da1e28;
+}
+
+.arrivedNumber {
+  width: 31px;
+  height: 36px;
+  margin: 8px 25px 0 12px;
+  font-family: Helvetica;
+  font-size: 18px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 2;
+  letter-spacing: normal;
+  color: #319227;
+}
+
+.arrived {
+  width: 34px;
+  height: 16px;
+  margin: 17px 25px 31px 9px;
+  font-family: Helvetica;
+  font-size: 10px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: 0.27px;
+  color: #525252;
+}
+.testtotalsValue {
+  @include type.type-style('heading-04');
+  color: $ui-05;
+}
+.secondtilelabelContainer {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  padding: 0 spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-03;
+}
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+// .totalsLabel {
+//   @include type.type-style('label-01');
+//   margin: 1px 25px 0 12px;
+//   color: $text-02;
+// }
+.totalsLabel {
+  width: 49px;
+  height: 16px;
+  font-family: IBMPlexSans;
+  font-size: 12px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: 0.32px;
+  color: #525252;
+}
+
+// .totalsValue {
+//   @include type.type-style('heading-04');
+//   margin: 2px 25px 0 12px;
+//   color: $ui-05;
+// }
+.totalsValue {
+  @include type.type-style('heading-04');
+  width: 48px;
+  height: 36px;
+  margin: 2px 25px 10px 12px;
+  font-family: IBMPlexSans;
+  font-size: 28px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.29;
+  letter-spacing: normal;
+  color: $ui-05;
+}
+.headerLabelContainer {
+  display: flex;
+  align-items: center;
+  height: spacing.$spacing-07;
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  align-items: flex-end;
+}
+
+.viewListBtn {
+  margin: spacing.$spacing-04 0 0 spacing.$spacing-03;
+}

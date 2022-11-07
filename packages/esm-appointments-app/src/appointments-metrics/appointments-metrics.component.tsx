@@ -7,6 +7,8 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 import { useAppointmentDate } from '../helpers';
+import MetricsCardScheduledAppt from './metric-card-scheduled-app.component';
+import { useActiveVisits } from '../hooks/useActiveVisits';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
@@ -14,6 +16,8 @@ const AppointmentsMetrics: React.FC = () => {
   const { totalProviders, isLoading: loading } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment();
   const startDate = useAppointmentDate();
+  const { activeVisits } = useActiveVisits();
+  var notArrived = totalScheduledAppointments - activeVisits;
   const formattedStartDate = formatDate(parseDate(startDate), { mode: 'standard', time: false });
 
   if (isLoading || loading) {
@@ -28,11 +32,15 @@ const AppointmentsMetrics: React.FC = () => {
     <>
       <MetricsHeader />
       <div className={styles.cardContainer}>
-        <MetricsCard
+        <MetricsCardScheduledAppt
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           view="patients"
+          arrivedLabel={t('arrived', 'Arrived')}
+          arrivedValue={activeVisits}
+          notArrivedLabel={t('notArrived', 'Not Arrived')}
+          notArrivedValue={notArrived}
         />
         <MetricsCard
           label={t(highestServiceLoad?.serviceName)}
