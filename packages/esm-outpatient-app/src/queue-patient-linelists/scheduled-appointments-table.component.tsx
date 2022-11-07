@@ -40,6 +40,11 @@ const AppointmentsTable: React.FC = () => {
       },
       {
         id: 5,
+        header: t('status', 'Status'),
+        key: 'status',
+      },
+      {
+        id: 6,
         header: t('phoneNumber', 'Phone Number'),
         key: 'phoneNumber',
       },
@@ -63,6 +68,7 @@ const AppointmentsTable: React.FC = () => {
           gender: appointment.patient?.gender,
           age: appointment.patient.age,
           visitType: appointment.appointmentKind,
+          status: appointment.status,
           phoneNumber: appointment.patient?.phoneNumber,
         };
       }),
