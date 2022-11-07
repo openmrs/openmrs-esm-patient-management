@@ -56,7 +56,7 @@ export function useAllAppointmentsByDate() {
 
 export const useScheduledAppointment = () => {
   const startDate = useAppointmentDate();
-  const url = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`;
+  const url = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
 
   const { data, error, mutate } = useSWR<{
     data: Array<AppointmentSummary>;
