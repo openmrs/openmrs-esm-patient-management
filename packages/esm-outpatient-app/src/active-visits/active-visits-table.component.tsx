@@ -57,6 +57,12 @@ import styles from './active-visits-table.scss';
 import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import {
+  updateSelectedServiceName,
+  updateSelectedServiceUuid,
+  useSelectedServiceName,
+  useSelectedServiceUuid,
+} from '../helpers/helpers';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -163,10 +169,8 @@ function ActiveVisitsTable() {
   const session = useSession();
   const locations = useLocations();
   const { services } = useServices(userLocation);
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-  const [filteredRows, setFilteredRows] = useState<Array<MappedVisitQueueEntry>>([]);
-  const [allEntries, setAllEntries] = useState(true);
-  const [filter, setFilter] = useState('');
+  const currentServiceName = useSelectedServiceName();
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const layout = useLayoutType();
@@ -181,22 +185,6 @@ function ActiveVisitsTable() {
       setUserLocation(first(locations)?.uuid);
     }
   }, [session, locations, userLocation]);
-
-  useEffect(() => {
-    if (filter) {
-      if (filter === 'All') {
-        setFilteredRows(visitQueueEntries);
-        setFilter('');
-        setAllEntries(true);
-      } else {
-        setFilteredRows(
-          visitQueueEntries?.filter((entry) => entry.service === filter && /waiting/i.exec(entry.status)),
-        );
-        setFilter('');
-        setAllEntries(false);
-      }
-    }
-  }, [filter, filteredRows, visitQueueEntries]);
 
   const tableHeaders = useMemo(
     () => [
@@ -262,8 +250,13 @@ function ActiveVisitsTable() {
     }
   };
 
+  const handleServiceChange = ({ selectedItem }) => {
+    updateSelectedServiceUuid(selectedItem.uuid);
+    updateSelectedServiceName(selectedItem.display);
+  };
+
   const tableRows = useMemo(() => {
-    return (filteredRows?.length || allEntries === false ? filteredRows : visitQueueEntries)?.map((entry) => ({
+    return visitQueueEntries?.map((entry) => ({
       ...entry,
       name: {
         content: (
@@ -306,11 +299,7 @@ function ActiveVisitsTable() {
         content: <span className={styles.statusContainer}>{formatWaitTime(entry.waitTime)}</span>,
       },
     }));
-  }, [filteredRows, visitQueueEntries]);
-
-  const handleServiceChange = ({ selectedItem }) => {
-    setFilter(selectedItem.display);
-  };
+  }, [visitQueueEntries]);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -376,9 +365,8 @@ function ActiveVisitsTable() {
                   <div className={styles.filterContainer}>
                     <Dropdown
                       id="serviceFilter"
-                      initialSelectedItem={{ display: `${t('all', 'All')}` }}
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-                      label={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+                      label={currentServiceName}
                       type="inline"
                       items={[{ display: `${t('all', 'All')}` }, ...services]}
                       itemToString={(item) => (item ? item.display : '')}

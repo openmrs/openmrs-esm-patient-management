@@ -65,14 +65,6 @@ describe('Appointment calendar view', () => {
     expect(screen.getByText(/clinical appointments/i)).toBeInTheDocument();
     expect(screen.getByText(/appointment list is empty/i)).toBeInTheDocument();
   });
-
-  it('renders a loading state when appointments data is being fetched', () => {
-    mockedOpenmrsFetch.mockRejectedValue({ data: [] });
-
-    renderAppointmentsCalendarListView();
-
-    expect(screen.queryByRole('progressbar')).toBeInTheDocument();
-  });
 });
 
 function renderAppointmentsCalendarListView() {

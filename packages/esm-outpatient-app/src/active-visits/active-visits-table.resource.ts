@@ -8,13 +8,13 @@ import {
   parseDate,
   toDateObjectStrict,
   toOmrsIsoString,
-  updateVisit,
   useConfig,
   Visit,
 } from '@openmrs/esm-framework';
 import last from 'lodash-es/last';
-import { MappedServiceQueueEntry, QueueEntryPayload, QueueServiceInfo } from '../types';
+import { MappedServiceQueueEntry, QueueServiceInfo } from '../types';
 import isEmpty from 'lodash-es/isEmpty';
+import { useTranslation } from 'react-i18next';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -90,6 +90,7 @@ export interface MappedVisitQueueEntry {
 
 interface UseVisitQueueEntries {
   visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+  visitQueueEntriesCount: number;
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
@@ -161,8 +162,9 @@ export function usePriority() {
   };
 }
 
-export function useVisitQueueEntries(): UseVisitQueueEntries {
+export function useVisitQueueEntries(currServiceName: string): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+  const { t } = useTranslation();
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -211,10 +213,19 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  let mappedVisitQueueEntries;
+
+  if (!currServiceName || currServiceName == t('all', 'All')) {
+    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  } else {
+    mappedVisitQueueEntries = data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((data) => data.service === currServiceName);
+  }
 
   return {
     visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    visitQueueEntriesCount: mappedVisitQueueEntries ? mappedVisitQueueEntries.length : 0,
     isLoading: !data && !error,
     isError: error,
     isValidating,
