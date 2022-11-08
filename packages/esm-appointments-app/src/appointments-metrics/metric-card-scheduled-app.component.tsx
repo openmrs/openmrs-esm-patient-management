@@ -52,7 +52,7 @@ const MetricsCardScheduledAppt: React.FC<MetricsCardScheduledApptProps> = ({
           <label className={styles.totalsLabel}>{label}</label>
           <p className={styles.totalsValue}>{value}</p>
         </div>
-        <div className={styles.testlabelContainer}>
+        <div className={styles.arrivedLabelContainer}>
           <div>
             <label className={styles.arrived}>{arrivedLabel}</label>
             <p className={styles.arrivedNumber}>{arrivedValue}</p>
