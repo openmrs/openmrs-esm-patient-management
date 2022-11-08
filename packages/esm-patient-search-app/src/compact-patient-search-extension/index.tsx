@@ -57,8 +57,21 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   const bannerContainerRef = useRef(null);
-  const inputRef = useRef(null);
-  const focussedResult = useArrowNavigation(patients?.length ?? 0, handlePatientSelection, -1);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFocusToInput = useCallback(() => {
+    var len = inputRef.current.value?.length ?? 0;
+    inputRef.current.setSelectionRange(len, len);
+    inputRef.current.focus();
+  }, [inputRef]);
+
+  const focussedResult = useArrowNavigation(
+    inputRef,
+    patients?.length ?? 0,
+    handlePatientSelection,
+    handleFocusToInput,
+    -1,
+  );
 
   useEffect(() => {
     if (bannerContainerRef.current && focussedResult > -1) {
@@ -69,10 +82,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         inline: 'nearest',
       });
     } else if (bannerContainerRef.current && inputRef.current && focussedResult === -1) {
-      bannerContainerRef.current.children?.[0]?.blur();
-      inputRef.current?.focus();
+      handleFocusToInput();
     }
-  }, [focussedResult, bannerContainerRef]);
+  }, [focussedResult, bannerContainerRef, handleFocusToInput]);
 
   return (
     <div className={styles.patientSearchBar}>

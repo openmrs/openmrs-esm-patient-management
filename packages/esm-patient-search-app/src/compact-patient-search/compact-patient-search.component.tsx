@@ -26,10 +26,16 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const showSearchResults = useMemo(() => !!searchTerm.trim(), [searchTerm]);
   const bannerContainerRef = useRef(null);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const config = useConfig();
   const patientSearchResponse = usePatientSearchInfinite(searchTerm, config.includeDead, showSearchResults);
   const { data: patients } = patientSearchResponse;
+
+  const handleFocusToInput = useCallback(() => {
+    var len = inputRef.current.value?.length ?? 0;
+    inputRef.current.setSelectionRange(len, len);
+    inputRef.current.focus();
+  }, [inputRef]);
 
   const handleCloseSearchResults = useCallback(() => {
     setSearchTerm('');
@@ -52,7 +58,13 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     },
     [config.search, selectPatientAction, patients, handleCloseSearchResults],
   );
-  const focussedResult = useArrowNavigation(patients?.length ?? 0, handlePatientSelection, -1);
+  const focussedResult = useArrowNavigation(
+    inputRef,
+    patients?.length ?? 0,
+    handlePatientSelection,
+    handleFocusToInput,
+    -1,
+  );
 
   useEffect(() => {
     if (bannerContainerRef.current && focussedResult > -1) {
@@ -63,10 +75,9 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         inline: 'nearest',
       });
     } else if (bannerContainerRef.current && inputRef.current && focussedResult === -1) {
-      bannerContainerRef.current.children?.[0]?.blur();
-      inputRef.current?.focus();
+      handleFocusToInput();
     }
-  }, [focussedResult, bannerContainerRef]);
+  }, [focussedResult, bannerContainerRef, handleFocusToInput]);
 
   const onSubmit = useCallback(
     (searchTerm) => {
