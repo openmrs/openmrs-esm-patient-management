@@ -40,7 +40,7 @@ describe('Clinic metrics', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Scheduled appts. today/i)).toBeInTheDocument();
+    expect(screen.getByText(/CheckedIn appts. today/i)).toBeInTheDocument();
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();
     expect(screen.getByText(/minutes/i)).toBeInTheDocument();
     expect(screen.getByText(/--/i)).toBeInTheDocument();
@@ -48,7 +48,6 @@ describe('Clinic metrics', () => {
     expect(screen.getAllByText(/patient list/i));
 
     // Select a different service to show metrics for
-    expect(screen.getByLabelText(/triage/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open menu/i }));
   });
 });

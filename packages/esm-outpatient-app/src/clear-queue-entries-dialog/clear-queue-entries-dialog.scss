@@ -1,8 +1,15 @@
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import '~carbon-components/src/globals/scss/mixins';
 
 #subHeading {
   @include carbon--type-style('productive-heading-01');
   color: $ui-05;
+}
+
+.clearBtn {
+  margin-left: spacing.$spacing-05;
+  height: spacing.$spacing-09;
+  border: 0.063rem solid #a2191f;
 }

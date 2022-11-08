@@ -2,14 +2,14 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
-import { useAppointments } from './queue-linelist.resource';
+import { useCheckedInAppointments } from './queue-linelist.resource';
 
 const pageSize = 20;
 
-const AppointmentsTable: React.FC = () => {
+const CheckedInAppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
-  const { appointmentQueueEntries, isLoading } = useAppointments();
-  const { results: paginatedAppointments } = usePagination(appointmentQueueEntries, pageSize);
+  const { checkedInAppointments, isLoading } = useCheckedInAppointments();
+  const { results: paginatedAppointments } = usePagination(checkedInAppointments, pageSize);
 
   const tableHeaders = useMemo(
     () => [
@@ -78,7 +78,7 @@ const AppointmentsTable: React.FC = () => {
   return (
     <div>
       <QueuePatientBaseTable
-        title={t('scheduledAppointmentsList', 'Scheduled appointments patient list')}
+        title={t('checkedInedAppointmentsList', 'CheckedIn appointments patient list')}
         headers={tableHeaders}
         rows={tableRows}
         patientData={paginatedAppointments}
@@ -89,4 +89,4 @@ const AppointmentsTable: React.FC = () => {
   );
 };
 
-export default AppointmentsTable;
+export default CheckedInAppointmentsTable;

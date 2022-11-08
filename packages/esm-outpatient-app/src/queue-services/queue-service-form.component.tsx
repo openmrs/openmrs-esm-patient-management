@@ -50,6 +50,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
             });
             closePanel();
             mutate(`/ws/rest/v1/queue?${userLocation}`);
+            mutate(`/ws/rest/v1/queue?location=${userLocation}`);
           }
         },
         (error) => {
@@ -135,7 +136,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         </Column>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.BASIC)}>
+        <Button className={styles.button} kind="secondary" onClick={() => closePanel()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

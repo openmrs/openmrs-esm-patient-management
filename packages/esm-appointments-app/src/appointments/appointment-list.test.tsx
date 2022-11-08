@@ -20,17 +20,20 @@ describe('AppointmentList', () => {
 
     await waitForLoadingToFinish();
 
-    const scheduledAppointmentsTab = screen.getByRole('tab', { name: /scheduled/i });
+    const scheduledAppointmentsTab = screen.getByRole('tab', { name: /^scheduled$/i });
     const completedAppointmentsTab = screen.getByRole('tab', { name: /completed/i });
-    const cancelledAppointmentsTab = screen.getByRole('tab', { name: /cancelled/i });
+    const unsheduledAppointment = screen.getByRole('tab', { name: /^unScheduled$/i });
+    const pendingAppointments = screen.getByRole('tab', { name: /^unScheduled$/i });
 
     expect(scheduledAppointmentsTab).toBeInTheDocument();
     expect(completedAppointmentsTab).toBeInTheDocument();
-    expect(cancelledAppointmentsTab).toBeInTheDocument();
+    expect(unsheduledAppointment).toBeInTheDocument();
+    expect(pendingAppointments).toBeInTheDocument();
 
     expect(scheduledAppointmentsTab).toHaveAttribute('aria-selected', 'true');
     expect(completedAppointmentsTab).toHaveAttribute('aria-selected', 'false');
-    expect(cancelledAppointmentsTab).toHaveAttribute('aria-selected', 'false');
+    expect(unsheduledAppointment).toHaveAttribute('aria-selected', 'false');
+    expect(pendingAppointments).toHaveAttribute('aria-selected', 'false');
 
     expect(screen.getByRole('button', { name: /add new appointment/i })).toBeInTheDocument();
     expect(screen.getByText(/view calendar/i)).toBeInTheDocument();
@@ -53,10 +56,7 @@ describe('AppointmentList', () => {
     await waitFor(() => user.click(completedAppointmentsTab));
 
     expect(scheduledAppointmentsTab).toHaveAttribute('aria-selected', 'false');
-    expect(cancelledAppointmentsTab).toHaveAttribute('aria-selected', 'false');
     expect(completedAppointmentsTab).toHaveAttribute('aria-selected', 'true');
-
-    expect(screen.getByText(/add new appointment/i)).toBeInTheDocument();
   });
 });
 

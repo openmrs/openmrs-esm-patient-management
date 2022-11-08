@@ -14,6 +14,11 @@
   padding: 1rem;
 }
 
+.headerButtons {
+  display: flex;
+  flex-flow: column;
+}
+
 .heading {
   @include type.type-style('heading-03');
 }
@@ -229,4 +234,9 @@
   background-color: $ui-background;
   padding: spacing.$spacing-05;
   text-align: right;
+}
+
+.addPatientToListBtn {
+  margin-left: spacing.$spacing-05;
+  height: spacing.$spacing-09;
 }

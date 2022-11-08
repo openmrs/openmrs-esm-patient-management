@@ -69,7 +69,7 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
           <Switch name={'monthly'} text={t('monthly', 'Monthly')} />
         </ContentSwitcher>
       </div>
-      <StructuredListWrapper className={styles.structuredListWrapper} light ariaLabel="Structured list">
+      <StructuredListWrapper className={styles.structuredListWrapper} ariaLabel="Structured list">
         <StructuredListHead>
           <StructuredListRow head tabIndex={0}>
             <StructuredListCell head>{t('patientName', 'Patient name')}</StructuredListCell>

@@ -43,7 +43,7 @@ const AppointmentsMetrics: React.FC = () => {
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
-          headerLabel={t('providersAvailableToday', 'Providers available {time}', { time: formattedStartDate })}
+          headerLabel={t('providersAvailableToday', 'Providers available : {time}', { time: formattedStartDate })}
           view="providers"
         />
       </div>

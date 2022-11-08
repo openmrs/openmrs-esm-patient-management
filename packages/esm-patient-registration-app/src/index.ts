@@ -28,6 +28,11 @@ function setupOpenMRS() {
       title: 'Patient Registration',
       parent: `${window.spaBase}/home`,
     },
+    {
+      path: `${window.spaBase}/patient/:patientUuid/edit`,
+      title: 'Edit patient details',
+      parent: `${window.spaBase}/patient/:patientUuid/chart`,
+    },
   ]);
 
   setupOffline();
@@ -46,20 +51,19 @@ function setupOpenMRS() {
           isOffline: true,
         },
       },
-      // TODO: Check in with Manuel about whether this bit is still required
-      // {
-      //   load: getAsyncLifecycle(() => import('./root.component'), {
-      //     featureName: 'edit-patient-details-form',
-      //     moduleName,
-      //   }),
-      //   route: /patient\-registration\/patient\/([a-zA-Z0-9\-]+)\/edit/,
-      //   online: {
-      //     savePatientForm: FormManager.savePatientFormOnline,
-      //   },
-      //   offline: {
-      //     savePatientForm: FormManager.savePatientFormOffline,
-      //   },
-      // },
+      {
+        load: getAsyncLifecycle(() => import('./root.component'), {
+          featureName: 'edit-patient-details-form',
+          moduleName,
+        }),
+        route: /patient\/([a-zA-Z0-9\-]+)\/edit/,
+        online: {
+          savePatientForm: FormManager.savePatientFormOnline,
+        },
+        offline: {
+          savePatientForm: FormManager.savePatientFormOffline,
+        },
+      },
     ],
     extensions: [
       {
@@ -79,6 +83,13 @@ function setupOpenMRS() {
         id: 'patient-photo-widget',
         slot: 'patient-photo-slot',
         load: getAsyncLifecycle(() => import('./widgets/display-photo.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'edit-patient-details-button',
+        slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./widgets/edit-patient-details-button.component'), options),
         online: true,
         offline: true,
       },
