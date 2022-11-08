@@ -151,12 +151,12 @@ function EditMenu({ queueEntry }: { queueEntry: MappedVisitQueueEntry }) {
 }
 
 function StatusIcon({ status }) {
-  switch (status as QueueStatus) {
-    case 'Waiting':
+  switch (status) {
+    case 'waiting':
       return <InProgress size={16} />;
-    case 'In Service':
+    case 'in service':
       return <Group size={16} />;
-    case 'Finished Service':
+    case 'finished service':
       return <Group size={16} />;
     default:
       return null;
@@ -223,16 +223,16 @@ function ActiveVisitsTable() {
     }
   };
 
-  const buildStatusString = (status: QueueStatus, service: QueueService) => {
+  const buildStatusString = (status: string, service: QueueService) => {
     if (!status || !service) {
       return '';
     }
 
-    if (status === 'Waiting') {
+    if (status === 'waiting') {
       return `${status} for ${service}`;
-    } else if (status === 'In Service') {
+    } else if (status === 'in service') {
       return `Attending ${service}`;
-    } else if (status === 'Finished Service') {
+    } else if (status === 'finished service') {
       return `Finished ${service}`;
     }
   };
@@ -290,8 +290,8 @@ function ActiveVisitsTable() {
       status: {
         content: (
           <span className={styles.statusContainer}>
-            <StatusIcon status={entry.status} />
-            <span>{buildStatusString(entry.status, entry.service)}</span>
+            <StatusIcon status={entry.status.toLowerCase()} />
+            <span>{buildStatusString(entry.status.toLowerCase(), entry.service)}</span>
           </span>
         ),
       },
@@ -498,7 +498,10 @@ function ActiveVisitsTable() {
         <Button
           iconDescription={t('addPatientToQueue', 'Add patient to queue')}
           kind="secondary"
-          onClick={() => setShowOverlay(true)}
+          onClick={() => {
+            setShowOverlay(true);
+            setView(SearchTypes.BASIC);
+          }}
           renderIcon={(props) => <Add size={16} {...props} />}
           size="sm">
           {t('addPatientToQueue', 'Add patient to queue')}
