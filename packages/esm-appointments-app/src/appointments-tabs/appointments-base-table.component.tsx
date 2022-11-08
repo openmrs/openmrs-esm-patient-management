@@ -37,6 +37,7 @@ import VisitForm from '../patient-queue/visit-form/visit-form.component';
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isToday from 'dayjs/plugin/isToday';
+import { useServiceQueues } from '../hooks/useServiceQueus';
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isToday);
 
@@ -113,10 +114,14 @@ function ServiceIcon({ service }) {
 
 const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
+  const { isLoading: isLoadingQueueEntries, queueEntries } = useServiceQueues();
 
   const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
   const [filter, setFilter] = useState('');
-
+  const patientQueueEntry = (patientUuid: string) => {
+    const queryEntries = queueEntries.find((entry) => entry.queueEntry.patient.uuid === patientUuid);
+    return ` ${queryEntries?.queueEntry?.status?.display} ${queryEntries?.queueEntry?.queue?.display}`;
+  };
   useEffect(() => {
     if (filter) {
       setFilteredRows(appointments?.filter((entry) => entry.serviceType === filter));
@@ -227,7 +232,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 {dayjs(appointment.dateTime).isToday() && (
                   <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-                    {appointment.status === 'Scheduled' ? t('checkIn', 'Check In') : t('changeStatus', 'Change status')}
+                    {appointment.status === 'Scheduled'
+                      ? t('checkIn', 'Check In')
+                      : appointment.status === 'Completed'
+                      ? t('completed', 'Completed')
+                      : patientQueueEntry(appointment.patientUuid)}
                   </Button>
                 )}
 

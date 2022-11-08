@@ -38,7 +38,7 @@ const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
               style={{ backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
               id="date-picker-calendar-id"
               placeholder="DD-MMM-YYYY"
-              labelText="DD-MMM-YYYY"
+              labelText=""
               type="text"
               value={dayjs(appointmentDate).format('DD MMM YYYY')}
             />

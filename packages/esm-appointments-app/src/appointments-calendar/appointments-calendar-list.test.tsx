@@ -24,7 +24,6 @@ describe('Appointment calendar view', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/clinical appointments/i)).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /DD-MMM-YYYY/i })).toBeInTheDocument();
     expect(screen.getByText(/add new clinic day/i)).toBeInTheDocument();
     expect(screen.getByText(/calendar/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /filter/i })).toBeInTheDocument();

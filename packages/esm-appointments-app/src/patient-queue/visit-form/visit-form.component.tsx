@@ -153,6 +153,9 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                       });
                       await changeAppointmentStatus('CheckedIn', appointment.id, new AbortController());
                       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
+                      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=CheckedIn`);
+                      mutate(`/ws/rest/v1/appointment/all?forDate=${startDate}`);
+                      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
                       closeOverlay();
                     }
                   },
