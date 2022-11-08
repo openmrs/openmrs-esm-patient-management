@@ -44,17 +44,17 @@ export function useServiceMetricsCount(service: string) {
 }
 
 export const useAppointmentMetrics = () => {
-  const url = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=Scheduled`;
+  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
 
   const { data, error, mutate } = useSWR<{
     data: Array<AppointmentSummary>;
-  }>(url, openmrsFetch);
+  }>(apiUrl, openmrsFetch);
 
-  const totalScheduledAppointments = data?.data.length ?? 0;
+  const totalCheckedAppointments = data?.data.length ?? 0;
 
   return {
     isLoading: !data && !error,
     error,
-    totalScheduledAppointments,
+    totalCheckedAppointments,
   };
 };

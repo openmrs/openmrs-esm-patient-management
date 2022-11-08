@@ -25,7 +25,7 @@ function ClinicMetrics() {
   const session = useSession();
 
   const { metrics, isLoading } = useMetrics();
-  const { totalScheduledAppointments } = useAppointmentMetrics();
+  const { totalCheckedAppointments } = useAppointmentMetrics();
   const [userLocation, setUserLocation] = useState('');
   const { allServices } = useServices(userLocation);
   const currentServiceName = useSelectedServiceName();
@@ -48,7 +48,7 @@ function ClinicMetrics() {
     } else if (currentServiceName === t('all', 'All')) {
       setInitialSelectItem(true);
     }
-  }, [allServices, currentServiceName, currentServiceUuid]);
+  }, [allServices, currentServiceName, currentServiceUuid, t]);
 
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedServiceUuid(selectedItem.uuid);
@@ -66,8 +66,8 @@ function ClinicMetrics() {
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={totalScheduledAppointments}
-          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          value={totalCheckedAppointments}
+          headerLabel={t('checkedInAppointments', 'CheckedIn appts. today')}
           service="scheduled"
         />
         <MetricsCard

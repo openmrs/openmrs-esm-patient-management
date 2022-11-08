@@ -23,7 +23,7 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ visitQueueEntries
   return (
     <Button
       size="sm"
-      kind="primary"
+      kind="danger--tertiary"
       className={styles.clearBtn}
       renderIcon={(props) => <TrashCan size={16} {...props} />}
       onClick={launchClearAllQueueEntriesModal}

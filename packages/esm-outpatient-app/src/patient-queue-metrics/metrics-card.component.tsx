@@ -27,7 +27,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
           </div>
           {service == 'scheduled' ? (
             <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments-list/${service}`}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/checkedin-appointments-list`}>
                 {t('patientList', 'Patient list')}
               </ConfigurableLink>
               <ArrowRight size={16} />
