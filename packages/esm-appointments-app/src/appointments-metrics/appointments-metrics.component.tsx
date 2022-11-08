@@ -2,13 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import { ErrorState, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
+import {
+  useClinicalMetrics,
+  useAllAppointmentsByDate,
+  useScheduledAppointment,
+  useActiveVisits,
+} from '../hooks/useClinicalMetrics';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 import { useAppointmentDate } from '../helpers';
 import MetricsCardScheduledAppt from './metric-card-scheduled-app.component';
-import { useActiveVisits } from '../hooks/useActiveVisits';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
@@ -37,9 +41,9 @@ const AppointmentsMetrics: React.FC = () => {
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           view="patients"
-          arrivedLabel={t('arrived', 'Arrived')}
+          arrivedLabel={t('checkedIn', 'Checked In')}
           arrivedValue={activeVisits}
-          notArrivedLabel={t('notArrived', 'Not Arrived')}
+          notArrivedLabel={t('pending', 'Pending')}
           notArrivedValue={notArrived}
         />
         <MetricsCard
