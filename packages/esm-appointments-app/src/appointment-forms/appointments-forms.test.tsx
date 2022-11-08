@@ -89,6 +89,7 @@ describe('AppointmentForm', () => {
       'end-time-picker',
       'appointmentKind',
       'providers',
+      'reason',
       'facility',
       'community',
     ]);
@@ -96,8 +97,7 @@ describe('AppointmentForm', () => {
 
   it('renders the form with all expected inputs in edit mode', () => {
     renderAppointmentsForm('editing', mockPatient.uuid);
-
-    expect(screen.getByLabelText('Reason For Changes')).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /Reason for change/ })).toBeInTheDocument();
   });
 
   it('renders the expected appointment kinds', () => {

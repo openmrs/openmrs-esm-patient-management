@@ -58,6 +58,21 @@ export const configSchema = {
     _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
     _default: `${spaBasePath}`,
   },
+  appointmentComments: {
+    _type: Type.Array,
+    _description: 'Reason for Changes',
+    _default: [
+      'Forgot Appoinment',
+      'Lack of Transport',
+      'Travelled',
+      'Work/Schedule/Busy',
+      'Had enough Medicine',
+      'Taking Herbal Medication',
+      'Spiritual Healed',
+      'Recieved Refill in another facility',
+      'Other',
+    ],
+  },
 };
 
 export interface ConfigObject {
@@ -71,4 +86,5 @@ export interface ConfigObject {
   useBahmniAppointmentsUI: boolean;
   useFullViewPrivilege: boolean;
   fullViewPrivilege: string;
+  appointmentComments: Array<string>;
 }
