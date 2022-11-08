@@ -192,6 +192,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           });
           setIsSubmitting(false);
           mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=CheckedIn`);
           mutate(`/ws/rest/v1/appointment/all?forDate=${appointmentStartDate}`);
           closeOverlay();
         }

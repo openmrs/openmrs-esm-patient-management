@@ -2,25 +2,20 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppointments } from './appointments-table.resource';
 import AppointmentsBaseTable from './appointments-base-table.component';
-import { AppointmentTypes } from '../types';
 
-interface ScheduledAppointmentsProps {
-  status: string;
-}
-
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ status }) => {
+const PendingAppointments: React.FC = () => {
   const { t } = useTranslation();
   const { appointments, isLoading } = useAppointments();
-
+  const pendingAppointments = appointments.filter((appointment) => appointment.status === 'Scheduled');
   return (
     <div>
       <AppointmentsBaseTable
-        appointments={appointments}
+        appointments={pendingAppointments}
         isLoading={isLoading}
-        tableHeading={AppointmentTypes.SCHEDULED}
+        tableHeading={t('pending', 'Pending')}
       />
     </div>
   );
 };
 
-export default ScheduledAppointments;
+export default PendingAppointments;
