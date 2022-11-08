@@ -24,3 +24,10 @@
   min-height: 0;
 }
 
+.downloadButton {
+  margin: spacing.$spacing-05;
+}
+.downloadLink {
+  text-decoration: none;
+  color: inherit;
+}
