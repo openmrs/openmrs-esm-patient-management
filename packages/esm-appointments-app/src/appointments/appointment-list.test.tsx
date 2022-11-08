@@ -21,7 +21,7 @@ describe('AppointmentList', () => {
     await waitForLoadingToFinish();
 
     const scheduledAppointmentsTab = screen.getByRole('tab', { name: /^scheduled$/i });
-    const completedAppointmentsTab = screen.getByRole('tab', { name: /completed/i });
+    const completedAppointmentsTab = screen.getByRole('tab', { name: /^honoured/i });
     const unsheduledAppointment = screen.getByRole('tab', { name: /^unScheduled$/i });
     const pendingAppointments = screen.getByRole('tab', { name: /^unScheduled$/i });
 

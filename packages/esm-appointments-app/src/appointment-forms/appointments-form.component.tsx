@@ -237,43 +237,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       )}
 
-      <div className={styles.childRow}>
-        <div className={styles.row}>
-          <Select
-            labelText={t('frequency', 'Frequency')}
-            id="frequency"
-            className={styles.select}
-            invalidText="Required"
-            value={frequency}
-            onChange={(event) => setFrequency(event.target.value)}
-            light>
-            {mockFrequency.data?.length > 0 &&
-              mockFrequency.data.map((frequency) => (
-                <SelectItem key={frequency.uuid} text={frequency.display} value={frequency.uuid}>
-                  {frequency.display}
-                </SelectItem>
-              ))}
-          </Select>
-
-          {isFullDay ? (
-            <Select
-              labelText={t('day', 'Day')}
-              id="day"
-              invalidText="Required"
-              value={day}
-              onChange={(event) => setDay(event.target.value)}
-              light>
-              {daysOfTheWeek?.length > 0 &&
-                daysOfTheWeek.map((day) => (
-                  <SelectItem key={day} text={day} value={day}>
-                    {day}
-                  </SelectItem>
-                ))}
-            </Select>
-          ) : null}
-        </div>
-      </div>
-
       <div className={styles.inputContainer} id="appointment-place">
         <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
         <ContentSwitcher className={styles.inputContainer} data-testid="appointment-place">

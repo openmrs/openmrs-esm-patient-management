@@ -82,7 +82,6 @@ describe('AppointmentForm', () => {
       'Yes',
       'No',
       '',
-      'frequency',
       'location',
       'service',
       'start-time-picker',

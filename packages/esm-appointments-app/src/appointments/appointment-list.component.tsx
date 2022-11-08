@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import { Calendar } from '@carbon/react/icons';
-import CompletedAppointments from '../appointments-tabs/completed-appointments.component';
 import styles from './appointment-list.scss';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
@@ -12,6 +11,7 @@ import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
 import UnScheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
 import PendingAppointments from '../appointments-tabs/pending-appointments.component';
+import HonouredAppointments from '../appointments-tabs/honoured-appointments.component';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
@@ -34,7 +34,7 @@ const AppointmentList: React.FC = () => {
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
           <Tab>{t('scheduled', 'Scheduled')}</Tab>
           <Tab>{t('unScheduled', 'UnScheduled')}</Tab>
-          <Tab>{t('completed', 'Completed')}</Tab>
+          <Tab>{t('honoured', 'Honoured')}</Tab>
           <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
           <Tab>{t('pending', 'Pending')}</Tab>
           <Button
@@ -54,7 +54,7 @@ const AppointmentList: React.FC = () => {
           <TabPanel style={{ padding: 0 }}>
             <UnScheduledAppointments />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
+          <TabPanel style={{ padding: 0 }}>{<HonouredAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
           {isToday && (
             <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
           )}
