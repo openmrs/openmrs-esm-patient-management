@@ -16,6 +16,18 @@ export function useAppointments() {
   };
 }
 
+export function useCheckedInAppointments() {
+  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
+  const { data, error, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+
+  return {
+    checkedInAppointments: data ? data?.data : [],
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
+}
+
 export function useProviders() {
   const customRepresentation = 'custom:(uuid,display,person:(age,display,gender,uuid))';
   const apiUrl = `/ws/rest/v1/provider?q=&v=${customRepresentation}`;
