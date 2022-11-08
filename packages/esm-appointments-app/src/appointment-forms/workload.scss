@@ -19,7 +19,6 @@
   flex-direction: column;
   cursor: pointer;
   border: 1px solid colors.$blue-30;
-  border-left-width: 0;
 
   &:first-child {
     border-left-width: 1px;

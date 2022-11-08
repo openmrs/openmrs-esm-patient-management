@@ -52,7 +52,11 @@
   margin: 0 1rem;
   color: #525252;
 }
-
+.monthlyWorkLoadCard {
+  color: #525252;
+  display: flex;
+  flex-wrap: wrap;
+}
 .workLoadContainer {
   display: flex;
   flex-direction: column;
