@@ -19,7 +19,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
 
     const handleChange = useCallback(
       (val) => {
-        if (onChange) {
+        if (typeof onChange === 'function') {
           onChange(val);
         }
         setSearchTerm(val);
@@ -27,13 +27,10 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
       [onChange, setSearchTerm],
     );
 
-    const handleSubmit = useCallback(
-      (evt) => {
-        evt.preventDefault();
-        onSubmit(searchTerm);
-      },
-      [searchTerm, onSubmit],
-    );
+    const handleSubmit = (evt) => {
+      evt.preventDefault();
+      onSubmit(searchTerm);
+    };
 
     return (
       <form onSubmit={handleSubmit} className={styles.searchArea}>
