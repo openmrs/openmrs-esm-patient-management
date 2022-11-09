@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentSummary, QueueServiceInfo } from '../types';
+import { Appointment, QueueServiceInfo } from '../types';
 import { startOfDay } from '../constants';
 
 export function useMetrics() {
@@ -44,17 +44,17 @@ export function useServiceMetricsCount(service: string) {
 }
 
 export const useAppointmentMetrics = () => {
-  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
+  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startOfDay}`;
 
   const { data, error, mutate } = useSWR<{
-    data: Array<AppointmentSummary>;
+    data: Array<Appointment>;
   }>(apiUrl, openmrsFetch);
 
-  const totalCheckedAppointments = data?.data.length ?? 0;
+  const totalScheduledAppointments = data?.data.length ?? 0;
 
   return {
     isLoading: !data && !error,
     error,
-    totalCheckedAppointments,
+    totalScheduledAppointments,
   };
 };
