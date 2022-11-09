@@ -12,6 +12,8 @@
   &:hover,
   &:focus {
     background-color: $ui-01;
+    border: 0;
+    outline: 0;
   }
 }
 
