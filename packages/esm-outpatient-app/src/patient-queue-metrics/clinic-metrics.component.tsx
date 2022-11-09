@@ -25,7 +25,7 @@ function ClinicMetrics() {
   const session = useSession();
 
   const { metrics, isLoading } = useMetrics();
-  const { totalCheckedAppointments } = useAppointmentMetrics();
+  const { totalScheduledAppointments } = useAppointmentMetrics();
   const [userLocation, setUserLocation] = useState('');
   const { allServices } = useServices(userLocation);
   const currentServiceName = useSelectedServiceName();
@@ -66,8 +66,8 @@ function ClinicMetrics() {
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={totalCheckedAppointments}
-          headerLabel={t('checkedInAppointments', 'CheckedIn appts. today')}
+          value={totalScheduledAppointments}
+          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
           service="scheduled"
         />
         <MetricsCard

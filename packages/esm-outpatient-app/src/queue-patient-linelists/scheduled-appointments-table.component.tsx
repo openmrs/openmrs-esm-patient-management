@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-import { formatDatetime, parseDate, usePagination, ConfigurableLink } from '@openmrs/esm-framework';
+import { usePagination, ConfigurableLink, formatDate } from '@openmrs/esm-framework';
 import { useAppointments } from './queue-linelist.resource';
 
-const pageSize = 20;
+const pageSize = 100;
 
 const AppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
@@ -64,7 +64,7 @@ const AppointmentsTable: React.FC = () => {
               </ConfigurableLink>
             ),
           },
-          returnDate: formatDatetime(parseDate(appointment.startDateTime.toString()), { mode: 'wide' }),
+          returnDate: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
           gender: appointment.patient?.gender,
           age: appointment.patient.age,
           visitType: appointment.appointmentKind,
