@@ -46,6 +46,22 @@ You could provide `yarn start` with as many `sources` arguments as you require. 
 yarn start --sources 'packages/esm-patient-search-app' --sources 'packages/esm-patient-registration-app'
 ```
 
+## Troubleshooting
+
+If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in the reference application, you likely have outdated versions of core libraries. To update core libraries, run the following commands:
+
+```bash
+# Upgrade core libraries
+yarn up openmrs @openmrs/esm-framework
+
+# Reset version specifiers to `next`. Don't commit actual version numbers.
+git checkout package.json
+
+# Run `yarn` to recreate the lockfile
+yarn
+```
+
+
 ## Contributing
 
 Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/contributing) guide.
