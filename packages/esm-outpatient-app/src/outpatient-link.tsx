@@ -5,5 +5,5 @@ import { spaBasePath } from './constants';
 
 export default function OutpatientAppLink() {
   const { t } = useTranslation();
-  return <ConfigurableLink to={spaBasePath}>{t('outpatient', 'Outpatient')}</ConfigurableLink>;
+  return <ConfigurableLink to={spaBasePath}>{t('serviceQueues', 'Service Queues')}</ConfigurableLink>;
 }
