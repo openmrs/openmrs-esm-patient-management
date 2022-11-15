@@ -79,7 +79,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
-  const { appointmentKinds } = useConfig() as ConfigObject;
+  const { appointmentTypes } = useConfig() as ConfigObject;
   const { daysOfTheWeek } = useConfig() as ConfigObject;
   const { appointmentComments } = useConfig() as ConfigObject;
   const { appointmentStatuses } = useConfig() as ConfigObject;
@@ -107,7 +107,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   );
   const [isFullDay, setIsFullDay] = useState<boolean>(false);
   const [day, setDay] = useState(appointmentState.dateTime);
-  const [appointmentKind, setAppointmentKind] = useState(appointmentState.appointmentKind);
+  const [appointmentType, setAppointmentType] = useState(appointmentState.appointmentKind);
   const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status ?? 'Scheduled');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const appointmentStartDate = useAppointmentDate();
@@ -123,7 +123,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
     () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],
     [appointmentStartDate, appointmentSummary],
   );
-  const isMissingRequirements = !selectedService || !appointmentKind.length || !selectedProvider;
+  const isMissingRequirements = !selectedService || !appointmentType.length || !selectedProvider;
   const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
 
   useEffect(() => {
@@ -160,7 +160,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
     );
     const appointmentPayload: AppointmentPayload = {
-      appointmentKind: appointmentKind,
+      appointmentKind: appointmentType,
       status: appointmentStatus,
       serviceUuid: selectedService,
       startDateTime: dayjs(startDatetime).format(),
@@ -445,18 +445,18 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       )}
 
       <Select
-        id="appointmentKind"
+        id="appointmentType"
         invalidText="Required"
-        labelText={t('selectAppointmentKind', 'Select an appointment kind')}
+        labelText={t('selectAppointmentType', 'Select an appointment type')}
         light
         className={styles.inputContainer}
-        onChange={(event) => setAppointmentKind(event.target.value)}
-        value={appointmentKind}>
-        {!appointmentKind || appointmentKind == '--' ? (
-          <SelectItem text={t('selectAppointmentKind', 'Select an appointment kind')} value="" />
+        onChange={(event) => setAppointmentType(event.target.value)}
+        value={appointmentType}>
+        {!appointmentType || appointmentType == '--' ? (
+          <SelectItem text={t('selectAppointmentType', 'Select an appointment type')} value="" />
         ) : null}
-        {appointmentKinds?.length > 0 &&
-          appointmentKinds.map((service) => (
+        {appointmentTypes?.length > 0 &&
+          appointmentTypes.map((service) => (
             <SelectItem key={service} text={service} value={service}>
               {service}
             </SelectItem>

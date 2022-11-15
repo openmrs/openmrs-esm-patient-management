@@ -16,9 +16,9 @@ export const configSchema = {
       _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
     },
   },
-  appointmentKinds: {
+  appointmentTypes: {
     _type: Type.Array,
-    _description: 'Configurable appointment kinds (types of appointments)',
+    _description: 'Configurable appointment types (types of appointments)',
     _default: ['Scheduled'],
   },
   appointmentStatuses: {
@@ -80,7 +80,7 @@ export interface ConfigObject {
     priorityConceptSetUuid: string;
     serviceConceptSetUuid: string;
   };
-  appointmentKinds: Array<string>;
+  appointmentTypes: Array<string>;
   daysOfTheWeek: Array<string>;
   appointmentStatuses: Array<string>;
   useBahmniAppointmentsUI: boolean;
