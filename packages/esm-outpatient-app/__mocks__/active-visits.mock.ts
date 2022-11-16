@@ -19,8 +19,8 @@ export const mockVisitQueueEntries = [
       endedAt: null,
       queue: {
         uuid: '6a97bd65-3a9a-4fab-ae8f-be59dd4ddd87',
-        display: 'TRIAGE QUEUE',
-        name: 'TRIAGE QUEUE',
+        display: 'Triage',
+        name: 'Triage',
         description: 'Queue for patients waiting for triage',
         service: {
           display: 'Triage',
@@ -67,8 +67,8 @@ export const mockVisitQueueEntries = [
       endedAt: null,
       queue: {
         uuid: 'c187d78b-5c54-49bf-a0f8-b7fb6034d36d',
-        display: 'Consultation queue',
-        name: 'Consultation queue',
+        display: 'Clinical Consultation',
+        name: 'Clinical Consultation',
         description: 'A queue for patients for a clincal consultation i.e. Doctor, Clinician',
         service: {
           display: 'Clinical Consultation',

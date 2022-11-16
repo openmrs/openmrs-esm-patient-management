@@ -135,6 +135,13 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'service-queue-entries-table',
+        load: getAsyncLifecycle(() => import('./active-visits/active-visits-table.component'), {
+          featureName: 'view list of patients in queue',
+          moduleName,
+        }),
+      },
     ],
   };
 }

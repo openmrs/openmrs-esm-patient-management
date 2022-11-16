@@ -223,7 +223,7 @@ function ActiveVisitsTable() {
     }
   };
 
-  const buildStatusString = (status: string, service: QueueService) => {
+  const buildStatusString = (status: string, service: string) => {
     if (!status || !service) {
       return '';
     }
