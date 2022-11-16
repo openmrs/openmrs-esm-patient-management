@@ -75,7 +75,7 @@ export interface MappedVisitQueueEntry {
   priority: MappedQueuePriority;
   priorityComment: string;
   priorityUuid: string;
-  service: QueueService;
+  service: string;
   status: QueueStatus;
   statusUuid: string;
   visitStartDateTime: string;
@@ -198,7 +198,7 @@ export function useVisitQueueEntries(currServiceName: string): UseVisitQueueEntr
         : visitQueueEntry.queueEntry.priority.display,
     priorityComment: visitQueueEntry.queueEntry.priorityComment,
     priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
-    service: visitQueueEntry.queueEntry.queue.service.display,
+    service: visitQueueEntry?.queueEntry.queue.name,
     status: visitQueueEntry.queueEntry.status.display,
     statusUuid: visitQueueEntry.queueEntry.status.uuid,
     waitTime: visitQueueEntry.queueEntry.startedAt
