@@ -13,12 +13,14 @@ import dayjs from 'dayjs';
 import UnScheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
 import PendingAppointments from '../appointments-tabs/pending-appointments.component';
 import { useAppointments } from '../appointments-tabs/appointments-table.resource';
+import MissedAppointments from '../appointments-tabs/missed-appointment.component';
 
 enum AppointmentTypes {
   SCHEDULED = 'Scheduled',
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
   CHECKEDIN = 'CheckedIn',
+  MISSED = 'Missed',
 }
 
 const AppointmentList: React.FC = () => {
@@ -66,6 +68,7 @@ const AppointmentList: React.FC = () => {
           <Tab>{t('unScheduled', 'UnScheduled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
           <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
+          <Tab>{t('missed', 'Missed')}</Tab>
           <Tab>{t('pending', 'Pending')}</Tab>
           <Button
             className={styles.calendarButton}
@@ -88,6 +91,7 @@ const AppointmentList: React.FC = () => {
           {isToday && (
             <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
           )}
+          <TabPanel style={{ padding: 0 }}>{<MissedAppointments status={AppointmentTypes.MISSED} />}</TabPanel>
           <TabPanel style={{ padding: 0 }}>
             <PendingAppointments />
           </TabPanel>
