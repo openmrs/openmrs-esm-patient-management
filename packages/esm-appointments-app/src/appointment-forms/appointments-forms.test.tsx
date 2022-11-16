@@ -37,7 +37,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
 let mockOpenmrsConfig = {
   daysOfTheWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  appointmentKinds: ['Scheduled', 'WalkIn', 'Virtual'],
+  appointmentTypes: ['Scheduled', 'WalkIn', 'Virtual'],
   appointmentStatuses: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
 };
 
@@ -87,7 +87,7 @@ describe('AppointmentForm', () => {
       'service',
       'start-time-picker',
       'end-time-picker',
-      'appointmentKind',
+      'appointmentType',
       'providers',
       'reason',
       'facility',
@@ -100,17 +100,17 @@ describe('AppointmentForm', () => {
     expect(screen.getByRole('option', { name: /Reason for change/ })).toBeInTheDocument();
   });
 
-  it('renders the expected appointment kinds', () => {
+  it('renders the expected appointment types', () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
-    const appointmentKindSelect = screen.getByLabelText('Select an appointment kind');
+    const appointmentTypeSelect = screen.getByLabelText('Select an appointment type');
 
-    expect((screen.getByRole('option', { name: 'Select an appointment kind' }) as HTMLOptionElement).selected).toBe(
+    expect((screen.getByRole('option', { name: 'Select an appointment type' }) as HTMLOptionElement).selected).toBe(
       true,
     );
-    expect(within(appointmentKindSelect).getAllByRole('option')).toHaveLength(4);
-    expect(within(appointmentKindSelect).getAllByRole('option')[1]).toHaveValue('Scheduled');
-    expect(within(appointmentKindSelect).getAllByRole('option')[2]).toHaveValue('WalkIn');
-    expect(within(appointmentKindSelect).getAllByRole('option')[3]).toHaveValue('Virtual');
+    expect(within(appointmentTypeSelect).getAllByRole('option')).toHaveLength(4);
+    expect(within(appointmentTypeSelect).getAllByRole('option')[1]).toHaveValue('Scheduled');
+    expect(within(appointmentTypeSelect).getAllByRole('option')[2]).toHaveValue('WalkIn');
+    expect(within(appointmentTypeSelect).getAllByRole('option')[3]).toHaveValue('Virtual');
 
     // TODO handle onselect an option
   });
