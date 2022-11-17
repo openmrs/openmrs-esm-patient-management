@@ -81,6 +81,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           aria-label={t('searchPatient', 'Search Patient')}
           aria-labelledby="Search Patient"
           className={`${showSearchInput ? styles.activeSearchIconButton : styles.searchIconButton}`}
+          enterDelayMs={500}
           name="SearchPatientIcon"
           onClick={handleGlobalAction}>
           {showSearchInput ? <Close size={20} /> : <Search size={20} />}

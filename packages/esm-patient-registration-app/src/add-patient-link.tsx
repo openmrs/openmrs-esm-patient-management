@@ -11,6 +11,7 @@ export default function Root() {
     <HeaderGlobalAction
       aria-label="Add Patient"
       aria-labelledby="Add Patient"
+      enterDelayMs={500}
       name="AddPatientIcon"
       onClick={addPatient}
       className={styles.slotStyles}>
