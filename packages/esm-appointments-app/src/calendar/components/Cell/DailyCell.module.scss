@@ -1,0 +1,35 @@
+@use '../../styles/variables.scss' as var;
+
+.daily-cell {
+  position: relative;
+  border-right: var.$border;
+  border-bottom: var.$border;
+  min-height: 120px;
+  color: var.$primary-color;
+
+  .week-time {
+    display: none;
+  }
+
+  &:nth-child(-n + 8) {
+    border-top: var.$border;
+  }
+
+  &:first-child {
+    border-top: none;
+  }
+
+  &:nth-child(8n + 1) {
+    border-bottom: none;
+
+    .week-time {
+      white-space: nowrap;
+      display: inline;
+      color: var.$disabled-color;
+      position: absolute;
+      top: -11px;
+      height: 22px;
+      width: 30px;
+    }
+  }
+}

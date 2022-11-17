@@ -1,0 +1,70 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+
+.cardContainer {
+  background-color: $ui-02;
+  display: flex;
+  height: spacing.$spacing-12;
+}
+
+.tileContainer {
+  padding: 0.5rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  border: 1px solid colors.$blue-30;
+  border-left-width: 0;
+
+  &:first-child {
+    border-left-width: 1px;
+  }
+
+  & label {
+    color: colors.$gray-70;
+  }
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: spacing.$spacing-05;
+}
+
+.headerLabel {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+}
+
+.totalsLabel {
+  @include carbon--type-style('label-01');
+  color: $text-02;
+}
+
+.totalsValue {
+  @include carbon--type-style('productive-heading-04');
+  color: $ui-05;
+}
+
+.headerLabelContainer {
+  display: flex;
+  align-items: center;
+  height: $spacing-07;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.activeWorkloadCard {
+  background-color: colors.$blue-10;
+
+  & label {
+    color: colors.$blue-60;
+  }
+}
