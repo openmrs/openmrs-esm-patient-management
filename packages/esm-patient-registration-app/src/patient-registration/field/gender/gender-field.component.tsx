@@ -17,6 +17,13 @@ export const GenderField: React.FC = () => {
   const setGender = (gender: string) => {
     setFieldValue('gender', gender);
   };
+  /**
+   * DO NOT REMOVE THIS COMMENT HERE, ADDS TRANSLATION FOR SEX OPTIONS
+   * t('male', 'Male')
+   * t('female', 'Female')
+   * t('other', 'Other')
+   * t('unknown', 'Unknown')
+   */
 
   return (
     <div className={styles.halfWidthInDesktopView}>
