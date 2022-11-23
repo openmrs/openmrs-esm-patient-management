@@ -41,7 +41,7 @@ import { useSWRConfig } from 'swr';
 import isNull from 'lodash-es/isNull';
 import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
-import { usePriority, useServices, useStatus } from './useVisit';
+import { usePriority, useQueues, useStatus } from './useVisit';
 import { MappedAppointment } from '../../types';
 import { changeAppointmentStatus } from '../../change-appointment-status/appointment-status.resource';
 
@@ -68,7 +68,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const [priority, setPriority] = useState('');
   const { priorities } = usePriority();
   const { statuses } = useStatus();
-  const { services: allServices } = useServices(selectedLocation);
+  const { queues } = useQueues(selectedLocation);
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
   const { isLoading, patient } = usePatient(patientUuid);
@@ -110,7 +110,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           (response) => {
             if (response.status === 201) {
               if (isNull(service)) {
-                const [uuid] = allServices;
+                const [uuid] = queues;
                 setSelectedService(uuid);
               }
               const status = statuses.find((data) => data.display.toLowerCase() === 'waiting')?.uuid;
@@ -190,7 +190,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
       service,
       statuses,
       priority,
-      allServices,
+      queues,
       priorities,
       t,
     ],
@@ -356,16 +356,16 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           )}
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+            <div className={styles.sectionTitle}>{t('queue', 'Queue')}</div>
             <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
+              labelText={t('selectQueue', 'Select queue')}
+              id="queue"
               invalidText="Required"
               value={service}
               onChange={(event) => setSelectedService(event.target.value)}>
-              {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {allServices?.length > 0 &&
-                allServices.map((service) => (
+              {!service ? <SelectItem text={t('chooseQueue', 'Select a queue')} value="" /> : null}
+              {queues?.length > 0 &&
+                queues.map((service) => (
                   <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
                     {service.display}
                   </SelectItem>
