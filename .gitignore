@@ -78,3 +78,6 @@ dist
 
 .turbo/
 ~
+/test-results/
+/playwright-report/
+/playwright/.cache/

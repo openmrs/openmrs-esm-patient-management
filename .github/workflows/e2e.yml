@@ -1,0 +1,46 @@
+name: Run E2E tests
+
+on:
+  push:
+    branches: [temp]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16"
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Run db and web containers
+        run: |
+          cd e2e
+          docker-compose up -d
+      - name: Wait for Openmrs instance to start
+        run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8080/openmrs/login.htm)" != "200" ]]; do sleep 10; done
+      - name: Run dev server
+        run: yarn start --backend "http://localhost:8080" --port 80 &
+      - name: Checkout test-3refapp repo
+          uses: actions/checkout@v3
+          with:
+            repository: jayasanka-sack/openmrs-test-3refapp
+            path: my-tools
+      - name: Installing dependencies
+        run: yarn install
+      - name: Run tests
+        run: |
+          cd packages/cypress
+          cypress run
+      - name: Upload screen recordings of failed tests
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Screen recordings of failed tests
+          path: |
+            packages/cypress/cypress/videos
+            packages/cypress/cypress/screenshots

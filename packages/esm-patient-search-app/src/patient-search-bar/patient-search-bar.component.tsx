@@ -45,6 +45,7 @@ const PatientSearchBar = React.forwardRef<HTMLInputElement, React.PropsWithChild
           size={small ? 'sm' : 'lg'}
           value={searchTerm}
           ref={ref}
+          data-testid="patientSearchBar"
         />
         <Button type="submit" kind="secondary" size={small ? 'sm' : 'lg'} onClick={handleSubmit} {...buttonProps}>
           {t('search', 'Search')}
