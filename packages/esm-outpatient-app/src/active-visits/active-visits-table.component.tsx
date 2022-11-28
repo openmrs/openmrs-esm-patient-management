@@ -40,6 +40,7 @@ import {
   isDesktop,
   useSession,
   useLocations,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -495,17 +496,18 @@ function ActiveVisitsTable() {
       </div>
       <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
-        <Button
-          iconDescription={t('addPatientToQueue', 'Add patient to queue')}
-          kind="secondary"
-          onClick={() => {
-            setShowOverlay(true);
-            setView(SearchTypes.BASIC);
+        <ExtensionSlot
+          extensionSlotName="patient-search-button-slot"
+          state={{
+            buttonText: t('addPatientToQueue', 'Add patient to queue'),
+            overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+            buttonProps: {
+              kind: 'secondary',
+              renderIcon: (props) => <Add size={16} {...props} />,
+              size: 'sm',
+            },
           }}
-          renderIcon={(props) => <Add size={16} {...props} />}
-          size="sm">
-          {t('addPatientToQueue', 'Add patient to queue')}
-        </Button>
+        />
       </div>
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
