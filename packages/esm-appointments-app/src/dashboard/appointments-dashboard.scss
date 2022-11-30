@@ -2,9 +2,10 @@
 
 .dashboardContainer {
   display: -webkit-flex;
-  height: 90vh;
+  min-height: 100vh;
   position: relative;
   overflow-y: hidden;
+  background-color: white;
 }
 
 .dashboardContent {

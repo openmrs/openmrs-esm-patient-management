@@ -1,16 +1,21 @@
 import React from 'react';
-import { Layer, Tile } from '@carbon/react';
-import styles from './empty-state.scss';
-import EmptyDataIllustration from './empty-icon.component';
+import { Layer, Button, Tile } from '@carbon/react';
+import { Trans, useTranslation } from 'react-i18next';
+import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './empty-state.scss';
+import { Add } from '@carbon/react/icons';
 
-interface EmptyStateProps {
+export interface EmptyStateProps {
+  displayText: string;
   headerTitle: string;
-  displayMessage: string;
+  launchForm?(): void;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayMessage }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText, launchForm }) => {
+  const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+
   return (
     <Layer>
       <Tile className={styles.tile}>
@@ -18,10 +23,21 @@ const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayMessage }) 
           <h4>{headerTitle}</h4>
         </div>
         <EmptyDataIllustration />
-        <p className={styles.content}>{displayMessage}</p>
+        <p className={styles.content}>
+          <Trans i18nKey="emptyStateText" values={{ displayText: displayText.toLowerCase() }}>
+            There are no {displayText.toLowerCase()} to display
+          </Trans>
+        </p>
+        <p className={styles.action}>
+          {launchForm && (
+            <span>
+              <Button renderIcon={Add} kind="ghost" onClick={() => launchForm()}>
+                {t('createAppointment', 'Create appointment')}
+              </Button>
+            </span>
+          )}
+        </p>
       </Tile>
     </Layer>
   );
 };
-
-export default EmptyState;

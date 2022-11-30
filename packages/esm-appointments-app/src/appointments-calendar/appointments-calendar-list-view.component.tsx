@@ -16,10 +16,10 @@ import { useTranslation } from 'react-i18next';
 import { formatDate, formatTime } from '@openmrs/esm-framework';
 import AppointmentsHeader from '../appointments-header/appointments-header.component';
 import styles from './appointments-calendar-list-view.scss';
-import EmptyState from '../empty-state/empty-state.component';
 import { DurationPeriod } from '../types';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from '../constants';
+import { EmptyState } from '../empty-state/empty-state.component';
 
 interface AppointmentsCalendarListViewProps {}
 
@@ -39,7 +39,7 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
       <>
         <AppointmentsHeader title={t('clinicalAppointments', 'Clinical Appointments')} />
         <EmptyState
-          displayMessage={t('appointmentsList', 'Appointment list is empty')}
+          displayText={t('appointmentsList', 'Appointment list is empty')}
           headerTitle={t('appointmentList', 'Appointments list')}
         />
       </>

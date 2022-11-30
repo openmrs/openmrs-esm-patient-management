@@ -51,7 +51,13 @@ const AppointmentsDashboard: React.FC = () => {
 };
 
 const DashboardView: React.FC<{ dashboardSlot: string; title: string }> = ({ dashboardSlot, title }) => {
-  return <ExtensionSlot extensionSlotName={dashboardSlot} state={{ dashboardTitle: title }} />;
+  return (
+    <ExtensionSlot
+      style={{ backgroundColor: 'white' }}
+      extensionSlotName={dashboardSlot}
+      state={{ dashboardTitle: title }}
+    />
+  );
 };
 
 export default AppointmentsDashboard;

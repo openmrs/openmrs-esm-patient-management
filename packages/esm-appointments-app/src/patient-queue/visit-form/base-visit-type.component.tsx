@@ -4,7 +4,6 @@ import debounce from 'lodash-es/debounce';
 import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './base-visit-type.scss';
-import EmptyState from '../../empty-state/empty-state.component';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;

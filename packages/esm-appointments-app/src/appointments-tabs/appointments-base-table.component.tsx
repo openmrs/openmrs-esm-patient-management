@@ -1,333 +1,171 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '../empty-state/empty-state.component';
+import { launchOverlay } from '../hooks/useOverlay';
+import PatientSearch from '../patient-search/patient-search.component';
+import { MappedAppointment } from '../types';
 import {
-  Button,
-  DataTable,
-  DataTableHeader,
   DataTableSkeleton,
-  Layer,
-  OverflowMenu,
-  OverflowMenuItem,
-  Table,
-  TableBody,
-  TableCell,
+  DataTable,
   TableContainer,
-  TableExpandedRow,
-  TableExpandHeader,
-  TableExpandRow,
+  Table,
   TableHead,
-  TableHeader,
   TableRow,
+  TableExpandHeader,
+  TableHeader,
+  TableBody,
+  TableExpandRow,
+  TableCell,
+  TableExpandedRow,
+  Pagination,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tile,
-  Dropdown,
+  Button,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
-import { Add, Cough, Medication, Omega } from '@carbon/react/icons';
-import { ConfigurableLink, formatDatetime, parseDate, showModal } from '@openmrs/esm-framework';
-import { launchOverlay } from '../hooks/useOverlay';
-import { MappedAppointment } from '../types';
+import { ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
+import startCase from 'lodash-es/startCase';
+import { Add } from '@carbon/react/icons';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
-import AppointmentForm from '../appointment-forms/appointments-form.component';
-import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
+import { handleFilter } from './utils';
+import AppointmentForm from '../appointment-forms/appointments-form.component';
 import CancelAppointment from '../appointment-forms/cancel-appointment.component';
-import VisitForm from '../patient-queue/visit-form/visit-form.component';
 import dayjs from 'dayjs';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isToday from 'dayjs/plugin/isToday';
-import { useServiceQueues } from '../hooks/useServiceQueus';
-dayjs.extend(isSameOrAfter);
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 dayjs.extend(isToday);
 
-interface AppointmentsProps {
+interface AppointmentsBaseTableProps {
   appointments: Array<MappedAppointment>;
-  isLoading: Boolean;
-  tableHeading: String;
+  isLoading: boolean;
+  tableHeading: string;
   mutate?: () => void;
 }
 
-interface ActionMenuProps {
-  appointment: MappedAppointment;
-  appointmentTitle: String;
-  mutate?: () => void;
-}
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
-  cellsById: any;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
-
-function ActionsMenu({ appointmentTitle, appointment, mutate }: ActionMenuProps) {
+const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
+  appointments,
+  isLoading,
+  tableHeading,
+  mutate,
+}) => {
   const { t } = useTranslation();
+  const { results, goTo, currentPage } = usePagination(appointments, 10);
 
-  return (
-    <Layer>
-      <OverflowMenu ariaLabel="Edit appointment" selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
-        <OverflowMenuItem
-          className={styles.menuItem}
-          id="#editAppointment"
-          onClick={() =>
-            launchOverlay(
-              t('editAppointment', 'Edit Appointment'),
-              <AppointmentForm appointment={appointment} context="editing" />,
-            )
-          }
-          itemText={t('editAppointment', 'Edit Appointment')}>
-          {t('editAppointment', 'Edit Appointment')}
-        </OverflowMenuItem>
-        {appointmentTitle === 'scheduled' ? (
-          <OverflowMenuItem
-            className={styles.menuItem}
-            id="#cancelAppointment"
-            onClick={() =>
-              launchOverlay(
-                t('cancelAppointment', 'Cancel Appointment'),
-                <CancelAppointment appointment={appointment} />,
-              )
-            }
-            itemText={t('cancelAppointment', 'Cancel Appointment')}>
-            {t('cancelAppointment', 'Cancel Appointment')}
-          </OverflowMenuItem>
-        ) : null}
-      </OverflowMenu>
-    </Layer>
-  );
-}
+  const headerData = [
+    {
+      header: t('patientName', 'Patient name'),
+      key: 'patientName',
+    },
+    {
+      header: t('identifier', 'identifier'),
+      key: 'identifier',
+    },
+    {
+      header: t('dateTime', 'Date & Time'),
+      key: 'dateTime',
+    },
+    {
+      header: t('serviceType', 'Service Type'),
+      key: 'serviceType',
+    },
+    {
+      header: t('actions', 'Actions'),
+      key: 'actions',
+    },
+  ];
 
-function ServiceIcon({ service }) {
-  switch (service) {
-    case 'TB Clinic':
-      return <Cough size={16} />;
-    case 'HIV Clinic':
-      return <Omega size={16} />;
-    case 'Drug Dispense':
-      return <Medication size={16} />;
-    default:
-      return null;
-  }
-}
+  const rowData = results?.map((appointment, index) => ({
+    id: `${index}`,
+    patientName: {
+      content: (
+        <ConfigurableLink
+          style={{ textDecoration: 'none' }}
+          to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+          {appointment.name}
+        </ConfigurableLink>
+      ),
+    },
+    identifier: appointment.identifier,
+    dateTime: formatDatetime(new Date(appointment.dateTime)),
+    serviceType: appointment.serviceType,
+    provider: appointment.provider,
+    actions: (
+      <>
+        {(dayjs(appointment.dateTime).isAfter(dayjs()) || dayjs(appointment.dateTime).isToday()) && (
+          <OverflowMenu size="sm" flipped>
+            <OverflowMenuItem
+              itemText={t('editAppointments', 'Edit Appointment')}
+              onClick={() =>
+                launchOverlay(
+                  t('editAppointments', 'Edit Appointment'),
+                  <AppointmentForm appointment={appointment} context="editing" />,
+                )
+              }
+            />
+            <OverflowMenuItem
+              itemText={t('cancelAppointment', 'Cancel appointment')}
+              onClick={() =>
+                launchOverlay(
+                  t('cancelAppointment', 'Cancel appointment'),
+                  <CancelAppointment appointment={appointment} />,
+                )
+              }
+            />
+          </OverflowMenu>
+        )}
+      </>
+    ),
+  }));
 
-const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLoading, tableHeading }) => {
-  const { t } = useTranslation();
-  const { isLoading: isLoadingQueueEntries, queueEntries } = useServiceQueues();
-
-  const [filteredRows, setFilteredRows] = useState<Array<MappedAppointment>>([]);
-  const [filter, setFilter] = useState('');
-  const patientQueueEntry = (patientUuid: string) => {
-    const queryEntries = queueEntries.find((entry) => entry.queueEntry.patient.uuid === patientUuid);
-    return ` ${queryEntries?.queueEntry?.status?.display} ${queryEntries?.queueEntry?.queue?.display}`;
-  };
-  useEffect(() => {
-    if (filter) {
-      setFilteredRows(appointments?.filter((entry) => entry.serviceType === filter));
-      setFilter('');
-    }
-  }, [filter, filteredRows, appointments]);
-
-  const handleServiceTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem?.display);
-  };
-
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
-
-        if (typeof filterableValue === 'boolean') {
-          return false;
-        }
-        if (filterableValue.hasOwnProperty('content')) {
-          if (Array.isArray(filterableValue.content.props.children)) {
-            return ('' + filterableValue.content.props.children[1]).toLowerCase().includes(filterTerm);
-          }
-          if (typeof filterableValue.content.props.children === 'object') {
-            return ('' + filterableValue.content.props.children.props.children).toLowerCase().includes(filterTerm);
-          }
-          return ('' + filterableValue.content.props.children).toLowerCase().includes(filterTerm);
-        }
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
-
-  const handleAppointmentActionButtonClick = (appointment: MappedAppointment) => {
-    if (appointment.status === 'Scheduled') {
-      launchOverlay(
-        t('AddPatientToQueue', 'Add patient to queue'),
-        <VisitForm patientUuid={appointment.patientUuid} appointment={appointment} />,
-      );
-      return;
-    }
-
-    const dispose = showModal('change-appointment-status-modal', {
-      closeModal: () => dispose(),
-      appointment,
+  const pageSizes = useMemo(() => {
+    const numberOfPages = Math.ceil(appointments.length / 10);
+    return [...Array(numberOfPages).keys()].map((x) => {
+      return (x + 1) * 10;
     });
-  };
-
-  const tableHeaders = useMemo(
-    () => [
-      {
-        header: t('name', 'Name'),
-        key: 'name',
-      },
-      {
-        header: t('dateTime', 'Date & Time'),
-        key: 'dateTime',
-      },
-      {
-        header: t('serviceType', 'Service Type'),
-        key: 'serviceType',
-      },
-      {
-        header: t('provider', 'Provider'),
-        key: 'provider',
-      },
-      {
-        header: t('location', 'Location'),
-        key: 'location',
-      },
-      {
-        header: 'Actions',
-        key: 'startButton',
-      },
-    ],
-    [t],
-  );
-  const services = appointments.map(({ serviceType }) => ({ display: serviceType })) ?? [];
-  const tableRows = useMemo(() => {
-    return (filteredRows.length ? filteredRows : appointments)?.map((appointment, index) => ({
-      ...appointment,
-      name: {
-        content: (
-          <ConfigurableLink
-            style={{ textDecoration: 'none' }}
-            to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
-            {appointment.name}
-          </ConfigurableLink>
-        ),
-      },
-      dateTime: {
-        content: <span className={styles.statusContainer}>{formatDatetime(parseDate(appointment.dateTime))}</span>,
-      },
-      serviceType: {
-        content: (
-          <span className={styles.statusContainer}>
-            <ServiceIcon service={appointment.serviceType} />
-            {appointment.serviceType}
-          </span>
-        ),
-      },
-      startButton: {
-        content: (
-          <>
-            {dayjs(appointment.dateTime).isSameOrAfter(new Date(), 'day') && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {dayjs(appointment.dateTime).isToday() && (
-                  <Button onClick={() => handleAppointmentActionButtonClick(appointment)} kind="ghost">
-                    {appointment.status === 'Scheduled'
-                      ? t('checkIn', 'Check In')
-                      : appointment.status === 'Completed'
-                      ? t('completed', 'Completed')
-                      : patientQueueEntry(appointment.patientUuid)}
-                  </Button>
-                )}
-
-                <ActionsMenu appointmentTitle={tableHeading} appointment={appointments?.[index]} />
-              </div>
-            )}
-          </>
-        ),
-      },
-    }));
-  }, [filteredRows, appointments, t, tableHeading, handleAppointmentActionButtonClick]);
-
+  }, [appointments]);
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return <DataTableSkeleton role="progressbar" row={5} />;
   }
 
-  if (appointments?.length === 0) {
+  if (!appointments?.length) {
     return (
-      <div className={styles.container}>
-        <div className={styles.tileContainer}>
-          <Tile className={styles.tile}>
-            <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-            <Button
-              kind="ghost"
-              size="sm"
-              renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}>
-              {t('addNewAppointment', 'Add new appointment')}
-            </Button>
-          </Tile>
-        </div>
-      </div>
+      <EmptyState
+        headerTitle={`${tableHeading} appointments`}
+        displayText={`${tableHeading} appointments`}
+        launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+      />
     );
   }
 
   return (
-    <div className={styles.container}>
-      <DataTable rows={tableRows} headers={tableHeaders} filterRows={handleFilter}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getTableContainerProps,
-          getToolbarProps,
-          onInputChange,
-        }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <TableToolbar size="sm" {...getToolbarProps()} aria-label="data table toolbar">
-              <TableToolbarContent className={styles.tableToolBarContent}>
-                <TableToolbarSearch
-                  style={{ height: '2rem' }}
-                  className={styles.search}
-                  expanded
-                  onChange={onInputChange}
-                  placeholder={t('searchAppointments', 'Search appointments')}
-                  size="sm"
-                  id="toolBarSearch"
-                />
-                <Dropdown
-                  style={{ width: '18rem' }}
-                  id="serviceFilter"
-                  initialSelectedItem={{ display: `${t('all', 'All')}` }}
-                  titleText={t('filterByServiceType', '')}
-                  label={t('filterByServiceType', '')}
-                  type="inline"
-                  items={[{ display: t('all', 'All') }, ...services]}
-                  itemToString={(item) => (item ? item.display : '')}
-                  onChange={(event) => handleServiceTypeChange(event)}
-                  size="sm"
-                />
+    <div className={styles.appointmentBaseTable}>
+      <DataTable rows={rowData} headers={headerData} isSortable filterRows={handleFilter}>
+        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getBatchActionProps, onInputChange }) => (
+          <TableContainer
+            title={`${startCase(tableHeading)} ${t('appointments', 'appointment')} ${appointments.length ?? 0}`}>
+            <TableToolbar>
+              <TableToolbarContent>
+                <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
                 <Button
-                  kind="secondary"
-                  className={styles.appointmentButton}
-                  style={{ minHeight: 0 }}
-                  renderIcon={(props) => <Add size={16} {...props} />}
+                  tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-                  iconDescription={t('addNewAppointment', 'Add new appointment')}>
-                  {t('addNewAppointment', 'Add new appointment')}
+                  size="sm"
+                  renderIcon={Add}
+                  kind="secondary">
+                  {t('createNewAppointment', 'Create new appointment')}
                 </Button>
               </TableToolbarContent>
             </TableToolbar>
-            <Table useZebraStyles size="sm" {...getTableProps()}>
+            <Table {...getTableProps()} size="sm" useZebraStyles>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader id="expand" />
-                  {headers.map((header, i) => (
-                    <TableHeader key={i} {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
+                  <TableExpandHeader />
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
@@ -336,15 +174,15 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell className="cds--table-column-menu" key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
                       ))}
                     </TableExpandRow>
-                    {row.isExpanded ? (
-                      <TableExpandedRow colSpan={headers.length + 2}>
-                        <AppointmentDetails appointment={appointments?.[index]} />
+                    {row.isExpanded && (
+                      <TableExpandedRow colSpan={headers.length + 1}>
+                        <AppointmentDetails appointment={results[index]} />
                       </TableExpandedRow>
-                    ) : (
-                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                     )}
                   </React.Fragment>
                 ))}
@@ -353,6 +191,17 @@ const AppointmentsBaseTable: React.FC<AppointmentsProps> = ({ appointments, isLo
           </TableContainer>
         )}
       </DataTable>
+      <Pagination
+        backwardText="Previous page"
+        forwardText="Next page"
+        itemsPerPageText="Items per page:"
+        page={currentPage}
+        pageNumberText="Page Number"
+        pageSize={10}
+        onChange={({ page }) => goTo(page)}
+        pageSizes={pageSizes}
+        totalItems={appointments.length ?? 0}
+      />
     </div>
   );
 };

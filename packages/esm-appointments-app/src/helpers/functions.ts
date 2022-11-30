@@ -90,6 +90,7 @@ export const getAppointment = (appointment: Appointment) => {
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
     providers: appointment.providers,
+    identifier: appointment.patient.identifier,
   };
   return formattedAppointment;
 };

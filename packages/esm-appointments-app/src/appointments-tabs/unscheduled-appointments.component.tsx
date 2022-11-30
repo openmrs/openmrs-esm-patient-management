@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVisits } from '../hooks/useVisits';
 import {
@@ -10,18 +10,26 @@ import {
   TableRow,
   TableBody,
   TableCell,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
+  Pagination,
+  DataTableSkeleton,
 } from '@carbon/react';
 import { useAppointments } from './appointments-table.resource';
-import { ConfigurableLink, formatDatetime } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
+import { EmptyState } from '../empty-state/empty-state.component';
+import isEmpty from 'lodash-es/isEmpty';
 
 const UnScheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
   const { isLoading: isVisitLoading, visits } = useVisits();
   const { appointments, isLoading } = useAppointments();
   const patientUuids = appointments?.map(({ patientUuid }) => patientUuid);
-  const filteredAppointment = !isVisitLoading
-    ? visits?.filter((visit) => !patientUuids.includes(visit.patient.uuid))
-    : [];
+  const filteredAppointment = useMemo(
+    () => (!isVisitLoading ? visits?.filter((visit) => !patientUuids.includes(visit.patient.uuid)) : []),
+    [isVisitLoading, patientUuids, visits],
+  );
   const headerData = [
     {
       header: 'Name',
@@ -41,7 +49,9 @@ const UnScheduledAppointments: React.FC = () => {
     },
   ];
 
-  const rowData = filteredAppointment?.map((visit) => ({
+  const { results, currentPage, goTo } = usePagination(filteredAppointment, 10);
+
+  const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
     name: (
       <ConfigurableLink
@@ -54,11 +64,32 @@ const UnScheduledAppointments: React.FC = () => {
     visitType: visit.visitType.display,
     location: visit.location.display,
   }));
+
+  const pageSizes = useMemo(() => {
+    const numberOfPages = Math.ceil(filteredAppointment.length / 10);
+    return [...Array(numberOfPages).keys()].map((x) => {
+      return (x + 1) * 10;
+    });
+  }, [filteredAppointment]);
+
+  if (isLoading && isVisitLoading) {
+    return <DataTableSkeleton />;
+  }
+
+  if (isEmpty(filteredAppointment)) {
+    return <EmptyState headerTitle="UnScheduled Appointments" displayText="UnScheduled Appointments" />;
+  }
+
   return (
     <div>
       <DataTable rows={rowData} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
           <TableContainer title={`${t('unScheduledAppointments', 'UnScheduled appointments')} ${rowData.length}`}>
+            <TableToolbar>
+              <TableToolbarContent>
+                <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
+              </TableToolbarContent>
+            </TableToolbar>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
@@ -80,6 +111,17 @@ const UnScheduledAppointments: React.FC = () => {
           </TableContainer>
         )}
       </DataTable>
+
+      <Pagination
+        backwardText="Previous page"
+        forwardText="Next page"
+        page={currentPage}
+        pageNumberText="Page Number"
+        pageSize={10}
+        onChange={({ page }) => goTo(page)}
+        pageSizes={pageSizes.length > 0 ? pageSizes : [10]}
+        totalItems={appointments.length ?? 0}
+      />
     </div>
   );
 };
