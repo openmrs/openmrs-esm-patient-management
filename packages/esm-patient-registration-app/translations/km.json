@@ -32,6 +32,7 @@
   "estimatedAgeInYearsLabelText": "អាយុប៉ាន់ស្មានគិតជាឆ្នាំ",
   "familyNameLabelText": "នាមត្រកូល",
   "familyNameRequired": "តម្រូវឱ្យបំពេញនាមត្រកូល",
+  "female": "ស្រី",
   "fieldErrorTitleMessage": "ផ្នែកខាងក្រោមមានកំហុស៖",
   "fullNameLabelText": "ឈ្មោះ​ពេញ",
   "genderLabelText": "ភេទ",
@@ -47,6 +48,7 @@
   "isDeadInputLabel": "គឺស្លាប់",
   "jumpTo": "រំលងទៅ",
   "loadingResults": "កំពុងផ្ទុកលទ្ធផល",
+  "male": "ប្រុស",
   "middleNameLabelText": "លេខជាឈ្មោះដែលសង្ស័យ",
   "months": "ខែ",
   "negativeMonths": "ខែអវិជ្ជមាន",
@@ -55,6 +57,7 @@
   "noResultsFound": "រកមិនឃើញលទ្ធផលទេ",
   "numberInNameDubious": "លេខគឺជាឈ្មោះគួរឱ្យសង្ស័យ",
   "optional": "ជាជម្រើស",
+  "other": "ផ្សេងៗ",
   "patient": "អ្នកជំងឺ",
   "patientNameKnown": "ស្គាល់ឈ្មោះអ្នកជំងឺឬទេ?",
   "phoneEmailLabelText": "ទូរស័ព្ទ អ៊ីមែល។ល។",
@@ -82,5 +85,5 @@
   "updationSuccessToastTitle": "ព័ត៌មានលម្អិតអំពីអ្នកជំងឺត្រូវបានធ្វើបច្ចុប្បន្នភាព",
   "years": "ឆ្នាំ",
   "yearsEstimateRequired": "តម្រូវ​ឱ្យ​មាន​ការ​ប៉ាន់ស្មាន​ឆ្នាំ",
-  "yes": "បាទ/ចា"
+  "yes": "បាទ/ចាស"
 }
