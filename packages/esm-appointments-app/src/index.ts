@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { clinicalAppointmentsDashboardMeta } from './dashboard.meta';
@@ -22,6 +22,19 @@ function setupOpenMRS() {
   };
 
   defineConfigSchema(moduleName, configSchema);
+
+  registerBreadcrumbs([
+    {
+      path: `${window.spaBase}/appointments`,
+      title: 'Appointments',
+      parent: `${window.spaBase}/home`,
+    },
+    {
+      path: `${window.spaBase}/appointments/calendar`,
+      title: 'Calendar',
+      parent: `${window.spaBase}/appointments`,
+    },
+  ]);
 
   return {
     pages: [

@@ -13,7 +13,7 @@ import {
 } from '@carbon/react';
 import { ArrowRight, Filter } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { formatDate, formatTime } from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDate, formatTime } from '@openmrs/esm-framework';
 import AppointmentsHeader from '../appointments-header/appointments-header.component';
 import styles from './appointments-calendar-list-view.scss';
 import EmptyState from '../empty-state/empty-state.component';
@@ -49,6 +49,7 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
   return (
     <div>
       <AppointmentsHeader title={t('clinicalAppointments', 'Clinical Appointments')} />
+      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
       <div className={styles.calendarTitle}>
         <h3 className={styles.productiveHeading02}>{t('calendar', 'Calendar')}</h3>
         <Button renderIcon={ArrowRight} kind="ghost">
