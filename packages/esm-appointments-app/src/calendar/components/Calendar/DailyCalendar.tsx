@@ -15,7 +15,7 @@ function DailyCalendarView({
   events,
 }: {
   type: CalendarType;
-  events: { start: string; end: string; [key: string]: any }[];
+  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
 }) {
   const [currentDate, setCurrentDate] = useState(dayjs());
 
@@ -24,17 +24,19 @@ function DailyCalendarView({
       <DailyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
       <div className={styles.wrapper}>
         {type === 'daily' ? (
-          <div className={styles['daily-calendar']}>
-            {dailyHours(currentDate).map((dateTime, i) => (
-              <DailyCell type={type} key={i} dateTime={dateTime} currentDate={currentDate} />
-            ))}
-          </div>
+          <>
+            <div className={styles['daily-calendar']}>
+              {dailyHours(currentDate).map((dateTime, i) => (
+                <DailyCell type={type} key={i} dateTime={dateTime} currentDate={currentDate} />
+              ))}
+            </div>
+          </>
         ) : null}
         {events.map((event, i) => {
           const dayStart = currentDate.startOf('day');
           const dayEnd = currentDate.endOf('day');
-          const start = dayjs(event.start);
-          const end = dayjs(event.end);
+          const start = dayjs(event.startDateTime);
+          const end = dayjs(event.endDateTime);
 
           const startDay = dayStart.isBefore(start) || dayStart.isSame(start) ? start.day() : 0;
           const endDay = dayEnd.isAfter(end) || dayEnd.isSame(end) ? end.day() + 1 : 7;
@@ -48,21 +50,27 @@ function DailyCalendarView({
 
           const height = (end.hour() * 60 + end.minute() - (start.hour() * 60 + start.minute())) * 1;
           const width = `calc(((100% - 60px) / 7) * ${endDay - startDay})`;
-          const left = `calc((((100% - 60px) / 60)* ${startDay}))`;
+          const left = `calc((((100% - 60px) / 30)* ${startDay}) + 100px)`;
           return (
             <div
               key={i}
               style={{
                 display: dateArr.some((date) => date.isBetween(dayStart, dayEnd)) ? 'inline-block' : 'none',
                 position: 'absolute',
-                top: start.hour() * 120 + start.minute() * 2,
+                top: start.hour() * 60 + start.minute() * 2,
                 left: left,
                 height: height,
                 width: width,
                 borderRadius: 6,
                 background: 'lightblue',
               }}>
-              {event.title}
+              {event.service.map((data) => {
+                return (
+                  <p>
+                    {data.serviceName} - {data.count}
+                  </p>
+                );
+              })}
             </div>
           );
         })}

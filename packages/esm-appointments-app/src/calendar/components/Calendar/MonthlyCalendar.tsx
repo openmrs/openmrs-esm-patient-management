@@ -15,7 +15,7 @@ function MonthlyCalendarView({
   events,
 }: {
   type: CalendarType;
-  events: { start: string; end: string; [key: string]: any }[];
+  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
 }) {
   const [currentDate, setCurrentDate] = useState(dayjs());
 

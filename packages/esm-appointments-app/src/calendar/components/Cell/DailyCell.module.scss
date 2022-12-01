@@ -3,33 +3,27 @@
 .daily-cell {
   position: relative;
   border-right: var.$border;
-  border-bottom: var.$border;
-  min-height: 120px;
-  color: var.$primary-color;
+  border-left: var.$border;
+  min-height: 50px;
+  //  color: var.$primary-color;
 
-  .week-time {
-    display: none;
+  .day-time {
+    white-space: nowrap;
+    display: inline;
+    position: absolute;
+    top: -11px;
+    left: 20;
+    height: 22px;
+    width: 30px;
   }
 
-  &:nth-child(-n + 8) {
+  &:nth-child(-n + 24) {
     border-top: var.$border;
+    border-left: var.$border;
+    left: 20px;
   }
 
-  &:first-child {
-    border-top: none;
-  }
-
-  &:nth-child(8n + 1) {
-    border-bottom: none;
-
-    .week-time {
-      white-space: nowrap;
-      display: inline;
-      color: var.$disabled-color;
-      position: absolute;
-      top: -11px;
-      height: 22px;
-      width: 30px;
-    }
+  &:nth-child(24n) {
+    border-bottom: var.$border;
   }
 }

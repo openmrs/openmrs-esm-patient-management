@@ -29,6 +29,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { MappedAppointment } from '../../../types';
 import { useServices } from '../../../appointments-tabs/appointments-table.resource';
 import isEmpty from 'lodash-es/isEmpty';
+import useSWR from 'swr';
 
 interface AppointmentsCalendarListViewProps {
   appointment?: MappedAppointment;
@@ -55,7 +56,7 @@ const CalendarView: React.FC<AppointmentsCalendarListViewProps> = ({ appointment
   };
 
   const { services } = useServices();
-  const [selectedTab, setSelectedTab] = useState(2);
+  const [selectedTab, setSelectedTab] = useState(0);
   const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
 
@@ -94,13 +95,9 @@ const CalendarView: React.FC<AppointmentsCalendarListViewProps> = ({ appointment
         onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
         className={styles.tabs}>
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
-          <Tab>{t('daily', 'Daily')}</Tab>
-          <Tab>{t('weekly', 'Weekly')}</Tab>
           <Tab>{t('monthly', 'Monthly')}</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel style={{ padding: 0 }}>{<DailyCalendarView type="daily" events={events} />}</TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<WeeklyCalendarView type="weekly" events={events} />}</TabPanel>
           <TabPanel style={{ padding: 0 }}>{<MonthlyCalendarView type="monthly" events={events} />}</TabPanel>
         </TabPanels>
       </Tabs>
@@ -111,33 +108,77 @@ const CalendarView: React.FC<AppointmentsCalendarListViewProps> = ({ appointment
 export default CalendarView;
 const events = [
   {
-    title: 'Dr John Doe',
-    start: '2022-11-15 14:20:00',
-    end: '2022-11-15 14:30:00',
+    appointmentDate: '2022-12-30 05:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Lab testing', count: 7 },
+      { serviceName: 'Refill', count: 15 },
+    ],
   },
   {
-    title: 'HIV Consultation 3',
-    start: '2022-11-14 04:00:00',
-    end: '2022-11-14 04:40:00',
+    appointmentDate: '2022-12-28 10:20:00',
+    service: [
+      { serviceName: 'HIV', count: 5 },
+      { serviceName: 'Lab testing', count: 3 },
+      { serviceName: 'Refill', count: 1 },
+    ],
   },
   {
-    title: 'Lab Test 5',
-    start: '2022-11-09 01:50:00',
-    end: '2022-11-09 02:40:00',
+    appointmentDate: '2022-11-24 09:20:00',
+    service: [
+      { serviceName: 'Test', count: 10 },
+      { serviceName: 'Lab testing', count: 10 },
+    ],
   },
   {
-    title: 'Walkin Appointment',
-    start: '2022-11-13 03:20:00',
-    end: '2022-11-13 03:40:00',
+    appointmentDate: '2022-11-21 10:00:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Lab testing', count: 1 },
+      { serviceName: 'Refill', count: 1 },
+    ],
   },
   {
-    title: 'Scheduled Appointment',
-    start: '2022-11-06 04:00:00',
-    end: '2022-11-06 04:40:00',
+    appointmentDate: '2022-11-18 08:20:00',
+    service: [
+      { serviceName: 'HIV', count: 21 },
+      { serviceName: 'Drug Pickup', count: 4 },
+      { serviceName: 'Lab testing', count: 10 },
+      { serviceName: 'Refill', count: 3 },
+    ],
   },
   {
-    title: 'Walkin Apppointment',
-    start: '2021-10-10 06:50:00',
-    end: '2021-10-10 07:40:00',
+    appointmentDate: '2022-11-14 12:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Refill', count: 2 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-11 14:20:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Lab testing', count: 10 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-08 13:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Lab testing', count: 10 },
+      { serviceName: 'Refill', count: 15 },
+    ],
+  },
+  {
+    appointmentDate: '2022-10-27 15:20:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Drug pickup', count: 4 },
+      { serviceName: 'Refill', count: 1 },
+    ],
+  },
+  {
+    appointmentDate: '2022-10-22 17:20:00',
+    service: [{ serviceName: 'HIV', count: 13 }],
   },
 ];

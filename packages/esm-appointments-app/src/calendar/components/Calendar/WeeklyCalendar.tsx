@@ -7,26 +7,28 @@ import Header from '../Header';
 import Cell from '../Cell';
 import styles from './Calendar.module.scss';
 
-import { weekDays } from '../../functions/weekly';
+import { topWeekDays, weekDays } from '../../functions/weekly';
 import WeeklyCell from '../Cell/WeeklyCell';
+import WeeklyTopCell from '../Cell/WeekTopCell';
+import WeeklyHeader from '../Header/WeeklyHeader';
 dayjs.extend(isBetween);
 function WeeklyCalendarView({
   type = 'weekly',
   events,
 }: {
   type: CalendarType;
-  events: { start: string; end: string; [key: string]: any }[];
+  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
 }) {
   const [currentDate, setCurrentDate] = useState(dayjs());
 
   return (
     <div>
-      <Header type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
+      <WeeklyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
       <div className={styles.wrapper}>
         {type === 'weekly' ? (
           <div className={styles['weekly-calendar']}>
-            {weekDays(currentDate).map((dateTime, i) => (
-              <WeeklyCell type={type} key={i} dateTime={dateTime} currentDate={currentDate} />
+            {topWeekDays(currentDate).map((dateTime, i) => (
+              <WeeklyTopCell type={type} key={i} dateTime={dateTime} currentDate={currentDate} events={events} />
             ))}
           </div>
         ) : null}
@@ -34,8 +36,8 @@ function WeeklyCalendarView({
           const weekStart = currentDate.startOf('week');
           const weekEnd = currentDate.endOf('week');
 
-          const start = dayjs(event.start);
-          const end = dayjs(event.end);
+          const start = dayjs(event.startDateTime);
+          const end = dayjs(event.endDateTime);
 
           const startDay = weekStart.isBefore(start) || weekStart.isSame(start) ? start.day() : 0;
           const endDay = weekEnd.isAfter(end) || weekEnd.isSame(end) ? end.day() + 1 : 7;
@@ -66,7 +68,7 @@ function WeeklyCalendarView({
                 borderRadius: 6,
                 background: 'lightblue',
               }}>
-              {event.title}
+              {event.appointmentKind}
             </div>
           );
         })}

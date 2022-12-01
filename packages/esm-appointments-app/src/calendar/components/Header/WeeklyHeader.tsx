@@ -1,5 +1,5 @@
-import { Dayjs } from 'dayjs';
-import React from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+import React, { useMemo } from 'react';
 import { CalendarType } from '../../utils/types';
 import DaysOfWeekCard from '../Cell/DaysOfWeek';
 import styles from './MonthlyHeader.module.scss';
@@ -12,8 +12,10 @@ const Format = {
 
 const monthFormat = 'MMMM, YYYY';
 const dateFormat = 'D MMM';
-const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-function MonthlyHeader({
+const startOfWeek = dayjs().startOf('week');
+
+const weekdays = new Array(7).fill(startOfWeek).map((day, idx) => day.add(idx, 'day').format('dddd DD/YY'));
+function WeeklyHeader({
   type,
   currentDate,
   setCurrentDate,
@@ -35,12 +37,7 @@ function MonthlyHeader({
         </span>
         <button onClick={() => setCurrentDate(currentDate.add(1, Format[type]))}>next</button>
       </div>
-      <div className={styles.workLoadCard}>
-        {daysInWeek?.map((dayy) => {
-          return <DaysOfWeekCard dayOfWeek={dayy} />;
-        })}
-      </div>
     </>
   );
 }
-export default MonthlyHeader;
+export default WeeklyHeader;
