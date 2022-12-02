@@ -20,7 +20,7 @@ export const monthDays = (currentDate: Dayjs) => {
     days.push(currentDate.date(i));
   }
 
-  const dayLen = days.length > 35 ? 7 : 14;
+  const dayLen = days.length > 30 ? 7 : 14;
 
   for (let i = 1; i < dayLen - monthEnd.day(); i++) {
     days.push(currentDate.date(i).month(nextMonth.month()));

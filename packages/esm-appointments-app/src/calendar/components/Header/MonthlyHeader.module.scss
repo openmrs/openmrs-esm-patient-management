@@ -5,14 +5,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  // padding: 8px 0px;
   height: var.$header-height;
-
-  button {
-    background: transparent;
-    border: 2px solid rgb(209, 209, 209);
-    border-radius: 6px;
-  }
 }
 .workLoadCard {
   display: flex;

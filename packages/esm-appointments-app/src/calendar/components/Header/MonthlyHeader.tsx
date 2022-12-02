@@ -1,8 +1,10 @@
-import { Dayjs } from 'dayjs';
 import React from 'react';
-import { CalendarType } from '../../utils/types';
+import { Dayjs } from 'dayjs';
 import DaysOfWeekCard from '../Cell/DaysOfWeek';
 import styles from './MonthlyHeader.module.scss';
+import { Button } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { CalendarType } from '../../../types';
 
 const Format = {
   monthly: 'month',
@@ -11,8 +13,7 @@ const Format = {
 } as const;
 
 const monthFormat = 'MMMM, YYYY';
-const dateFormat = 'D MMM';
-const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 function MonthlyHeader({
   type,
   currentDate,
@@ -22,23 +23,23 @@ function MonthlyHeader({
   currentDate: Dayjs;
   setCurrentDate: (date: Dayjs) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className={styles.container}>
-        <button onClick={() => setCurrentDate(currentDate.subtract(1, Format[type]))}>prev</button>
-        <span>
-          {type === 'monthly'
-            ? currentDate.format(monthFormat)
-            : type === 'daily'
-            ? currentDate.format(dateFormat)
-            : `${currentDate.startOf('week').format(dateFormat)} - ${currentDate.endOf('week').format(dateFormat)}`}
-        </span>
-        <button onClick={() => setCurrentDate(currentDate.add(1, Format[type]))}>next</button>
+        <Button size="sm" onClick={() => setCurrentDate(currentDate.subtract(1, Format[type]))} kind="tertiary">
+          {t('prev', 'Prev')}
+        </Button>
+        <span>{currentDate.format(monthFormat)}</span>
+
+        <Button size="sm" onClick={() => setCurrentDate(currentDate.add(1, Format[type]))} kind="tertiary">
+          {t('next', 'Next')}
+        </Button>
       </div>
       <div className={styles.workLoadCard}>
-        {daysInWeek?.map((dayy) => {
-          return <DaysOfWeekCard dayOfWeek={dayy} />;
-        })}
+        {daysInWeek?.map((dayy) => (
+          <DaysOfWeekCard dayOfWeek={dayy} />
+        ))}
       </div>
     </>
   );

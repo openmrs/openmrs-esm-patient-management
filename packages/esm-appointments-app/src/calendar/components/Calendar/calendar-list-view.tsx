@@ -1,107 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import {
-  StructuredListSkeleton,
-  StructuredListWrapper,
-  StructuredListHead,
-  StructuredListCell,
-  StructuredListRow,
-  StructuredListBody,
-  Button,
-  ContentSwitcher,
-  Switch,
-  Tab,
-  TabList,
-  Tabs,
-  TabPanel,
-  TabPanels,
-  Select,
-  SelectItem,
-} from '@carbon/react';
-import { ArrowRight, Filter } from '@carbon/react/icons';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './appointments-calendar-list-view.scss';
 import AppointmentsHeader from '../../../appointments-header/appointments-header.component';
-import DailyCalendarView from './DailyCalendar';
-import WeeklyCalendarView from './WeeklyCalendar';
+import CalendarHeader from '../Header/calendar-header.component';
 import MonthlyCalendarView from './MonthlyCalendar';
-import { useAllAppointments } from '../Resource/allAppointments.resource';
-import dayjs, { Dayjs } from 'dayjs';
-import { MappedAppointment } from '../../../types';
-import { useServices } from '../../../appointments-tabs/appointments-table.resource';
-import isEmpty from 'lodash-es/isEmpty';
-import useSWR from 'swr';
 
-interface AppointmentsCalendarListViewProps {
-  appointment?: MappedAppointment;
-  patientUuid?: string;
-  context?: string;
-  dateTime?: Dayjs;
-}
+interface AppointmentsCalendarListViewProps {}
 
-const CalendarView: React.FC<AppointmentsCalendarListViewProps> = ({ appointment, patientUuid, dateTime }) => {
+type CalendarView = 'daily' | 'weekly' | 'monthly';
+
+const CalendarView: React.FC<AppointmentsCalendarListViewProps> = () => {
   const { t } = useTranslation();
-  const initialState = {
-    patientUuid,
-    dateTime: undefined,
-    location: '',
-    serviceUuid: '',
-    comments: '',
-    appointmentKind: '',
-    status: '',
-    id: undefined,
-    gender: '',
-    serviceType: '',
-    provider: '',
-    appointmentNumber: undefined,
-  };
-
-  const { services } = useServices();
-  const [selectedTab, setSelectedTab] = useState(0);
-  const appointmentState = !isEmpty(appointment) ? appointment : initialState;
-  const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
-
+  const [calendarView, setCalendarView] = useState<CalendarView>('monthly');
   return (
-    <>
-      <div>
-        <AppointmentsHeader title={t('clinicalAppointments', 'Clinical Appointments')} />
-        <div className={styles.calendarTitle}>
-          <h3 className={styles.productiveHeading02}>{t('calendar', 'Calendar')}</h3>
-          <div className={styles['right-justified-items']}>
-            <div className={styles['date-and-location']}>
-              <Select
-                id="service"
-                invalidText="Required"
-                labelText={t('selectService', 'Select a service')}
-                light
-                className={styles.inputContainer}
-                onChange={(event) => setSelectedService(event.target.value)}
-                value={selectedService}>
-                {!selectedService || selectedService == '--' ? (
-                  <SelectItem text={t('chooseService', 'Select service')} value="" />
-                ) : null}
-                {services?.length > 0 &&
-                  services.map((service) => (
-                    <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
-                      {service.name}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </div>
-          </div>
-        </div>
-      </div>
-      <Tabs
-        selectedIndex={selectedTab}
-        onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
-        className={styles.tabs}>
-        <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
-          <Tab>{t('monthly', 'Monthly')}</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel style={{ padding: 0 }}>{<MonthlyCalendarView type="monthly" events={events} />}</TabPanel>
-        </TabPanels>
-      </Tabs>
-    </>
+    <div style={{ backgroundColor: 'white' }}>
+      <AppointmentsHeader title={t('appointments', 'Appointments')} />
+      <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
+      {calendarView === 'monthly' && <MonthlyCalendarView type="monthly" events={events} />}
+    </div>
   );
 };
 

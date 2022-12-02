@@ -5,15 +5,21 @@
 @import '~carbon-components/src/globals/scss/mixins';
 
 .tileContainer {
+  height: 56px;
   display: flex;
-  padding: 0rem 0rem 0rem 4rem;
-  flex: 1;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  flex-direction: column;
-  // cursor: pointer;
-  border: 1px solid colors.$blue-30;
+  width: 100%;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+
+  & > span {
+    font-size: spacing.$spacing-05;
+    color: colors.$gray-70;
+  }
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .tileHeader {
