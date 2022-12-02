@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @import '../root.scss';
 
 .appointmentList {
@@ -26,6 +27,9 @@
 
 .downloadButton {
   margin: spacing.$spacing-05;
+  & > button {
+    border: 1px solid colors.$blue-60;
+  }
 }
 .downloadLink {
   text-decoration: none;

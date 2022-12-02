@@ -15,14 +15,19 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid, new AbortController());
 
   return (
-    <div className={styles.container}>
-      <div className="header">
-        <p className={styles.title}>{appointment.serviceType}</p>
-        <p className={styles.subHeading}>{formatDate(new Date(appointment.dateTime), { mode: 'standard' })}</p>
+    <div className={styles.appointmentDetailsContainer}>
+      <p className={styles.title}>{appointment.serviceType}</p>
+      <p className={styles.subTitle}>{formatDate(new Date(appointment.dateTime))}</p>
+
+      <div className={styles.tags}>
+        <Tag type="red" title={appointment.appointmentKind}>
+          {appointment.appointmentKind}
+        </Tag>
       </div>
-      <section>
+
+      <div className={styles.patientInfoGrid}>
         <div>
-          <h4 className={styles.heading}>{t('patientDetails', 'Patient Details')}</h4>
+          <p className={styles.gridTitle}>{t('patientDetails', 'Patient details')}</p>
           <p className={styles.label}>{appointment.name}</p>
           <p className={styles.label}>{appointment.age}</p>
           <p className={styles.label}>{appointment.gender}</p>
@@ -30,31 +35,31 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
           <p className={styles.label}>{appointment.phoneNumber}</p>
         </div>
         <div>
-          <h4 className={styles.heading}>{t('appointmentNotes', 'Appointment Notes')}</h4>
+          <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
           <p className={styles.label}>{appointment.comments}</p>
         </div>
         <div>
-          <h4 className={styles.heading}>{t('appointmentHistory', 'Appointment History')}</h4>
-          <div className={styles.appointmentHistory}>
+          <p className={styles.gridTitle}>{t('appointmentHistory', 'Appointment History')}</p>
+          <div className={styles.historyGrid}>
             <div>
-              <span className={styles.historyTitle}>{t('completed', 'Completed')}</span>
-              <p className={styles.labelPrimary}> {appointmentsCount.completedAppointments}</p>
+              <p className={styles.historyGridLabel}>{t('completed', 'Completed')}</p>
+              <span className={styles.historyGridCount}>{appointmentsCount.completedAppointments}</span>
             </div>
             <div>
-              <span className={styles.historyTitle}>{t('cancelled', 'Cancelled')}</span>
-              <p className={styles.labelPrimary}> {appointmentsCount.cancelledAppointments}</p>
+              <p className={styles.historyGridLabel}>{t('missed', 'Missed')}</p>
+              <span className={styles.historyGridCountRed}>{appointmentsCount.missedAppointments}</span>
             </div>
             <div>
-              <span className={styles.historyTitle}>{t('missed', 'Missed')}</span>
-              <p className={styles.labelDanger}> {appointmentsCount.missedAppointments}</p>
+              <p className={styles.historyGridLabel}>{t('cancelled', 'Cancelled')}</p>
+              <span className={styles.historyGridCount}>{appointmentsCount.cancelledAppointments}</span>
             </div>
             <div>
-              <span className={styles.historyTitle}>{t('upcoming', 'Upcoming')}</span>
-              <p className={styles.labelPrimary}> {appointmentsCount.upcomingAppointments}</p>
+              <p className={styles.historyGridLabel}>{t('upcomming', 'Upcoming')}</p>
+              <span className={styles.historyGridCount}>{appointmentsCount.upcomingAppointments}</span>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

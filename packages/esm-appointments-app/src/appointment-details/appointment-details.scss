@@ -1,76 +1,69 @@
 @use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
 
-.container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  & > section {
-    display: flex;
-    gap: spacing.$spacing-09;
-    & > div {
-      width: fit-content;
-      margin: 0 spacing.$spacing-07 0 0;
-    }
-  }
+.appointmentDetailsContainer {
+  min-height: fit-content;
+  background-color: colors.$white;
+  padding: spacing.$spacing-05;
 }
 
 .title {
-  @include type.type-style('body-compact-01');
-  color: colors.$cool-gray-90-hover;
-  margin: spacing.$spacing-03 0;
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-90;
 }
 
-.heading {
-  @include type.type-style('body-compact-01');
-  color: $ui-05;
-  margin-bottom: spacing.$spacing-06;
-  color: $text-02;
-}
-
-.subHeading {
+.subTitle {
   @include type.type-style('label-01');
-  color: $text-02;
-  margin-bottom: spacing.$spacing-05;
+  color: colors.$gray-70;
+}
+
+.tags {
+  margin-top: spacing.$spacing-05;
+  display: flex;
+  column-gap: spacing.$spacing-03;
+
+  & > div {
+    margin: 0;
+  }
+}
+
+.patientInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
+}
+
+.gridTitle {
+  @include type.type-style('label-02');
+  margin-bottom: spacing.$spacing-06;
+  color: colors.$gray-70;
 }
 
 .label {
-  color: $text-02;
-  @include type.type-style('legal-02');
-  margin: spacing.$spacing-04 0;
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
 }
 
-.labelPrimary {
-  color: colors.$blue-60;
-  @include type.type-style('body-compact-02');
-  margin: spacing.$spacing-05 0;
-}
-
-.labelDanger {
-  color: colors.$red-60;
-  @include type.type-style('body-compact-02');
-  margin: spacing.$spacing-05 0;
-}
-
-.historyTitle {
-  color: $text-02;
-  @include type.type-style('legal-01');
-}
-
-.tag {
-  margin-bottom: spacing.$spacing-05;
-}
-
-.appointmentHistory {
+.historyGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: minmax(auto, auto);
+  grid-template-columns: 1fr 1fr;
+  row-gap: spacing.$spacing-05;
+}
 
-  & > div {
-    display: flex;
-    flex-direction: column;
-  }
+.historyGridLabel {
+  @include type.type-style('legal-01');
+  color: colors.$gray-70;
+}
+.historyGridCount {
+  @include type.type-style('heading-02');
+  margin-top: spacing.$spacing-01;
+  color: colors.$blue-60;
+}
+
+.historyGridCountRed {
+  @include type.type-style('heading-02');
+  margin-top: spacing.$spacing-01;
+  color: colors.$red-60;
 }

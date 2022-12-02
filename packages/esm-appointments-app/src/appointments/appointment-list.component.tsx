@@ -40,17 +40,17 @@ const AppointmentList: React.FC = () => {
       .join('\n')
       .replace(/(^\[)|(\]$)/gm, '');
     return new Blob([downloadInfo], {
-      type: 'text/csv;charset=utf-8;',
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
   };
   return (
     <div className={styles.appointmentList}>
       <div className={styles.downloadButton}>
         {appointments.length > 0 && (
-          <Button renderIcon={Download} kind="tertiary">
+          <Button renderIcon={Download} kind="ghost">
             <a
               className={styles.downloadLink}
-              download={`Appointments ${startDate}.csv`}
+              download={`Patient appointments list - ${dayjs().format('DD-MMMM-YYYY')}.xls`}
               href={window.URL.createObjectURL(appointmentDownloadInfo())}>
               {t('downloadAppointmentList', 'Download appointment list')}
             </a>

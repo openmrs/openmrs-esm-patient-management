@@ -49,4 +49,9 @@
 .tile {
   text-align: center;
   border: 1px solid $ui-03;
+  margin: spacing.$spacing-07 spacing.$spacing-05;
+}
+.actionText {
+  display: flex;
+  align-items: center;
 }

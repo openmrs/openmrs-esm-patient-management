@@ -7,6 +7,8 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 import { useAppointmentDate } from '../helpers';
+import { useAppointments } from '../appointments-tabs/appointments-table.resource';
+import { useVisits } from '../hooks/useVisits';
 
 const AppointmentsMetrics: React.FC = () => {
   const { t } = useTranslation();
@@ -15,6 +17,13 @@ const AppointmentsMetrics: React.FC = () => {
   const { totalScheduledAppointments } = useScheduledAppointment();
   const startDate = useAppointmentDate();
   const formattedStartDate = formatDate(parseDate(startDate), { mode: 'standard', time: false });
+  const { appointments } = useAppointments();
+  const { visits } = useVisits();
+
+  const hashTable = new Map([]);
+  visits?.map((visit) => hashTable.set(visit.patient.uuid, visit));
+  const pendingAppointments = appointments.filter((appointment) => !hashTable.get(appointment.patientUuid));
+  const arrivedAppointments = appointments.filter((appointment) => hashTable.get(appointment.patientUuid));
 
   if (isLoading || loading) {
     return <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />;
@@ -33,9 +42,12 @@ const AppointmentsMetrics: React.FC = () => {
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           view="patients"
+          count={{ pendingAppointments, arrivedAppointments }}
         />
         <MetricsCard
-          label={t(highestServiceLoad?.serviceName)}
+          label={
+            highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
+          }
           value={highestServiceLoad?.count ?? '--'}
           headerLabel={t('highestServiceVolume', 'High volume Service : {time}', { time: formattedStartDate })}
           view="highVolume"

@@ -12,8 +12,9 @@
 }
 
 .metricsTitle {
-  // @include type.type-style('heading-04');
+  @include type.type-style('heading-03');
   color: $ui-05;
+  margin: spacing.$spacing-03 0;
 }
 
 .link {
@@ -28,4 +29,5 @@
 
 .metricsContent {
   display: flex;
+  align-items: center;
 }
