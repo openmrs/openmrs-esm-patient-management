@@ -190,3 +190,5 @@ export enum AppointmentTypes {
   CHECKEDIN = 'checkedin',
   COMPLETED = 'completed',
 }
+
+export type CalendarType = 'daily' | 'weekly' | 'monthly';

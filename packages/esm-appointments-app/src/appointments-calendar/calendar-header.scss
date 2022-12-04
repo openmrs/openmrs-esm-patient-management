@@ -1,0 +1,30 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+
+.calendarHeaderContainer {
+  display: flex;
+  margin: 1rem;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & > p {
+    @include type.type-style('heading-02');
+  }
+
+  & > button {
+    color: colors.$blue-60;
+    @include type.type-style('label-02');
+  }
+}
+
+.titleContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

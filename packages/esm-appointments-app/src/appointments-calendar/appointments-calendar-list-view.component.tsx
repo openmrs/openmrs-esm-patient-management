@@ -1,105 +1,97 @@
-import React, { useMemo, useState } from 'react';
-import { useAppointmentsByDurationPeriod, useDailyAppointments } from '../hooks/useAppointments';
-import {
-  StructuredListSkeleton,
-  StructuredListWrapper,
-  StructuredListHead,
-  StructuredListCell,
-  StructuredListRow,
-  StructuredListBody,
-  Button,
-  ContentSwitcher,
-  Switch,
-} from '@carbon/react';
-import { ArrowRight, Filter } from '@carbon/react/icons';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, formatDate, formatTime } from '@openmrs/esm-framework';
 import AppointmentsHeader from '../appointments-header/appointments-header.component';
-import styles from './appointments-calendar-list-view.scss';
-import { DurationPeriod } from '../types';
-import dayjs from 'dayjs';
-import { omrsDateFormat } from '../constants';
-import { EmptyState } from '../empty-state/empty-state.component';
+import CalendarHeader from './calendar-header.component';
+import MonthlyCalendarView from './monthly-calendar-view.component';
 
 interface AppointmentsCalendarListViewProps {}
-
+type AppointmentsCalendarListView = 'daily' | 'weekly' | 'monthly';
 const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> = () => {
   const { t } = useTranslation();
-  const currentDate = useMemo(() => dayjs(new Date().setHours(0, 0)).format(omrsDateFormat), []);
-  const [selectedDurationIndex, setSelectedDurationIndex] = useState(DurationPeriod.weekly);
-  const { isLoading, appointments } = (
-    selectedDurationIndex !== DurationPeriod.daily ? useDailyAppointments : useAppointmentsByDurationPeriod
-  )(currentDate, selectedDurationIndex);
-  if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
-  }
-
-  if (appointments.length === 0) {
-    return (
-      <>
-        <AppointmentsHeader title={t('clinicalAppointments', 'Clinical Appointments')} />
-        <EmptyState
-          displayText={t('appointmentsList', 'Appointment list is empty')}
-          headerTitle={t('appointmentList', 'Appointments list')}
-        />
-      </>
-    );
-  }
-
+  const [calendarView, setCalendarView] = useState<AppointmentsCalendarListView>('monthly');
   return (
-    <div>
-      <AppointmentsHeader title={t('clinicalAppointments', 'Clinical Appointments')} />
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-      <div className={styles.calendarTitle}>
-        <h3 className={styles.productiveHeading02}>{t('calendar', 'Calendar')}</h3>
-        <Button renderIcon={ArrowRight} kind="ghost">
-          {t('addNewClinicDay', 'Add new clinic day')}
-        </Button>
-      </div>
-      <div className={styles.filterContainer}>
-        <Button renderIcon={Filter} kind="ghost">
-          {t('filter', 'Filter')}
-        </Button>
-
-        <ContentSwitcher
-          selectedIndex={selectedDurationIndex}
-          style={{ maxWidth: '25rem' }}
-          onChange={({ index }) => setSelectedDurationIndex(index)}>
-          <Switch name={'daily'} text={t('daily', 'Daily')} />
-          <Switch name={'weekly'} text={t('weekly', 'Weekly')} />
-          <Switch name={'monthly'} text={t('monthly', 'Monthly')} />
-        </ContentSwitcher>
-      </div>
-      <StructuredListWrapper className={styles.structuredListWrapper} ariaLabel="Structured list">
-        <StructuredListHead>
-          <StructuredListRow head tabIndex={0}>
-            <StructuredListCell head>{t('patientName', 'Patient name')}</StructuredListCell>
-            <StructuredListCell head>{t('date', 'Date')}</StructuredListCell>
-            <StructuredListCell head>{t('startTime', 'Start time')}</StructuredListCell>
-            <StructuredListCell head>{t('endTime', 'End time')}</StructuredListCell>
-            <StructuredListCell head>{t('provider', 'Provider')}</StructuredListCell>
-            <StructuredListCell head>{t('service', 'Service')}</StructuredListCell>
-            <StructuredListCell head>{t('comments', 'Comments')}</StructuredListCell>
-          </StructuredListRow>
-        </StructuredListHead>
-        <StructuredListBody>
-          {appointments.map((appointment: any) => (
-            <StructuredListRow key={appointment.uuid} tabIndex={0}>
-              <StructuredListCell>{appointment.patient.name}</StructuredListCell>
-              <StructuredListCell>
-                {formatDate(new Date(appointment.startDateTime), { mode: 'standard' })}
-              </StructuredListCell>
-              <StructuredListCell>{formatTime(new Date(appointment.startDateTime))}</StructuredListCell>
-              <StructuredListCell>{formatTime(new Date(appointment.endDateTime))}</StructuredListCell>
-              <StructuredListCell>{appointment.provider?.name ?? '--'}</StructuredListCell>
-              <StructuredListCell>{appointment.service.name}</StructuredListCell>
-              <StructuredListCell>{appointment.comments}</StructuredListCell>
-            </StructuredListRow>
-          ))}
-        </StructuredListBody>
-      </StructuredListWrapper>
+    <div style={{ backgroundColor: 'white' }}>
+      <AppointmentsHeader title={t('appointments', 'Appointments')} />
+      <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
+      {calendarView === 'monthly' && <MonthlyCalendarView type="monthly" events={events} />}
     </div>
   );
 };
 
 export default AppointmentsCalendarListView;
+const events = [
+  {
+    appointmentDate: '2022-12-01 05:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Lab testing', count: 7 },
+      { serviceName: 'Refill', count: 15 },
+    ],
+  },
+  {
+    appointmentDate: '2022-12-05 10:20:00',
+    service: [
+      { serviceName: 'HIV', count: 5 },
+      { serviceName: 'Lab testing', count: 3 },
+      { serviceName: 'Refill', count: 1 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-24 09:20:00',
+    service: [
+      { serviceName: 'Test', count: 10 },
+      { serviceName: 'Lab testing', count: 10 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-21 10:00:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Lab testing', count: 1 },
+      { serviceName: 'Refill', count: 1 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-18 08:20:00',
+    service: [
+      { serviceName: 'HIV', count: 21 },
+      { serviceName: 'Drug Pickup', count: 4 },
+      { serviceName: 'Lab testing', count: 10 },
+      { serviceName: 'Refill', count: 3 },
+    ],
+  },
+  {
+    appointmentDate: '2022-12-14 12:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Refill', count: 2 },
+    ],
+  },
+  {
+    appointmentDate: '2022-12-11 14:20:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Lab testing', count: 10 },
+    ],
+  },
+  {
+    appointmentDate: '2022-11-26 13:20:00',
+    service: [
+      { serviceName: 'HIV', count: 10 },
+      { serviceName: 'Lab testing', count: 10 },
+      { serviceName: 'Refill', count: 15 },
+    ],
+  },
+  {
+    appointmentDate: '2022-10-27 15:20:00',
+    service: [
+      { serviceName: 'HIV', count: 1 },
+      { serviceName: 'Drug pickup', count: 4 },
+      { serviceName: 'Refill', count: 1 },
+    ],
+  },
+  {
+    appointmentDate: '2022-10-22 17:20:00',
+    service: [{ serviceName: 'HIV', count: 13 }],
+  },
+];

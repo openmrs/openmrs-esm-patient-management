@@ -2,33 +2,29 @@
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.calendarTitle {
-  padding: 0 spacing.$spacing-05;
+.wrapper {
+  position: relative;
+}
+
+.monthly-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(6, minmax(0px, 1fr));
+}
+
+.weekly-calendar {
+  display: grid;
+  grid-template-columns: 60px repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(24, minmax(0px, 1fr));
+}
+.daily-calendar {
+  display: grid;
+  grid-template-columns: repeat(0, minmax(60px));
+  grid-template-rows: repeat(24, minmax(60px, 1fr));
+}
+.date-and-location {
   display: flex;
-  justify-content: space-between;
-  background-color: $ui-02;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.filterContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 spacing.$spacing-05 0 0;
-}
-
-.structuredListWrapper {
-  background-color: $ui-02;
-}
-
-.productiveHeading01 {
-  @include type.type-style('heading-compact-01');
-}
-
-.productiveHeading02 {
-  @include type.type-style('heading-compact-02');
-}
-
-.bodyLong01 {
-  @include type.type-style('body-01');
+  margin-right: 1rem;
 }
