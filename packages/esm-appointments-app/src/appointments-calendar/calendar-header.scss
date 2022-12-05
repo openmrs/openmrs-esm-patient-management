@@ -1,0 +1,23 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & > p {
+    @include type.type-style('heading-02');
+  }
+
+  & > button {
+    color: colors.$blue-60;
+    @include type.type-style('label-02');
+  }
+}
+
+.titleContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

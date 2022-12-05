@@ -1,0 +1,14 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-10;
+}
+.workLoadCard {
+  display: flex;
+  color: colors.$black;
+}

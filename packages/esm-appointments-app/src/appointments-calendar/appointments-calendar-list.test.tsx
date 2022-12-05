@@ -17,29 +17,10 @@ jest.mock('../hooks/useAppointments'),
 describe('Appointment calendar view', () => {
   it('renders appointments in calendar view from appointments list', async () => {
     const user = userEvent.setup();
-    mockedOpenmrsFetch.mockResolvedValue({ data: mockAppointmentsData.data });
 
     renderAppointmentsCalendarListView();
 
-    await waitForLoadingToFinish();
-
-    expect(screen.getByText(/clinical appointments/i)).toBeInTheDocument();
-    expect(screen.getByText(/add new clinic day/i)).toBeInTheDocument();
-    expect(screen.getByText(/calendar/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /filter/i })).toBeInTheDocument();
-
-    const dailyAppointmentsTab = screen.getByRole('tab', { name: /daily/i });
-    const weeklyAppointmentsTab = screen.getByRole('tab', { name: /weekly/i });
-    const monthlyAppointmentsTab = screen.getByRole('tab', { name: /monthly/i });
-
-    expect(screen.getByRole('tablist')).toContainElement(dailyAppointmentsTab);
-    expect(screen.getByRole('tablist')).toContainElement(weeklyAppointmentsTab);
-    expect(screen.getByRole('tablist')).toContainElement(monthlyAppointmentsTab);
-
-    const expectedColumnHeaders = [/patient name/, /date/, /start time/, /end time/, /provider/, /service/, /comments/];
-    expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
-    });
+    expect(screen.getByText(/monthly/i)).toBeInTheDocument();
 
     const expectedTableRows = [
       /John Wilson 30-Aug-2021 03:35 03:35 Dr James Cook Outpatient Walk in appointments/,
@@ -49,20 +30,6 @@ describe('Appointment calendar view', () => {
     expectedTableRows.forEach((row) => {
       expect(screen.queryByRole('row', { name: new RegExp(row, 'i') })).not.toBeInTheDocument();
     });
-
-    await waitFor(() => user.click(weeklyAppointmentsTab));
-    expect(screen.getByRole('table')).toBeInTheDocument();
-  });
-
-  it('renders an empty state if appointments data is unavailable', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: [] });
-
-    renderAppointmentsCalendarListView();
-
-    await waitForLoadingToFinish();
-
-    expect(screen.getByText(/clinical appointments/i)).toBeInTheDocument();
-    expect(screen.getByText(/appointment list is empty/i)).toBeInTheDocument();
   });
 });
 
