@@ -84,7 +84,7 @@
 }
 
 .greyBackground {
-  background-color: #f5f2f2;
+  background-color: colors.$gray-10;
 }
 
 .serviceArea {
@@ -114,28 +114,28 @@
 }
 
 .red {
-  background-color: #952727;
+  background-color: colors.$red-60;
   color: colors.$white;
   font-weight: bold;
   padding: 0.0125rem;
 }
 
-.yellow {
-  background-color: #a3b40a;
+.purple {
+  background-color: colors.$purple-50;
   color: colors.$white;
   font-weight: bold;
   padding: 0.0125rem;
 }
 
 .blue {
-  background-color: #0c3ab7;
+  background-color: colors.$blue-60;
   color: colors.$white;
   font-weight: bold;
   padding: 0.0125rem;
 }
 
 .green {
-  background-color: #2e7f11;
+  background-color: colors.$green-50;
   color: colors.$white;
   font-weight: bold;
   padding: 0.0125rem;

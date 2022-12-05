@@ -17,7 +17,7 @@ const MonthlyWorkload: React.FC<MonthlyCellProps> = ({ type, dateTime, currentDa
   const currentData = events?.find(
     (event) => dayjs(event.appointmentDate).format('YYYY-MM-DD') === dayjs(dateTime).format('YYYY-MM-DD'),
   );
-  const colorCoding = { HIV: 'red', 'Lab testing': 'yellow', Refill: 'blue' };
+  const colorCoding = { HIV: 'red', 'Lab testing': 'purple', Refill: 'blue' };
   const { t } = useTranslation();
 
   return (

@@ -1,30 +1,16 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .wrapper {
   position: relative;
 }
-
 .monthly-calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0px, 1fr));
   grid-template-rows: repeat(6, minmax(0px, 1fr));
 }
-
-.weekly-calendar {
-  display: grid;
-  grid-template-columns: 60px repeat(7, minmax(0px, 1fr));
-  grid-template-rows: repeat(24, minmax(0px, 1fr));
-}
-.daily-calendar {
-  display: grid;
-  grid-template-columns: repeat(0, minmax(60px));
-  grid-template-rows: repeat(24, minmax(60px, 1fr));
-}
-.date-and-location {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: 1rem;
+.backgroundColor {
+  background-color: colors.$white;
 }

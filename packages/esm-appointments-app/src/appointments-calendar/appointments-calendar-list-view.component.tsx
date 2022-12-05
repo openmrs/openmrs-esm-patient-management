@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import AppointmentsHeader from '../appointments-header/appointments-header.component';
 import CalendarHeader from './calendar-header.component';
 import MonthlyCalendarView from './monthly-calendar-view.component';
+import styles from './appointments-calendar-list-view.scss';
 
 interface AppointmentsCalendarListViewProps {}
 type AppointmentsCalendarListView = 'daily' | 'weekly' | 'monthly';
@@ -10,7 +11,7 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
   const { t } = useTranslation();
   const [calendarView, setCalendarView] = useState<AppointmentsCalendarListView>('monthly');
   return (
-    <div style={{ backgroundColor: 'white' }}>
+    <div className={styles.backgroundColor}>
       <AppointmentsHeader title={t('appointments', 'Appointments')} />
       <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
       {calendarView === 'monthly' && <MonthlyCalendarView type="monthly" events={events} />}

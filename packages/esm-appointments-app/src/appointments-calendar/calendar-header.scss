@@ -1,13 +1,6 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/colors';
 
-.calendarHeaderContainer {
-  display: flex;
-  margin: 1rem;
-  flex-direction: column;
-  row-gap: 1rem;
-}
-
 .titleContainer {
   display: flex;
   justify-content: space-between;
