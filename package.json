@@ -7,7 +7,6 @@
   ],
   "scripts": {
     "start": "openmrs develop --sources 'packages/esm-*-app/'",
-    "start-dev": "openmrs develop --sources 'packages/esm-*-app/' --backend 'http://localhost:9000/'" ,
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
@@ -48,9 +47,7 @@
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^5.3.0",
     "cross-env": "^7.0.3",
-    "cypress": "^10.11.0",
     "dayjs": "^1.8.36",
-    "dotenv": "16.0.1",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
