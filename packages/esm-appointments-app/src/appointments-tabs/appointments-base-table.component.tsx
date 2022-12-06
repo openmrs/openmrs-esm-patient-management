@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../empty-state/empty-state.component';
-import { launchOverlay } from '../hooks/useOverlay';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import PatientSearch from '../patient-search/patient-search.component';
 import { MappedAppointment } from '../types';
 import {
@@ -54,6 +55,14 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const { results, goTo, currentPage } = usePagination(appointments, 10);
+
+  const launchCreateAppointmentForm = (patientUuid) => {
+    closeOverlay();
+    launchOverlay(
+      t('appointmentForm', 'Create Appointment'),
+      <AppointmentForm patientUuid={patientUuid} context="creating" />,
+    );
+  };
 
   const headerData = [
     {
@@ -143,6 +152,21 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
 
   return (
     <div className={styles.appointmentBaseTable}>
+      <div className={styles.addAppointmentButton}>
+        <ExtensionSlot
+          extensionSlotName="patient-search-button-slot"
+          state={{
+            selectPatientAction: launchCreateAppointmentForm,
+            buttonText: t('createNewAppointment', 'Create new appointment'),
+            overlayHeader: t('createNewAppointment', 'Create new appointment'),
+            buttonProps: {
+              kind: 'secondary',
+              size: 'sm',
+              renderIcon: (props) => <Add size={20} {...props} />,
+            },
+          }}
+        />
+      </div>
       <DataTable rows={rowData} headers={headerData} isSortable filterRows={handleFilter}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getBatchActionProps, onInputChange }) => (
           <TableContainer
@@ -150,14 +174,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
             <TableToolbar>
               <TableToolbarContent>
                 <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
-                <Button
-                  tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                  onClick={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-                  size="sm"
-                  renderIcon={Add}
-                  kind="secondary">
-                  {t('createNewAppointment', 'Create new appointment')}
-                </Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} size="sm" useZebraStyles>

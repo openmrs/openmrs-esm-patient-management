@@ -10,7 +10,7 @@
 
 .buttonContainer {
   display: flex;
-  &>button {
+  & > button {
     width: 50%;
     height: spacing.$spacing-10;
     display: flex;
