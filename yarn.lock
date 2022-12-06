@@ -3764,7 +3764,7 @@ __metadata:
     sass: ^1.29.0
     sass-loader: ^10.1.0
     swr: ^1.0.1
-    turbo: ^1.6.1
+    turbo: ^1.6.3
     typedoc: ^0.22.15
     typescript: ^4.0.3
     webpack: ^5.74.0
@@ -19044,7 +19044,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo@npm:^1.6.1":
+"turbo@npm:^1.6.3":
   version: 1.6.3
   resolution: "turbo@npm:1.6.3"
   dependencies:
