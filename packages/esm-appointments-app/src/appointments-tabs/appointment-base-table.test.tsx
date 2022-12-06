@@ -38,8 +38,6 @@ describe('AppointmentsBaseTable', () => {
       currentPage: 1,
     });
     renderAppointmentsBaseTable([], false, tableHeading);
-
-    expect(screen.getByRole('button', { name: /Create appointment/i })).toBeInTheDocument();
     expect(screen.getByText(/There are no scheduled appointments to display/i)).toBeInTheDocument();
   });
 
@@ -51,7 +49,6 @@ describe('AppointmentsBaseTable', () => {
     });
     renderAppointmentsBaseTable(mockMappedAppointmentsData.data, false, tableHeading);
 
-    expect(screen.getByRole('button', { name: /Create new appointment/i })).toBeInTheDocument();
     expect(screen.queryByText(/There are no scheduled appointments to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
 
