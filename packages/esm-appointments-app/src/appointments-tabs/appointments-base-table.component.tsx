@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../empty-state/empty-state.component';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import PatientSearch from '../patient-search/patient-search.component';
 import { MappedAppointment } from '../types';
@@ -26,7 +26,7 @@ import {
   OverflowMenu,
   OverflowMenuItem,
 } from '@carbon/react';
-import { ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
+import { ExtensionSlot, ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
 import { Add } from '@carbon/react/icons';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
