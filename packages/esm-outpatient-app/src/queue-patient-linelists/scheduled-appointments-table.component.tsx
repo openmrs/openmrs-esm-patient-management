@@ -288,7 +288,7 @@ const AppointmentsTable: React.FC = () => {
         pageSize={20}
         onChange={({ page }) => goTo(page)}
         pageSizes={pageSizes?.length > 0 ? pageSizes : [20]}
-        totalItems={results?.length ?? 0}
+        totalItems={appointmentQueueEntries?.length ?? 0}
       />
 
       {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
