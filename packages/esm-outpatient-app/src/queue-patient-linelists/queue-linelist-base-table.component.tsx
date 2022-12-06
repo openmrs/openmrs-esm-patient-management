@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -18,12 +18,14 @@ import {
   Tag,
   Tile,
   DataTableSkeleton,
+  Pagination,
 } from '@carbon/react';
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
+import { ConfigurableLink, ExtensionSlot, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
 import { FilterTypes } from '../types';
 import QueueLinelist from './queue-linelist.component';
+import { getGender } from '../helpers/helpers';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -37,7 +39,6 @@ interface QueuePatientTableProps {
   title: string;
   patientData: Array<any>;
   headers: Array<any>;
-  rows: any;
   serviceType: string;
   isLoading: boolean;
   toggleFilter?: (filterMode: FilterTypes) => void;
@@ -47,13 +48,12 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   title,
   patientData,
   headers,
-  rows,
   serviceType,
   isLoading,
-  toggleFilter,
 }) => {
   const { t } = useTranslation();
   const [showOverlay, setShowOverlay] = useState(false);
+  const { results, currentPage, goTo } = usePagination(patientData ?? [], 10);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -80,6 +80,35 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
       }),
     );
   };
+
+  const pageSizes = useMemo(() => {
+    const numberOfPages = Math.ceil(patientData?.length / 10);
+    return [...Array(numberOfPages).keys()].map((x) => {
+      return (x + 1) * 10;
+    });
+  }, [patientData]);
+
+  const tableRows = useMemo(
+    () =>
+      results?.map((entry) => {
+        return {
+          id: entry.id,
+          name: {
+            content: (
+              <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>
+                {entry.name}
+              </ConfigurableLink>
+            ),
+          },
+          returnDate: formatDatetime(parseDate(entry.returnDate), { mode: 'wide' }),
+          gender: getGender(entry.gender, t),
+          age: entry.age,
+          visitType: entry.visitType,
+          phoneNumber: entry.phoneNumber,
+        };
+      }),
+    [results, t],
+  );
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -123,73 +152,76 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
         </Tile>
       </Layer>
 
-      {patientData?.length ? (
-        <DataTable
-          data-floating-menu-container
-          filterRows={handleFilter}
-          headers={headers}
-          overflowMenuOnHover={false}
-          rows={rows}
-          size="md"
-          useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
-            <TableContainer className={styles.tableContainer}>
-              <TableToolbar
-                style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
-                <TableToolbarContent className={styles.toolbarContent}>
-                  <TableToolbarSearch
-                    className={styles.search}
-                    expanded
-                    onChange={onInputChange}
-                    placeholder={t('searchThisList', 'Search this list')}
-                    size="sm"
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
-              <Table {...getTableProps()} className={styles.queueTable}>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => {
-                    return (
-                      <React.Fragment key={row.id}>
-                        <TableRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                          ))}
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              {rows.length === 0 ? (
-                <div className={styles.tileContainer}>
-                  <Layer>
-                    <Tile className={styles.tile}>
-                      <div className={styles.tileContent}>
-                        <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                      </div>
-                    </Tile>
-                  </Layer>
-                </div>
-              ) : null}
-            </TableContainer>
-          )}
-        </DataTable>
-      ) : (
-        <Layer>
-          <Tile className={styles.tile}>
-            <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-          </Tile>
-        </Layer>
-      )}
+      <DataTable
+        data-floating-menu-container
+        filterRows={handleFilter}
+        headers={headers}
+        overflowMenuOnHover={false}
+        rows={tableRows}
+        size="md"
+        useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
+          <TableContainer className={styles.tableContainer}>
+            <TableToolbar style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+              <TableToolbarContent className={styles.toolbarContent}>
+                <TableToolbarSearch
+                  className={styles.search}
+                  expanded
+                  onChange={onInputChange}
+                  placeholder={t('searchThisList', 'Search this list')}
+                  size="sm"
+                />
+              </TableToolbarContent>
+            </TableToolbar>
+            <Table {...getTableProps()} className={styles.queueTable}>
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => {
+                  return (
+                    <React.Fragment key={row.id}>
+                      <TableRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {rows.length === 0 ? (
+              <div className={styles.tileContainer}>
+                <Layer>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </Layer>
+              </div>
+            ) : null}
+          </TableContainer>
+        )}
+      </DataTable>
+
+      <Pagination
+        backwardText="Previous page"
+        forwardText="Next page"
+        page={currentPage}
+        pageNumberText="Page Number"
+        pageSize={10}
+        onChange={({ page }) => goTo(page)}
+        pageSizes={pageSizes?.length > 0 ? pageSizes : [10]}
+        totalItems={patientData?.length ?? 0}
+      />
+
       {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
     </div>
   );

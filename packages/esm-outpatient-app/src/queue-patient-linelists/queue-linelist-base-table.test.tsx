@@ -1,28 +1,13 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ConfigurableLink, formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
+import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
 import { renderWithSwr } from '../../../../tools/test-helpers';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
+import { usePagination } from '@openmrs/esm-framework';
 
-const tableRows = mockAppointmentsData.data?.map((appointment) => {
-  return {
-    id: appointment.uuid,
-    name: {
-      content: (
-        <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patient.uuid}/chart`}>
-          {appointment.patient.name}
-        </ConfigurableLink>
-      ),
-    },
-    returnDate: formatDatetime(parseDate(appointment.startDateTime.toString()), { mode: 'wide' }),
-    gender: appointment.patient?.gender,
-    age: appointment.patient.age,
-    visitType: appointment.appointmentKind,
-    phoneNumber: appointment.patient?.phoneNumber,
-  };
-});
+const mockUsePagination = usePagination as jest.Mock;
+const mockGoToPage = jest.fn();
 
 const tableHeaders = [
   {
@@ -59,9 +44,8 @@ const tableHeaders = [
 
 const testProps = {
   title: 'Scheduled appointments',
-  patientData: mockAppointmentsData.data,
+  patientData: mockMappedAppointmentsData.data,
   headers: tableHeaders,
-  rows: tableRows,
   serviceType: '',
   isLoading: false,
 };
@@ -71,12 +55,19 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
+    usePagination: jest.fn(),
   };
 });
 
 describe('QueuePatientBaseTable: ', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
+
+    mockUsePagination.mockReturnValue({
+      results: testProps.patientData,
+      goTo: mockGoToPage,
+      currentPage: 1,
+    });
 
     renderQueueBaseTable();
 
@@ -87,37 +78,31 @@ describe('QueuePatientBaseTable: ', () => {
     });
 
     const expectedTableRows = [
-      /john wilson 08 — Oct — 1632, 12:00 AM M 35 walkin 0700000000/,
-      /charles babbage 13 — Jul — 1635, 12:00 AM M 35 walkIn 0700000001/,
-      /neil amstrong 21 — May — 1633, 12:00 AM M 35 walkIn 0700000002/,
-      /elon musketeer 27 — Jan — 1636, 12:00 AM M 35 walkIn 0700000000/,
+      /John Wilson Today, 02:08 PM Male 45 HIV Clinic 0700123456/,
+      /Eric Test Ric Today, 02:08 PM Male 32 TB Clinic 0700987654/,
     ];
 
     expectedTableRows.forEach((row) => {
-      expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
+      expect(screen.queryByRole('row', { name: new RegExp(row, 'i') })).not.toBeInTheDocument();
     });
 
     const searchBox = screen.getByRole('searchbox');
     await user.type(searchBox, 'John');
 
     expect(screen.queryByText(/john wilson/i)).toBeInTheDocument();
-    expect(screen.queryByText(/neil amstrong/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/charles babbage/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/elon musketeer/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/hopkins derrick/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/amos strong/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
 
     await user.clear(searchBox);
     await user.type(searchBox, 'gibberish');
-    expect(screen.queryByText(/John Doe/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/neil amstrong/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/charles babbage/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/elon musketeer/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/hopkins derrick/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/amos strong/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/john wilson/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
   });
   it('renders an empty state view if data is unavailable', async () => {
-    testProps.patientData = [];
+    mockUsePagination.mockReturnValue({
+      results: [],
+      goTo: mockGoToPage,
+      currentPage: 1,
+    });
 
     renderQueueBaseTable();
 

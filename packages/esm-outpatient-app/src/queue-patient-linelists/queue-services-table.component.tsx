@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-import { formatDatetime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { useServiceQueueEntries } from '../active-visits/active-visits-table.resource';
 
 const ServicesTable: React.FC = () => {
@@ -47,34 +46,11 @@ const ServicesTable: React.FC = () => {
     [t],
   );
 
-  const tableRows = useMemo(
-    () =>
-      serviceQueueEntries?.map((entry) => {
-        return {
-          id: entry.id,
-          name: {
-            content: (
-              <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>
-                {entry.name}
-              </ConfigurableLink>
-            ),
-          },
-          returnDate: formatDatetime(parseDate(entry.returnDate), { mode: 'wide' }),
-          gender: entry.gender,
-          age: entry.age,
-          visitType: entry.visitType,
-          phoneNumber: entry.phoneNumber,
-        };
-      }),
-    [serviceQueueEntries],
-  );
-
   return (
     <div>
       <QueuePatientBaseTable
         title={t('alistOfClients', 'A list of clients waiting for ')}
         headers={tableHeaders}
-        rows={tableRows}
         patientData={serviceQueueEntries}
         serviceType={service}
         isLoading={isLoading}

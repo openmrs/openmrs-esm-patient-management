@@ -318,7 +318,7 @@ export function useServiceQueueEntries(service: string) {
   const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
 
   return {
-    serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : null,
+    serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
     isLoading: !data && !error,
     isError: error,
     isValidating,

@@ -49,7 +49,7 @@ export const getTodaysAppointment = (appointment: Appointment, t?: Function) => 
     name: appointment.patient?.name,
     age: appointment.patient?.birthDate,
     gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.contact,
+    phoneNumber: appointment.patient?.phoneNumber,
     dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
     patientUuid: appointment.patient?.uuid,
     dateTime: formatAMPM(parseDate(appointment.startDateTime)),
@@ -78,7 +78,7 @@ export const getAppointment = (appointment: Appointment) => {
     name: appointment.patient?.name,
     age: appointment.patient?.birthDate,
     gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.contact,
+    phoneNumber: appointment.patient?.phoneNumber,
     dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
     patientUuid: appointment.patient?.uuid,
     dateTime: appointment.startDateTime,
@@ -122,4 +122,19 @@ export const monthDays = (currentDate: Dayjs) => {
     days.push(currentDate.date(i).month(nextMonth.month()));
   }
   return days;
+};
+
+export const getGender = (gender, t) => {
+  switch (gender) {
+    case 'M':
+      return t('male', 'Male');
+    case 'F':
+      return t('female', 'Female');
+    case 'O':
+      return t('other', 'Other');
+    case 'U':
+      return t('unknown', 'Unknown');
+    default:
+      return gender;
+  }
 };

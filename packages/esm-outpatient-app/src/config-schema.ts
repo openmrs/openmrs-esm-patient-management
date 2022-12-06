@@ -65,6 +65,11 @@ export const configSchema = {
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
+  appointmentStatuses: {
+    _type: Type.Array,
+    _description: 'Configurable appointment status (status of appointments)',
+    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+  },
 };
 
 export interface ConfigObject {
@@ -85,6 +90,7 @@ export interface ConfigObject {
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
+  appointmentStatuses: Array<string>;
 }
 
 export interface OutpatientConfig {
