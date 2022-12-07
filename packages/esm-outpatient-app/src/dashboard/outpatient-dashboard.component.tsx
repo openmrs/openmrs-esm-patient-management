@@ -1,6 +1,6 @@
+import React, { useEffect } from 'react';
 import { attach, detach, ExtensionSlot, useExtensionStore, useLayoutType, isDesktop } from '@openmrs/esm-framework';
-import React, { useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
 import { useNavGroups } from '../side-menu/nav-group/nav-group';
 import styles from './outpatient-dashboard.scss';
@@ -11,10 +11,9 @@ export interface DashboardConfig {
   title: string;
 }
 
-export const OutpatientDashboard = () => {
+const OutpatientDashboard: React.FC = () => {
   const { view } = useParams();
   const layout = useLayoutType();
-  const navigate = useNavigate();
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
@@ -26,14 +25,7 @@ export const OutpatientDashboard = () => {
     .map((slotName) => extensionStore.slots[slotName]?.assignedExtensions.map((e) => e.meta))
     .flat();
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
-  const currentDashboard = useMemo(() => dashboards.find((dashboard) => dashboard.name === view), [dashboards, view]);
-
-  useEffect(() => {
-    if (!currentDashboard) {
-      // redirect to the home dashboard
-      return navigate('/home');
-    }
-  }, [currentDashboard, navigate]);
+  const currentDashboard = dashboards.find((dashboard) => dashboard.name === view) || dashboards[0];
 
   useEffect(() => {
     if (!isDesktop(layout)) {
@@ -48,9 +40,25 @@ export const OutpatientDashboard = () => {
       {currentDashboard && (
         <div className={`cds--grid ${styles.dashboardContent}`}>
           <PatientQueueHeader title={currentDashboard.title} />
-          <ExtensionSlot extensionSlotName={currentDashboard.slot} />
+          <DashboardView
+            dashboardSlot={currentDashboard.slot}
+            title={currentDashboard.title}
+            key={currentDashboard.slot}
+          />
         </div>
       )}
     </div>
   );
 };
+
+const DashboardView: React.FC<{ dashboardSlot: string; title: string }> = ({ dashboardSlot, title }) => {
+  return (
+    <ExtensionSlot
+      style={{ backgroundColor: 'white' }}
+      extensionSlotName={dashboardSlot}
+      state={{ dashboardTitle: title }}
+    />
+  );
+};
+
+export default OutpatientDashboard;

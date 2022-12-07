@@ -1,6 +1,21 @@
 import React from 'react';
-import { LeftNavMenu } from '@openmrs/esm-framework';
+import { SideNav, SideNavItems } from '@carbon/react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import styles from './side-menu.scss';
 
-const SideMenu = () => <LeftNavMenu isFixedNav expanded isChildOfHeader={false} />;
+const SideMenu = () => {
+  return (
+    <SideNav
+      isFixedNav
+      expanded={true}
+      isChildOfHeader={false}
+      aria-label="Side navigation"
+      className={styles.sideMenuContainer}>
+      <SideNavItems>
+        <ExtensionSlot extensionSlotName="outpatient-dashboard-slot" />
+      </SideNavItems>
+    </SideNav>
+  );
+};
 
 export default SideMenu;

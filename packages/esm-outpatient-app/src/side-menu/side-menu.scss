@@ -1,0 +1,25 @@
+@use '@carbon/colors';
+@import '../root.scss';
+
+.sideMenuContainer {
+  width: 16rem;
+  min-height: 8rem;
+  overscroll-behavior: contain;
+  margin: 48px 13px 15px 0;
+}
+
+@media (max-width: 1200px) {
+  .sideMenuContainer :global(.cds--side-nav) {
+    z-index: -100 !important;
+  }
+
+  .sideMenuContainer :global(.cds--side-nav__items) {
+    padding: 0 !important;
+  }
+}
+
+@media (min-width: 1201px) {
+  .sideMenuContainer {
+    border-right: 1px solid colors.$gray-20;
+  }
+}

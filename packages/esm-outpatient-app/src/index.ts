@@ -23,6 +23,11 @@ function setupOpenMRS() {
 
   registerBreadcrumbs([
     {
+      path: `${window.spaBase}/outpatient`,
+      title: 'Outpatient',
+      parent: `${window.spaBase}/home`,
+    },
+    {
       path: `${window.spaBase}/appointments-list/:value?`,
       title: ([x]) => `Patient Lists / ${x}`,
       parent: `${window.spaBase}`,
@@ -76,7 +81,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'home-db-link',
+        name: 'home-db-link',
         slot: 'outpatient-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(homeDashboardMeta), options),
         meta: homeDashboardMeta,
@@ -84,8 +89,8 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'home-dashboard',
-        slot: 'home-dashboard-slot',
+        name: 'home-dashboard',
+        slot: 'home-outpatient-dashboard-slot',
         load: getAsyncLifecycle(() => import('./home.component'), options),
         online: true,
         offline: true,
