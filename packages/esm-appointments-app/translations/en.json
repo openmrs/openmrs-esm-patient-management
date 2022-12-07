@@ -57,7 +57,6 @@
   "editAppointment": "Edit Appointment",
   "editAppointments": "Edit Appointment",
   "emergency": "Emergency",
-  "emptyStateText": "There are no {displayText.toLowerCase()} to display",
   "encounters": "Encounters",
   "encounterType": "Encounter type",
   "endTime": "End Time",

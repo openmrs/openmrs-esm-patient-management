@@ -50,13 +50,13 @@ const AppointmentsMetrics: React.FC = () => {
           }
           value={highestServiceLoad?.count ?? '--'}
           headerLabel={t('highestServiceVolume', 'High volume Service : {time}', { time: formattedStartDate })}
-          view="highVolume"
+          view=""
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
           headerLabel={t('providersAvailableToday', 'Providers available : {time}', { time: formattedStartDate })}
-          view="providers"
+          view=""
         />
       </div>
     </>

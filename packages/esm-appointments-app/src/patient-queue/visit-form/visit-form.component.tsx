@@ -21,7 +21,6 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  useLocations,
   useSession,
   ExtensionSlot,
   useLayoutType,
@@ -54,11 +53,11 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
   const startDate = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
+  const locations = sessionUser?.sessionLocation ? [{ ...sessionUser?.sessionLocation }] : [];
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(sessionUser?.sessionLocation?.uuid ?? '');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
@@ -72,12 +71,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
   const { isLoading, patient } = usePatient(patientUuid);
-
-  useEffect(() => {
-    if (locations && sessionUser?.sessionLocation?.uuid) {
-      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
-    }
-  }, [locations, sessionUser]);
 
   const handleSubmit = useCallback(
     (event) => {

@@ -4,6 +4,7 @@ import AppointmentsHeader from '../appointments-header/appointments-header.compo
 import CalendarHeader from './calendar-header.component';
 import MonthlyCalendarView from './monthly-calendar-view.component';
 import styles from './appointments-calendar-list-view.scss';
+import CommingSoon from '../empty-state/comming-soon.component';
 
 interface AppointmentsCalendarListViewProps {}
 type AppointmentsCalendarListView = 'daily' | 'weekly' | 'monthly';
@@ -15,6 +16,7 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
       <AppointmentsHeader title={t('appointments', 'Appointments')} />
       <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
       {calendarView === 'monthly' && <MonthlyCalendarView type="monthly" events={events} />}
+      {calendarView !== 'monthly' && <CommingSoon />}
     </div>
   );
 };

@@ -7,19 +7,11 @@ import styles from './appointment-list.scss';
 import { formatDate, navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
-import CheckInAppointments from '../appointments-tabs/checkedinappointments.component';
 import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
 import UnScheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
-import PendingAppointments from '../appointments-tabs/pending-appointments.component';
 import { useAppointments } from '../appointments-tabs/appointments-table.resource';
-
-enum AppointmentTypes {
-  SCHEDULED = 'Scheduled',
-  COMPLETED = 'Completed',
-  CANCELLED = 'Cancelled',
-  CHECKEDIN = 'CheckedIn',
-}
+import { useVisits } from '../hooks/useVisits';
 
 const AppointmentList: React.FC = () => {
   const { t } = useTranslation();
@@ -27,6 +19,7 @@ const AppointmentList: React.FC = () => {
   const { appointments } = useAppointments();
   const isToday = dayjs(new Date(startDate)).isSame(new Date(), 'date');
   const [selectedTab, setSelectedTab] = useState(0);
+  const { isLoading, visits } = useVisits();
 
   const appointmentDownloadInfo = () => {
     const downloadInfo: any = appointments
@@ -62,11 +55,8 @@ const AppointmentList: React.FC = () => {
         onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
         className={styles.tabs}>
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
-          <Tab>{t('scheduled', 'Scheduled')}</Tab>
-          <Tab>{t('unScheduled', 'UnScheduled')}</Tab>
-          <Tab>{t('completed', 'Completed')}</Tab>
-          <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
-          <Tab>{t('pending', 'Pending')}</Tab>
+          <Tab style={{ minWidth: '12rem' }}>{t('scheduled', 'Scheduled')}</Tab>
+          <Tab style={{ minWidth: '12rem' }}>{t('unScheduled', 'UnScheduled')}</Tab>
           <Button
             className={styles.calendarButton}
             kind="primary"
@@ -79,17 +69,10 @@ const AppointmentList: React.FC = () => {
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>
-            <ScheduledAppointments status={AppointmentTypes.SCHEDULED} />
+            <ScheduledAppointments visits={visits} isLoading={isLoading} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
             <UnScheduledAppointments />
-          </TabPanel>
-          <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
-          {isToday && (
-            <TabPanel style={{ padding: 0 }}>{<CheckInAppointments status={AppointmentTypes.CHECKEDIN} />}</TabPanel>
-          )}
-          <TabPanel style={{ padding: 0 }}>
-            <PendingAppointments />
           </TabPanel>
         </TabPanels>
       </Tabs>

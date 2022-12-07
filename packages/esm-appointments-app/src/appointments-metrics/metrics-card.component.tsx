@@ -45,8 +45,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
         </div>
         {!isEmpty(count) && (
           <div className={styles.countGrid}>
-            <span>Arrived</span>
-            <span>Pending</span>
+            <span>{t('arrived', 'Arrived')}</span>
+            <span>{t('notArrived', 'Not arrived')}</span>
             <p style={{ color: '#319227' }}>{count.arrivedAppointments?.length}</p>
             <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
           </div>
