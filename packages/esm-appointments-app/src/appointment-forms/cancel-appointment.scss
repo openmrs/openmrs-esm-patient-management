@@ -1,13 +1,3 @@
-@use '@carbon/styles/scss/spacing';
-
-.formContainer {
-  margin: spacing.$spacing-05;
-}
-
-.inputContainer {
-  margin: spacing.$spacing-05;
-}
-
 .buttonContainer {
   display: flex;
   & > button {

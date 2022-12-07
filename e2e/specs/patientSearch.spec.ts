@@ -1,7 +1,7 @@
 import { test } from '../core';
 import { HomePage } from '../pages/homePage';
 import { expect } from '@playwright/test';
-import { generateRandomPatient, deletePatient } from '../commands/patientOperations';
+import { generateRandomPatient, deletePatient } from '../commands';
 import { Patient } from '../core/types';
 
 let patient: Patient;
