@@ -1,4 +1,4 @@
-import { chromium, request } from '@playwright/test';
+import { request } from '@playwright/test';
 
 /**
  * This configuration is to reuse the signed-in state in the tests
