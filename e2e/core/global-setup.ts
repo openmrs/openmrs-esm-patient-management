@@ -2,7 +2,7 @@ import { chromium, request } from '@playwright/test';
 
 /**
  * This configuration is to reuse the signed-in state in the tests
- * by log in only once and then skip the log in step for all the tests.
+ * by log in only once using the API and then skip the log in step for all the tests.
  *
  * https://playwright.dev/docs/auth#reuse-signed-in-state
  */

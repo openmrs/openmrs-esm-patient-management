@@ -1,34 +1,35 @@
 # E2E Tests
 
-This package contains an E2E test suite using the [Playwright](https://playwright.dev)
+This directory contains an E2E test suite using the [Playwright](https://playwright.dev)
 framework. 
 
 ## Getting Started
 
 Please ensure that you have followed the basic installation guide in the
-[root README](./../../README.md).
-Once everything is setup 
-
-
-```sh
-# Given that you start in the repository's root:
-cd packages/playwright
-```
-```sh
-# Run all playwright tests:
-yarn test
-```
-By default, the test suite will run against the https://dev3.openmrs.org server.
-You can override this by exporting `UI_BASE_URL` and `WS_BASE_URL` environment variables beforehand:
+[root README](./../README.md).
+Once everything is set up,
 
 ```sh
-# Set the server URL to localhost:
-export UI_BASE_URL=http://localhost/openmrs/spa/
-export WS_BASE_URL=http://localhost/openmrs/ws/
-
-# Run all playwright tests:
-yarn test
+# Run all e2e tests in chromium with headed mode:
+yarn test-e2e
 ```
+
+By default, the test suite will run against the http://localhost:8080.
+You can override this by exporting `E2E_UI_BASE_URL` and `E2E_WS_BASE_URL` environment variables beforehand:
+
+```sh
+# Ex: Set the server URL to dev3:
+export E2E_UI_BASE_URL=https://dev3.openmrs.org/openmrs/spa/
+export E2E_WS_BASE_URL=https://dev3.openmrs.org/openmrs/ws/
+
+# Run all e2e tests:
+yarn test-e2e
+```
+To run a specific test by title:
+```sh
+yarn test-e2e -g "title of the test"
+```
+Check [this documentation](https://playwright.dev/docs/running-tests#command-line) for more running options.  
 
 It is also highly recommended to install the companion VS Code extension:
 https://playwright.dev/docs/getting-started-vscode
@@ -41,7 +42,7 @@ before writing new test cases. The project uses the official Playwright test run
 generally, follows a very simple project stucture:
 
 ```
-src
+e2e
 |__ commands
 |   ^ Contains "commands" (simple reusable functions) that can be used in test cases/specs.
 |__ core
@@ -49,7 +50,7 @@ src
 |     You probably need to touch this infrequently.
 |__ fixtures
 |   ^ Contains fixtures (https://playwright.dev/docs/test-fixtures) which are used
-|     to run reusable setup/teardown tasks, e.g. logging in.
+|     to run reusable setup/teardown tasks
 |__ pages
 |   ^ Contains page object model classes for interacting with the frontend.
 |     See https://playwright.dev/docs/test-pom for details.
@@ -57,18 +58,33 @@ src
     ^ Contains the actual test cases/specs. New tests should be placed in this folder.
 ```
 
-When you want to write a new test case, start by creating a new spec in `./src/specs`.
+When you want to write a new test case, start by creating a new spec in `./specs`.
 Depending on what you want to achieve, you might want to create new fixtures and/or
 page object models. To see examples, have a look at the existing code to see how these
 different concepts play together.
 
+## Open reports from GitHub Actions / Bamboo
+
+To download the report from the GitHub action/Bamboo plan, follow these steps:
+
+1. Go to the artifact section of the action/plan and locate the report file.
+2. Download the report file and unzip it using a tool of your choice.
+3. Open the index.html file in a web browser to view the report. 
+
+The report will show you a full summary of your tests, including information on which 
+tests passed, failed, were skipped, or were flaky. You can filter the report by browser 
+and explore the details of individual tests, including any errors or failures, video 
+recordings, and the steps involved in each test. Simply click on a test to view its details.
+
+## Debugging Tests
+
+Refer to [this documentation](https://playwright.dev/docs/debug) on how to debug a test.
 
 ## Configuration
 
 This is very much underdeveloped/WIP. At the moment, there exists a (git-shared) `.env`
 file which can be used for configuring certain test attributes. This is most likely
-about to change in the future when the test suite is supposed to be used in, e.g.,
-GitHub Actions pipelines. Stay tuned for updates!
+about to change in the future. Stay tuned for updates!
 
 ## Troubleshooting tips
 
