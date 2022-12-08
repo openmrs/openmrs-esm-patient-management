@@ -6,6 +6,7 @@ import {
   PatientIdentifier,
   PatientUuidMapType,
   PatientIdentifierValue,
+  Patient,
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';

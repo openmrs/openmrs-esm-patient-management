@@ -31,4 +31,14 @@ export const configSchema = {
       'e3d177ee-04ad-11ed-828d-0242ac1e0002',
     ],
   },
+  MPI: {
+    prefferedPatientIdentifierTitle: {
+      _type: Type.String,
+      _default: 'Health ID',
+    },
+    prefferedPatientIdentifierType: {
+      _type: Type.String,
+      _default: '',
+    },
+  },
 };

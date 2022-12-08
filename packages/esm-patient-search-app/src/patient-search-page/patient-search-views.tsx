@@ -5,6 +5,7 @@ import { Layer, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
 import { SearchedPatient } from '../types';
+import { MPISearchBasedSummaryCard } from '../mpi/search/mpi-search-based-summary-card';
 
 interface EmptyQueryIllustrationProps {
   inTabletOrOverlay: boolean;
@@ -95,23 +96,30 @@ export const EmptySearchResultsIllustration: React.FC<EmptySearchResultsIllustra
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
   handlePatientSelection: (evt: any, patientUuid: string) => void;
+  dataSource?: 'EMR' | 'MPI';
 }
 
 export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
   searchResults,
   handlePatientSelection,
+  dataSource = 'EMR',
 }) => {
   const { t } = useTranslation();
   return (
-    <div className={styles.results}>
-      {searchResults.map((patient, indx) => (
-        <PatientBanner
-          key={indx}
-          selectPatientAction={handlePatientSelection}
-          patientUuid={patient.uuid}
-          patient={patient}
-        />
-      ))}
+    <div>
+      <div className={styles.results}>
+        {searchResults.map((patient, indx) => (
+          <PatientBanner
+            key={indx}
+            selectPatientAction={handlePatientSelection}
+            patientUuid={patient.uuid}
+            patient={patient}
+            canCreateNewRecordFromPatientSearchResult={dataSource == 'MPI'}
+          />
+        ))}
+      </div>
+      <MPISearchBasedSummaryCard />
+      {/* <EmptySearchResultsIllustration inTabletOrOverlay={false} /> */}
     </div>
   );
 };

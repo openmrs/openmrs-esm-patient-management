@@ -1,7 +1,8 @@
 import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
-import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
+import { ChevronDown, ChevronUp, OverflowMenuVertical, UserFollow } from '@carbon/react/icons';
+
 import {
   ExtensionSlot,
   age,
@@ -11,11 +12,13 @@ import {
   interpolateString,
   useConfig,
   ConfigurableLink,
+  navigate,
 } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { getPatientHealthId } from '../../../mpi/utils';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
@@ -23,6 +26,7 @@ interface PatientBannerProps {
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
   selectPatientAction: (evt: any, patientUuid: string) => void;
+  canCreateNewRecordFromPatientSearchResult?: boolean;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
@@ -31,6 +35,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   onTransition,
   hideActionsOverflow,
   selectPatientAction,
+  canCreateNewRecordFromPatientSearchResult,
 }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
@@ -109,7 +114,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
         </ConfigurableLink>
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow && (
+          {!hideActionsOverflow && !canCreateNewRecordFromPatientSearchResult && (
             <div ref={overFlowMenuRef}>
               <CustomOverflowMenuComponent
                 menuTitle={
@@ -126,6 +131,22 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
+            </div>
+          )}
+          {canCreateNewRecordFromPatientSearchResult && (
+            <div>
+              <Button
+                kind="ghost"
+                renderIcon={UserFollow}
+                iconDescription="Create Patient Record"
+                onClick={() =>
+                  navigate({
+                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${getPatientHealthId(patient)}`,
+                  })
+                }
+                style={{ marginTop: '-0.25rem' }}>
+                {t('createPatientRecord', 'Create Patient Record')}
+              </Button>
             </div>
           )}
           {!currentVisit ? (

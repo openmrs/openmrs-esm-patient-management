@@ -13,9 +13,9 @@ import {
   usePatient,
 } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
+import { FormValues, CapturePhotoProps, PatientIdentifierValue, Patient } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { FormManager, SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import {
@@ -36,19 +36,28 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
   isOffline: boolean;
+  draftPatient?: Partial<Patient>;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
+  savePatientForm,
+  isOffline,
+  draftPatient,
+}) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
+  const sourcePatientId = new URLSearchParams(search).get('sourceRecord');
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(uuidOfPatientToEdit);
+  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
+    uuidOfPatientToEdit || sourcePatientId,
+    !!sourcePatientId,
+  );
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
   const location = currentSession?.sessionLocation?.uuid;

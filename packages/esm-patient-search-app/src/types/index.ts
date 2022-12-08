@@ -1,7 +1,7 @@
 import { FetchResponse } from '@openmrs/esm-framework';
 export interface SearchedPatient {
   uuid: string;
-  identifiers: Array<{ identifier: string }>;
+  identifiers: Array<{ identifier: string; isMPIRecordId?: true }>;
   person: {
     addresses: Array<Address>;
     age: number;
@@ -109,3 +109,5 @@ export interface AdvancedPatientSearchAction {
   postcode?: string;
   age?: number;
 }
+
+export type DataSource = 'EMR' | 'MPI';

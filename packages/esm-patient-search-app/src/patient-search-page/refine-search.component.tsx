@@ -1,19 +1,25 @@
 import React, { useCallback, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch, TextInput, DatePicker, DatePickerInput, Button, NumberInput } from '@carbon/react';
+import { ContentSwitcher, Switch, TextInput, Button, NumberInput, RadioButton, RadioButtonGroup } from '@carbon/react';
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import styles from './refine-search.scss';
 import reducer, { initialState } from './advanced-search-reducer';
-import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
+import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState, DataSource } from '../types';
 import { useLayoutType } from '@openmrs/esm-framework';
 
 interface RefineSearchProps {
   inTabletOrOverlay: boolean;
   setFilters: React.Dispatch<React.SetStateAction<AdvancedPatientSearchState>>;
   filtersApplied: number;
+  setDataSource: React.Dispatch<React.SetStateAction<DataSource>>;
 }
 
-const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverlay, filtersApplied }) => {
+const RefineSearch: React.FC<RefineSearchProps> = ({
+  setFilters,
+  inTabletOrOverlay,
+  filtersApplied,
+  setDataSource,
+}) => {
   const [formState, formDispatch] = useReducer(reducer, initialState);
   const [showRefineSearchDialog, setShowRefineSearchDialog] = useState(false);
   const { t } = useTranslation();
@@ -284,6 +290,23 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
   return (
     <form onSubmit={handleSubmit} className={styles.refineSeachContainer}>
       <h2 className={styles.productiveHeading02}>{t('refineSearch', 'Refine search')}</h2>
+      <div className={styles.field}>
+        <div className={styles.labelText}>
+          <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="">
+            {t('dataSource', 'Data Source')}
+          </label>
+        </div>
+        <RadioButtonGroup
+          defaultSelected="EMR"
+          orientation="vertical"
+          onChange={(event) => {
+            setDataSource(event.toString());
+          }}
+          name="appointment-reminder-radio-group">
+          <RadioButton className={styles.radioButton} id="emr" labelText="EMR" value="EMR" />
+          <RadioButton className={styles.radioButton} id="mpi" labelText="MPI" value="MPI" />
+        </RadioButtonGroup>
+      </div>
       <div className={styles.field}>
         <div className={styles.labelText}>
           <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">

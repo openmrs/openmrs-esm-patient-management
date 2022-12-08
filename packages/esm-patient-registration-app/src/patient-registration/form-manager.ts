@@ -26,6 +26,7 @@ import {
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
+import { pushNewPatientToMPI } from './mpi/mpi-api';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -404,6 +405,7 @@ export class FormManager {
     // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
     // Update as required.
     return {
+      resourceType: 'Patient',
       id: patient.uuid,
       gender: genderMap[patient.person?.gender],
       birthDate: patient.person?.birthdate,

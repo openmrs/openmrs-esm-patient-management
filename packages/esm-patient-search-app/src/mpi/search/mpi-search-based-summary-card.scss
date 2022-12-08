@@ -1,0 +1,25 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../../root.scss';
+
+.emptyResultText {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: 0.313rem;
+}
+
+.actionText {
+  @include type.type-style('body-01');
+  color: $text-02;
+}
+
+.actionText > div {
+  margin: 0rem 2rem;
+}
+
+.emptySearchResultsTile {
+  text-align: center;
+  margin: 0;
+  padding: spacing.$spacing-09 0rem;
+}

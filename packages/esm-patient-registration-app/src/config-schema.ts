@@ -306,6 +306,24 @@ export const esmPatientRegistrationSchema = {
       _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
+  MPI: {
+    accessToken: {
+      _type: Type.String,
+      _default: '5C931FA3B170ED118F9F0242AC130004B9AE53B4A8C654E8A94E21141929E366365DACE31EE9C2C6EDDBEB1AAC40B2B8',
+    },
+    accessTokenType: {
+      _type: Type.String,
+      _default: 'Bearer',
+    },
+    host: {
+      _type: Type.String,
+      _default: 'https://namibia-mpi.globalhealthapp.net',
+    },
+    basePath: {
+      _type: Type.String,
+      _default: '/',
+    },
+  },
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {

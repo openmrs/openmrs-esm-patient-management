@@ -22,6 +22,7 @@ interface PatientSearchComponentProps {
   searchResults: Array<SearchedPatient>;
   isLoading: boolean;
   fetchError: Error;
+  dataSource?: 'EMR' | 'MPI';
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -33,6 +34,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   searchResults,
   isLoading,
   fetchError,
+  dataSource = 'EMR',
 }) => {
   const { t } = useTranslation();
   const config = useConfig();
@@ -84,7 +86,13 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <EmptySearchResultsIllustration inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
-    return <PatientSearchResults searchResults={results} handlePatientSelection={handlePatientSelection} />;
+    return (
+      <PatientSearchResults
+        searchResults={results}
+        handlePatientSelection={handlePatientSelection}
+        dataSource={dataSource}
+      />
+    );
   }, [query, isLoading, inTabletOrOverlay, results, handlePatientSelection, fetchError]);
 
   return (
@@ -112,6 +120,14 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       )}
     </div>
   );
+
+  // return (
+  //   <div>
+  //     <div>{searchResultsView}</div>
+  //     <br />
+  //     <div>{searchResultsView}</div>
+  //   </div>
+  // );
 };
 
 export default PatientSearchComponent;

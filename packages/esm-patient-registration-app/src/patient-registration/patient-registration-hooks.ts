@@ -4,12 +4,14 @@ import { Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { patientRegistration } from '../constants';
+import { useMPIPatient } from './mpi/resource';
 import {
   FormValues,
   PatientRegistration,
   PatientUuidMapType,
   PersonAttributeResponse,
   PatientIdentifierResponse,
+  Patient,
 } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
@@ -19,8 +21,12 @@ import {
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 
-export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
+export function useInitialFormValues(
+  patientUuid: string,
+  isMPIRecordId: boolean = false,
+): [FormValues, Dispatch<FormValues>] {
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(isMPIRecordId ? null : patientUuid);
+  const { isLoading: isLoadingSourcePatientObject, patient: sourcePatientObject } = useMPIPatient(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
@@ -72,6 +78,17 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
+  useEffect(() => {
+    if (sourcePatientObject) {
+      setInitialFormValues({
+        ...initialFormValues,
+        ...getFormValuesFromFhirPatient(sourcePatientObject),
+        address: getAddressFieldValuesFromFhirPatient(sourcePatientObject),
+        ...getPhonePersonAttributeValueFromFhirPatient(sourcePatientObject),
+      });
+    }
+  }, [sourcePatientObject, isLoadingSourcePatientObject]);
+
   // Set initial patient relationships
   useEffect(() => {
     if (!isLoadingRelationships && relationships) {
@@ -106,6 +123,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     }
   }, [attributes, setInitialFormValues, isLoadingAttributes]);
 
+  console.log({ sourcePatientObject });
   return [initialFormValues, setInitialFormValues];
 }
 

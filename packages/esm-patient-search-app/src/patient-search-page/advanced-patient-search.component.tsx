@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useGetPatientAttributePhoneUuid, usePatientSearchInfinite } from '../patient-search.resource';
-import { AdvancedPatientSearchState } from '../types';
+import {
+  useGetPatientAttributePhoneUuid,
+  useMPIPatientSearch,
+  usePatientSearch,
+  usePatientSearchInfinite,
+} from '../patient-search.resource';
+import { AdvancedPatientSearchState, DataSource } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
@@ -22,6 +27,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   hidePanel,
 }) => {
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialState);
+  const [dataSource, setDataSource] = useState<DataSource>('EMR');
   const filtersApplied = useMemo(() => {
     let count = 0;
     Object.entries(filters).forEach(([key, value]) => {
@@ -39,7 +45,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     hasMore,
     isLoading,
     fetchError,
-  } = usePatientSearchInfinite(query, false, !!query, 50);
+  } = usePatientSearch(query, dataSource, false, !!query, 50);
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {
@@ -123,7 +129,12 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
       }`}>
       {!inTabletOrOverlay && (
         <div className={styles.refineSearchDesktop}>
-          <RefineSearch filtersApplied={filtersApplied} setFilters={setFilters} inTabletOrOverlay={inTabletOrOverlay} />
+          <RefineSearch
+            filtersApplied={filtersApplied}
+            setFilters={setFilters}
+            inTabletOrOverlay={inTabletOrOverlay}
+            setDataSource={setDataSource}
+          />
         </div>
       )}
       <div
@@ -139,10 +150,16 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
+          dataSource={dataSource}
         />
       </div>
       {inTabletOrOverlay && (
-        <RefineSearch filtersApplied={filtersApplied} setFilters={setFilters} inTabletOrOverlay={inTabletOrOverlay} />
+        <RefineSearch
+          filtersApplied={filtersApplied}
+          setFilters={setFilters}
+          inTabletOrOverlay={inTabletOrOverlay}
+          setDataSource={setDataSource}
+        />
       )}
     </div>
   );
