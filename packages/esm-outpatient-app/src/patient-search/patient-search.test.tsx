@@ -19,5 +19,12 @@ describe('PatientSearch: ', () => {
 
 function renderPatientSearch() {
   const closePanel = jest.fn();
-  render(<PatientSearch closePanel={closePanel} />);
+  render(
+    <PatientSearch
+      closePanel={closePanel}
+      viewState={{
+        selectedPatientUuid: '',
+      }}
+    />,
+  );
 }
