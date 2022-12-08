@@ -174,6 +174,7 @@ function ActiveVisitsTable() {
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
+  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
 
   const currentPathName: string = window.location.pathname;
@@ -474,7 +475,15 @@ function ActiveVisitsTable() {
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} />}
+        {showOverlay && (
+          <PatientSearch
+            view={view}
+            closePanel={() => setShowOverlay(false)}
+            viewState={{
+              selectedPatientUuid: '',
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -506,6 +515,11 @@ function ActiveVisitsTable() {
               renderIcon: (props) => <Add size={16} {...props} />,
               size: 'sm',
             },
+            selectPatientAction: (selectedPatientUuid) => {
+              setShowOverlay(true);
+              setView(SearchTypes.SCHEDULED_VISITS);
+              setViewState({ selectedPatientUuid });
+            },
           }}
         />
       </div>
@@ -521,7 +535,7 @@ function ActiveVisitsTable() {
           </Button>
         </Tile>
       </div>
-      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} />}
+      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }

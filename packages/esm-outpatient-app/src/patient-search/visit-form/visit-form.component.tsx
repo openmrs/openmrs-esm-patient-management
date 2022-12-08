@@ -218,16 +218,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           </Row>
         )}
         <div className={styles.backButton}>
-          {mode === true ? (
-            <Button
-              kind="ghost"
-              renderIcon={ArrowLeft}
-              iconDescription="Back to search results"
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid)}>
-              <span>{t('backToSearchResults', 'Back to search results')}</span>
-            </Button>
-          ) : (
+          {mode === true ? null : (
             <Button
               kind="ghost"
               renderIcon={(props) => <ArrowLeft size={24} {...props} />}
