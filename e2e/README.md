@@ -15,7 +15,7 @@ yarn playwright test --project=chromium
 ```
 Remove the --project flag to run on chromium, firefox, and WebKit at once:
 ```sh
-# Run all e2e tests only on chromium:
+# Run all e2e tests only on all browsers
 yarn playwright test
 ```
 
