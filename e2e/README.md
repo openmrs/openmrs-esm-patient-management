@@ -11,7 +11,7 @@ Once everything is set up,
 
 ```sh
 # Run all e2e tests:
-yarn playwright test --project=chromium 
+yarn test-e2e 
 ```
 Remove the --project flag to run on chromium, firefox, and WebKit at once:
 ```sh
@@ -28,11 +28,11 @@ export E2E_UI_BASE_URL=https://dev3.openmrs.org/openmrs/spa/
 export E2E_WS_BASE_URL=https://dev3.openmrs.org/openmrs/ws/
 
 # Run all e2e tests:
-yarn playwright test
+yarn test-e2e
 ```
 To run a specific test by title:
 ```sh
-yarn playwright test --project=chromium -g "title of the test"
+yarn test-e2e -g "title of the test"
 ```
 Check [this documentation](https://playwright.dev/docs/running-tests#command-line) for more running options.  
 
