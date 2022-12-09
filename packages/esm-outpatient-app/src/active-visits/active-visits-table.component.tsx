@@ -44,11 +44,8 @@ import {
 import {
   useVisitQueueEntries,
   useServices,
-  QueueService,
-  QueueStatus,
   MappedVisitQueueEntry,
   MappedQueuePriority,
-  getOriginFromPathName,
 } from './active-visits-table.resource';
 import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
@@ -57,12 +54,7 @@ import styles from './active-visits-table.scss';
 import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
-import {
-  updateSelectedServiceName,
-  updateSelectedServiceUuid,
-  useSelectedServiceName,
-  useSelectedServiceUuid,
-} from '../helpers/helpers';
+import { updateSelectedServiceName, updateSelectedServiceUuid, useSelectedServiceName } from '../helpers/helpers';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -74,14 +66,12 @@ type FilterProps = {
 
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
-  from: string;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+const PatientNameLink: React.FC<NameLinkProps> = ({ to, children }) => {
   const handleNameClick = (event: MouseEvent, to: string) => {
     event.preventDefault();
     navigate({ to });
-    localStorage.setItem('fromPage', from);
   };
 
   return (
@@ -176,7 +166,6 @@ function ActiveVisitsTable() {
   const layout = useLayoutType();
 
   const currentPathName: string = window.location.pathname;
-  const fromPage: string = getOriginFromPathName(currentPathName);
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -260,9 +249,7 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
-            {entry.name}
-          </PatientNameLink>
+          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</PatientNameLink>
         ),
       },
       priority: {

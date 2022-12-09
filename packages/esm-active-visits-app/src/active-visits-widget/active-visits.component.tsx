@@ -43,14 +43,12 @@ interface PaginationData {
 }
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
-  from: string;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
+const PatientNameLink: React.FC<NameLinkProps> = ({ to, children }) => {
   const handleNameClick = (event: MouseEvent, to: string) => {
     event.preventDefault();
     navigate({ to });
-    localStorage.setItem('fromPage', from);
   };
   return (
     <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
@@ -69,7 +67,6 @@ const ActiveVisitsTable = () => {
   const [searchString, setSearchString] = useState('');
 
   const currentPathName = window.location.pathname;
-  const fromPage = getOriginFromPathName(currentPathName);
 
   const headerData = useMemo(
     () => [
@@ -190,7 +187,6 @@ const ActiveVisitsTable = () => {
                           <TableCell key={cell.id}>
                             {cell.info.header === 'name' ? (
                               <PatientNameLink
-                                from={fromPage}
                                 to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
                                 {cell.value}
                               </PatientNameLink>

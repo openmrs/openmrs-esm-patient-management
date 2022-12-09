@@ -232,11 +232,6 @@ export function useVisitQueueEntries(currServiceName: string): UseVisitQueueEntr
   };
 }
 
-export const getOriginFromPathName = (pathname = '') => {
-  const from = pathname.split('/');
-  return last(from);
-};
-
 export async function updateQueueEntry(
   visitUuid: string,
   previousQueueUuid: string,
