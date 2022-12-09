@@ -10,8 +10,13 @@ Please ensure that you have followed the basic installation guide in the
 Once everything is set up,
 
 ```sh
-# Run all e2e tests in chromium with headed mode:
-yarn test-e2e
+# Run all e2e tests:
+yarn playwright test --project=chromium 
+```
+Remove the --project flag to run on chromium, firefox, and WebKit at once:
+```sh
+# Run all e2e tests only on chromium:
+yarn playwright test
 ```
 
 By default, the test suite will run against the http://localhost:8080.
@@ -23,11 +28,11 @@ export E2E_UI_BASE_URL=https://dev3.openmrs.org/openmrs/spa/
 export E2E_WS_BASE_URL=https://dev3.openmrs.org/openmrs/ws/
 
 # Run all e2e tests:
-yarn test-e2e
+yarn playwright test
 ```
 To run a specific test by title:
 ```sh
-yarn test-e2e -g "title of the test"
+yarn playwright test --project=chromium -g "title of the test"
 ```
 Check [this documentation](https://playwright.dev/docs/running-tests#command-line) for more running options.  
 
