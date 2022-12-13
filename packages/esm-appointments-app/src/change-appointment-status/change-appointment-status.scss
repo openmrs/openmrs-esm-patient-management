@@ -3,30 +3,29 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .radioButtonGroup {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: spacing.$spacing-03;
-    min-height: spacing.$spacing-10;
-    width: 100%;
-    @include type.type-style('body-compact-01');
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: spacing.$spacing-03;
+  min-height: spacing.$spacing-10;
+  width: 100%;
+  @include type.type-style('body-compact-01');
 }
 
 .radioButton {
-    padding: spacing.$spacing-02 spacing.$spacing-02;
-    margin: spacing.$spacing-03 0;
+  padding: spacing.$spacing-02 spacing.$spacing-02;
+  margin: spacing.$spacing-03 0;
 }
 
 section {
-    margin: spacing.$spacing-03;
+  margin: spacing.$spacing-03;
 }
 
 .sectionTitle {
-    @include type.type-style('heading-compact-02');
-    color: $text-02;
-    margin-bottom: spacing.$spacing-04;
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-04;
 }
 
 .modalBody {
-
 }
