@@ -49,7 +49,6 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
         });
         registerPatientToUser(patient?.uuid, user).then(() => {
-          console.log('in');
           setSessionLocation(currentLocation, new AbortController());
           mutateUser();
         });
