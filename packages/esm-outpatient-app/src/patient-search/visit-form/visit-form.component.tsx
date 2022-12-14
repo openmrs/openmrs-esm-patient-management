@@ -424,42 +424,53 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-            <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
-              invalidText="Required"
-              value={service}
-              onChange={(event) => setSelectedService(event.target.value)}>
-              {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {allServices?.length > 0 &&
-                allServices.map((service) => (
-                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                    {service.display}
-                  </SelectItem>
-                ))}
-            </Select>
-          </section>
+            {!allServices?.length ? (
+              <InlineNotification
+                className={styles.inlineNotification}
+                kind={'error'}
+                lowContrast
+                subtitle={t('configureServices', 'Please configure services to continue.')}
+                title={t('noServicesConfigured', 'No services configured')}
+              />
+            ) : (
+              <Select
+                labelText={t('selectService', 'Select a service')}
+                id="service"
+                invalidText="Required"
+                value={service}
+                onChange={(event) => setSelectedService(event.target.value)}>
+                {!setSelectedService ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+                {allServices?.length > 0 &&
+                  allServices.map((service) => (
+                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                      {service.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
 
-          <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-            <ContentSwitcher
-              size="sm"
-              selectionMode="manual"
-              onChange={(event) => {
-                setPriority(event.name as any);
-              }}>
-              {priorities?.length > 0 ? (
-                priorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
-                })
-              ) : (
-                <Switch
-                  name={t('noPriorityFound', 'No priority found')}
-                  text={t('noPriorityFound', 'No priority found')}
-                  value={null}
-                />
-              )}
-            </ContentSwitcher>
+            {!priorities?.length ? (
+              <InlineNotification
+                className={styles.inlineNotification}
+                kind={'error'}
+                lowContrast
+                subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                title={t('noPrioritiesConfigured', 'No priorities configured')}
+              />
+            ) : (
+              <ContentSwitcher
+                size="sm"
+                selectionMode="manual"
+                onChange={(event) => {
+                  setPriority(event.name as any);
+                }}>
+                {priorities?.length > 0 &&
+                  priorities.map(({ uuid, display }) => {
+                    return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
+                  })}
+              </ContentSwitcher>
+            )}
           </section>
         </Stack>
       </div>
