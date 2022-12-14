@@ -1,8 +1,15 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, useConfig, FetchResponse, openmrsObservableFetch, showToast } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  useConfig,
+  FetchResponse,
+  showNotification,
+  useSession,
+  LoggedInUser,
+} from '@openmrs/esm-framework';
 import { PatientSearchResponse, SearchedPatient, User } from './types';
 import { useTranslation } from 'react-i18next';
 
@@ -106,38 +113,48 @@ export function useGetPatientAttributePhoneUuid(): string {
     '/ws/rest/v1/personattributetype?q=Telephone Number',
     openmrsFetch,
   );
-  if (error) {
-    showToast({
-      description: `${t(
-        'fetchingPhoneNumberUuidFailed',
-        'Fetching Phone number attribute type UUID failed with error',
-      )}: ${error?.message}`,
-      kind: 'error',
-    });
-  }
+
+  useEffect(() => {
+    if (error) {
+      showNotification({
+        description: `${t(
+          'fetchingPhoneNumberUuidFailed',
+          'Fetching Phone number attribute type UUID failed with error',
+        )}: ${error?.message}`,
+        kind: 'error',
+      });
+    }
+  }, [error]);
+
   return data?.data?.results?.[0]?.uuid;
 }
 
-export function useUserUuid() {
+export function useUserVisitedPatients() {
   const { t } = useTranslation();
-  const { data, error } = useSWRImmutable<FetchResponse<{ user: User }>, Error>('/ws/rest/v1/session', openmrsFetch);
+  const { user } = useSession();
+  const userUuid = user?.uuid;
+  const { data, error, mutate } = useSWR<FetchResponse<User>, Error>(
+    userUuid ? `/ws/rest/v1/user/${userUuid}` : null,
+    openmrsFetch,
+  );
 
-  if (error) {
-    showToast({
-      kind: 'error',
-      title: t('fetchingSessionFailed', 'Fetching session details failed'),
-      description: error.message,
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      showNotification({
+        kind: 'error',
+        title: t('fetchingSessionFailed', 'Fetching session details failed'),
+        description: error.message,
+      });
+    }
+  }, [error]);
 
   const result = useMemo(
     () => ({
-      isLoadingUser: !data && !error,
-      user: data?.data?.user,
-      userUuid: data?.data?.user?.uuid,
-      patientsVisited: data?.data?.user?.userProperties?.patientsVisited,
+      isLoadingPatients: !data && !error,
+      patientsVisited: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
+      mutate,
     }),
-    [data, error],
+    [data, error, mutate],
   );
 
   return result;
@@ -149,13 +166,16 @@ export function useRESTPatient(patientUuid: string) {
     `/ws/rest/v1/patient/${patientUuid}?v=${v}`,
     openmrsFetch,
   );
-  if (error) {
-    showToast({
-      kind: 'error',
-      title: t('fetchingPatientFailed', 'Fetching patient details failed'),
-      description: error.message,
-    });
-  }
+
+  useEffect(() => {
+    if (error) {
+      showNotification({
+        kind: 'error',
+        title: t('fetchingPatientFailed', 'Fetching patient details failed'),
+        description: error.message,
+      });
+    }
+  }, [error]);
 
   const results = useMemo(
     () => ({
@@ -166,4 +186,22 @@ export function useRESTPatient(patientUuid: string) {
   );
 
   return results;
+}
+
+export function registerPatientToUser(patientUuid: string, user: LoggedInUser) {
+  const patientsVisited: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
+  const restPatients = patientsVisited.filter((uuid) => uuid !== patientUuid);
+  const newPatientsVisited = [patientUuid, ...restPatients].join(',');
+
+  return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: {
+      userProperties: {
+        patientsVisited: newPatientsVisited,
+      },
+    },
+  });
 }

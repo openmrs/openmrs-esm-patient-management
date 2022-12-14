@@ -2,22 +2,20 @@ import React from 'react';
 import { SearchedPatient } from '../types';
 import styles from '../compact-patient-search/patient-search.scss';
 import { useTranslation } from 'react-i18next';
-import { useRESTPatient, useUserUuid } from '../patient-search.resource';
+import { useRESTPatient } from '../patient-search.resource';
 import CompactPatientBanner, { SearchResultSkeleton } from '../compact-patient-search/compact-patient-banner.component';
 
 interface RecentSearchProps {
   selectPatientAction: (evt, patient: SearchedPatient) => void;
+  patientsVisited: Array<string>;
 }
 
-const RecentSearch: React.FC<RecentSearchProps> = ({ selectPatientAction }) => {
+const RecentSearch: React.FC<RecentSearchProps> = ({ selectPatientAction, patientsVisited }) => {
   const { t } = useTranslation();
-  const { user, userUuid, isLoadingUser, patientsVisited } = useUserUuid();
 
-  if (isLoadingUser || !patientsVisited) {
+  if (patientsVisited?.length === 0) {
     return null;
   }
-
-  const patientUuids = patientsVisited.split(',');
 
   return (
     <div
@@ -25,10 +23,8 @@ const RecentSearch: React.FC<RecentSearchProps> = ({ selectPatientAction }) => {
       style={{
         maxHeight: '22rem',
       }}>
-      <p className={styles.resultsText}>
-        {patientUuids?.length} {t('searchResultsText', 'search result(s)')}
-      </p>
-      {patientUuids.map((patientUuid) => (
+      <p className={styles.resultsText}>{t('recentlyViewedCharts', 'Recently viewed charts')}</p>
+      {patientsVisited.map((patientUuid) => (
         <RecentPatient key={patientUuid} patientUuid={patientUuid} selectPatientAction={selectPatientAction} />
       ))}
     </div>

@@ -38,14 +38,14 @@ const CompactPatientBanner: React.FC<CompactPatientBannerProps> = ({ patient, se
       key={patient.uuid}
       className={styles.patientSearchResult}>
       <div className={styles.patientAvatar} role="img">
-        {/* <ExtensionSlot
+        <ExtensionSlot
           extensionSlotName="patient-photo-slot"
           state={{
             patientUuid: patient.uuid,
             patientName: patient.person.personName.display,
             size: 'small',
           }}
-        /> */}
+        />
       </div>
       <div>
         <h2 className={styles.patientName}>{patient.person.personName.display}</h2>
