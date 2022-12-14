@@ -3,9 +3,10 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { CalendarType } from '../types';
 import { monthDays } from '../helpers/functions';
-import styles from './appointments-calendar-list-view.scss';
+// import styles from './appointments-calendar.scss';
 import MonthlyWorkload from './monthly-view-workload.component';
 import MonthlyHeader from './monthly-header.module';
+import styles from './appointment-calendar.scss';
 dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {

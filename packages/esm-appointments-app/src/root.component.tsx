@@ -1,10 +1,10 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { spaBasePath, spaRoot } from './constants';
+import { spaBasePath } from './constants';
 import AppointmentsDashboard from './dashboard/appointments-dashboard.component';
 import Overlay from './overlay.component';
-import AppointmentsCalendarListView from './appointments-calendar/appointments-calendar-list-view.component';
+import AppointmentCalendar from './appointments-calendar/appointment-calendar.component';
 import MissedAppointmentList from './appointments/missed-appointment-list.component';
 
 const swrConfiguration = {
@@ -18,7 +18,7 @@ const Root: React.FC = () => {
         <BrowserRouter basename={spaBasePath}>
           <Routes>
             <Route path="" element={<AppointmentsDashboard />} />
-            <Route path="/calendar" element={<AppointmentsCalendarListView />} />
+            <Route path="/calendar" element={<AppointmentCalendar />} />
             <Route path="/missed" element={<MissedAppointmentList />} />
           </Routes>
           <Overlay />

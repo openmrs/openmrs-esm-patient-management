@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import AppointmentsHeader from '../appointments-header/appointments-header.component';
 import CalendarHeader from './calendar-header.component';
 import MonthlyCalendarView from './monthly-calendar-view.component';
-import styles from './appointments-calendar-list-view.scss';
+import styles from './appointment-calendar.scss';
+import ComingSoon from './coming-soon.component';
 
-interface AppointmentsCalendarListViewProps {}
+interface AppointmentCalendarProps {}
+
 type AppointmentsCalendarListView = 'daily' | 'weekly' | 'monthly';
-const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> = () => {
+
+const AppointmentCalendar: React.FC<AppointmentCalendarProps> = () => {
   const { t } = useTranslation();
   const [calendarView, setCalendarView] = useState<AppointmentsCalendarListView>('monthly');
   return (
@@ -15,11 +18,12 @@ const AppointmentsCalendarListView: React.FC<AppointmentsCalendarListViewProps> 
       <AppointmentsHeader title={t('appointments', 'Appointments')} />
       <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
       {calendarView === 'monthly' && <MonthlyCalendarView type="monthly" events={events} />}
+      {calendarView !== 'monthly' && <ComingSoon />}
     </div>
   );
 };
 
-export default AppointmentsCalendarListView;
+export default AppointmentCalendar;
 const events = [
   {
     appointmentDate: '2022-12-01 05:20:00',
