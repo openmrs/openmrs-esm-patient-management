@@ -39,12 +39,13 @@ https://playwright.dev/docs/getting-started-vscode
 
 In general, it is recommended to read through the official [Playwright docs](https://playwright.dev/docs/intro)
 before writing new test cases. The project uses the official Playwright test runner and,
-generally, follows a very simple project stucture:
+generally, follows a very simple project structure:
 
 ```
 e2e
 |__ commands
-|   ^ Contains "commands" (simple reusable functions) that can be used in test cases/specs.
+|   ^ Contains "commands" (simple reusable functions) that can be used in test cases/specs,
+|     e.g. generate a random patient.
 |__ core
 |   ^ Contains code related to the test runner itself, e.g. setting up the custom fixtures.
 |     You probably need to touch this infrequently.
