@@ -75,6 +75,8 @@ dist
 
 .turbo/
 ~
+
+# Playwright and e2e tests
 /test-results/
 /playwright-report/
 /playwright/.cache/

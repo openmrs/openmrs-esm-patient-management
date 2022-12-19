@@ -6,12 +6,12 @@ framework.
 ## Getting Started
 
 Please ensure that you have followed the basic installation guide in the
-[root README](./../README.md).
+[root README](../README.md).
 Once everything is set up,
 
 ```sh
 # Run all e2e tests:
-yarn test-e2e 
+yarn test-e2e --headed 
 ```
 
 By default, the test suite will run against the http://localhost:8080.
@@ -23,7 +23,7 @@ export E2E_UI_BASE_URL=https://dev3.openmrs.org/openmrs/spa/
 export E2E_WS_BASE_URL=https://dev3.openmrs.org/openmrs/ws/
 
 # Run all e2e tests:
-yarn test-e2e
+yarn test-e2e --headed
 ```
 To run a specific test by title:
 ```sh
