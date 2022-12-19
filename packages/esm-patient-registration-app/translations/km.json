@@ -21,7 +21,7 @@
   "deleteIdentifierTooltip": "លុប",
   "deleteRelationshipTooltipText": "លុប",
   "discard": "បោះបង់",
-  "discardModalBody": "The changes you made to this patient's details have not been saved. Discard changes?",
+  "discardModalBody": "ការផ្លាស់ប្តូរដែលអ្នកបានធ្វើចំពោះព័ត៌មានលម្អិតរបស់អ្នកជំងឺនេះមិនត្រូវបានរក្សាទុកទេ។ បោះបង់ការផ្លាស់ប្តូរ?",
   "discardModalHeader": "បញ្ជាក់ការផ្លាស់ប្តូរការបោះបង់",
   "dobToggleLabelText": "ស្គាល់ថ្ងៃខែឆ្នាំកំណើត?",
   "edit": "កែសម្រួល",
