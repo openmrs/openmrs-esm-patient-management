@@ -3,16 +3,25 @@ import { APIRequestContext, expect } from '@playwright/test';
 export interface Patient {
   uuid: string;
   identifiers: Identifier[];
+  display: string;
   person: {
+    uuid: string;
     display: string;
-    addresses: Address[];
-    age: number;
-    birthdate: string;
     gender: string;
-    death: boolean;
-    deathDate: string;
+    age: number;
+    birthdate: Date;
+    birthdateEstimated: boolean;
+    dead: boolean;
+    deathDate?: any;
+    causeOfDeath?: any;
+    attributes: any[];
+    voided: boolean;
+    birthtime?: any;
+    deathdateEstimated: boolean;
+    resourceVersion: string;
   };
   attributes: { value: string; attributeType: { uuid: string; display: string } }[];
+  voided: boolean;
 }
 
 export interface Address {
