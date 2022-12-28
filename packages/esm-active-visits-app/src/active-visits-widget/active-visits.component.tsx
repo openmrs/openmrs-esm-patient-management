@@ -71,7 +71,7 @@ const ActiveVisitsTable = () => {
   const currentPathName = window.location.pathname;
   const fromPage = getOriginFromPathName(currentPathName);
 
-  const computeExpensiveValue = useCallback(
+  const computeHeaderData = useCallback(
     (t, config) => {
       let headers = [
         {
@@ -120,53 +120,7 @@ const ActiveVisitsTable = () => {
     [activeVisits],
   );
 
-  const headerData = useMemo(() => computeExpensiveValue(t, config), [computeExpensiveValue, config, t]);
-  //   let headers = [
-  //     {
-  //       id: 0,
-  //       header: t('visitStartTime', 'Visit Time'),
-  //       key: 'visitStartTime',
-  //     },
-  //     {
-  //       id: 1,
-  //       header: t('idNumber', 'ID Number'),
-  //       key: 'idNumber',
-  //     },
-  //     {
-  //       id: 2,
-  //       header: t('name', 'Name'),
-  //       key: 'name',
-  //     },
-  //     {
-  //       id: 3,
-  //       header: t('gender', 'Gender'),
-  //       key: 'gender',
-  //     },
-  //     {
-  //       id: 4,
-  //       header: t('age', 'Age'),
-  //       key: 'age',
-  //     },
-  //     {
-  //       id: 5,
-  //       header: t('visitType', 'Visit Type'),
-  //       key: 'visitType',
-  //     },
-  //   ];
-
-  //   console.log('activeVisits', activeVisits);
-
-  //   config.identifiers.map((identifier) => {
-  //     headers.push({
-  //       id: identifier.id,
-  //       header: t(identifier.header.key, identifier.header.default),
-  //       key: identifier.header.key,
-  //     });
-  //   });
-
-  //   console.log('headers', headers);
-  //   return headers;
-  // };
+  const headerData = useMemo(() => computeHeaderData(t, config), [computeHeaderData, config, t]);
 
   const rowData = activeVisits.map((visit) => ({
     ...visit,
