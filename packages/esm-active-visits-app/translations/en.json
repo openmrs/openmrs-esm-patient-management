@@ -7,7 +7,6 @@
   "encounterType": "Encounter Type",
   "filterTable": "Filter table",
   "gender": "Gender",
-  "idNumber": "ID Number",
   "medications": "Medications",
   "name": "Name",
   "noActiveVisitsForLocation": "There are no active visits to display for this location.",

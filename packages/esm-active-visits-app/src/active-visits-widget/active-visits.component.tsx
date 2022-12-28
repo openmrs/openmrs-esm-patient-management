@@ -73,7 +73,7 @@ const ActiveVisitsTable = () => {
 
   const computeHeaderData = useCallback(
     (t, config) => {
-      let headers = [
+      const headers = [
         {
           id: 0,
           header: t('visitStartTime', 'Visit Time'),

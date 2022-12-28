@@ -9,7 +9,6 @@ dayjs.extend(isToday);
 export interface ActiveVisit {
   age: string;
   id: string;
-  idNumber: string;
   gender: string;
   location: string;
   name: string;
@@ -44,7 +43,6 @@ export function useActiveVisits() {
     let activeVisits: ActiveVisit = {
       age: visit?.patient?.person?.age,
       id: visit.uuid,
-      idNumber: null,
       gender: visit?.patient?.person?.gender,
       location: visit?.location?.uuid,
       name: visit?.patient?.person?.display,
@@ -53,6 +51,19 @@ export function useActiveVisits() {
       visitType: visit?.visitType?.display,
       visitUuid: visit.uuid,
     };
+
+    //in case no configuration is given the previsous behavior remanes the same
+    if (!config?.activeVisits?.identifiers) {
+      config.activeVisits.identifiers = [
+        {
+          header: {
+            key: 'idNumber',
+            default: 'ID Number',
+          },
+          identifierName: visit?.patient?.identifiers[0].identifierType?.name,
+        },
+      ];
+    }
 
     //map identifires on config
     config?.activeVisits?.identifiers?.map((configIdentifier) => {
@@ -65,19 +76,14 @@ export function useActiveVisits() {
       });
 
       if (visitIdentifier) {
-        //if we find a visit identifier and its idNumber we rewrite the null value
-        if (configIdentifier?.header?.key === 'idNumber') {
-          activeVisits.idNumber = visitIdentifier?.identifier;
-        }
-        //else we add the new identifier to activeVisit object
-        //the parameter will conresponde to the name of the key value of the configuration
+        //add the new identifier or rewrite existing one to activeVisit object
+        //the parameter will corresponde to the name of the key value of the configuration
         //and the respective value is the visit identifier
-        else {
-          activeVisits = {
-            ...activeVisits,
-            [configIdentifier?.header?.key]: visitIdentifier?.identifier,
-          };
-        }
+
+        activeVisits = {
+          ...activeVisits,
+          [configIdentifier?.header?.key]: visitIdentifier?.identifier,
+        };
       } else {
         //If there isn't a identifier we display this default text
         activeVisits = {
