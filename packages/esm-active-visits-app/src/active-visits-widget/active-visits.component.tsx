@@ -71,41 +71,102 @@ const ActiveVisitsTable = () => {
   const currentPathName = window.location.pathname;
   const fromPage = getOriginFromPathName(currentPathName);
 
-  const headerData = useMemo(
-    () => [
-      {
-        id: 0,
-        header: t('visitStartTime', 'Visit Time'),
-        key: 'visitStartTime',
-      },
-      {
-        id: 1,
-        header: t('idNumber', 'ID Number'),
-        key: 'idNumber',
-      },
-      {
-        id: 2,
-        header: t('name', 'Name'),
-        key: 'name',
-      },
-      {
-        id: 3,
-        header: t('gender', 'Gender'),
-        key: 'gender',
-      },
-      {
-        id: 4,
-        header: t('age', 'Age'),
-        key: 'age',
-      },
-      {
-        id: 5,
-        header: t('visitType', 'Visit Type'),
-        key: 'visitType',
-      },
-    ],
-    [t],
+  const computeExpensiveValue = useCallback(
+    (t, config) => {
+      let headers = [
+        {
+          id: 0,
+          header: t('visitStartTime', 'Visit Time'),
+          key: 'visitStartTime',
+        },
+      ];
+
+      config?.activeVisits?.identifiers?.map((identifier, index) => {
+        //this ensures that only identifiers that are present at least on one user are shown on the table headers
+        if (activeVisits.some((visit) => visit[identifier?.header?.key] !== '--')) {
+          headers.push({
+            id: index + 1,
+            header: t(identifier?.header?.key, identifier?.header?.default),
+            key: identifier?.header?.key,
+          });
+        }
+      });
+
+      headers.push(
+        {
+          id: headers[headers.length - 1].id + 2,
+          header: t('name', 'Name'),
+          key: 'name',
+        },
+        {
+          id: headers[headers.length - 1].id + 3,
+          header: t('gender', 'Gender'),
+          key: 'gender',
+        },
+        {
+          id: headers[headers.length - 1].id + 4,
+          header: t('age', 'Age'),
+          key: 'age',
+        },
+        {
+          id: headers[headers.length - 1].id + 5,
+          header: t('visitType', 'Visit Type'),
+          key: 'visitType',
+        },
+      );
+
+      return headers;
+    },
+    [activeVisits],
   );
+
+  const headerData = useMemo(() => computeExpensiveValue(t, config), [computeExpensiveValue, config, t]);
+  //   let headers = [
+  //     {
+  //       id: 0,
+  //       header: t('visitStartTime', 'Visit Time'),
+  //       key: 'visitStartTime',
+  //     },
+  //     {
+  //       id: 1,
+  //       header: t('idNumber', 'ID Number'),
+  //       key: 'idNumber',
+  //     },
+  //     {
+  //       id: 2,
+  //       header: t('name', 'Name'),
+  //       key: 'name',
+  //     },
+  //     {
+  //       id: 3,
+  //       header: t('gender', 'Gender'),
+  //       key: 'gender',
+  //     },
+  //     {
+  //       id: 4,
+  //       header: t('age', 'Age'),
+  //       key: 'age',
+  //     },
+  //     {
+  //       id: 5,
+  //       header: t('visitType', 'Visit Type'),
+  //       key: 'visitType',
+  //     },
+  //   ];
+
+  //   console.log('activeVisits', activeVisits);
+
+  //   config.identifiers.map((identifier) => {
+  //     headers.push({
+  //       id: identifier.id,
+  //       header: t(identifier.header.key, identifier.header.default),
+  //       key: identifier.header.key,
+  //     });
+  //   });
+
+  //   console.log('headers', headers);
+  //   return headers;
+  // };
 
   const rowData = activeVisits.map((visit) => ({
     ...visit,
@@ -140,7 +201,7 @@ const ActiveVisitsTable = () => {
     if (currentPage !== 1) {
       goTo(1);
     }
-  }, [searchString]);
+  }, [currentPage, goTo, searchString]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
