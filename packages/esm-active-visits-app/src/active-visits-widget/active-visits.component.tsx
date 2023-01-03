@@ -82,14 +82,11 @@ const ActiveVisitsTable = () => {
       ];
 
       config?.activeVisits?.identifiers?.map((identifier, index) => {
-        //this ensures that only identifiers that are present at least on one user are shown on the table headers
-        if (activeVisits.some((visit) => visit[identifier?.header?.key] !== '--')) {
-          headers.push({
-            id: index + 1,
-            header: t(identifier?.header?.key, identifier?.header?.default),
-            key: identifier?.header?.key,
-          });
-        }
+        headers.push({
+          id: index + 1,
+          header: t(identifier?.header?.key, identifier?.header?.default),
+          key: identifier?.header?.key,
+        });
       });
 
       headers.push(
