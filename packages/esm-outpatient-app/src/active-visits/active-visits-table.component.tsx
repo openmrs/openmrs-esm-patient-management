@@ -526,13 +526,23 @@ function ActiveVisitsTable() {
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-          <Button
-            kind="ghost"
-            size="sm"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            onClick={() => setShowOverlay(true)}>
-            {t('addPatientToQueue', 'Add patient to queue')}
-          </Button>
+          <ExtensionSlot
+            extensionSlotName="patient-search-button-slot"
+            state={{
+              buttonText: t('addPatientToQueue', 'Add patient to queue'),
+              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+              buttonProps: {
+                kind: 'ghost',
+                renderIcon: (props) => <Add size={16} {...props} />,
+                size: 'sm',
+              },
+              selectPatientAction: (selectedPatientUuid) => {
+                setShowOverlay(true);
+                setView(SearchTypes.SCHEDULED_VISITS);
+                setViewState({ selectedPatientUuid });
+              },
+            }}
+          />
         </Tile>
       </div>
       {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
