@@ -1,32 +1,35 @@
+import { getConfig, navigate } from '@openmrs/esm-framework';
+import capitalize from 'lodash-es/capitalize';
 import { SearchedPatient } from '../types';
 
-export function mapToOpenMRSBundle(patientBundle: any): Array<SearchedPatient> {
-  const buffer = [];
-  if (!patientBundle || patientBundle.total == 0) {
-    return buffer;
+export function mapToOpenMRSPatient(
+  fhirPatient: Partial<fhir.Patient>,
+  prefferedExternalIdTitle: string,
+): SearchedPatient {
+  if (!fhirPatient) {
+    return null;
   }
-  return patientBundle.entry.map(({ resource }) => mapToOpenMRSPatient(resource));
-}
-
-function mapToOpenMRSPatient(fhirPatient: Partial<fhir.Patient>): SearchedPatient {
+  getConfig('');
   return {
-    uuid: fhirPatient.id,
+    uuid: null,
     identifiers: fhirPatient.identifier.map((id) => {
-      if (id.system.includes('Health_ID')) {
-        return {
-          identifier: id.value,
-          isMPIRecordId: true,
-        };
-      }
       return {
         identifier: id.value,
+        isMPIRecordId: id.type.text.toLocaleLowerCase().includes(prefferedExternalIdTitle.toLocaleLowerCase()),
       };
     }),
     person: {
-      addresses: [],
+      addresses: fhirPatient?.address?.map((address) => ({
+        cityVillage: address.city,
+        stateProvince: address.state,
+        country: address.country,
+        postalCode: address.postalCode,
+        preferred: false,
+        address1: '',
+      })),
       age: null,
       birthdate: fhirPatient.birthDate,
-      gender: fhirPatient.gender,
+      gender: capitalize(fhirPatient.gender),
       death: !fhirPatient.active,
       deathDate: '',
       personName: {
@@ -41,5 +44,12 @@ function mapToOpenMRSPatient(fhirPatient: Partial<fhir.Patient>): SearchedPatien
 }
 
 export function getPatientHealthId(patient: SearchedPatient) {
-  return patient.identifiers.find((identifier) => identifier.isMPIRecordId).identifier;
+  return patient.identifiers.find((identifier) => identifier.isMPIRecordId)?.identifier;
+}
+
+export function doMPISearch(searchTerm: string) {
+  navigate({
+    to: '${openmrsSpaBase}/search?query=${searchTerm}&mode=external',
+    templateParams: { searchTerm: searchTerm },
+  });
 }

@@ -3,10 +3,9 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, useConfig, FetchResponse, openmrsObservableFetch, showToast } from '@openmrs/esm-framework';
-import { PatientSearchResponse, SearchedPatient } from './types';
+import { MPIConfig, PatientSearchResponse, SearchedPatient, SearchMode } from './types';
 import { useTranslation } from 'react-i18next';
-import { patientsByFreeTextSearch, patientsById } from './mpi/mock';
-import { mapToOpenMRSBundle } from './mpi/utils';
+import { mapToOpenMRSPatient } from './mpi/utils';
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +
@@ -88,30 +87,19 @@ export function useMPIPatientSearch(
 
 export function usePatientSearch(
   searchTerm: string,
-  dataSource: 'EMR' | 'MPI',
+  searchMode: SearchMode,
+  mpiConfig: MPIConfig,
   includeDead: boolean,
   searching: boolean = true,
   resultsToFetch: number = 10,
   customRepresentation: string = v,
 ): PatientSearchResponse {
-  const [refinedSearchTerm, setRefinedSearchTerm] = useState(searchTerm);
-
-  const isIdentifierBased = useMemo(() => {
-    if (searchTerm.includes(':')) {
-      const parts = searchTerm.split(':');
-      setRefinedSearchTerm(parts[1]);
-      return parts[0] == 'id';
-    } else {
-      setRefinedSearchTerm(searchTerm);
-    }
-  }, [searchTerm]);
-
-  const getUrlEMR = useCallback(
+  const getInternalUrl = useCallback(
     (
       page,
       prevPageData: FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }> }>,
     ) => {
-      if ((prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) || dataSource == 'MPI') {
+      if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
         return null;
       }
       let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}&totalCount=true`;
@@ -120,54 +108,43 @@ export function usePatientSearch(
       }
       return url;
     },
-    [searchTerm, customRepresentation, includeDead, resultsToFetch, dataSource],
+    [searchTerm, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const mpiUrl = useMemo(() => {
-    if (dataSource == 'EMR') {
-      return null;
+  const getExternalUrl = useCallback(() => {
+    if (mpiConfig?.patientResourceURL) {
+      return mpiConfig.patientResourceURL.endsWith('/')
+        ? mpiConfig.patientResourceURL + searchTerm
+        : mpiConfig.patientResourceURL + '/' + searchTerm;
     }
-    const baseUrl = 'https://namibia-mpi.globalhealthapp.net/Patient';
-    return isIdentifierBased ? `${baseUrl}/${searchTerm}` : `${baseUrl}?freetext=${searchTerm}`;
-  }, [dataSource, isIdentifierBased, searchTerm]);
-
-  const mpiFetcher = (url) => {
-    if (!url) {
-      return Promise.resolve(null);
-    }
-    if (isIdentifierBased) {
-      return Promise.resolve(patientsById[refinedSearchTerm]).then((response) => {
-        return mapToOpenMRSBundle(response);
-      });
-    }
-
-    return Promise.resolve(patientsByFreeTextSearch[refinedSearchTerm]).then((response) => {
-      return mapToOpenMRSBundle(response);
-    });
-  };
+    return null;
+  }, [mpiConfig, searchTerm]);
 
   const emrResponse = useSWRInfinite<
     FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>,
     Error
-  >(searching ? getUrlEMR : null, openmrsFetch);
+  >(searching && searchMode == 'Internal' ? getInternalUrl : null, openmrsFetch);
 
-  const mpiResponse = useSWR(searching ? mpiUrl : null, mpiFetcher);
+  const mpiResponse = useSWRImmutable(searching && searchMode == 'External' ? getExternalUrl : null, openmrsFetch);
 
   const results = useMemo(() => {
     const { data, isValidating, error, setSize, size } =
-      dataSource == 'EMR' ? (emrResponse as any) : (mpiResponse as any);
-
+      searchMode == 'Internal' ? (emrResponse as any) : (mpiResponse as any);
     return {
-      data: data ? (dataSource == 'EMR' ? [].concat(...data?.map((resp) => resp?.data?.results)) : data) : null,
+      data: data
+        ? searchMode == 'Internal'
+          ? [].concat(...data?.map((resp) => resp?.data?.results))
+          : [mapToOpenMRSPatient(data.data, mpiConfig.preferredPatientIdentifierTitle)]
+        : null,
       isLoading: !data && !error,
-      fetchError: error,
+      fetchError: isSoftError(error, searchMode) ? null : error,
       hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
       loadingNewData: isValidating,
       setPage: setSize,
       currentPage: size,
       totalResults: data?.[0]?.data?.totalCount || data?.length,
     };
-  }, [dataSource, emrResponse, mpiResponse]);
+  }, [searchMode, emrResponse, mpiResponse]);
 
   return results;
 }
@@ -234,4 +211,14 @@ export function useGetPatientAttributePhoneUuid(): string {
     });
   }
   return data?.data?.results?.[0]?.uuid;
+}
+
+function isSoftError(error: any, searchMode: SearchMode): boolean {
+  if (error && error.response.status == 500 && searchMode == 'External') {
+    // Some external sources throw a server error when processing an ID based search operation that doesn't get a hit.
+    // Ignore this error in such scenarios.
+    return true;
+  }
+  // return false;
+  return true;
 }

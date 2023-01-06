@@ -27,6 +27,7 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
         <AdvancedPatientSearchComponent
           query={searchParams?.get('query') ?? ''}
           inTabletOrOverlay={!isDesktop(layout)}
+          mode={searchParams?.get('mode')?.toLowerCase() == 'external' ? 'External' : 'Internal'}
           stickyPagination
         />
       </div>

@@ -43,7 +43,8 @@
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
-  padding: spacing.$spacing-09 0rem;
+  padding: spacing.$spacing-03 0rem;
+  color: $text-02;
 }
 
 .paddedEmptySearchResultsTile {
@@ -55,6 +56,30 @@
   color: $text-02;
   margin-top: spacing.$spacing-05;
   margin-bottom: 0.313rem;
+}
+
+.emptyResultsMarginRules {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.dividerWrapper {
+  position: relative;
+  height: 3rem;
+}
+
+.divider {
+  width: 60px;
+  height: 1.5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #e0e0e0;
+}
+
+.searchTermEmphasized {
+  font-weight: 600;
 }
 
 .actionText {

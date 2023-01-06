@@ -11,15 +11,9 @@ interface RefineSearchProps {
   inTabletOrOverlay: boolean;
   setFilters: React.Dispatch<React.SetStateAction<AdvancedPatientSearchState>>;
   filtersApplied: number;
-  setDataSource: React.Dispatch<React.SetStateAction<DataSource>>;
 }
 
-const RefineSearch: React.FC<RefineSearchProps> = ({
-  setFilters,
-  inTabletOrOverlay,
-  filtersApplied,
-  setDataSource,
-}) => {
+const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverlay, filtersApplied }) => {
   const [formState, formDispatch] = useReducer(reducer, initialState);
   const [showRefineSearchDialog, setShowRefineSearchDialog] = useState(false);
   const { t } = useTranslation();
@@ -290,23 +284,6 @@ const RefineSearch: React.FC<RefineSearchProps> = ({
   return (
     <form onSubmit={handleSubmit} className={styles.refineSeachContainer}>
       <h2 className={styles.productiveHeading02}>{t('refineSearch', 'Refine search')}</h2>
-      <div className={styles.field}>
-        <div className={styles.labelText}>
-          <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="">
-            {t('dataSource', 'Data Source')}
-          </label>
-        </div>
-        <RadioButtonGroup
-          defaultSelected="EMR"
-          orientation="vertical"
-          onChange={(event) => {
-            setDataSource(event.toString());
-          }}
-          name="appointment-reminder-radio-group">
-          <RadioButton className={styles.radioButton} id="emr" labelText="EMR" value="EMR" />
-          <RadioButton className={styles.radioButton} id="mpi" labelText="MPI" value="MPI" />
-        </RadioButtonGroup>
-      </div>
       <div className={styles.field}>
         <div className={styles.labelText}>
           <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">

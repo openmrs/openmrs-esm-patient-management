@@ -1,3 +1,4 @@
+import { useConfig } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   useGetPatientAttributePhoneUuid,
@@ -5,7 +6,7 @@ import {
   usePatientSearch,
   usePatientSearchInfinite,
 } from '../patient-search.resource';
-import { AdvancedPatientSearchState, DataSource } from '../types';
+import { AdvancedPatientSearchState, DataSource, SearchMode } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
@@ -17,6 +18,7 @@ interface AdvancedPatientSearchProps {
   stickyPagination?: boolean;
   selectPatientAction?: (patientUuid: string) => void;
   hidePanel?: () => void;
+  mode: SearchMode;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
@@ -25,9 +27,10 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   selectPatientAction,
   inTabletOrOverlay,
   hidePanel,
+  mode,
 }) => {
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialState);
-  const [dataSource, setDataSource] = useState<DataSource>('EMR');
+  const { MPI: mpiConfig } = useConfig();
   const filtersApplied = useMemo(() => {
     let count = 0;
     Object.entries(filters).forEach(([key, value]) => {
@@ -45,7 +48,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     hasMore,
     isLoading,
     fetchError,
-  } = usePatientSearch(query, dataSource, false, !!query, 50);
+  } = usePatientSearch(query, mode, mpiConfig, false, !!query, 50);
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {
@@ -129,12 +132,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
       }`}>
       {!inTabletOrOverlay && (
         <div className={styles.refineSearchDesktop}>
-          <RefineSearch
-            filtersApplied={filtersApplied}
-            setFilters={setFilters}
-            inTabletOrOverlay={inTabletOrOverlay}
-            setDataSource={setDataSource}
-          />
+          <RefineSearch filtersApplied={filtersApplied} setFilters={setFilters} inTabletOrOverlay={inTabletOrOverlay} />
         </div>
       )}
       <div
@@ -150,16 +148,11 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}
-          dataSource={dataSource}
+          searchMode={mode}
         />
       </div>
       {inTabletOrOverlay && (
-        <RefineSearch
-          filtersApplied={filtersApplied}
-          setFilters={setFilters}
-          inTabletOrOverlay={inTabletOrOverlay}
-          setDataSource={setDataSource}
-        />
+        <RefineSearch filtersApplied={filtersApplied} setFilters={setFilters} inTabletOrOverlay={inTabletOrOverlay} />
       )}
     </div>
   );

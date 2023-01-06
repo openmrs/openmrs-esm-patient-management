@@ -32,13 +32,25 @@ export const configSchema = {
     ],
   },
   MPI: {
-    prefferedPatientIdentifierTitle: {
+    title: {
+      _type: Type.String,
+      _default: 'MPI',
+    },
+    patientResourceURL: {
+      _type: Type.String,
+      _default: '/ws/fhir2/R4/MPIPatient',
+    },
+    preferredPatientIdentifierTitle: {
       _type: Type.String,
       _default: 'Health ID',
     },
-    prefferedPatientIdentifierType: {
+    preferredPatientIdentifierType: {
       _type: Type.String,
-      _default: '',
+      _default: 'ac79a22f-4783-498d-80d8-d0523f6f91d2',
+    },
+    isMPIEnabled: {
+      _type: Type.Boolean,
+      _default: true,
     },
   },
 };

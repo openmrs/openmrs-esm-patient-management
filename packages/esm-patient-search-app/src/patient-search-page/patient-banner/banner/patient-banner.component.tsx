@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
+import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical, UserFollow } from '@carbon/react/icons';
 
 import {
@@ -14,7 +14,7 @@ import {
   ConfigurableLink,
   navigate,
 } from '@openmrs/esm-framework';
-import { SearchedPatient } from '../../../types';
+import { MPIConfig, SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -26,7 +26,8 @@ interface PatientBannerProps {
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
   selectPatientAction: (evt: any, patientUuid: string) => void;
-  canCreateNewRecordFromPatientSearchResult?: boolean;
+  isMPIPatient?: boolean;
+  mpiConfig: MPIConfig;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
@@ -35,7 +36,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   onTransition,
   hideActionsOverflow,
   selectPatientAction,
-  canCreateNewRecordFromPatientSearchResult,
+  isMPIPatient,
+  mpiConfig,
 }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
@@ -98,6 +100,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
+              {isMPIPatient && (
+                <div>
+                  <Tag className={styles.mpiTag} type="blue">
+                    &#127760; {mpiConfig.title}
+                  </Tag>
+                </div>
+              )}
               <ExtensionSlot
                 extensionSlotName="patient-banner-tags-slot"
                 state={{ patientUuid, patient }}
@@ -114,7 +123,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
         </ConfigurableLink>
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow && !canCreateNewRecordFromPatientSearchResult && (
+          {!hideActionsOverflow && !isMPIPatient && (
             <div ref={overFlowMenuRef}>
               <CustomOverflowMenuComponent
                 menuTitle={
@@ -133,7 +142,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               </CustomOverflowMenuComponent>
             </div>
           )}
-          {canCreateNewRecordFromPatientSearchResult && (
+          {isMPIPatient && (
             <div>
               <Button
                 kind="ghost"
@@ -149,7 +158,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               </Button>
             </div>
           )}
-          {!currentVisit ? (
+          {!currentVisit && !isMPIPatient ? (
             <ExtensionSlot
               extensionSlotName="start-visit-button-slot"
               state={{

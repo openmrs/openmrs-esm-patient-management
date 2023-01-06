@@ -36,14 +36,9 @@ let exportedInitialFormValuesForTesting = {} as FormValues;
 export interface PatientRegistrationProps {
   savePatientForm: SavePatientForm;
   isOffline: boolean;
-  draftPatient?: Partial<Patient>;
 }
 
-export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
-  savePatientForm,
-  isOffline,
-  draftPatient,
-}) => {
+export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePatientForm, isOffline }) => {
   const { currentSession, addressTemplate, identifierTypes } = useContext(ResourcesContext);
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
@@ -54,7 +49,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues] = useInitialFormValues(
+  const [initialFormValues, setInitialFormValues, isConstructingBaseInitialValuesObject] = useInitialFormValues(
     uuidOfPatientToEdit || sourcePatientId,
     !!sourcePatientId,
   );
@@ -82,7 +77,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   }, [config.sections, config.sectionDefinitions]);
 
   useEffect(() => {
-    if (addressTemplate) {
+    if (!isConstructingBaseInitialValuesObject && addressTemplate) {
       const addressTemplateXml = addressTemplate?.results[0].value;
       if (!addressTemplateXml) {
         return;
@@ -99,11 +94,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
           }
         }
         fieldDefinition?.map((field) => (initialAddressFieldValues[field.id] = ''));
-
         setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
       }
     }
-  }, [inEditMode, addressTemplate, initialAddressFieldValues]);
+  }, [inEditMode, addressTemplate, initialAddressFieldValues, initialFormValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();

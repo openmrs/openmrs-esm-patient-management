@@ -1,5 +1,5 @@
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
-import { patientsById } from './mock';
 
 export function useMPIPatient(patientId) {
   const [patient, setPatient] = useState(null);
@@ -7,22 +7,17 @@ export function useMPIPatient(patientId) {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchMPIPatient(patientId).then((response) => {
+    openmrsFetch('/ws/fhir2/R4/MPIPatient/' + patientId).then((response) => {
       if (response.status == 200 && response.data) {
-        setPatient(response.data.entry[0].resource);
+        setPatient(response.data);
         setIsLoading(false);
       }
     });
   }, [patientId]);
 
-  console.log({ patient });
   return {
     isLoading,
     patient,
     error: null,
   };
-}
-
-function fetchMPIPatient(patientId: string) {
-  return Promise.resolve({ data: patientsById[patientId], status: 200 });
 }

@@ -11,7 +11,6 @@ import {
   PatientUuidMapType,
   PersonAttributeResponse,
   PatientIdentifierResponse,
-  Patient,
 } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
@@ -24,12 +23,14 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 export function useInitialFormValues(
   patientUuid: string,
   isMPIRecordId: boolean = false,
-): [FormValues, Dispatch<FormValues>] {
+): [FormValues, Dispatch<FormValues>, boolean] {
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(isMPIRecordId ? null : patientUuid);
   const { isLoading: isLoadingSourcePatientObject, patient: sourcePatientObject } = useMPIPatient(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
+  const [isConstructingBaseInitialValuesObject, setIsConstructingBaseInitialValuesObject] = useState(true);
+
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
     patientUuid: v4(),
     givenName: '',
@@ -63,29 +64,32 @@ export function useInitialFormValues(
           address: getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
         });
+        setIsConstructingBaseInitialValuesObject(false);
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
 
-        if (!registration._patientRegistrationData.formValues) {
+        if (!registration?._patientRegistrationData?.formValues) {
           console.error(
             `Found a queued offline patient registration for patient ${patientUuid}, but without form values. Not using these values.`,
           );
           return;
         }
-
         setInitialFormValues(registration._patientRegistrationData.formValues);
+        setIsConstructingBaseInitialValuesObject(false);
       }
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
   useEffect(() => {
     if (sourcePatientObject) {
-      setInitialFormValues({
+      const values = {
         ...initialFormValues,
         ...getFormValuesFromFhirPatient(sourcePatientObject),
         address: getAddressFieldValuesFromFhirPatient(sourcePatientObject),
         ...getPhonePersonAttributeValueFromFhirPatient(sourcePatientObject),
-      });
+      };
+      setInitialFormValues(values);
+      setIsConstructingBaseInitialValuesObject(false);
     }
   }, [sourcePatientObject, isLoadingSourcePatientObject]);
 
@@ -123,8 +127,7 @@ export function useInitialFormValues(
     }
   }, [attributes, setInitialFormValues, isLoadingAttributes]);
 
-  console.log({ sourcePatientObject });
-  return [initialFormValues, setInitialFormValues];
+  return [initialFormValues, setInitialFormValues, isConstructingBaseInitialValuesObject];
 }
 
 export function useInitialAddressFieldValues(patientUuid: string, fallback = {}): [object, Dispatch<object>] {

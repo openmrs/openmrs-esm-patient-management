@@ -49,6 +49,7 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
           query={searchTerm}
           inTabletOrOverlay
           hidePanel={onClose}
+          mode={'Internal'}
         />
       )}
     </Overlay>
