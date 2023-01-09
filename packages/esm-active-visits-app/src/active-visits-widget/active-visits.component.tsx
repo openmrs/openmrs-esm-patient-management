@@ -89,6 +89,14 @@ const ActiveVisitsTable = () => {
         });
       });
 
+      config?.activeVisits?.attributes?.map((attribute, index) => {
+        headers.push({
+          id: index + config?.activeVisits?.identifiers.length + 1,
+          header: t(attribute?.header?.key, attribute?.header?.default),
+          key: attribute?.header?.key,
+        });
+      });
+
       headers.push(
         {
           id: headers[headers.length - 1].id + 2,

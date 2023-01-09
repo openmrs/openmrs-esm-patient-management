@@ -26,7 +26,8 @@ export function useActiveVisits() {
   const sessionLocation = currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
-    'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid,identifierType:(name,uuid)),person:(age,display,gender,uuid)),' +
+    'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid,identifierType:(name,uuid)),' +
+    'person:(age,display,gender,uuid,attributes:(value,attributeType:(uuid,display)))),' +
     'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)&fromStartDate=' +
     startDate +
@@ -89,6 +90,32 @@ export function useActiveVisits() {
         activeVisits = {
           ...activeVisits,
           [configIdentifier?.header?.key]: '--',
+        };
+      }
+    });
+
+    //map attributes on config
+    config?.activeVisits?.attributes?.map(({ display, header }) => {
+      const personAttributes = visit?.patient?.person?.attributes.find((personAttributes) => {
+        if (personAttributes?.attributeType?.display === display) {
+          return true;
+        }
+        return false;
+      });
+
+      if (personAttributes) {
+        //add the new attribute or rewrite existing one to activeVisit object
+        //the parameter will corresponde to the name of the key value of the configuration
+        //and the respective value is the persons value
+        activeVisits = {
+          ...activeVisits,
+          [header?.key]: personAttributes?.value,
+        };
+      } else {
+        //If there isn't a attributes we display this default text
+        activeVisits = {
+          ...activeVisits,
+          [header?.key]: '--',
         };
       }
     });
