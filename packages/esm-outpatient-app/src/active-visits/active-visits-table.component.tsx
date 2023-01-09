@@ -40,6 +40,7 @@ import {
   isDesktop,
   useSession,
   useLocations,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -173,6 +174,7 @@ function ActiveVisitsTable() {
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
+  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
 
   const currentPathName: string = window.location.pathname;
@@ -473,7 +475,15 @@ function ActiveVisitsTable() {
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} />}
+        {showOverlay && (
+          <PatientSearch
+            view={view}
+            closePanel={() => setShowOverlay(false)}
+            viewState={{
+              selectedPatientUuid: '',
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -495,31 +505,47 @@ function ActiveVisitsTable() {
       </div>
       <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
-        <Button
-          iconDescription={t('addPatientToQueue', 'Add patient to queue')}
-          kind="secondary"
-          onClick={() => {
-            setShowOverlay(true);
-            setView(SearchTypes.BASIC);
+        <ExtensionSlot
+          extensionSlotName="patient-search-button-slot"
+          state={{
+            buttonText: t('addPatientToQueue', 'Add patient to queue'),
+            overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+            buttonProps: {
+              kind: 'secondary',
+              renderIcon: (props) => <Add size={16} {...props} />,
+              size: 'sm',
+            },
+            selectPatientAction: (selectedPatientUuid) => {
+              setShowOverlay(true);
+              setView(SearchTypes.SCHEDULED_VISITS);
+              setViewState({ selectedPatientUuid });
+            },
           }}
-          renderIcon={(props) => <Add size={16} {...props} />}
-          size="sm">
-          {t('addPatientToQueue', 'Add patient to queue')}
-        </Button>
+        />
       </div>
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-          <Button
-            kind="ghost"
-            size="sm"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            onClick={() => setShowOverlay(true)}>
-            {t('addPatientToQueue', 'Add patient to queue')}
-          </Button>
+          <ExtensionSlot
+            extensionSlotName="patient-search-button-slot"
+            state={{
+              buttonText: t('addPatientToQueue', 'Add patient to queue'),
+              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+              buttonProps: {
+                kind: 'ghost',
+                renderIcon: (props) => <Add size={16} {...props} />,
+                size: 'sm',
+              },
+              selectPatientAction: (selectedPatientUuid) => {
+                setShowOverlay(true);
+                setView(SearchTypes.SCHEDULED_VISITS);
+                setViewState({ selectedPatientUuid });
+              },
+            }}
+          />
         </Tile>
       </div>
-      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} />}
+      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }

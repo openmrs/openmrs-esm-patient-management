@@ -292,17 +292,6 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={ArrowLeft}
-          iconDescription="Back to search results"
-          size="sm"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid, false)}>
-          <span>{t('backToSearchResults', 'Back to search results')}</span>
-        </Button>
-      </div>
-
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={appointments?.recentVisits}
