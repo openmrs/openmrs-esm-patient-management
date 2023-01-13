@@ -12,5 +12,12 @@
   grid-template-rows: repeat(6, minmax(0px, 1fr));
 }
 .backgroundColor {
+  //  width: 100%;
+  // float: right;
+  margin: 1px 0 0;
+  transition: width 0.24s ease-in-out;
+  padding: 0 2rem 0;
+  position: relative;
+  min-height: calc(100vh - 80px);
   background-color: colors.$white;
 }

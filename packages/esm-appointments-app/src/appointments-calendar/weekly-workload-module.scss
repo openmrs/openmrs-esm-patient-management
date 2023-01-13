@@ -1,0 +1,133 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.monthly-cell {
+  border-left: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  background: colors.$white;
+  color: colors.$black;
+  padding: layout.$spacing-01;
+  text-align: right;
+  @include type.type-style('body-compact-02');
+
+  &:nth-child(-n + 7) {
+    border-top: 1px solid colors.$gray-20;
+  }
+
+  &:nth-child(7n) {
+    border-right: 1px solid colors.$gray-20;
+  }
+
+  &-disabled {
+    border-left: 1px solid colors.$gray-20;
+    border-bottom: 1px solid colors.$gray-20;
+  }
+  &-disabled:last-child {
+    border-right: 1px solid colors.$gray-20;
+  }
+}
+.weekly-cell {
+  position: relative;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  border-left: 1px solid colors.$gray-20;
+  min-height: 120px;
+  color: colors.$black;
+
+  .week-time {
+    display: none;
+  }
+
+  &:nth-child(-n + 8) {
+    border-top: 1px solid colors.$gray-20;
+    .allDay {
+      display: none;
+    }
+  }
+
+  &:first-child {
+    border-top: none;
+    .allDay {
+      display: flex;
+      border-bottom: 1px solid colors.$gray-20;
+      border-top: 1px solid colors.$gray-20;
+      padding-top: 50px;
+      padding-left: 5px;
+      padding-bottom: 50px;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &:nth-child(8n + 1) {
+    border-bottom: none;
+
+    .week-time {
+      white-space: nowrap;
+      display: inline;
+      color: colors.$black;
+
+      position: absolute;
+      top: -11px;
+      height: 22px;
+      width: 30px;
+    }
+  }
+}
+.serviceArea {
+  display: grid;
+  column-gap: 2rem;
+  grid-template-columns: 0fr 1fr;
+  justify-content: flex-start;
+  text-align: left;
+  margin: 0.125rem;
+  @include type.type-style('label-02');
+  color: #020f1b;
+  cursor: pointer;
+  & > span:first-child {
+    text-align: left;
+    text-overflow: ellipsis;
+    width: layout.$spacing-06;
+  }
+}
+.currentData {
+  margin: 2px;
+}
+
+.smallDesktop {
+  height: 100px;
+}
+
+.largeDesktop {
+  height: 150px;
+}
+
+.red {
+  background-color: colors.$red-60;
+  color: colors.$white;
+  font-weight: bold;
+  padding: 0.0125rem;
+}
+
+.purple {
+  background-color: colors.$purple-50;
+  color: colors.$white;
+  font-weight: bold;
+  padding: 0.0125rem;
+}
+
+.blue {
+  background-color: colors.$blue-60;
+  color: colors.$white;
+  font-weight: bold;
+  padding: 0.0125rem;
+}
+
+.green {
+  background-color: colors.$green-50;
+  color: colors.$white;
+  font-weight: bold;
+  padding: 0.0125rem;
+}
