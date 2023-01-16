@@ -89,7 +89,7 @@ To run E2E tests, use:
 ```sh
 yarn test-e2e --headed
 ```
-Please read [the readme file](e2e/README.md) for E2E testing.
+Please read [the E2E README file](e2e/README.md) for E2E testing.
 ## Deployment
 
 The `main` branch of this repo is deployed in a [demo environment](https://openmrs-spa.org/openmrs/spa).
