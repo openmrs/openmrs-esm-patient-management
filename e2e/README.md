@@ -56,7 +56,9 @@ e2e
 |   ^ Contains page object model classes for interacting with the frontend.
 |     See https://playwright.dev/docs/test-pom for details.
 |__ specs
-    ^ Contains the actual test cases/specs. New tests should be placed in this folder.
+|   ^ Contains the actual test cases/specs. New tests should be placed in this folder.
+|__ support
+    ^ Contains support files that requires to run e2e tests, e.g. docker compose files. 
 ```
 
 When you want to write a new test case, start by creating a new spec in `./specs`.
