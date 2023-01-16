@@ -1,5 +1,5 @@
 import { test } from '../core';
-import { HomePage } from '../pages/homePage';
+import { HomePage } from '../pages';
 import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
 
