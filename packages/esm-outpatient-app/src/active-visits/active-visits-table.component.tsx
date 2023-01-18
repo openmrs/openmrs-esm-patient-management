@@ -339,9 +339,10 @@ function ActiveVisitsTable() {
             size="sm"
             kind="ghost"
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
-            onClick={() => {
+            onClick={(selectedPatientUuid) => {
               setShowOverlay(true);
               setView(SearchTypes.QUEUE_SERVICE_FORM);
+              setViewState({ selectedPatientUuid });
             }}
             iconDescription={t('addNewQueue', 'Add new queue')}>
             {t('addNewService', 'Add new service')}
@@ -495,9 +496,10 @@ function ActiveVisitsTable() {
           size="sm"
           kind="ghost"
           renderIcon={(props) => <ArrowRight size={16} {...props} />}
-          onClick={() => {
+          onClick={(selectedPatientUuid) => {
             setShowOverlay(true);
             setView(SearchTypes.QUEUE_SERVICE_FORM);
+            setViewState({ selectedPatientUuid });
           }}
           iconDescription={t('addNewQueue', 'Add new queue')}>
           {t('addNewService', 'Add new service')}
