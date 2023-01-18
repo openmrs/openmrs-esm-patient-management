@@ -79,13 +79,23 @@ Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/
 
 ## Running tests
 
+### Unit tests
 To run unit tests, use:
 
 ```sh
 yarn test
 ```
 
-To run E2E tests, use:
+### E2E tests
+
+To run E2E tests, make sure the dev server is running by using:
+
+```sh
+yarn start
+```
+
+Then, in a separate terminal, run:
+
 ```sh
 yarn test-e2e --headed
 ```
