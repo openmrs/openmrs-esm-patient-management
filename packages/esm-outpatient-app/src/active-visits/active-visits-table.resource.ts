@@ -155,10 +155,12 @@ export function usePriority() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${priorityConceptSetUuid}`;
-  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     priorities: data ? data?.data?.setMembers : [],
+    isLoading: !data && !error,
+    isError: error,
   };
 }
 
