@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Overlay from '../overlay.component';
-import BasicSearch from './basic-search.component';
-import AdvancedSearch from './advanced-search.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import SearchResults from './search-results.component';
 import VisitForm from './visit-form/visit-form.component';
 import { SearchTypes } from '../types';
 import QueueServiceForm from '../queue-services/queue-service-form.component';
@@ -13,7 +10,7 @@ interface PatientSearchProps {
   closePanel: () => void;
   view?: string;
   viewState: {
-    selectedPatientUuid: string;
+    selectedPatientUuid?: string;
   };
 }
 
@@ -25,7 +22,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
   );
   const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
 
-  const toggleSearchType = (searchType: SearchTypes, patientUuid: string = '', mode: boolean = false) => {
+  const toggleSearchType = (searchType: SearchTypes, mode: boolean = false) => {
     setSearchType(searchType);
     setNewVisitMode(mode);
   };
