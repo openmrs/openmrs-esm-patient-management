@@ -7,11 +7,15 @@ framework.
 
 Please ensure that you have followed the basic installation guide in the
 [root README](../README.md).
-Once everything is set up,
+Once everything is set up, make sure the dev server is running by using:
 
 ```sh
-# Run all e2e tests:
-yarn test-e2e --headed 
+yarn start
+```
+Then, in a separate terminal, run:
+
+```sh
+yarn test-e2e --headed
 ```
 
 By default, the test suite will run against the http://localhost:8080.
@@ -27,7 +31,7 @@ yarn test-e2e --headed
 ```
 To run a specific test by title:
 ```sh
-yarn test-e2e -g "title of the test"
+yarn test-e2e --headed -g "title of the test"
 ```
 Check [this documentation](https://playwright.dev/docs/running-tests#command-line) for more running options.  
 
