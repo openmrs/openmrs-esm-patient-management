@@ -14,6 +14,12 @@ const config: PlaywrightTestConfig = {
   retries: process.env.CI ? 2 : 1,
   reporter: 'html',
   globalSetup: require.resolve('./e2e/core/global-setup'),
+  webServer: {
+    command: 'yarn start',
+    url: process.env.E2E_UI_BASE_URL,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+  },
   use: {
     baseURL: process.env.E2E_UI_BASE_URL,
     storageState: 'e2e/storageState.json',
