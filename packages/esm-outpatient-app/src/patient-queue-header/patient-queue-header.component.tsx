@@ -5,13 +5,23 @@ import { Dropdown } from '@carbon/react';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
-import { useQueueClinics } from './patient-queue-header.resource';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import {
+  updateSelectedQueueLocationUuid,
+  updateSelectedQueueLocationName,
+  useSelectedQueueLocationUuid,
+  useSelectedQueueLocationName,
+} from '../helpers/helpers';
 
 const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
-  const { clinics } = useQueueClinics();
+  const { queueLocations } = useQueueLocations();
+  const handleQueueLocationChange = ({ selectedItem }) => {
+    updateSelectedQueueLocationUuid(selectedItem.id);
+    updateSelectedQueueLocationName(selectedItem.name);
+  };
 
   return (
     <div className={styles.header}>
@@ -35,9 +45,11 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
           <Dropdown
             id="typeOfCare"
             label={t('careType', 'Type of Care')}
-            items={[{ display: `${t('all', 'All')}` }, ...clinics]}
+            initialSelectedItem={queueLocations[0]?.name}
+            items={[{ display: `${t('all', 'All')}` }, ...queueLocations]}
             itemToString={(item) => (item ? item.name : '')}
             type="inline"
+            onChange={handleQueueLocationChange}
           />
         </div>
       </div>

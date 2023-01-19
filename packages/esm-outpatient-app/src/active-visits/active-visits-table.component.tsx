@@ -57,7 +57,13 @@ import styles from './active-visits-table.scss';
 import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
-import { updateSelectedServiceName, updateSelectedServiceUuid, useSelectedServiceName } from '../helpers/helpers';
+import {
+  updateSelectedServiceName,
+  updateSelectedServiceUuid,
+  useSelectedServiceName,
+  useSelectedServiceUuid,
+  useSelectedQueueLocationUuid,
+} from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType } from '../helpers/functions';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
@@ -100,9 +106,10 @@ function ActiveVisitsTable() {
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
   const locations = useLocations();
-  const { services } = useServices(userLocation);
+  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { services } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName);
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
@@ -128,7 +135,7 @@ function ActiveVisitsTable() {
     } else if (!userLocation && locations) {
       setUserLocation(first(locations)?.uuid);
     }
-  }, [session, locations, userLocation]);
+  }, [session, locations, userLocation, currentQueueLocation]);
 
   const tableHeaders = useMemo(
     () => [
