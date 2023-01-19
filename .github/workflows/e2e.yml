@@ -6,6 +6,14 @@ on:
   pull_request:
     branches:
       - main
+
+env:
+  E2E_UI_BASE_URL: ${{ secrets.E2E_UI_BASE_URL }}
+  E2E_WS_BASE_URL: ${{ secrets.E2E_WS_BASE_URL }}
+  E2E_USER_ADMIN_USERNAME: ${{ secrets.E2E_USER_ADMIN_USERNAME }}
+  E2E_USER_ADMIN_PASSWORD: ${{ secrets.E2E_USER_ADMIN_PASSWORD }}
+  E2E_LOGIN_DEFAULT_LOCATION_UUID: ${{ secrets.E2E_LOGIN_DEFAULT_LOCATION_UUID }}
+
 jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
@@ -71,7 +79,7 @@ jobs:
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:9000/openmrs/login.htm)" != "200" ]]; do sleep 10; done
       
       - name: Run dev server
-        run: yarn start --backend "http://localhost:9000" &
+        run: yarn start --backend "http://localhost:9000"
     
       - name: Run E2E tests
         run: yarn playwright test
