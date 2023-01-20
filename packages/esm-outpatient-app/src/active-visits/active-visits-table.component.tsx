@@ -350,7 +350,25 @@ function ActiveVisitsTable() {
         </div>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</span>
-          <div className={styles.headerButtons}></div>
+          <div className={styles.headerButtons}>
+            <ExtensionSlot
+              extensionSlotName="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'secondary',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: 'sm',
+                },
+                selectPatientAction: (selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.SCHEDULED_VISITS);
+                  setViewState({ selectedPatientUuid });
+                },
+              }}
+            />
+          </div>
         </div>
         <DataTable
           data-floating-menu-container
@@ -385,18 +403,6 @@ function ActiveVisitsTable() {
                       size="sm"
                     />
                   </Layer>
-                  <Button
-                    size="sm"
-                    kind="secondary"
-                    className={styles.addPatientToListBtn}
-                    renderIcon={(props) => <Add size={16} {...props} />}
-                    onClick={() => {
-                      setShowOverlay(true);
-                      setView('');
-                    }}
-                    iconDescription={t('addPatientToQueue', 'Add patient to queue')}>
-                    {t('addPatientToQueue', 'Add patient to queue')}
-                  </Button>
                   <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
                 </TableToolbarContent>
               </TableToolbar>
@@ -481,7 +487,7 @@ function ActiveVisitsTable() {
             view={view}
             closePanel={() => setShowOverlay(false)}
             viewState={{
-              selectedPatientUuid: '',
+              selectedPatientUuid: viewState.selectedPatientUuid,
             }}
           />
         )}
