@@ -1,4 +1,7 @@
 import { request } from '@playwright/test';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * This configuration is to reuse the signed-in state in the tests
