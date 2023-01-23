@@ -29,7 +29,6 @@
   min-height: 40px;
   width: 100%;
   &:nth-child(-n + 24) {
-    // border-top: 1px solid colors.$gray-20;
     border-bottom: 1px solid colors.$gray-20;
   }
 }
@@ -43,7 +42,6 @@
   text-align: center;
 
   &:nth-child(-n + 24) {
-    // border-top: 1px solid colors.$gray-20;
     border-bottom: 1px solid colors.$gray-20;
   }
 
