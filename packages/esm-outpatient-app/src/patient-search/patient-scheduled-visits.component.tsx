@@ -26,6 +26,8 @@ import {
   saveVisit,
   useVisitTypes,
   useVisit,
+  useConfig,
+  ConfigObject,
 } from '@openmrs/esm-framework';
 import { QueueEntryPayload, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
@@ -73,6 +75,7 @@ const ScheduledVisits: React.FC<{
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
+  const config = useConfig() as ConfigObject;
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -101,8 +104,8 @@ const ScheduledVisits: React.FC<{
       };
 
       const service = head(services)?.uuid;
-      const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-      const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
+      const defaultStatus = config.concepts.defaultStatusConceptUuid;
+      const defaultPriority = config.concepts.defaultPriorityConceptUuid;
 
       const abortController = new AbortController();
       if (currentVisit) {
@@ -125,7 +128,7 @@ const ScheduledVisits: React.FC<{
                   },
                   queueEntry: {
                     status: {
-                      uuid: status,
+                      uuid: defaultStatus,
                     },
                     priority: {
                       uuid: priority ? priority : defaultPriority,

@@ -8,6 +8,11 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
     },
+    defaultPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default priority for the queues eg Not urgent.',
+      _default: '9e123c90-76ac-4eaa-8d40-35577781eb46',
+    },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
@@ -15,6 +20,11 @@ export const configSchema = {
     statusConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
+    },
+    defaultStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for the queues eg Waiting.',
+      _default: '136203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
@@ -70,8 +80,10 @@ export const configSchema = {
 export interface ConfigObject {
   concepts: {
     priorityConceptSetUuid: string;
+    defaultPriorityConceptUuid: string;
     serviceConceptSetUuid: string;
     statusConceptSetUuid: string;
+    defaultStatusConceptUuid: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
     pulseUuid: string;

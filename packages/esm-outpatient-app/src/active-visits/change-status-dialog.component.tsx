@@ -15,10 +15,12 @@ import {
   SelectItem,
 } from '@carbon/react';
 import {
+  ConfigObject,
   showNotification,
   showToast,
   toDateObjectStrict,
   toOmrsIsoString,
+  useConfig,
   useLocations,
   useSession,
 } from '@openmrs/esm-framework';
@@ -46,7 +48,6 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const [patientUuid, setPatientUuid] = useState(queueEntry.patientUuid);
   const [patientName, setPatientName] = useState(queueEntry.name);
   const [patientAge, setPatientAge] = useState(queueEntry.patientAge);
-  const [patientDob, setPatientDob] = useState(queueEntry.patientDob);
   const [patientSex, setPatientSex] = useState(queueEntry.patientSex);
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
@@ -55,6 +56,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const session = useSession();
   const locations = useLocations();
   const { services } = useServices(userLocation);
+  const config = useConfig() as ConfigObject;
 
   useEffect(() => {
     setNewQueueUuid(previousQueueUuid);
@@ -69,11 +71,13 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   }, [session, locations, userLocation]);
 
   const changeQueueStatus = useCallback(() => {
+    const defaultStatus = config.concepts.defaultStatusConceptUuid;
+    const defaultPriority = config.concepts.defaultPriorityConceptUuid;
     if (priority === '') {
-      setPriority([...priorities].shift().uuid);
+      setPriority(defaultPriority);
     }
     if (status === '') {
-      statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+      setStatus(defaultStatus);
     }
     const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
     updateQueueEntry(
