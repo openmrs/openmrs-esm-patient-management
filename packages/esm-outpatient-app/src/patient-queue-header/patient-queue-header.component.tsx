@@ -5,25 +5,13 @@ import { Dropdown } from '@carbon/react';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import styles from './patient-queue-header.scss';
+import { useQueueClinics } from './patient-queue-header.resource';
 
 const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
-  const careTypes = [
-    {
-      id: 'option-1',
-      text: t('ncdCare', 'NCD Care'),
-    },
-    {
-      id: 'option-2',
-      text: t('hivCare', 'HIV Care'),
-    },
-    {
-      id: 'option-3',
-      text: t('tbCare', 'TB Care'),
-    },
-  ];
+  const { clinics } = useQueueClinics();
 
   return (
     <div className={styles.header}>
@@ -47,9 +35,8 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
           <Dropdown
             id="typeOfCare"
             label={t('careType', 'Type of Care')}
-            initialSelectedItem={careTypes[0]}
-            items={careTypes}
-            itemToString={(item) => (item ? item.text : '')}
+            items={[{ display: `${t('all', 'All')}` }, ...clinics]}
+            itemToString={(item) => (item ? item.name : '')}
             type="inline"
           />
         </div>

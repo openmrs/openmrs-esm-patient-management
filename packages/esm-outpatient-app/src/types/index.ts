@@ -350,3 +350,9 @@ export interface EndVisitPayload {
   visitType: string;
   stopDatetime: Date;
 }
+
+export interface QueueClinic {
+  uuid: string;
+  name: string;
+  description: string;
+}
