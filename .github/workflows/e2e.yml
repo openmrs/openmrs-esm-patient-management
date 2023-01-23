@@ -7,6 +7,13 @@ on:
     branches:
       - main
 
+env:
+  E2E_UI_BASE_URL: ${{ vars.E2E_UI_BASE_URL }}
+  E2E_WS_BASE_URL: ${{ vars.E2E_WS_BASE_URL }}
+  E2E_USER_ADMIN_USERNAME: ${{ vars.E2E_USER_ADMIN_USERNAME }}
+  E2E_USER_ADMIN_PASSWORD: ${{ vars.E2E_USER_ADMIN_PASSWORD }}
+  E2E_LOGIN_DEFAULT_LOCATION_UUID: ${{ vars.E2E_LOGIN_DEFAULT_LOCATION_UUID }}
+
 jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
@@ -15,6 +22,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Copy test environment variables
+        run: cp example.env .env
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -29,12 +39,6 @@ jobs:
 
       - name: Run E2E tests
         run: yarn playwright test --project=chromium
-        env:
-          E2E_UI_BASE_URL: ${{ vars.E2E_UI_BASE_URL }}
-          E2E_WS_BASE_URL: ${{ vars.E2E_WS_BASE_URL }}
-          E2E_USER_ADMIN_USERNAME: ${{ vars.E2E_USER_ADMIN_USERNAME }}
-          E2E_USER_ADMIN_PASSWORD: ${{ vars.E2E_USER_ADMIN_PASSWORD }}
-          E2E_LOGIN_DEFAULT_LOCATION_UUID: ${{ vars.E2E_LOGIN_DEFAULT_LOCATION_UUID }}
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
@@ -51,6 +55,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Copy test environment variables
+        run: cp example.env .env
 
       - name: Setup node 
         uses: actions/setup-node@v3
@@ -76,12 +83,6 @@ jobs:
     
       - name: Run E2E tests
         run: yarn playwright test
-        env:
-          E2E_UI_BASE_URL: ${{ vars.E2E_UI_BASE_URL }}
-          E2E_WS_BASE_URL: ${{ vars.E2E_WS_BASE_URL }}
-          E2E_USER_ADMIN_USERNAME: ${{ vars.E2E_USER_ADMIN_USERNAME }}
-          E2E_USER_ADMIN_PASSWORD: ${{ vars.E2E_USER_ADMIN_PASSWORD }}
-          E2E_LOGIN_DEFAULT_LOCATION_UUID: ${{ vars.E2E_LOGIN_DEFAULT_LOCATION_UUID }}
 
       - name: Upload report
         uses: actions/upload-artifact@v3
