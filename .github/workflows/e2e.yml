@@ -7,13 +7,6 @@ on:
     branches:
       - main
 
-env:
-  E2E_UI_BASE_URL: ${{ secrets.E2E_UI_BASE_URL }}
-  E2E_WS_BASE_URL: ${{ secrets.E2E_WS_BASE_URL }}
-  E2E_USER_ADMIN_USERNAME: ${{ secrets.E2E_USER_ADMIN_USERNAME }}
-  E2E_USER_ADMIN_PASSWORD: ${{ secrets.E2E_USER_ADMIN_PASSWORD }}
-  E2E_LOGIN_DEFAULT_LOCATION_UUID: ${{ secrets.E2E_LOGIN_DEFAULT_LOCATION_UUID }}
-
 jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
