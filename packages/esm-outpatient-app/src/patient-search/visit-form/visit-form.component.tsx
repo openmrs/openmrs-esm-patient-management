@@ -36,6 +36,7 @@ import {
   showNotification,
   showToast,
   useConfig,
+  ConfigObject,
 } from '@openmrs/esm-framework';
 import styles from './visit-form.scss';
 import { SearchTypes, PatientProgram, QueueEntryPayload } from '../../types/index';
@@ -43,7 +44,6 @@ import BaseVisitType from './base-visit-type.component';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { OutpatientConfig } from '../../config-schema';
 import { saveQueueEntry } from './queue.resource';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
@@ -65,6 +65,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const sessionUser = useSession();
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(0);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
+  const [isMissingService, setIsMissingService] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
@@ -83,7 +84,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
 
-  const config = useConfig() as OutpatientConfig;
+  const config = useConfig() as ConfigObject;
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -97,6 +98,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
 
       if (!visitType) {
         setIsMissingVisitType(true);
+        return;
+      }
+
+      if (!service) {
+        setIsMissingService(true);
         return;
       }
 
@@ -124,8 +130,8 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               if (isNull(service)) {
                 setSelectedService(head(allServices)?.uuid);
               }
-              const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-              const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
+              const defaultStatus = config.concepts.defaultStatusConceptUuid;
+              const defaultPriority = config.concepts.defaultPriorityConceptUuid;
 
               const queuePayload: QueueEntryPayload = {
                 visit: {
@@ -133,7 +139,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 },
                 queueEntry: {
                   status: {
-                    uuid: status,
+                    uuid: defaultStatus,
                   },
                   priority: {
                     uuid: priority ? priority : defaultPriority,
@@ -415,42 +421,66 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-            <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
-              invalidText="Required"
-              value={service}
-              onChange={(event) => setSelectedService(event.target.value)}>
-              {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {allServices?.length > 0 &&
-                allServices.map((service) => (
-                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                    {service.display}
-                  </SelectItem>
-                ))}
-            </Select>
+            {!allServices?.length ? (
+              <InlineNotification
+                className={styles.inlineNotification}
+                kind={'error'}
+                lowContrast
+                subtitle={t('configureServices', 'Please configure services to continue.')}
+                title={t('noServicesConfigured', 'No services configured')}
+              />
+            ) : (
+              <Select
+                labelText={t('selectService', 'Select a service')}
+                id="service"
+                invalidText="Required"
+                value={service}
+                onChange={(event) => setSelectedService(event.target.value)}>
+                {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+                {allServices?.length > 0 &&
+                  allServices.map((service) => (
+                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                      {service.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
           </section>
+          {isMissingService && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingService', 'Missing service type')}
+                subtitle={t('selectServiceType', 'Please select a service type')}
+              />
+            </section>
+          )}
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-            <ContentSwitcher
-              size="sm"
-              selectionMode="manual"
-              onChange={(event) => {
-                setPriority(event.name as any);
-              }}>
-              {priorities?.length > 0 ? (
-                priorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
-                })
-              ) : (
-                <Switch
-                  name={t('noPriorityFound', 'No priority found')}
-                  text={t('noPriorityFound', 'No priority found')}
-                  value={null}
-                />
-              )}
-            </ContentSwitcher>
+            {!priorities?.length ? (
+              <InlineNotification
+                className={styles.inlineNotification}
+                kind={'error'}
+                lowContrast
+                subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                title={t('noPrioritiesConfigured', 'No priorities configured')}
+              />
+            ) : (
+              <ContentSwitcher
+                size="sm"
+                selectionMode="manual"
+                onChange={(event) => {
+                  setPriority(event.name as any);
+                }}>
+                {priorities?.length > 0 &&
+                  priorities.map(({ uuid, display }) => {
+                    return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
+                  })}
+              </ContentSwitcher>
+            )}
           </section>
         </Stack>
       </div>
