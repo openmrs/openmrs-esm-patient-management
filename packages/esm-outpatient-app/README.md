@@ -1,4 +1,4 @@
-# Outpatient app
+# Outpatient app aka Service Queues
 
 The `Outpatient` app is a package that provides capabilities to track a patient's progress as they move through a clinic. Users can see an overview of various clinic metrics such as:
 
