@@ -28,7 +28,10 @@ export const mockPatientsVisits = {
       },
       serviceType: null,
       provider: null,
-      location: null,
+      location: {
+        name: '10 Engineer VCT',
+        uuid: '673d1efd-6a96-47c3-a332-54c30d9f0c29',
+      },
       startDateTime: 1659970578000,
       endDateTime: 1659970578000,
       appointmentKind: 'WalkIn',
@@ -81,7 +84,10 @@ export const mockPatientsVisits = {
       },
       serviceType: null,
       provider: null,
-      location: null,
+      location: {
+        name: '10 Engineer VCT',
+        uuid: '673d1efd-6a96-47c3-a332-54c30d9f0c29',
+      },
       startDateTime: 1659970578000,
       endDateTime: 1659970578000,
       appointmentKind: 'WalkIn',
