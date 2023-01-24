@@ -163,7 +163,7 @@ const MissingQueueEntries = () => {
     if (currentPage !== 1) {
       goTo(1);
     }
-  }, [searchString]);
+  }, [searchString, currentPage, goTo]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
