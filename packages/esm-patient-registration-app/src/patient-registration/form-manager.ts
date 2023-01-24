@@ -24,9 +24,7 @@ import {
   updatePatientIdentifier,
   saveEncounter,
 } from './patient-registration.resource';
-import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
-import { pushNewPatientToMPI } from './mpi/mpi-api';
 
 export type SavePatientForm = (
   isNewPatient: boolean,

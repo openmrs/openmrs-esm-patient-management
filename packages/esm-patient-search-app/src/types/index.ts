@@ -26,6 +26,12 @@ export interface Address {
   postalCode: string;
   stateProvince: string;
 }
+
+export interface Identifier {
+  identifier: string;
+  identifierTypeOrientation: 'external' | 'external-preferred' | 'internal' | 'unknown';
+}
+
 export interface FHIRPatientType {
   id: string;
   identifier: Array<{
@@ -111,13 +117,11 @@ export interface AdvancedPatientSearchAction {
 }
 
 export interface MPIConfig {
-  patientResourceURL: string;
+  baseAPIPath: string;
   preferredPatientIdentifierTitle: string;
   preferredPatientIdentifierType: string;
   title: string;
   isMPIEnabled: boolean;
 }
-
-export type DataSource = 'EMR' | 'MPI';
 
 export type SearchMode = 'External' | 'Internal';

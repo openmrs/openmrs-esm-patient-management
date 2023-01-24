@@ -43,9 +43,9 @@ export function useInitialPatientRelationships(patientUuid: string): {
     return {
       data: relationships,
       error,
-      isLoading: !data && !error,
+      isLoading: !data && !error && shouldFetch,
     };
-  }, [patientUuid, data, error]);
+  }, [patientUuid, data, error, shouldFetch]);
 
   return result;
 }

@@ -1,4 +1,4 @@
-import { getConfig, navigate } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import { SearchedPatient } from '../types';
 
@@ -9,7 +9,6 @@ export function mapToOpenMRSPatient(
   if (!fhirPatient) {
     return null;
   }
-  getConfig('');
   return {
     uuid: null,
     identifiers: fhirPatient.identifier.map((id) => {
@@ -43,7 +42,7 @@ export function mapToOpenMRSPatient(
   };
 }
 
-export function getPatientHealthId(patient: SearchedPatient) {
+export function getExternalPatientHealthId(patient: SearchedPatient) {
   return patient.identifiers.find((identifier) => identifier.isMPIRecordId)?.identifier;
 }
 
@@ -53,3 +52,5 @@ export function doMPISearch(searchTerm: string) {
     templateParams: { searchTerm: searchTerm },
   });
 }
+
+export function isAssociatedWithOMRSId(patient: SearchedPatient) {}

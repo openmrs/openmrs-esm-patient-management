@@ -112,10 +112,10 @@ export function usePatientSearch(
   );
 
   const getExternalUrl = useCallback(() => {
-    if (mpiConfig?.patientResourceURL) {
-      return mpiConfig.patientResourceURL.endsWith('/')
-        ? mpiConfig.patientResourceURL + searchTerm
-        : mpiConfig.patientResourceURL + '/' + searchTerm;
+    if (mpiConfig?.baseAPIPath) {
+      return mpiConfig.baseAPIPath.endsWith('/')
+        ? mpiConfig.baseAPIPath + searchTerm
+        : mpiConfig.baseAPIPath + '/' + searchTerm;
     }
     return null;
   }, [mpiConfig, searchTerm]);

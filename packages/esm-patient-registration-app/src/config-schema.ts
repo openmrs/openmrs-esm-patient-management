@@ -69,6 +69,12 @@ export interface RegistrationConfig {
     encounterProviderRoleUuid: string;
     registrationFormUuid: string | null;
   };
+  MPI: {
+    baseAPIPath: string;
+    preferredPatientIdentifierTitle: string;
+    preferredPatientIdentifierType: string;
+    title: string;
+  };
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -307,27 +313,27 @@ export const esmPatientRegistrationSchema = {
     },
   },
   MPI: {
-    accessToken: {
+    title: {
       _type: Type.String,
-      _default: '5C931FA3B170ED118F9F0242AC130004B9AE53B4A8C654E8A94E21141929E366365DACE31EE9C2C6EDDBEB1AAC40B2B8',
+      _default: 'MPI',
     },
-    accessTokenType: {
+    baseAPIPath: {
       _type: Type.String,
-      _default: 'Bearer',
+      _default: '/ws/fhir2/R4/MPIPatient',
     },
-    host: {
+    preferredPatientIdentifierTitle: {
       _type: Type.String,
-      _default: 'https://namibia-mpi.globalhealthapp.net',
+      _default: 'Health ID',
     },
-    basePath: {
+    preferredPatientIdentifierType: {
       _type: Type.String,
-      _default: '/',
+      _default: 'ac79a22f-4783-498d-80d8-d0523f6f91d2',
     },
   },
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
-      _type: Type.PatientIdentifierTypeUuid,
+      _type: Type.String,
     },
     _default: [],
   },

@@ -36,7 +36,7 @@ export const configSchema = {
       _type: Type.String,
       _default: 'MPI',
     },
-    patientResourceURL: {
+    baseAPIPath: {
       _type: Type.String,
       _default: '/ws/fhir2/R4/MPIPatient',
     },

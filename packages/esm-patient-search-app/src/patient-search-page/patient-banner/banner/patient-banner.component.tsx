@@ -18,7 +18,7 @@ import { MPIConfig, SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { getPatientHealthId } from '../../../mpi/utils';
+import { getExternalPatientHealthId } from '../../../mpi/utils';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
@@ -150,7 +150,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 iconDescription="Create Patient Record"
                 onClick={() =>
                   navigate({
-                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${getPatientHealthId(patient)}`,
+                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${getExternalPatientHealthId(
+                      patient,
+                    )}`,
                   })
                 }
                 style={{ marginTop: '-0.25rem' }}>

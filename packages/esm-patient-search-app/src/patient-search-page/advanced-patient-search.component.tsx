@@ -6,7 +6,7 @@ import {
   usePatientSearch,
   usePatientSearchInfinite,
 } from '../patient-search.resource';
-import { AdvancedPatientSearchState, DataSource, SearchMode } from '../types';
+import { AdvancedPatientSearchState, SearchMode } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';

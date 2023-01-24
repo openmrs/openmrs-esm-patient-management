@@ -4,7 +4,7 @@ import { ContentSwitcher, Switch, TextInput, Button, NumberInput, RadioButton, R
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
 import styles from './refine-search.scss';
 import reducer, { initialState } from './advanced-search-reducer';
-import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState, DataSource } from '../types';
+import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
 import { useLayoutType } from '@openmrs/esm-framework';
 
 interface RefineSearchProps {

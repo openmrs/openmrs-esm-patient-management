@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Button, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
-import { Router, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
-import {
-  createErrorHandler,
-  showToast,
-  useConfig,
-  interpolateString,
-  interpolateUrl,
-  usePatient,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, PatientIdentifierValue, Patient } from './patient-registration-types';
+import { FormValues, CapturePhotoProps } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { FormManager, SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import {
@@ -49,9 +42,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
   const [capturePhotoProps, setCapturePhotoProps] = useState<CapturePhotoProps | null>(null);
-  const [initialFormValues, setInitialFormValues, isConstructingBaseInitialValuesObject] = useInitialFormValues(
+  const [initialFormValues, setInitialFormValues, isLoadingBaseInitialValues] = useInitialFormValues(
     uuidOfPatientToEdit || sourcePatientId,
     !!sourcePatientId,
+    config,
   );
   const [initialAddressFieldValues] = useInitialAddressFieldValues(uuidOfPatientToEdit);
   const [patientUuidMap] = usePatientUuidMap(uuidOfPatientToEdit);
@@ -77,7 +71,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   }, [config.sections, config.sectionDefinitions]);
 
   useEffect(() => {
-    if (!isConstructingBaseInitialValuesObject && addressTemplate) {
+    if (!isLoadingBaseInitialValues && addressTemplate) {
       const addressTemplateXml = addressTemplate?.results[0].value;
       if (!addressTemplateXml) {
         return;
@@ -97,7 +91,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
       }
     }
-  }, [inEditMode, addressTemplate, initialAddressFieldValues, initialFormValues]);
+  }, [inEditMode, addressTemplate, initialAddressFieldValues, isLoadingBaseInitialValues]);
 
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
@@ -173,7 +167,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       });
     }
   };
-
   return (
     <Formik
       enableReinitialize
