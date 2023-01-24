@@ -1,14 +1,11 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useEffect, useMemo, useState } from 'react';
 
-export function useMPIPatient(patientId: string, apiPath: string = '/ws/fhir2/R4/MPIPatient') {
+export function useMPIPatient(patientId: string, path: string = '/ws/fhir2/R4/MPIPatient') {
   const [patient, setPatient] = useState<fhir.Patient>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const url = useMemo(
-    () => (apiPath.endsWith('/') ? apiPath + patientId : `${apiPath}/${patientId}`),
-    [apiPath, patientId],
-  );
+  const url = useMemo(() => (path.endsWith('/') ? path + patientId : `${path}/${patientId}`), [path, patientId]);
   useEffect(() => {
     if (patientId && url) {
       setIsLoading(true);

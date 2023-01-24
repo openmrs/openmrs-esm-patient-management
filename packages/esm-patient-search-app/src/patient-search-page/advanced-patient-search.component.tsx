@@ -1,11 +1,6 @@
 import { useConfig } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  useGetPatientAttributePhoneUuid,
-  useMPIPatientSearch,
-  usePatientSearch,
-  usePatientSearchInfinite,
-} from '../patient-search.resource';
+import { usePatientSearch } from '../patient-search.resource';
 import { AdvancedPatientSearchState, SearchMode } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';

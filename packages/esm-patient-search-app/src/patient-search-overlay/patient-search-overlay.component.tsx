@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { PatientUuid } from '@openmrs/esm-framework';
 import Overlay from '../ui-components/overlay';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
-import PatientSearchComponent from '../patient-search-page/patient-search-lg.component';
 import debounce from 'lodash-es/debounce';
 import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
+import { useSearchParams } from 'react-router-dom';
+import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -21,6 +22,7 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
   selectPatientAction,
 }) => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(query);
   const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
@@ -49,7 +51,7 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
           query={searchTerm}
           inTabletOrOverlay
           hidePanel={onClose}
-          mode={'Internal'}
+          mode={inferModeFromSearchParams(searchParams)}
         />
       )}
     </Overlay>

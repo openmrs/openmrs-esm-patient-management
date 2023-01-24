@@ -18,7 +18,7 @@ import { MPIConfig, SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { getExternalPatientHealthId } from '../../../mpi/utils';
+import { getPreferredExternalHealthId, isAssociatedWithOmrsId } from '../../../mpi/utils';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
@@ -42,7 +42,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
   const showContactDetailsRef = React.useRef(null);
-  const startVisitButtonRef = React.useRef(null);
   const { currentVisit } = useVisit(patientUuid);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const config = useConfig();
@@ -150,12 +149,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 iconDescription="Create Patient Record"
                 onClick={() =>
                   navigate({
-                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${getExternalPatientHealthId(
+                    to: `${window.getOpenmrsSpaBase()}patient-registration?sourceRecord=${getPreferredExternalHealthId(
                       patient,
                     )}`,
                   })
                 }
-                style={{ marginTop: '-0.25rem' }}>
+                style={{ marginTop: '-0.25rem' }}
+                disabled={isAssociatedWithOmrsId(patient)}>
                 {t('createPatientRecord', 'Create Patient Record')}
               </Button>
             </div>

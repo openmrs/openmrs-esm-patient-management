@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
-import PatientSearchComponent from './patient-search-lg.component';
 import styles from './patient-search-page.scss';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import AdvancedPatientSearchComponent from './advanced-patient-search.component';
+import { inferModeFromSearchParams } from '../mpi/utils';
 
 interface PatientSearchPageComponentProps {}
 
@@ -27,7 +27,7 @@ const PatientSearchPageComponent: React.FC<PatientSearchPageComponentProps> = ()
         <AdvancedPatientSearchComponent
           query={searchParams?.get('query') ?? ''}
           inTabletOrOverlay={!isDesktop(layout)}
-          mode={searchParams?.get('mode')?.toLowerCase() == 'external' ? 'External' : 'Internal'}
+          mode={inferModeFromSearchParams(searchParams)}
           stickyPagination
         />
       </div>

@@ -48,7 +48,11 @@ export const configSchema = {
       _type: Type.String,
       _default: 'ac79a22f-4783-498d-80d8-d0523f6f91d2',
     },
-    isMPIEnabled: {
+    primaryOmrsIdentifierType: {
+      _type: Type.String,
+      _default: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+    },
+    disableSearch: {
       _type: Type.Boolean,
       _default: true,
     },

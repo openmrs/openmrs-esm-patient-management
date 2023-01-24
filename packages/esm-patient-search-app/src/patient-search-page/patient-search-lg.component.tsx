@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import { interpolateString, navigate, useConfig, usePagination } from '@openmrs/esm-framework';
@@ -13,7 +13,6 @@ import {
 } from './patient-search-views';
 import { SearchedPatient, SearchMode } from '../types';
 import { MPISearchBasedFeatureCard } from '../mpi/components/mpi-search-drawer/mpi-search-based-feature-card';
-import { EmptySearchResultsIllustrationAlt } from '../mpi/components/empty-state/empty-state-illustration';
 
 interface PatientSearchComponentProps {
   query: string;
@@ -25,11 +24,6 @@ interface PatientSearchComponentProps {
   isLoading: boolean;
   fetchError: Error;
   searchMode: SearchMode;
-}
-
-interface PatientSearchStatusProps {
-  type: 'INTERNAL' | 'EXTERNAL';
-  isLoading: boolean;
 }
 
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
@@ -74,7 +68,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       evt.preventDefault();
 
       if (searchMode == 'External') {
-        // Chances are high that this is none existing patient.
+        // This is an external result, so we assume that the record doesn't exist.
         // Just return
         return;
       }

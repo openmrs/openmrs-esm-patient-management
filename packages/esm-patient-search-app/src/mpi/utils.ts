@@ -1,20 +1,21 @@
 import { navigate } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
-import { SearchedPatient } from '../types';
+import { MPIConfig, SearchedPatient } from '../types';
 
-export function mapToOpenMRSPatient(
-  fhirPatient: Partial<fhir.Patient>,
-  prefferedExternalIdTitle: string,
-): SearchedPatient {
+export function mapToOpenMRSPatient(fhirPatient: Partial<fhir.Patient>, mpiConfig: MPIConfig): SearchedPatient {
   if (!fhirPatient) {
     return null;
   }
+  const identifierMap = {
+    [mpiConfig.primaryOmrsIdentifierType]: 'internal',
+    [mpiConfig.preferredPatientIdentifierType]: 'external-preferred',
+  };
   return {
     uuid: null,
     identifiers: fhirPatient.identifier.map((id) => {
       return {
         identifier: id.value,
-        isMPIRecordId: id.type.text.toLocaleLowerCase().includes(prefferedExternalIdTitle.toLocaleLowerCase()),
+        identifierTypeOrientation: (identifierMap[id.type.coding[0]?.code] as any) || 'external',
       };
     }),
     person: {
@@ -42,8 +43,9 @@ export function mapToOpenMRSPatient(
   };
 }
 
-export function getExternalPatientHealthId(patient: SearchedPatient) {
-  return patient.identifiers.find((identifier) => identifier.isMPIRecordId)?.identifier;
+export function getPreferredExternalHealthId(patient: SearchedPatient) {
+  return patient.identifiers.find((identifier) => identifier.identifierTypeOrientation == 'external-preferred')
+    ?.identifier;
 }
 
 export function doMPISearch(searchTerm: string) {
@@ -53,4 +55,10 @@ export function doMPISearch(searchTerm: string) {
   });
 }
 
-export function isAssociatedWithOMRSId(patient: SearchedPatient) {}
+export function isAssociatedWithOmrsId(patient: SearchedPatient) {
+  return patient.identifiers.some((identifier) => identifier.identifierTypeOrientation == 'internal');
+}
+
+export function inferModeFromSearchParams(searchParams: URLSearchParams) {
+  return searchParams?.get('mode')?.toLowerCase() == 'external' ? 'External' : 'Internal';
+}

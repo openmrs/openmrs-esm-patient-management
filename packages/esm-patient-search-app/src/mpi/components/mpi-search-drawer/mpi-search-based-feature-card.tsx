@@ -12,7 +12,7 @@ export const MPISearchBasedFeatureCard: React.FC<{ searchTerm: string; mpiConfig
   mpiConfig,
 }) => {
   const { t } = useTranslation();
-  const { isMPIEnabled, title } = mpiConfig;
+  const { title } = mpiConfig;
   const handleMPISearchEvent = useCallback(
     (e) => {
       e.preventDefault();
@@ -36,7 +36,7 @@ export const MPISearchBasedFeatureCard: React.FC<{ searchTerm: string; mpiConfig
             </span>
           </div>
           <br />
-          <Button kind="ghost" renderIcon={Search} onClick={handleMPISearchEvent}>
+          <Button kind="ghost" renderIcon={Search} onClick={handleMPISearchEvent} disabled={mpiConfig.disableSearch}>
             {`${t('search', 'Search')} ${title}`}
           </Button>
         </div>

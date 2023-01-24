@@ -333,7 +333,7 @@ export const esmPatientRegistrationSchema = {
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
     _elements: {
-      _type: Type.String,
+      _type: Type.PatientIdentifierTypeUuid,
     },
     _default: [],
   },

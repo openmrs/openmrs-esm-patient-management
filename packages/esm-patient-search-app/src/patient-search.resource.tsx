@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, useConfig, FetchResponse, openmrsObservableFetch, showToast } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, FetchResponse, showToast } from '@openmrs/esm-framework';
 import { MPIConfig, PatientSearchResponse, SearchedPatient, SearchMode } from './types';
 import { useTranslation } from 'react-i18next';
 import { mapToOpenMRSPatient } from './mpi/utils';
@@ -55,36 +55,6 @@ export function usePatientSearchPaginated(
   return results;
 }
 
-export function useMPIPatientSearch(
-  searchTerm: string,
-  isIdBasedSearch: boolean,
-  searching: boolean = true,
-  pageSize: number = 10,
-) {
-  const baseUrl = 'https://namibia-mpi.globalhealthapp.net/Patient';
-  const url = isIdBasedSearch ? `${baseUrl}/${searchTerm}` : `${baseUrl}?freetext=${searchTerm}`;
-  const fetcher = (url) =>
-    window.fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer CA08A0AA4071ED118F9F0242AC130004F2D6D5AB1EA6819401B11B379D6D536017A06FB8E6C43A419769B96710F9DEFF`,
-      },
-    });
-  const { data, error, isValidating } = useSWR(searching ? url : null, fetcher);
-
-  return {
-    data: null,
-    isLoading: !data && !error,
-    fetchError: error,
-    hasMore: false,
-    loadingNewData: isValidating,
-    setPage: () => {},
-    currentPage: null,
-    totalResults: data?.[0]?.data?.totalCount,
-  };
-}
-
 export function usePatientSearch(
   searchTerm: string,
   searchMode: SearchMode,
@@ -134,7 +104,7 @@ export function usePatientSearch(
       data: data
         ? searchMode == 'Internal'
           ? [].concat(...data?.map((resp) => resp?.data?.results))
-          : [mapToOpenMRSPatient(data.data, mpiConfig.preferredPatientIdentifierTitle)]
+          : [mapToOpenMRSPatient(data.data, mpiConfig)]
         : null,
       isLoading: !data && !error,
       fetchError: isSoftError(error, searchMode) ? null : error,

@@ -84,7 +84,7 @@ export const EmptySearchResultsIllustration: React.FC<EmptySearchResultsIllustra
   mpiConfig,
 }) => {
   const { t } = useTranslation();
-  const { isMPIEnabled, title } = mpiConfig;
+  const { title } = mpiConfig;
   return (
     <Layer>
       <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
@@ -112,7 +112,8 @@ export const EmptySearchResultsIllustration: React.FC<EmptySearchResultsIllustra
                 onClick={(e) => {
                   e.preventDefault();
                   doMPISearch(searchTerm);
-                }}>
+                }}
+                disabled={mpiConfig.disableSearch}>
                 {`${t('search', 'Search')} ${title}`}
               </Button>
             </div>
