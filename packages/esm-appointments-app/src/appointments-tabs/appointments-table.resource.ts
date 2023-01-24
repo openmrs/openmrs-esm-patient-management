@@ -1,23 +1,25 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
-import { useMemo } from 'react';
-import { getAppointment, useAppointmentDate } from '../helpers';
-import isEmpty from 'lodash-es/isEmpty';
+import { formatAppointmentData, useAppointmentDate } from '../helpers';
 
 export function useAppointments(status?: string) {
   const startDate = useAppointmentDate();
-  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
+  const appointmentsByStatusUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
   const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
-    isEmpty(status) ? allAppointmentsUrl : apiUrl,
+    status ? allAppointmentsUrl : appointmentsByStatusUrl,
     openmrsFetch,
   );
 
-  const appointments = useMemo(() => data?.data?.map((appointment) => getAppointment(appointment)) ?? [], [data?.data]);
+  const formattedAppointments = useMemo(
+    () => data?.data?.map((appointment) => formatAppointmentData(appointment)) ?? [],
+    [data?.data],
+  );
 
   return {
-    appointments,
+    appointments: formattedAppointments,
     isLoading: !data && !error,
     isError: error,
     isValidating,

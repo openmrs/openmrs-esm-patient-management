@@ -70,7 +70,7 @@
   "futureScheduledVisits": " {count, plural, one{{count} visit} other{{count} visits}} scheduled for dates in the future",
   "futureScheduledVisits_plural": "",
   "getAppointmentReminder": "Would you like to get a reminder about this appointment?",
-  "highestServiceVolume": "High volume Service : {time}",
+  "highestServiceVolume": "High volume service: {time}",
   "identifier": "Identifier",
   "loading": "Loading...",
   "location": "Location",
