@@ -20,7 +20,7 @@
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
   "dependencies": {
-    "swr": "^1.0.1"
+    "swr": "^2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
