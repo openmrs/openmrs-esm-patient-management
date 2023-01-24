@@ -24,6 +24,17 @@ To install the dependancies, run:
 npx lerna bootstrap
 ```
 
+To set up environment variables for the project, follow these steps:
+
+1. Create a copy of the .env.example file by running the following command:
+  ```bash
+  cp .env.example .env
+  ```
+2. Open the newly created .env file in the root of the project.
+3. Add the environment variables you need. 
+
+Note: These variables are currently only used for end-to-end tests.
+
 To start a dev server running all the modules simultaneously, run:
 
 ```bash
@@ -68,12 +79,27 @@ Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/
 
 ## Running tests
 
-To run tests, use:
+### Unit tests
+To run unit tests, use:
 
 ```sh
 yarn test
 ```
 
+### E2E tests
+
+To run E2E tests, make sure the dev server is running by using:
+
+```sh
+yarn start
+```
+
+Then, in a separate terminal, run:
+
+```sh
+yarn test-e2e --headed
+```
+Please read [the E2E README file](e2e/README.md) for E2E testing.
 ## Deployment
 
 The `main` branch of this repo is deployed in a [demo environment](https://openmrs-spa.org/openmrs/spa).

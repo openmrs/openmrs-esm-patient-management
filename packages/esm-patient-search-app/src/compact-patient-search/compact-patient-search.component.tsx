@@ -110,7 +110,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         ref={inputRef}
       />
       {!isSearchPage && showSearchResults && (
-        <div className={styles.floatingSearchResultsContainer}>
+        <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
           <PatientSearch
             query={searchTerm}
             selectPatientAction={handlePatientSelection}
