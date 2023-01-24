@@ -1,16 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { ErrorState, formatDate, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
+import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
-import styles from './appointments-metrics.scss';
 import { useAppointmentDate } from '../helpers';
 import { useAppointments } from '../appointments-tabs/appointments-table.resource';
+import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
 import { useVisits } from '../hooks/useVisits';
+import styles from './appointment-metrics.scss';
 
-const AppointmentsMetrics: React.FC = () => {
+const AppointmentMetrics: React.FC = () => {
   const { t } = useTranslation();
   const { highestServiceLoad, isLoading, error } = useClinicalMetrics();
   const { totalProviders, isLoading: loading } = useAllAppointmentsByDate();
@@ -49,7 +49,7 @@ const AppointmentsMetrics: React.FC = () => {
             highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
           }
           value={highestServiceLoad?.count ?? '--'}
-          headerLabel={t('highestServiceVolume', 'High volume Service : {time}', { time: formattedStartDate })}
+          headerLabel={t('highestServiceVolume', 'High volume service: {time}', { time: formattedStartDate })}
           view="highVolume"
         />
         <MetricsCard
@@ -63,4 +63,4 @@ const AppointmentsMetrics: React.FC = () => {
   );
 };
 
-export default AppointmentsMetrics;
+export default AppointmentMetrics;

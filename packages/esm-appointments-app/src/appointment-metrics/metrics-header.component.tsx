@@ -1,15 +1,15 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Add } from '@carbon/react/icons';
-import styles from './metrics-header.scss';
 import { navigate } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
 import { launchOverlay } from '../hooks/useOverlay';
-import AppointmentServices from '../admin/appointment-services/appointment-services.component';
 import { useAppointmentDate } from '../helpers';
-import dayjs from 'dayjs';
+import AppointmentServices from '../admin/appointment-services/appointment-services.component';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
+import styles from './metrics-header.scss';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();

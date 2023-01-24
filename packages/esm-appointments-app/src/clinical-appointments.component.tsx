@@ -1,6 +1,6 @@
 import React from 'react';
 import AppointmentList from './appointments/appointment-list.component';
-import ClinicMetrics from './appointments-metrics/appointments-metrics.component';
+import ClinicMetrics from './appointment-metrics/appointment-metrics.component';
 
 interface ClinicalAppointmentsProps {}
 
