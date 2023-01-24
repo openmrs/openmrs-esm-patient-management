@@ -189,10 +189,13 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
       selectedLocation,
       service,
       statuses,
+      priorities,
       priority,
       queues,
-      priorities,
       t,
+      appointment.id,
+      mutate,
+      startDate,
     ],
   );
 

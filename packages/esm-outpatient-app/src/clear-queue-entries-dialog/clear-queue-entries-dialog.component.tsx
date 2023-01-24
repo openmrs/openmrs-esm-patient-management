@@ -40,7 +40,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
         });
       },
     );
-  }, [t, visitQueueEntries]);
+  }, [closeModal, mutate, t, visitQueueEntries]);
 
   return (
     <div>

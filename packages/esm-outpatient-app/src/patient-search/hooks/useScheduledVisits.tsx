@@ -20,7 +20,10 @@ export function useScheduledVisits(patientUuid: string, abortController: AbortCo
       },
     });
 
-  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
+  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
+    appointmentsSearchUrl,
+    fetcher,
+  );
 
   const appointments = data?.data?.length
     ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
@@ -41,6 +44,6 @@ export function useScheduledVisits(patientUuid: string, abortController: AbortCo
   return {
     appointments: data ? { recentVisits, futureVisits } : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }

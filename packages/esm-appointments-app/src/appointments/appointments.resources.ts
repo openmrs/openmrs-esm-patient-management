@@ -22,7 +22,10 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
       },
     });
 
-  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
+  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
+    appointmentsSearchUrl,
+    fetcher,
+  );
 
   const appointments = data?.data?.length
     ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
@@ -31,13 +34,13 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
   return {
     data: data ? appointments : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
 
 export function useAppointmentService() {
-  const { data, error } = useSWR<{ data: Array<AppointmentService> }, Error>(
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
     `/ws/rest/v1/appointmentService/all/full`,
     openmrsFetch,
   );
@@ -45,7 +48,7 @@ export function useAppointmentService() {
   return {
     data: data ? data.data : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 

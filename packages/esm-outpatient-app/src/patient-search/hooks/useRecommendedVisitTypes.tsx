@@ -18,7 +18,7 @@ export const useRecommendedVisitTypes = (
   locationUuid: string,
 ) => {
   const { visitTypeResourceUrl, showRecommendedVisitTypeTab } = useConfig() as OutpatientConfig;
-  const { data, error } = useSWR<{ data: EnrollmentVisitType }>(
+  const { data, error, isLoading } = useSWR<{ data: EnrollmentVisitType }>(
     showRecommendedVisitTypeTab &&
       patientUuid &&
       enrollmentUuid &&
@@ -28,7 +28,7 @@ export const useRecommendedVisitTypes = (
   );
 
   const recommendedVisitTypes = useMemo(() => data?.data?.visitTypes?.allowed.map(mapToVisitType) ?? [], [data]);
-  return { recommendedVisitTypes, error, isLoading: !data && !error };
+  return { recommendedVisitTypes, error, isLoading };
 };
 
 const mapToVisitType = (visitType) => {

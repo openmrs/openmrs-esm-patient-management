@@ -4,7 +4,7 @@ import { ConceptAnswers, ConceptResponse } from '../patient-registration-types';
 
 export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoading: boolean } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
-  const { data, error } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
     shouldFetch ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
@@ -15,12 +15,12 @@ export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoad
       kind: 'error',
     });
   }
-  return { data: data?.data, isLoading: !data && !error };
+  return { data: data?.data, isLoading };
 }
 
 export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAnswers>; isLoading: boolean } {
   const shouldFetch = typeof conceptUuid === 'string' && conceptUuid !== '';
-  const { data, error } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<ConceptResponse>, Error>(
     shouldFetch ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
@@ -31,5 +31,5 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
       kind: 'error',
     });
   }
-  return { data: data?.data?.answers, isLoading: !data && !error };
+  return { data: data?.data?.answers, isLoading };
 }

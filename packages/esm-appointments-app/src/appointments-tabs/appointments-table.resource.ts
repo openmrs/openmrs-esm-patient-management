@@ -8,7 +8,7 @@ export function useAppointments(status?: string) {
   const startDate = useAppointmentDate();
   const appointmentsByStatusUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
-  const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     status ? allAppointmentsUrl : appointmentsByStatusUrl,
     openmrsFetch,
   );
@@ -20,7 +20,7 @@ export function useAppointments(status?: string) {
 
   return {
     appointments: formattedAppointments,
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
     mutate,
@@ -29,11 +29,14 @@ export function useAppointments(status?: string) {
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   return {
     services: data ? data.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };

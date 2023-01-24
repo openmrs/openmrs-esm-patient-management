@@ -60,7 +60,10 @@ export function useCheckedInAppointments(patientUuid: string, startDate: string,
       },
     });
 
-  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
+  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
+    appointmentsSearchUrl,
+    fetcher,
+  );
 
   const appointments = data?.data?.length
     ? data.data.filter((appointment) => appointment.status === 'CheckedIn')
@@ -69,7 +72,7 @@ export function useCheckedInAppointments(patientUuid: string, startDate: string,
   return {
     data: data ? appointments : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

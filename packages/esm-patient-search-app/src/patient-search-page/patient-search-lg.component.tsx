@@ -46,6 +46,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 
   useEffect(() => {
     goTo(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const handlePatientSelection = useCallback(

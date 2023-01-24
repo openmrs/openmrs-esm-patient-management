@@ -6,7 +6,7 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse;
   isLoading: boolean;
 } {
-  const { data, error } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
     `/ws/rest/v1/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );
@@ -19,6 +19,6 @@ export function usePersonAttributeType(personAttributeTypeUuid: string): {
   }
   return {
     data: data?.data,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
