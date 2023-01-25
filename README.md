@@ -99,7 +99,13 @@ Then, in a separate terminal, run:
 ```sh
 yarn test-e2e --headed
 ```
-Please read [the E2E README file](e2e/README.md) for E2E testing.
+
+Please read [our e2e docs](e2e/README.md) for more information about E2E testing.
+
+## Design Patterns
+
+For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
+
 ## Deployment
 
 The `main` branch of this repo is deployed in a [demo environment](https://openmrs-spa.org/openmrs/spa).
