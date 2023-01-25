@@ -37,3 +37,18 @@ export const formatWaitTime = (waitTime: string, t) => {
     return rminutes + ' ' + `${t('minutes', 'minutes')}`;
   }
 };
+
+export const getGender = (gender, t) => {
+  switch (gender) {
+    case 'M':
+      return t('male', 'Male');
+    case 'F':
+      return t('female', 'Female');
+    case 'O':
+      return t('other', 'Other');
+    case 'U':
+      return t('unknown', 'Unknown');
+    default:
+      return gender;
+  }
+};

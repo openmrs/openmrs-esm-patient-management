@@ -80,6 +80,11 @@ export const configSchema = {
     _default: false,
     _description: 'Disable outpatient table tabs',
   },
+  appointmentStatuses: {
+    _type: Type.Array,
+    _description: 'Configurable appointment status (status of appointments)',
+    _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+  },
 };
 
 export interface ConfigObject {
@@ -103,6 +108,7 @@ export interface ConfigObject {
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
   showQueueTableTab: boolean;
+  appointmentStatuses: Array<string>;
 }
 
 export interface OutpatientConfig {

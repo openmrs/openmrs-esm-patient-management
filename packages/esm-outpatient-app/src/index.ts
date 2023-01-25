@@ -54,15 +54,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        load: getAsyncLifecycle(
-          () => import('./queue-patient-linelists/checkedin-appointments-table.component'),
-          options,
-        ),
-        route: /^checkedin-appointments-list/,
-        online: true,
-        offline: true,
-      },
-      {
         load: getAsyncLifecycle(() => import('./queue-patient-linelists/queue-services-table.component'), options),
         route: /^queue-list/,
         online: true,
