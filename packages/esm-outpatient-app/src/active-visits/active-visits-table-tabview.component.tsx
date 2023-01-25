@@ -29,7 +29,7 @@ import {
   Tag,
   Tile,
 } from '@carbon/react';
-import { Add, ArrowRight } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   useLayoutType,
   navigate,
@@ -80,7 +80,7 @@ const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
   );
 };
 
-function ActiveVisitsTable() {
+function ActiveVisitsTabview() {
   const { t } = useTranslation();
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
@@ -212,41 +212,9 @@ function ActiveVisitsTable() {
   if (visitQueueEntries?.length) {
     return (
       <div className={styles.container}>
-        <div className={styles.headerBtnContainer}>
-          <Button
-            size="sm"
-            kind="ghost"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
-            onClick={(selectedPatientUuid) => {
-              setShowOverlay(true);
-              setView(SearchTypes.QUEUE_SERVICE_FORM);
-              setViewState({ selectedPatientUuid });
-            }}
-            iconDescription={t('addNewQueue', 'Add new queue')}>
-            {t('addNewService', 'Add new service')}
-          </Button>
-        </div>
         <div className={styles.headerContainer}>
           <span className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</span>
-          <div className={styles.headerButtons}>
-            <ExtensionSlot
-              extensionSlotName="patient-search-button-slot"
-              state={{
-                buttonText: t('addPatientToQueue', 'Add patient to queue'),
-                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-                buttonProps: {
-                  kind: 'secondary',
-                  renderIcon: (props) => <Add size={16} {...props} />,
-                  size: 'sm',
-                },
-                selectPatientAction: (selectedPatientUuid) => {
-                  setShowOverlay(true);
-                  setView(SearchTypes.SCHEDULED_VISITS);
-                  setViewState({ selectedPatientUuid });
-                },
-              }}
-            />
-          </div>
+          <div className={styles.headerButtons}></div>
         </div>
         <DataTable
           data-floating-menu-container
@@ -360,54 +328,14 @@ function ActiveVisitsTable() {
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && (
-          <PatientSearch
-            view={view}
-            closePanel={() => setShowOverlay(false)}
-            viewState={{
-              selectedPatientUuid: viewState.selectedPatientUuid,
-            }}
-          />
-        )}
       </div>
     );
   }
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerBtnContainer}>
-        <Button
-          size="sm"
-          kind="ghost"
-          renderIcon={(props) => <ArrowRight size={16} {...props} />}
-          onClick={(selectedPatientUuid) => {
-            setShowOverlay(true);
-            setView(SearchTypes.QUEUE_SERVICE_FORM);
-            setViewState({ selectedPatientUuid });
-          }}
-          iconDescription={t('addNewQueue', 'Add new queue')}>
-          {t('addNewService', 'Add new service')}
-        </Button>
-      </div>
       <div className={styles.headerContainer}>
         <label className={styles.heading}>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</label>
-        <ExtensionSlot
-          extensionSlotName="patient-search-button-slot"
-          state={{
-            buttonText: t('addPatientToQueue', 'Add patient to queue'),
-            overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-            buttonProps: {
-              kind: 'secondary',
-              renderIcon: (props) => <Add size={16} {...props} />,
-              size: 'sm',
-            },
-            selectPatientAction: (selectedPatientUuid) => {
-              setShowOverlay(true);
-              setView(SearchTypes.SCHEDULED_VISITS);
-              setViewState({ selectedPatientUuid });
-            },
-          }}
-        />
       </div>
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
@@ -436,4 +364,4 @@ function ActiveVisitsTable() {
   );
 }
 
-export default ActiveVisitsTable;
+export default ActiveVisitsTabview;

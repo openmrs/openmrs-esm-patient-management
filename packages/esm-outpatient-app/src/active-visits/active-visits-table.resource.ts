@@ -21,13 +21,13 @@ export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
 export type QueueService = 'Clinical consultation' | 'Triage';
 export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 
-interface VisitQueueEntry {
+export interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
   uuid: string;
   visit: Visit;
 }
 
-interface VisitQueueEntry {
+export interface VisitQueueEntry {
   display: string;
   endedAt: null;
   locationWaitingFor: string | null;
@@ -325,4 +325,39 @@ export function useServiceQueueEntries(service: string) {
     isError: error,
     isValidating,
   };
+}
+
+export async function addQueueEntry(
+  visitUuid: string,
+  queueUuid: string,
+  patientUuid: string,
+  priority: string,
+  status: string,
+  abortController: AbortController,
+) {
+  return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      visit: { uuid: visitUuid },
+      queueEntry: {
+        status: {
+          uuid: status,
+        },
+        priority: {
+          uuid: priority,
+        },
+        queue: {
+          uuid: queueUuid,
+        },
+        patient: {
+          uuid: patientUuid,
+        },
+        startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+      },
+    },
+  });
 }

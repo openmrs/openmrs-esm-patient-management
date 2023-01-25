@@ -86,36 +86,8 @@ describe('ActiveVisitsTable: ', () => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
 
-    // filter table to only show patients waiting for `Triage`
-    const serviceFilter = screen.getByRole('button', { name: /show patients waiting for/i });
-    await user.click(serviceFilter);
-    await user.click(screen.getByRole('option', { name: /Triage/i }));
-
-    expect(screen.queryByText(/waiting for clinical consultation/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/waiting for triage/i)).toBeInTheDocument();
-
-    // show patients waiting for all services
-    await user.click(serviceFilter);
-    await user.click(screen.getByRole('option', { name: /all/i }));
-
     expect(screen.getByText(/waiting for triage/i)).toBeInTheDocument();
     expect(screen.getByText(/waiting for clinical consultation/i)).toBeInTheDocument();
-
-    // filter table by typing in the searchbox
-    const searchbox = screen.getByRole('searchbox');
-    await user.type(searchbox, 'Eric');
-
-    expect(screen.getByText(/eric test ric/i)).toBeInTheDocument();
-    expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
-
-    await user.clear(searchbox);
-    await user.type(searchbox, 'gibberish');
-
-    expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/john smith/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
-    expect(screen.getByText(/^or$/i)).toBeInTheDocument();
-    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 });
 

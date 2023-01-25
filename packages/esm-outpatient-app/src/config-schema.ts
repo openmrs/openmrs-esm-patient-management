@@ -75,6 +75,11 @@ export const configSchema = {
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
+  showQueueTableTab: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Disable outpatient table tabs',
+  },
 };
 
 export interface ConfigObject {
@@ -97,6 +102,7 @@ export interface ConfigObject {
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
+  showQueueTableTab: boolean;
 }
 
 export interface OutpatientConfig {
