@@ -1,6 +1,7 @@
 {
   "actions": "Actions",
   "activeVisits": "Active Visits",
+  "activeVisitsNotInQueue": "Active visits not in queue",
   "add": "Add",
   "addEntry": "Add entry",
   "addisitToQueueTooltip": "Add",
@@ -110,7 +111,7 @@
   "noStatusAvailable": "No Status Available",
   "notes": "Notes",
   "NotInQueue": "Not In Queue",
-  "noVisitsFound": "No matching visits found",
+  "noVisitsNotInQueueFound": "No visits currently not in queue found",
   "noVisitTypes": "There are no visit types to display for this patient",
   "noVitalsFound": "No vitals found",
   "oldest": "Oldest first",

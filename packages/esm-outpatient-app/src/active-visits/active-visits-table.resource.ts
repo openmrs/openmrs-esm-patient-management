@@ -226,7 +226,7 @@ export function useVisitQueueEntries(currServiceName: string): UseVisitQueueEntr
   }
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : [],
     visitQueueEntriesCount: mappedVisitQueueEntries ? mappedVisitQueueEntries.length : 0,
     isLoading: !data && !error,
     isError: error,

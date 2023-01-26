@@ -173,7 +173,7 @@ const MissingQueueEntries = () => {
       <div className={styles.activeVisitsContainer}>
         <div className={styles.activeVisitsDetailHeaderContainer}>
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('activeVisits', 'Active Visits')}</h4>
+            <h4>{t('activeVisitsNotInQueue', 'Active visits not in queue')}</h4>
           </div>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{visitsIsValidating ? <InlineLoading /> : null}</span>
@@ -253,7 +253,7 @@ const MissingQueueEntries = () => {
                     margin: '1rem 1.5rem',
                   }}
                   className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                  {t('noVisitsFound', 'No matching visits found')}
+                  {t('noVisitsNotInQueueFound', 'No visits currently not in queue found')}
                 </p>
               )}
               <Pagination

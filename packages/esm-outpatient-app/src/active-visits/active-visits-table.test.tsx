@@ -1,15 +1,18 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { ConfigObject, openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
+import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
+const mockUsePagination = usePagination as jest.Mock;
+const mockGoToPage = jest.fn();
 
 jest.mock('./active-visits-table.resource.ts', () => {
   const originalModule = jest.requireActual('./active-visits-table.resource.ts');
@@ -39,6 +42,7 @@ describe('ActiveVisitsTable: ', () => {
         priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
         serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
       },
+      showQueueTableTab: false,
     } as ConfigObject),
   );
 
@@ -55,9 +59,12 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
-    const user = userEvent.setup();
-
     mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitQueueEntries } });
+    mockUsePagination.mockReturnValue({
+      results: mockMappedQueueEntries.data.slice(0, 2),
+      goTo: mockGoToPage,
+      currentPage: 1,
+    });
 
     renderActiveVisitsTable();
 
@@ -69,8 +76,6 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
-    expect(screen.getByText(/needs triage/i)).toBeInTheDocument();
-    expect(screen.getByText(/needs immediate assistance/i)).toBeInTheDocument();
 
     const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time/];
     expectedColumnHeaders.forEach((header) => {
@@ -78,16 +83,13 @@ describe('ActiveVisitsTable: ', () => {
     });
 
     const expectedTableRows = [
-      /Eric Test Ric Not Urgent Needs Triage Waiting/,
-      /John Smith Emergency Needs immediate assistance Waiting/,
+      /Eric Test Ric Not Urgent Waiting For Triage 206 hours and 2 minutes/,
+      /John Smith Emergency Attending Clinical Consultation 206 hours and 2 minutes/,
     ];
 
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
-
-    expect(screen.getByText(/waiting for triage/i)).toBeInTheDocument();
-    expect(screen.getByText(/waiting for clinical consultation/i)).toBeInTheDocument();
   });
 });
 
