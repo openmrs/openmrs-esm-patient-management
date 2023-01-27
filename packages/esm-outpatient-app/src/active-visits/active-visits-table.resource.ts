@@ -54,6 +54,10 @@ export interface VisitQueueEntry {
       display: QueueService;
     };
     uuid: string;
+    location: {
+      uuid: string;
+      name: string;
+    };
   };
   startedAt: string;
   status: {
@@ -86,6 +90,7 @@ export interface MappedVisitQueueEntry {
   waitTime: string;
   queueUuid: string;
   queueEntryUuid: string;
+  queueLocation: string;
 }
 
 interface UseVisitQueueEntries {
@@ -209,6 +214,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
     visitType: visitQueueEntry.visit?.visitType?.display,
     visitLocation: visitQueueEntry.visit?.location?.uuid,
+    queueLocation: visitQueueEntry.queueEntry?.queue?.location?.uuid,
     visitTypeUuid: visitQueueEntry.visit?.visitType?.uuid,
     visitUuid: visitQueueEntry.visit?.uuid,
     queueUuid: visitQueueEntry.queueEntry.queue.uuid,

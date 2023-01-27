@@ -342,6 +342,7 @@ export interface MappedQueueEntry {
   waitTime: string;
   queueUuid: string;
   queueEntryUuid: string;
+  queueLocation: string;
 }
 
 export interface EndVisitPayload {
