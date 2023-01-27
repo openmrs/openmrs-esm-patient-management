@@ -424,11 +424,48 @@ function ActiveVisitsTable() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
-        </div>
-      </div>
+      {useQueueTableTabs === false ? (
+        <>
+          <div className={styles.headerBtnContainer}>
+            <Button
+              size="sm"
+              kind="ghost"
+              renderIcon={(props) => <ArrowRight size={16} {...props} />}
+              onClick={(selectedPatientUuid) => {
+                setShowOverlay(true);
+                setView(SearchTypes.QUEUE_SERVICE_FORM);
+                setViewState({ selectedPatientUuid });
+              }}
+              iconDescription={t('addNewQueue', 'Add new queue')}>
+              {t('addNewService', 'Add new service')}
+            </Button>
+          </div>
+          <div className={styles.headerContainer}>
+            <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+              <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+            </div>
+            <div className={styles.headerButtons}>
+              <ExtensionSlot
+                extensionSlotName="patient-search-button-slot"
+                state={{
+                  buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                  overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                  buttonProps: {
+                    kind: 'secondary',
+                    renderIcon: (props) => <Add size={16} {...props} />,
+                    size: 'sm',
+                  },
+                  selectPatientAction: (selectedPatientUuid) => {
+                    setShowOverlay(true);
+                    setView(SearchTypes.SCHEDULED_VISITS);
+                    setViewState({ selectedPatientUuid });
+                  },
+                }}
+              />
+            </div>
+          </div>
+        </>
+      ) : null}
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
