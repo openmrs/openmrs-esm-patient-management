@@ -47,6 +47,7 @@ import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment'
 import { saveQueueEntry } from './queue.resource';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useSWRConfig } from 'swr';
 import isNull from 'lodash-es/isNull';
 import head from 'lodash-es/head';
@@ -68,6 +69,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [isMissingService, setIsMissingService] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
@@ -80,9 +82,10 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [priority, setPriority] = useState('');
   const { priorities } = usePriority();
   const { statuses } = useStatus();
-  const { allServices } = useServices(selectedLocation);
+  const { allServices } = useServices(selectedQueueLocation);
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
+  const { queueLocations } = useQueueLocations();
 
   const config = useConfig() as ConfigObject;
 
@@ -345,6 +348,41 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                   locations.map((location) => (
                     <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                       {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
+          </section>
+
+          <section className={styles.section}>
+            <div className={styles.sectionTitle}>{t('queueLocation', 'Queue Location')}</div>
+            {isTablet ? (
+              <Layer>
+                <Select
+                  labelText={t('selectQueueLocation', 'Select a queue location')}
+                  id="location"
+                  invalidText="Required"
+                  value={selectedQueueLocation}
+                  onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+                  {queueLocations?.length > 0 &&
+                    queueLocations.map((location) => (
+                      <SelectItem key={location.id} text={location.name} value={location.id}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                </Select>
+              </Layer>
+            ) : (
+              <Select
+                labelText={t('selectQueueLocation', 'Select a queue location')}
+                id="location"
+                invalidText="Required"
+                value={selectedQueueLocation}
+                onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+                {queueLocations?.length > 0 &&
+                  queueLocations.map((location) => (
+                    <SelectItem key={location.id} text={location.name} value={location.id}>
+                      {location.name}
                     </SelectItem>
                   ))}
               </Select>

@@ -7,6 +7,7 @@ import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { WarningAlt } from '@carbon/react/icons';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface QueueServiceFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -24,6 +25,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
   const [isMissingAllFields, setMissingAllFields] = useState(false);
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
+  const { queueLocations } = useQueueLocations();
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -124,11 +126,11 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               value={userLocation}
               onChange={(event) => setUserLocation(event.target.value)}
               light>
-              {locations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
-              {locations?.length > 0 &&
-                locations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
+              {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
+              {queueLocations?.length > 0 &&
+                queueLocations.map((location) => (
+                  <SelectItem key={location.id} text={location.name} value={location.id}>
+                    {location.name}
                   </SelectItem>
                 ))}
             </Select>

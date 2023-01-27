@@ -164,8 +164,8 @@ export function usePriority() {
   };
 }
 
-export function useVisitQueueEntries(currServiceName: string): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${locationUuid}&v=full`;
   const { t } = useTranslation();
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
