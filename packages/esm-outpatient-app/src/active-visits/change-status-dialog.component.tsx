@@ -30,6 +30,7 @@ import styles from './change-status-dialog.scss';
 import { useSWRConfig } from 'swr';
 import first from 'lodash-es/first';
 import { MappedQueueEntry } from '../types';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;
@@ -55,12 +56,11 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
   const locations = useLocations();
-  const { services } = useServices(userLocation);
   const config = useConfig() as ConfigObject;
-
-  useEffect(() => {
-    setNewQueueUuid(previousQueueUuid);
-  }, [previousQueueUuid]);
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueEntry.queueLocation);
+  const { services } = useServices(selectedQueueLocation);
+  const { queueLocations } = useQueueLocations();
+  const [editLocation, setEditLocation] = useState(false);
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -73,6 +73,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const changeQueueStatus = useCallback(() => {
     const defaultStatus = config.concepts.defaultStatusConceptUuid;
     const defaultPriority = config.concepts.defaultPriorityConceptUuid;
+    setEditLocation(false);
     if (priority === '') {
       setPriority(defaultPriority);
     }
@@ -100,7 +101,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
         }
       },
       (error) => {
@@ -157,6 +158,25 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             </RadioButtonGroup>
           </FormGroup>
 
+          <section>
+            <Select
+              labelText={t('selectQueueLocation', 'Select a queue location')}
+              id="location"
+              invalidText="Required"
+              value={selectedQueueLocation}
+              onChange={(event) => {
+                setSelectedQueueLocation(event.target.value);
+                setEditLocation(true);
+              }}>
+              {queueLocations?.length > 0 &&
+                queueLocations.map((location) => (
+                  <SelectItem key={location.id} text={location.name} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </section>
+
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
             <Select
@@ -165,7 +185,10 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               invalidText="Required"
               value={newQueueUuid}
               onChange={(event) => setNewQueueUuid(event.target.value)}>
-              {!newQueueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+              {!newQueueUuid && editLocation === true ? (
+                <SelectItem text={t('selectService', 'Select a service')} value="" />
+              ) : null}
+              {!previousQueueUuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
               {services?.length > 0 &&
                 services.map((service) => (
                   <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
