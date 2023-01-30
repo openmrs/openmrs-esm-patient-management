@@ -1,12 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Column, Form, Layer, Stack, TextInput, Select, SelectItem, TextArea, ButtonSet, Button } from '@carbon/react';
+import {
+  Column,
+  Form,
+  Layer,
+  Stack,
+  TextInput,
+  Select,
+  SelectItem,
+  TextArea,
+  ButtonSet,
+  Button,
+  InlineNotification,
+} from '@carbon/react';
 import { showNotification, showToast, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
 import styles from './queue-service.scss';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { SearchTypes } from '../types';
 import { mutate } from 'swr';
-import { WarningAlt } from '@carbon/react/icons';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface QueueServiceFormProps {
@@ -22,7 +33,10 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
   const [queueDescription, setQueueDescription] = useState('');
-  const [isMissingAllFields, setMissingAllFields] = useState(false);
+  const [isMissingName, setMissingName] = useState(false);
+  const [isMissingDescription, setMissingDescription] = useState(false);
+  const [isMissingQueue, setMissingQueue] = useState(false);
+  const [isMissingLocation, setMissingLocation] = useState(false);
   const [userLocation, setUserLocation] = useState('');
   const session = useSession();
   const { queueLocations } = useQueueLocations();
@@ -37,11 +51,28 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
     (event) => {
       event.preventDefault();
 
-      if (!queueName || !queueConcept || !queueDescription || !userLocation) {
-        setMissingAllFields(true);
+      if (!queueName) {
+        setMissingName(true);
         return;
       }
-      setMissingAllFields(false);
+      if (!queueConcept) {
+        setMissingQueue(true);
+        return;
+      }
+      if (!queueDescription) {
+        setMissingDescription(true);
+        return;
+      }
+      if (!userLocation) {
+        setMissingLocation(true);
+        return;
+      }
+
+      setMissingName(false);
+      setMissingDescription(false);
+      setMissingQueue(false);
+      setMissingLocation(false);
+
       saveQueue(queueName, queueConcept, queueDescription, userLocation, new AbortController()).then(
         ({ status }) => {
           if (status === 201) {
@@ -74,12 +105,6 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         <Column>
           <h3 className={styles.heading}>{t('addNewQueue', 'Add new queue')}</h3>
           <Layer className={styles.input}>
-            {isMissingAllFields === true && (
-              <div className={styles.warningContainer}>
-                <WarningAlt size={16} />{' '}
-                <p className={styles.warning}>{t('allFieldsAreRequired', 'All fields are required')}</p>
-              </div>
-            )}
             <TextInput
               id="queueName"
               invalidText="Required"
@@ -87,6 +112,17 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               onChange={(event) => setQueueName(event.target.value)}
               value={queueName}
             />
+            {isMissingName && (
+              <section>
+                <InlineNotification
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingQueueName', 'Missing queue name')}
+                  subtitle={t('addQueueName', 'Please add a queue name')}
+                />
+              </section>
+            )}
           </Layer>
           <Layer className={styles.input}>
             <TextArea
@@ -98,6 +134,17 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               value={queueDescription}
             />
           </Layer>
+          {isMissingDescription && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingQueueDescription', 'Missing queue description')}
+                subtitle={t('addQueueDescription', 'Please add a queue description')}
+              />
+            </section>
+          )}
 
           <Layer className={styles.input}>
             <Select
@@ -116,6 +163,17 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
                   </SelectItem>
                 ))}
             </Select>
+            {isMissingQueue && (
+              <section>
+                <InlineNotification
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingConcept', 'Missing concept')}
+                  subtitle={t('selectQueueConcept', 'Please select a concept for the queue')}
+                />
+              </section>
+            )}
           </Layer>
 
           <Layer className={styles.input}>
@@ -134,6 +192,17 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
                   </SelectItem>
                 ))}
             </Select>
+            {isMissingLocation && (
+              <section>
+                <InlineNotification
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingLocation', 'Missing location')}
+                  subtitle={t('selectLocation', 'Please select a location')}
+                />
+              </section>
+            )}
           </Layer>
         </Column>
       </Stack>
