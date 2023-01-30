@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Button,
   InlineLoading,
@@ -13,14 +13,15 @@ import {
   Switch,
   Select,
   SelectItem,
+  InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLocations, useSession } from '@openmrs/esm-framework';
+import { showNotification, showToast } from '@openmrs/esm-framework';
 import { addQueueEntry, usePriority, useServices, useStatus } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './add-patient-toqueue-dialog.scss';
 import { useSWRConfig } from 'swr';
-import first from 'lodash-es/first';
 import { ActiveVisit } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;
@@ -41,26 +42,31 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
-  const [userLocation, setUserLocation] = useState('');
-  const session = useSession();
-  const locations = useLocations();
-  const { services } = useServices(userLocation);
-
-  useEffect(() => {
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    } else if (!userLocation && locations) {
-      setUserLocation(first(locations)?.uuid);
-    }
-  }, [session, locations, userLocation]);
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
+  const { services } = useServices(selectedQueueLocation);
+  const { queueLocations } = useQueueLocations();
+  const [isMissingStatus, setIsMissingStatus] = useState(false);
+  const [isMissingPriority, setIsMissingPriority] = useState(false);
+  const [isMissingService, setIsMissingService] = useState(false);
 
   const addVisitToQueue = useCallback(() => {
-    if (priority === '') {
-      setPriority([...priorities].shift().uuid);
+    if (!status) {
+      setIsMissingStatus(true);
+      return;
     }
-    if (status === '') {
-      statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
+    setIsMissingStatus(false);
+    if (!queueUuid) {
+      setIsMissingService(true);
+      return;
     }
+    setIsMissingService(false);
+
+    if (!priority) {
+      setIsMissingPriority(true);
+      return;
+    }
+    setIsMissingPriority(false);
+
     addQueueEntry(visitUuid, queueUuid, patientUuid, priority, status, new AbortController()).then(
       ({ status }) => {
         if (status === 201) {
@@ -73,6 +79,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
           closeModal();
           mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
           mutate(`/ws/rest/v1/visit?includeInactive=false`);
+          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
         }
       },
       (error) => {
@@ -115,6 +122,35 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
               )}
             </RadioButtonGroup>
           </FormGroup>
+          {isMissingStatus && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingStatus', 'Please select a status')}
+              />
+            </section>
+          )}
+
+          <section>
+            <Select
+              labelText={t('selectQueueLocation', 'Select a queue location')}
+              id="location"
+              invalidText="Required"
+              value={selectedQueueLocation}
+              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+              {!selectedQueueLocation ? (
+                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+              ) : null}
+              {queueLocations?.length > 0 &&
+                queueLocations.map((location) => (
+                  <SelectItem key={location.id} text={location.name} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
@@ -133,6 +169,16 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
                 ))}
             </Select>
           </section>
+          {isMissingService && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingService', 'Please select a service')}
+              />
+            </section>
+          )}
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
@@ -155,6 +201,16 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
               )}
             </ContentSwitcher>
           </section>
+          {isMissingPriority && (
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingPriority', 'Please select a priority')}
+              />
+            </section>
+          )}
         </Form>
       </ModalBody>
       <ModalFooter>
