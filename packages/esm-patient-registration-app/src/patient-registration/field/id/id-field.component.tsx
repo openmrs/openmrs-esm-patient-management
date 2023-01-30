@@ -81,6 +81,7 @@ export const Identifiers: React.FC = () => {
         )
         .filter((type) => !values.identifiers[type.fieldName])
         .forEach((type) => {
+          initialFormValues.identifiers[type.uuid];
           identifiers[type.fieldName] = initializeIdentifier(
             type,
             values.identifiers[type.uuid] ?? initialFormValues.identifiers[type.uuid] ?? {},

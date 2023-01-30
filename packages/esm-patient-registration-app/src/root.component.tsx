@@ -13,6 +13,7 @@ import { SavePatientForm } from './patient-registration/form-manager';
 import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
 import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
+import PatientVerificationSearch from './patient-verification/verification-search/patient-verification-search.component';
 export interface RootProps extends PatientRegistrationProps, Resources {
   savePatientForm: SavePatientForm;
   isOffline: boolean;
@@ -49,6 +50,7 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
                 path="patient-registration"
                 element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
               />
+              <Route path="patient-registration/patient-verification" element={<PatientVerificationSearch />} />
               <Route
                 path="patient/:patientUuid/edit"
                 element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}

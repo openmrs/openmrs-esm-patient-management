@@ -29,6 +29,11 @@ function setupOpenMRS() {
       parent: `${window.spaBase}/home`,
     },
     {
+      path: `${window.spaBase}/${patientRegistration}/patient-verification`,
+      title: 'Patient Verification',
+      parent: `${window.spaBase}/${patientRegistration}`,
+    },
+    {
       path: `${window.spaBase}/patient/:patientUuid/edit`,
       title: 'Edit patient details',
       parent: `${window.spaBase}/patient/:patientUuid/chart`,

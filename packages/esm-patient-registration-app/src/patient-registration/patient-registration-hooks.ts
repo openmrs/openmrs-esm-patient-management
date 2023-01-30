@@ -18,13 +18,10 @@ import {
   getPhonePersonAttributeValueFromFhirPatient,
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
+import { clientRegistryStore } from '../patient-verification/patient-verification-helper';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
-  const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
-  const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
-  const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
-  const [initialFormValues, setInitialFormValues] = useState<FormValues>({
+  const defaultValues = {
     patientUuid: v4(),
     givenName: '',
     middleName: '',
@@ -46,7 +43,15 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     relationships: [],
     identifiers: {},
     address: {},
-  });
+  };
+  const { clientRegistryInitialValues, clientExists } = useClientRegistryIntialValues();
+  const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
+  const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
+  const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
+  const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
+  const [initialFormValues, setInitialFormValues] = useState<FormValues>(
+    clientExists ? clientRegistryInitialValues : defaultValues,
+  );
 
   useEffect(() => {
     (async () => {
@@ -95,7 +100,13 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   // Set Initial person attributes
   useEffect(() => {
     if (!isLoadingAttributes && attributes) {
-      let personAttributes = {};
+      const intialIdentifiers = {
+        'b8d0b331-1d2d-4a9a-b741-1816f498bdb6': 'email@gmail.com',
+        '27573398-4651-4ce5-89d8-abec5998165c': 'Nearest health center',
+        'b2c38640-2603-4629-aebd-3b54f33f1e3a': '0717417867', //primary phone number
+        '94614350-84c8-41e0-ac29-86bc107069be': '0727417867',
+      };
+      let personAttributes = { ...intialIdentifiers };
       attributes.forEach((attribute) => {
         personAttributes[attribute.attributeType.uuid] = attribute.value;
       });
@@ -209,4 +220,58 @@ function useInitialPersonAttributes(personUuid: string) {
     };
   }, [data, error]);
   return result;
+}
+
+function useClientRegistryIntialValues() {
+  const { client, clientExists } = clientRegistryStore.getState();
+  const initialValues = {
+    patientUuid: v4(),
+    givenName: client.firstName,
+    middleName: client.middleName,
+    familyName: client.lastName,
+    unidentifiedPatient: false,
+    additionalGivenName: '',
+    additionalMiddleName: '',
+    additionalFamilyName: '',
+    addNameInLocalLanguage: false,
+    gender: client.gender === 'male' ? 'Male' : 'Female',
+    birthdate: new Date(client?.dateOfBirth),
+    yearsEstimated: null,
+    monthsEstimated: 0,
+    birthdateEstimated: false,
+    telephoneNumber: client?.contact?.primaryPhone,
+    isDead: !client.isAlive,
+    deathDate: '',
+    deathCause: '',
+    relationships: [],
+    identifiers: {
+      nationalId: {
+        identifierTypeUuid: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
+        identifierName: 'National ID',
+        identifierValue: client?.identifications !== undefined && client?.identifications[0]?.identificationNumber,
+      },
+      nationalUniquePatientIdentifier: {
+        identifierTypeUuid: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
+        identifierName: 'National Unique patient identifier',
+        identifierValue: client?.clientNumber,
+      },
+    },
+    attributes: {
+      'b2c38640-2603-4629-aebd-3b54f33f1e3a': client?.contact?.primaryPhone,
+      '94614350-84c8-41e0-ac29-86bc107069be': client?.contact?.secondaryPhone,
+      'b8d0b331-1d2d-4a9a-b741-1816f498bdb6': client?.contact?.emailAddress ?? '',
+    },
+
+    address: {
+      address1: client?.residence?.address,
+      address2: '',
+      address4: client?.residence?.ward,
+      cityVillage: client.residence?.village,
+      stateProvince: client?.residence?.subCounty,
+      countyDistrict: client?.residence?.county,
+      country: 'Kenya',
+      postalCode: client?.residence?.address,
+    },
+  };
+  return { clientRegistryInitialValues: initialValues, clientExists };
 }

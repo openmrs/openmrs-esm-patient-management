@@ -26,6 +26,11 @@ import {
 } from './patient-registration.resource';
 import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
+import {
+  generateClientRegistryPayload,
+  savePatientToCR,
+} from '../patient-verification/verification-search/verification.resource';
+import { RegistryPatient } from '../patient-verification/patient-verification-types';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
@@ -102,7 +107,7 @@ export class FormManager {
       abortController,
     );
 
-    const createdPatient = FormManager.getPatientToCreate(
+    let createdPatient = FormManager.getPatientToCreate(
       values,
       patientUuidMap,
       initialAddressFieldValues,
@@ -112,7 +117,18 @@ export class FormManager {
     FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
       await deletePersonName(name.nameUuid, name.personUuid, abortController);
     });
+    const crPatient = generateClientRegistryPayload(createdPatient, values.obs);
+    const nupi = patientIdentifiers.find((id) => id.identifierType === 'f85081e2-b4be-4e48-b3a4-7994b69bb101');
+    const crResponse = await savePatientToCR<RegistryPatient>(crPatient, nupi?.identifier ?? '');
 
+    if (crResponse.status === 200) {
+      const identifier: PatientIdentifier = {
+        identifier: crResponse.data.clientNumber,
+        identifierType: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
+      };
+      const updatedIdentifiers = [...createdPatient.identifiers, identifier];
+      createdPatient = { ...createdPatient, identifiers: updatedIdentifiers };
+    }
     const savePatientResponse = await savePatient(
       abortController,
       createdPatient,
