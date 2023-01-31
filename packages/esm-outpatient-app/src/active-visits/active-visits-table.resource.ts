@@ -305,8 +305,8 @@ export async function endPatientStatus(
   });
 }
 
-export function useServiceQueueEntries(service: string) {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?status=waiting&service=${service}&v=full`;
+export function useServiceQueueEntries(service: string, locationUuid: string) {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
   const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
