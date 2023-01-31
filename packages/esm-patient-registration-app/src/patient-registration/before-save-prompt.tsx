@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { showModal, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { clientRegistryStore } from '../patient-verification/patient-verification-helper';
 
 function getUrlWithoutPrefix(url: string) {
   return url.split(window['getOpenmrsSpaBase']())?.[1];
@@ -62,6 +63,7 @@ const BeforeSavePrompt: React.FC<BeforeSavePromptProps> = ({ when, redirect }) =
 
   useEffect(() => {
     if (typeof target === 'string') {
+      clientRegistryStore.setState({ clientExists: false, client: {} as any }, true);
       navigate({ to: `\${openmrsSpaBase}/${getUrlWithoutPrefix(target)}` });
     }
   }, [target]);

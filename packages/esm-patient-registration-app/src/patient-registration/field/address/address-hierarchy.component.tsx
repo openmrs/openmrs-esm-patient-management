@@ -114,7 +114,11 @@ export const AddressHierarchy: React.FC = () => {
                 <Input
                   key={`combo_input_${index}`}
                   name={`address.${attributes.name}`}
-                  labelText={t(attributes.name)}
+                  labelText={
+                    isEmpty(config.fieldConfigurations.address.useAddressHierarchy.useAddressHierarchyLabel)
+                      ? t(attributes.name)
+                      : config.fieldConfigurations.address.useAddressHierarchy.useAddressHierarchyLabel[attributes.name]
+                  }
                   id={attributes.name}
                   setSelectedValue={setSelectedValue}
                   selected={selected}

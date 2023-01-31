@@ -69,6 +69,11 @@ export interface RegistrationConfig {
     encounterProviderRoleUuid: string;
     registrationFormUuid: string | null;
   };
+  patientVerification: {
+    usePatientVerification: boolean;
+    clientRegistryAuthUrl: Type.String;
+    clientRegistryUrl: Type.String;
+  };
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -330,6 +335,22 @@ export const esmPatientRegistrationSchema = {
       _default: null,
       _description:
         'The form UUID to associate with the registration encounter. By default no form will be associated.',
+    },
+  },
+  patientVerification: {
+    usePatientVerification: {
+      _type: Type.Boolean,
+      _default: false,
+    },
+    clientRegistryAuthUrl: {
+      _type: Type.String,
+      _default: 'https://dhpidentitystagingapi.health.go.ke/connect/token',
+      _description: 'The url used to authenticate to central client registry',
+    },
+    clientRegistryUrl: {
+      _type: Type.String,
+      _default: 'https://dhpstagingapi.health.go.ke/partners/registry',
+      _description: 'The url used to perform client registry CRUD operation',
     },
   },
   _validators: [

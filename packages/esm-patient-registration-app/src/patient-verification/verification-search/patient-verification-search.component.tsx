@@ -72,7 +72,7 @@ const PatientVerificationSearch: React.FC<PatientVerificationSearchProps> = () =
 
       {error && (
         <div style={{ display: 'flex', alignItems: 'center', minHeight: '15rem' }}>
-          <ErrorState headerTitle={t('searchError', 'Search erro')} error={error} />
+          <ErrorState headerTitle={t('searchError', 'Search error')} error={error} />
         </div>
       )}
 

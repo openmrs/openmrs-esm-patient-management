@@ -65,7 +65,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
             }
           }}
           placeholder={placeholder}
-          titleText={labelText}
+          titleText={''}
           light
         />
       </Layer>

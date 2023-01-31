@@ -2,22 +2,20 @@ import useSWR from 'swr';
 import { Encounter, Patient } from '../../patient-registration/patient-registration-types';
 import { ClientIdentification, ClientRegistryPatient, RegistryPatient } from '../patient-verification-types';
 import counties from '../assets/counties.json';
-import { FetchResponse, OpenmrsFetchError } from '@openmrs/esm-framework';
-
-const clientRegistryUrl = 'https://dhpstagingapi.health.go.ke/partners/registry';
+import { FetchResponse, OpenmrsFetchError, useConfig } from '@openmrs/esm-framework';
+import { RegistrationConfig } from '../../config-schema';
 
 function setCookie(tokenValue: string) {
   document.cookie = `CRSESSION=${tokenValue};expires=86400;`;
 }
 
-function getCookie() {
+function getCookie(url: string) {
   const cookies = document.cookie;
   const results = cookies.match(RegExp('CRSESSION' + '=.[^;]*'));
   if (results) {
     const cookie = results[0].split('=');
     return { token: cookie[1] };
   } else {
-    const url = `https://dhpidentitystagingapi.health.go.ke/connect/token`;
     const urlencoded = new URLSearchParams();
     urlencoded.append('client_id', 'partner.test.client');
     urlencoded.append('client_secret', 'partnerTestPwd');
@@ -44,7 +42,11 @@ const fetcher = (url, token) =>
   }).then((r) => r.json());
 
 export const useSearchClientRegistry = (documentType: string, searchTerm: string) => {
-  const cookie = getCookie();
+  const {
+    patientVerification: { clientRegistryUrl, clientRegistryAuthUrl },
+  } = useConfig() as RegistrationConfig;
+
+  const cookie = getCookie(clientRegistryAuthUrl);
   const url = `${clientRegistryUrl}/search/KE/${documentType}/${searchTerm}`;
   const { data, isLoading, error } = useSWR(documentType && searchTerm ? [url, cookie?.token] : null, ([url, token]) =>
     fetcher(url, token),
@@ -108,15 +110,18 @@ export function generateClientRegistryPayload(patient: Patient, obs: { [conceptU
     },
     nextOfKins: [],
   };
-  savePatientToCR(clientRegistryPayload);
   return clientRegistryPayload;
 }
 
 export function savePatientToCR<T>(clientRegistryPatient: RegistryPatient, nupi?: string) {
+  const {
+    patientVerification: { clientRegistryUrl, clientRegistryAuthUrl },
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+  } = useConfig() as RegistrationConfig;
+  const cookie = getCookie(clientRegistryAuthUrl);
   if (nupi) {
     return Promise.resolve({ status: '300', data: clientRegistryPatient });
   }
-  const cookie = getCookie();
   return window
     .fetch(clientRegistryUrl, {
       method: 'POST',

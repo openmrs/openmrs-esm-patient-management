@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Button, Link } from '@carbon/react';
-import { XAxis } from '@carbon/react/icons';
+import { XAxis, CertificateCheck } from '@carbon/react/icons';
 import { Router, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
@@ -11,6 +11,8 @@ import {
   interpolateString,
   interpolateUrl,
   usePatient,
+  ConfigurableLink,
+  navigate,
 } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
 import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
@@ -30,6 +32,7 @@ import { builtInSections, RegistrationConfig, SectionDefinition } from '../confi
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
+import { clientRegistryStore } from '../patient-verification/patient-verification-helper';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -128,7 +131,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           : t('registrationSuccessToastTitle', 'New Patient Created'),
         kind: 'success',
       });
-
+      clientRegistryStore.setState({ clientExists: false, client: {} as any }, true);
       const afterUrl = new URLSearchParams(search).get('afterUrl');
       const redirectUrl = interpolateUrl(afterUrl || config.links.submitButton, { patientUuid: values.patientUuid });
 
@@ -180,6 +183,23 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       {(props) => (
         <Form className={styles.form}>
           <BeforeSavePrompt when={props.dirty} redirect={target} />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              margin: '0.125rem 0',
+              position: 'absolute',
+              right: 0,
+            }}>
+            <Button
+              kind="ghost"
+              size="sm"
+              renderIcon={CertificateCheck}
+              style={{}}
+              onClick={() => navigate({ to: `\${openmrsSpaBase}/patient-registration/patient-verification` })}>
+              {t('patientVerification', 'Patient verification')}
+            </Button>
+          </div>
           <div className={styles.formContainer}>
             <div>
               <div className={styles.stickyColumn}>
