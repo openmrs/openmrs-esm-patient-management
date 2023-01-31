@@ -44,17 +44,17 @@ export class PatientRegistrationPage {
     const tryFill = (locator: Locator, value?: string) => value && locator.fill(value);
 
     formValues.sex && (await this.sexRadioButton(formValues.sex).check());
-    await tryFill(this.givenNameInput(), formValues.givenName);
-    await tryFill(this.middleNameInput(), formValues.middleName);
-    await tryFill(this.familyNameInput(), formValues.familyName);
-    await tryFill(this.birthdateInput(), formValues.birthdate);
     await tryFill(this.address1Input(), formValues.address1);
-    await tryFill(this.countryInput(), formValues.country);
-    await tryFill(this.countyDistrictInput(), formValues.countyDistrict);
     await tryFill(this.stateProvinceInput(), formValues.stateProvince);
     await tryFill(this.cityVillageInput(), formValues.cityVillage);
     await tryFill(this.phoneInput(), formValues.phone);
     await tryFill(this.emailInput(), formValues.email);
+    await tryFill(this.givenNameInput(), formValues.givenName);
+    await tryFill(this.middleNameInput(), formValues.middleName);
+    await tryFill(this.familyNameInput(), formValues.familyName);
+    await tryFill(this.countryInput(), formValues.country);
+    await tryFill(this.countyDistrictInput(), formValues.countyDistrict);
+    await tryFill(this.birthdateInput(), formValues.birthdate);
     await this.createPatientButton().click();
   }
 }

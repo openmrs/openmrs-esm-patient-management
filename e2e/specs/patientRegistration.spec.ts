@@ -11,7 +11,7 @@ test('should be able to register a patient', async ({ page, api }) => {
     middleName: 'Donny',
     familyName: 'Ronny',
     sex: 'male',
-    birthdate: '2020-2-1',
+    birthdate: '1/2/2020',
     postalCode: '',
     address1: 'Bom Jesus Street',
     address2: '',
