@@ -81,7 +81,8 @@ function ClinicMetrics() {
           value={initialSelectedItem ? visitQueueEntriesCount : serviceCount}
           headerLabel={`${t('waitingFor', 'Waiting for')}:`}
           service={currentServiceName}
-          serviceUuid={currentServiceUuid}>
+          serviceUuid={currentServiceUuid}
+          locationUuid={currentQueueLocation}>
           <Dropdown
             id="inline"
             type="inline"
