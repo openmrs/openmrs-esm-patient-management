@@ -11,6 +11,7 @@ import {
   updateSelectedQueueLocationName,
   useSelectedQueueLocationUuid,
   useSelectedQueueLocationName,
+  updateSelectedServiceName,
 } from '../helpers/helpers';
 
 const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
@@ -21,6 +22,7 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const handleQueueLocationChange = ({ selectedItem }) => {
     updateSelectedQueueLocationUuid(selectedItem.id);
     updateSelectedQueueLocationName(selectedItem.name);
+    updateSelectedServiceName('All');
   };
 
   return (

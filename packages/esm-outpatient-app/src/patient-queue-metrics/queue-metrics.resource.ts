@@ -26,9 +26,9 @@ export function useServices(location: string) {
   };
 }
 
-export function useServiceMetricsCount(service: string) {
+export function useServiceMetricsCount(service: string, location: string) {
   const status = 'Waiting';
-  const apiUrl = `/ws/rest/v1/queue-entry-metrics?service=${service}&status=${status}`;
+  const apiUrl = `/ws/rest/v1/queue-entry-metrics?service=${service}&status=${status}&location=${location}`;
   const { data } = useSWRImmutable<
     {
       data: {
