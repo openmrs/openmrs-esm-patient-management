@@ -24,6 +24,8 @@ const useArrowNavigation = (
       } else if (focussedResult !== -1) {
         // This condition will be met when scrolling through the list, the user presses another
         // key, then the user should be focussed to the input.
+        // The focus to input should only be called when the user is scrolling through the list
+        // Hence the if condition
         resetFocusCallback();
         setFocussedResult(initalFocussedResult);
       }
