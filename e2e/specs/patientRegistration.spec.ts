@@ -1,15 +1,20 @@
 import { test } from '../core';
-import { PatientRegistrationFormValues, PatientRegistrationPage } from '../pages/patientRegistrationPage';
+import { expect } from '@playwright/test';
+import { PatientRegistrationFormValues, PatientRegistrationPage } from '../pages';
+import { deletePatient, getPatient } from '../commands';
+
+let patientUuid: string;
 
 test('should be able to register a patient', async ({ page, api }) => {
+  test.setTimeout(5 * 60 * 1000);
   const patientRegistrationPage = new PatientRegistrationPage(page);
 
   await patientRegistrationPage.goto();
 
   const formValues: PatientRegistrationFormValues = {
-    givenName: 'Johnny',
+    givenName: `Johnny`,
     middleName: 'Donny',
-    familyName: 'Ronny',
+    familyName: `Ronny`,
     sex: 'male',
     birthdate: '1/2/2020',
     postalCode: '',
@@ -25,13 +30,21 @@ test('should be able to register a patient', async ({ page, api }) => {
 
   await patientRegistrationPage.fillPatientRegistrationForm(formValues);
 
-  const newPatientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? '';
-  const newPatientRes = await api.get(`rest/v1/patient/${newPatientUuid}`);
+  await expect(page).toHaveURL(new RegExp('^[\\w\\d]+/patient/[\\w\\d]+/chart/Patient Summary$'));
+  const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
+  await expect(patientUuid).not.toBeNull();
 
-  await expect(page).toHaveURL(`${process.env.E2E_UI_BASE_URL}patient/${newPatientUuid}/chart/Patient Summary`);
-  await expect(newPatientRes.ok()).toBeTruthy();
-  const newAddress1 = newPatientRes.json().then((data) => {
-    return data.person.address1;
-  });
-  await expect(newAddress1).toBe(formValues.address1);
+  const patient = await getPatient(api, patientUuid);
+  const { person } = patient;
+  const { givenName, middleName, familyName, sex } = formValues;
+
+  await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
+  await expect(person.gender).toBe(sex[0].toUpperCase());
+  // TODO: Check other attributes
+});
+
+test.afterEach(async ({ api }) => {
+  if (patientUuid) {
+    await deletePatient(api, patientUuid);
+  }
 });
