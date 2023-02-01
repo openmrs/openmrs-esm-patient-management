@@ -12,12 +12,16 @@ const useArrowNavigation = (
   const handleKeyPress = useCallback(
     (e) => {
       if (e.key === 'ArrowUp') {
-        setFocussedResult((prev) => Math.max(-1, prev - 1));
+        const newFocussedResult = Math.max(-1, focussedResult - 1);
+        setFocussedResult(newFocussedResult);
+        if (newFocussedResult === -1) {
+          resetFocusCallback();
+        }
       } else if (e.key === 'ArrowDown') {
         setFocussedResult((prev) => Math.min(totalResults - 1, prev + 1));
       } else if (e.key === 'Enter' && focussedResult > -1) {
         enterCallback(e, focussedResult);
-      } else if (document.activeElement !== inputRef.current) {
+      } else if (focussedResult !== -1) {
         resetFocusCallback();
         setFocussedResult(initalFocussedResult);
       }
