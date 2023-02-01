@@ -22,6 +22,8 @@ const useArrowNavigation = (
       } else if (e.key === 'Enter' && focussedResult > -1) {
         enterCallback(e, focussedResult);
       } else if (focussedResult !== -1) {
+        // This condition will be met when scrolling through the list, the user presses another
+        // key, then the user should be focussed to the input.
         resetFocusCallback();
         setFocussedResult(initalFocussedResult);
       }
