@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 
 const useArrowNavigation = (
-  inputRef: React.MutableRefObject<HTMLInputElement>,
   totalResults: number,
   enterCallback: (evt: any, index: number) => void,
   resetFocusCallback: () => void,
@@ -30,15 +29,7 @@ const useArrowNavigation = (
         setFocussedResult(initalFocussedResult);
       }
     },
-    [
-      setFocussedResult,
-      totalResults,
-      focussedResult,
-      enterCallback,
-      initalFocussedResult,
-      inputRef,
-      resetFocusCallback,
-    ],
+    [setFocussedResult, totalResults, focussedResult, enterCallback, initalFocussedResult, resetFocusCallback],
   );
 
   useEffect(() => {
