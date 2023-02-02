@@ -140,7 +140,7 @@ export function useVisit(visitUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
-  const { data, error, isValidating } = useSWR<{ data: Visit }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Visit }, Error>(
     `/ws/rest/v1/visit/${visitUuid}?v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -148,7 +148,7 @@ export function useVisit(visitUuid: string) {
   return {
     visit: data ? data.data : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

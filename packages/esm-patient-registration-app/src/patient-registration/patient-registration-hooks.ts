@@ -161,7 +161,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 } {
   const shouldFetch = !!patientUuid;
 
-  const { data, error } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
     shouldFetch
       ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`
       : null,
@@ -189,7 +189,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
     });
     return {
       data: identifiers,
-      isLoading: !data && !error,
+      isLoading,
     };
   }, [data, error]);
 
@@ -198,14 +198,14 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 
 function useInitialPersonAttributes(personUuid: string) {
   const shouldFetch = !!personUuid;
-  const { data, error } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
     shouldFetch ? `/ws/rest/v1/person/${personUuid}/attribute` : null,
     openmrsFetch,
   );
   const result = useMemo(() => {
     return {
       data: data?.data?.results,
-      isLoading: !data && !error,
+      isLoading,
     };
   }, [data, error]);
   return result;

@@ -78,7 +78,7 @@ export function usePatientSearchInfinite(
     [searchTerm, customRepresentation, includeDead, resultsToFetch],
   );
 
-  const { data, isValidating, setSize, error, size } = useSWRInfinite<
+  const { data, isLoading, isValidating, setSize, error, size } = useSWRInfinite<
     FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>,
     Error
   >(searching ? getUrl : null, openmrsFetch);
@@ -86,7 +86,7 @@ export function usePatientSearchInfinite(
   const results = useMemo(
     () => ({
       data: data ? [].concat(...data?.map((resp) => resp?.data?.results)) : null,
-      isLoading: !data && !error,
+      isLoading: isLoading,
       fetchError: error,
       hasMore: data?.length ? !!data[data.length - 1].data?.links?.some((link) => link.rel === 'next') : false,
       loadingNewData: isValidating,
@@ -94,7 +94,7 @@ export function usePatientSearchInfinite(
       currentPage: size,
       totalResults: data?.[0]?.data?.totalCount,
     }),
-    [data, isValidating, error, setSize, size],
+    [data, isLoading, isValidating, error, setSize, size],
   );
 
   return results;
@@ -102,7 +102,7 @@ export function usePatientSearchInfinite(
 
 export function useGetPatientAttributePhoneUuid(): string {
   const { t } = useTranslation();
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<{ uuid: string }> }>>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<{ uuid: string }> }>>(
     '/ws/rest/v1/personattributetype?q=Telephone Number',
     openmrsFetch,
   );

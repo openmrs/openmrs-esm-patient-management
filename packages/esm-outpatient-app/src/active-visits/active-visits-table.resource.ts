@@ -145,11 +145,11 @@ export function useStatus() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     statuses: data ? data?.data?.setMembers : [],
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
@@ -160,11 +160,11 @@ export function usePriority() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${priorityConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     priorities: data ? data?.data?.setMembers : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
   };
 }
@@ -172,7 +172,7 @@ export function usePriority() {
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${locationUuid}&v=full`;
   const { t } = useTranslation();
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -234,7 +234,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   return {
     visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : [],
     visitQueueEntriesCount: mappedVisitQueueEntries ? mappedVisitQueueEntries.length : 0,
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };
@@ -307,7 +307,7 @@ export async function endPatientStatus(
 
 export function useServiceQueueEntries(service: string, locationUuid: string) {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -327,7 +327,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
 
   return {
     serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };

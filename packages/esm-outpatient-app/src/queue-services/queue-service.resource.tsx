@@ -9,11 +9,11 @@ export function useServiceConcepts() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     queueConcepts: data ? data?.data?.setMembers : [],
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 

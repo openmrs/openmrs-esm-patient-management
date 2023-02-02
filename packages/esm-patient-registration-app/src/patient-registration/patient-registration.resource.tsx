@@ -154,7 +154,7 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
   } = useConfig();
   const url = `/ws/rest/v1/obs?patient=${patientUuid}&concept=${patientPhotoUuid}&v=full`;
 
-  const { data, error } = useSWR<{ data: ObsFetchResponse }, Error>(patientUuid ? url : null, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: ObsFetchResponse }, Error>(patientUuid ? url : null, openmrsFetch);
 
   const item = data?.data?.results[0];
 
@@ -166,7 +166,7 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
         }
       : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
@@ -229,7 +229,7 @@ export function useAddressHierarchy(
   isLoading: boolean;
   error: Error;
 } {
-  const { data, error } = useSWRImmutable<
+  const { data, error, isLoading } = useSWRImmutable<
     FetchResponse<
       Array<{
         address: string;
@@ -247,7 +247,7 @@ export function useAddressHierarchy(
     () => ({
       addresses: data?.data?.map((address) => address.address) ?? [],
       error,
-      isLoading: !data && !error,
+      isLoading,
     }),
     [data, error],
   );
@@ -266,7 +266,7 @@ export function useAdressHierarchyWithParentSearch(
     name: string;
   }>;
 } {
-  const { data, error } = useSWRImmutable<
+  const { data, error, isLoading } = useSWRImmutable<
     FetchResponse<
       Array<{
         uuid: string;
@@ -283,7 +283,7 @@ export function useAdressHierarchyWithParentSearch(
   const results = useMemo(
     () => ({
       error: error,
-      isLoading: !data && !error,
+      isLoading,
       addresses: data?.data ?? [],
     }),
     [data, error],

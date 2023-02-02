@@ -6,11 +6,11 @@ import { startOfDay } from '../constants';
 
 export function useAppointments() {
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startOfDay}`;
-  const { data, error, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
   return {
     appointmentQueueEntries: data ? data?.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };
@@ -18,11 +18,11 @@ export function useAppointments() {
 
 export function useCheckedInAppointments() {
   const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
-  const { data, error, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
   return {
     checkedInAppointments: data ? data?.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };
@@ -31,11 +31,14 @@ export function useCheckedInAppointments() {
 export function useProviders() {
   const customRepresentation = 'custom:(uuid,display,person:(age,display,gender,uuid))';
   const apiUrl = `/ws/rest/v1/provider?q=&v=${customRepresentation}`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Provider> } }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Provider> } }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   return {
     providers: data ? data.data?.results : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };

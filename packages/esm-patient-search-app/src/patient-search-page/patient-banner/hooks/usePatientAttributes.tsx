@@ -11,13 +11,13 @@ const customRepresentation =
  * @returns Object containing `patient-attributes`, `isLoading` loading status, `error`
  */
 export const usePatientAttributes = (patientUuid: string) => {
-  const { data, error } = useSWRImmutable<{ data: Patient }>(
+  const { data, error, isLoading } = useSWRImmutable<{ data: Patient }>(
     `/ws/rest/v1/patient/${patientUuid}?v=${customRepresentation}`,
     openmrsFetch,
   );
 
   return {
-    isLoading: !data && !error,
+    isLoading,
     attributes: data?.data.person.attributes ?? [],
     error: error,
   };

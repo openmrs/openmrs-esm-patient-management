@@ -11,30 +11,36 @@ export function useTodayAppointments() {
   const { t } = useTranslation();
   const startDate = useAppointmentDate();
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
-  const { data, error, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
-  const serverAppointments = data?.data?.map((appointment) => getTodaysAppointment(appointment, t)) ?? [];
+  const results = useMemo(() => {
+    const serverAppointments = data?.data?.map((appointment) => getTodaysAppointment(appointment, t)) ?? [];
 
-  const results = useMemo(
-    () => ({
+    return {
       appointments: serverAppointments,
-      isLoading: !data && !error,
+      isLoading,
       isError: error,
       isValidating,
       mutate,
-    }),
-    [data, error, isValidating, mutate, serverAppointments.length],
-  );
+    };
+  }, [data?.data, error, isLoading, isValidating, mutate, t]);
+
   return results;
 }
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   return {
     services: data ? data.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };
