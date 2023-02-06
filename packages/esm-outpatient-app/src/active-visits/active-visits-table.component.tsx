@@ -103,9 +103,6 @@ const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
-  const [userLocation, setUserLocation] = useState('');
-  const session = useSession();
-  const locations = useLocations();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { services } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
@@ -128,14 +125,6 @@ function ActiveVisitsTable() {
     results: paginatedQueueEntries,
     currentPage,
   }: PaginationData = usePagination(visitQueueEntries, currentPageSize);
-
-  useEffect(() => {
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    } else if (!userLocation && locations) {
-      setUserLocation(first(locations)?.uuid);
-    }
-  }, [session, locations, userLocation, currentQueueLocation]);
 
   const tableHeaders = useMemo(
     () => [

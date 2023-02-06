@@ -32,6 +32,11 @@ function setupOpenMRS() {
       title: ([x]) => `Patient Lists / ${x}`,
       parent: `${window.spaBase}`,
     },
+    {
+      path: `${window.spaBase}/outpatient/home`,
+      title: 'Service Queues',
+      parent: `${window.spaBase}/home`,
+    },
   ]);
 
   defineConfigSchema(moduleName, configSchema);
