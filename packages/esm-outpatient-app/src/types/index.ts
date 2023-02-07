@@ -241,8 +241,6 @@ export interface FormattedEncounter {
   form: OpenmrsResource;
   obs: Array<Observation>;
   provider: string;
-  visitType: string;
-  visitUuid: string;
 }
 
 export interface ObsMetaInfo {
@@ -383,5 +381,15 @@ export interface Resource {
       display: string;
       system: string;
     }>;
+  };
+}
+
+export interface Identifer {
+  identifier: string;
+  display: string;
+  uuid: string;
+  identifierType: {
+    uuid: string;
+    display: string;
   };
 }
