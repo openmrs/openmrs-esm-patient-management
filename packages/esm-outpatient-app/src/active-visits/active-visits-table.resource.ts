@@ -15,6 +15,7 @@ import last from 'lodash-es/last';
 import { MappedServiceQueueEntry, QueueServiceInfo } from '../types';
 import isEmpty from 'lodash-es/isEmpty';
 import { useTranslation } from 'react-i18next';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -170,7 +171,10 @@ export function usePriority() {
 }
 
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${locationUuid}&v=full`;
+  const { queueLocations } = useQueueLocations();
+  const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
+
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,

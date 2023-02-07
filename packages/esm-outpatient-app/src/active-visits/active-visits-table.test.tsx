@@ -1,25 +1,25 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { ConfigObject, openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
+import { mockQueueLocations } from '../../../../__mocks__/locations.mock';
 import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
+import { useVisitQueueEntries } from './active-visits-table.resource';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
+const mockUseVisitQueueEntries = useVisitQueueEntries as jest.Mock;
 
-jest.mock('./active-visits-table.resource.ts', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource.ts');
+jest.mock('./active-visits-table.resource', () => {
+  const originalModule = jest.requireActual('./active-visits-table.resource');
 
   return {
     ...originalModule,
     useServices: jest.fn().mockReturnValue({ services: mockServices }),
+    useVisitQueueEntries: jest.fn(),
   };
 });
 
@@ -28,8 +28,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-    useLocations: jest.fn().mockImplementation(() => mockLocations.data),
-    useSession: jest.fn().mockImplementation(() => mockSession.data),
   };
 });
 
@@ -47,11 +45,9 @@ describe('ActiveVisitsTable: ', () => {
   );
 
   it('renders an empty state view if data is unavailable', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+    mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: [], isLoading: false });
 
     renderActiveVisitsTable();
-
-    await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
@@ -59,7 +55,7 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitQueueEntries } });
+    mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
     mockUsePagination.mockReturnValue({
       results: mockMappedQueueEntries.data.slice(0, 2),
       goTo: mockGoToPage,
@@ -68,9 +64,6 @@ describe('ActiveVisitsTable: ', () => {
 
     renderActiveVisitsTable();
 
-    await waitForLoadingToFinish();
-
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
