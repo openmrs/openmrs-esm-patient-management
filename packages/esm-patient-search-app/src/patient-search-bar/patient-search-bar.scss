@@ -7,11 +7,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid $ui-04;
+  border: 1px solid #fdae1b;
 }
 
 .patientSearchInput {
-  border: none;
+  border: 1px solid #fdae1b;
 }
 
 .patientSearchInput input:focus {
