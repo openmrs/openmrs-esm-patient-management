@@ -17,7 +17,12 @@ import {
   parseAddressTemplateXml,
   scrollIntoView,
 } from './patient-registration-utils';
-import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
+import {
+  useInitialAddressFieldValues,
+  useInitialFormValues,
+  usePatientObs,
+  usePatientUuidMap,
+} from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
@@ -52,6 +57,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
+  const [enableClientRegistry, setEnableClientRegistry] = useState(
+    inEditMode ? initialFormValues.identifiers['nationalUniquePatientIdentifier']?.identifierValue : false,
+  );
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -144,7 +152,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   return (
     <Formik
-      enableReinitialize={true}
+      enableReinitialize
       initialValues={initialFormValues}
       validationSchema={validationSchema}
       onSubmit={onFormSubmit}>
@@ -170,8 +178,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   renderIcon={ShareKnowledge}
                   disabled={!currentSession || !identifierTypes}
                   onClick={() => {
+                    setEnableClientRegistry(true);
                     props.isValid
-                      ? handleSavePatientToClientRegistry(props.values, props.setValues)
+                      ? handleSavePatientToClientRegistry(props.values, props.setValues, inEditMode)
                       : props.validateForm().then((errors) => displayErrors(errors));
                   }}
                   className={styles.submitButton}>
@@ -184,7 +193,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   // Current session and identifiers are required for patient registration.
                   // If currentSession or identifierTypes are not available, then the
                   // user should be blocked to register the patient.
-                  disabled={!currentSession || !identifierTypes}>
+                  disabled={!enableClientRegistry}>
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
