@@ -60,7 +60,7 @@ const ConfirmPrompt: React.FC<ConfirmPromptProps> = ({ close, onConfirm, patient
         <Button kind="secondary" onClick={close}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button onClick={onConfirm}>{t('continue', 'Continue')}</Button>
+        <Button onClick={onConfirm}>{t('useValues', 'Use values')}</Button>
       </div>
     </>
   );

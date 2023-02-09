@@ -1,8 +1,30 @@
+@use '@carbon/colors';
 @import '../patient-registration/patient-registration.scss';
 
-.verificationWrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 0.5fr;
-  column-gap: 0.25rem;
-  align-items: flex-end;
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .verificationWrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    column-gap: 0.325rem;
+    align-items: flex-end;
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .verificationWrapper {
+    row-gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+
+  }
+}
+
+.errorWrapper {
+  color: colors.$red-50;
+  margin: 0 0 1rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

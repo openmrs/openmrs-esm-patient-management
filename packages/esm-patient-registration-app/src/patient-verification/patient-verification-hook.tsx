@@ -1,26 +1,110 @@
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { ConceptAnswers, ConceptResponse, FormValues } from '../patient-registration/patient-registration-types';
+import { generateNUPIPayload, handleClientRegistryResponse } from './patient-verification-utils';
 import useSWR from 'swr';
-import { FormValues } from '../patient-registration/patient-registration-types';
-import { generateNUPIPayload } from './patient-verification-utils';
-import { RegistryPatient } from './verification-types';
-const token =
-  'eyJhbGciOiJSUzI1NiIsImtpZCI6IkU0MUU1QUM5RUIxNTlBMjc1NTY4NjM0MzIxMUJDQzAzMDMyMEUzMTZSUzI1NiIsIng1dCI6IjVCNWF5ZXNWbWlkVmFHTkRJUnZNQXdNZzR4WSIsInR5cCI6ImF0K2p3dCJ9.eyJpc3MiOiJodHRwczovL2RocGlkZW50aXR5c3RhZ2luZ2FwaS5oZWFsdGguZ28ua2UiLCJuYmYiOjE2NzU4ODM2NjEsImlhdCI6MTY3NTg4MzY2MSwiZXhwIjoxNjc1OTcwMDYxLCJhdWQiOlsiREhQLkdhdGV3YXkiLCJESFAuUGFydG5lcnMiXSwic2NvcGUiOlsiREhQLkdhdGV3YXkiLCJESFAuUGFydG5lcnMiXSwiY2xpZW50X2lkIjoicGFydG5lci50ZXN0LmNsaWVudCIsImp0aSI6IjYzQjhEOEQ3QjcyRTc4OTlDNjMxNzk3MjA3QjQ1MDE1In0.MXe4skggqsdwl2ie2PFdgiuCaycja8ONgIVONQrbIx3OQU7butFUGK9UYBtr91fgj7jeLVqAik14C0RMJ34D385CJFn8ePH6Af3DvyZlXBjUTL69tg54a4mYO7_FRFXO43bsiBSN9aIm93ewC69YL5YZZmPadUYMkhFIhnwsWMOaosy-Vw6vnRCRgjrwED8bXw-uU9fXSmdLySf_PS5vtiZ61gs8lDnhOIRIUb85A3I3TxsJJsjyp_BkCD-kf5_ZSgLuOIJOzRX7XqYXbA-F0xPynHINIlppDgA5GohZGdbiVv5DRchtG-I5BKv56e9UWSYOIGR2SNZ6OmAkJcp6Ig';
+import useSWRImmutable from 'swr/immutable';
 
-export function searchClientRegistry(identifierType: string, searchTerm: string) {
-  const url = `https://dhpstagingapi.health.go.ke/partners/registry/search/KE/${identifierType}/${searchTerm}`;
+export function searchClientRegistry(identifierType: string, searchTerm: string, token: string) {
+  const url = `https://afyakenyaapi.health.go.ke/partners/registry/search/KE/${identifierType}/${searchTerm}`;
   return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
 }
 
 export function savePatientToClientRegistry(formValues: FormValues) {
   const createdRegistryPatient = generateNUPIPayload(formValues);
-  return fetch(`https://dhpstagingapi.health.go.ke/partners/registry`, {
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+  return fetch(`https://afyakenyaapi.health.go.ke/partners/registry`, {
+    headers: { Authorization: `Bearer ${formValues.token}`, 'Content-Type': 'application/json' },
     method: 'POST',
     body: JSON.stringify(createdRegistryPatient),
   });
 }
 
 export async function handleSavePatientToClientRegistry(
+  formValues: FormValues,
+  setValues: (values: FormValues, shouldValidate?: boolean) => void,
+  inEditMode: boolean,
+) {
+  const mode = inEditMode ? 'edit' : 'new';
+  switch (mode) {
+    case 'edit': {
+      try {
+        const searchResponse = await searchClientRegistry(
+          'national-id',
+          formValues.identifiers['nationalId'].identifierValue,
+          formValues.token,
+        );
+
+        // if client does not exists post client to registry
+        if (searchResponse?.clientExists === false) {
+          postToRegistry(formValues, setValues);
+        }
+      } catch (error) {
+        showToast({
+          title: 'Client registry error',
+          description: `${error}`,
+          millis: 10000,
+          kind: 'error',
+          critical: true,
+        });
+      }
+      return;
+    }
+    case 'new': {
+      postToRegistry(formValues, setValues);
+    }
+  }
+}
+
+export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAnswers>; isLoading: boolean } {
+  const { data, error, isLoading } = useSWR<FetchResponse<ConceptResponse>, Error>(
+    `/ws/rest/v1/concept/${conceptUuid}`,
+    openmrsFetch,
+  );
+  if (error) {
+    showToast({
+      title: error.name,
+      description: error.message,
+      kind: 'error',
+    });
+  }
+  return { data: data?.data?.answers ?? [], isLoading };
+}
+
+const urlencoded = new URLSearchParams();
+urlencoded.append('client_id', 'palladium.partner.client');
+urlencoded.append('client_secret', '28f95b2a');
+urlencoded.append('grant_type', 'client_credentials');
+urlencoded.append('scope', 'DHP.Gateway DHP.Partners');
+
+const swrFetcher = async (url) => {
+  const res = await fetch(url, {
+    method: 'POST',
+    body: urlencoded,
+    redirect: 'follow',
+  });
+
+  // If the status code is not in the range 200-299,
+  // we still try to parse and throw it.
+  if (!res.ok) {
+    const error = new Error('An error occurred while fetching the data.') as any;
+    // Attach extra info to the error object.
+    error.info = await res.json();
+    error.status = res.status;
+    throw error;
+  }
+
+  return res.json();
+};
+
+export function useGlobalProperties() {
+  const { data, isLoading, error } = useSWRImmutable(
+    `https://afyakenyaidentityapi.health.go.ke/connect/token`,
+    swrFetcher,
+    { refreshInterval: 864000 },
+  );
+  return { data: data, isLoading, error };
+}
+
+async function postToRegistry(
   formValues: FormValues,
   setValues: (values: FormValues, shouldValidate?: boolean) => void,
 ) {
@@ -48,9 +132,20 @@ export async function handleSavePatientToClientRegistry(
       });
     } else {
       const responseError = await clientRegistryResponse.json();
+      const errorMessage = Object.values(responseError.errors ?? {})
+        .map((error: any) => error.join())
+        .toString();
+      setValues({
+        ...formValues,
+        attributes: {
+          ...formValues.attributes,
+          ['869f623a-f78e-4ace-9202-0bed481822f5']: 'Failed validation',
+          ['752a0331-5293-4aa5-bf46-4d51aaf2cdc5']: 'Failed',
+        },
+      });
       showNotification({
         title: responseError.title,
-        description: Object.values(responseError.errors ?? {}).map((error: any) => error.join()),
+        description: errorMessage,
         kind: 'warning',
         millis: 150000,
       });

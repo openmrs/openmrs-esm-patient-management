@@ -4,10 +4,29 @@ import { FormValues } from '../patient-registration/patient-registration-types';
 import { ClientRegistryPatient, RegistryPatient } from './verification-types';
 import counties from './assets/counties.json';
 
-export function handleClientRegistryResponse(clientResponse: ClientRegistryPatient, props: FormikProps<FormValues>) {
+export function handleClientRegistryResponse(
+  clientResponse: ClientRegistryPatient,
+  props: FormikProps<FormValues>,
+  searchTerm: string,
+) {
   if (clientResponse?.clientExists === false) {
+    const nupiIdentifiers = {
+      ['nationalId']: {
+        initialValue: searchTerm,
+        identifierUuid: undefined,
+        selectedSource: { uuid: '', name: '' },
+        preferred: false,
+        required: false,
+        identifierTypeUuid: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
+        identifierName: 'National ID',
+        identifierValue: searchTerm,
+      },
+    };
     const dispose = showModal('empty-client-registry-modal', {
-      onConfirm: () => dispose(),
+      onConfirm: () => {
+        props.setValues({ ...props.values, identifiers: { ...props.values.identifiers, ...nupiIdentifiers } });
+        dispose();
+      },
       close: () => dispose(),
     });
   }
@@ -27,6 +46,9 @@ export function handleClientRegistryResponse(clientResponse: ClientRegistryPatie
         dateOfBirth,
         isAlive,
         clientNumber,
+        educationLevel,
+        occupation,
+        maritalStatus,
       },
     } = clientResponse;
 
@@ -80,6 +102,17 @@ export function handleClientRegistryResponse(clientResponse: ClientRegistryPatie
             postalCode: residence?.address,
           },
           identifiers: { ...props.values.identifiers, ...nupiIdentifiers },
+          obs: {
+            '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+              props.values.concepts.find((concept) => concept.display?.toLowerCase() === maritalStatus?.toLowerCase())
+                ?.uuid ?? '',
+            '1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+              props.values.concepts.find((concept) => concept.display?.toLowerCase() === educationLevel?.toLowerCase())
+                ?.uuid ?? '',
+            '1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+              props.values.concepts.find((concept) => concept.display?.toLowerCase() === occupation?.toLowerCase())
+                ?.uuid ?? '',
+          },
         });
         dispose();
       },
@@ -90,6 +123,16 @@ export function handleClientRegistryResponse(clientResponse: ClientRegistryPatie
 }
 
 export function generateNUPIPayload(formValues: FormValues): RegistryPatient {
+  const educationLevel = formValues.concepts.find(
+    (concept) => concept.uuid === formValues.obs['1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+  );
+  const occupation = formValues.concepts.find(
+    (concept) => concept.uuid === formValues.obs['1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+  );
+  const maritalStatus = formValues.concepts.find(
+    (concept) => concept.uuid === formValues.obs['1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+  );
+
   let createRegistryPatient: RegistryPatient = {
     firstName: formValues?.givenName,
     middleName: formValues?.middleName,
@@ -112,12 +155,12 @@ export function generateNUPIPayload(formValues: FormValues): RegistryPatient {
       emailAddress: formValues.attributes['b8d0b331-1d2d-4a9a-b741-1816f498bdb6'],
     },
     country: 'KE',
-    countyOfBirth: '036',
-    educationLevel: '',
+    countyOfBirth: `0${counties.find((county) => county.name.includes(formValues.address['countyDistrict']))?.code}`,
+    educationLevel: educationLevel?.display?.toLowerCase() ?? '',
     religion: '',
-    occupation: '',
-    maritalStatus: '',
-    originFacilityKmflCode: '15205',
+    occupation: occupation?.display?.toLowerCase() ?? '',
+    maritalStatus: maritalStatus?.display?.toLowerCase() ?? '',
+    originFacilityKmflCode: '',
     nascopCCCNumber: '',
     identifications: [
       {
