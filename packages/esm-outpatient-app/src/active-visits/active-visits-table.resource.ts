@@ -67,6 +67,7 @@ export interface VisitQueueEntry {
   };
   uuid: string;
   visit: Visit;
+  sortWeight: number;
 }
 
 export interface MappedVisitQueueEntry {
@@ -92,6 +93,7 @@ export interface MappedVisitQueueEntry {
   queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
+  sortWeight: number;
 }
 
 interface UseVisitQueueEntries {
@@ -223,6 +225,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     visitUuid: visitQueueEntry.visit?.uuid,
     queueUuid: visitQueueEntry.queueEntry.queue.uuid,
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
+    sortWeight: visitQueueEntry.queueEntry.sortWeight,
   });
 
   let mappedVisitQueueEntries;
@@ -258,6 +261,7 @@ export async function updateQueueEntry(
   priority: string,
   status: string,
   endedAt: Date,
+  sortWeight: number,
   abortController: AbortController,
 ) {
   const queueServiceUuid = isEmpty(newQueueUuid) ? previousQueueUuid : newQueueUuid;
@@ -286,6 +290,7 @@ export async function updateQueueEntry(
           uuid: patientUuid,
         },
         startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        sortWeight: sortWeight,
       },
     },
   });
@@ -343,6 +348,7 @@ export async function addQueueEntry(
   patientUuid: string,
   priority: string,
   status: string,
+  sortWeight: number,
   abortController: AbortController,
 ) {
   return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
@@ -367,6 +373,7 @@ export async function addQueueEntry(
           uuid: patientUuid,
         },
         startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        sortWeight: sortWeight,
       },
     },
   });
