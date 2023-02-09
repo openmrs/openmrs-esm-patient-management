@@ -7,12 +7,14 @@ import {
   usePatient,
   restBaseUrl,
 } from '@openmrs/esm-framework';
+import last from 'lodash-es/last';
 import camelCase from 'lodash-es/camelCase';
 import { type Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
 import { type RegistrationConfig } from '../config-schema';
 import { patientRegistration } from '../constants';
+import { useConceptAnswers, useGlobalProperties } from '../patient-verification/patient-verification-hook';
 import {
   type FormValues,
   type PatientRegistration,
@@ -20,6 +22,8 @@ import {
   type PersonAttributeResponse,
   type PatientIdentifierResponse,
   type Encounter,
+  type ConceptAnswers,
+  type ObsResponse,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
@@ -32,12 +36,13 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 import dayjs from 'dayjs';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
+  const { martialStatus, education, occupation, educationLoad, loadingStatus } = useConcepts();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
-  const { data: encounters } = useInitialEncounters(patientUuid, patientToEdit);
-
+  const { data: obs, isLoading: isLoadingObs, obs: observations } = usePatientObs(patientUuid);
+  const { data: token, isLoading: isLoadingToken } = useGlobalProperties();
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
     patientUuid: v4(),
     givenName: '',
@@ -96,6 +101,14 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     })();
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
 
+  // Setting authentication token
+
+  useEffect(() => {
+    if (!isLoadingToken && token) {
+      setInitialFormValues((initialFormValues) => ({ ...initialFormValues, token: String(token.access_token) }));
+    }
+  }, [isLoadingToken, token]);
+
   // Set initial patient relationships
   useEffect(() => {
     if (!isLoadingRelationships && relationships) {
@@ -134,15 +147,24 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     }
   }, [attributes, setInitialFormValues, isLoadingAttributes]);
 
-  // Set Initial registration encounters
+  // Set initial patient obs
+
   useEffect(() => {
-    if (patientToEdit && encounters) {
+    if (!isLoadingObs) {
+      setInitialFormValues((initialFormValues) => ({ ...initialFormValues, obs: obs, observation: observations }));
+    }
+  }, [isLoadingObs]);
+
+  // Set Initial encounter
+
+  useEffect(() => {
+    if (!educationLoad || !loadingStatus) {
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,
-        obs: encounters as Record<string, string>,
+        concepts: [...occupation, ...martialStatus, ...education],
       }));
     }
-  }, [encounters, patientToEdit]);
+  }, [educationLoad, loadingStatus]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -285,4 +307,54 @@ function getPatientAttributeUuidMapForPatient(attributes: Array<PersonAttributeR
     attributeUuidMap[`attribute.${attribute?.attributeType?.uuid}`] = attribute?.uuid;
   });
   return attributeUuidMap;
+}
+
+export function usePatientObs(patientUuid: string) {
+  const {
+    registrationObs: { encounterTypeUuid },
+  } = useConfig() as RegistrationConfig;
+  const url = `/ws/rest/v1/encounter?patient=${patientUuid}&encounterType=${encounterTypeUuid}&v=custom:(obs:(uuid,display,concept:(uuid,display),value:(uuid,display)))`;
+  const { data, isLoading, error } = useSWR<{ data: ObsResponse }>(patientUuid ? url : null, openmrsFetch);
+  let obsObject = {};
+  const patientObs = last(data?.data?.results)?.obs?.forEach((ob) => {
+    Object.assign(obsObject, { [ob.concept.uuid]: ob.value.uuid });
+  });
+  return { data: obsObject, isLoading, error, obs: data?.data };
+}
+
+function useConcepts() {
+  const { data: martialStatus, isLoading: loadingStatus } = useConceptAnswers('1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const { data: education, isLoading: educationLoad } = useConceptAnswers('1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const occupation: Array<ConceptAnswers> = [
+    {
+      uuid: '1538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Farmer',
+    },
+    {
+      uuid: '1540AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Employee',
+    },
+    {
+      uuid: '1539AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Trader',
+    },
+    {
+      uuid: '159465AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Student',
+    },
+    {
+      uuid: '159466AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Driver',
+    },
+    {
+      uuid: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'None',
+    },
+    {
+      uuid: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Other',
+    },
+  ];
+
+  return { martialStatus, education, occupation, loadingStatus, educationLoad };
 }
