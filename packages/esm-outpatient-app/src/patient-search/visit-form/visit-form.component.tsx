@@ -86,14 +86,13 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
   const { queueLocations } = useQueueLocations();
-
   const config = useConfig() as ConfigObject;
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
     }
-  }, [locations, sessionUser]);
+  }, [locations, sessionUser, priority]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -135,6 +134,8 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               }
               const defaultStatus = config.concepts.defaultStatusConceptUuid;
               const defaultPriority = config.concepts.defaultPriorityConceptUuid;
+              const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
+              const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
 
               const queuePayload: QueueEntryPayload = {
                 visit: {
@@ -154,6 +155,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     uuid: patientUuid,
                   },
                   startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+                  sortWeight: sortWeight,
                 },
               };
 
@@ -173,6 +175,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                       });
                       closePanel();
                       mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+                      mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
                     }
                   },
                   (error) => {

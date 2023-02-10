@@ -13,6 +13,11 @@ export const configSchema = {
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
       _default: '9e123c90-76ac-4eaa-8d40-35577781eb46',
     },
+    emergencyPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
+      _default: '5c2d5f8c-5efb-46d0-8e28-9e707ab7523c',
+    },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
@@ -66,6 +71,11 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    visitQueueNumberAttributeUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the visit attribute that contains the visit queue number.',
+      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -103,6 +113,8 @@ export interface ConfigObject {
     weightUuid: string;
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
+    visitQueueNumberAttributeUuid: string;
+    emergencyPriorityConceptUuid: string;
   };
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;

@@ -288,6 +288,7 @@ export interface QueueEntryPayload {
     queue: { uuid: string };
     patient: { uuid: string };
     startedAt: Date;
+    sortWeight: number;
   };
 }
 
@@ -343,6 +344,7 @@ export interface MappedQueueEntry {
   queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
+  sortWeight: string;
 }
 
 export interface EndVisitPayload {

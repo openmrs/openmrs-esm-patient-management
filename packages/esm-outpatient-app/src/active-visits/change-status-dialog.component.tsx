@@ -80,6 +80,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
     if (status === '') {
       setStatus(defaultStatus);
     }
+    const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
+    const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
     const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
     updateQueueEntry(
       visitUuid,
@@ -90,6 +92,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       priority,
       status,
       endDate,
+      sortWeight,
       new AbortController(),
     ).then(
       ({ status }) => {
@@ -130,7 +133,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
 
   return (
     <div>
-      <ModalHeader closeModal={closeModal} title={t('changePatientQueueStatus', 'Change patient queue status?')} />
+      <ModalHeader closeModal={closeModal} title={t('movePatientToNextService', 'Move patient to the next service?')} />
       <ModalBody>
         <Form onSubmit={changeQueueStatus}>
           <div className={styles.modalBody}>
@@ -138,26 +141,6 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               {patientName} &nbsp; · &nbsp;{patientSex} &nbsp; · &nbsp;{patientAge}&nbsp;{t('years', 'Years')}
             </h5>
           </div>
-          <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-          <FormGroup legendText="">
-            <RadioButtonGroup
-              className={styles.radioButtonGroup}
-              valueSelected={status}
-              orientation="vertical"
-              onChange={(event) => setStatus(event.toString())}
-              name="radio-button-group">
-              {isLoading ? (
-                <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />
-              ) : statuses?.length === 0 ? (
-                <p>{t('noStatusAvailable', 'No Status Available')}</p>
-              ) : (
-                statuses.map(({ uuid, display, name }) => (
-                  <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-                ))
-              )}
-            </RadioButtonGroup>
-          </FormGroup>
-
           <section>
             <Select
               labelText={t('selectQueueLocation', 'Select a queue location')}
@@ -225,7 +208,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button onClick={changeQueueStatus}>{t('exitAndChangeStatus', 'Exit and change status')}</Button>
+        <Button onClick={changeQueueStatus}>{t('moveToNextService', 'Move to next service')}</Button>
       </ModalFooter>
     </div>
   );
