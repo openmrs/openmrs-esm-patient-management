@@ -59,3 +59,12 @@
 .middot {
   margin: 0 spacing.$spacing-03;
 }
+
+.configuredTag {
+  margin: spacing.$spacing-01;
+}
+
+.configuredLabel {
+  @include type.type-style('label-01');
+  color: $ui-05;
+}
