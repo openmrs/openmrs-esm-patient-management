@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash-es/isEmpty';
 import {
   Button,
   ButtonSet,
@@ -13,7 +12,6 @@ import {
   Select,
   SelectItem,
   Switch,
-  TextArea,
   TimePicker,
   TimePickerSelect,
   Toggle,
@@ -23,38 +21,34 @@ import {
   Tabs,
   TabPanel,
   TabPanels,
+  TextArea,
   Layer,
-  TextInput,
 } from '@carbon/react';
 import {
   useLocations,
-  useSession,
-  showToast,
-  showNotification,
   ExtensionSlot,
   usePatient,
   useConfig,
-  parseDate,
+  showNotification,
+  showToast,
 } from '@openmrs/esm-framework';
 import { AppointmentPayload, MappedAppointment } from '../types';
-import { amPm, convertTime12to24 } from '../helpers';
+import { convertTime12to24, useAppointmentDate } from '../helpers';
 import {
-  saveAppointment,
   useServices,
   useAppointmentSummary,
-  checkAppointmentConflict,
-  useMonthlyAppointmentSummary,
+  saveAppointment,
+  toAppointmentDateTime,
 } from './appointment-forms.resource';
 import { ConfigObject } from '../config-schema';
 import { useProviders } from '../hooks/useProviders';
 import { closeOverlay } from '../hooks/useOverlay';
-import { mockFrequency } from '../../__mocks__/appointments.mock';
 import WorkloadCard from './workload.component';
 import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
-import { useSWRConfig } from 'swr';
-import { useAppointmentDate } from '../helpers/time';
-import { getMonthlyCalendarDistribution, getWeeklyCalendarDistribution } from './workload-helper';
+import { useCalendarDistribution } from './workload-helper';
+import { PatientAppointment, useInitialAppointmentFormValue } from './useInitialFormValues';
+import { mutate } from 'swr';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -62,134 +56,43 @@ interface AppointmentFormProps {
   context: string;
 }
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientUuid, context }) => {
-  const initialState = {
-    patientUuid,
-    dateTime: undefined,
-    location: '',
-    serviceUuid: '',
-    comments: '',
-    appointmentKind: '',
-    status: '',
-    id: undefined,
-    gender: '',
-    serviceType: '',
-    provider: '',
-    appointmentNumber: undefined,
-  };
-  const appointmentState = !isEmpty(appointment) ? appointment : initialState;
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
-  const { appointmentTypes } = useConfig() as ConfigObject;
-  const { daysOfTheWeek } = useConfig() as ConfigObject;
-  const { appointmentComments } = useConfig() as ConfigObject;
-  const { appointmentStatuses } = useConfig() as ConfigObject;
-  const { patient, isLoading } = usePatient(patientUuid ?? appointmentState.patientUuid);
+  const { appointmentTypes, appointmentStatuses, hiddenFormFields } = useConfig() as ConfigObject;
+  const initialAppointmentFormValues = useInitialAppointmentFormValue(appointment, patientUuid);
+  const [patientAppointment, setPatientAppointment] = useState<PatientAppointment>(initialAppointmentFormValues);
+  const { patient, isLoading } = usePatient(patientUuid ?? patientAppointment.patientUuid);
   const locations = useLocations();
-  const session = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
-  const [startDate, setStartDate] = useState(
-    dayjs(appointmentState.dateTime).format('hh:mm') || dayjs(new Date()).format('hh:mm'),
-  );
-  const [endDate, setEndDate] = useState(
-    dayjs(appointmentState.dateTime).format('hh:mm') || dayjs(new Date()).format('hh:mm'),
-  );
-  const [frequency, setFrequency] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState(appointmentState.location);
-  const [selectedService, setSelectedService] = useState(appointmentState.serviceUuid);
-  const [selectedProvider, setSelectedProvider] = useState(appointmentState.provider);
-  const [reminder, setReminder] = useState('');
-  const [appointmentComment, setAppointmentComment] = useState(appointmentState.comments);
-  const [reason, setReason] = useState('');
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [visitDate, setVisitDate] = React.useState(
-    appointmentState.dateTime ? new Date(appointmentState.dateTime) : new Date(),
-  );
-  const [isFullDay, setIsFullDay] = useState<boolean>(false);
-  const [day, setDay] = useState(appointmentState.dateTime);
-  const [appointmentType, setAppointmentType] = useState(appointmentState.appointmentKind);
-  const [appointmentStatus, setAppointmentStatus] = useState(appointmentState.status ?? 'Scheduled');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const appointmentStartDate = useAppointmentDate();
-  const appointmentSummary = useAppointmentSummary(visitDate, selectedService);
-  const appointmentMonthly = useMonthlyAppointmentSummary(visitDate, selectedService);
+  const appointmentSummary = useAppointmentSummary(patientAppointment.visitDate, patientAppointment.serviceUuid);
   const [selectedTab, setSelectedTab] = useState(0);
-  const monthlyDistribution = useMemo(
-    () => getMonthlyCalendarDistribution(new Date(appointmentStartDate), appointmentMonthly) ?? [],
-    [appointmentStartDate, appointmentMonthly],
+  const calendarWorkload = useCalendarDistribution(
+    patientAppointment.serviceUuid,
+    selectedTab === 0 ? 'week' : 'month',
   );
+  const appointmentStartDate = useAppointmentDate();
 
-  const weeklyDistribution = useMemo(
-    () => getWeeklyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [],
-    [appointmentStartDate, appointmentSummary],
-  );
-  const isMissingRequirements = !selectedService || !appointmentType.length || !selectedProvider;
-  const appointmentService = services?.find(({ uuid }) => uuid === selectedService);
-
-  useEffect(() => {
-    if (appointmentService) {
-      const [hours, minutes] = convertTime12to24(startDate, timeFormat);
-      const startDatetime = new Date(
-        dayjs(visitDate).year(),
-        dayjs(visitDate).month(),
-        dayjs(visitDate).date(),
-        hours,
-        minutes,
-      );
-      setEndDate(
-        dayjs(startDatetime)
-          .add(parseInt(appointmentService?.durationMins ?? '0'), 'minutes')
-          .format('hh:mm'),
-      );
-    }
-  }, [startDate, timeFormat, appointmentService, visitDate]);
+  const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
 
   const handleSubmit = async () => {
-    const [hours, minutes] = convertTime12to24(startDate, timeFormat);
-    const providerUuid =
-      providers.find((provider) => provider.display === selectedProvider)?.uuid ?? appointment.providers[0].uuid;
-    const startDatetime = new Date(
-      dayjs(visitDate).year(),
-      dayjs(visitDate).month(),
-      dayjs(visitDate).date(),
-      hours,
-      minutes,
-    );
-
-    const endDatetime = dayjs(
-      new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
-    );
+    const [hours, minutes] = convertTime12to24(patientAppointment.startDateTime, patientAppointment.timeFormat);
+    const startDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
+    const endDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
     const appointmentPayload: AppointmentPayload = {
-      appointmentKind: appointmentType,
-      status: appointmentStatus,
-      serviceUuid: selectedService,
+      appointmentKind: patientAppointment.appointmentKind,
+      status: patientAppointment.status,
+      serviceUuid: patientAppointment.serviceUuid,
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
-      providerUuid: providerUuid,
-      providers: [{ uuid: providerUuid }],
-      comments: appointmentComment,
-      locationUuid: selectedLocation,
-      patientUuid: appointmentState.patientUuid,
-      appointmentNumber: appointmentState.appointmentNumber,
-      uuid: appointmentState.id,
+      providerUuid: patientAppointment.providerUuid,
+      providers: [{ uuid: patientAppointment.providerUuid }],
+      comments: patientAppointment.comments,
+      locationUuid: patientAppointment.locationUuid,
+      patientUuid: patientAppointment.patientUuid,
+      appointmentNumber: patientAppointment.appointmentNumber,
+      uuid: patientAppointment.uuid,
     };
-
-    const { data } = await checkAppointmentConflict(appointmentPayload);
-    const [bookingStatus] = Object.keys(data);
-    const isPatientDoubleBooking = 'PATIENT_DOUBLE_BOOKING' === bookingStatus;
-
-    if (isPatientDoubleBooking) {
-      showToast({
-        critical: true,
-        kind: 'warning',
-        description: t(
-          'doublePatientBooking',
-          'There exist an appointment on the specified service and appointment date',
-        ),
-        title: t('doubleBooking', 'Appointment double booking'),
-      });
-      return;
-    }
 
     const abortController = new AbortController();
     setIsSubmitting(true);
@@ -231,48 +134,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             extensionSlotName="patient-header-slot"
             state={{
               patient,
-              patientUuid: appointmentState.patientUuid,
+              patientUuid: patientAppointment.patientUuid,
             }}
           />
         </div>
       )}
-
-      <div className={styles.childRow}>
-        <div className={styles.row}>
-          <Select
-            labelText={t('frequency', 'Frequency')}
-            id="frequency"
-            className={styles.select}
-            invalidText="Required"
-            value={frequency}
-            onChange={(event) => setFrequency(event.target.value)}
-            light>
-            {mockFrequency.data?.length > 0 &&
-              mockFrequency.data.map((frequency) => (
-                <SelectItem key={frequency.uuid} text={frequency.display} value={frequency.uuid}>
-                  {frequency.display}
-                </SelectItem>
-              ))}
-          </Select>
-
-          {isFullDay ? (
-            <Select
-              labelText={t('day', 'Day')}
-              id="day"
-              invalidText="Required"
-              value={day}
-              onChange={(event) => setDay(event.target.value)}
-              light>
-              {daysOfTheWeek?.length > 0 &&
-                daysOfTheWeek.map((day) => (
-                  <SelectItem key={day} text={day} value={day}>
-                    {day}
-                  </SelectItem>
-                ))}
-            </Select>
-          ) : null}
-        </div>
-      </div>
 
       <div className={styles.inputContainer} id="appointment-place">
         <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
@@ -290,10 +156,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         labelText={t('selectLocation', 'Select a location')}
         id="location"
         invalidText="Required"
-        value={selectedLocation}
+        value={patientAppointment.locationUuid}
         className={styles.inputContainer}
-        onChange={(event) => setSelectedLocation(event.target.value)}
-        light>
+        onChange={(event) => setPatientAppointment({ ...patientAppointment, locationUuid: event.target.value })}>
         {locations?.length > 0 &&
           locations.map((location) => (
             <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
@@ -306,11 +171,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         id="service"
         invalidText="Required"
         labelText={t('selectService', 'Select a service')}
-        light
         className={styles.inputContainer}
-        onChange={(event) => setSelectedService(event.target.value)}
-        value={selectedService}>
-        {!selectedService || selectedService == '--' ? (
+        onChange={(event) => setPatientAppointment({ ...patientAppointment, serviceUuid: event.target.value })}
+        value={patientAppointment.serviceUuid}>
+        {!patientAppointment.serviceUuid || patientAppointment.serviceUuid == '--' ? (
           <SelectItem text={t('chooseService', 'Select service')} value="" />
         ) : null}
         {services?.length > 0 &&
@@ -324,16 +188,22 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       <p>{t('appointmentDateAndTime', 'Appointments Date and Time')}</p>
 
       <div className={styles.row}>
-        <Toggle onToggle={(value) => setIsFullDay(value)} id="allDay" labelA="Off" labelB="On" labelText="All Day" />
+        <Toggle
+          onToggle={(value) => setPatientAppointment({ ...patientAppointment, isFullDay: value })}
+          id="allDay"
+          labelA="Off"
+          labelB="On"
+          labelText="All Day"
+          defaultToggled={patientAppointment.isFullDay}
+        />
         <DatePicker
           dateFormat="d/m/Y"
           datePickerType="single"
           id="visitDate"
-          light
-          minDate={visitDate}
+          minDate={patientAppointment.visitDate}
           className={styles.datePickerInput}
-          onChange={([date]) => setVisitDate(date)}
-          value={visitDate}>
+          onChange={([date]) => setPatientAppointment({ ...patientAppointment, visitDate: date })}
+          value={patientAppointment.visitDate}>
           <DatePickerInput
             id="visitStartDateInput"
             labelText={t('date', 'Date')}
@@ -342,22 +212,21 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           />
         </DatePicker>
       </div>
-      {!isFullDay ? (
+      {!patientAppointment.isFullDay ? (
         <div className={styles.row}>
           <TimePicker
             disabled={!appointmentService}
-            light
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
-            onChange={(event) => setStartDate(event.target.value)}
-            value={startDate}
+            onChange={(event) => setPatientAppointment({ ...patientAppointment, startDateTime: event.target.value })}
+            value={patientAppointment.endDateTime}
             labelText={t('startTime', 'Start Time')}
             id="start-time-picker">
             <TimePickerSelect
               disabled={!appointmentService}
               id="start-time-picker"
-              onChange={(event) => setTimeFormat(event.target.value as amPm)}
-              value={timeFormat}
+              onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
+              value={patientAppointment.timeFormat}
               labelText={t('time', 'Time')}
               aria-label={t('time', 'Time')}>
               <SelectItem value="AM" text="AM" />
@@ -367,18 +236,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
 
           <TimePicker
             disabled={!appointmentService}
-            light
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
-            onChange={(event) => setEndDate(event.target.value)}
-            value={endDate}
+            onChange={(event) => setPatientAppointment({ ...patientAppointment, endDateTime: event.target.value })}
+            value={patientAppointment.endDateTime}
             labelText={t('endTime', 'End Time')}
             id="end-time-picker">
             <TimePickerSelect
               disabled={!appointmentService}
               id="end-time-picker"
-              onChange={(event) => setTimeFormat(event.target.value as amPm)}
-              value={timeFormat}
+              onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
+              value={patientAppointment.timeFormat}
               labelText={t('time', 'Time')}
               aria-label={t('time', 'Time')}>
               <SelectItem value="AM" text="AM" />
@@ -388,7 +256,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       ) : null}
 
-      {selectedService && (
+      {patientAppointment.serviceUuid && (
         <div className={styles.workLoadContainer}>
           <>
             <p className={styles.workLoadTitle}>
@@ -410,14 +278,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
               <TabPanels>
                 <TabPanel style={{ padding: 0 }}>
                   <div className={styles.workLoadCard}>
-                    {weeklyDistribution?.map(({ date, count }, index) => {
+                    {calendarWorkload?.map(({ date, count }, index) => {
                       return (
                         <WorkloadCard
-                          onClick={() => setVisitDate(new Date(date))}
+                          onClick={() => setPatientAppointment({ ...patientAppointment, visitDate: new Date(date) })}
                           key={date}
                           date={dayjs(date).format('DD/MM')}
                           count={count}
-                          isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
+                          isActive={
+                            dayjs(date).format('DD-MM-YYYY') ===
+                            dayjs(patientAppointment.visitDate).format('DD-MM-YYYY')
+                          }
                         />
                       );
                     })}
@@ -425,14 +296,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
                 </TabPanel>
                 <TabPanel style={{ padding: 0 }}>
                   <div className={styles.monthlyWorkLoadCard}>
-                    {monthlyDistribution?.map(({ date, count }) => {
+                    {calendarWorkload?.map(({ date, count }) => {
                       return (
                         <WorkloadCard
-                          onClick={() => setVisitDate(new Date(date))}
+                          onClick={() => setPatientAppointment({ ...patientAppointment, visitDate: new Date(date) })}
                           key={date}
                           date={dayjs(date).format('DD/MM')}
                           count={count}
-                          isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(visitDate).format('DD-MM-YYYY')}
+                          isActive={
+                            dayjs(date).format('DD-MM-YYYY') ===
+                            dayjs(patientAppointment.visitDate).format('DD-MM-YYYY')
+                          }
                         />
                       );
                     })}
@@ -448,11 +322,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         id="appointmentType"
         invalidText="Required"
         labelText={t('selectAppointmentType', 'Select an appointment type')}
-        light
         className={styles.inputContainer}
-        onChange={(event) => setAppointmentType(event.target.value)}
-        value={appointmentType}>
-        {!appointmentType || appointmentType == '--' ? (
+        onChange={(event) => setPatientAppointment({ ...patientAppointment, appointmentKind: event.target.value })}
+        value={patientAppointment.appointmentKind}>
+        {!patientAppointment.appointmentKind || patientAppointment.appointmentKind == '--' ? (
           <SelectItem text={t('selectAppointmentType', 'Select an appointment type')} value="" />
         ) : null}
         {appointmentTypes?.length > 0 &&
@@ -467,11 +340,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           id="appointmentStatus"
           invalidText="Required"
           labelText={t('selectAppointmentStatus', 'Select status')}
-          light
           className={styles.inputContainer}
-          onChange={(event) => setAppointmentStatus(event.target.value)}
-          value={appointmentStatus}>
-          {!appointmentStatus || appointmentStatus == '--' ? (
+          onChange={(event) => setPatientAppointment({ ...patientAppointment, status: event.target.value })}
+          value={patientAppointment.status}>
+          {!patientAppointment.status || patientAppointment.status == '--' ? (
             <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
           ) : null}
           {appointmentStatuses?.length > 0 &&
@@ -487,14 +359,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         id="providers"
         invalidText="Required"
         labelText={t('selectProvider', 'Select a provider')}
-        light
-        className={styles.inputContainer}
-        onChange={(event) => setSelectedProvider(event.target.value)}
-        value={selectedProvider}>
-        {!selectedProvider ? <SelectItem text={t('chooseProvider', 'Select Provider')} value="" /> : null}
+        className={`${styles.inputContainer} ${hiddenFormFields.includes('providers') && styles.hide}`}
+        onChange={(event) => {
+          setPatientAppointment({ ...patientAppointment, providerUuid: event.target.value });
+        }}
+        value={patientAppointment.providerUuid}>
+        {!patientAppointment.providerUuid ? (
+          <SelectItem text={t('chooseProvider', 'Select Provider')} value="" />
+        ) : null}
         {providers?.length > 0 &&
           providers.map((provider) => (
-            <SelectItem key={provider.uuid} text={provider.display} value={provider.display}>
+            <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
               {provider.display}
             </SelectItem>
           ))}
@@ -507,33 +382,26 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         <RadioButtonGroup
           defaultSelected="No"
           orientation="vertical"
-          onChange={(event) => {
-            setReminder(event.toString());
-          }}
+          onChange={(event) => {}}
           name="appointment-reminder-radio-group">
           <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
           <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
         </RadioButtonGroup>
       </div>
 
-      <Select
-        id="reason"
-        invalidText="Required"
-        labelText={t('reasonForChanges', 'Reason for change')}
-        light
-        className={styles.inputContainer}
-        onChange={(event) => setAppointmentComment(event.target.value)}
-        value={appointmentComment}>
-        {!appointmentComment || appointmentComment == '--' ? (
-          <SelectItem text={t('reasonForChanges', 'Reason for change')} value="" />
-        ) : null}
-        {appointmentComments?.length > 0 &&
-          appointmentComments.map((comments) => (
-            <SelectItem key={comments} text={comments} value={comments}>
-              {comments}
-            </SelectItem>
-          ))}
-      </Select>
+      <Layer>
+        <TextArea
+          cols={50}
+          id="comment"
+          invalidText="A valid value is required"
+          labelText={t('comment', 'Comment')}
+          placeholder={t('typeInComments', 'Type in appointment comment')}
+          rows={4}
+          value={patientAppointment.comments}
+          onChange={(event) => setPatientAppointment({ ...patientAppointment, comments: event.target.value })}
+        />
+      </Layer>
+
       <ButtonSet>
         <Button onClick={closeOverlay} className={styles.button} kind="secondary">
           {t('discard', 'Discard')}
@@ -541,7 +409,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         <Button
           onClick={handleSubmit}
           className={styles.button}
-          disabled={isSubmitting || isMissingRequirements}
+          disabled={isSubmitting || !patientAppointment.serviceUuid}
           kind="primary"
           type="submit">
           {t('save', 'Save')}

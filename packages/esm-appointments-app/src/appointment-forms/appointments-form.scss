@@ -22,12 +22,8 @@
   margin-right: 60%;
 }
 
-.childRow {
-  margin-left: spacing.$spacing-05;
-}
-
 .inputContainer {
-  margin: spacing.$spacing-05;
+  margin: spacing.$spacing-05 0;
 }
 
 .button {
@@ -73,4 +69,8 @@
 }
 .input {
   width: 13.5rem;
+}
+
+.hide {
+  display: none;
 }
