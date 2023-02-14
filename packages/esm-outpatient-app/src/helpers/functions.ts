@@ -52,3 +52,9 @@ export const getGender = (gender, t) => {
       return gender;
   }
 };
+
+export function generateVisitQueueNumber(service, maxVisitNumber) {
+  const servicePrefix = service?.toUpperCase().substring(0, 3);
+  const visitNumber = (maxVisitNumber + 1)?.toString().padStart(4, '0');
+  return servicePrefix + '-' + visitNumber;
+}

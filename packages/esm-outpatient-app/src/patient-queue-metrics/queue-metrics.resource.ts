@@ -26,6 +26,7 @@ export function useServices(location: string) {
   return {
     services: data ? data?.data?.results?.map((service) => service.display) : [],
     allServices: data ? data?.data.results : [],
+    isLoading: isLoading,
   };
 }
 
