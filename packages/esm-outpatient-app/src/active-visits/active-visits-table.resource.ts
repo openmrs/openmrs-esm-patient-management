@@ -12,10 +12,11 @@ import {
   Visit,
 } from '@openmrs/esm-framework';
 import last from 'lodash-es/last';
-import { MappedServiceQueueEntry, QueueServiceInfo } from '../types';
+import { Identifer, MappedServiceQueueEntry, QueueServiceInfo } from '../types';
 import isEmpty from 'lodash-es/isEmpty';
 import { useTranslation } from 'react-i18next';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { string } from 'yup';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -40,6 +41,7 @@ export interface VisitQueueEntry {
       birthdate: string;
     };
     phoneNumber: string;
+    identifiers: Array<Identifer>;
   };
   priority: {
     display: QueuePriority;
@@ -94,6 +96,8 @@ export interface MappedVisitQueueEntry {
   queueEntryUuid: string;
   queueLocation: string;
   sortWeight: number;
+  visitQueueNumber: string;
+  identifiers: Array<Identifer>;
 }
 
 interface UseVisitQueueEntries {
@@ -175,6 +179,10 @@ export function usePriority() {
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
+  const config = useConfig();
+  const {
+    concepts: { visitQueueNumberAttributeUuid },
+  } = config;
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();
@@ -226,6 +234,10 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     queueUuid: visitQueueEntry.queueEntry.queue.uuid,
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
     sortWeight: visitQueueEntry.queueEntry.sortWeight,
+    visitQueueNumber: visitQueueEntry?.visit?.attributes?.find(
+      (e) => e.attributeType.uuid === visitQueueNumberAttributeUuid,
+    )?.value,
+    identifiers: visitQueueEntry.queueEntry.patient?.identifiers,
   });
 
   let mappedVisitQueueEntries;

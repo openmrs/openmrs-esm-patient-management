@@ -31,6 +31,16 @@ export const configSchema = {
       _description: 'The UUID of the default status for the queues eg Waiting.',
       _default: '136203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    defaultTransitionStatus: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
+      _default: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    visitQueueNumberAttributeUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the visit attribute that contains the visit queue number.',
+      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
       _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -71,11 +81,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    visitQueueNumberAttributeUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the visit attribute that contains the visit queue number.',
-      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -94,6 +99,14 @@ export const configSchema = {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+  },
+  defaultIdentifierTypes: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.String,
+    },
+    _description: 'The identifier types to be display on all patient search result page',
+    _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
   },
 };
 
@@ -121,6 +134,7 @@ export interface ConfigObject {
   biometrics: BiometricsConfigObject;
   showQueueTableTab: boolean;
   appointmentStatuses: Array<string>;
+  defaultIdentifierTypes: Array<string>;
 }
 
 export interface OutpatientConfig {

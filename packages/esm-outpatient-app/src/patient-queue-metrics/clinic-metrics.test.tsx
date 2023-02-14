@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 
 import ClinicMetrics from './clinic-metrics.component';
 import { mockMetrics, mockServiceTypes } from '../../../../__mocks__/metrics.mock';
@@ -10,6 +10,7 @@ import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockedUseConfig = useConfig as jest.Mock;
 
 jest.mock('./queue-metrics.resource.ts', () => {
   const originalModule = jest.requireActual('./queue-metrics.resource.ts');
@@ -31,6 +32,13 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('Clinic metrics', () => {
+  beforeEach(() =>
+    mockedUseConfig.mockReturnValue({
+      concepts: {
+        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+      },
+    } as ConfigObject),
+  );
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     const user = userEvent.setup();
 

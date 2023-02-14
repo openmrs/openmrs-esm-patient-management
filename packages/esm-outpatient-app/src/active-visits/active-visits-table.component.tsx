@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -36,13 +36,10 @@ import {
   navigate,
   interpolateUrl,
   isDesktop,
-  useSession,
-  useLocations,
   ExtensionSlot,
   usePagination,
   useConfig,
   ConfigObject,
-  ConfigurableLink,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -54,7 +51,6 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
-import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -68,6 +64,7 @@ import { buildStatusString, formatWaitTime, getTagType } from '../helpers/functi
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
+import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -135,16 +132,21 @@ function ActiveVisitsTable() {
       },
       {
         id: 1,
+        header: t('queueNumber', 'QueueNumber'),
+        key: 'queueNumber',
+      },
+      {
+        id: 2,
         header: t('priority', 'Priority'),
         key: 'priority',
       },
       {
-        id: 2,
+        id: 3,
         header: t('status', 'Status'),
         key: 'status',
       },
       {
-        id: 3,
+        id: 4,
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
@@ -166,6 +168,9 @@ function ActiveVisitsTable() {
             {entry.name}
           </PatientNameLink>
         ),
+      },
+      queueNumber: {
+        content: <span className={styles.statusContainer}>{entry?.visitQueueNumber}</span>,
       },
       priority: {
         content: (
@@ -330,6 +335,9 @@ function ActiveVisitsTable() {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
+                          <TableCell className="cds--table-column-menu">
+                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                          </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
                           </TableCell>
