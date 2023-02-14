@@ -41,9 +41,6 @@ export const configSchema = {
   },
   defaultIdentifier: {
     _type: Type.String,
-    _elements: {
-      _type: Type.String,
-    },
     _description: 'Identifier to be shown in the event defaultIdentifierTypes does is empty',
     _default: 'OpenMRS ID',
   },
