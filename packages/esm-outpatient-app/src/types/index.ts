@@ -393,3 +393,16 @@ export interface Identifer {
     display: string;
   };
 }
+
+export interface NewVisitPayload {
+  uuid?: string;
+  location: string;
+  patient?: string;
+  startDatetime: Date;
+  visitType: string;
+  stopDatetime?: Date;
+  attributes?: Array<{
+    attributeType: string;
+    value: string;
+  }>;
+}

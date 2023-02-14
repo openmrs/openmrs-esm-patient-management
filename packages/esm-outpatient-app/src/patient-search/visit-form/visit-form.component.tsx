@@ -20,6 +20,7 @@ import {
   FormGroup,
   RadioButton,
   RadioButtonGroup,
+  Dropdown,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +30,6 @@ import {
   ExtensionSlot,
   useLayoutType,
   useVisitTypes,
-  NewVisitPayload,
   saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
@@ -39,18 +39,24 @@ import {
   ConfigObject,
 } from '@openmrs/esm-framework';
 import styles from './visit-form.scss';
-import { SearchTypes, PatientProgram, QueueEntryPayload } from '../../types/index';
+import { SearchTypes, PatientProgram, QueueEntryPayload, NewVisitPayload } from '../../types/index';
 import BaseVisitType from './base-visit-type.component';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { saveQueueEntry } from './queue.resource';
-import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
+import {
+  usePriority,
+  useServiceQueueEntries,
+  useStatus,
+  useVisitQueueEntries,
+} from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { useSWRConfig } from 'swr';
 import isNull from 'lodash-es/isNull';
 import head from 'lodash-es/head';
+import { generateVisitQueueNumber } from '../../helpers/functions';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -64,12 +70,12 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(0);
+  const config = useConfig() as ConfigObject;
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
@@ -82,17 +88,27 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [priority, setPriority] = useState('');
   const { priorities } = usePriority();
   const { statuses } = useStatus();
-  const { allServices } = useServices(selectedQueueLocation);
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
   const { queueLocations } = useQueueLocations();
-  const config = useConfig() as ConfigObject;
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
+  const { allServices, isLoading: isLoadingServices } = useServices(selectedQueueLocation);
+  const [selectedServiceName, setSelectedServiceName] = useState('');
+  const { visitQueueEntriesCount } = useVisitQueueEntries(selectedServiceName, selectedQueueLocation);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+      setVisitType(allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null);
     }
-  }, [locations, sessionUser, priority]);
+  }, [locations, sessionUser, allVisitTypes]);
+
+  useEffect(() => {
+    if (!isLoadingServices) {
+      setSelectedService(allServices.length > 0 ? allServices[0].uuid : '');
+      setSelectedServiceName(allServices.length > 0 ? allServices[0].display : '');
+    }
+  }, [isLoadingServices, allServices]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -111,7 +127,14 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       setIsSubmitting(true);
 
       const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
+      const visitQueueEntryNumber = config.generateVisitQueueNumber
+        ? generateVisitQueueNumber(selectedServiceName, visitQueueEntriesCount)
+        : '';
 
+      const visitQueueNumberAttribute = {
+        attributeType: config.visitQueueNumberAttributeUuid,
+        value: visitQueueEntryNumber,
+      };
       const payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
@@ -121,6 +144,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         ),
         visitType: visitType,
         location: selectedLocation,
+        attributes: [visitQueueNumberAttribute],
       };
 
       const abortController = new AbortController();
@@ -476,6 +500,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 id="service"
                 invalidText="Required"
                 value={service}
+                defaultSelected={service}
                 onChange={(event) => setSelectedService(event.target.value)}>
                 {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
                 {allServices?.length > 0 &&

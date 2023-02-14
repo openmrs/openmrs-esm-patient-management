@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
 import EmptyDataIllustration from '../empty-data-illustration.component';
 import styles from './base-visit-type.scss';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;
   patientUuid: string;
-  visitTypes;
+  visitTypes: Array<VisitType>;
 }
 
 const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) => {
@@ -52,11 +52,11 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
           <RadioButtonGroup
             className={styles.radioButtonGroup}
-            defaultSelected="default-selected"
+            defaultSelected={results?.length === 1 && results[0].uuid}
             orientation="vertical"
             onChange={onChange}
             name="radio-button-group"
-            valueSelected="default-selected">
+            valueSelected={results?.length === 1 && results[0].uuid}>
             {results.map(({ uuid, display, name }) => (
               <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
             ))}
