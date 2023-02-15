@@ -24,7 +24,7 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry, closeModal 
 
   return (
     <Button
-      kind={`${queueEntry.statusUuid === defaultTransitionStatus ? 'danger--ghost' : 'ghost'}`}
+      kind={`${queueEntry?.statusUuid === defaultTransitionStatus ? 'danger--ghost' : 'ghost'}`}
       onClick={launchTransitionPriorityModal}
       iconDescription={t('call', 'Call')}
       hasIconOnly>
