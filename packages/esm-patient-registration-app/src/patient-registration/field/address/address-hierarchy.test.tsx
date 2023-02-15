@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { AddressHierarchy } from './address-hierarchy.component';
 import { Formik, Form } from 'formik';
 import { Resources, ResourcesContext } from '../../../offline.resources';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -34,7 +35,9 @@ describe('address hierarchy', () => {
       <ResourcesContext.Provider value={{ addressTemplate: mockResponse } as Resources}>
         <Formik initialValues={{}} onSubmit={null}>
           <Form>
-            <AddressHierarchy />
+            <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() }}>
+              <AddressHierarchy />
+            </PatientRegistrationContext.Provider>
           </Form>
         </Formik>
       </ResourcesContext.Provider>,
