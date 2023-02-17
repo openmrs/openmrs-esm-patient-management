@@ -18,7 +18,7 @@ import {
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { updateQueueEntry, usePriority, useServices, useStatus } from './active-visits-table.resource';
+import { updateQueueEntry, usePriority, useServices } from './active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './change-status-dialog.scss';
 import { useSWRConfig } from 'swr';
@@ -33,18 +33,9 @@ interface ChangeStatusDialogProps {
 const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
-  const [status, setStatus] = useState(queueEntry?.statusUuid);
   const [priority, setPriority] = useState(queueEntry?.priorityUuid);
-  const [visitUuid, setVisitUuid] = useState(queueEntry?.visitUuid);
-  const [previousQueueUuid, setPreviousQueueUuid] = useState(queueEntry?.queueUuid);
   const [newQueueUuid, setNewQueueUuid] = useState('');
-  const [queueEntryUuid, setQueueEntryUuid] = useState(queueEntry?.queueEntryUuid);
-  const [patientUuid, setPatientUuid] = useState(queueEntry?.patientUuid);
-  const [patientName, setPatientName] = useState(queueEntry?.name);
-  const [patientAge, setPatientAge] = useState(queueEntry?.patientAge);
-  const [patientSex, setPatientSex] = useState(queueEntry?.patientSex);
   const { priorities } = usePriority();
-  const { statuses, isLoading } = useStatus();
   const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueEntry?.queueLocation);
@@ -52,66 +43,64 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const { queueLocations } = useQueueLocations();
   const [editLocation, setEditLocation] = useState(false);
 
-  const changeQueueStatus = useCallback(() => {
-    const defaultStatus = config.concepts.defaultStatusConceptUuid;
-    const defaultPriority = config.concepts.defaultPriorityConceptUuid;
-    setEditLocation(false);
-    if (priority === '') {
-      setPriority(defaultPriority);
-    }
-    if (status === '') {
-      setStatus(defaultStatus);
-    }
-    const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
-    const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
-    const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
-    updateQueueEntry(
-      visitUuid,
-      previousQueueUuid,
-      newQueueUuid,
-      queueEntryUuid,
-      patientUuid,
-      priority,
-      status,
-      endDate,
-      sortWeight,
-      new AbortController(),
-    ).then(
-      ({ status }) => {
-        if (status === 201) {
-          showToast({
+  const changeQueueStatus = useCallback(
+    (event) => {
+      event.preventDefault();
+      const defaultPriority = config.concepts.defaultPriorityConceptUuid;
+      setEditLocation(false);
+      const queuePriority = priority === '' ? defaultPriority : priority;
+      const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
+      const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
+      const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
+      updateQueueEntry(
+        queueEntry.visitUuid,
+        queueEntry.queueUuid,
+        event.target['service']?.value,
+        queueEntry.queueEntryUuid,
+        queueEntry.patientUuid,
+        queuePriority,
+        queueEntry.statusUuid,
+        endDate,
+        sortWeight,
+        new AbortController(),
+      ).then(
+        ({ status }) => {
+          if (status === 201) {
+            showToast({
+              critical: true,
+              title: t('updateEntry', 'Update entry'),
+              kind: 'success',
+              description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
+            });
+            closeModal();
+            mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
+          }
+        },
+        (error) => {
+          showNotification({
+            title: t('queueEntryUpdateFailed', 'Error updating queue entry status'),
+            kind: 'error',
             critical: true,
-            title: t('updateEntry', 'Update entry'),
-            kind: 'success',
-            description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
+            description: error?.message,
           });
-          closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
-        }
-      },
-      (error) => {
-        showNotification({
-          title: t('queueEntryUpdateFailed', 'Error updating queue entry status'),
-          kind: 'error',
-          critical: true,
-          description: error?.message,
-        });
-      },
-    );
-  }, [
-    priority,
-    status,
-    visitUuid,
-    previousQueueUuid,
-    newQueueUuid,
-    queueEntryUuid,
-    patientUuid,
-    priorities,
-    statuses,
-    t,
-    closeModal,
-    mutate,
-  ]);
+        },
+      );
+    },
+    [
+      config.concepts.defaultPriorityConceptUuid,
+      config.concepts.emergencyPriorityConceptUuid,
+      priority,
+      queueEntry.visitUuid,
+      queueEntry.queueUuid,
+      queueEntry.queueEntryUuid,
+      queueEntry.patientUuid,
+      queueEntry.statusUuid,
+      t,
+      closeModal,
+      mutate,
+      selectedQueueLocation,
+    ],
+  );
 
   if (Object.keys(queueEntry)?.length === 0) {
     return <ModalHeader closeModal={closeModal} title={t('patientNotInQueue', 'The patient is not in the queue')} />;
@@ -120,15 +109,16 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   if (Object.keys(queueEntry)?.length > 0) {
     return (
       <div>
-        <ModalHeader
-          closeModal={closeModal}
-          title={t('movePatientToNextService', 'Move patient to the next service?')}
-        />
-        <ModalBody>
-          <Form onSubmit={changeQueueStatus}>
+        <Form onSubmit={changeQueueStatus}>
+          <ModalHeader
+            closeModal={closeModal}
+            title={t('movePatientToNextService', 'Move patient to the next service?')}
+          />
+          <ModalBody>
             <div className={styles.modalBody}>
               <h5>
-                {patientName} &nbsp; · &nbsp;{patientSex} &nbsp; · &nbsp;{patientAge}&nbsp;{t('years', 'Years')}
+                {queueEntry.name} &nbsp; · &nbsp;{queueEntry.patientSex} &nbsp; · &nbsp;{queueEntry.patientAge}&nbsp;
+                {t('years', 'Years')}
               </h5>
             </div>
             <section>
@@ -161,7 +151,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                 {!newQueueUuid && editLocation === true ? (
                   <SelectItem text={t('selectService', 'Select a service')} value="" />
                 ) : null}
-                {!previousQueueUuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
+                {!queueEntry.queueUuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
                 {services?.length > 0 &&
                   services.map((service) => (
                     <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
@@ -192,14 +182,14 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                 )}
               </ContentSwitcher>
             </section>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button kind="secondary" onClick={closeModal}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button onClick={changeQueueStatus}>{t('moveToNextService', 'Move to next service')}</Button>
-        </ModalFooter>
+          </ModalBody>
+          <ModalFooter>
+            <Button kind="secondary" onClick={closeModal}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button type="submit">{t('moveToNextService', 'Move to next service')}</Button>
+          </ModalFooter>
+        </Form>
       </div>
     );
   }
