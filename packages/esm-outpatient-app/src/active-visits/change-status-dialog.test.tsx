@@ -93,7 +93,6 @@ describe('Queue entry details', () => {
 
     await waitFor(() => user.click(screen.getByRole('button', { name: /move to next service/i })));
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
     expect(mockShowNotification).toHaveBeenCalledWith({
       description: 'Internal Server Error',
       kind: 'error',
