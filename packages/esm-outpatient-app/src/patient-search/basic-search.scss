@@ -12,13 +12,6 @@
   flex-grow: 1;
 }
 
-.searchInput {
-  input:focus {
-    outline: none;
-    border: spacing.$spacing-01 solid var(--omrs-color-brand-orange);
-  }
-}
-
 .tileContainer {
   :global(.omrs-breakpoint-gt-tablet) & {
     margin: 0 1.5rem 0;
