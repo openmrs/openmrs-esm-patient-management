@@ -21,7 +21,7 @@ This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/le
 
 To install the dependancies, run:
 ```bash
-npx lerna bootstrap
+yarn install
 ```
 
 To set up environment variables for the project, follow these steps:
