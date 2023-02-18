@@ -28,7 +28,7 @@ To set up environment variables for the project, follow these steps:
 
 1. Create a copy of the .env.example file by running the following command:
   ```bash
-  cp .env.example .env
+  cp example.env .env
   ```
 2. Open the newly created .env file in the root of the project.
 3. Add the environment variables you need. 
