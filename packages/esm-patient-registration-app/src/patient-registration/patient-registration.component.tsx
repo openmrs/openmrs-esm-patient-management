@@ -78,21 +78,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       if (!addressTemplateXml) {
         return;
       }
-      const { addressFieldValues, addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
+      const { addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
       setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
-      // `=== false` is here on purpose (`inEditMode` can be null).
-      // We *only* want to set initial address field values when *creating* a patient.
-      // We must wait until after loading for this info.
-      if (inEditMode === false) {
-        for (const { name, defaultValue } of addressFieldValues) {
-          if (!initialAddressFieldValues[name]) {
-            initialAddressFieldValues[name] = defaultValue;
-          }
-        }
-        fieldDefinition?.map((field) => (initialAddressFieldValues[field.id] = ''));
-
-        setInitialFormValues({ ...initialFormValues, ...initialAddressFieldValues });
-      }
     }
   }, [inEditMode, addressTemplate, initialAddressFieldValues]);
 
