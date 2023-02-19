@@ -36,8 +36,6 @@ export class registrationAndEditPage {
   readonly emailInput = () => this.page.locator('#email');
   readonly createPatientButton = () => this.page.locator('button[type=submit]');
 
-  readonly updateButton = () => this.page.locator('button:');
-
   async goto(editPatientUuid?: string) {
     await this.page.goto(editPatientUuid ? `patient/${editPatientUuid}/edit` : 'patient-registration');
   }
