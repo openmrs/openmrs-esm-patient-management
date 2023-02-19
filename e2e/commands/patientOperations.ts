@@ -1,4 +1,5 @@
 import { APIRequestContext, expect } from '@playwright/test';
+import { api } from '../fixtures';
 
 export interface Patient {
   uuid: string;
@@ -9,7 +10,7 @@ export interface Patient {
     display: string;
     gender: string;
     age: number;
-    birthdate: Date;
+    birthdate: string;
     birthdateEstimated: boolean;
     dead: boolean;
     deathDate?: any;
@@ -85,6 +86,11 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
     },
   });
   await expect(patientRes.ok()).toBeTruthy();
+  return await patientRes.json();
+};
+
+export const getPatient = async (api: APIRequestContext, uuid: string): Promise<Patient> => {
+  const patientRes = await api.get(`rest/v1/patient/${uuid}`);
   return await patientRes.json();
 };
 
