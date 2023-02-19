@@ -19,7 +19,7 @@ export interface PatientRegistrationFormValues {
   email?: string;
 }
 
-export class PatientRegistrationPage {
+export class registrationAndEditPage {
   constructor(readonly page: Page) {}
 
   readonly givenNameInput = () => this.page.locator('#givenName');
@@ -35,6 +35,8 @@ export class PatientRegistrationPage {
   readonly phoneInput = () => this.page.locator('#phone');
   readonly emailInput = () => this.page.locator('#email');
   readonly createPatientButton = () => this.page.locator('button[type=submit]');
+
+  readonly updateButton = () => this.page.locator('button:');
 
   async goto(editPatientUuid?: string) {
     await this.page.goto(editPatientUuid ? `patient/${editPatientUuid}/edit` : 'patient-registration');
