@@ -3722,7 +3722,7 @@ __metadata:
     "@babel/core": ^7.11.6
     "@carbon/react": ^1.12.0
     "@openmrs/esm-framework": next
-    "@playwright/test": ^1.28.1
+    "@playwright/test": ^1.30.0
     "@swc/core": ^1.2.165
     "@swc/jest": ^0.2.20
     "@testing-library/dom": ^8.13.0
@@ -3899,15 +3899,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.28.1":
-  version: 1.28.1
-  resolution: "@playwright/test@npm:1.28.1"
+"@playwright/test@npm:^1.30.0":
+  version: 1.30.0
+  resolution: "@playwright/test@npm:1.30.0"
   dependencies:
     "@types/node": "*"
-    playwright-core: 1.28.1
+    playwright-core: 1.30.0
   bin:
     playwright: cli.js
-  checksum: dc39dfdf848171a6c65fc32a9dbc95162684a4a1e3401dd157d7d6822a065d8dcb96b2484fc3b223baea4da774450fddaeaa6d4d21546d17d45f01884fa8d7c5
+  checksum: 777432ac9cf3d0341fcd8dd265cb4c0775619d0ef48252b32a7c4d632d8038449756ec34bec873828cadbc08ba634e81176cb193304d34e699472771b7fb4d1e
   languageName: node
   linkType: hard
 
@@ -15607,12 +15607,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.28.1":
-  version: 1.28.1
-  resolution: "playwright-core@npm:1.28.1"
+"playwright-core@npm:1.30.0":
+  version: 1.30.0
+  resolution: "playwright-core@npm:1.30.0"
   bin:
     playwright: cli.js
-  checksum: 8899e0d65de43ee10fadc171e0d48cd514bb574f3505478700094afa8a6e0dcd888a5c87af22acf31ebad455ada1327028909c42e20b8e25908b6255dc143bf0
+  checksum: 4c5693f27245a1168f94708ecd8e1eb0d200de435b25cc07cfa25b97a094633818954dc00baf24e0ff551825f672050b83d1309362c1f97213fe8ebd2a147ed9
   languageName: node
   linkType: hard
 
