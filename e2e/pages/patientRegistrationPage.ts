@@ -38,7 +38,6 @@ export class PatientRegistrationPage {
 
   async goto(editPatientUuid?: string) {
     await this.page.goto(editPatientUuid ? `patient/${editPatientUuid}/edit` : 'patient-registration');
-    await this.page.locator('button:has-text("Configure")').waitFor(); // wait for page to load fully (when identifers are available)
   }
 
   async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {

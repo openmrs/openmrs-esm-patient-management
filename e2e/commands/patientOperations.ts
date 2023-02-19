@@ -10,7 +10,7 @@ export interface Patient {
     display: string;
     gender: string;
     age: number;
-    birthdate: Date;
+    birthdate: string;
     birthdateEstimated: boolean;
     dead: boolean;
     deathDate?: any;
