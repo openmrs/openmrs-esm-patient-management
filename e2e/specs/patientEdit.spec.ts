@@ -1,6 +1,6 @@
 import { test } from '../core';
 import { expect } from '@playwright/test';
-import { PatientRegistrationFormValues, registrationAndEditPage } from '../pages';
+import { PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
 import { deletePatient, generateRandomPatient, getPatient, Patient } from '../commands';
 import dayjs from 'dayjs';
 
@@ -11,7 +11,7 @@ test.beforeEach(async ({ api }) => {
 
 test('should be able to edit a patient', async ({ page, api }) => {
   test.setTimeout(5 * 60 * 1000);
-  const patientEditPage = new registrationAndEditPage(page);
+  const patientEditPage = new RegistrationAndEditPage(page);
 
   await patientEditPage.goto(patient.uuid);
 
