@@ -20,6 +20,8 @@ import dayjs from 'dayjs';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import { usePastVisits } from '../past-visit/past-visit.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
+import { findObsByConceptUUID } from '../helpers/functions';
+
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
@@ -46,6 +48,8 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     new AbortController(),
   );
   const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
+  const obsToDisplay =
+    !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
 
   const launchEditPriorityModal = useCallback(() => {
     const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
@@ -136,6 +140,13 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
               {!loading && !visits && t('none', 'None')}
               {visits && formatDatetime(parseDate(visits?.startDatetime))}
             </p>
+            {obsToDisplay?.length
+              ? obsToDisplay.map((o) => (
+                  <p className={styles.p}>
+                    {o.concept.display} : &nbsp; {o.value.display}
+                  </p>
+                ))
+              : ''}
             <p className={styles.p}>
               {t('tcaDate', 'Tca date')} : &nbsp; {isLoading && t('loading', 'Loading...')}
               {!isLoading && !upcomingAppointment && t('none', 'None')}
