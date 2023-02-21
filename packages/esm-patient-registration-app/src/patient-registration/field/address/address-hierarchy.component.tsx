@@ -5,14 +5,10 @@ import { ComboInput } from '../../input/combo-input/combo-input.component';
 import { SkeletonText } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import AddressSearchComponent from './address-search.component';
-import isEmpty from 'lodash-es/isEmpty';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 
-export function getFieldValue(field: string, doc: XMLDocument) {
-  const fieldElement = doc.getElementsByName(field)[0];
-  return fieldElement ? fieldElement.getAttribute('value') : null;
-}
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
   return parser.parseFromString(xmlDockAsString, 'text/xml');
@@ -40,11 +36,18 @@ export const AddressHierarchy: React.FC = () => {
     },
   } = config;
 
-  const layout = useLayoutType();
+  const { setFieldValue, values } = useContext(PatientRegistrationContext);
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
-    const elementDefaults = getTagAsDocument('elementdefaults', templateXmlDoc);
+    const elementDefaults = getTagAsDocument('elementDefaults', templateXmlDoc);
+    const defaultValuesEntries = elementDefaults.getElementsByTagName('entry');
+    const defaultValues = Object.fromEntries(
+      Array.prototype.map.call(defaultValuesEntries, (entry: Element) => {
+        const [name, value] = Array.from(entry.getElementsByTagName('string'));
+        return [name.innerHTML, value.innerHTML];
+      }),
+    );
     const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
     const properties =
       Array.from(nameMappings.getElementsByTagName('property')).length > 0
@@ -66,7 +69,10 @@ export const AddressHierarchy: React.FC = () => {
         t('country', 'Country')
         t('countyDistrict', 'District')
       */
-      const value = getFieldValue(name, elementDefaults);
+      const value = defaultValues[name];
+      if (!values?.address?.[name] && value) {
+        setFieldValue(`address.${name}`, value);
+      }
       return {
         id: name,
         name,
@@ -75,7 +81,7 @@ export const AddressHierarchy: React.FC = () => {
       };
     });
     setAddressLayout(propertiesObj);
-  }, [t, addressTemplateXml]);
+  }, [t, addressTemplateXml, setFieldValue, values]);
 
   if (!addressTemplate) {
     return (
