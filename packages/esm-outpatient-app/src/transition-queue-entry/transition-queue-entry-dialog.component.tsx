@@ -19,10 +19,16 @@ import styles from './transition-queue-entry-dialog.scss';
 import dayjs from 'dayjs';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import { usePastVisits } from '../past-visit/past-visit.resource';
+import { requeueQueueEntry } from './transition-queue-entry.resource';
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
 }
+
+enum priorityComment {
+  REQUEUED = 'Requeued',
+}
+
 const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
@@ -79,6 +85,36 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     );
   }, [queueEntry]);
 
+  const handleRequeuePatient = useCallback(() => {
+    requeueQueueEntry(
+      priorityComment.REQUEUED,
+      queueEntry?.queueUuid,
+      queueEntry?.queueEntryUuid,
+      new AbortController(),
+    ).then(
+      ({ status }) => {
+        if (status === 200) {
+          showToast({
+            critical: true,
+            title: t('success', 'Success'),
+            kind: 'success',
+            description: t('patientRequeued', 'Patient has been requeued'),
+          });
+          closeModal();
+          mutate(`/ws/rest/v1/visit-queue-entry?location=${queueEntry?.queueLocation}&v=full`);
+        }
+      },
+      (error) => {
+        showNotification({
+          title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
+          kind: 'error',
+          critical: true,
+          description: error?.message,
+        });
+      },
+    );
+  }, []);
+
   return (
     <div>
       <ModalHeader closeModal={closeModal} title={t('admitPatient', 'Admit patient')} />
@@ -116,7 +152,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         </div>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
+        <Button kind="secondary" onClick={() => handleRequeuePatient()}>
           {t('requeue', 'Requeue')}
         </Button>
         <Button onClick={() => launchEditPriorityModal()}>{t('admit', 'Admit')}</Button>

@@ -131,6 +131,7 @@
   "patientList": "Patient list",
   "patientName": "Patient name",
   "patientNotInQueue": "The patient is not in the queue",
+  "patientRequeued": "Patient has been requeued",
   "patients": "Patients",
   "patientsCurrentlyInQueue": "Patients currently in queue",
   "personalDetails": "Personal Details",

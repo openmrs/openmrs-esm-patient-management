@@ -4,6 +4,7 @@ import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.reso
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
+import styles from './edit-entry.scss';
 
 interface EditMenuProps {
   queueEntry: MappedVisitQueueEntry;
@@ -20,8 +21,8 @@ const EditMenu: React.FC<EditMenuProps> = ({ queueEntry, closeModal }) => {
 
   return (
     <Button
-      kind="ghost"
       onClick={launchEditPriorityModal}
+      className={styles.editIcon}
       iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
       hasIconOnly
       renderIcon={(props) => <Collaborate size={16} {...props} />}
