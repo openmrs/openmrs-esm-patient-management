@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
-import { mockPatient, mockServices, mockProviders } from '../../__mocks__/appointments.mock';
+import { mockPatient, mockServices, mockProviders } from '../../../../__mocks__/appointments.mock';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 import { MappedAppointment } from '../types';
