@@ -40,6 +40,7 @@ import {
   usePagination,
   useConfig,
   ConfigObject,
+  UserHasAccess,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -242,18 +243,32 @@ function ActiveVisitsTable() {
         {useQueueTableTabs === false ? (
           <>
             <div className={styles.headerBtnContainer}>
-              <Button
-                size="sm"
-                kind="ghost"
-                renderIcon={(props) => <ArrowRight size={16} {...props} />}
-                onClick={(selectedPatientUuid) => {
-                  setShowOverlay(true);
-                  setView(SearchTypes.QUEUE_SERVICE_FORM);
-                  setViewState({ selectedPatientUuid });
-                }}
-                iconDescription={t('addNewQueue', 'Add new queue')}>
-                {t('addNewService', 'Add new service')}
-              </Button>
+              <UserHasAccess privilege="Manage Forms">
+                <Button
+                  size="sm"
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={(selectedPatientUuid) => {
+                    setShowOverlay(true);
+                    setView(SearchTypes.QUEUE_SERVICE_FORM);
+                    setViewState({ selectedPatientUuid });
+                  }}
+                  iconDescription={t('addNewQueue', 'Add new queue')}>
+                  {t('addNewService', 'Add new service')}
+                </Button>
+                <Button
+                  size="sm"
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={(selectedPatientUuid) => {
+                    setShowOverlay(true);
+                    setView(SearchTypes.QUEUE_ROOM_FORM);
+                    setViewState({ selectedPatientUuid });
+                  }}
+                  iconDescription={t('addNewQueueRoom', 'Add new queue room')}>
+                  {t('addNewServiceRoom', 'Add new service room')}
+                </Button>
+              </UserHasAccess>
             </div>
             <div className={styles.headerContainer}>
               <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
@@ -431,18 +446,32 @@ function ActiveVisitsTable() {
       {useQueueTableTabs === false ? (
         <>
           <div className={styles.headerBtnContainer}>
-            <Button
-              size="sm"
-              kind="ghost"
-              renderIcon={(props) => <ArrowRight size={16} {...props} />}
-              onClick={(selectedPatientUuid) => {
-                setShowOverlay(true);
-                setView(SearchTypes.QUEUE_SERVICE_FORM);
-                setViewState({ selectedPatientUuid });
-              }}
-              iconDescription={t('addNewQueue', 'Add new queue')}>
-              {t('addNewService', 'Add new service')}
-            </Button>
+            <UserHasAccess privilege="Manage Forms">
+              <Button
+                size="sm"
+                kind="ghost"
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                onClick={(selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.QUEUE_SERVICE_FORM);
+                  setViewState({ selectedPatientUuid });
+                }}
+                iconDescription={t('addNewQueue', 'Add new queue')}>
+                {t('addNewService', 'Add new service')}
+              </Button>
+              <Button
+                size="sm"
+                kind="ghost"
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                onClick={(selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.QUEUE_ROOM_FORM);
+                  setViewState({ selectedPatientUuid });
+                }}
+                iconDescription={t('addNewQueueRoom', 'Add new queue room')}>
+                {t('addNewServiceRoom', 'Add new service room')}
+              </Button>
+            </UserHasAccess>
           </div>
           <div className={styles.headerContainer}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>

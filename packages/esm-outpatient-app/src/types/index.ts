@@ -7,6 +7,7 @@ export enum SearchTypes {
   SCHEDULED_VISITS = 'scheduled-visits',
   VISIT_FORM = 'visit_form',
   QUEUE_SERVICE_FORM = 'queue_service_form',
+  QUEUE_ROOM_FORM = 'queue_room_form',
 }
 
 export interface Patient {
