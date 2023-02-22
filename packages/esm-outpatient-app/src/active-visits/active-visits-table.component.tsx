@@ -1,4 +1,4 @@
-import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -41,6 +41,8 @@ import {
   useConfig,
   ConfigObject,
   UserHasAccess,
+  useSession,
+  showModal,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -58,14 +60,15 @@ import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
   useSelectedServiceName,
-  useSelectedServiceUuid,
   useSelectedQueueLocationUuid,
+  useSelectedProviderRoomTimestamp,
 } from '../helpers/helpers';
-import { buildStatusString, formatWaitTime, getTagType } from '../helpers/functions';
+import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
+import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -111,6 +114,11 @@ function ActiveVisitsTable() {
   const layout = useLayoutType();
   const config = useConfig() as ConfigObject;
   const useQueueTableTabs = config.showQueueTableTab;
+  const currentUserSession = useSession();
+  const providerUuid = currentUserSession?.currentProvider?.uuid;
+  const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
+  const currentProviderRoomTimestamp = useSelectedProviderRoomTimestamp();
+  const differenceInTime = timeDiffInMinutes(new Date(), currentProviderRoomTimestamp);
 
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
@@ -232,6 +240,19 @@ function ActiveVisitsTable() {
       }),
     );
   };
+
+  const launchAddProviderRoomModal = useCallback(() => {
+    const dispose = showModal('add-provider-to-room-modal', {
+      closeModal: () => dispose(),
+      providerUuid,
+    });
+  }, [providerUuid]);
+
+  useEffect(() => {
+    if (differenceInTime >= 1) {
+      launchAddProviderRoomModal();
+    }
+  }, []);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
