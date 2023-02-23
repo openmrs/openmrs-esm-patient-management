@@ -32,6 +32,18 @@ function ActiveVisitsTabs() {
             iconDescription={t('addNewQueue', 'Add new queue')}>
             {t('addNewService', 'Add new service')}
           </Button>
+          <Button
+            size="sm"
+            kind="ghost"
+            renderIcon={(props) => <ArrowRight size={16} {...props} />}
+            onClick={(selectedPatientUuid) => {
+              setShowOverlay(true);
+              setView(SearchTypes.QUEUE_ROOM_FORM);
+              setViewState({ selectedPatientUuid });
+            }}
+            iconDescription={t('addNewQueueRoom', 'Add new queue room')}>
+            {t('addNewServiceRoom', 'Add new service room')}
+          </Button>
         </UserHasAccess>
         <ExtensionSlot
           extensionSlotName="patient-search-button-slot"
