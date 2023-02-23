@@ -110,6 +110,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     }
   }, [isLoadingServices, allServices]);
 
+  const handleServiceChange = ({ selectedItem }) => {
+    setSelectedService(selectedItem.uuid);
+    setSelectedServiceName(selectedItem.display);
+  };
+
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
@@ -495,21 +500,15 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 title={t('noServicesConfigured', 'No services configured')}
               />
             ) : (
-              <Select
-                labelText={t('selectService', 'Select a service')}
-                id="service"
-                invalidText="Required"
-                value={service}
-                defaultSelected={service}
-                onChange={(event) => setSelectedService(event.target.value)}>
-                {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-                {allServices?.length > 0 &&
-                  allServices.map((service) => (
-                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                      {service.display}
-                    </SelectItem>
-                  ))}
-              </Select>
+              <Dropdown
+                id="serviceFilter"
+                label={t('selectService', 'Select a service')}
+                type="default"
+                items={allServices}
+                itemToString={(item) => (item ? item.display : '')}
+                onChange={handleServiceChange}
+                size="md"
+              />
             )}
           </section>
           {isMissingService && (
