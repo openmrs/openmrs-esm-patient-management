@@ -75,7 +75,7 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
         if (obs?.concept?.display === 'Visit Diagnoses') {
           // Putting all the diagnoses in a single array.
           diagnoses.push({
-            diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
+            diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST')?.value.display,
           });
         } else if (obs?.concept?.display === 'General patient note') {
           // Putting all notes in a single array.
