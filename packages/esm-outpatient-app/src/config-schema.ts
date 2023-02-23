@@ -81,6 +81,11 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    historicalObsConceptUuid: {
+      _type: Type.Array,
+      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
+      _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -142,6 +147,7 @@ export interface ConfigObject {
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
     emergencyPriorityConceptUuid: string;
+    historicalObsConceptUuid: Array<string>;
   };
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;

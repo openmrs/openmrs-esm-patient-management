@@ -1,3 +1,4 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { MappedQueuePriority } from '../active-visits/active-visits-table.resource';
 
 export const getTagType = (priority: string) => {
@@ -57,4 +58,12 @@ export function generateVisitQueueNumber(service, maxVisitNumber) {
   const servicePrefix = service?.toUpperCase().substring(0, 3);
   const visitNumber = (maxVisitNumber + 1)?.toString().padStart(4, '0');
   return servicePrefix + '-' + visitNumber;
+}
+
+export function findObsByConceptUUID(arr: Array<OpenmrsResource>, ids: Array<string>) {
+  for (const visit of arr) {
+    return visit.obs.filter((o) => {
+      return ids.includes(o.concept.uuid);
+    });
+  }
 }
