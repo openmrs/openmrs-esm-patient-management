@@ -407,3 +407,10 @@ export interface NewVisitPayload {
     value: string;
   }>;
 }
+
+export interface QueueRoom {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+}

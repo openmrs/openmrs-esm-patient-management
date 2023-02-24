@@ -150,6 +150,13 @@ function setupOpenMRS() {
         slot: 'previous-visit-summary-slot',
         load: getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options),
       },
+      {
+        id: 'add-provider-to-room-modal',
+        load: getAsyncLifecycle(() => import('./add-provider-queue-room/add-provider-queue-room.component'), {
+          featureName: 'add provider queue room',
+          moduleName,
+        }),
+      },
     ],
   };
 }

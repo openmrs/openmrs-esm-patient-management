@@ -1,17 +1,28 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { ConfigObject, openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
+import { renderWithSwr } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
-import { mockQueueLocations } from '../../../../__mocks__/locations.mock';
 import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
 import { useVisitQueueEntries } from './active-visits-table.resource';
+import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
 const mockUseVisitQueueEntries = useVisitQueueEntries as jest.Mock;
+const mockUseProvidersQueueRoom = useProvidersQueueRoom as jest.Mock;
+const mockUseSession = useSession as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    openmrsFetch: jest.fn(),
+  };
+});
 
 jest.mock('./active-visits-table.resource', () => {
   const originalModule = jest.requireActual('./active-visits-table.resource');
@@ -23,30 +34,33 @@ jest.mock('./active-visits-table.resource', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => {
+  const originalModule = jest.requireActual('../add-provider-queue-room/add-provider-queue-room.resource');
+
   return {
     ...originalModule,
-    openmrsFetch: jest.fn(),
+    useProvidersQueueRoom: jest.fn(),
   };
 });
 
 jest.setTimeout(20000);
 
 describe('ActiveVisitsTable: ', () => {
-  beforeEach(() =>
-    mockedUseConfig.mockReturnValue({
-      concepts: {
-        priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
-        serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-      },
-      showQueueTableTab: false,
-    } as ConfigObject),
-  );
+  beforeEach(() => {
+    mockUseSession.mockReturnValue(mockSession),
+      mockedUseConfig.mockReturnValue({
+        concepts: {
+          priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
+          serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
+          visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+        },
+        showQueueTableTab: false,
+      } as ConfigObject);
+  });
 
   it('renders an empty state view if data is unavailable', async () => {
     mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: [], isLoading: false });
+    mockUseProvidersQueueRoom.mockReturnValue({ providers: mockSession });
 
     renderActiveVisitsTable();
 
@@ -56,12 +70,13 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
-    mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
+    mockUseVisitQueueEntries.mockReturnValue({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
     mockUsePagination.mockReturnValue({
       results: mockMappedQueueEntries.data.slice(0, 2),
       goTo: mockGoToPage,
       currentPage: 1,
     });
+    mockUseProvidersQueueRoom.mockReturnValue({ providers: mockSession });
 
     renderActiveVisitsTable();
 

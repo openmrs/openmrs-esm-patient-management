@@ -17,6 +17,7 @@ const initialServiceUuidState = { serviceUuid: '' };
 const intialStatusNameState = { status: '' };
 const initialQueueLocationNameState = { queueLocationName: '' };
 const initialQueueLocationUuidState = { queueLocationUuid: '' };
+const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
 
 export function getSelectedServiceName() {
   return getGlobalStore<{ serviceName: string }>('queueSelectedServiceName', initialServiceNameState);
@@ -36,6 +37,13 @@ export function getSelectedQueueLocationName() {
 
 export function getSelectedQueueLocationUuid() {
   return getGlobalStore<{ queueLocationUuid: string }>('queueLocationUuidSelected', initialQueueLocationUuidState);
+}
+
+export function getSelectedQueueRoomTimestamp() {
+  return getGlobalStore<{ providerQueueRoomTimestamp: Date }>(
+    'queueProviderRoomTimestamp',
+    initialSelectedQueueRoomTimestamp,
+  );
 }
 
 export const updateSelectedServiceName = (currentServiceName: string) => {
@@ -61,6 +69,11 @@ export const updateSelectedQueueLocationName = (currentLocationName: string) => 
 export const updateSelectedQueueLocationUuid = (currentLocationUuid: string) => {
   const store = getSelectedQueueLocationUuid();
   store.setState({ queueLocationUuid: currentLocationUuid });
+};
+
+export const updatedSelectedQueueRoomTimestamp = (currentProviderRoomTimestamp: Date) => {
+  const store = getSelectedQueueRoomTimestamp();
+  store.setState({ providerQueueRoomTimestamp: currentProviderRoomTimestamp });
 };
 
 export const useSelectedServiceName = () => {
@@ -110,4 +123,17 @@ export const useSelectedQueueLocationUuid = () => {
     getSelectedQueueLocationUuid().subscribe(({ queueLocationUuid }) => setCurrentQueueLocationUuid(queueLocationUuid));
   }, []);
   return currentQueueLocationUuid;
+};
+
+export const useSelectedProviderRoomTimestamp = () => {
+  const [currentProviderRoomTimestamp, setCurrentProviderRoomTimestamp] = useState(
+    initialSelectedQueueRoomTimestamp.providerQueueRoomTimestamp,
+  );
+
+  useEffect(() => {
+    getSelectedQueueRoomTimestamp().subscribe(({ providerQueueRoomTimestamp }) =>
+      setCurrentProviderRoomTimestamp(providerQueueRoomTimestamp),
+    );
+  }, []);
+  return currentProviderRoomTimestamp;
 };
