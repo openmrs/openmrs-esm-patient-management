@@ -5,9 +5,10 @@ import {
   ModalFooter,
   ModalHeader,
   Form,
+  InlineNotification,
   Select,
   SelectItem,
-  InlineNotification,
+  Dropdown,
 } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { useServices } from '../active-visits/active-visits-table.resource';
@@ -16,7 +17,13 @@ import styles from './add-provider-queue-room.scss';
 import { useSWRConfig } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { addProviderToQueueRoom, useQueueRooms } from './add-provider-queue-room.resource';
-import { updatedSelectedQueueRoomTimestamp } from '../helpers/helpers';
+import {
+  updatedSelectedQueueRoomTimestamp,
+  updateSelectedQueueLocationName,
+  updateSelectedQueueLocationUuid,
+  updateSelectedServiceName,
+  updateSelectedServiceUuid,
+} from '../helpers/helpers';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;
@@ -59,9 +66,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-          mutate(`/ws/rest/v1/visit?includeInactive=false`);
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
+          mutate(`/ws/rest/v1/queueroom?location=${selectedQueueLocation}&queue=${queueUuid}`);
         }
       },
       (error) => {
@@ -75,46 +80,47 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
     );
   }, [queueUuid, providerUuid, queueRoomUuid, t, closeModal, mutate]);
 
+  const handleServiceChange = ({ selectedItem }) => {
+    setQueueUuid(selectedItem.uuid);
+    updateSelectedServiceName(selectedItem.name);
+    updateSelectedServiceUuid(selectedItem.uuid);
+  };
+
+  const handleQueueLocationChange = ({ selectedItem }) => {
+    setSelectedQueueLocation(selectedItem.id);
+    updateSelectedQueueLocationName(selectedItem.name);
+    updateSelectedQueueLocationUuid(selectedItem.id);
+  };
+
   return (
     <div>
       <ModalHeader closeModal={closeModal} title={t('addProviderQueueRoom', 'Add provider queue room?')} />
       <ModalBody>
         <Form onSubmit={onSubmit}>
           <section className={styles.section}>
-            <Select
-              labelText={t('selectQueueLocation', 'Select a queue location')}
-              id="location"
-              invalidText="Required"
-              value={selectedQueueLocation}
-              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
-              {!selectedQueueLocation ? (
-                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-              ) : null}
-              {queueLocations?.length > 0 &&
-                queueLocations.map((location) => (
-                  <SelectItem key={location.id} text={location.name} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-            </Select>
+            <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
+            <Dropdown
+              id="queueLocation"
+              label={t('selectQueueLocation', 'Select a queue location')}
+              type="default"
+              items={queueLocations}
+              itemToString={(item) => (item ? item.name : '')}
+              onChange={handleQueueLocationChange}
+              size="md"
+            />
           </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
-            <Select
-              labelText={t('selectService', 'Select a service')}
+            <Dropdown
               id="service"
-              invalidText="Required"
-              value={queueUuid}
-              onChange={(event) => setQueueUuid(event.target.value)}>
-              {!queueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {services?.length > 0 &&
-                services.map((service) => (
-                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                    {service.display}
-                  </SelectItem>
-                ))}
-            </Select>
+              label={t('selectService', 'Select a service')}
+              type="default"
+              items={services}
+              itemToString={(item) => (item ? item.display : '')}
+              onChange={handleServiceChange}
+              size="md"
+            />
           </section>
           {isMissingService && (
             <section>

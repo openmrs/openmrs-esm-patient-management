@@ -10,6 +10,7 @@ import {
   updateSelectedQueueLocationUuid,
   updateSelectedQueueLocationName,
   updateSelectedServiceName,
+  useSelectedQueueLocationName,
 } from '../helpers/helpers';
 
 const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
@@ -17,6 +18,7 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const { queueLocations } = useQueueLocations();
+  const currentQueueLocationName = useSelectedQueueLocationName();
 
   const handleQueueLocationChange = ({ selectedItem }) => {
     updateSelectedQueueLocationUuid(selectedItem.id);
@@ -47,7 +49,7 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
             <label className={styles.view}>{t('view', 'View')}:</label>
             <Dropdown
               id="typeOfCare"
-              label={queueLocations[0]?.name}
+              label={currentQueueLocationName}
               items={[{ display: `${t('all', 'All')}` }, ...queueLocations]}
               itemToString={(item) => (item ? item.name : '')}
               type="inline"
