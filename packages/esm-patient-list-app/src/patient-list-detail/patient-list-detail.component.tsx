@@ -108,7 +108,7 @@ const PatientListDetailComponent = () => {
     <main className={`omrs-main-content ${styles.patientListDetailsPage}`}>
       <section>
         <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-        <div className={styles.cohortHeader}>
+        <div className={styles.cohortHeader} data-testid="patientListHeader">
           <div>
             {patientListDetails && (
               <>
