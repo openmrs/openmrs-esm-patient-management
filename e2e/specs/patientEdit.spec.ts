@@ -1,16 +1,21 @@
 import { test } from '../core';
 import { expect } from '@playwright/test';
 import { PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
-import { deletePatient, getPatient } from '../commands';
+import { deletePatient, generateRandomPatient, getPatient, Patient } from '../commands';
 import dayjs from 'dayjs';
 
-let patientUuid: string;
+let patient: Patient;
+test.beforeEach(async ({ api }) => {
+  patient = await generateRandomPatient(api);
+});
 
-test('should be able to register a patient', async ({ page, api }) => {
+test('should be able to edit a patient', async ({ page, api }) => {
   test.setTimeout(5 * 60 * 1000);
-  const patientRegistrationPage = new RegistrationAndEditPage(page);
+  const patientEditPage = new RegistrationAndEditPage(page);
 
-  await patientRegistrationPage.goto();
+  await patientEditPage.goto(patient.uuid);
+
+  await expect(patientEditPage.givenNameInput()).not.toHaveValue('');
 
   // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
   const formValues: PatientRegistrationFormValues = {
@@ -29,14 +34,11 @@ test('should be able to register a patient', async ({ page, api }) => {
     phone: '5555551234',
   };
 
-  await patientRegistrationPage.fillPatientRegistrationForm(formValues);
+  await patientEditPage.fillPatientRegistrationForm(formValues);
 
-  await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$'));
-  const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
-  await expect(patientUuid).not.toBeNull();
-
-  const patient = await getPatient(api, patientUuid);
-  const { person } = patient;
+  await expect(page).toHaveURL(`${process.env.E2E_UI_BASE_URL}patient/${patient.uuid}/chart/Patient Summary`);
+  const updatedPatient = await getPatient(api, patient.uuid);
+  const { person } = updatedPatient;
   const { givenName, middleName, familyName, sex } = formValues;
 
   await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
@@ -46,7 +48,5 @@ test('should be able to register a patient', async ({ page, api }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  if (patientUuid) {
-    await deletePatient(api, patientUuid);
-  }
+  await deletePatient(api, patient.uuid);
 });

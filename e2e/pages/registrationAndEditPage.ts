@@ -19,7 +19,7 @@ export interface PatientRegistrationFormValues {
   email?: string;
 }
 
-export class PatientRegistrationPage {
+export class RegistrationAndEditPage {
   constructor(readonly page: Page) {}
 
   readonly givenNameInput = () => this.page.locator('#givenName');
