@@ -30,7 +30,10 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
 }
 
 export function usePatientListDetails(patientListUuid: string) {
-  const swrResult = useSWR<FetchResponse<OpenmrsCohort>, Error>(`${cohortUrl}/cohort/${patientListUuid}`, openmrsFetch);
+  const swrResult = useSWR<FetchResponse<OpenmrsCohort>, Error>(
+    `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate)`,
+    openmrsFetch,
+  );
   return { ...swrResult, data: swrResult?.data?.data };
 }
 
