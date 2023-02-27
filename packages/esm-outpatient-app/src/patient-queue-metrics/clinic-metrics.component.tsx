@@ -5,7 +5,6 @@ import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices 
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './clinic-metrics.scss';
-import { useSession, useLocations } from '@openmrs/esm-framework';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -14,7 +13,6 @@ import {
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { useActiveVisits } from './clinic-metrics.resource';
 
 export interface Service {
@@ -24,14 +22,8 @@ export interface Service {
 
 function ClinicMetrics() {
   const { t } = useTranslation();
-  const locations = useLocations();
-  const session = useSession();
 
   const { metrics, isLoading } = useMetrics();
-  const { totalScheduledAppointments } = useAppointmentMetrics();
-  const [userLocation, setUserLocation] = useState('');
-  const [queueLocation, setQueueLocation] = useState('');
-  const { queueLocations } = useQueueLocations();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { allServices } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
@@ -40,15 +32,6 @@ function ClinicMetrics() {
   const [initialSelectedItem, setInitialSelectItem] = useState(true);
   const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
-
-  useEffect(() => {
-    setQueueLocation([...queueLocations].shift()?.id);
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    } else if (!userLocation && locations) {
-      setUserLocation([...locations].shift()?.uuid);
-    }
-  }, [session, locations, userLocation, queueLocations, queueLocation, currentQueueLocation]);
 
   useEffect(() => {
     if (currentServiceName && currentServiceUuid) {
