@@ -15,6 +15,7 @@ import {
 } from '../helpers/helpers';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useActiveVisits } from './clinic-metrics.resource';
 
 export interface Service {
   uuid: string;
@@ -38,6 +39,7 @@ function ClinicMetrics() {
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
   const [initialSelectedItem, setInitialSelectItem] = useState(true);
   const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
+  const { activeVisitsCount, isLoading: loading } = useActiveVisits();
 
   useEffect(() => {
     setQueueLocation([...queueLocations].shift()?.id);
@@ -72,8 +74,8 @@ function ClinicMetrics() {
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={totalScheduledAppointments}
-          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          value={loading ? '--' : activeVisitsCount}
+          headerLabel={t('checkedInPatients', 'Checked in patients')}
           service="scheduled"
         />
         <MetricsCard
