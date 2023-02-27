@@ -11,7 +11,7 @@ const config: PlaywrightTestConfig = {
   },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 1,
+  retries: process.env.CI ? 1 : 0,
   reporter: 'html',
   globalSetup: require.resolve('./e2e/core/global-setup'),
   use: {
