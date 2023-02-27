@@ -10,7 +10,7 @@ on:
 jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-        
+
       - name: Install dependencies
         run: yarn
 
@@ -55,28 +55,28 @@ jobs:
       - name: Copy test environment variables
         run: cp example.env .env
 
-      - name: Setup node 
+      - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 16
-     
+
       - name: Install dependencies
         run: yarn
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      
+
       - name: Run db and web containers
         run: |
           cd e2e/support
           docker-compose up -d
-    
+
       - name: Wait for OpenMRS instance to start
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:9000/openmrs/login.htm)" != "200" ]]; do sleep 10; done
-      
+
       - name: Run dev server
         run: yarn start --backend "http://localhost:9000" &
-    
+
       - name: Run E2E tests
         run: yarn playwright test
 
