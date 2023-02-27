@@ -8,7 +8,6 @@ import {
   TextInput,
   Select,
   SelectItem,
-  TextArea,
   ButtonSet,
   Button,
   InlineNotification,
@@ -31,9 +30,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
   const isTablet = useLayoutType() === 'tablet';
   const [queueRoomName, setQueueRoomName] = useState('');
   const [queueRoomService, setQueueRoomService] = useState('');
-  const [queueRoomDescription, setQueueRoomDescription] = useState('');
   const [isMissingRoomName, setMissingRoomName] = useState(false);
-  const [isMissingRoomDescription, setMissingRoomDescription] = useState(false);
   const [isMissingQueueRoomService, setMissingQueueRoomService] = useState(false);
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const { services } = useServices(selectedQueueLocation);
@@ -47,20 +44,15 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
         setMissingRoomName(true);
         return;
       }
-      if (!queueRoomDescription) {
-        setMissingRoomDescription(true);
-        return;
-      }
       if (!queueRoomService) {
         setMissingQueueRoomService(true);
         return;
       }
 
       setMissingRoomName(false);
-      setMissingRoomDescription(false);
       setMissingQueueRoomService(false);
 
-      saveQueueRoom(queueRoomName, queueRoomDescription, queueRoomService, new AbortController()).then(
+      saveQueueRoom(queueRoomName, queueRoomName, queueRoomService, new AbortController()).then(
         ({ status }) => {
           if (status === 201) {
             showToast({
@@ -82,7 +74,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
         },
       );
     },
-    [queueRoomName, queueRoomDescription, queueRoomService, t, closePanel],
+    [queueRoomName, queueRoomService, t, closePanel],
   );
 
   return (
@@ -110,27 +102,6 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
               </section>
             )}
           </Layer>
-          <Layer className={styles.input}>
-            <TextArea
-              rows={3}
-              id="queueRoomDescription"
-              invalidText="Required"
-              labelText={t('queueRoomDescription', 'Queue room description')}
-              onChange={(event) => setQueueRoomDescription(event.target.value)}
-              value={queueRoomDescription}
-            />
-          </Layer>
-          {isMissingRoomDescription && (
-            <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingQueueRoomDescription', 'Missing queue room description')}
-                subtitle={t('addQueueRoomDescription', 'Please add a queue room description')}
-              />
-            </section>
-          )}
 
           <section className={styles.section}>
             <Select
