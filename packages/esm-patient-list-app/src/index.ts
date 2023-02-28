@@ -1,4 +1,4 @@
-import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { setupOffline } from './offline';
 
 declare var __VERSION__: string;
@@ -24,7 +24,9 @@ const options = {
 function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
+
   setupOffline();
+  defineConfigSchema(moduleName, {});
 
   registerBreadcrumbs([
     {
