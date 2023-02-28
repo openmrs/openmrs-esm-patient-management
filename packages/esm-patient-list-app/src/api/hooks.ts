@@ -42,7 +42,8 @@ export function usePatientListDetails(patientListUuid: string) {
     error,
     isLoading,
     mutate,
-  };
+  }
+};
 
 export function usePatientListMembers(
   patientListUuid: string,
