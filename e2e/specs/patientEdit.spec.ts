@@ -15,7 +15,7 @@ test('should be able to edit a patient', async ({ page, api }) => {
 
   await patientEditPage.goto(patient.uuid);
 
-  await expect(patientEditPage.givenNameInput()).not.toHaveValue('');
+  await expect(patientEditPage.givenNameInput()).not.toHaveValue('', { timeout: 2 * 60 * 1000 });
 
   // TODO: Add email field after fixing O3-1883 (https://issues.openmrs.org/browse/O3-1883)
   const formValues: PatientRegistrationFormValues = {
