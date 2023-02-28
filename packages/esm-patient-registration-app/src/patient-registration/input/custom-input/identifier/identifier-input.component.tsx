@@ -60,10 +60,10 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
   };
 
   const handleDelete = () => {
-    /* 
-    If there is an initialValue to the identifier, a confirmation modal seeking 
-    confirmation to delete the identifier should be shown, else in the other case, 
-    we can directly delete the identifier. 
+    /*
+    If there is an initialValue to the identifier, a confirmation modal seeking
+    confirmation to delete the identifier should be shown, else in the other case,
+    we can directly delete the identifier.
     */
 
     if (initialValue) {
@@ -111,6 +111,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       )}
       <div>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
+         <UserHasAccess privilege="App: Edit Patient Identifiers">
           <Button
             kind="ghost"
             onClick={handleEdit}
@@ -119,8 +120,10 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             hasIconOnly>
             <Edit size={16} />
           </Button>
+        </UserHasAccess>
         )}
         {initialValue && initialValue !== identifierValue && (
+        <UserHasAccess privilege="App: Add Patient Identifiers">
           <Button
             kind="ghost"
             onClick={handleReset}
@@ -129,9 +132,10 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             hasIconOnly>
             <Reset size={16} />
           </Button>
+        </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <UserHasAccess privilege="coreapps.systemAdministration">
+          <UserHasAccess privilege="App: Get Patient Identifiers Types">
             <Button
               kind="danger--ghost"
               onClick={handleDelete}
