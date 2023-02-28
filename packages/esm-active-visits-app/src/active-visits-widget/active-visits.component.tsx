@@ -185,7 +185,9 @@ const ActiveVisitsTable = () => {
                 <TableBody>
                   {rows.map((row, index) => (
                     <React.Fragment key={index}>
-                      <TableExpandRow {...getRowProps({ row })}>
+                      <TableExpandRow
+                        {...getRowProps({ row })}
+                        data-testid={`activeVisitRow${paginatedActiveVisits?.[index]?.patientUuid}`}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'name' ? (
