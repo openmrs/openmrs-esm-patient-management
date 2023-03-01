@@ -19,12 +19,11 @@ yarn test-e2e --headed
 ```
 
 By default, the test suite will run against the http://localhost:8080.
-You can override this by exporting `E2E_UI_BASE_URL` and `E2E_WS_BASE_URL` environment variables beforehand:
+You can override this by exporting `E2E_BASE_URL` environment variables beforehand:
 
 ```sh
 # Ex: Set the server URL to dev3:
-export E2E_UI_BASE_URL=https://dev3.openmrs.org/openmrs/spa/
-export E2E_WS_BASE_URL=https://dev3.openmrs.org/openmrs/ws/
+export E2E_BASE_URL=https://dev3.openmrs.org/openmrs
 
 # Run all e2e tests:
 yarn test-e2e --headed

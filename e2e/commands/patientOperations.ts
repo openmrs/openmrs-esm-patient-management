@@ -1,5 +1,4 @@
 import { APIRequestContext, expect } from '@playwright/test';
-import { api } from '../fixtures';
 
 export interface Patient {
   uuid: string;
@@ -40,14 +39,13 @@ export interface Identifier {
 }
 
 export const generateRandomPatient = async (api: APIRequestContext): Promise<Patient> => {
-  const identifierRes = await api.post(
-    'rest/v1/idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier',
-    { data: {} },
-  );
+  const identifierRes = await api.post('idgen/identifiersource/8549f706-7e85-4c1d-9424-217d50a2988b/identifier', {
+    data: {},
+  });
   await expect(identifierRes.ok()).toBeTruthy();
   const { identifier } = await identifierRes.json();
 
-  const patientRes = await api.post('rest/v1/patient', {
+  const patientRes = await api.post('patient', {
     // TODO: This is not configurable right now. It probably should be.
     data: {
       identifiers: [
@@ -90,10 +88,10 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
 };
 
 export const getPatient = async (api: APIRequestContext, uuid: string): Promise<Patient> => {
-  const patientRes = await api.get(`rest/v1/patient/${uuid}`);
+  const patientRes = await api.get(`patient/${uuid}`);
   return await patientRes.json();
 };
 
 export const deletePatient = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`rest/v1/patient/${uuid}`, { data: {} });
+  await api.delete(`patient/${uuid}`, { data: {} });
 };
