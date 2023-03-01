@@ -213,25 +213,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              {isTablet ? (
-                <Layer>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    id="visitDate"
-                    style={{ paddingBottom: '1rem' }}
-                    maxDate={new Date().toISOString()}
-                    onChange={([date]) => setVisitDate(date)}
-                    value={visitDate}>
-                    <DatePickerInput
-                      id="visitStartDateInput"
-                      labelText={t('date', 'Date')}
-                      placeholder="dd/mm/yyyy"
-                      style={{ width: '100%' }}
-                    />
-                  </DatePicker>
-                </Layer>
-              ) : (
+              <ResponsiveWrapper isTablet={isTablet}>
                 <DatePicker
                   dateFormat="d/m/Y"
                   datePickerType="single"
@@ -247,28 +229,8 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     style={{ width: '100%' }}
                   />
                 </DatePicker>
-              )}
-              {isTablet ? (
-                <Layer>
-                  <TimePicker
-                    id="visitStartTime"
-                    labelText={t('time', 'Time')}
-                    onChange={(event) => setVisitTime(event.target.value as amPm)}
-                    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                    style={{ marginLeft: '0.125rem', flex: 'none' }}
-                    value={visitTime}>
-                    <TimePickerSelect
-                      id="visitStartTimeSelect"
-                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                      value={timeFormat}
-                      labelText={t('time', 'Time')}
-                      aria-label={t('time', 'Time')}>
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
-                    </TimePickerSelect>
-                  </TimePicker>
-                </Layer>
-              ) : (
+              </ResponsiveWrapper>
+              <ResponsiveWrapper isTablet={isTablet}>
                 <TimePicker
                   id="visitStartTime"
                   labelText={t('time', 'Time')}
@@ -286,29 +248,13 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     <SelectItem value="PM" text="PM" />
                   </TimePickerSelect>
                 </TimePicker>
-              )}
+              </ResponsiveWrapper>
             </div>
           </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            {isTablet ? (
-              <Layer>
-                <Select
-                  labelText={t('selectLocation', 'Select a location')}
-                  id="location"
-                  invalidText="Required"
-                  value={selectedLocation}
-                  onChange={(event) => setSelectedLocation(event.target.value)}>
-                  {locations?.length > 0 &&
-                    locations.map((location) => (
-                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                        {location.display}
-                      </SelectItem>
-                    ))}
-                </Select>
-              </Layer>
-            ) : (
+            <ResponsiveWrapper isTablet={isTablet}>
               <Select
                 labelText={t('selectLocation', 'Select a location')}
                 id="location"
@@ -322,7 +268,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                     </SelectItem>
                   ))}
               </Select>
-            )}
+            </ResponsiveWrapper>
           </section>
 
           {config.showRecommendedVisitTypeTab && (
@@ -406,5 +352,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }) {
+  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
+}
 
 export default StartVisitForm;

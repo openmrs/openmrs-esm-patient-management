@@ -11,7 +11,6 @@ const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { priorities } = usePriority();
-  const [service, setSelectedService] = useState('');
   const { statuses } = useStatus();
   const { queueLocations } = useQueueLocations();
   const config = useConfig() as ConfigObject;
@@ -21,50 +20,25 @@ const StartVisitQueueFields: React.FC = () => {
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { allServices, isLoading } = useServices(selectedQueueLocation);
   const [priority, setPriority] = useState(defaultPriority);
-  const [status, setStatus] = useState('');
-  const [sortWeight, setSortWeight] = useState(0);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setSelectedService(allServices.length > 0 ? allServices[0].uuid : '');
-    }
-  }, [isLoading, allServices]);
-
-  useEffect(() => {
-    setStatus(defaultStatus);
-  }, [defaultStatus]);
-
-  // to sort sortWeight
-  useEffect(() => {
+  const [status, setStatus] = useState(defaultStatus);
+  const [sortWeight, setSortWeight] = useState(() => {
     if (priority === emergencyPriorityConceptUuid) {
-      setSortWeight(1);
-    } else {
-      setSortWeight(0);
+      return 1;
     }
-  }, [priority]);
+    return 0;
+  });
+  const [service, setSelectedService] = useState(() => {
+    if (allServices?.length > 0) {
+      return allServices[0].uuid;
+    }
+    return '';
+  });
 
   return (
-    <div>
+    <div className={styles.container}>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue Location')}</div>
-        {isTablet ? (
-          <Layer>
-            <Select
-              labelText={t('selectQueueLocation', 'Select a queue location')}
-              id="queueLocation"
-              name="queueLocation"
-              invalidText="Required"
-              value={selectedQueueLocation}
-              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
-              {queueLocations?.length > 0 &&
-                queueLocations.map((location) => (
-                  <SelectItem key={location.id} text={location.name} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-            </Select>
-          </Layer>
-        ) : (
+        <ResponsiveWrapper isTablet={isTablet}>
           <Select
             labelText={t('selectQueueLocation', 'Select a queue location')}
             id="queueLocation"
@@ -72,6 +46,9 @@ const StartVisitQueueFields: React.FC = () => {
             invalidText="Required"
             value={selectedQueueLocation}
             onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+            {!selectedQueueLocation ? (
+              <SelectItem text={t('selectLocation', 'Select a queue location')} value="" />
+            ) : null}
             {queueLocations?.length > 0 &&
               queueLocations.map((location) => (
                 <SelectItem key={location.id} text={location.name} value={location.id}>
@@ -79,7 +56,7 @@ const StartVisitQueueFields: React.FC = () => {
                 </SelectItem>
               ))}
           </Select>
-        )}
+        </ResponsiveWrapper>
       </section>
 
       <section className={styles.section}>
@@ -100,6 +77,7 @@ const StartVisitQueueFields: React.FC = () => {
             invalidText="Required"
             value={service}
             onChange={(event) => setSelectedService(event.target.value)}>
+            {!service ? <SelectItem text={t('selectService', 'Select a queue service')} value="" /> : null}
             {allServices?.length > 0 &&
               allServices.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
@@ -118,7 +96,7 @@ const StartVisitQueueFields: React.FC = () => {
           name="status"
           invalidText="Required"
           value={status}
-          onChange={(event) => setSelectedService(event.target.value)}>
+          onChange={(event) => setStatus(event.target.value)}>
           {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
           {statuses?.length > 0 &&
             statuses.map((status) => (
@@ -144,14 +122,12 @@ const StartVisitQueueFields: React.FC = () => {
             className={styles.radioButtonWrapper}
             name="priority"
             id="priority"
-            valueSelected={defaultPriority}
-            onChange={(event) => {
-              setPriority(event.name as any);
+            defaultSelected={defaultPriority}
+            onChange={(uuid) => {
+              setPriority(uuid);
             }}>
             {priorities?.length > 0 &&
-              priorities.map((priority) => (
-                <RadioButton key={priority.uuid} labelText={priority.display} value={priority.uuid} />
-              ))}
+              priorities.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
           </RadioButtonGroup>
         )}
       </section>
@@ -168,5 +144,9 @@ const StartVisitQueueFields: React.FC = () => {
     </div>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }) {
+  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
+}
 
 export default StartVisitQueueFields;
