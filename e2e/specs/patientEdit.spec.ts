@@ -36,7 +36,7 @@ test('should be able to edit a patient', async ({ page, api }) => {
 
   await patientEditPage.fillPatientRegistrationForm(formValues);
 
-  await expect(page).toHaveURL(`${process.env.E2E_UI_BASE_URL}patient/${patient.uuid}/chart/Patient Summary`);
+  await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
   const updatedPatient = await getPatient(api, patient.uuid);
   const { person } = updatedPatient;
   const { givenName, middleName, familyName, sex } = formValues;
