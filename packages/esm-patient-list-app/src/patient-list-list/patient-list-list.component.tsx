@@ -24,12 +24,13 @@ const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'isStarred', header: '' },
 ];
 
-function createLabels() {
+function createLabels(setSelectedTab: React.Dispatch<React.SetStateAction<TabTypes>>) {
   const res: Array<ReactNode> = [];
+  const handleSelectedTab = (tabType) => setSelectedTab(tabType);
 
   for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
     res.push(
-      <Tab key={index} id={'tab-' + index}>
+      <Tab key={index} id={'tab-' + index} onClick={() => handleSelectedTab(TabTypes[Object.keys(TabTypes)[index]])}>
         {labelMap[index]}
       </Tab>,
     );
@@ -109,8 +110,9 @@ const PatientListList: React.FC = () => {
         </div>
         <Tabs className={styles.tabs} tabContentClassName={styles.hiddenTabsContent} onSelectionChange={setSelectedTab}>
           <TabList aria-label="List tabs" contained>
-            {createLabels()}
+            {createLabels(setSelectedTab)}
           </TabList>
+          <div>{selectedTab}</div>
         </Tabs>
         <div className={styles.patientListTableContainer}>
           <PatientListTable
