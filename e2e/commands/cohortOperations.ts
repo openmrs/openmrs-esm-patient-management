@@ -40,7 +40,7 @@ export interface CohortMember {
 }
 
 export const generateRandomCohortType = async (api: APIRequestContext): Promise<CohortType> => {
-  const cohortTypeRes = await api.post('rest/v1/cohortm/cohorttype', {
+  const cohortTypeRes = await api.post('cohortm/cohorttype', {
     data: {
       name: `Cohort type ${Math.floor(Math.random() * 10000)}`,
       description: `Cohort type description ${Math.floor(Math.random() * 10000)}`,
@@ -51,11 +51,11 @@ export const generateRandomCohortType = async (api: APIRequestContext): Promise<
 };
 
 export const deleteCohortType = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`rest/v1/cohortm/cohorttype/${uuid}`, { data: {} });
+  await api.delete(`cohortm/cohorttype/${uuid}`, { data: {} });
 };
 
 export const generateRandomCohort = async (api: APIRequestContext, cohortTypeUuid: string): Promise<Cohort> => {
-  const cohortRes = await api.post('rest/v1/cohortm/cohort', {
+  const cohortRes = await api.post('cohortm/cohort', {
     data: {
       name: `Cohort ${Math.floor(Math.random() * 10000)}`,
       description: `Cohort description ${Math.floor(Math.random() * 10000)}`,
@@ -69,7 +69,7 @@ export const generateRandomCohort = async (api: APIRequestContext, cohortTypeUui
 };
 
 export const deleteCohort = async (api: APIRequestContext, uuid: string) => {
-  await api.delete(`rest/v1/cohortm/cohort/${uuid}`, {
+  await api.delete(`cohortm/cohort/${uuid}`, {
     data: {
       voidReason: 'Test void reason',
     },
@@ -81,7 +81,7 @@ export const addPatientToCohort = async (
   cohortUuid: string,
   patientUuid: string,
 ): Promise<CohortMember> => {
-  const cohortMemberRes = await api.post(`rest/v1/cohortm/cohortmember`, {
+  const cohortMemberRes = await api.post(`cohortm/cohortmember`, {
     data: {
       patient: patientUuid,
       cohort: cohortUuid,
