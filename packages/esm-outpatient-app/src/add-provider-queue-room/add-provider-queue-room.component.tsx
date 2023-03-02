@@ -12,10 +12,9 @@ import {
   Dropdown,
 } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
-import { useServices } from '../active-visits/active-visits-table.resource';
+import { useServices, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './add-provider-queue-room.scss';
-import { useSWRConfig } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -59,7 +58,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
     }
   });
 
-  const { mutate } = useSWRConfig();
+  const { mutate } = useProvidersQueueRoom(providerUuid);
   const { services } = useServices(currentLocationUuid);
   const { rooms } = useQueueRooms(currentLocationUuid, currentServiceUuid);
   const { queueLocations } = useQueueLocations();
@@ -104,10 +103,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             closeModal();
             localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
             updatedSelectedQueueRoomTimestamp(new Date());
-            mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-            mutate(`/ws/rest/v1/visit?includeInactive=false`);
-            mutate(`/ws/rest/v1/visit-queue-entry?location=${currentLocationUuid}&v=full`);
-            mutate(`/ws/rest/v1/queueroom?location=${currentLocationUuid}&queue=${currentServiceUuid}`);
+            mutate();
           }
         },
         (error) => {
@@ -133,10 +129,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             closeModal();
             localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
             updatedSelectedQueueRoomTimestamp(new Date());
-            mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-            mutate(`/ws/rest/v1/visit?includeInactive=false`);
-            mutate(`/ws/rest/v1/visit-queue-entry?location=${currentLocationUuid}&v=full`);
-            mutate(`/ws/rest/v1/queueroom?location=${currentLocationUuid}&queue=${currentServiceUuid}`);
+            mutate();
           }
         },
         (error) => {

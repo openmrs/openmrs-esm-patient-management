@@ -5,7 +5,7 @@ import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@ca
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { useSWRConfig } from 'swr';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
-import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 
 interface ClearQueueEntriesDialogProps {
   visitQueueEntries: Array<MappedVisitQueueEntry>;
@@ -14,7 +14,7 @@ interface ClearQueueEntriesDialogProps {
 
 const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visitQueueEntries, closeModal }) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
+  const { mutate } = useVisitQueueEntries('', '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClearQueueBatchRequest = useCallback(() => {
@@ -28,8 +28,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           kind: 'success',
           description: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
-        mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-        mutate(`/ws/rest/v1/queue-entry-metrics?service=Triage&status=Waiting`);
+        mutate();
       },
       (error) => {
         showNotification({

@@ -56,7 +56,7 @@ export function updateProviderToQueueRoom(
 
 export function useProvidersQueueRoom(providerUuid: string) {
   const apiUrl = `/ws/rest/v1/roomprovidermap?provider=${providerUuid}`;
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<ProvidersQueueRoom> } }, Error>(
+  const { data, error, isLoading, mutate } = useSWR<{ data: { results: Array<ProvidersQueueRoom> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -65,5 +65,6 @@ export function useProvidersQueueRoom(providerUuid: string) {
     providerRoom: data ? data?.data?.results : [],
     isError: error,
     isLoading,
+    mutate,
   };
 }

@@ -14,6 +14,7 @@ import {
 import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
 import { useSWRConfig } from 'swr';
 import { startOfDay } from '../constants';
+import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;
@@ -23,7 +24,7 @@ interface RemoveQueueEntryDialogProps {
 const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(queueEntry.patientUuid);
-  const { mutate } = useSWRConfig();
+  const { mutate } = useVisitQueueEntries('', '');
   const abortController = new AbortController();
 
   const { data: appointments } = useCheckedInAppointments(queueEntry.patientUuid, startOfDay, abortController);
@@ -48,7 +49,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
       appointments,
     ).then((response) => {
       closeModal();
-      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+      mutate();
       showToast({
         critical: true,
         kind: 'success',

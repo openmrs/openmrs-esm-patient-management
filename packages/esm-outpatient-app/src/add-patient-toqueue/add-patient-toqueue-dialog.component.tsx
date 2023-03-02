@@ -16,7 +16,13 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
-import { addQueueEntry, usePriority, useServices, useStatus } from '../active-visits/active-visits-table.resource';
+import {
+  addQueueEntry,
+  usePriority,
+  useServices,
+  useStatus,
+  useVisitQueueEntries,
+} from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import styles from './add-patient-toqueue-dialog.scss';
 import { useSWRConfig } from 'swr';
@@ -40,13 +46,13 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const patientSex = visitDetails?.gender;
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
-  const { mutate } = useSWRConfig();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const { services } = useServices(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
   const [isMissingPriority, setIsMissingPriority] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
   const config = useConfig() as ConfigObject;
+  const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
 
   const addVisitToQueue = useCallback(() => {
     if (!queueUuid) {
@@ -63,8 +69,19 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
     const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
     const status = config.concepts.defaultStatusConceptUuid;
+    const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
 
-    addQueueEntry(visitUuid, queueUuid, patientUuid, priority, status, sortWeight, new AbortController()).then(
+    addQueueEntry(
+      visitUuid,
+      queueUuid,
+      patientUuid,
+      priority,
+      status,
+      sortWeight,
+      new AbortController(),
+      selectedQueueLocation,
+      visitQueueNumberAttributeUuid,
+    ).then(
       ({ status }) => {
         if (status === 201) {
           showToast({
@@ -74,9 +91,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-          mutate(`/ws/rest/v1/visit?includeInactive=false`);
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
+          mutate();
         }
       },
       (error) => {

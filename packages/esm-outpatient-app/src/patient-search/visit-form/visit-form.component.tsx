@@ -43,8 +43,7 @@ import BaseVisitType from './base-visit-type.component';
 import { convertTime12to24, amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { useSWRConfig } from 'swr';
-import { saveQueueEntry } from './queue.resource';
+import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -72,7 +71,8 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
-  const { mutate } = useSWRConfig();
+  const { mutate } = useVisitQueueEntries('', '');
+  const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -120,56 +120,41 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           (response) => {
             if (response.status === 201) {
               // add new queue entry if visit created successfully
-              const queuePayload: QueueEntryPayload = {
-                visit: {
-                  uuid: response.data.uuid,
-                },
-                queueEntry: {
-                  status: {
-                    uuid: status,
-                  },
-                  priority: {
-                    uuid: priority,
-                  },
-                  queue: {
-                    uuid: serviceUuid,
-                  },
-                  patient: {
-                    uuid: patientUuid,
-                  },
-                  startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
-                  sortWeight: sortWeight,
-                },
-              };
-
-              saveQueueEntry(queuePayload, abortController)
-                .pipe(first())
-                .subscribe(
-                  (response) => {
-                    if (response.status === 201) {
-                      showToast({
-                        kind: 'success',
-                        title: t('startVisit', 'Start a visit'),
-                        description: t(
-                          'startVisitQueueSuccessfully',
-                          'Patient has been added to active visits list and queue.',
-                          `${hours} : ${minutes}`,
-                        ),
-                      });
-                      closePanel();
-                      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-                      mutate(`/ws/rest/v1/visit-queue-entry?location=${queueLocation}&v=full`);
-                    }
-                  },
-                  (error) => {
-                    showNotification({
-                      title: t('queueEntryError', 'Error adding patient to the queue'),
-                      kind: 'error',
-                      critical: true,
-                      description: error?.message,
+              addQueueEntry(
+                response.data.uuid,
+                serviceUuid,
+                patientUuid,
+                priority,
+                status,
+                sortWeight,
+                abortController,
+                queueLocation,
+                visitQueueNumberAttributeUuid,
+              ).then(
+                ({ status }) => {
+                  if (status === 201) {
+                    showToast({
+                      kind: 'success',
+                      title: t('startVisit', 'Start a visit'),
+                      description: t(
+                        'startVisitQueueSuccessfully',
+                        'Patient has been added to active visits list and queue.',
+                        `${hours} : ${minutes}`,
+                      ),
                     });
-                  },
-                );
+                    closePanel();
+                    mutate();
+                  }
+                },
+                (error) => {
+                  showNotification({
+                    title: t('queueEntryError', 'Error adding patient to the queue'),
+                    kind: 'error',
+                    critical: true,
+                    description: error?.message,
+                  });
+                },
+              );
             }
           },
           (error) => {
