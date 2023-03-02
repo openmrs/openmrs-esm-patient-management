@@ -97,7 +97,10 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     if (!isLoadingAttributes && attributes) {
       let personAttributes = {};
       attributes.forEach((attribute) => {
-        personAttributes[attribute.attributeType.uuid] = attribute.value;
+        personAttributes[attribute.attributeType.uuid] =
+          attribute.attributeType.format === 'org.openmrs.Concept' && typeof attribute.value === 'object'
+            ? attribute.value?.uuid
+            : attribute.value;
       });
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,
@@ -199,7 +202,9 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 function useInitialPersonAttributes(personUuid: string) {
   const shouldFetch = !!personUuid;
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
-    shouldFetch ? `/ws/rest/v1/person/${personUuid}/attribute` : null,
+    shouldFetch
+      ? `/ws/rest/v1/person/${personUuid}/attribute?v=custom:(uuid,display,attributeType:(uuid,display,format),value)`
+      : null,
     openmrsFetch,
   );
   const result = useMemo(() => {
