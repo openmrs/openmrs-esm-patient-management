@@ -1,6 +1,7 @@
 import { useSession, Visit, openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
+import { WaitTime } from '../types';
 
 export function useActiveVisits() {
   const currentUserSession = useSession();
@@ -29,5 +30,18 @@ export function useActiveVisits() {
     isLoading,
     isError: error,
     isValidating,
+  };
+}
+
+export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
+  const apiUrl = `/ws/rest/v1/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(apiUrl, openmrsFetch);
+
+  return {
+    waitTime: data ? data?.data : null,
+    isLoading,
+    isError: error,
+    isValidating,
+    mutate,
   };
 }
