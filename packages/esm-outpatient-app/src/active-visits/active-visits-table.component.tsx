@@ -62,6 +62,7 @@ import {
   useSelectedServiceName,
   useSelectedQueueLocationUuid,
   useSelectedProviderRoomTimestamp,
+  useIsPermanentProviderQueueRoom,
 } from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
@@ -107,7 +108,8 @@ function ActiveVisitsTable() {
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { services } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
+  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
@@ -117,9 +119,12 @@ function ActiveVisitsTable() {
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
   const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
-  const currentProviderRoomTimestamp = useSelectedProviderRoomTimestamp();
-  const differenceInTime = timeDiffInMinutes(new Date(), currentProviderRoomTimestamp);
+  const differenceInTime = timeDiffInMinutes(
+    new Date(),
+    new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
+  );
 
+  const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
 
@@ -249,7 +254,7 @@ function ActiveVisitsTable() {
   }, [providerUuid]);
 
   useEffect(() => {
-    if (differenceInTime >= 1) {
+    if (differenceInTime >= 1 && isPermanentProviderQueueRoom == 'false') {
       launchAddProviderRoomModal();
     }
   }, []);

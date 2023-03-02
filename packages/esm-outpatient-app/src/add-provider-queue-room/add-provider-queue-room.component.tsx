@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   ModalBody,
@@ -8,6 +8,7 @@ import {
   InlineNotification,
   Select,
   SelectItem,
+  Checkbox,
   Dropdown,
 } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
@@ -16,13 +17,23 @@ import { useTranslation } from 'react-i18next';
 import styles from './add-provider-queue-room.scss';
 import { useSWRConfig } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { addProviderToQueueRoom, useQueueRooms } from './add-provider-queue-room.resource';
+import {
+  addProviderToQueueRoom,
+  updateProviderToQueueRoom,
+  useProvidersQueueRoom,
+  useQueueRooms,
+} from './add-provider-queue-room.resource';
 import {
   updatedSelectedQueueRoomTimestamp,
+  updateIsPermanentProviderQueueRoom,
   updateSelectedQueueLocationName,
   updateSelectedQueueLocationUuid,
   updateSelectedServiceName,
   updateSelectedServiceUuid,
+  useIsPermanentProviderQueueRoom,
+  useSelectedQueueLocationUuid,
+  useSelectedServiceName,
+  useSelectedServiceUuid,
 } from '../helpers/helpers';
 
 interface AddProviderQueueRoomProps {
@@ -33,64 +44,112 @@ interface AddProviderQueueRoomProps {
 const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUuid, closeModal }) => {
   const { t } = useTranslation();
 
-  const [queueUuid, setQueueUuid] = useState('');
+  const currentLocationName = useSelectedServiceName();
+  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const currentServiceUuid = useSelectedServiceUuid();
+  const currentServiceName = useSelectedServiceName();
+  const currentIsPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
+  const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
   const [queueRoomUuid, setQueueRoomUuid] = useState('');
+  const [queueProviderMapUuid, setQueueProviderMapUuid] = useState('');
+  useEffect(() => {
+    if (providerRoom?.length > 0) {
+      setQueueRoomUuid(providerRoom?.[0].queueRoom?.uuid);
+      setQueueProviderMapUuid(providerRoom?.[0].uuid);
+    }
+  });
+
   const { mutate } = useSWRConfig();
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { services } = useServices(selectedQueueLocation);
-  const { rooms } = useQueueRooms(selectedQueueLocation, queueUuid);
+  const { services } = useServices(currentLocationUuid);
+  const { rooms } = useQueueRooms(currentLocationUuid, currentServiceUuid);
   const { queueLocations } = useQueueLocations();
   const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
-  const [isMissingService, setIsMissingService] = useState(false);
+
+  const handleServiceChange = ({ selectedItem }) => {
+    localStorage.setItem('queueServiceName', selectedItem.name);
+    localStorage.setItem('queueServiceUuid', selectedItem.uuid);
+    updateSelectedServiceName(selectedItem.name);
+    updateSelectedServiceUuid(selectedItem.uuid);
+  };
+
+  const handleQueueLocationChange = ({ selectedItem }) => {
+    localStorage.setItem('queueLocationUuid', selectedItem.id);
+    localStorage.setItem('queueLocationName', selectedItem.name);
+    updateSelectedQueueLocationName(selectedItem.name);
+    updateSelectedQueueLocationUuid(selectedItem.id);
+  };
+
+  const handleRetainLocation = (e) => {
+    localStorage.setItem('isPermanentProviderQueueRoom', JSON.parse(e.target.checked));
+    updateIsPermanentProviderQueueRoom(JSON.parse(e.target.checked));
+  };
 
   const onSubmit = useCallback(() => {
-    if (!queueUuid) {
-      setIsMissingService(true);
-      return;
-    }
-    setIsMissingService(false);
-
     if (!queueRoomUuid) {
       setIsMissingQueueRoom(true);
       return;
     }
     setIsMissingQueueRoom(false);
 
-    addProviderToQueueRoom(queueRoomUuid, providerUuid, new AbortController()).then(
-      ({ status }) => {
-        if (status === 201) {
-          showToast({
+    if (providerRoom?.length > 0) {
+      updateProviderToQueueRoom(queueProviderMapUuid, queueRoomUuid, providerUuid, new AbortController()).then(
+        ({ status }) => {
+          if (status === 200) {
+            showToast({
+              critical: true,
+              title: t('updateRoom', 'Update room'),
+              kind: 'success',
+              description: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
+            });
+            closeModal();
+            localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
+            updatedSelectedQueueRoomTimestamp(new Date());
+            mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+            mutate(`/ws/rest/v1/visit?includeInactive=false`);
+            mutate(`/ws/rest/v1/visit-queue-entry?location=${currentLocationUuid}&v=full`);
+            mutate(`/ws/rest/v1/queueroom?location=${currentLocationUuid}&queue=${currentServiceUuid}`);
+          }
+        },
+        (error) => {
+          showNotification({
+            title: t('queueRoomAddFailed', 'Error adding queue room'),
+            kind: 'error',
             critical: true,
-            title: t('addEntry', 'Add entry'),
-            kind: 'success',
-            description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
+            description: error?.message,
           });
           closeModal();
-          mutate(`/ws/rest/v1/queueroom?location=${selectedQueueLocation}&queue=${queueUuid}`);
-        }
-      },
-      (error) => {
-        showNotification({
-          title: t('queueEntryAddFailed', 'Error adding queue entry status'),
-          kind: 'error',
-          critical: true,
-          description: error?.message,
-        });
-      },
-    );
-  }, [queueUuid, providerUuid, queueRoomUuid, t, closeModal, mutate]);
-
-  const handleServiceChange = ({ selectedItem }) => {
-    setQueueUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.name);
-    updateSelectedServiceUuid(selectedItem.uuid);
-  };
-
-  const handleQueueLocationChange = ({ selectedItem }) => {
-    setSelectedQueueLocation(selectedItem.id);
-    updateSelectedQueueLocationName(selectedItem.name);
-    updateSelectedQueueLocationUuid(selectedItem.id);
-  };
+        },
+      );
+    } else {
+      addProviderToQueueRoom(queueRoomUuid, providerUuid, new AbortController()).then(
+        ({ status }) => {
+          if (status === 201) {
+            showToast({
+              critical: true,
+              title: t('addRoom', 'Add room'),
+              kind: 'success',
+              description: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+            });
+            closeModal();
+            localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
+            updatedSelectedQueueRoomTimestamp(new Date());
+            mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+            mutate(`/ws/rest/v1/visit?includeInactive=false`);
+            mutate(`/ws/rest/v1/visit-queue-entry?location=${currentLocationUuid}&v=full`);
+            mutate(`/ws/rest/v1/queueroom?location=${currentLocationUuid}&queue=${currentServiceUuid}`);
+          }
+        },
+        (error) => {
+          showNotification({
+            title: t('queueRoomAddFailed', 'Error adding queue room'),
+            kind: 'error',
+            critical: true,
+            description: error?.message,
+          });
+        },
+      );
+    }
+  }, [providerUuid, queueRoomUuid, t, closeModal, mutate]);
 
   return (
     <div>
@@ -107,6 +166,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               itemToString={(item) => (item ? item.name : '')}
               onChange={handleQueueLocationChange}
               size="md"
+              initialSelectedItem={{ uuid: currentLocationUuid, name: currentLocationName }}
             />
           </section>
 
@@ -120,18 +180,9 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}
               size="md"
+              initialSelectedItem={{ uuid: currentServiceUuid, display: currentServiceName }}
             />
           </section>
-          {isMissingService && (
-            <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingService', 'Please select a service')}
-              />
-            </section>
-          )}
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueRoom', 'Queue room')}</div>
@@ -141,9 +192,10 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
                 id="service"
                 invalidText="Required"
                 value={queueRoomUuid}
+                defaultValue={queueRoomUuid}
                 onChange={(event) => {
                   setQueueRoomUuid(event.target.value);
-                  updatedSelectedQueueRoomTimestamp(new Date());
+                  localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
                 }}>
                 {!queueRoomUuid ? <SelectItem text={t('chooseRoom', 'Select a room')} value="" /> : null}
                 {rooms?.length > 0 &&
@@ -165,6 +217,16 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               />
             </section>
           )}
+
+          <section className={styles.section}>
+            <Checkbox
+              onChange={handleRetainLocation}
+              checked={currentIsPermanentProviderQueueRoom}
+              labelText={t('retainLocation', `Retail location?`)}
+              id="retianLocation"
+              className={styles.checkbox}
+            />
+          </section>
         </Form>
       </ModalBody>
       <ModalFooter>

@@ -26,8 +26,8 @@ function ClinicMetrics() {
   const { metrics, isLoading } = useMetrics();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { allServices } = useServices(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
   const currentServiceUuid = useSelectedServiceUuid();
+  const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
   const [initialSelectedItem, setInitialSelectItem] = useState(true);
   const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);

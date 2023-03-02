@@ -1,6 +1,7 @@
 import { AppointmentSummary, QueueServiceInfo } from '../types';
 import { getGlobalStore } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
+import { boolean } from 'yup';
 
 export const getServiceCountByAppointmentType = (
   appointmentSummary: Array<AppointmentSummary>,
@@ -12,12 +13,15 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-const initialServiceNameState = { serviceName: '' };
-const initialServiceUuidState = { serviceUuid: '' };
+const initialServiceNameState = { serviceName: localStorage.getItem('queueServiceName') };
+const initialServiceUuidState = { serviceUuid: localStorage.getItem('queueServiceUuid') };
 const intialStatusNameState = { status: '' };
-const initialQueueLocationNameState = { queueLocationName: '' };
-const initialQueueLocationUuidState = { queueLocationUuid: '' };
+const initialQueueLocationNameState = { queueLocationName: localStorage.getItem('queueLocationName') };
+const initialQueueLocationUuidState = { queueLocationUuid: localStorage.getItem('queueLocationUuid') };
 const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
+const initialPermanentProviderQueueRoomState = {
+  isPermanentProviderQueueRoom: localStorage.getItem('isPermanentProviderQueueRoom'),
+};
 
 export function getSelectedServiceName() {
   return getGlobalStore<{ serviceName: string }>('queueSelectedServiceName', initialServiceNameState);
@@ -43,6 +47,13 @@ export function getSelectedQueueRoomTimestamp() {
   return getGlobalStore<{ providerQueueRoomTimestamp: Date }>(
     'queueProviderRoomTimestamp',
     initialSelectedQueueRoomTimestamp,
+  );
+}
+
+export function getIsPermanentProviderQueueRoom() {
+  return getGlobalStore<{ isPermanentProviderQueueRoom: string }>(
+    'isPermanentProviderQueueRoom',
+    initialPermanentProviderQueueRoomState,
   );
 }
 
@@ -74,6 +85,11 @@ export const updateSelectedQueueLocationUuid = (currentLocationUuid: string) => 
 export const updatedSelectedQueueRoomTimestamp = (currentProviderRoomTimestamp: Date) => {
   const store = getSelectedQueueRoomTimestamp();
   store.setState({ providerQueueRoomTimestamp: currentProviderRoomTimestamp });
+};
+
+export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQueueRoom) => {
+  const store = getIsPermanentProviderQueueRoom();
+  store.setState({ isPermanentProviderQueueRoom: currentIsPermanentProviderQueueRoom });
 };
 
 export const useSelectedServiceName = () => {
@@ -136,4 +152,17 @@ export const useSelectedProviderRoomTimestamp = () => {
     );
   }, []);
   return currentProviderRoomTimestamp;
+};
+
+export const useIsPermanentProviderQueueRoom = () => {
+  const [currentIsPermanentProviderQueueRoom, setCurrentIsPermanentProviderQueueRoom] = useState(
+    initialPermanentProviderQueueRoomState.isPermanentProviderQueueRoom,
+  );
+
+  useEffect(() => {
+    getIsPermanentProviderQueueRoom().subscribe(({ isPermanentProviderQueueRoom }) =>
+      setCurrentIsPermanentProviderQueueRoom(isPermanentProviderQueueRoom),
+    );
+  }, []);
+  return currentIsPermanentProviderQueueRoom;
 };
