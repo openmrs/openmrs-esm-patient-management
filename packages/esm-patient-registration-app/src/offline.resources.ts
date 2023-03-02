@@ -41,11 +41,10 @@ export async function fetchPatientIdentifierTypesWithSources(
   // @ts-ignore Reason: The required props of the type are generated below.
   const identifierTypes: Array<PatientIdentifierType> = patientIdentifierTypes.filter(Boolean);
 
-  const autoGenOptions = await fetchAutoGenerationOptions(abortController);
-
-  const allIdentifierSources = await Promise.all(
-    identifierTypes.map((identifierType) => fetchIdentifierSources(identifierType.uuid, abortController)),
-  );
+  const [autoGenOptions, ...allIdentifierSources] = await Promise.all([
+    fetchAutoGenerationOptions(abortController),
+    ...identifierTypes.map((identifierType) => fetchIdentifierSources(identifierType.uuid, abortController)),
+  ]);
 
   for (let i = 0; i < identifierTypes?.length; i++) {
     identifierTypes[i].identifierSources = allIdentifierSources[i].data.results.map((source) => {
@@ -61,15 +60,13 @@ export async function fetchPatientIdentifierTypesWithSources(
 async function fetchPatientIdentifierTypes(
   abortController?: AbortController,
 ): Promise<Array<FetchedPatientIdentifierType>> {
-  const patientIdentifierTypesResponse = await cacheAndFetch(
-    '/ws/rest/v1/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)',
-    abortController,
-  );
-
-  const primaryIdentifierTypeResponse = await cacheAndFetch(
-    '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
-    abortController,
-  );
+  const [patientIdentifierTypesResponse, primaryIdentifierTypeResponse] = await Promise.all([
+    cacheAndFetch(
+      '/ws/rest/v1/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)',
+      abortController,
+    ),
+    cacheAndFetch('/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType', abortController),
+  ]);
 
   if (patientIdentifierTypesResponse.ok) {
     // Primary identifier type is to be kept at the top of the list.
