@@ -10,6 +10,7 @@ import {
   Select,
   SelectItem,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import {
   ConfigObject,
   showNotification,
@@ -18,12 +19,10 @@ import {
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { updateQueueEntry, usePriority, useServices, useVisitQueueEntries } from './active-visits-table.resource';
-import { useTranslation } from 'react-i18next';
-import styles from './change-status-dialog.scss';
-import { useSWRConfig } from 'swr';
 import { MappedQueueEntry } from '../types';
+import { updateQueueEntry, usePriority, useServices, useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import styles from './change-status-dialog.scss';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;

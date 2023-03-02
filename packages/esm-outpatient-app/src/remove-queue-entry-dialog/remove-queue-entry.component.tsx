@@ -1,7 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MappedQueueEntry } from '../types';
-import styles from './remove-queue-entry.scss';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import {
   parseDate,
@@ -11,10 +9,11 @@ import {
   toOmrsIsoString,
   useVisit,
 } from '@openmrs/esm-framework';
-import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
-import { useSWRConfig } from 'swr';
+import { MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
+import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import styles from './remove-queue-entry.scss';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;

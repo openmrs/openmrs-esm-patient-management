@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import styles from './clear-queue-entries-dialog.scss';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
-import { useSWRConfig } from 'swr';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
 import { MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 

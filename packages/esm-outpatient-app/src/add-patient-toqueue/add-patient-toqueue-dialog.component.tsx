@@ -1,19 +1,16 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
-  InlineLoading,
+  ContentSwitcher,
+  Form,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Form,
-  FormGroup,
-  RadioButton,
-  RadioButtonGroup,
-  ContentSwitcher,
-  Switch,
   Select,
   SelectItem,
-  InlineNotification,
+  Switch,
 } from '@carbon/react';
 import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import {
@@ -23,9 +20,7 @@ import {
   useStatus,
   useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
-import { useTranslation } from 'react-i18next';
 import styles from './add-patient-toqueue-dialog.scss';
-import { useSWRConfig } from 'swr';
 import { ActiveVisit } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
@@ -103,7 +98,19 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
         });
       },
     );
-  }, [priority, status, visitUuid, queueUuid, patientUuid, priorities, statuses, t, closeModal, mutate]);
+  }, [
+    queueUuid,
+    priority,
+    config.concepts.emergencyPriorityConceptUuid,
+    config.concepts.defaultStatusConceptUuid,
+    config.concepts.visitQueueNumberAttributeUuid,
+    visitUuid,
+    patientUuid,
+    selectedQueueLocation,
+    t,
+    closeModal,
+    mutate,
+  ]);
 
   return (
     <div>
