@@ -91,7 +91,7 @@ yarn test
 To run E2E tests, make sure the dev server is running by using:
 
 ```sh
-yarn start
+yarn start --sources 'packages/esm-*-app/'
 ```
 
 Then, in a separate terminal, run:

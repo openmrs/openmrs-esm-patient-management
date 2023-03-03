@@ -31,7 +31,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run dev server
-        run: yarn start &
+        run: yarn start --sources 'packages/esm-*-app/'&
 
       - name: Run E2E tests
         run: yarn playwright test --project=chromium
@@ -75,7 +75,7 @@ jobs:
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:9000/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
       - name: Run dev server
-        run: yarn start --backend "http://localhost:9000" &
+        run: yarn start --sources 'packages/esm-*-app/' --backend "http://localhost:9000" &
 
       - name: Run E2E tests
         run: yarn playwright test
