@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
-import { MappedVisitQueueEntry, updateQueueEntry } from '../active-visits/active-visits-table.resource';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import {
   ConfigObject,
   ExtensionSlot,
@@ -13,14 +14,16 @@ import {
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { mutate } from 'swr';
-import styles from './transition-queue-entry-dialog.scss';
-import dayjs from 'dayjs';
-import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
-import { usePastVisits } from '../past-visit/past-visit.resource';
-import { requeueQueueEntry } from './transition-queue-entry.resource';
+import {
+  MappedVisitQueueEntry,
+  updateQueueEntry,
+  useVisitQueueEntries,
+} from '../active-visits/active-visits-table.resource';
 import { findObsByConceptUUID } from '../helpers/functions';
+import { requeueQueueEntry } from './transition-queue-entry.resource';
+import { usePastVisits } from '../past-visit/past-visit.resource';
+import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
+import styles from './transition-queue-entry-dialog.scss';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
@@ -50,6 +53,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
   const obsToDisplay =
     !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
+  const { mutate } = useVisitQueueEntries('', '');
 
   const launchEditPriorityModal = useCallback(() => {
     const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
@@ -74,7 +78,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             description: t('patientAttendingService', 'Patient attending service'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${queueEntry?.queueLocation}&v=full`);
+          mutate();
           navigate({ to: `\${openmrsSpaBase}/patient/${queueEntry?.patientUuid}/chart` });
         }
       },
@@ -105,7 +109,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             description: t('patientRequeued', 'Patient has been requeued'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${queueEntry?.queueLocation}&v=full`);
+          mutate();
         }
       },
       (error) => {

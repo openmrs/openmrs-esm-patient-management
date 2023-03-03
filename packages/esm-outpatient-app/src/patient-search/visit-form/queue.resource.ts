@@ -1,23 +1,6 @@
-import {
-  FetchResponse,
-  openmrsFetch,
-  openmrsObservableFetch,
-  toDateObjectStrict,
-  toOmrsIsoString,
-} from '@openmrs/esm-framework';
-import { Observable } from 'rxjs';
+import { openmrsFetch, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
+import { generateVisitQueueNumber } from '../../active-visits/active-visits-table.resource';
 import { Appointment } from '../../types';
-
-export function saveQueueEntry(payload: any, abortController: AbortController): Observable<FetchResponse<any>> {
-  return openmrsObservableFetch(`/ws/rest/v1/visit-queue-entry`, {
-    signal: abortController.signal,
-    method: 'POST',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: payload,
-  });
-}
 
 export async function addQueueEntry(
   visitUuid: string,
@@ -27,8 +10,13 @@ export async function addQueueEntry(
   queueServiceUuid: string,
   appointment: Appointment,
   abortController: AbortController,
+  locationUuid: string,
+  visitQueueNumberAttributeUuid: string,
 ) {
-  await Promise.all([saveAppointment(appointment, abortController)]);
+  await Promise.all([
+    saveAppointment(appointment, abortController),
+    generateVisitQueueNumber(locationUuid, visitUuid, queueServiceUuid, abortController, visitQueueNumberAttributeUuid),
+  ]);
 
   return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
     method: 'POST',

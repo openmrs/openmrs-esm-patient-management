@@ -106,6 +106,7 @@ interface UseVisitQueueEntries {
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
+  mutate: () => void;
 }
 
 interface ObsData {
@@ -186,7 +187,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -256,6 +257,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     isLoading,
     isError: error,
     isValidating,
+    mutate,
   };
 }
 
@@ -362,7 +364,13 @@ export async function addQueueEntry(
   status: string,
   sortWeight: number,
   abortController: AbortController,
+  locationUuid: string,
+  visitQueueNumberAttributeUuid: string,
 ) {
+  await Promise.all([
+    generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, abortController, visitQueueNumberAttributeUuid),
+  ]);
+
   return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
     method: 'POST',
     headers: {
@@ -389,4 +397,23 @@ export async function addQueueEntry(
       },
     },
   });
+}
+
+export async function generateVisitQueueNumber(
+  location: string,
+  visitUuid: string,
+  queueUuid: string,
+  abortController: AbortController,
+  visitQueueNumberAttributeUuid: string,
+) {
+  await openmrsFetch(
+    `/ws/rest/v1/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: abortController.signal,
+    },
+  );
 }

@@ -157,6 +157,14 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'add-queue-entry-widget',
+        slot: 'add-queue-entry-slot',
+        load: getAsyncLifecycle(
+          () => import('./patient-search/visit-form-queue-fields/visit-form-queue-fields.component'),
+          options,
+        ),
+      },
     ],
   };
 }
