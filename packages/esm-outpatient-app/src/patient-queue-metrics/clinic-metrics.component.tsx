@@ -13,7 +13,7 @@ import {
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
-import { useActiveVisits } from './clinic-metrics.resource';
+import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 
 export interface Service {
   uuid: string;
@@ -32,6 +32,7 @@ function ClinicMetrics() {
   const [initialSelectedItem, setInitialSelectItem] = useState(true);
   const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
+  const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
 
   useEffect(() => {
     if (currentServiceName && currentServiceUuid) {
@@ -79,7 +80,7 @@ function ClinicMetrics() {
         </MetricsCard>
         <MetricsCard
           label={t('minutes', 'Minutes')}
-          value="--"
+          value={waitTime ? waitTime.averageWaitTime : '--'}
           headerLabel={t('averageWaitTime', 'Average wait time today')}
           service="waitTime"
         />

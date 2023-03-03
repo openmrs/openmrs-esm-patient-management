@@ -21,6 +21,16 @@ jest.mock('./queue-metrics.resource.ts', () => {
   };
 });
 
+jest.mock('./clinic-metrics.resource.tsx', () => {
+  const originalModule = jest.requireActual('./clinic-metrics.resource.tsx');
+
+  return {
+    ...originalModule,
+    useAverageWaitTime: jest.fn().mockImplementation(() => ({ waitTime: mockMetrics.waitTime })),
+    useActiveVisits: jest.fn().mockImplementation(() => ({ activeVisitsCount: mockMetrics.activeVisitsCount })),
+  };
+});
+
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
@@ -49,11 +59,12 @@ describe('Clinic metrics', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Checked in patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/100/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/patient list/i));
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();
     expect(screen.getByText(/minutes/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/--/i));
     expect(screen.getByRole('button', { name: /see more metrics/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/patient list/i));
+    expect(screen.getByText(/69/i)).toBeInTheDocument();
 
     // Select a different service to show metrics for
     expect(screen.getByRole('button', { name: /open menu/i }));

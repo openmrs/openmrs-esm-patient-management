@@ -427,3 +427,8 @@ export interface ProvidersQueueRoom {
     display: string;
   };
 }
+
+export interface WaitTime {
+  metric: string;
+  averageWaitTime: string;
+}

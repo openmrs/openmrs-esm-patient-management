@@ -1,7 +1,10 @@
 export const mockMetrics = {
-  scheduledAppointments: 100,
-  waiting: 8,
+  activeVisitsCount: 100,
   averageMinutes: 28,
+  waitTime: {
+    queue: 'Clinical Consultation',
+    averageWaitTime: 69.0,
+  },
 };
 
 export const mockServices = ['Clinical consultation', 'Triage'];
