@@ -21,12 +21,14 @@ const StartVisitQueueFields: React.FC = () => {
   const { allServices, isLoading } = useServices(selectedQueueLocation);
   const [priority, setPriority] = useState(defaultPriority);
   const [status, setStatus] = useState(defaultStatus);
-  const [sortWeight, setSortWeight] = useState(() => {
+  const [sortWeight, setSortWeight] = useState(0);
+
+  useEffect(() => {
     if (priority === emergencyPriorityConceptUuid) {
-      return 1;
+      setSortWeight(1);
     }
-    return 0;
-  });
+  }, [priority]);
+
   const [service, setSelectedService] = useState(() => {
     if (allServices?.length > 0) {
       return allServices[0].uuid;
