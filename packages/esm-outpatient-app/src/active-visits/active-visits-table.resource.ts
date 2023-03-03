@@ -226,7 +226,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     waitTime: visitQueueEntry.queueEntry.startedAt
       ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
       : '--',
-    visitStartDateTime: visitQueueEntry.visit?.visitStartDateTime,
+    visitStartDateTime: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
     visitLocation: visitQueueEntry.visit?.location?.uuid,
     queueLocation: visitQueueEntry.queueEntry?.queue?.location?.uuid,
@@ -244,11 +244,13 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   let mappedVisitQueueEntries;
 
   if (!currServiceName || currServiceName == t('all', 'All')) {
-    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+    mappedVisitQueueEntries = data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter(({ visitStartDateTime }) => dayjs(visitStartDateTime).isToday());
   } else {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service === currServiceName);
+      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime).isToday());
   }
 
   return {
@@ -339,14 +341,16 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
     id: visitQueueEntry.queueEntry.uuid,
     name: visitQueueEntry.queueEntry.display,
     age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age : '--',
-    returnDate: visitQueueEntry.visit?.visitStartDateTime,
+    returnDate: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
     phoneNumber: visitQueueEntry.patient ? visitQueueEntry.patient?.phoneNumber : '--',
     gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
     patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
   });
 
-  const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
+  const mappedServiceQueueEntries = data?.data?.results
+    ?.map(mapServiceQueueEntryProperties)
+    .filter(({ returnDate }) => dayjs(returnDate).isToday());
 
   return {
     serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],

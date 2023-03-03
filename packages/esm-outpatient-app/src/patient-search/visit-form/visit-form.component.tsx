@@ -247,9 +247,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           </section>
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
+            <div className={styles.sectionTitle}>{t('facility', 'Facility')}</div>
             <Select
-              labelText={t('selectLocation', 'Select a location')}
+              labelText={t('selectFacility', 'Select a facility')}
               id="location"
               invalidText="Required"
               value={selectedLocation}

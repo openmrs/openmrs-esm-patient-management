@@ -125,7 +125,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
 
   return (
     <div>
-      <ModalHeader closeModal={closeModal} title={t('admitPatient', 'Admit patient')} />
+      <ModalHeader closeModal={closeModal} title={t('servePatient', 'Serve patient')} />
       <ModalBody className={styles.modalBody}>
         <div>
           <section className={styles.modalBody}>
@@ -170,7 +170,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         <Button kind="secondary" onClick={() => handleRequeuePatient()}>
           {t('requeue', 'Requeue')}
         </Button>
-        <Button onClick={() => launchEditPriorityModal()}>{t('admit', 'Admit')}</Button>
+        <Button onClick={() => launchEditPriorityModal()}>{t('serve', 'Serve')}</Button>
       </ModalFooter>
     </div>
   );
