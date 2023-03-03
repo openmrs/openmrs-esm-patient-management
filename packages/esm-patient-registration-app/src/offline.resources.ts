@@ -41,13 +41,13 @@ export async function fetchPatientIdentifierTypesWithSources(
   // @ts-ignore Reason: The required props of the type are generated below.
   const identifierTypes: Array<PatientIdentifierType> = patientIdentifierTypes.filter(Boolean);
 
-  for (const identifierType of identifierTypes) {
-    const [identifierSources, autoGenOptions] = await Promise.all([
-      fetchIdentifierSources(identifierType.uuid, abortController),
-      fetchAutoGenerationOptions(abortController),
-    ]);
+  const [autoGenOptions, ...allIdentifierSources] = await Promise.all([
+    fetchAutoGenerationOptions(abortController),
+    ...identifierTypes.map((identifierType) => fetchIdentifierSources(identifierType.uuid, abortController)),
+  ]);
 
-    identifierType.identifierSources = identifierSources.data.results.map((source) => {
+  for (let i = 0; i < identifierTypes?.length; i++) {
+    identifierTypes[i].identifierSources = allIdentifierSources[i].data.results.map((source) => {
       const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
       source.autoGenerationOption = option;
       return source;
@@ -60,15 +60,13 @@ export async function fetchPatientIdentifierTypesWithSources(
 async function fetchPatientIdentifierTypes(
   abortController?: AbortController,
 ): Promise<Array<FetchedPatientIdentifierType>> {
-  const patientIdentifierTypesResponse = await cacheAndFetch(
-    '/ws/rest/v1/patientidentifiertype?v=full',
-    abortController,
-  );
-
-  const primaryIdentifierTypeResponse = await cacheAndFetch(
-    '/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType',
-    abortController,
-  );
+  const [patientIdentifierTypesResponse, primaryIdentifierTypeResponse] = await Promise.all([
+    cacheAndFetch(
+      '/ws/rest/v1/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)',
+      abortController,
+    ),
+    cacheAndFetch('/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType', abortController),
+  ]);
 
   if (patientIdentifierTypesResponse.ok) {
     // Primary identifier type is to be kept at the top of the list.
@@ -90,10 +88,7 @@ async function fetchPatientIdentifierTypes(
         identifierTypes.push(mapPatientIdentifierType(type, false));
       }
     });
-    return identifierTypes.map((identifierType) => ({
-      ...identifierType,
-      fieldName: camelCase(identifierType.name),
-    }));
+    return identifierTypes;
   }
 
   return [];
@@ -122,7 +117,7 @@ async function cacheAndFetch<T = any>(url: string, abortController?: AbortContro
 function mapPatientIdentifierType(patientIdentifierType, isPrimary) {
   return {
     name: patientIdentifierType.display,
-    fieldName: camelCase(patientIdentifierType.display),
+    fieldName: camelCase(patientIdentifierType.name),
     required: patientIdentifierType.required,
     uuid: patientIdentifierType.uuid,
     format: patientIdentifierType.format,
