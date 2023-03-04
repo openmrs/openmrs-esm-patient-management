@@ -10,7 +10,7 @@ Please ensure that you have followed the basic installation guide in the
 Once everything is set up, make sure the dev server is running by using:
 
 ```sh
-yarn start
+yarn start --sources 'packages/esm-*-app/'
 ```
 Then, in a separate terminal, run:
 
