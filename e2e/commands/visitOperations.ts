@@ -3,7 +3,7 @@ import { Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 export const startVisit = async (api: APIRequestContext, patientId: string): Promise<Visit> => {
-  const visitRes = await api.post('rest/v1/visit', {
+  const visitRes = await api.post('visit', {
     data: {
       startDatetime: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
       patient: patientId,
@@ -18,7 +18,7 @@ export const startVisit = async (api: APIRequestContext, patientId: string): Pro
 };
 
 export const endVisit = async (api: APIRequestContext, uuid: string) => {
-  await api.post(`rest/v1/visit/${uuid}`, {
+  await api.post(`visit/${uuid}`, {
     data: {
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
       startDatetime: dayjs().subtract(1, 'D').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'),

@@ -63,7 +63,7 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
+  const { activeVisits, isLoading, isValidating } = useActiveVisits();
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
