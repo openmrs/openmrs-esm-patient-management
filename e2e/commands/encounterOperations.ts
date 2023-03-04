@@ -8,8 +8,14 @@ export const createEncounter = async (api: APIRequestContext, patientId: string,
       encounterDatetime: dayjs().format(),
       form: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
       patient: patientId,
+      encounterProviders: [
+        {
+          encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+          provider: '729cad8f-25d2-4b1f-83da-54d180a18729',
+        },
+      ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
-      encounterType: '0e8230ce-bd1d-43f5-a863-cf44344fa4b0',
+      encounterType: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
       obs: [
         {
           concept: {

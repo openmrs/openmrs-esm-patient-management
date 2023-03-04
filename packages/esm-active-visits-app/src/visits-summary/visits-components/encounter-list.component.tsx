@@ -90,7 +90,9 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                        <TableCell key={cell.id} data-testid={cell.id}>
+                          {cell.value}
+                        </TableCell>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (

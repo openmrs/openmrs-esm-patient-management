@@ -189,7 +189,7 @@ const ActiveVisitsTable = () => {
                         {...getRowProps({ row })}
                         data-testid={`activeVisitRow${paginatedActiveVisits?.[index]?.patientUuid}`}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
+                          <TableCell key={cell.id} data-testid={cell.id}>
                             {cell.info.header === 'name' ? (
                               <PatientNameLink
                                 from={fromPage}

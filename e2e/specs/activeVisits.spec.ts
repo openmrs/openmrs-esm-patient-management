@@ -18,34 +18,29 @@ test.beforeEach(async ({ api }) => {
 
 test('should be able to see the active visits', async ({ page }) => {
   const homePage = new HomePage(page);
+  const openmrsIdentifier = patient.identifiers[0].display.split('=')[1].trim();
+  const firstName = patient.person.display.split(' ')[0];
+  const lastName = patient.person.display.split(' ')[1];
+
   await homePage.goto();
 
   await homePage.clickOnActiveVisitPatient(patient.uuid);
-
-  // Checks for the encounter
-  await expect(
-    page.getByTestId('encountersTable').getByRole('cell', { name: encounter.encounterType.display }),
-  ).toBeTruthy();
-  await expect(page.getByTestId('encountersTable').getByRole('cell', { name: 'Super User: Clinician' })).toBeTruthy();
 
   // Checks the visit details
-  await expect(page.getByRole('cell', { name: patient.display })).toBeTruthy();
-  await expect(
-    page.getByTestId(`activeVisitRow${patient.uuid}`).getByRole('cell', { name: visit.display }),
-  ).toBeTruthy();
-});
+  await expect(page.getByTestId(`${visit.uuid}:idNumber`)).toContainText(openmrsIdentifier);
+  await expect(page.getByTestId(`${visit.uuid}:name`)).toContainText(`${firstName} ${lastName}`);
+  await expect(page.getByTestId(`${visit.uuid}:visitType`)).toContainText(visit.visitType.display);
 
-test('should be able to see the active visit notes', async ({ page }) => {
-  const homePage = new HomePage(page);
-  await homePage.goto();
+  // Checks for the encounter
+  await expect(page.getByTestId(`${encounter.uuid}:encounterType`)).toContainText(encounter.encounterType.display);
+  await expect(page.getByTestId(`${encounter.uuid}:provider`)).toContainText('Super User: Clinician');
 
-  await homePage.clickOnActiveVisitPatient(patient.uuid);
-
+  // Checks for the visit note
   await homePage.clickOnVisitSummaryTab();
-  await expect(page.getByRole('tabpanel', { name: encounterNote }).getByText('note')).toBeTruthy();
+  await expect(page.getByTestId('note')).toContainText(encounterNote);
 });
 
 test.afterEach(async ({ api }) => {
-  await deletePatient(api, patient.uuid);
   await endVisit(api, patient.uuid);
+  await deletePatient(api, patient.uuid);
 });
