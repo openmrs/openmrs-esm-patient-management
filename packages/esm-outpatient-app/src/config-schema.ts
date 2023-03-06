@@ -113,16 +113,6 @@ export const configSchema = {
     _description: 'The identifier types to be display on all patient search result page',
     _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
   },
-  generateVisitQueueNumber: {
-    _type: Type.Boolean,
-    _description: 'Whether to generate a visit queue number on creating a visit',
-    _default: true,
-  },
-  visitQueueNumberAttributeUuid: {
-    _type: Type.ConceptUuid,
-    _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  },
   showRecommendedVisitTypeTab: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
@@ -155,8 +145,6 @@ export interface ConfigObject {
   showQueueTableTab: boolean;
   appointmentStatuses: Array<string>;
   defaultIdentifierTypes: Array<string>;
-  generateVisitQueueNumber: boolean;
-  visitQueueNumberAttributeUuid: string;
   showRecommendedVisitTypeTab: boolean;
 }
 

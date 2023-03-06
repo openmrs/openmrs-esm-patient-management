@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   ConfigObject,
+  navigate,
   showNotification,
   showToast,
   toDateObjectStrict,
@@ -73,6 +74,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             });
             closeModal();
             mutate();
+            navigate({ to: `${window.spaBase}/home` });
           }
         },
         (error) => {
