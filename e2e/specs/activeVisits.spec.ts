@@ -2,7 +2,15 @@ import { Encounter } from './../../packages/esm-active-visits-app/src/visits-sum
 import { test } from '../core';
 import { HomePage } from '../pages';
 import { expect } from '@playwright/test';
-import { createEncounter, deletePatient, endVisit, generateRandomPatient, Patient, startVisit } from '../commands';
+import {
+  createEncounter,
+  deleteEncounter,
+  deletePatient,
+  endVisit,
+  generateRandomPatient,
+  Patient,
+  startVisit,
+} from '../commands';
 import { Visit } from '@openmrs/esm-framework';
 
 let patient: Patient;
@@ -42,5 +50,6 @@ test('should be able to see the active visits', async ({ page }) => {
 
 test.afterEach(async ({ api }) => {
   await endVisit(api, patient.uuid);
+  await deleteEncounter(api, encounter.uuid);
   await deletePatient(api, patient.uuid);
 });

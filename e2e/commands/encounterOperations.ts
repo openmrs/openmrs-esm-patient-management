@@ -30,3 +30,7 @@ export const createEncounter = async (api: APIRequestContext, patientId: string,
   await expect(encounterRes.ok()).toBeTruthy();
   return await encounterRes.json();
 };
+
+export const deleteEncounter = async (api: APIRequestContext, uuid: string) => {
+  await api.delete(`encounter/${uuid}`, { data: {} });
+};
