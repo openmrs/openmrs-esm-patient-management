@@ -10,7 +10,7 @@ export function usePastVisits(patientUuid: string) {
     'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -18,7 +18,7 @@ export function usePastVisits(patientUuid: string) {
   return {
     data: data ? data.data.results : null,
     isError: error,
-    isLoading,
+    isLoading: !data && !error,
     isValidating,
   };
 }

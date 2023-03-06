@@ -12,7 +12,6 @@ export function useTodaysAppointments() {
   const startDate = useAppointmentDate();
 
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
-
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     startDate ? apiUrl : null,
     openmrsFetch,
@@ -35,14 +34,11 @@ export function useTodaysAppointments() {
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
 
   return {
     services: data ? data.data : [],
-    isLoading,
+    isLoading: !data && !error,
     isError: error,
     isValidating,
   };

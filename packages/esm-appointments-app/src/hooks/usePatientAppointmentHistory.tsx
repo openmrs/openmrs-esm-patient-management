@@ -20,10 +20,7 @@ export function usePatientAppointmentHistory(patientUuid: string, abortControlle
       },
     });
 
-  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
-    appointmentsSearchUrl,
-    fetcher,
-  );
+  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
 
   const missedAppointments = data?.data?.length
     ? data.data.filter((appointment) => appointment.status === 'Missed').length
@@ -41,7 +38,7 @@ export function usePatientAppointmentHistory(patientUuid: string, abortControlle
   return {
     appointmentsCount: { missedAppointments, completedAppointments, cancelledAppointments, upcomingAppointments },
     isError: error,
-    isLoading,
+    isLoading: !data && !error,
     isValidating,
   };
 }

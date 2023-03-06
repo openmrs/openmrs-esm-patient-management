@@ -9,14 +9,11 @@ export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
 
   return {
     services: data ? data.data : [],
-    isLoading,
+    isLoading: !data && !error,
     isError: error,
     isValidating,
   };
@@ -29,15 +26,12 @@ export function getAppointmentService(abortController: AbortController, uuid) {
 }
 
 export function useProviders() {
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<Provider> } }, Error>(
-    `/ws/rest/v1/provider`,
-    openmrsFetch,
-  );
+  const { data, error } = useSWR<{ data: { results: Array<Provider> } }, Error>(`/ws/rest/v1/provider`, openmrsFetch);
 
   return {
     data: data ? data.data.results : null,
     isError: error,
-    isLoading,
+    isLoading: !data && !error,
   };
 }
 
@@ -69,7 +63,7 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
   const startDate = dayjs(fromDate).startOf('week').format(omrsDateFormat);
   const endDate = dayjs(startDate).add(2, 'week').format(omrsDateFormat);
   const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
+  const { data, error } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
   const results = first(data?.data.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
   const appointmentCountMap = results?.appointmentCountMap;
   return Object.entries(appointmentCountMap ?? [])
@@ -79,7 +73,6 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
     }))
     .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
-
 export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
   return await openmrsFetch('/ws/rest/v1/appointments/conflicts', {
     method: 'POST',

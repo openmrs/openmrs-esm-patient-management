@@ -50,7 +50,7 @@ const AddAppointmentLink = () => {
       kind="ghost"
       renderIcon={(props) => <Add size={16} {...props} />}
       onClick={() => {
-        navigate({ to: `${spaBasePath}` });
+        navigate({ to: `${spaBasePath}/appointments` });
         launchOverlay(t('search', 'Search'), <PatientSearch />);
       }}>
       {t('addNewAppointment', 'Add new appointment')}

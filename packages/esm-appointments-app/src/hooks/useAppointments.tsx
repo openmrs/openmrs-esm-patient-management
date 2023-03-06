@@ -12,11 +12,11 @@ interface AppointmentsReturnType {
 
 export const useDailyAppointments = (startDateTime: string, durationPeriod: DurationPeriod) => {
   const url = `/ws/rest/v1/appointment/all?forDate=${startDateTime}`;
-  const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }>(url, openmrsFetch);
+  const { data, error } = useSWR<{ data: Array<Appointment> }>(url, openmrsFetch);
 
   return {
     appointments: data?.data ?? [],
-    isLoading,
+    isLoading: !data && !error,
     error: error,
   };
 };
@@ -38,8 +38,8 @@ export const useAppointmentsByDurationPeriod = (date: string, durationPeriod: Du
       },
     });
   const url = 'openmrs/ws/rest/v1/appointments/search';
-  const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }>(url, fetcher);
-  return { isLoading, appointments: data?.data ?? [], error };
+  const { data, error } = useSWR<{ data: Array<Appointment> }>(url, fetcher);
+  return { isLoading: !data && !error, appointments: data?.data ?? [], error };
 };
 
 const getStartAndEndDate = (durationPeriod: DurationPeriod, date: string) => {

@@ -1,20 +1,26 @@
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Location } from '@carbon/react/icons';
-import { formatDate, useSession } from '@openmrs/esm-framework';
+import { Location } from '@carbon/react/icons';
+import { useSession } from '@openmrs/esm-framework';
 import AppointmentsIllustration from './appointments-illustration.component';
 import styles from './appointments-header.scss';
-import { DatePicker, DatePickerInput } from '@carbon/react';
+import { DatePicker, DatePickerInput, Dropdown, Layer } from '@carbon/react';
 import dayjs from 'dayjs';
 import { changeStartDate } from '../helpers';
+import { useAppointmentServices } from '../hooks/useAppointmentService';
 
-const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
+interface AppointmentHeaderProps {
+  title: string;
+  onChange?: (evt) => void;
+}
+
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
   const { t } = useTranslation();
   const session = useSession();
   const datePickerRef = useRef(null);
   const [appointmentDate, setDateTime] = useState(new Date());
   const location = session?.sessionLocation?.display;
-
+  const { serviceTypes } = useAppointmentServices();
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
@@ -44,6 +50,24 @@ const AppointmentsHeader: React.FC<{ title: string }> = ({ title }) => {
             />
           </DatePicker>
         </div>
+        {typeof onChange === 'function' && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '0.25rem' }}>
+            <Layer>
+              <Dropdown
+                ariaLabel="Dropdown"
+                id="selectServicesDropDown"
+                items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
+                itemToString={(item) => (item ? item.name : '')}
+                label={t('selectServiceType', 'Select service type')}
+                titleText={t('view', 'View')}
+                type="inline"
+                size="sm"
+                direction="left"
+                onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
+              />
+            </Layer>
+          </div>
+        )}
       </div>
     </div>
   );

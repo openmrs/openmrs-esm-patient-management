@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import styles from './metrics-card.scss';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
 
 interface MetricsCardProps {
   label: string;
@@ -13,10 +16,20 @@ interface MetricsCardProps {
   children?: React.ReactNode;
   view: string;
   count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
+  appointmentDate?: string;
 }
 
-const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, children, view, count }) => {
+const MetricsCard: React.FC<MetricsCardProps> = ({
+  label,
+  value,
+  headerLabel,
+  children,
+  view,
+  count,
+  appointmentDate,
+}) => {
   const { t } = useTranslation();
+  const isDateInPast = useMemo(() => !dayjs(appointmentDate).isBefore(dayjs(), 'date'), [appointmentDate]);
 
   const metricsLink = {
     patients: 'appointments-list/scheduled',
@@ -45,8 +58,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
         </div>
         {!isEmpty(count) && (
           <div className={styles.countGrid}>
-            <span>Arrived</span>
-            <span>Pending</span>
+            <span>{t('honored', 'Honored')}</span>
+            <span>{isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}</span>
             <p style={{ color: '#319227' }}>{count.arrivedAppointments?.length}</p>
             <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
           </div>
