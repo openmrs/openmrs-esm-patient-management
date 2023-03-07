@@ -91,3 +91,9 @@ export const addPatientToCohort = async (
   await expect(cohortMemberRes.ok()).toBeTruthy();
   return await cohortMemberRes.json();
 };
+
+export const removePatientFromCohort = async (api: APIRequestContext, cohortMemberUuid: string) => {
+  await api.delete(`cohortm/cohortmember/${cohortMemberUuid}`, {
+    data: {},
+  });
+};

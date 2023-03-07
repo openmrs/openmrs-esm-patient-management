@@ -12,11 +12,14 @@ import {
   deleteCohort,
   generateRandomCohort,
   addPatientToCohort,
+  CohortMember,
+  removePatientFromCohort,
 } from '../commands';
 
 let patient: Patient;
 let cohortType: CohortType;
 let cohort: Cohort;
+let createdCohortMember: CohortMember;
 let createdPatientListUuid: string;
 
 test.beforeEach(async ({ api }) => {
@@ -25,7 +28,7 @@ test.beforeEach(async ({ api }) => {
   cohort = await generateRandomCohort(api, cohortType.uuid);
 });
 
-test('should be able to create and display a patient list', async ({ page, api }) => {
+test('should be able to create and display a patient list', async ({ page }) => {
   const patientListName = `Cohort ${Math.floor(Math.random() * 10000)}`;
   const patientListDescription = `Cohort Description ${Math.floor(Math.random() * 10000)}`;
 
@@ -34,10 +37,6 @@ test('should be able to create and display a patient list', async ({ page, api }
 
   await patientListPage.addNewPatientList(patientListName, patientListDescription, cohortType.name);
 
-  // TODO: Here we are exctracting the list uuid by navigating the the created patient list.
-  // But this will fail if the patient list details compenent have error.
-  // If it fails, the created patient list won't be deleted
-  // What can we do to avoid this ?
   await patientListPage.patientListsTable().getByText(patientListName).click();
   await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient-list\\/[\\w\\d-]+$'));
   createdPatientListUuid = /patient-list\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
@@ -47,7 +46,7 @@ test('should be able to create and display a patient list', async ({ page, api }
   await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
 });
 
-test('should be able to edit the details of a patient list', async ({ page, api }) => {
+test('should be able to edit the details of a patient list', async ({ page }) => {
   const patientListPage = new PatientListsPage(page);
   await patientListPage.goto(cohort.uuid);
 
@@ -61,7 +60,7 @@ test('should be able to edit the details of a patient list', async ({ page, api 
 });
 
 test('should be able to display the patients of a patient list', async ({ page, api }) => {
-  await addPatientToCohort(api, cohort.uuid, patient.uuid); // TODO: remove created cohort member
+  createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
 
   const patientListPage = new PatientListsPage(page);
   await patientListPage.goto(cohort.uuid);
@@ -80,6 +79,9 @@ test('should be able to delete a patient list', async ({ page, api }) => {
 });
 
 test.afterEach(async ({ api }) => {
+  if (createdCohortMember) {
+    await removePatientFromCohort(api, createdCohortMember.uuid);
+  }
   if (createdPatientListUuid) {
     await deleteCohort(api, createdPatientListUuid);
   }
