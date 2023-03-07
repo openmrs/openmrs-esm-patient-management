@@ -6,6 +6,7 @@ import {
   OpenmrsCohort,
   OpenmrsCohortMember,
   OpenmrsCohortRef,
+  PatientList,
   PatientListFilter,
   PatientListMember,
   PatientListUpdate,
@@ -161,4 +162,17 @@ export async function deletePatientList(cohortUuid: string, ac = new AbortContro
     },
     ac,
   );
+}
+
+export async function getPatientListName(patientListUuid: string, ac = new AbortController()) {
+  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(name,uuid)`;
+  const {
+    data: { results, error },
+  } = await openmrsFetch<CohortResponse<PatientList>>(url, {
+    signal: ac.signal,
+  });
+  if (error) {
+    throw error;
+  }
+  return results;
 }

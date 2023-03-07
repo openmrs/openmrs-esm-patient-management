@@ -1,4 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getPatientListName } from './api/api-remote';
 import { setupOffline } from './offline';
 
 declare var __VERSION__: string;
@@ -25,6 +26,17 @@ function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
 
+  async function getName(x: string) {
+    const name = await getPatientListName(`${x}`)
+      .then((results) => results.find((r) => r.id === x).display)
+      .catch((err) => {
+        if (err) {
+          return 'err';
+        }
+      });
+    return name;
+  }
+
   setupOffline();
   defineConfigSchema(moduleName, {});
 
@@ -36,7 +48,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:uuid?`,
-      title: ([x]) => `${x}`,
+      title: ([x]) => getName(`${x}`),
       parent: spaBasePath,
     },
   ]);
