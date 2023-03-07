@@ -27,7 +27,7 @@ function setupOpenMRS() {
   const spaBasePath = `${window.spaBase}/${route}`;
 
   async function getName(x: string) {
-    const name = await getPatientListName(`${x}`)
+    const name = await getPatientListName(x)
       .then((results) => results.find((r) => r.id === x).display)
       .catch((err) => {
         if (err) {
