@@ -13,9 +13,10 @@ interface PatientSearchProps {
   viewState: {
     selectedPatientUuid?: string;
   };
+  headerTitle?: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewState }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewState, headerTitle }) => {
   const { t } = useTranslation();
   const { selectedPatientUuid } = viewState;
   const [searchType, setSearchType] = useState<SearchTypes>(
@@ -34,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
 
   return (
     <>
-      <Overlay header={t('addPatientToQueue', 'Add patient to queue')} closePanel={closePanel}>
+      <Overlay header={headerTitle} closePanel={closePanel}>
         <div className="omrs-main-content">
           {searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits
