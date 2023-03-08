@@ -165,14 +165,9 @@ export async function deletePatientList(cohortUuid: string, ac = new AbortContro
 }
 
 export async function getPatientListName(patientListUuid: string, ac = new AbortController()) {
-  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(name,uuid)`;
-  const {
-    data: { results, error },
-  } = await openmrsFetch<CohortResponse<PatientList>>(url, {
+  const url = `${cohortUrl}/cohort/${patientListUuid}?`;
+  const { data } = await openmrsFetch<OpenmrsCohort>(url, {
     signal: ac.signal,
   });
-  if (error) {
-    throw error;
-  }
-  return results;
+  return data.name;
 }
