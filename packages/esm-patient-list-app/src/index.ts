@@ -27,8 +27,14 @@ function setupOpenMRS() {
   const spaBasePath = `${window.spaBase}/${route}`;
 
   async function getName(x: string) {
-    const name = await getPatientListName(x);
-    return name;
+    const cachedName = localStorage.getItem(x);
+    if (cachedName) {
+      return cachedName;
+    } else {
+      const name = await getPatientListName(x);
+      localStorage.setItem(x, name);
+      return name;
+    }
   }
 
   setupOffline();
