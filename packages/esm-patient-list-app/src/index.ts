@@ -27,8 +27,12 @@ function setupOpenMRS() {
   const spaBasePath = `${window.spaBase}/${route}`;
 
   async function getName(x: string) {
-    const name = await getPatientListName(x);
-    return name;
+    try {
+      const name = await getPatientListName(x);
+      return name;
+    } catch (error) {
+      return error.message;
+    }
   }
 
   setupOffline();
