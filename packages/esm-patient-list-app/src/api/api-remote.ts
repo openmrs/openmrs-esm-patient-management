@@ -6,7 +6,6 @@ import {
   OpenmrsCohort,
   OpenmrsCohortMember,
   OpenmrsCohortRef,
-  PatientList,
   PatientListFilter,
   PatientListMember,
   PatientListUpdate,
