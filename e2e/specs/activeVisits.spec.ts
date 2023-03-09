@@ -1,3 +1,4 @@
+import { Provider } from './../../packages/esm-appointments-app/src/types/index';
 import { Encounter } from './../../packages/esm-active-visits-app/src/visits-summary/visit.resource';
 import { test } from '../core';
 import { HomePage } from '../pages';
@@ -12,16 +13,19 @@ import {
   startVisit,
 } from '../commands';
 import { Visit } from '@openmrs/esm-framework';
+import { getProvider } from '../commands/providerOperation';
 
 let patient: Patient;
 let visit: Visit;
 let encounter: Encounter;
+let provider: Provider;
 const encounterNote = 'This is a test note';
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   visit = await startVisit(api, patient.uuid);
-  encounter = await createEncounter(api, patient.uuid, encounterNote);
+  provider = await getProvider(api);
+  encounter = await createEncounter(api, patient.uuid, provider.uuid, encounterNote);
 });
 
 test('should be able to see the active visits', async ({ page }) => {

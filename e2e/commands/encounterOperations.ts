@@ -2,7 +2,12 @@ import { Encounter } from './../../packages/esm-active-visits-app/src/visits-sum
 import { APIRequestContext, expect } from '@playwright/test';
 import dayjs from 'dayjs';
 
-export const createEncounter = async (api: APIRequestContext, patientId: string, note?: string): Promise<Encounter> => {
+export const createEncounter = async (
+  api: APIRequestContext,
+  patientId: string,
+  providerId: string,
+  note?: string,
+): Promise<Encounter> => {
   const encounterRes = await api.post('encounter', {
     data: {
       encounterDatetime: dayjs().format(),
@@ -11,7 +16,7 @@ export const createEncounter = async (api: APIRequestContext, patientId: string,
       encounterProviders: [
         {
           encounterRole: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
-          provider: '729cad8f-25d2-4b1f-83da-54d180a18729',
+          provider: providerId,
         },
       ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
