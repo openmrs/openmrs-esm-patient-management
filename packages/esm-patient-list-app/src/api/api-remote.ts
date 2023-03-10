@@ -163,14 +163,16 @@ export async function deletePatientList(cohortUuid: string, ac = new AbortContro
   );
 }
 
-export async function getPatientListName(patientListUuid: string, ac = new AbortController()) {
+export async function getPatientListName(patientListUuid: string) {
+  const abortController = new AbortController();
+
   try {
     const url = `${cohortUrl}/cohort/${patientListUuid}?`;
     const { data } = await openmrsFetch<OpenmrsCohort>(url, {
-      signal: ac.signal,
+      signal: abortController.signal,
     });
-    return data.name;
+    return data?.name;
   } catch (error) {
-    throw error;
+    console.error('Error resolving patient list name: ', error);
   }
 }

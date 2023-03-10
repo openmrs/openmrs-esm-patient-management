@@ -26,13 +26,8 @@ function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
 
-  async function getName(x: string) {
-    try {
-      const name = await getPatientListName(x);
-      return name;
-    } catch (error) {
-      return error.message;
-    }
+  async function getListName(patientListUuid: string): Promise<string> {
+    return (await getPatientListName(patientListUuid)) ?? '--';
   }
 
   setupOffline();
@@ -46,7 +41,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:uuid?`,
-      title: ([x]) => getName(`${x}`),
+      title: ([patientListUuid]) => getListName(patientListUuid),
       parent: spaBasePath,
     },
   ]);
