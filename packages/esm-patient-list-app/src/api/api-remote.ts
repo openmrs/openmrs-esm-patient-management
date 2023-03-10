@@ -38,7 +38,7 @@ async function deleteData(url: string, data = {}, ac = new AbortController()) {
 }
 
 export async function getAllPatientLists(filter: PatientListFilter = {}, ac = new AbortController()) {
-  const custom = 'custom:(uuid,name,description,display,size,attributes)';
+  const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [['v', custom]];
 
   if (filter.name !== undefined && filter.name !== '') {
@@ -78,7 +78,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
     id: cohort.uuid,
     display: cohort.name,
     description: cohort.description,
-    type: cohort.attributes.find((att) => att?.cohortAttributeType?.name === 'Patient List Type')?.value,
+    type: cohort.cohortType.display,
     size: cohort.size,
     isStarred: false, // TODO
   }));

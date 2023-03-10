@@ -15,13 +15,15 @@ import {
   Search,
   SearchProps,
   InlineLoading,
+  Pagination,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
-import { useSession, ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import { useSession, ConfigurableLink, useLayoutType, isDesktop, usePagination } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
 import { PatientList } from '../api/types';
 import { updatePatientList } from '../api/api-remote';
+import { PatientListEmptyState } from './empty-state/empty-state.component';
 
 const defaultHeaders: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -43,6 +45,8 @@ interface PatientListTableProps {
     currentSearchTerm?: string;
     otherSearchProps?: SearchProps;
   };
+  listType: string;
+  handleCreate?: () => void;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
@@ -53,6 +57,8 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   headers = defaultHeaders,
   refetch,
   search,
+  listType,
+  handleCreate,
 }) => {
   const userId = useSession()?.user.uuid;
   const layout = useLayoutType();
@@ -65,6 +71,18 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
     }
   };
 
+  const { results, goTo, currentPage } = usePagination(patientLists, 10);
+
+  const pageSizes = useMemo(() => {
+    const numberOfPages = Math.ceil(patientLists.length / 10);
+    return [...Array(numberOfPages).keys()].map((x) => {
+      return (x + 1) * 10;
+    });
+  }, [patientLists]);
+
+  if (!patientLists?.length && !loading) {
+    return <PatientListEmptyState launchForm={handleCreate} listType={listType} />;
+  }
   return !loading ? (
     <div>
       <div id="table-tool-bar" className={styles.searchContainer}>
@@ -84,7 +102,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
           </Layer>
         </div>
       </div>
-      <DataTable rows={patientLists} headers={headers}>
+      <DataTable rows={results} headers={headers}>
         {({
           rows,
           headers,
@@ -160,6 +178,17 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
           </TableContainer>
         )}
       </DataTable>
+      <Pagination
+        backwardText="Previous page"
+        forwardText="Next page"
+        itemsPerPageText="Items per page:"
+        page={currentPage}
+        pageNumberText="Page Number"
+        pageSize={10}
+        onChange={({ page }) => goTo(page)}
+        pageSizes={pageSizes}
+        totalItems={patientLists.length ?? 0}
+      />
     </div>
   ) : (
     <DataTableSkeleton

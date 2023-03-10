@@ -1,6 +1,6 @@
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableHeader, Tab, Tabs, TabList } from '@carbon/react';
+import { Button, DataTableHeader, Tab, Tabs, TabList, TabPanels, TabPanel } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
@@ -10,13 +10,11 @@ import PatientListTable from './patient-list-table.component';
 import styles from './patient-list-list.scss';
 
 enum TabTypes {
-  STARRED,
-  SYSTEM,
-  USER,
-  ALL,
+  Starred,
+  'System List',
+  'My List',
+  All,
 }
-
-const labelMap = ['Starred', 'System lists', 'My lists', 'All'];
 
 const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'display', header: 'List Name' },
@@ -24,30 +22,16 @@ const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
   { key: 'isStarred', header: '' },
 ];
 
-function createLabels() {
-  const res: Array<ReactNode> = [];
-
-  for (let index = 0; index < Object.keys(TabTypes).length / 2; index++) {
-    res.push(
-      <Tab key={index} id={'tab-' + index}>
-        {labelMap[index]}
-      </Tab>,
-    );
-  }
-
-  return res;
-}
-
 function usePatientListFilterForCurrentTab(selectedTab: TabTypes, search: string) {
   return useMemo<PatientListFilter>(() => {
     switch (selectedTab) {
-      case TabTypes.STARRED:
+      case TabTypes.Starred:
         return { isStarred: true, name: search };
-      case TabTypes.SYSTEM:
+      case TabTypes['System Lists']:
         return { type: PatientListType.SYSTEM, name: search };
-      case TabTypes.USER:
+      case TabTypes['My Lists']:
         return { type: PatientListType.USER, name: search };
-      case TabTypes.ALL:
+      case TabTypes.All:
       default:
         return { name: search };
     }
@@ -56,7 +40,8 @@ function usePatientListFilterForCurrentTab(selectedTab: TabTypes, search: string
 
 function useAppropriateTableHeadersForSelectedTab(selectedTab: TabTypes) {
   return useMemo(
-    () => (selectedTab === TabTypes.SYSTEM || selectedTab === TabTypes.USER ? headersWithoutType : undefined),
+    () =>
+      selectedTab === TabTypes['System List'] || selectedTab === TabTypes['My List'] ? headersWithoutType : undefined,
     [selectedTab],
   );
 }
@@ -79,7 +64,7 @@ type RouteState = AllListRouteState | CreateNewListState;
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [routeState, setRouteState] = useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
-  const [selectedTab, setSelectedTab] = useState(TabTypes.STARRED);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [searchString, setSearchString] = useState<string>('');
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
@@ -107,25 +92,84 @@ const PatientListList: React.FC = () => {
             {t('newList', 'New List')}
           </Button>
         </div>
-        <Tabs className={styles.tabs} tabContentClassName={styles.hiddenTabsContent} onSelectionChange={setSelectedTab}>
+        <Tabs
+          className={styles.tabs}
+          tabContentClassName={styles.hiddenTabsContent}
+          selectedIndex={selectedTab}
+          onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}>
           <TabList aria-label="List tabs" contained>
-            {createLabels()}
+            <Tab>{t('starred', 'Starred')}</Tab>
+            <Tab>{t('systemList', 'System List')}</Tab>
+            <Tab>{t('myList', 'My List')}</Tab>
+            <Tab>{t('all', 'All')}</Tab>
           </TabList>
+          <div className={styles.patientListTableContainer}>
+            <TabPanels>
+              <TabPanel style={{ padding: 0 }}>
+                <PatientListTable
+                  listType={TabTypes[selectedTab]}
+                  loading={!patientListQuery.data}
+                  fetching={patientListQuery.isValidating}
+                  headers={customHeaders}
+                  patientLists={patientListQuery?.data?.filter((d) => d.isStarred)}
+                  refetch={patientListQuery.mutate}
+                  search={{
+                    onSearch: handleSearch,
+                    placeHolder: t('search', 'Search'),
+                    currentSearchTerm: searchString,
+                  }}
+                />
+              </TabPanel>
+              <TabPanel style={{ padding: 0 }}>
+                <PatientListTable
+                  listType={TabTypes[selectedTab]}
+                  loading={!patientListQuery.data}
+                  fetching={patientListQuery.isValidating}
+                  headers={customHeaders}
+                  patientLists={patientListQuery?.data?.filter((d) => d.type === 'System List')}
+                  refetch={patientListQuery.mutate}
+                  search={{
+                    onSearch: handleSearch,
+                    placeHolder: t('search', 'Search'),
+                    currentSearchTerm: searchString,
+                  }}
+                />
+              </TabPanel>
+              <TabPanel style={{ padding: 0 }}>
+                <PatientListTable
+                  listType={TabTypes[selectedTab]}
+                  loading={!patientListQuery.data}
+                  fetching={patientListQuery.isValidating}
+                  headers={customHeaders}
+                  patientLists={patientListQuery?.data?.filter((d) => d.type === 'My List')}
+                  refetch={patientListQuery.mutate}
+                  search={{
+                    onSearch: handleSearch,
+                    placeHolder: t('search', 'Search'),
+                    currentSearchTerm: searchString,
+                  }}
+                  handleCreate={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}
+                />
+              </TabPanel>
+              <TabPanel style={{ padding: 0 }}>
+                <PatientListTable
+                  listType={TabTypes[selectedTab]}
+                  loading={!patientListQuery.data}
+                  fetching={patientListQuery.isValidating}
+                  headers={customHeaders}
+                  patientLists={patientListQuery?.data}
+                  refetch={patientListQuery.mutate}
+                  search={{
+                    onSearch: handleSearch,
+                    placeHolder: t('search', 'Search'),
+                    currentSearchTerm: searchString,
+                  }}
+                  handleCreate={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}
+                />
+              </TabPanel>
+            </TabPanels>
+          </div>
         </Tabs>
-        <div className={styles.patientListTableContainer}>
-          <PatientListTable
-            loading={!patientListQuery.data}
-            fetching={patientListQuery.isValidating}
-            headers={customHeaders}
-            patientLists={patientListQuery.data}
-            refetch={patientListQuery.mutate}
-            search={{
-              onSearch: handleSearch,
-              placeHolder: t('search', 'Search'),
-              currentSearchTerm: searchString,
-            }}
-          />
-        </div>
       </section>
       <section>
         {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
