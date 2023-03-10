@@ -24,7 +24,7 @@ export class PatientListsPage {
     await this.page.getByRole('button', { name: 'Create list' }).click();
   }
 
-  async editPatientList(listName: string, description: string) {
+  async editPatientList(listName: string, description: string, cohortType: string) {
     await this.page.getByRole('button', { name: 'Actions' }).click();
     await this.page.getByRole('menuitem', { name: 'Edit Name/ Description' }).click();
     await this.page.getByRole('textbox', { name: 'List name' }).fill(listName);
@@ -33,6 +33,8 @@ export class PatientListsPage {
         'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
       )
       .fill(description);
+    await this.page.getByRole('button', { name: 'Select patient list type' }).click();
+    await this.page.getByRole('option', { name: cohortType }).click();
     await this.page.getByRole('button', { name: 'Edit list' }).click();
   }
 
