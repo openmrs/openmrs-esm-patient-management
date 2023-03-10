@@ -16,11 +16,13 @@ export const PatientListEmptyState: React.FC<EmptyStateProps> = ({ listType, lau
   return (
     <Layer>
       <Tile className={styles.tile}>
-        <EmptyDataIllustration />
+        <div className={styles.illo}>
+          <EmptyDataIllustration />
+        </div>
         <p className={styles.content}>
-          <Trans i18nKey="emptyStateText" values={{ listType: listType.toLowerCase() }}>
-            There are no {listType.toLowerCase()} patient lists to display
-          </Trans>
+          {t('emptyStateText', 'There are no {listType} patient lists to display', {
+            listType: listType.toLowerCase(),
+          })}
         </p>
         <p className={styles.action}>
           {launchForm && (

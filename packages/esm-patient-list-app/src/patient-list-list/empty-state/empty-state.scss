@@ -2,6 +2,15 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.illo {
+  margin-top: spacing.$spacing-05;
+}
+
 .content {
   @include type.type-style('heading-compact-01');
   color: $text-02;
@@ -9,10 +18,6 @@
   margin-bottom: spacing.$spacing-03;
 }
 
-.tile {
-  text-align: center;
-  border: 1px solid $ui-03;
-}
 .actionText {
   display: flex;
   align-items: center;
