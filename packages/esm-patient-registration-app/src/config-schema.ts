@@ -77,7 +77,7 @@ export const builtInSections: Array<SectionDefinition> = [
     name: 'Basic Info',
     fields: ['name', 'gender', 'dob', 'id'],
   },
-  { id: 'contact', name: 'Contact Details', fields: ['address', 'phone', 'email'] },
+  { id: 'contact', name: 'Contact Details', fields: ['address', 'phone & email'] },
   { id: 'death', name: 'Death Info', fields: [] },
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
@@ -177,24 +177,7 @@ export const esmPatientRegistrationSchema = {
         _description: 'For coded questions only. Provide ability to add custom concept answers.',
       },
     },
-    _default: [
-      {
-        id: 'phone',
-        type: 'person attribute',
-        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-        validation: {
-          matches: '',
-        },
-      },
-      {
-        id: 'email',
-        type: 'person attribute',
-        uuid: 'a2c222fa-b9ca-11ed-8850-0242ac190003',
-        validation: {
-          matches: '',
-        },
-      },
-    ],
+    _default: [],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
