@@ -13,9 +13,11 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
   return (
     <React.Fragment>
       {notes.length > 0 ? (
-        notes.map((note, ind) => (
-          <React.Fragment key={ind}>
-            <p className={`${styles.medicationBlock} ${styles.bodyLong01}`}>{note.note}</p>
+        notes.map((note, index) => (
+          <React.Fragment key={index}>
+            <p className={`${styles.medicationBlock} ${styles.bodyLong01}`} data-testid={'note'}>
+              {note.note}
+            </p>
             <p className={styles.caption01} style={{ color: '#525252' }}>
               {note.time} &middot; {note.provider.name} &middot; {note.provider.role}
             </p>
