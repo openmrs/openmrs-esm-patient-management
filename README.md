@@ -40,8 +40,7 @@ To start a dev server running all the modules simultaneously, run:
 ```bash
 yarn start
 ```
-Note: You need to specify the sources for yarn start to work.
-For example - ```bash yarn start --sources 'packages/esm-patient-search-app' ```
+Note: You need to specify the sources for yarn start to work.For example - `yarn start --sources 'packages/esm-patient-search-app'`
 
 This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified module.
 
