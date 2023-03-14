@@ -40,7 +40,6 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       setSelected((prev) => prev.filter((x) => x !== patientListId));
     }
   }, []);
-  console.log(selected);
 
   const handleSubmit = useCallback(() => {
     for (const selectedId of selected) {
