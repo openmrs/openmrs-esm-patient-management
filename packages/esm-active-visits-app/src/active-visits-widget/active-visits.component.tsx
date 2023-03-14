@@ -63,7 +63,7 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const { activeVisits, isError, isLoading, isValidating } = useActiveVisits();
+  const { activeVisits, isLoading, isValidating } = useActiveVisits();
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
@@ -185,9 +185,11 @@ const ActiveVisitsTable = () => {
                 <TableBody>
                   {rows.map((row, index) => (
                     <React.Fragment key={index}>
-                      <TableExpandRow {...getRowProps({ row })}>
+                      <TableExpandRow
+                        {...getRowProps({ row })}
+                        data-testid={`activeVisitRow${paginatedActiveVisits?.[index]?.patientUuid}`}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
+                          <TableCell key={cell.id} data-testid={cell.id}>
                             {cell.info.header === 'name' ? (
                               <PatientNameLink
                                 from={fromPage}

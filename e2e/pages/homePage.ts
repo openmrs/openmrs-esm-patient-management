@@ -19,4 +19,15 @@ export class HomePage {
   async clickOnPatientResult(name: string) {
     await this.floatingSearchResultsContainer().locator(`text=${name}`).click();
   }
+
+  async clickOnActiveVisitPatient(patientId: string) {
+    await this.page
+      .locator(`[data-testid=activeVisitRow${patientId}]`)
+      .getByRole('button', { name: 'Expand current row' })
+      .click();
+  }
+
+  async clickOnVisitSummaryTab() {
+    await this.page.getByRole('tab', { name: 'Visit Summary' }).click();
+  }
 }
