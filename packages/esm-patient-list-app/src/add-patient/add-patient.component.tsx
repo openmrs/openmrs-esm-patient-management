@@ -9,7 +9,7 @@ import {
   toOmrsIsoString,
   usePagination,
 } from '@openmrs/esm-framework';
-import { Button, Checkbox, Pagination, Search, SkeletonText } from '@carbon/react';
+import { Button, Checkbox, Pagination, Search, SkeletonText, CheckboxSkeleton } from '@carbon/react';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
 import { TFunction } from 'i18next';
 import styles from './add-patient.scss';
@@ -23,15 +23,17 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
-  const { data, isValidating } = useAddablePatientLists(patientUuid);
+  const { data, isLoading } = useAddablePatientLists(patientUuid);
 
-  const handleSelectionChanged = useCallback((patientListId: string, selected: boolean) => {
-    if (selected) {
+  const handleSelectionChanged = useCallback((patientListId: string, listSelected: boolean) => {
+    console.log(listSelected);
+    if (listSelected) {
       setSelected((prev) => [...prev, patientListId]);
     } else {
       setSelected((prev) => prev.filter((x) => x !== patientListId));
     }
   }, []);
+  console.log(selected);
 
   const handleSubmit = useCallback(() => {
     for (const selectedId of selected) {
@@ -104,14 +106,14 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="cds--fieldset">
           <p className="cds--label">Patient Lists</p>
-          {!isValidating && results ? (
+          {!isLoading && results ? (
             results.length > 0 ? (
               results.map((patientList) => (
                 <div key={patientList.id} className={styles.checkbox}>
                   <Checkbox
                     key={patientList.id}
-                    onChange={(e) => handleSelectionChanged(patientList.id, e)}
-                    checked={selected.some((id) => id === patientList.id)}
+                    onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
+                    checked={selected.find((id) => id === patientList.id)}
                     labelText={patientList.displayName}
                     id={patientList.id}
                   />
@@ -121,7 +123,23 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
               <p className={styles.bodyLong01}>{t('noPatientListFound', 'No patient list found')}</p>
             )
           ) : (
-            <SkeletonText />
+            <>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+              <div className={styles.checkbox}>
+                <CheckboxSkeleton />
+              </div>
+            </>
           )}
         </fieldset>
       </div>
@@ -143,12 +161,14 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
         </div>
       )}
       <div className={styles.buttonSet}>
-        <Button kind="ghost">{t('createNewPatientList', 'Create new patient list')}</Button>
+        <Button kind="ghost" size="xl">
+          {t('createNewPatientList', 'Create new patient list')}
+        </Button>
         <div>
-          <Button kind="secondary" className={styles.largeButtons} onClick={closeModal}>
+          <Button kind="secondary" size="xl" onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button onClick={handleSubmit} className={styles.largeButtons}>
+          <Button onClick={handleSubmit} size="xl">
             {t('addToList', 'Add to list')}
           </Button>
         </div>
