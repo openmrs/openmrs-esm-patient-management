@@ -8,6 +8,7 @@ import {
   showToast,
   toOmrsIsoString,
   usePagination,
+  navigate,
 } from '@openmrs/esm-framework';
 import { Button, Checkbox, Pagination, Search, SkeletonText, CheckboxSkeleton } from '@carbon/react';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
@@ -25,8 +26,14 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const [selected, setSelected] = useState<Array<string>>([]);
   const { data, isLoading } = useAddablePatientLists(patientUuid);
 
+  const handleCreateNewList = () => {
+    navigate({
+      to: '${openmrsSpaBase}/patient-list?new_cohort=true',
+    });
+    closeModal();
+  };
+
   const handleSelectionChanged = useCallback((patientListId: string, listSelected: boolean) => {
-    console.log(listSelected);
     if (listSelected) {
       setSelected((prev) => [...prev, patientListId]);
     } else {
@@ -161,7 +168,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
         </div>
       )}
       <div className={styles.buttonSet}>
-        <Button kind="ghost" size="xl">
+        <Button kind="ghost" size="xl" onClick={handleCreateNewList}>
           {t('createNewPatientList', 'Create new patient list')}
         </Button>
         <div>

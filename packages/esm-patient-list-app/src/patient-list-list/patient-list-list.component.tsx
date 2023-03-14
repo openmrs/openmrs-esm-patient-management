@@ -2,12 +2,13 @@ import React, { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableHeader, Tab, Tabs, TabList } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientList, PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
 import PatientListTable from './patient-list-table.component';
 import styles from './patient-list-list.scss';
+import { useLocation } from 'react-router-dom';
 
 enum TabTypes {
   STARRED,
@@ -61,29 +62,33 @@ function useAppropriateTableHeadersForSelectedTab(selectedTab: TabTypes) {
   );
 }
 
-enum RouteStateTypes {
-  ALL_LISTS,
-  CREATE_NEW_LIST,
-}
-
-interface AllListRouteState {
-  type: RouteStateTypes.ALL_LISTS;
-}
-
-interface CreateNewListState {
-  type: RouteStateTypes.CREATE_NEW_LIST;
-}
-
-type RouteState = AllListRouteState | CreateNewListState;
-
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const [routeState, setRouteState] = useState<RouteState>({ type: RouteStateTypes.ALL_LISTS });
   const [selectedTab, setSelectedTab] = useState(TabTypes.STARRED);
   const [searchString, setSearchString] = useState<string>('');
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
   const customHeaders = useAppropriateTableHeadersForSelectedTab(selectedTab);
   const patientListQuery = useAllPatientLists(patientListFilter);
+  const { search } = useLocation();
+  const createNewList =
+    Object.fromEntries(
+      search
+        .slice(1)
+        .split('&')
+        ?.map((searchParam) => searchParam?.split('=')),
+    )['new_cohort'] === 'true';
+
+  const handleShowNewListOverlay = () => {
+    navigate({
+      to: '${openmrsSpaBase}/patient-list?new_cohort=true',
+    });
+  };
+
+  const handleHideNewListOverlay = () => {
+    navigate({
+      to: '${openmrsSpaBase}/patient-list',
+    });
+  };
 
   const handleSearch = (str) => setSearchString(str);
 
@@ -103,7 +108,7 @@ const PatientListList: React.FC = () => {
             kind="ghost"
             renderIcon={(props) => <Add {...props} size={16} />}
             iconDescription="Add"
-            onClick={() => setRouteState({ type: RouteStateTypes.CREATE_NEW_LIST })}>
+            onClick={handleShowNewListOverlay}>
             {t('newList', 'New List')}
           </Button>
         </div>
@@ -128,11 +133,8 @@ const PatientListList: React.FC = () => {
         </div>
       </section>
       <section>
-        {routeState.type === RouteStateTypes.CREATE_NEW_LIST && (
-          <CreateNewList
-            close={() => setRouteState({ type: RouteStateTypes.ALL_LISTS })}
-            onSuccess={() => patientListQuery.mutate()}
-          />
+        {createNewList && (
+          <CreateNewList close={handleHideNewListOverlay} onSuccess={() => patientListQuery.mutate()} />
         )}
       </section>
     </main>
