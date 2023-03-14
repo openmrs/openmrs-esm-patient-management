@@ -1,4 +1,5 @@
 name: E2E Tests
+
 on:
   push:
     branches:
@@ -24,8 +25,16 @@ jobs:
         with:
           node-version: 16
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      
       - name: Install dependencies
-        run: yarn
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --immutable
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
@@ -60,8 +69,16 @@ jobs:
         with:
           node-version: 16
 
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
       - name: Install dependencies
-        run: yarn
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --immutable
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
