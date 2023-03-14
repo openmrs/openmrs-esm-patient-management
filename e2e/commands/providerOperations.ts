@@ -1,4 +1,4 @@
-import { Provider } from './../../packages/esm-appointments-app/src/types/index';
+import { Provider } from '../../packages/esm-appointments-app/src/types/index';
 import { APIRequestContext, expect } from '@playwright/test';
 
 export const getProvider = async (api: APIRequestContext): Promise<Provider> => {

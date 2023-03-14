@@ -8,6 +8,17 @@ export const createEncounter = async (
   providerId: string,
   note?: string,
 ): Promise<Encounter> => {
+  const observations = [];
+
+  if (note) {
+    observations.push({
+      concept: {
+        uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        display: '',
+      },
+      value: note,
+    });
+  }
   const encounterRes = await api.post('encounter', {
     data: {
       encounterDatetime: dayjs().format(),
@@ -21,15 +32,7 @@ export const createEncounter = async (
       ],
       location: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
       encounterType: 'd7151f82-c1f3-4152-a605-2f9ea7414a79',
-      obs: [
-        {
-          concept: {
-            uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: '',
-          },
-          value: note ?? 'This is a test note',
-        },
-      ],
+      obs: observations,
     },
   });
   await expect(encounterRes.ok()).toBeTruthy();

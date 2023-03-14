@@ -11,9 +11,9 @@ import {
   generateRandomPatient,
   Patient,
   startVisit,
+  getProvider,
 } from '../commands';
 import { Visit } from '@openmrs/esm-framework';
-import { getProvider } from '../commands/providerOperation';
 
 let patient: Patient;
 let visit: Visit;
