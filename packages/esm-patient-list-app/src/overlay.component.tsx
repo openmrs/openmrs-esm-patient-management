@@ -9,13 +9,16 @@ interface OverlayProps {
   header: string;
   buttonsGroup?: React.ReactElement;
   children?: React.ReactNode;
+  background?: string;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup }) => {
+const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup, background }) => {
   const layout = useLayoutType();
 
   return (
-    <div className={isDesktop(layout) ? styles.desktopOverlay : styles.tabletOverlay}>
+    <div
+      className={isDesktop(layout) ? styles.desktopOverlay : styles.tabletOverlay}
+      style={{ background: background }}>
       {isDesktop(layout) ? (
         <div className={styles.desktopHeader}>
           <div className={styles.headerContent}>{header}</div>

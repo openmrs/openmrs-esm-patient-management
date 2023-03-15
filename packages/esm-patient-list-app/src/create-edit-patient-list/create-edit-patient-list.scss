@@ -13,6 +13,34 @@
 
 .buttonsGroup {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  gap: 0.1rem;
+}
+
+.cancel {
+  flex: 1;
+  background: #393939;
+}
+
+.createlist {
+  flex: 1;
+  background: #007d79 !important;
+  color: #fff !important;
+}
+
+.information_wrapper {
+  background-color: white;
+  margin-top: 1rem;
+  box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
+}
+
+.information_list {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+.input {
+  background-color: #fff;
 }

@@ -1,12 +1,24 @@
 import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Dropdown, Layer, OnChangeData, TextArea, TextInput } from '@carbon/react';
+import {
+  Button,
+  Dropdown,
+  Layer,
+  OnChangeData,
+  TextArea,
+  TextInput,
+  Checkbox,
+  FormLabel,
+  Accordion,
+  AccordionItem,
+} from '@carbon/react';
 import { useLayoutType, showToast, useSession, isDesktop } from '@openmrs/esm-framework';
 import { createPatientList, editPatientList } from '../api/api-remote';
 import { useCohortTypes } from '../api/hooks';
 import { OpenmrsCohort, NewCohortData } from '../api/types';
 import Overlay from '../overlay.component';
 import styles from './create-edit-patient-list.scss';
+import { informationList } from '../constants';
 
 interface CreateEditPatientListProps {
   close: () => void;
@@ -27,7 +39,9 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     description: '',
     cohortType: '',
     location: '',
+    information: [],
   });
+
   const layout = useLayoutType();
   const user = useSession();
   const { data: cohortTypes } = useCohortTypes();
@@ -108,18 +122,32 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     [setCohortDetails, cohortTypes],
   );
 
+  const handleCheckChange = useCallback((e) => {
+    const { value, checked } = e.target;
+    // if (checked) {
+    //   setCohortDetails((cohortDetails) => ({
+    //     ...cohortDetails,
+    //     information: [...information, value],
+    //   }));
+    // } else {
+    //   setCohortDetails({ ...cohortDetails, information: information.filter((e) => e !== value) });
+    // }
+  }, []);
+
   return (
     <Overlay
       header={!edit ? t('newPatientListHeader', 'New patient list') : t('editPatientListHeader', 'Edit patient list')}
       close={close}
+      background="#ededed"
       buttonsGroup={
         <div className={styles.buttonsGroup}>
-          <Button onClick={close} kind="secondary" size="lg">
+          <Button onClick={close} kind="secondary" size="lg" className={styles.cancel}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button
             onClick={createPL}
             size="lg"
+            className={styles.createlist}
             disabled={Object.values(cohortDetails)?.some(
               (value) => value === '' || value === undefined || value === null,
             )}>
@@ -151,7 +179,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           </Layer>
         )}
       </div>
-      <div className={styles.input}>
+      <div>
         {isDesktop(layout) ? (
           <Layer>
             <TextArea
@@ -178,7 +206,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           />
         )}
       </div>
-      <div className={styles.input}>
+      <div>
         {isDesktop(layout) ? (
           <Dropdown
             id="cohortType"
@@ -205,6 +233,38 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
               onChange={handleTypeChange}
             />
           </Layer>
+        )}
+      </div>
+      <div style={{ marginTop: '1rem' }}>
+        <FormLabel>Choose which information to include in the list</FormLabel>
+        {isDesktop(layout) ? (
+          <Accordion align="end" className={styles.information_wrapper}>
+            <AccordionItem title="Choose as many option as you like" className={styles.information_list}>
+              {informationList.map((item, index) => (
+                <Checkbox
+                  key={item?.label}
+                  labelText={t('newPatientListInformationLabel', item?.label)}
+                  id={`informationList${index}`}
+                  value={item?.value}
+                  onChange={handleCheckChange}
+                />
+              ))}
+            </AccordionItem>
+          </Accordion>
+        ) : (
+          <Accordion align="end" className={styles.information_wrapper}>
+            <AccordionItem title="Choose as many option as you like" className={styles.information_list}>
+              {informationList.map((item, index) => (
+                <Checkbox
+                  key={item?.label}
+                  labelText={t('newPatientListInformationLabel', item?.label)}
+                  id={`informationList${index}`}
+                  value={item?.value}
+                  onChange={handleCheckChange}
+                />
+              ))}
+            </AccordionItem>
+          </Accordion>
         )}
       </div>
     </Overlay>

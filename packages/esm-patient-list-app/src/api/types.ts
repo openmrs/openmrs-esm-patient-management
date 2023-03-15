@@ -84,6 +84,7 @@ export interface NewCohortData {
   description: string;
   location: string;
   cohortType: string;
+  information?: string[];
 }
 
 export interface CohortType {
