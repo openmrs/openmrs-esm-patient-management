@@ -1,8 +1,9 @@
-import { FetchResponse, getSynchronizationItems, openmrsFetch, usePatient } from '@openmrs/esm-framework';
+import { FetchResponse, getSynchronizationItems, openmrsFetch, useConfig, usePatient } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
 import { Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
+import { RegistrationConfig } from '../config-schema';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -10,12 +11,14 @@ import {
   PatientUuidMapType,
   PersonAttributeResponse,
   PatientIdentifierResponse,
+  Encounter,
 } from './patient-registration-types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,
   getPatientUuidMapFromFhirPatient,
   getPhonePersonAttributeValueFromFhirPatient,
+  latestFirstEncounter,
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
 
@@ -24,6 +27,8 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
   const { data: relationships, isLoading: isLoadingRelationships } = useInitialPatientRelationships(patientUuid);
+  const { data: encounters } = useInitialEncounters(patientUuid, patientToEdit);
+
   const [initialFormValues, setInitialFormValues] = useState<FormValues>({
     patientUuid: v4(),
     givenName: '',
@@ -108,6 +113,16 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       }));
     }
   }, [attributes, setInitialFormValues, isLoadingAttributes]);
+
+  // Set Initial registration encounters
+  useEffect(() => {
+    if (patientToEdit && encounters) {
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        obs: encounters as Record<string, string>,
+      }));
+    }
+  }, [encounters, patientToEdit]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -197,6 +212,22 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
   }, [data, error]);
 
   return result;
+}
+
+function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) {
+  const { registrationObs } = useConfig() as RegistrationConfig;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Encounter> }>>(
+    patientToEdit
+      ? `/ws/rest/v1/encounter?patient=${patientUuid}&v=full&encounterType=${registrationObs.encounterTypeUuid}`
+      : null,
+    openmrsFetch,
+  );
+  const obs = data?.data.results.sort(latestFirstEncounter)?.at(0)?.obs;
+  const encounters = obs
+    ?.map(({ concept, value }) => ({ [concept['uuid']]: value['uuid'] }))
+    .reduce((accu, curr) => Object.assign(accu, curr), {});
+
+  return { data: encounters, isLoading, error };
 }
 
 function useInitialPersonAttributes(personUuid: string) {
