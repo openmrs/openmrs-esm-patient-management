@@ -8,10 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TURBO_API: 'http://127.0.0.1:9080'
+      TURBO_TOKEN: ${{ secrets.TURBO_SERVER_TOKEN }}
+      TURBO_TEAM: ${{ github.repository_owner }}
 
     steps:
       - uses: actions/checkout@v3
-      - uses: preactjs/compressed-size-action@v2
+
+      - name: Setup a local cache server for Turborepo
+        uses: felixmosh/turborepo-gh-artifacts@v2
         with:
-          build-script: "turbo run build --color"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
+
+      - name: Compute bundle size report
+        uses: preactjs/compressed-size-action@v2
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
           minimum-change-threshold: 10000 # 10 KB
+          build-script: "turbo run build --color --concurrency=5"
+
