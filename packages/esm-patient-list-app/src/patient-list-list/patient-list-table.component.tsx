@@ -118,7 +118,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
             getTableContainerProps,
           }: DataTableCustomRenderProps) => (
             <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
-              <Table {...getTableProps()} isSortable useZebraStyles>
+              <Table {...getTableProps()} data-testid="patientListsTable" isSortable useZebraStyles>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
