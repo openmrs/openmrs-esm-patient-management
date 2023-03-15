@@ -34,12 +34,13 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   onSuccess = () => {},
 }) => {
   const { t } = useTranslation();
+
+  const [information, setInformation] = useState([]);
   const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
     name: '',
     description: '',
     cohortType: '',
     location: '',
-    information: [],
   });
 
   const layout = useLayoutType();
@@ -124,14 +125,11 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
 
   const handleCheckChange = useCallback((e) => {
     const { value, checked } = e.target;
-    // if (checked) {
-    //   setCohortDetails((cohortDetails) => ({
-    //     ...cohortDetails,
-    //     information: [...information, value],
-    //   }));
-    // } else {
-    //   setCohortDetails({ ...cohortDetails, information: information.filter((e) => e !== value) });
-    // }
+    if (checked) {
+      setInformation((information) => [...information, value]);
+    } else {
+      setInformation((information) => information.filter((e) => e !== value));
+    }
   }, []);
 
   return (
@@ -235,7 +233,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           </Layer>
         )}
       </div>
-      <div style={{ marginTop: '1rem' }}>
+      <div className={styles.informationList_section}>
         <FormLabel>Choose which information to include in the list</FormLabel>
         {isDesktop(layout) ? (
           <Accordion align="end" className={styles.information_wrapper}>
@@ -243,7 +241,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
               {informationList.map((item, index) => (
                 <Checkbox
                   key={item?.label}
-                  labelText={t('newPatientListInformationLabel', item?.label)}
+                  labelText={item?.label}
                   id={`informationList${index}`}
                   value={item?.value}
                   onChange={handleCheckChange}
@@ -257,7 +255,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
               {informationList.map((item, index) => (
                 <Checkbox
                   key={item?.label}
-                  labelText={t('newPatientListInformationLabel', item?.label)}
+                  labelText={item?.label}
                   id={`informationList${index}`}
                   value={item?.value}
                   onChange={handleCheckChange}

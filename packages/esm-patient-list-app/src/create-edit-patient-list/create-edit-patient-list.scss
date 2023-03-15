@@ -31,9 +31,9 @@
 .information_wrapper {
   background-color: white;
   margin-top: 1rem;
-  box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
-  -webkit-box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 0.5px 0.5px 0.5px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.5);
 }
 
 .information_list {
@@ -41,6 +41,6 @@
   border-bottom: none !important;
 }
 
-.input {
-  background-color: #fff;
+.informationList_section {
+  margin-top: 1.5rem;
 }

@@ -27,6 +27,7 @@
   "newPatientListCohortTypeLabel": "Choose the type for the new patient list",
   "newPatientListDescriptionLabel": "Describe the purpose of this list in a few words",
   "newPatientListHeader": "New patient list",
+  "newPatientListInformationLabel": "",
   "newPatientListNameLabel": "List name",
   "noPatientListFound": "No patient list found",
   "offlinePatients": "Offline patients",
