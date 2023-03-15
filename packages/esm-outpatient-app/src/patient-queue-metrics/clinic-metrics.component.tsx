@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown, DataTableSkeleton } from '@carbon/react';
-import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
+import { Dropdown } from '@carbon/react';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
-import styles from './clinic-metrics.scss';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -12,8 +10,10 @@ import {
   useSelectedServiceUuid,
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
-import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
+import { useServiceMetricsCount, useServices } from './queue-metrics.resource';
+import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import styles from './clinic-metrics.scss';
 
 export interface Service {
   uuid: string;
@@ -23,34 +23,27 @@ export interface Service {
 function ClinicMetrics() {
   const { t } = useTranslation();
 
-  const { metrics, isLoading } = useMetrics();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { allServices } = useServices(currentQueueLocation);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
-  const [initialSelectedItem, setInitialSelectItem] = useState(true);
+  const [initialSelectedItem, setInitialSelectItem] = useState(() => {
+    if (currentServiceName && currentServiceUuid) {
+      return false;
+    } else if (currentServiceName === t('all', 'All')) {
+      return true;
+    }
+  });
   const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
   const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
-
-  useEffect(() => {
-    if (currentServiceName && currentServiceUuid) {
-      setInitialSelectItem(false);
-    } else if (currentServiceName === t('all', 'All')) {
-      setInitialSelectItem(true);
-    }
-  }, [allServices, currentServiceName, serviceCount, currentServiceUuid, t]);
 
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedServiceUuid(selectedItem.uuid);
     updateSelectedServiceName(selectedItem.display);
     setInitialSelectItem(false);
   };
-
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
 
   return (
     <>
