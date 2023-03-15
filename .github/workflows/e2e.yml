@@ -11,7 +11,6 @@ on:
 jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
-    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -43,7 +42,7 @@ jobs:
         run: yarn start --sources 'packages/esm-*-app/'&
 
       - name: Run E2E tests
-        run: yarn playwright test --project=chromium
+        run: yarn playwright test
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
@@ -81,7 +80,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --with-deps
 
       - name: Run db and web containers
         run: |
