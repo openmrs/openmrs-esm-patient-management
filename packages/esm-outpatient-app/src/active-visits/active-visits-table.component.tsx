@@ -70,6 +70,7 @@ import ActionsMenu from '../queue-entry-table-components/actions-menu.component'
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -385,6 +386,9 @@ function ActiveVisitsTable() {
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
+                            <OpenChartMenu patientUuid={visitQueueEntries?.[index]?.patientUuid} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
