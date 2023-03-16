@@ -5,7 +5,7 @@ import PatientListDetailComponent from './patient-list-detail/patient-list-detai
 
 const RootComponent: React.FC = () => {
   return (
-    <BrowserRouter basename={`${window.spaBase}/patient-list`}>
+    <BrowserRouter basename={`${window.spaBase}/patient-lists`}>
       <Routes>
         <Route path="/" element={<PatientListList />} />
         <Route path="/:patientListUuid/" element={<PatientListDetailComponent />} />

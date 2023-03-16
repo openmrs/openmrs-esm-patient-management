@@ -11,7 +11,7 @@ import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import styles from './patient-list-detail.scss';
 
 function getPatientListUuidFromUrl(): string {
-  const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
+  const match = /\/patient-lists\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
   return match && match[1];
 }
 
@@ -94,7 +94,7 @@ const PatientListDetailComponent = () => {
           kind: 'success',
         }),
       )
-      .then(() => navigate({ to: `${window.spaBase}/patient-list/` }))
+      .then(() => navigate({ to: `${window.spaBase}/patient-lists/` }))
       .catch(() =>
         showToast({
           title: t('error', 'Error'),

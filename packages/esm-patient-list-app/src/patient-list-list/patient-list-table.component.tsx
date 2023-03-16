@@ -145,7 +145,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                               <TableCell className={styles.tableCell} key={cell.id}>
                                 <ConfigurableLink
                                   className={styles.link}
-                                  to={`\${openmrsSpaBase}/patient-list/${patientLists[index]?.id}`}>
+                                  to={`\${openmrsSpaBase}/patient-lists/${patientLists[index]?.id}`}>
                                   {cell.value}
                                 </ConfigurableLink>
                               </TableCell>
