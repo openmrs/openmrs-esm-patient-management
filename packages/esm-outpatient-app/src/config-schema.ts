@@ -118,6 +118,16 @@ export const configSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
   },
+  customPatientChartUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to load patient chart',
+  },
+  customPatientIdUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to fetch patient with id',
+  },
 };
 
 export interface ConfigObject {
@@ -146,6 +156,8 @@ export interface ConfigObject {
   appointmentStatuses: Array<string>;
   defaultIdentifierTypes: Array<string>;
   showRecommendedVisitTypeTab: boolean;
+  customPatientChartUrl: string;
+  customPatientIdUrl: string;
 }
 
 export interface OutpatientConfig {

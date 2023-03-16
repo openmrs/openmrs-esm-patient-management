@@ -135,6 +135,7 @@
   "noVitalsFound": "No vitals found",
   "oldest": "Oldest first",
   "onTime": "On time",
+  "openChartTooltip": "Open",
   "or": "or",
   "orderDurationAndUnit": "for {duration} {durationUnit}",
   "orderIndefiniteDuration": "Indefinite duration",
