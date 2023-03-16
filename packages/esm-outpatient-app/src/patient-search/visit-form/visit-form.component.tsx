@@ -72,14 +72,15 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisitQueueEntries('', '');
   const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
-  const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
-  const [visitType, setVisitType] = useState<string | null>(() => {
-    if (locations?.length && sessionLocation) {
-      return allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null;
-    }
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [visitType, setVisitType] = useState('');
 
-    return null;
-  });
+  useEffect(() => {
+    if (locations?.length && sessionUser) {
+      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
+    }
+  }, [locations, sessionUser]);
 
   const handleSubmit = useCallback(
     (event) => {
