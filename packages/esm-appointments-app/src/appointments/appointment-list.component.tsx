@@ -10,7 +10,7 @@ import ScheduledAppointments from '../appointments-tabs/schedule-appointment.com
 import CheckInAppointments from '../appointments-tabs/checkedinappointments.component';
 import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
-import UnScheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
+import UnscheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
 import PendingAppointments from '../appointments-tabs/pending-appointments.component';
 import { useAppointments } from '../appointments-tabs/appointments-table.resource';
 
@@ -63,9 +63,9 @@ const AppointmentList: React.FC = () => {
         className={styles.tabs}>
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
           <Tab>{t('scheduled', 'Scheduled')}</Tab>
-          <Tab>{t('unScheduled', 'UnScheduled')}</Tab>
+          <Tab>{t('unscheduled', 'Unscheduled')}</Tab>
           <Tab>{t('completed', 'Completed')}</Tab>
-          <Tab disabled={!isToday}>{t('checkedIn', 'CheckedIn')}</Tab>
+          <Tab disabled={!isToday}>{t('checkedIn', 'Checked in')}</Tab>
           <Tab>{t('pending', 'Pending')}</Tab>
           <Button
             className={styles.calendarButton}
@@ -73,8 +73,8 @@ const AppointmentList: React.FC = () => {
             onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
             renderIcon={(props) => <Calendar size={16} {...props} />}
             data-floating-menu-primary-focus
-            iconDescription={t('viewCalendar', 'View Calendar')}>
-            {t('viewCalendar', 'View Calendar')}
+            iconDescription={t('viewCalendar', 'View calendar')}>
+            {t('viewCalendar', 'View calendar')}
           </Button>
         </TabList>
         <TabPanels>
@@ -82,7 +82,7 @@ const AppointmentList: React.FC = () => {
             <ScheduledAppointments status={AppointmentTypes.SCHEDULED} />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
-            <UnScheduledAppointments />
+            <UnscheduledAppointments />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>{<CompletedAppointments status={AppointmentTypes.COMPLETED} />}</TabPanel>
           {isToday && (

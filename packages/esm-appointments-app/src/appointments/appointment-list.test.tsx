@@ -22,8 +22,8 @@ describe('AppointmentList', () => {
 
     const scheduledAppointmentsTab = screen.getByRole('tab', { name: /^scheduled$/i });
     const completedAppointmentsTab = screen.getByRole('tab', { name: /completed/i });
-    const unsheduledAppointment = screen.getByRole('tab', { name: /^unScheduled$/i });
-    const pendingAppointments = screen.getByRole('tab', { name: /^unScheduled$/i });
+    const unsheduledAppointment = screen.getByRole('tab', { name: /^unscheduled$/i });
+    const pendingAppointments = screen.getByRole('tab', { name: /^unscheduled$/i });
 
     expect(scheduledAppointmentsTab).toBeInTheDocument();
     expect(completedAppointmentsTab).toBeInTheDocument();
