@@ -4,7 +4,6 @@ import {
   DataTableCustomRenderProps,
   DataTableHeader,
   DataTableSkeleton,
-  Layer,
   Table,
   TableBody,
   TableContainer,
@@ -12,15 +11,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Search,
-  SearchProps,
-  InlineLoading,
   Pagination,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
 import { useSession, ConfigurableLink, useLayoutType, isDesktop, usePagination } from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
-import debounce from 'lodash-es/debounce';
 import { PatientList } from '../api/types';
 import { updatePatientList } from '../api/api-remote';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
@@ -29,15 +24,8 @@ interface PatientListTableProps {
   style?: CSSProperties;
   patientLists: Array<PatientList>;
   loading?: boolean;
-  fetching?: boolean;
   headers?: Array<DataTableHeader<keyof PatientList>>;
   refetch(): void;
-  search: {
-    onSearch(searchTerm: string): any;
-    placeHolder: string;
-    currentSearchTerm?: string;
-    otherSearchProps?: SearchProps;
-  };
   listType: string;
   handleCreate?: () => void;
 }
@@ -46,17 +34,14 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   style,
   patientLists = [],
   loading = false,
-  fetching = false,
   headers,
   refetch,
-  search,
   listType,
   handleCreate,
 }) => {
   const userId = useSession()?.user.uuid;
   const layout = useLayoutType();
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
       await updatePatientList(patientListId, { isStarred });
@@ -91,23 +76,6 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   if (patientLists?.length) {
     return (
       <div>
-        <div id="table-tool-bar" className={styles.searchContainer}>
-          <div>{fetching && <InlineLoading />}</div>
-          <div>
-            <Layer>
-              <Search
-                id="patient-list-search"
-                placeholder={search.placeHolder}
-                labelText=""
-                size={isDesktop(layout) ? 'md' : 'lg'}
-                className={styles.search}
-                onChange={(evnt) => handleSearch(evnt.target.value)}
-                defaultValue={search.currentSearchTerm}
-                {...search?.otherSearchProps}
-              />
-            </Layer>
-          </div>
-        </div>
         <DataTable rows={results} headers={headers}>
           {({
             rows,
