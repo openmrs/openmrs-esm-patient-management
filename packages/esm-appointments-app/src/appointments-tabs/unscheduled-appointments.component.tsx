@@ -21,12 +21,12 @@ import { ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-fr
 import { EmptyState } from '../empty-state/empty-state.component';
 import isEmpty from 'lodash-es/isEmpty';
 
-const UnScheduledAppointments: React.FC = () => {
+const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
   const { isLoading: isVisitLoading, visits } = useVisits();
   const { appointments, isLoading } = useAppointments();
   const patientUuids = appointments?.map(({ patientUuid }) => patientUuid);
-  const filteredAppointment = useMemo(
+  const filteredAppointments = useMemo(
     () => (!isVisitLoading ? visits?.filter((visit) => !patientUuids.includes(visit.patient.uuid)) : []),
     [isVisitLoading, patientUuids, visits],
   );
@@ -49,7 +49,7 @@ const UnScheduledAppointments: React.FC = () => {
     },
   ];
 
-  const { results, currentPage, goTo } = usePagination(filteredAppointment, 10);
+  const { results, currentPage, goTo } = usePagination(filteredAppointments, 10);
 
   const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
@@ -66,25 +66,30 @@ const UnScheduledAppointments: React.FC = () => {
   }));
 
   const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(filteredAppointment.length / 10);
+    const numberOfPages = Math.ceil(filteredAppointments.length / 10);
     return [...Array(numberOfPages).keys()].map((x) => {
       return (x + 1) * 10;
     });
-  }, [filteredAppointment]);
+  }, [filteredAppointments]);
 
   if (isLoading && isVisitLoading) {
     return <DataTableSkeleton />;
   }
 
-  if (isEmpty(filteredAppointment)) {
-    return <EmptyState headerTitle="UnScheduled Appointments" displayText="UnScheduled Appointments" />;
+  if (isEmpty(filteredAppointments)) {
+    return (
+      <EmptyState
+        headerTitle={t('unscheduledAppointments', 'Unscheduled appointments')}
+        displayText={t('unscheduledAppointments_lower', 'unscheduled appointments')}
+      />
+    );
   }
 
   return (
     <div>
       <DataTable rows={rowData} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
-          <TableContainer title={`${t('unScheduledAppointments', 'UnScheduled appointments')} ${rowData.length}`}>
+          <TableContainer title={`${t('UnscheduledAppointments', 'Unscheduled appointments')} ${rowData.length}`}>
             <TableToolbar>
               <TableToolbarContent>
                 <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
@@ -126,4 +131,4 @@ const UnScheduledAppointments: React.FC = () => {
   );
 };
 
-export default UnScheduledAppointments;
+export default UnscheduledAppointments;

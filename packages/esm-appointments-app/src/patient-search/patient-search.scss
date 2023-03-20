@@ -9,9 +9,7 @@
 [data-extension-id='patient-search-bar'] {
   & > div {
     width: 100%;
-    & form {
-      margin: 0.0125rem;
-    }
+
     & input {
       background-color: $ui-02;
       border-bottom: none;

@@ -70,6 +70,7 @@ import ActionsMenu from '../queue-entry-table-components/actions-menu.component'
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -130,6 +131,7 @@ function ActiveVisitsTable() {
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
+  const [overlayHeader, setOverlayTitle] = useState('');
 
   const {
     goTo,
@@ -278,6 +280,7 @@ function ActiveVisitsTable() {
                     setShowOverlay(true);
                     setView(SearchTypes.QUEUE_SERVICE_FORM);
                     setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
                   }}
                   iconDescription={t('addNewQueue', 'Add new queue')}>
                   {t('addNewService', 'Add new service')}
@@ -290,8 +293,9 @@ function ActiveVisitsTable() {
                     setShowOverlay(true);
                     setView(SearchTypes.QUEUE_ROOM_FORM);
                     setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
                   }}
-                  iconDescription={t('addNewQueueRoom', 'Add new queue room')}>
+                  iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
                   {t('addNewServiceRoom', 'Add new service room')}
                 </Button>
               </UserHasAccess>
@@ -315,6 +319,7 @@ function ActiveVisitsTable() {
                       setShowOverlay(true);
                       setView(SearchTypes.SCHEDULED_VISITS);
                       setViewState({ selectedPatientUuid });
+                      setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                     },
                   }}
                 />
@@ -381,6 +386,9 @@ function ActiveVisitsTable() {
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
+                            <OpenChartMenu patientUuid={visitQueueEntries?.[index]?.patientUuid} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
@@ -461,6 +469,7 @@ function ActiveVisitsTable() {
             viewState={{
               selectedPatientUuid: viewState.selectedPatientUuid,
             }}
+            headerTitle={overlayHeader}
           />
         )}
       </div>
@@ -481,8 +490,9 @@ function ActiveVisitsTable() {
                   setShowOverlay(true);
                   setView(SearchTypes.QUEUE_SERVICE_FORM);
                   setViewState({ selectedPatientUuid });
+                  setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
                 }}
-                iconDescription={t('addNewQueue', 'Add new queue')}>
+                iconDescription={t('addNewQueueService', 'Add new queue service')}>
                 {t('addNewService', 'Add new service')}
               </Button>
               <Button
@@ -493,9 +503,10 @@ function ActiveVisitsTable() {
                   setShowOverlay(true);
                   setView(SearchTypes.QUEUE_ROOM_FORM);
                   setViewState({ selectedPatientUuid });
+                  setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
                 }}
-                iconDescription={t('addNewQueueRoom', 'Add new queue room')}>
-                {t('addNewServiceRoom', 'Add new service room')}
+                iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
+                {t('addNewQueueRoom', 'Add new queue room')}
               </Button>
             </UserHasAccess>
           </div>
@@ -518,6 +529,7 @@ function ActiveVisitsTable() {
                     setShowOverlay(true);
                     setView(SearchTypes.SCHEDULED_VISITS);
                     setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                   },
                 }}
               />
@@ -542,12 +554,20 @@ function ActiveVisitsTable() {
                 setShowOverlay(true);
                 setView(SearchTypes.SCHEDULED_VISITS);
                 setViewState({ selectedPatientUuid });
+                setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
               },
             }}
           />
         </Tile>
       </div>
-      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
+      {showOverlay && (
+        <PatientSearch
+          view={view}
+          closePanel={() => setShowOverlay(false)}
+          viewState={viewState}
+          headerTitle={overlayHeader}
+        />
+      )}
     </div>
   );
 }

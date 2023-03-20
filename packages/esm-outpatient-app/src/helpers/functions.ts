@@ -54,12 +54,6 @@ export const getGender = (gender, t) => {
   }
 };
 
-export function generateVisitQueueNumber(service, maxVisitNumber) {
-  const servicePrefix = service?.toUpperCase().substring(0, 3);
-  const visitNumber = (maxVisitNumber + 1)?.toString().padStart(4, '0');
-  return servicePrefix + '-' + visitNumber;
-}
-
 export function findObsByConceptUUID(arr: Array<OpenmrsResource>, ids: Array<string>) {
   for (const visit of arr) {
     return visit.obs.filter((o) => {
