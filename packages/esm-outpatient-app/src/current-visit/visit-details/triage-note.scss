@@ -19,7 +19,7 @@
 }
 
 .vitalValues {
-  @include type.type-style('body-compact-01');
+  @include type.type-style('body-compact-02');
   color: $ui-05;
   margin-left: spacing.$spacing-02;
 }
@@ -75,4 +75,15 @@
 
 .bodyLong01 {
   @include type.type-style('body-01');
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.25rem 0.5rem;
+}
+
+.tile {
+  background-color: white;
 }

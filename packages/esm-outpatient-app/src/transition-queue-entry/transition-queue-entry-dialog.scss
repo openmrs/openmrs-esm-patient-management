@@ -1,0 +1,11 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.modalBody {
+  padding-bottom: spacing.$spacing-03;
+}
+
+.p {
+  margin-bottom: spacing.$spacing-02;
+  @include type.type-style('body-01');
+}

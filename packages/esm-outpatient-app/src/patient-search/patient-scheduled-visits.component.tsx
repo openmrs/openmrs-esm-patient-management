@@ -33,13 +33,18 @@ import { Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
-import { usePriority, useServices, useStatus } from '../active-visits/active-visits-table.resource';
-import { useSWRConfig } from 'swr';
+import {
+  usePriority,
+  useServices,
+  useStatus,
+  useVisitQueueEntries,
+} from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
+import { useQueueLocations } from './hooks/useQueueLocations';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
@@ -68,7 +73,7 @@ const ScheduledVisits: React.FC<{
   const locations = useLocations();
   const session = useSession();
   const { services } = useServices(userLocation);
-  const { mutate } = useSWRConfig();
+  const { mutate } = useVisitQueueEntries('', '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
@@ -78,6 +83,9 @@ const ScheduledVisits: React.FC<{
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
   const config = useConfig() as ConfigObject;
+  const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+  const { queueLocations } = useQueueLocations();
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
 
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
@@ -132,6 +140,8 @@ const ScheduledVisits: React.FC<{
                   service,
                   appointment,
                   abortController,
+                  selectedQueueLocation,
+                  visitQueueNumberAttributeUuid,
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
@@ -146,7 +156,7 @@ const ScheduledVisits: React.FC<{
                       });
                       closePanel();
                       setIsSubmitting(false);
-                      mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
+                      mutate();
                     }
                   },
                   (error) => {

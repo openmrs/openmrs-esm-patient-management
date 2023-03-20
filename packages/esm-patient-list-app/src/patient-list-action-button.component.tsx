@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import { ListBulleted } from '@carbon/react/icons';
+import { Events } from '@carbon/react/icons';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-action-button.scss';
 
@@ -14,21 +14,24 @@ const PatientListActionButton: React.FC = () => {
   if (layout === 'tablet') {
     return (
       <Button kind="ghost" className={styles.container} role="button" tabIndex={0} onClick={navigateToPatientList}>
-        <ListBulleted size={20} />
-        <span>{t('patientList', 'Patient list')}</span>
+        <Events size={16} />
+        <span>{t('patientLists', 'Patient lists')}</span>
       </Button>
     );
   }
+
   return (
     <Button
       className={styles.container}
       onClick={navigateToPatientList}
       kind="ghost"
-      renderIcon={(props) => <ListBulleted {...props} />}
+      renderIcon={(props) => <Events size={20} {...props} />}
       hasIconOnly
-      iconDescription={t('patientList', 'Patient list')}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
+      iconDescription={t('patientLists', 'Patient lists')}
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
+      size="sm"
     />
   );
 };

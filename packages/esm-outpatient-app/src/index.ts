@@ -32,6 +32,11 @@ function setupOpenMRS() {
       title: ([x]) => `Patient Lists / ${x}`,
       parent: `${window.spaBase}`,
     },
+    {
+      path: `${window.spaBase}/outpatient/home`,
+      title: 'Service Queues',
+      parent: `${window.spaBase}/home`,
+    },
   ]);
 
   defineConfigSchema(moduleName, configSchema);
@@ -132,6 +137,33 @@ function setupOpenMRS() {
           featureName: 'add visit to queue',
           moduleName,
         }),
+      },
+      {
+        id: 'transition-queue-entry-status-modal',
+        load: getAsyncLifecycle(() => import('./transition-queue-entry/transition-queue-entry-dialog.component'), {
+          featureName: 'transition queue status',
+          moduleName,
+        }),
+      },
+      {
+        id: 'previous-visit-summary-widget',
+        slot: 'previous-visit-summary-slot',
+        load: getAsyncLifecycle(() => import('./past-visit/past-visit.component'), options),
+      },
+      {
+        id: 'add-provider-to-room-modal',
+        load: getAsyncLifecycle(() => import('./add-provider-queue-room/add-provider-queue-room.component'), {
+          featureName: 'add provider queue room',
+          moduleName,
+        }),
+      },
+      {
+        id: 'add-queue-entry-widget',
+        slot: 'add-queue-entry-slot',
+        load: getAsyncLifecycle(
+          () => import('./patient-search/visit-form-queue-fields/visit-form-queue-fields.component'),
+          options,
+        ),
       },
     ],
   };

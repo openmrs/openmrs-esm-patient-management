@@ -1,4 +1,4 @@
-:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher:
+:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher: 
 
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/actions/workflows/ci.yml/badge.svg)
 
@@ -21,35 +21,27 @@ This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/le
 
 To install the dependancies, run:
 ```bash
-npx lerna bootstrap
+yarn install
 ```
 
 To set up environment variables for the project, follow these steps:
 
 1. Create a copy of the .env.example file by running the following command:
   ```bash
-  cp .env.example .env
+  cp example.env .env
   ```
 2. Open the newly created .env file in the root of the project.
 3. Add the environment variables you need. 
 
 Note: These variables are currently only used for end-to-end tests.
 
-To start a dev server running all the modules simultaneously, run:
-
-```bash
-yarn start
-```
-
-This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified module.
-
-Note that this is very resource-intensive.
-
 To start a dev server for a specific module, run:
 
 ```bash
 yarn start --sources 'packages/esm-<insert-package-name>-app'
 ```
+
+This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-management` as well as the specified module.
 
 You could provide `yarn start` with as many `sources` arguments as you require. For example, to run the patient registration and patient search modules only, use:
 
@@ -91,7 +83,7 @@ yarn test
 To run E2E tests, make sure the dev server is running by using:
 
 ```sh
-yarn start
+yarn start --sources 'packages/esm-*-app/'
 ```
 
 Then, in a separate terminal, run:

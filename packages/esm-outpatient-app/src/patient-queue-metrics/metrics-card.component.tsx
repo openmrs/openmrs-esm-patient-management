@@ -36,7 +36,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           </div>
           {service == 'scheduled' ? (
             <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments-list/${service}`}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
                 {t('patientList', 'Patient list')}
               </ConfigurableLink>
               <ArrowRight size={16} />

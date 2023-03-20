@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { Edit } from '@carbon/react/icons';
+import { Collaborate } from '@carbon/react/icons';
 import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
+import styles from './edit-entry.scss';
 
 interface EditMenuProps {
   queueEntry: MappedVisitQueueEntry;
@@ -20,11 +21,11 @@ const EditMenu: React.FC<EditMenuProps> = ({ queueEntry, closeModal }) => {
 
   return (
     <Button
-      kind="ghost"
       onClick={launchEditPriorityModal}
+      className={styles.editIcon}
       iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
       hasIconOnly
-      renderIcon={(props) => <Edit size={16} {...props} />}
+      renderIcon={(props) => <Collaborate size={16} {...props} />}
     />
   );
 };

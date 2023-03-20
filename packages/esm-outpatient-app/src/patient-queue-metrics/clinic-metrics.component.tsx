@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dropdown, DataTableSkeleton } from '@carbon/react';
-import { useMetrics, useAppointmentMetrics, useServiceMetricsCount, useServices } from './queue-metrics.resource';
+import { Dropdown } from '@carbon/react';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
-import styles from './clinic-metrics.scss';
-import { useSession, useLocations } from '@openmrs/esm-framework';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -13,8 +10,10 @@ import {
   useSelectedServiceUuid,
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
+import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
+import { useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import styles from './clinic-metrics.scss';
 
 export interface Service {
   uuid: string;
@@ -23,38 +22,22 @@ export interface Service {
 
 function ClinicMetrics() {
   const { t } = useTranslation();
-  const locations = useLocations();
-  const session = useSession();
 
-  const { metrics, isLoading } = useMetrics();
-  const { totalScheduledAppointments } = useAppointmentMetrics();
-  const [userLocation, setUserLocation] = useState('');
-  const [queueLocation, setQueueLocation] = useState('');
-  const { queueLocations } = useQueueLocations();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { allServices } = useServices(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
   const currentServiceUuid = useSelectedServiceUuid();
+  const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
-  const [initialSelectedItem, setInitialSelectItem] = useState(true);
-  const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
-
-  useEffect(() => {
-    setQueueLocation([...queueLocations].shift()?.id);
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    } else if (!userLocation && locations) {
-      setUserLocation([...locations].shift()?.uuid);
-    }
-  }, [session, locations, userLocation, queueLocations, queueLocation, currentQueueLocation]);
-
-  useEffect(() => {
+  const [initialSelectedItem, setInitialSelectItem] = useState(() => {
     if (currentServiceName && currentServiceUuid) {
-      setInitialSelectItem(false);
+      return false;
     } else if (currentServiceName === t('all', 'All')) {
-      setInitialSelectItem(true);
+      return true;
     }
-  }, [allServices, currentServiceName, serviceCount, currentServiceUuid, t]);
+  });
+  const { visitQueueEntriesCount } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
+  const { activeVisitsCount, isLoading: loading } = useActiveVisits();
+  const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
 
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedServiceUuid(selectedItem.uuid);
@@ -62,18 +45,14 @@ function ClinicMetrics() {
     setInitialSelectItem(false);
   };
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
   return (
     <>
       <MetricsHeader />
       <div className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={totalScheduledAppointments}
-          headerLabel={t('scheduledAppointments', 'Scheduled appts. today')}
+          value={loading ? '--' : activeVisitsCount}
+          headerLabel={t('checkedInPatients', 'Checked in patients')}
           service="scheduled"
         />
         <MetricsCard
@@ -94,7 +73,7 @@ function ClinicMetrics() {
         </MetricsCard>
         <MetricsCard
           label={t('minutes', 'Minutes')}
-          value="--"
+          value={waitTime ? waitTime.averageWaitTime : '--'}
           headerLabel={t('averageWaitTime', 'Average wait time today')}
           service="waitTime"
         />

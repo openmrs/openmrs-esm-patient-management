@@ -1,4 +1,5 @@
-import { getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getPatientListName } from './api/api-remote';
 import { setupOffline } from './offline';
 
 declare var __VERSION__: string;
@@ -24,7 +25,13 @@ const options = {
 function setupOpenMRS() {
   const route = `patient-list`;
   const spaBasePath = `${window.spaBase}/${route}`;
+
+  async function getListName(patientListUuid: string): Promise<string> {
+    return (await getPatientListName(patientListUuid)) ?? '--';
+  }
+
   setupOffline();
+  defineConfigSchema(moduleName, {});
 
   registerBreadcrumbs([
     {
@@ -34,7 +41,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:uuid?`,
-      title: ([x]) => `${x}`,
+      title: ([patientListUuid]) => getListName(patientListUuid),
       parent: spaBasePath,
     },
   ]);
@@ -66,7 +73,7 @@ function setupOpenMRS() {
       },
       {
         name: 'patient-list-action-menu',
-        slot: 'action-menu-items-slot',
+        slot: 'action-menu-non-chart-items-slot',
         load: getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
           featureName: 'patient-list-action-menu-item',
           moduleName,

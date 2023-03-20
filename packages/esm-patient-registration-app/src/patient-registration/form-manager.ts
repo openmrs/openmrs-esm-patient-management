@@ -224,25 +224,29 @@ export class FormManager {
     location: string,
     abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
-    let identifierTypeRequests = Object.values(patientIdentifiers).map(async (patientIdentifier) => {
-      const {
-        identifierTypeUuid,
-        identifierValue,
-        identifierUuid,
-        selectedSource,
-        preferred,
-        autoGeneration,
-        initialValue,
-      } = patientIdentifier;
+    let identifierTypeRequests = Object.values(patientIdentifiers)
       /* Since default identifier-types will be present on the form and are also in the not-required state,
         therefore we might be running into situations when there's no value and no source associated,
         hence filtering these fields out.
       */
-      if (identifierValue || (autoGeneration && selectedSource)) {
+      .filter(
+        ({ identifierValue, autoGeneration, selectedSource }) => identifierValue || (autoGeneration && selectedSource),
+      )
+      .map(async (patientIdentifier) => {
+        const {
+          identifierTypeUuid,
+          identifierValue,
+          identifierUuid,
+          selectedSource,
+          preferred,
+          autoGeneration,
+          initialValue,
+        } = patientIdentifier;
+
         const identifier = !autoGeneration
           ? identifierValue
           : await (
-              await generateIdentifier(patientIdentifier.selectedSource.uuid, abortController)
+              await generateIdentifier(selectedSource.uuid, abortController)
             ).data.identifier;
         const identifierToCreate = {
           uuid: identifierUuid,
@@ -261,8 +265,7 @@ export class FormManager {
         }
 
         return identifierToCreate;
-      }
-    });
+      });
 
     /*
       If there was initially an identifier assigned to the patient, 

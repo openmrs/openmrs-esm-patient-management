@@ -2,10 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
-:global(.cds--side-nav) {
-  z-index: 0;
-}
-
 .searchResultsDesktop {
   height: calc(100vh - 4rem);
   display: flex;

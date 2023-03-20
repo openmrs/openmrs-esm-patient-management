@@ -1,0 +1,22 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.callBtn:hover {
+  background-color: transparent;
+}
+
+.requeueIcon {
+  background-color: transparent;
+
+  & svg {
+    fill: $danger;
+    color: $danger;
+  }
+}
+
+.normalIcon {
+  background-color: transparent;
+
+  & svg {
+    fill: var(--omrs-color-success);
+  }
+}
