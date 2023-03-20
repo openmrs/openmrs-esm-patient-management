@@ -7,6 +7,7 @@ export enum SearchTypes {
   SCHEDULED_VISITS = 'scheduled-visits',
   VISIT_FORM = 'visit_form',
   QUEUE_SERVICE_FORM = 'queue_service_form',
+  QUEUE_ROOM_FORM = 'queue_room_form',
 }
 
 export interface Patient {
@@ -241,8 +242,6 @@ export interface FormattedEncounter {
   form: OpenmrsResource;
   obs: Array<Observation>;
   provider: string;
-  visitType: string;
-  visitUuid: string;
 }
 
 export interface ObsMetaInfo {
@@ -288,6 +287,7 @@ export interface QueueEntryPayload {
     queue: { uuid: string };
     patient: { uuid: string };
     startedAt: Date;
+    sortWeight: number;
   };
 }
 
@@ -343,6 +343,7 @@ export interface MappedQueueEntry {
   queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
+  sortWeight: string;
 }
 
 export interface EndVisitPayload {
@@ -382,4 +383,52 @@ export interface Resource {
       system: string;
     }>;
   };
+}
+
+export interface Identifer {
+  identifier: string;
+  display: string;
+  uuid: string;
+  identifierType: {
+    uuid: string;
+    display: string;
+  };
+}
+
+export interface NewVisitPayload {
+  uuid?: string;
+  location: string;
+  patient?: string;
+  startDatetime: Date;
+  visitType: string;
+  stopDatetime?: Date;
+  attributes?: Array<{
+    attributeType: string;
+    value: string;
+  }>;
+}
+
+export interface QueueRoom {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+}
+
+export interface ProvidersQueueRoom {
+  uuid: string;
+  provider: {
+    uuid: string;
+    display: string;
+  };
+  queueRoom: {
+    uuid: string;
+    name: string;
+    display: string;
+  };
+}
+
+export interface WaitTime {
+  metric: string;
+  averageWaitTime: string;
 }

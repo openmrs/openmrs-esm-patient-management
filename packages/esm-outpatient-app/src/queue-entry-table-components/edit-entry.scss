@@ -1,0 +1,14 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.editIcon {
+  background-color: transparent;
+
+  & svg {
+    fill: var(--omrs-color-brand-orange);
+    color: var(--omrs-color-brand-orange);
+  }
+}
+
+.editIcon:hover {
+  background-color: transparent;
+}

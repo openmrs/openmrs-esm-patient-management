@@ -58,20 +58,10 @@ export const configSchema = {
     _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
     _default: `${spaBasePath}`,
   },
-  appointmentComments: {
+  hiddenFormFields: {
     _type: Type.Array,
-    _description: 'Reason for Changes',
-    _default: [
-      'Forgot Appoinment',
-      'Lack of Transport',
-      'Travelled',
-      'Work/Schedule/Busy',
-      'Had enough Medicine',
-      'Taking Herbal Medication',
-      'Spiritual Healed',
-      'Recieved Refill in another facility',
-      'Other',
-    ],
+    _description: 'Array of form controls to be hidden on form load',
+    _default: [],
   },
 };
 
@@ -87,4 +77,5 @@ export interface ConfigObject {
   useFullViewPrivilege: boolean;
   fullViewPrivilege: string;
   appointmentComments: Array<string>;
+  hiddenFormFields: Array<string>;
 }

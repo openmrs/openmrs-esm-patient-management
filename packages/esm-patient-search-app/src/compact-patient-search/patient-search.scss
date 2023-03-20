@@ -2,11 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
-// FIX: This is not ideal
-:global(.cds--side-nav) {
-  z-index: 0;
-}
-
 .searchResultsContainer {
   width: 100%;
   background-color: $ui-02;

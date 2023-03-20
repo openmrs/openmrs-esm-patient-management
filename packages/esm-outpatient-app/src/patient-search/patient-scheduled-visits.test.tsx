@@ -6,7 +6,7 @@ import { mockPatientsVisits } from '../../../../__mocks__/patient-visits.mock';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../esm-appointments-app/__mocks__/appointments.mock';
+import { mockPatient } from '../../../../__mocks__/appointments.mock';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockToggleSearchType = jest.fn();

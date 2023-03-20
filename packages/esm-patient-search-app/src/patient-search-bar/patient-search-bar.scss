@@ -7,13 +7,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid $ui-04;
 }
 
 .patientSearchInput {
   border: none;
-}
-
-.patientSearchInput input:focus {
-  outline: 1px solid 1px solid colors.$orange-40;
 }

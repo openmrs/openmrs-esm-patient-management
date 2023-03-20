@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -36,13 +36,13 @@ import {
   navigate,
   interpolateUrl,
   isDesktop,
-  useSession,
-  useLocations,
   ExtensionSlot,
   usePagination,
   useConfig,
   ConfigObject,
-  ConfigurableLink,
+  UserHasAccess,
+  useSession,
+  showModal,
 } from '@openmrs/esm-framework';
 import {
   useVisitQueueEntries,
@@ -54,20 +54,23 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import styles from './active-visits-table.scss';
-import first from 'lodash-es/first';
 import { SearchTypes } from '../types';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
   useSelectedServiceName,
-  useSelectedServiceUuid,
   useSelectedQueueLocationUuid,
+  useSelectedProviderRoomTimestamp,
+  useIsPermanentProviderQueueRoom,
 } from '../helpers/helpers';
-import { buildStatusString, formatWaitTime, getTagType } from '../helpers/functions';
+import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
+import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
+import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -103,39 +106,38 @@ const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
-  const [userLocation, setUserLocation] = useState('');
-  const session = useSession();
-  const locations = useLocations();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { services } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentQueueLocation);
+  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
   const config = useConfig() as ConfigObject;
   const useQueueTableTabs = config.showQueueTableTab;
+  const currentUserSession = useSession();
+  const providerUuid = currentUserSession?.currentProvider?.uuid;
+  const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
+  const differenceInTime = timeDiffInMinutes(
+    new Date(),
+    new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
+  );
 
+  const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const currentPathName: string = window.location.pathname;
   const fromPage: string = getOriginFromPathName(currentPathName);
 
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
+  const [overlayHeader, setOverlayTitle] = useState('');
 
   const {
     goTo,
     results: paginatedQueueEntries,
     currentPage,
   }: PaginationData = usePagination(visitQueueEntries, currentPageSize);
-
-  useEffect(() => {
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    } else if (!userLocation && locations) {
-      setUserLocation(first(locations)?.uuid);
-    }
-  }, [session, locations, userLocation, currentQueueLocation]);
 
   const tableHeaders = useMemo(
     () => [
@@ -146,16 +148,21 @@ function ActiveVisitsTable() {
       },
       {
         id: 1,
+        header: t('queueNumber', 'QueueNumber'),
+        key: 'queueNumber',
+      },
+      {
+        id: 2,
         header: t('priority', 'Priority'),
         key: 'priority',
       },
       {
-        id: 2,
+        id: 3,
         header: t('status', 'Status'),
         key: 'status',
       },
       {
-        id: 3,
+        id: 4,
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
@@ -177,6 +184,9 @@ function ActiveVisitsTable() {
             {entry.name}
           </PatientNameLink>
         ),
+      },
+      queueNumber: {
+        content: <span className={styles.statusContainer}>{entry?.visitQueueNumber}</span>,
       },
       priority: {
         content: (
@@ -238,6 +248,19 @@ function ActiveVisitsTable() {
     );
   };
 
+  const launchAddProviderRoomModal = useCallback(() => {
+    const dispose = showModal('add-provider-to-room-modal', {
+      closeModal: () => dispose(),
+      providerUuid,
+    });
+  }, [providerUuid]);
+
+  useEffect(() => {
+    if (differenceInTime >= 1 && isPermanentProviderQueueRoom == 'false') {
+      launchAddProviderRoomModal();
+    }
+  }, []);
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
@@ -248,18 +271,34 @@ function ActiveVisitsTable() {
         {useQueueTableTabs === false ? (
           <>
             <div className={styles.headerBtnContainer}>
-              <Button
-                size="sm"
-                kind="ghost"
-                renderIcon={(props) => <ArrowRight size={16} {...props} />}
-                onClick={(selectedPatientUuid) => {
-                  setShowOverlay(true);
-                  setView(SearchTypes.QUEUE_SERVICE_FORM);
-                  setViewState({ selectedPatientUuid });
-                }}
-                iconDescription={t('addNewQueue', 'Add new queue')}>
-                {t('addNewService', 'Add new service')}
-              </Button>
+              <UserHasAccess privilege="Manage Forms">
+                <Button
+                  size="sm"
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={(selectedPatientUuid) => {
+                    setShowOverlay(true);
+                    setView(SearchTypes.QUEUE_SERVICE_FORM);
+                    setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
+                  }}
+                  iconDescription={t('addNewQueue', 'Add new queue')}>
+                  {t('addNewService', 'Add new service')}
+                </Button>
+                <Button
+                  size="sm"
+                  kind="ghost"
+                  renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                  onClick={(selectedPatientUuid) => {
+                    setShowOverlay(true);
+                    setView(SearchTypes.QUEUE_ROOM_FORM);
+                    setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
+                  }}
+                  iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
+                  {t('addNewServiceRoom', 'Add new service room')}
+                </Button>
+              </UserHasAccess>
             </div>
             <div className={styles.headerContainer}>
               <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
@@ -280,6 +319,7 @@ function ActiveVisitsTable() {
                       setShowOverlay(true);
                       setView(SearchTypes.SCHEDULED_VISITS);
                       setViewState({ selectedPatientUuid });
+                      setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                     },
                   }}
                 />
@@ -342,7 +382,13 @@ function ActiveVisitsTable() {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
+                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
+                            <OpenChartMenu patientUuid={visitQueueEntries?.[index]?.patientUuid} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
@@ -423,6 +469,7 @@ function ActiveVisitsTable() {
             viewState={{
               selectedPatientUuid: viewState.selectedPatientUuid,
             }}
+            headerTitle={overlayHeader}
           />
         )}
       </div>
@@ -434,18 +481,34 @@ function ActiveVisitsTable() {
       {useQueueTableTabs === false ? (
         <>
           <div className={styles.headerBtnContainer}>
-            <Button
-              size="sm"
-              kind="ghost"
-              renderIcon={(props) => <ArrowRight size={16} {...props} />}
-              onClick={(selectedPatientUuid) => {
-                setShowOverlay(true);
-                setView(SearchTypes.QUEUE_SERVICE_FORM);
-                setViewState({ selectedPatientUuid });
-              }}
-              iconDescription={t('addNewQueue', 'Add new queue')}>
-              {t('addNewService', 'Add new service')}
-            </Button>
+            <UserHasAccess privilege="Manage Forms">
+              <Button
+                size="sm"
+                kind="ghost"
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                onClick={(selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.QUEUE_SERVICE_FORM);
+                  setViewState({ selectedPatientUuid });
+                  setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
+                }}
+                iconDescription={t('addNewQueueService', 'Add new queue service')}>
+                {t('addNewService', 'Add new service')}
+              </Button>
+              <Button
+                size="sm"
+                kind="ghost"
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
+                onClick={(selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.QUEUE_ROOM_FORM);
+                  setViewState({ selectedPatientUuid });
+                  setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
+                }}
+                iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
+                {t('addNewQueueRoom', 'Add new queue room')}
+              </Button>
+            </UserHasAccess>
           </div>
           <div className={styles.headerContainer}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
@@ -466,6 +529,7 @@ function ActiveVisitsTable() {
                     setShowOverlay(true);
                     setView(SearchTypes.SCHEDULED_VISITS);
                     setViewState({ selectedPatientUuid });
+                    setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                   },
                 }}
               />
@@ -490,12 +554,20 @@ function ActiveVisitsTable() {
                 setShowOverlay(true);
                 setView(SearchTypes.SCHEDULED_VISITS);
                 setViewState({ selectedPatientUuid });
+                setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
               },
             }}
           />
         </Tile>
       </div>
-      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
+      {showOverlay && (
+        <PatientSearch
+          view={view}
+          closePanel={() => setShowOverlay(false)}
+          viewState={viewState}
+          headerTitle={overlayHeader}
+        />
+      )}
     </div>
   );
 }

@@ -32,9 +32,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
   const locations = useLocations();
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
-  const [queueDescription, setQueueDescription] = useState('');
   const [isMissingName, setMissingName] = useState(false);
-  const [isMissingDescription, setMissingDescription] = useState(false);
   const [isMissingQueue, setMissingQueue] = useState(false);
   const [isMissingLocation, setMissingLocation] = useState(false);
   const [userLocation, setUserLocation] = useState('');
@@ -59,21 +57,16 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         setMissingQueue(true);
         return;
       }
-      if (!queueDescription) {
-        setMissingDescription(true);
-        return;
-      }
       if (!userLocation) {
         setMissingLocation(true);
         return;
       }
 
       setMissingName(false);
-      setMissingDescription(false);
       setMissingQueue(false);
       setMissingLocation(false);
 
-      saveQueue(queueName, queueConcept, queueDescription, userLocation, new AbortController()).then(
+      saveQueue(queueName, queueConcept, queueName, userLocation, new AbortController()).then(
         ({ status }) => {
           if (status === 201) {
             showToast({
@@ -96,7 +89,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
         },
       );
     },
-    [queueName, queueConcept, queueDescription, userLocation, t, closePanel],
+    [queueName, queueConcept, userLocation, t, closePanel],
   );
 
   return (
@@ -124,38 +117,17 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               </section>
             )}
           </Layer>
-          <Layer className={styles.input}>
-            <TextArea
-              rows={3}
-              id="queueDescription"
-              invalidText="Required"
-              labelText={t('queueDescription', 'Queue description')}
-              onChange={(event) => setQueueDescription(event.target.value)}
-              value={queueDescription}
-            />
-          </Layer>
-          {isMissingDescription && (
-            <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingQueueDescription', 'Missing queue description')}
-                subtitle={t('addQueueDescription', 'Please add a queue description')}
-              />
-            </section>
-          )}
 
           <Layer className={styles.input}>
             <Select
-              labelText={t('selectQueueConcept', 'Select a concept for the queue')}
+              labelText={t('selectServiceType', 'Select a servicee type')}
               id="queueConcept"
               invalidText="Required"
               value={queueConcept}
               onChange={(event) => setQueueConcept(event.target.value)}
               light>
-              {!queueConcept && <SelectItem text={t('selectQueueConcept', 'Select a concept for the queue')} />}
-              {queueConcepts.length === 0 && <SelectItem text={t('noConceptsAvailable', 'No concepts available')} />}
+              {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} />}
+              {queueConcepts.length === 0 && <SelectItem text={t('noServicesAvailable', 'No services available')} />}
               {queueConcepts?.length > 0 &&
                 queueConcepts.map((concept) => (
                   <SelectItem key={concept.uuid} text={concept.display} value={concept.uuid}>
@@ -169,8 +141,8 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
                   style={{ margin: '0', minWidth: '100%' }}
                   kind="error"
                   lowContrast={true}
-                  title={t('missingConcept', 'Missing concept')}
-                  subtitle={t('selectQueueConcept', 'Please select a concept for the queue')}
+                  title={t('missingService', 'Missing service')}
+                  subtitle={t('selectServiceType', 'Select a service type')}
                 />
               </section>
             )}

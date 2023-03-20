@@ -5,6 +5,7 @@ import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import { SearchTypes } from '../types';
 import QueueServiceForm from '../queue-services/queue-service-form.component';
+import QueueRoomForm from '../queue-rooms/queue-room-form.component';
 
 interface PatientSearchProps {
   closePanel: () => void;
@@ -12,13 +13,18 @@ interface PatientSearchProps {
   viewState: {
     selectedPatientUuid?: string;
   };
+  headerTitle?: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewState }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewState, headerTitle }) => {
   const { t } = useTranslation();
   const { selectedPatientUuid } = viewState;
   const [searchType, setSearchType] = useState<SearchTypes>(
-    view === 'queue_service_form' ? SearchTypes.QUEUE_SERVICE_FORM : SearchTypes.SCHEDULED_VISITS,
+    view === 'queue_service_form'
+      ? SearchTypes.QUEUE_SERVICE_FORM
+      : view === 'queue_room_form'
+      ? SearchTypes.QUEUE_ROOM_FORM
+      : SearchTypes.SCHEDULED_VISITS,
   );
   const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
 
@@ -29,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
 
   return (
     <>
-      <Overlay header={t('addPatientToQueue', 'Add patient to queue')} closePanel={closePanel}>
+      <Overlay header={headerTitle} closePanel={closePanel}>
         <div className="omrs-main-content">
           {searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits
@@ -46,6 +52,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
             />
           ) : searchType === SearchTypes.QUEUE_SERVICE_FORM ? (
             <QueueServiceForm toggleSearchType={toggleSearchType} closePanel={closePanel} />
+          ) : searchType === SearchTypes.QUEUE_ROOM_FORM ? (
+            <QueueRoomForm toggleSearchType={toggleSearchType} closePanel={closePanel} />
           ) : null}
         </div>
       </Overlay>

@@ -1,25 +1,26 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
-  InlineLoading,
+  ContentSwitcher,
+  Form,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Form,
-  FormGroup,
-  RadioButton,
-  RadioButtonGroup,
-  ContentSwitcher,
-  Switch,
   Select,
   SelectItem,
-  InlineNotification,
+  Switch,
 } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
-import { addQueueEntry, usePriority, useServices, useStatus } from '../active-visits/active-visits-table.resource';
-import { useTranslation } from 'react-i18next';
+import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import {
+  addQueueEntry,
+  usePriority,
+  useServices,
+  useStatus,
+  useVisitQueueEntries,
+} from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
-import { useSWRConfig } from 'swr';
 import { ActiveVisit } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
@@ -31,7 +32,6 @@ interface AddVisitToQueueDialogProps {
 const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, closeModal }) => {
   const { t } = useTranslation();
 
-  const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
   const visitUuid = visitDetails?.visitUuid;
   const [queueUuid, setQueueUuid] = useState('');
@@ -41,20 +41,15 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const patientSex = visitDetails?.gender;
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
-  const { mutate } = useSWRConfig();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const { services } = useServices(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
-  const [isMissingStatus, setIsMissingStatus] = useState(false);
   const [isMissingPriority, setIsMissingPriority] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
+  const config = useConfig() as ConfigObject;
+  const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
 
   const addVisitToQueue = useCallback(() => {
-    if (!status) {
-      setIsMissingStatus(true);
-      return;
-    }
-    setIsMissingStatus(false);
     if (!queueUuid) {
       setIsMissingService(true);
       return;
@@ -66,8 +61,22 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
       return;
     }
     setIsMissingPriority(false);
+    const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
+    const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
+    const status = config.concepts.defaultStatusConceptUuid;
+    const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
 
-    addQueueEntry(visitUuid, queueUuid, patientUuid, priority, status, new AbortController()).then(
+    addQueueEntry(
+      visitUuid,
+      queueUuid,
+      patientUuid,
+      priority,
+      status,
+      sortWeight,
+      new AbortController(),
+      selectedQueueLocation,
+      visitQueueNumberAttributeUuid,
+    ).then(
       ({ status }) => {
         if (status === 201) {
           showToast({
@@ -77,9 +86,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
-          mutate(`/ws/rest/v1/visit-queue-entry?v=full`);
-          mutate(`/ws/rest/v1/visit?includeInactive=false`);
-          mutate(`/ws/rest/v1/visit-queue-entry?location=${selectedQueueLocation}&v=full`);
+          mutate();
         }
       },
       (error) => {
@@ -91,7 +98,19 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
         });
       },
     );
-  }, [priority, status, visitUuid, queueUuid, patientUuid, priorities, statuses, t, closeModal, mutate]);
+  }, [
+    queueUuid,
+    priority,
+    config.concepts.emergencyPriorityConceptUuid,
+    config.concepts.defaultStatusConceptUuid,
+    config.concepts.visitQueueNumberAttributeUuid,
+    visitUuid,
+    patientUuid,
+    selectedQueueLocation,
+    t,
+    closeModal,
+    mutate,
+  ]);
 
   return (
     <div>
@@ -103,36 +122,6 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
               {patientName} &nbsp; · &nbsp;{patientSex} &nbsp; · &nbsp;{patientAge}&nbsp;{t('years', 'Years')}
             </h5>
           </div>
-          <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-          <FormGroup legendText="">
-            <RadioButtonGroup
-              className={styles.radioButtonGroup}
-              valueSelected={status}
-              orientation="vertical"
-              onChange={(event) => setStatus(event.toString())}
-              name="radio-button-group">
-              {isLoading ? (
-                <InlineLoading role="progressbar" description={t('loading', 'Loading...')} />
-              ) : statuses?.length === 0 ? (
-                <p>{t('noStatusAvailable', 'No Status Available')}</p>
-              ) : (
-                statuses.map(({ uuid, display, name }) => (
-                  <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-                ))
-              )}
-            </RadioButtonGroup>
-          </FormGroup>
-          {isMissingStatus && (
-            <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingStatus', 'Please select a status')}
-              />
-            </section>
-          )}
-
           <section>
             <Select
               labelText={t('selectQueueLocation', 'Select a queue location')}

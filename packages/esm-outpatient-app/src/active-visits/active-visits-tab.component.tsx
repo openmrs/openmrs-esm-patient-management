@@ -15,6 +15,7 @@ function ActiveVisitsTabs() {
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [overlayHeader, setOverlayTitle] = useState('');
 
   return (
     <div className={styles.container}>
@@ -28,9 +29,23 @@ function ActiveVisitsTabs() {
               setShowOverlay(true);
               setView(SearchTypes.QUEUE_SERVICE_FORM);
               setViewState({ selectedPatientUuid });
+              setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
             }}
-            iconDescription={t('addNewQueue', 'Add new queue')}>
+            iconDescription={t('addNewQueueService', 'Add new queue service')}>
             {t('addNewService', 'Add new service')}
+          </Button>
+          <Button
+            size="sm"
+            kind="ghost"
+            renderIcon={(props) => <ArrowRight size={16} {...props} />}
+            onClick={(selectedPatientUuid) => {
+              setShowOverlay(true);
+              setView(SearchTypes.QUEUE_ROOM_FORM);
+              setViewState({ selectedPatientUuid });
+              setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
+            }}
+            iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
+            {t('addNewServiceRoom', 'Add new service room')}
           </Button>
         </UserHasAccess>
         <ExtensionSlot
@@ -47,6 +62,7 @@ function ActiveVisitsTabs() {
               setShowOverlay(true);
               setView(SearchTypes.SCHEDULED_VISITS);
               setViewState({ selectedPatientUuid });
+              setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
             },
           }}
         />
@@ -68,7 +84,14 @@ function ActiveVisitsTabs() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-      {showOverlay && <PatientSearch view={view} closePanel={() => setShowOverlay(false)} viewState={viewState} />}
+      {showOverlay && (
+        <PatientSearch
+          view={view}
+          closePanel={() => setShowOverlay(false)}
+          viewState={viewState}
+          headerTitle={overlayHeader}
+        />
+      )}
     </div>
   );
 }

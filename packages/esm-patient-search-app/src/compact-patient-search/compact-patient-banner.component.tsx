@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
+import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
-import { SearchedPatient } from '../types/index';
+import { Identifier, SearchedPatient } from '../types/index';
 import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
@@ -68,35 +68,52 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
     return (
       <div ref={ref}>
-        {fhirPatients.map((patient, indx) => (
-          <ConfigurableLink
-            onClick={(evt) => selectPatientAction(evt, indx)}
-            to={`${interpolateString(config.search.patientResultUrl, {
-              patientUuid: patient.id,
-            })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
-            key={patient.id}
-            className={styles.patientSearchResult}>
-            <div className={styles.patientAvatar} role="img">
-              <ExtensionSlot
-                extensionSlotName="patient-photo-slot"
-                state={{
-                  patientUuid: patient.id,
-                  patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
-                  size: 'small',
-                }}
-              />
-            </div>
-            <div>
-              <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
-                patient.name?.[0]?.family
-              }`}</h2>
-              <p className={styles.demographics}>
-                {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
-                <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
-              </p>
-            </div>
-          </ConfigurableLink>
-        ))}
+        {fhirPatients.map((patient, indx) => {
+          const patientIdentifiers = patient.identifier.filter((identifier) =>
+            config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
+          );
+          return (
+            <ConfigurableLink
+              onClick={(evt) => selectPatientAction(evt, indx)}
+              to={`${interpolateString(config.search.patientResultUrl, {
+                patientUuid: patient.id,
+              })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
+              key={patient.id}
+              className={styles.patientSearchResult}>
+              <div className={styles.patientAvatar} role="img">
+                <ExtensionSlot
+                  extensionSlotName="patient-photo-slot"
+                  state={{
+                    patientUuid: patient.id,
+                    patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
+                    size: 'small',
+                  }}
+                />
+              </div>
+              <div>
+                <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
+                  patient.name?.[0]?.family
+                }`}</h2>
+                <p className={styles.demographics}>
+                  {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
+                  {config.defaultIdentifierTypes.length ? (
+                    <>
+                      {patientIdentifiers.length > 1 ? (
+                        <PatientIdentifier identifiers={patientIdentifiers} />
+                      ) : (
+                        <CustomIdentifier patient={patients[indx]} identifierName={config.defaultIdentifier} />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
+                    </>
+                  )}
+                </p>
+              </div>
+            </ConfigurableLink>
+          );
+        })}
       </div>
     );
   },
@@ -123,6 +140,36 @@ export const SearchResultSkeleton = () => {
         </span>
       </div>
     </div>
+  );
+};
+
+const PatientIdentifier: React.FC<{ identifiers: Array<Identifier> }> = ({ identifiers }) => {
+  return (
+    <>
+      {identifiers.map((identifier) => (
+        <>
+          <Tag className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
+            {identifier.identifierType.display}
+          </Tag>
+          <span className={styles.configuredLabel}>{identifier.identifier}</span>
+        </>
+      ))}
+    </>
+  );
+};
+
+const CustomIdentifier: React.FC<{ patient: SearchedPatient; identifierName: string }> = ({
+  patient,
+  identifierName,
+}) => {
+  const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
+  return (
+    <>
+      <Tag className={styles.configuredTag} type="warm-gray" title={identifier.display}>
+        {identifier.identifierType.display}
+      </Tag>
+      <span className={styles.configuredLabel}>{identifier.identifier}</span>
+    </>
   );
 };
 

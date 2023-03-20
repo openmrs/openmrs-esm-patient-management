@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
-import { mockPatient, mockServices, mockProviders } from '../../__mocks__/appointments.mock';
+import { mockPatient, mockServices, mockProviders } from '../../../../__mocks__/appointments.mock';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 import { MappedAppointment } from '../types';
@@ -39,6 +39,7 @@ let mockOpenmrsConfig = {
   daysOfTheWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   appointmentTypes: ['Scheduled', 'WalkIn', 'Virtual'],
   appointmentStatuses: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
+  hiddenFormFields: [],
 };
 
 describe('AppointmentForm', () => {
@@ -74,22 +75,15 @@ describe('AppointmentForm', () => {
     allSelects.forEach((select) => inputAndSelectNamesAndTabValues.push(select?.id));
     allTabs.forEach((tab) => inputAndSelectNamesAndTabValues.push(tab?.id));
 
-    expect(screen.queryByLabelText('Reason For Changes')).not.toBeInTheDocument();
     expect(inputAndSelectNamesAndTabValues).toEqual([
       'visitStartDateInput',
-      'start-time-picker',
-      'end-time-picker',
       'Yes',
       'No',
       '',
-      'frequency',
       'location',
       'service',
-      'start-time-picker',
-      'end-time-picker',
       'appointmentType',
       'providers',
-      'reason',
       'facility',
       'community',
     ]);
@@ -97,20 +91,16 @@ describe('AppointmentForm', () => {
 
   it('renders the form with all expected inputs in edit mode', () => {
     renderAppointmentsForm('editing', mockPatient.uuid);
-    expect(screen.getByRole('option', { name: /Reason for change/ })).toBeInTheDocument();
   });
 
   it('renders the expected appointment types', () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
     const appointmentTypeSelect = screen.getByLabelText('Select an appointment type');
 
-    expect((screen.getByRole('option', { name: 'Select an appointment type' }) as HTMLOptionElement).selected).toBe(
-      true,
-    );
-    expect(within(appointmentTypeSelect).getAllByRole('option')).toHaveLength(4);
-    expect(within(appointmentTypeSelect).getAllByRole('option')[1]).toHaveValue('Scheduled');
-    expect(within(appointmentTypeSelect).getAllByRole('option')[2]).toHaveValue('WalkIn');
-    expect(within(appointmentTypeSelect).getAllByRole('option')[3]).toHaveValue('Virtual');
+    expect(within(appointmentTypeSelect).getAllByRole('option')).toHaveLength(3);
+    expect(within(appointmentTypeSelect).getAllByRole('option')[2]).toHaveValue('Virtual');
+    expect(within(appointmentTypeSelect).getAllByRole('option')[1]).toHaveValue('WalkIn');
+    expect(within(appointmentTypeSelect).getAllByRole('option')[0]).toHaveValue('Scheduled');
 
     // TODO handle onselect an option
   });

@@ -1,7 +1,7 @@
-import { FetchResponse } from '@openmrs/esm-framework';
+import { FetchResponse, OpenmrsResource } from '@openmrs/esm-framework';
 export interface SearchedPatient {
   uuid: string;
-  identifiers: Array<{ identifier: string }>;
+  identifiers: Array<Identifier>;
   person: {
     addresses: Array<Address>;
     age: number;
@@ -17,6 +17,14 @@ export interface SearchedPatient {
     };
   };
   attributes: Array<{ value: string; attributeType: { uuid: string; display: string } }>;
+}
+
+export interface Identifier {
+  display: string;
+  identifier: string;
+  identifierType: OpenmrsResource;
+  location: OpenmrsResource;
+  uuid: string;
 }
 export interface Address {
   preferred: boolean;

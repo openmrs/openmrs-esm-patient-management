@@ -13,6 +13,11 @@ export const configSchema = {
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
       _default: '9e123c90-76ac-4eaa-8d40-35577781eb46',
     },
+    emergencyPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
+      _default: '5c2d5f8c-5efb-46d0-8e28-9e707ab7523c',
+    },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
       _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
@@ -25,6 +30,16 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default status for the queues eg Waiting.',
       _default: '136203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    defaultTransitionStatus: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
+      _default: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    visitQueueNumberAttributeUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the visit attribute that contains the visit queue number.',
+      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
     },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
@@ -66,6 +81,11 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    historicalObsConceptUuid: {
+      _type: Type.Array,
+      _description: 'The Uuids of the obs that are displayed on the previous visit modal',
+      _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    },
   },
   contactAttributeType: {
     _type: Type.UUID,
@@ -85,6 +105,29 @@ export const configSchema = {
     _description: 'Configurable appointment status (status of appointments)',
     _default: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
   },
+  defaultIdentifierTypes: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.String,
+    },
+    _description: 'The identifier types to be display on all patient search result page',
+    _default: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
+  },
+  showRecommendedVisitTypeTab: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
+    _default: false,
+  },
+  customPatientChartUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to load patient chart',
+  },
+  customPatientIdUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to fetch patient with id',
+  },
 };
 
 export interface ConfigObject {
@@ -103,16 +146,20 @@ export interface ConfigObject {
     weightUuid: string;
     respiratoryRateUuid: string;
     midUpperArmCircumferenceUuid: string;
+    emergencyPriorityConceptUuid: string;
+    historicalObsConceptUuid: Array<string>;
   };
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
   showQueueTableTab: boolean;
   appointmentStatuses: Array<string>;
+  defaultIdentifierTypes: Array<string>;
+  showRecommendedVisitTypeTab: boolean;
+  customPatientChartUrl: string;
+  customPatientIdUrl: string;
 }
 
 export interface OutpatientConfig {
-  offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
-  showRecommendedVisitTypeTab: boolean;
 }

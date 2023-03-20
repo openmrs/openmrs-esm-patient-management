@@ -31,4 +31,17 @@ export const configSchema = {
       'e3d177ee-04ad-11ed-828d-0242ac1e0002',
     ],
   },
+  defaultIdentifierTypes: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.String,
+    },
+    _description: 'The identifier types to be display on all patient search result page',
+    _default: ['b4d66522-11fc-45c7-83e3-39a1af21ae0d', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
+  },
+  defaultIdentifier: {
+    _type: Type.String,
+    _description: 'Identifier to be shown in the event defaultIdentifierTypes does is empty',
+    _default: 'OpenMRS ID',
+  },
 };

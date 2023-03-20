@@ -35,9 +35,9 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
     if (showSearchInput) {
       if (isSearchPage) {
         navigate({
-          to: window.localStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
+          to: window.sessionStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
         });
-        window.localStorage.removeItem('searchReturnUrl');
+        window.sessionStorage.removeItem('searchReturnUrl');
       }
       setShowSearchInput(false);
     } else {

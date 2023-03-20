@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render, waitFor, within } from '@testing-library/react';
 import { mockServices } from '../../__mocks__/active-visits.mock';
 import { mockPriorities, mockStatus } from '../../../../__mocks__/metrics.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
@@ -56,9 +56,10 @@ describe('Queue entry details', () => {
     mockUpdateQueueEntry.mockResolvedValueOnce({ data: mockQueueEntry, status: 201, statusText: 'Updated' });
 
     renderUpdateQueueEntryDialog();
+    expect(screen.getByText(/queue service/i)).toBeInTheDocument();
+    expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /finished service/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /exit and change status/i })));
+    await waitFor(() => user.click(screen.getByRole('button', { name: /move to next service/i })));
 
     expect(mockShowToast).toHaveBeenCalledTimes(1);
     expect(mockShowToast).toHaveBeenCalledWith({
@@ -81,11 +82,17 @@ describe('Queue entry details', () => {
 
     renderUpdateQueueEntryDialog();
 
-    expect(screen.getByText(/change patient queue status/i)).toBeInTheDocument();
-    await waitFor(() => user.click(screen.getByRole('radio', { name: /finished service/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /exit and change status/i })));
+    expect(screen.getByText(/move patient to the next service?/i)).toBeInTheDocument();
+    expect(screen.getByText(/queue service/i)).toBeInTheDocument();
+    expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
+    const queueServiceTypes = screen.getByLabelText('Select a service');
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
+    expect(within(queueServiceTypes).getAllByRole('option')).toHaveLength(2);
+    expect(within(queueServiceTypes).getAllByRole('option')[0]).toHaveValue('176052c7-5fd4-4b33-89cc-7bae6848c65a');
+    expect(within(queueServiceTypes).getAllByRole('option')[1]).toHaveValue('d80ff12a-06a7-11ed-b939-0242ac120002');
+
+    await waitFor(() => user.click(screen.getByRole('button', { name: /move to next service/i })));
+
     expect(mockShowNotification).toHaveBeenCalledWith({
       description: 'Internal Server Error',
       kind: 'error',

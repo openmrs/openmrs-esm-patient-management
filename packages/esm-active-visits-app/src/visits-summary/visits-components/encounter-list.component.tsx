@@ -67,7 +67,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
     <DataTable rows={encounters} headers={headerData} size={!isDesktop(layout) ? 'md' : 'sm'}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
-          <TableContainer>
+          <TableContainer data-testid="encountersTable">
             <Table className={styles.customTable} {...getTableProps()}>
               <TableHead>
                 <TableRow>
@@ -90,7 +90,9 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                        <TableCell key={cell.id} data-testid={cell.id}>
+                          {cell.value}
+                        </TableCell>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
