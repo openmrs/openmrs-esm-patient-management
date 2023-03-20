@@ -186,14 +186,6 @@ export const esmPatientRegistrationSchema = {
           matches: '',
         },
       },
-      {
-        id: 'email',
-        type: 'person attribute',
-        uuid: 'a2c222fa-b9ca-11ed-8850-0242ac190003',
-        validation: {
-          matches: '',
-        },
-      },
     ],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
