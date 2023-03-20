@@ -135,7 +135,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <UserHasAccess privilege="Delete Patient Identifiers Types">
+          <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
               kind="danger--ghost"
               onClick={handleDelete}
