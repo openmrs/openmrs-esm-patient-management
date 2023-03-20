@@ -111,31 +111,31 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       )}
       <div>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
-         <UserHasAccess privilege="App: Edit Patient Identifiers">
-          <Button
-            kind="ghost"
-            onClick={handleEdit}
-            iconDescription={t('editIdentifierTooltip', 'Edit')}
-            disabled={disabled}
-            hasIconOnly>
-            <Edit size={16} />
-          </Button>
-        </UserHasAccess>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleEdit}
+              iconDescription={t('editIdentifierTooltip', 'Edit')}
+              disabled={disabled}
+              hasIconOnly>
+              <Edit size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {initialValue && initialValue !== identifierValue && (
-        <UserHasAccess privilege="App: Add Patient Identifiers">
-          <Button
-            kind="ghost"
-            onClick={handleReset}
-            iconDescription={t('resetIdentifierTooltip', 'Reset')}
-            disabled={disabled}
-            hasIconOnly>
-            <Reset size={16} />
-          </Button>
-        </UserHasAccess>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleReset}
+              iconDescription={t('resetIdentifierTooltip', 'Reset')}
+              disabled={disabled}
+              hasIconOnly>
+              <Reset size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <UserHasAccess privilege="App: Get Patient Identifiers Types">
+          <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
               kind="danger--ghost"
               onClick={handleDelete}

@@ -116,13 +116,15 @@ export const Identifiers: React.FC = () => {
       <UserHasAccess privilege="coreapps.systemAdministration">
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
-          <Button
-            kind="ghost"
-            className={styles.setIDNumberButton}
-            onClick={() => setShowIdentifierOverlay(true)}
-            size={isDesktop(layout) ? 'sm' : 'md'}>
-            {t('configure', 'Configure')} <ArrowRight size={16} />
-          </Button>
+          <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
+            <Button
+              kind="ghost"
+              className={styles.setIDNumberButton}
+              onClick={() => setShowIdentifierOverlay(true)}
+              size={isDesktop(layout) ? 'sm' : 'md'}>
+              {t('configure', 'Configure')} <ArrowRight size={16} />
+            </Button>
+          </UserHasAccess>
         </div>
       </UserHasAccess>
       <div>
