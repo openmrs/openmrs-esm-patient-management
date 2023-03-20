@@ -111,7 +111,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       )}
       <div>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
-         <UserHasAccess privilege="App: Edit Patient Identifiers">
+         <UserHasAccess privilege="Edit Patient Identifiers">
           <Button
             kind="ghost"
             onClick={handleEdit}
@@ -123,7 +123,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         </UserHasAccess>
         )}
         {initialValue && initialValue !== identifierValue && (
-        <UserHasAccess privilege="App: Add Patient Identifiers">
+        <UserHasAccess privilege="Edit Patient Identifiers">
           <Button
             kind="ghost"
             onClick={handleReset}
@@ -135,7 +135,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <UserHasAccess privilege="App: Get Patient Identifiers Types">
+          <UserHasAccess privilege="Delete Patient Identifiers Types">
             <Button
               kind="danger--ghost"
               onClick={handleDelete}
