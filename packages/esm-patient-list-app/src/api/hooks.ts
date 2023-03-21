@@ -30,7 +30,7 @@ export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: str
 }
 
 export function usePatientListDetails(patientListUuid: string) {
-  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate)`;
+  const url = `${cohortUrl}/cohort/${patientListUuid}?v=custom:(uuid,name,description,display,size,attributes,startDate,endDate,cohortType)`;
 
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<OpenmrsCohort>, Error>(
     patientListUuid ? url : null,
