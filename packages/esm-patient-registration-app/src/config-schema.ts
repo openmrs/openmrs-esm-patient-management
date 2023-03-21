@@ -1,4 +1,5 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
+import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
   id: string;
@@ -12,6 +13,7 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder: string;
+  showHeading: boolean;
   validation: {
     required: boolean;
     matches?: string;
@@ -136,6 +138,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.UUID,
         _description: "Person attribute type UUID that this field's data should be saved to.",
       },
+      showHeading: {
+        _type: Type.Boolean,
+        _description: 'Whether to show a heading above the person attribute field.',
+        _default: true,
+      },
       label: {
         _type: Type.String,
         _default: null,
@@ -182,9 +189,11 @@ export const esmPatientRegistrationSchema = {
         id: 'phone',
         type: 'person attribute',
         uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        showHeading: true,
         validation: {
           matches: '',
         },
+        label: 'Phone',
       },
     ],
     _description:
