@@ -84,6 +84,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     <div className={styles.patientSearchBar}>
       <form onSubmit={handleSubmit} className={styles.searchArea}>
         <Search
+          autoFocus
           className={styles.patientSearchInput}
           closeButtonLabelText={t('clearSearch', 'Clear')}
           labelText=""

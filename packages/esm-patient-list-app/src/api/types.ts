@@ -1,15 +1,17 @@
 import { OpenmrsResource } from '@openmrs/esm-api';
 
 export enum PatientListType {
-  SYSTEM,
-  USER,
+  STARRED = 'Starred',
+  SYSTEM = 'System list',
+  USER = 'My list',
+  ALL = 'All',
 }
 
 export interface PatientList {
   id: string;
   display: string;
   description: string;
-  type: PatientListType;
+  type: string;
   size: number;
   isStarred: boolean;
   options?: Array<PatientListOption>;

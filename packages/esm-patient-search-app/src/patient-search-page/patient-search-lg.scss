@@ -2,10 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
-:global(.cds--side-nav) {
-  z-index: 0;
-}
-
 .searchResultsDesktop {
   height: calc(100vh - 4rem);
   display: flex;
@@ -23,7 +19,7 @@
 }
 
 .resultsHeader {
-  margin: spacing.$spacing-03 0;
+  margin: spacing.$spacing-05 0rem spacing.$spacing-03 0rem;
 }
 
 .leftPaddedResultHeader {
@@ -42,7 +38,7 @@
 .emptySearchResultsTile {
   text-align: center;
   margin: 0;
-  padding: spacing.$spacing-09 0rem;
+  padding: spacing.$spacing-08 0;
 }
 
 .paddedEmptySearchResultsTile {
@@ -50,15 +46,18 @@
 }
 
 .emptyResultText {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('heading-02');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: 0.313rem;
+  margin-top: spacing.$spacing-03;
 }
 
 .actionText {
+  margin-top: spacing.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
+  margin: spacing.$spacing-03 auto 0;
+  max-width: 13.75rem;
+  text-align: center;
 }
 
 .pagination {
@@ -79,11 +78,9 @@
 }
 
 // Refine Search Params
-
 .advancedSearchPage {
   width: 100%;
   display: flex;
-  // grid-template-columns: auto 1fr;
   grid-column-gap: spacing.$spacing-09;
 }
 

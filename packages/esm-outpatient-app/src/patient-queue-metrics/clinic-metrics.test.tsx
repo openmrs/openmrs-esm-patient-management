@@ -1,11 +1,8 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import ClinicMetrics from './clinic-metrics.component';
 import { mockMetrics, mockServiceTypes } from '../../../../__mocks__/metrics.mock';
-import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockSession } from '../../../../__mocks__/session.mock';
 
@@ -18,6 +15,7 @@ jest.mock('./queue-metrics.resource.ts', () => {
   return {
     ...originalModule,
     useServices: jest.fn().mockImplementation(() => ({ allServices: mockServiceTypes.data })),
+    useServiceMetricsCount: jest.fn().mockReturnValue(5),
   };
 });
 
@@ -41,22 +39,35 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.mock('../helpers/helpers.tsx', () => {
+  const originalModule = jest.requireActual('../helpers/helpers.tsx');
+
+  return {
+    ...originalModule,
+    useSelectedServiceName: jest.fn().mockReturnValue('All'),
+  };
+});
+
+jest.mock('../active-visits/active-visits-table.resource.ts', () => {
+  const originalModule = jest.requireActual('../active-visits/active-visits-table.resource.ts');
+
+  return {
+    ...originalModule,
+    useVisitQueueEntries: jest.fn().mockReturnValue(5),
+  };
+});
+
 describe('Clinic metrics', () => {
-  beforeEach(() =>
+  it('renders a dashboard outlining metrics from the outpatient clinic', () => {
     mockedUseConfig.mockReturnValue({
       concepts: {
         visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
       },
-    } as ConfigObject),
-  );
-  it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
-    const user = userEvent.setup();
+    });
 
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: mockMetrics });
+    mockedOpenmrsFetch.mockReturnValue({ data: mockMetrics });
 
-    renderMetrics();
-
-    await waitForLoadingToFinish();
+    renderClinicMetrics();
 
     expect(screen.getByText(/Checked in patients/i)).toBeInTheDocument();
     expect(screen.getByText(/100/i)).toBeInTheDocument();
@@ -71,6 +82,6 @@ describe('Clinic metrics', () => {
   });
 });
 
-function renderMetrics() {
+function renderClinicMetrics() {
   render(<ClinicMetrics />);
 }

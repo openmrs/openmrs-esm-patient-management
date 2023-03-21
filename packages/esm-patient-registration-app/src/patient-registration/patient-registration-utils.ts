@@ -6,6 +6,7 @@ import {
   PatientIdentifier,
   PatientUuidMapType,
   PatientIdentifierValue,
+  Encounter,
 } from './patient-registration-types';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';
@@ -213,3 +214,6 @@ export const filterUndefinedPatientIdenfier = (patientIdenfiers) =>
       ([key, value]) => value.identifierValue !== undefined,
     ),
   );
+
+export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
+  new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();

@@ -4,14 +4,7 @@ import { XAxis } from '@carbon/react/icons';
 import { Router, useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
-import {
-  createErrorHandler,
-  showToast,
-  useConfig,
-  interpolateString,
-  interpolateUrl,
-  usePatient,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
 import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration-types';
 import { PatientRegistrationContext } from './patient-registration-context';
