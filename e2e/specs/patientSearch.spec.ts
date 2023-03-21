@@ -20,7 +20,7 @@ test('should be able to search patients by identifier', async ({ page }) => {
 
   await homePage.searchPatient(openmrsIdentifier);
 
-  await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search results/);
+  await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search result/);
   await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(firstName));
   await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(lastName));
 
@@ -41,7 +41,7 @@ test('should be able to search patients by name', async ({ page }) => {
 
   await homePage.searchPatient(`${firstName} ${lastName}`);
 
-  await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search results/);
+  await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search result/);
   await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(openmrsIdentifier));
 
   await homePage.clickOnPatientResult(openmrsIdentifier);

@@ -33,8 +33,8 @@ export const configSchema = {
   },
   defaultIdentifierTypes: {
     _type: Type.Array,
-    _element: {
-      _type: Type.String,
+    _elements: {
+      _type: Type.UUID,
     },
     _description: 'The identifier types to be display on all patient search result page',
     _default: ['b4d66522-11fc-45c7-83e3-39a1af21ae0d', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],

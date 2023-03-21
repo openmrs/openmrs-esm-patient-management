@@ -95,7 +95,8 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                   patient.name?.[0]?.family
                 }`}</h2>
                 <p className={styles.demographics}>
-                  {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}{' '}
+                  {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
+                  <span className={styles.middot}>&middot;</span>
                   {config.defaultIdentifierTypes.length ? (
                     <>
                       {patientIdentifiers.length > 1 ? (
@@ -131,7 +132,7 @@ export const SearchResultSkeleton = () => {
         />
       </div>
       <div>
-        <h2 className={styles.patientName}>
+        <h2>
           <SkeletonText />
         </h2>
         <span className={styles.demographics}>
@@ -148,7 +149,7 @@ const PatientIdentifier: React.FC<{ identifiers: Array<Identifier> }> = ({ ident
     <>
       {identifiers.map((identifier) => (
         <>
-          <Tag className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
+          <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
             {identifier.identifierType.display}
           </Tag>
           <span className={styles.configuredLabel}>{identifier.identifier}</span>
@@ -165,7 +166,7 @@ const CustomIdentifier: React.FC<{ patient: SearchedPatient; identifierName: str
   const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
   return (
     <>
-      <Tag className={styles.configuredTag} type="warm-gray" title={identifier.display}>
+      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.display}>
         {identifier.identifierType.display}
       </Tag>
       <span className={styles.configuredLabel}>{identifier.identifier}</span>
