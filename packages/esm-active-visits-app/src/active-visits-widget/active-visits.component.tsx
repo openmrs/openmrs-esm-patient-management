@@ -143,8 +143,31 @@ const ActiveVisitsTable = () => {
   }, [searchString]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return (
+      <div className={styles.container}>
+        <DataTableSkeleton role="progressbar" />
+      </div>
+    );
   }
+
+  if (activeVisits.length === 0) {
+    return (
+      <div className={styles.activeVisitsContainer}>
+        <Layer>
+          <Tile className={styles.tile}>
+            <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+              <h4>{t('activeVisits', 'Active Visits')}</h4>
+            </div>
+            <EmptyDataIllustration />
+            <p className={styles.content}>
+              {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
+            </p>
+          </Tile>
+        </Layer>
+      </div>
+    );
+  }
+
   if (activeVisits?.length) {
     return (
       <div className={styles.activeVisitsContainer}>
@@ -255,21 +278,6 @@ const ActiveVisitsTable = () => {
       </div>
     );
   }
-  return (
-    <div className={styles.activeVisitsContainer}>
-      <Layer>
-        <Tile className={styles.tile}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('activeVisits', 'Active Visits')}</h4>
-          </div>
-          <EmptyDataIllustration />
-          <p className={styles.content}>
-            {t('noActiveVisitsForLocation', 'There are no active visits to display for this location.')}
-          </p>
-        </Tile>
-      </Layer>
-    </div>
-  );
 };
 
 export default ActiveVisitsTable;
