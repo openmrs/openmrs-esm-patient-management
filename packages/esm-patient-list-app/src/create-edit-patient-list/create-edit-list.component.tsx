@@ -235,7 +235,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
       </div>
       <div className={styles.informationList_section}>
         <FormLabel>Choose which information to include in the list</FormLabel>
-        {isDesktop(layout) ? (
+        <Layer level={isDesktop(layout) ? 0 : 1}>
           <Accordion align="end" className={styles.information_wrapper}>
             <AccordionItem title="Choose as many option as you like" className={styles.information_list}>
               {informationList.map((item, index) => (
@@ -249,21 +249,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
               ))}
             </AccordionItem>
           </Accordion>
-        ) : (
-          <Accordion align="end" className={styles.information_wrapper}>
-            <AccordionItem title="Choose as many option as you like" className={styles.information_list}>
-              {informationList.map((item, index) => (
-                <Checkbox
-                  key={item?.label}
-                  labelText={item?.label}
-                  id={`informationList${index}`}
-                  value={item?.value}
-                  onChange={handleCheckChange}
-                />
-              ))}
-            </AccordionItem>
-          </Accordion>
-        )}
+        </Layer>
       </div>
     </Overlay>
   );
