@@ -18,7 +18,9 @@ import {
   TableExpandRow,
   TableExpandHeader,
   TableExpandedRow,
+  SearchSkeleton,
   Tile,
+  PaginationSkeleton,
 } from '@carbon/react';
 import {
   useLayoutType,
@@ -63,9 +65,10 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const { activeVisits, isLoading, isValidating } = useActiveVisits();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
+  const { activeVisits, isLoading, isValidating, totalResults } = useActiveVisits(page - 1, pageSize);
   const [searchString, setSearchString] = useState('');
 
   const currentPathName = window.location.pathname;
@@ -128,23 +131,56 @@ const ActiveVisitsTable = () => {
     }
   }, [searchString, rowData]);
 
-  const {
-    goTo,
-    results: paginatedActiveVisits,
-    currentPage,
-  }: PaginationData = usePagination(searchResults, currentPageSize);
-
   const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
 
   useEffect(() => {
-    if (currentPage !== 1) {
-      goTo(1);
+    if (page !== 1) {
+      setPage(1);
     }
   }, [searchString]);
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return (
+      <div className={styles.activeVisitsContainer}>
+        <div className={styles.activeVisitsDetailHeaderContainer}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('activeVisits', 'Active Visits')}</h4>
+          </div>
+          <div className={styles.backgroundDataFetchingIndicator}>
+            <span>{isValidating ? <InlineLoading /> : null}</span>
+          </div>
+        </div>
+        <Search
+          // tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+          labelText=""
+          placeholder={t('filterTable', 'Filter table')}
+          onChange={handleSearch}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+        />
+        <DataTableSkeleton rowCount={pageSize} showHeader={false} zebra columnCount={headerData?.length} />
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={page}
+          pageSize={pageSize}
+          pageSizes={pageSizes}
+          totalItems={totalResults}
+          className={styles.pagination}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+            if (newPage !== page) {
+              setPage(newPage);
+            }
+          }}
+          isLastPage
+        />
+      </div>
+    );
   }
+
   if (activeVisits?.length) {
     return (
       <div className={styles.activeVisitsContainer}>
@@ -156,23 +192,20 @@ const ActiveVisitsTable = () => {
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
         </div>
+        <Search
+          // tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+          labelText=""
+          placeholder={t('filterTable', 'Filter table')}
+          onChange={handleSearch}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+        />
         <DataTable
-          rows={paginatedActiveVisits}
+          rows={rowData}
           headers={headerData}
-          size={isDesktop(layout) ? 'xs' : 'md'}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
           useZebraStyles={activeVisits?.length > 1 ? true : false}>
           {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
             <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
-                  <Search
-                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                    labelText=""
-                    placeholder={t('filterTable', 'Filter table')}
-                    onChange={handleSearch}
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
               <Table className={styles.activeVisitsTable} {...getTableProps()}>
                 <TableHead>
                   <TableRow>
@@ -187,13 +220,13 @@ const ActiveVisitsTable = () => {
                     <React.Fragment key={index}>
                       <TableExpandRow
                         {...getRowProps({ row })}
-                        data-testid={`activeVisitRow${paginatedActiveVisits?.[index]?.patientUuid}`}>
+                        data-testid={`activeVisitRow${activeVisits?.[index]?.patientUuid}`}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id} data-testid={cell.id}>
                             {cell.info.header === 'name' ? (
                               <PatientNameLink
                                 from={fromPage}
-                                to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
+                                to={`\${openmrsSpaBase}/patient/${activeVisits?.[index]?.patientUuid}/chart/`}>
                                 {cell.value}
                               </PatientNameLink>
                             ) : (
@@ -209,8 +242,8 @@ const ActiveVisitsTable = () => {
                               className={styles.visitSummaryContainer}
                               extensionSlotName="visit-summary-slot"
                               state={{
-                                visitUuid: paginatedActiveVisits[index]?.visitUuid,
-                                patientUuid: paginatedActiveVisits[index]?.patientUuid,
+                                visitUuid: activeVisits[index]?.visitUuid,
+                                patientUuid: activeVisits[index]?.patientUuid,
                               }}
                             />
                           </th>
@@ -235,17 +268,18 @@ const ActiveVisitsTable = () => {
               <Pagination
                 forwardText="Next page"
                 backwardText="Previous page"
-                page={currentPage}
-                pageSize={currentPageSize}
+                page={page}
+                pageSize={pageSize}
                 pageSizes={pageSizes}
-                totalItems={searchResults.length}
+                totalItems={totalResults}
                 className={styles.pagination}
-                onChange={({ pageSize, page }) => {
-                  if (pageSize !== currentPageSize) {
-                    setPageSize(pageSize);
+                size={isDesktop(layout) ? 'sm' : 'lg'}
+                onChange={({ pageSize: newPageSize, page: newPage }) => {
+                  if (newPageSize !== pageSize) {
+                    setPageSize(newPageSize);
                   }
-                  if (page !== currentPage) {
-                    goTo(page);
+                  if (newPage !== page) {
+                    setPage(newPage);
                   }
                 }}
               />
