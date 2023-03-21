@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { InlineNotification, TextInputSkeleton } from '@carbon/react';
+import { InlineNotification, TextInputSkeleton, SkeletonText } from '@carbon/react';
 import { FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
@@ -27,6 +27,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             validationRegex={fieldDefinition.validation.matches}
             label={fieldDefinition.label}
             required={fieldDefinition.validation.required}
+            id={fieldDefinition?.id}
           />
         );
       case 'org.openmrs.Concept':
@@ -35,6 +36,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             personAttributeType={personAttributeType}
             answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
             label={fieldDefinition.label}
+            id={fieldDefinition?.id}
           />
         );
       default:
@@ -47,7 +49,12 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
   }, [personAttributeType, fieldDefinition, t]);
 
   if (isLoading) {
-    return <TextInputSkeleton />;
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{fieldDefinition?.label}</h4>
+        <TextInputSkeleton />
+      </div>
+    );
   }
 
   if (error) {

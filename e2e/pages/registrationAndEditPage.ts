@@ -32,7 +32,7 @@ export class RegistrationAndEditPage {
   readonly countyDistrictInput = () => this.page.locator('#countyDistrict');
   readonly stateProvinceInput = () => this.page.locator('#stateProvince');
   readonly cityVillageInput = () => this.page.locator('#cityVillage');
-  readonly phoneInput = () => this.page.locator('#person-attribute-14d4f066-15f5-102d-96e4-000c29c2a5d7');
+  readonly phoneInput = () => this.page.locator('#phone');
   readonly emailInput = () => this.page.locator('#email');
   readonly createPatientButton = () => this.page.locator('button[type=submit]');
 
