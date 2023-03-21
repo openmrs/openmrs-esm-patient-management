@@ -19,7 +19,7 @@
 }
 
 .resultsHeader {
-  margin: 1rem 0rem 0.5rem 0rem;
+  margin: spacing.$spacing-05 0rem spacing.$spacing-03 0rem;
 }
 
 .leftPaddedResultHeader {
@@ -52,10 +52,10 @@
 }
 
 .actionText {
-  margin-top: 0.5rem;
+  margin-top: spacing.$spacing-03;
   @include type.type-style('body-01');
   color: $text-02;
-  margin: 0.5rem auto 0;
+  margin: spacing.$spacing-03 auto 0;
   max-width: 13.75rem;
   text-align: center;
 }
