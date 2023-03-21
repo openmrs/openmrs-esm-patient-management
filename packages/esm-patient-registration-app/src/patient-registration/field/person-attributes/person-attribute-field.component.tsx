@@ -52,17 +52,20 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
 
   if (error) {
     return (
-      <InlineNotification kind="error" title={`${t('error', 'Error')} ${error?.response?.status}`}>
-        {t('unableToFetch', 'Unable to fetch person attribute type {personattributetype}', {
-          personattributetype: fieldDefinition?.id,
-        })}
-      </InlineNotification>
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{fieldDefinition?.label}</h4>
+        <InlineNotification kind="error" title={`${t('error', 'Error')} ${error?.response?.status}`}>
+          {t('unableToFetch', 'Unable to fetch person attribute type - {personattributetype}', {
+            personattributetype: fieldDefinition?.label ?? fieldDefinition?.id,
+          })}
+        </InlineNotification>
+      </div>
     );
   }
 
   return (
     <div>
-      <h4 className={styles.productiveHeading02Light}>{personAttributeType?.display}</h4>
+      <h4 className={styles.productiveHeading02Light}>{fieldDefinition?.label ?? personAttributeType?.display}</h4>
       {personAttributeField}
     </div>
   );
