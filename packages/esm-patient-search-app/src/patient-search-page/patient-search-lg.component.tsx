@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 import { interpolateString, navigate, useConfig, usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
-import styles from './patient-search-lg.scss';
 import {
-  EmptyQueryIllustration,
-  EmptySearchResultsIllustration,
-  FetchErrorIllustration,
-  LoadingSearchResults,
+  EmptyState,
+  ErrorState,
+  LoadingState,
   PatientSearchResults,
-} from './patient-search-views';
+  SearchResultsEmptyState,
+} from './patient-search-views.component';
 import { SearchedPatient } from '../types';
+import styles from './patient-search-lg.scss';
 
 interface PatientSearchComponentProps {
   query: string;
@@ -69,19 +68,19 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 
   const searchResultsView = useMemo(() => {
     if (!query) {
-      return <EmptyQueryIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+      return <EmptyState inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
     if (isLoading) {
-      return <LoadingSearchResults />;
+      return <LoadingState inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
     if (fetchError) {
-      return <FetchErrorIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+      return <ErrorState inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
-    if (isEmpty(results)) {
-      return <EmptySearchResultsIllustration inTabletOrOverlay={inTabletOrOverlay} />;
+    if (results?.length === 0) {
+      return <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
     return <PatientSearchResults searchResults={results} handlePatientSelection={handlePatientSelection} />;
@@ -94,9 +93,13 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
           className={`${styles.resultsHeader} ${styles.productiveHeading02} ${
             inTabletOrOverlay && styles.leftPaddedResultHeader
           }`}>
+          {isLoading ? t('searchingText', 'Searching...') : null}
           {!isLoading
-            ? `${totalResults ?? 0} ${t('seachResultsSmall', 'search results')}`
-            : t('searchingText', 'Searching...')}
+            ? t('searchResultsCount', '{count} search result{plural}', {
+                count: totalResults,
+                plural: totalResults === 0 || totalResults > 1 ? 's' : '',
+              })
+            : null}
         </h2>
         {searchResultsView}
       </div>
