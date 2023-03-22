@@ -1,9 +1,10 @@
 import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
-import { openmrsFetch, Visit, useSession, FetchResponse } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import { openmrsFetch, Visit, useSession, FetchResponse, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { useEffect, useMemo } from 'react';
 
 dayjs.extend(isToday);
 
@@ -20,33 +21,49 @@ export interface ActiveVisit {
   visitUuid: string;
 }
 
-export function useActiveVisits(page: number, size: number) {
+interface VisitResponse {
+  results: Array<Visit>;
+  links: Array<{ rel: 'prev' | 'next' }>;
+  totalCount: number;
+}
+
+export function useActiveVisits() {
   const currentUserSession = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
   const sessionLocation = currentUserSession?.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
-    'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,';
-  // 'stopDatetime)&fromStartDate=' +
-  // `${startDate}&location=${sessionLocation}`;
+    'visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime)';
 
-  let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&totalCount=true`;
+  const getUrl = (pageIndex, previousPageData: FetchResponse<VisitResponse>) => {
+    if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
+      return null;
+    }
 
-  if (page) {
-    url += `&startIndex=${page * size}`;
-  }
+    let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&totalCount=true&fromStartDate=${startDate}&location=${sessionLocation}`;
 
-  if (size) {
-    url += `&limit=${size}`;
-  }
+    if (pageIndex) {
+      url += `&startIndex=${pageIndex * 50}`;
+    }
 
-  // const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
+    return url;
+  };
 
-  const { data, error, isLoading, isValidating } = useSWR<
-    FetchResponse<{ results: Array<Visit>; links: Array<{ rel: string }>; totalCount: number }>,
-    Error
-  >(url, openmrsFetch);
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    size: pageNumber,
+    setSize,
+  } = useSWRInfinite<FetchResponse<VisitResponse>, Error>(getUrl, openmrsFetch);
+
+  useEffect(() => {
+    if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
+      setSize((currentSize) => currentSize + 1);
+    }
+  }, [data, pageNumber]);
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => ({
     age: visit?.patient?.person?.age,
@@ -56,24 +73,27 @@ export function useActiveVisits(page: number, size: number) {
     location: visit?.location?.uuid,
     name: visit?.patient?.person?.display,
     patientUuid: visit?.patient?.uuid,
-    visitStartTime: visit?.startDatetime,
+    visitStartTime: formatDatetime(parseDate(visit?.startDatetime)),
     visitType: visit?.visitType?.display,
     visitUuid: visit.uuid,
   });
 
-  const results = useMemo(() => {
-    const formattedActiveVisits = data?.data?.results?.map(mapVisitProperties) ?? [];
-    // .filter(({ visitStartTime }) => dayjs(visitStartTime).isToday()) ?? [];
+  const formattedActiveVisits: Array<ActiveVisit> = data
+    ? [].concat(
+        ...data?.map(
+          (res) => res?.data?.results?.map(mapVisitProperties),
+          // ?.filter(({ visitStartTime }) => dayjs(visitStartTime).isToday()),
+        ),
+      )
+    : [];
 
-    return {
-      activeVisits: formattedActiveVisits,
-      isLoading,
-      isError: error,
-      isValidating,
-      totalResults: data?.data?.totalCount ?? 0,
-    };
-  }, [data, error, isLoading, isValidating]);
-  return results;
+  return {
+    activeVisits: formattedActiveVisits,
+    isLoading,
+    isValidating,
+    isError: error,
+    totalResults: data?.[0]?.data?.totalCount ?? 0,
+  };
 }
 
 export const getOriginFromPathName = (pathname = '') => {

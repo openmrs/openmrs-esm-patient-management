@@ -3,7 +3,7 @@
 @import '../root.scss';
 
 .activeVisitsContainer {
-  background-color: $ui-background;
+  background-color: $ui-02;
   border: 1px solid $ui-03;
   width: 100%;
   margin: 0 auto;
@@ -15,7 +15,7 @@
   justify-content: space-between;
   align-items: center;
   padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
-  background-color: $ui-background;
+  background-color: $ui-02;
 }
 
 .backgroundDataFetchingIndicator {
@@ -103,4 +103,27 @@
 
 .tile {
   text-align: center;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-05;
+  text-align: center;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }
