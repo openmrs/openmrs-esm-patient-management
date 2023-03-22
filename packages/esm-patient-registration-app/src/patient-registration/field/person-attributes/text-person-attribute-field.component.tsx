@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 
 export interface TextPersonAttributeFieldProps {
+  id: string;
   personAttributeType: PersonAttributeTypeResponse;
   validationRegex?: string;
   label?: string;
@@ -13,6 +14,7 @@ export interface TextPersonAttributeFieldProps {
 }
 
 export function TextPersonAttributeField({
+  id,
   personAttributeType,
   validationRegex,
   label,
@@ -40,7 +42,8 @@ export function TextPersonAttributeField({
         {({ field, form: { touched, errors }, meta }) => {
           return (
             <Input
-              id={`person-attribute-${personAttributeType.uuid}`}
+              id={id}
+              name={`person-attribute-${personAttributeType.uuid}`}
               labelText={label ?? personAttributeType?.display}
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}

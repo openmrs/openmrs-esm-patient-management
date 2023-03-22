@@ -89,7 +89,7 @@ const UnscheduledAppointments: React.FC = () => {
     <div>
       <DataTable rows={rowData} headers={headerData} isSortable>
         {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
-          <TableContainer title={`${t('UnscheduledAppointments', 'Unscheduled appointments')} ${rowData.length}`}>
+          <TableContainer title={`${t('unscheduledAppointments', 'Unscheduled appointments')} ${rowData.length}`}>
             <TableToolbar>
               <TableToolbarContent>
                 <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
