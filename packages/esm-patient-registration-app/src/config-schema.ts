@@ -1,5 +1,4 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
-import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
   id: string;
@@ -193,7 +192,6 @@ export const esmPatientRegistrationSchema = {
         validation: {
           matches: '',
         },
-        label: 'Phone',
       },
     ],
     _description:
