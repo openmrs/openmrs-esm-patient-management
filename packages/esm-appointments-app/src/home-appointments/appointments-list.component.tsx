@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -25,16 +26,15 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { useTodayAppointments } from './appointments-table.resource';
-
+import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './emptyData';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links';
-import { useSWRConfig } from 'swr';
-import { ActionsMenu } from './appointment-actions.component';
 import { MappedHomeAppointment } from '../types';
-
+import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
+import { useAppointmentDate } from '../helpers';
+
 interface PaginationData {
   goTo: (page: number) => void;
   results: Array<MappedHomeAppointment>;
@@ -86,10 +86,12 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
 };
 
 const AppointmentsBaseTable = () => {
+  const layout = useLayoutType();
   const { user } = useSession();
-
+  const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
-  const { isLoading, appointments } = useTodayAppointments();
+  const { appointments, isLoading, isValidating } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
 
@@ -105,10 +107,6 @@ const AppointmentsBaseTable = () => {
     results: paginatedAppointments,
     currentPage,
   }: PaginationData = usePagination(filteredAppointments, currentPageSize);
-
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { mutate } = useSWRConfig();
 
   const tableHeaders = useMemo(
     () => [
@@ -193,7 +191,11 @@ const AppointmentsBaseTable = () => {
   }));
 
   if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
+    return (
+      <div className={styles.loadingContainer}>
+        <DataTableSkeleton role="progressbar" />
+      </div>
+    );
   }
 
   if (appointments?.length === 0) {
@@ -206,7 +208,11 @@ const AppointmentsBaseTable = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>
-            {t('noAppointmentsToDisplay', 'There are no appointments to display for this location')}.
+            {t(
+              'noAppointmentsScheduledForTodayToDisplay',
+              'There are no appointments scheduled for today to display for this location',
+            )}
+            .
           </p>
         </Tile>
       </Layer>

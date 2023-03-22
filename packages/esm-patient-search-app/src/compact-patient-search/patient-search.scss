@@ -5,13 +5,6 @@
 .searchResultsContainer {
   width: 100%;
   background-color: $ui-02;
-
-  a {
-    text-decoration: none;
-    @include type.type-style('heading-02');
-    color: $text-02;
-    margin: 0rem;
-  }
 }
 
 :global(.omrs-breakpoint-lt-desktop) .searchResultsContainer {
@@ -25,6 +18,7 @@
 
 .searchResults {
   width: 100%;
+  max-height: 22rem;
 }
 
 .loadingIcon {
@@ -61,6 +55,9 @@
 .actionText {
   @include type.type-style('body-01');
   color: $text-02;
+  margin: 0.5rem auto 0;
+  max-width: 13.75rem;
+  text-align: center;
 }
 
 .pagination {
@@ -71,12 +68,8 @@
 
 .emptySearchResultsTile {
   text-align: center;
-  margin-top: spacing.$spacing-05;
-  padding: spacing.$spacing-09 0rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .emptySearchResultsTile {
-  margin: spacing.$spacing-05;
+  margin: 0;
+  padding: spacing.$spacing-08 0;
 }
 
 .errorMessage {

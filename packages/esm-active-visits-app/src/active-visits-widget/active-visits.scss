@@ -2,6 +2,10 @@
 @use '@carbon/styles/scss/type';
 @import '../root.scss';
 
+.container {
+  margin: 0rem 1rem;
+}
+
 .activeVisitsContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;

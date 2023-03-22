@@ -3,11 +3,13 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .patientSearchResult {
+  color: unset !important;
+  margin: unset !important;
   text-decoration: none;
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ui-03;
-  padding: 0 spacing.$spacing-04;
+  padding: 0rem spacing.$spacing-05;
 
   &:hover,
   &:focus {
@@ -23,6 +25,7 @@
 
 .patientName {
   @include type.type-style('heading-02');
+  color: $text-02;
 }
 
 .patientAvatar {
@@ -30,6 +33,8 @@
   height: spacing.$spacing-09;
   margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03 0;
   border-radius: 1px;
+  font-weight: unset;
+  line-height: unset;
 }
 
 .patientInfo {
@@ -41,9 +46,13 @@
 }
 
 .demographics {
-  margin-top: spacing.$spacing-03;
-  @include type.type-style('body-compact-02');
+  margin-top: spacing.$spacing-02;
+  @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.identifier {
+  margin: 0rem spacing.$spacing-03;
 }
 
 .identifiers {
@@ -61,7 +70,7 @@
 }
 
 .configuredTag {
-  margin: spacing.$spacing-01;
+  margin: spacing.$spacing-01 spacing.$spacing-03;
 }
 
 .configuredLabel {
