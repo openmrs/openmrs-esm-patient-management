@@ -49,7 +49,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       selectedSource: null,
       autoGeneration: false,
     } as PatientIdentifierValue);
-  }, [initialValue, setHideInputField]);
+  }, [fieldName, initialValue, patientIdentifier, setFieldValue]);
 
   const handleEdit = () => {
     setHideInputField(false);
@@ -111,28 +111,28 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       )}
       <div>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
-         <UserHasAccess privilege="Edit Patient Identifiers">
-          <Button
-            kind="ghost"
-            onClick={handleEdit}
-            iconDescription={t('editIdentifierTooltip', 'Edit')}
-            disabled={disabled}
-            hasIconOnly>
-            <Edit size={16} />
-          </Button>
-        </UserHasAccess>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleEdit}
+              iconDescription={t('editIdentifierTooltip', 'Edit')}
+              disabled={disabled}
+              hasIconOnly>
+              <Edit size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {initialValue && initialValue !== identifierValue && (
-        <UserHasAccess privilege="Edit Patient Identifiers">
-          <Button
-            kind="ghost"
-            onClick={handleReset}
-            iconDescription={t('resetIdentifierTooltip', 'Reset')}
-            disabled={disabled}
-            hasIconOnly>
-            <Reset size={16} />
-          </Button>
-        </UserHasAccess>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleReset}
+              iconDescription={t('resetIdentifierTooltip', 'Reset')}
+              disabled={disabled}
+              hasIconOnly>
+              <Reset size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <UserHasAccess privilege="Delete Patient Identifiers">
