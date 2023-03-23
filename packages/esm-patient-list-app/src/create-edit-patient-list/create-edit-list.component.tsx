@@ -28,8 +28,6 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
     name: '',
     description: '',
-    location: session?.sessionLocation?.uuid,
-    cohortType: config?.myListCohortTypeUUID,
   });
   const isTablet = useLayoutType() === 'tablet';
   const user = useSession();
@@ -39,15 +37,17 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     setCohortDetails({
       name: patientListDetails?.name || '',
       description: patientListDetails?.description || '',
-      cohortType: patientListDetails?.cohortType?.uuid || '',
-      location: user?.sessionLocation?.uuid,
     });
   }, [user, patientListDetails]);
 
   const createPL = useCallback(() => {
     // set loading
     if (!edit) {
-      createPatientList(cohortDetails)
+      createPatientList({
+        ...cohortDetails,
+        location: session?.sessionLocation?.uuid,
+        cohortType: config?.myListCohortTypeUUID,
+      })
         .then(() =>
           showToast({
             title: t('successCreatedPatientList', 'Created patient list'),
@@ -120,12 +120,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           <Button onClick={close} kind="secondary" size="xl">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button
-            onClick={createPL}
-            size="xl"
-            disabled={Object.values(cohortDetails)?.some(
-              (value) => value === '' || value === undefined || value === null,
-            )}>
+          <Button onClick={createPL} size="xl">
             {!edit ? t('createList', 'Create list') : t('editList', 'Edit list')}
           </Button>
         </ButtonSet>

@@ -18,12 +18,20 @@ import {
   Pagination,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
-import { useSession, ConfigurableLink, useLayoutType, isDesktop, usePagination } from '@openmrs/esm-framework';
+import {
+  useSession,
+  ConfigurableLink,
+  useLayoutType,
+  isDesktop,
+  usePagination,
+  ErrorState,
+} from '@openmrs/esm-framework';
 import styles from './patient-list-list.scss';
 import debounce from 'lodash-es/debounce';
 import { PatientList } from '../api/types';
 import { updatePatientList } from '../api/api-remote';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
+import { useTranslation } from 'react-i18next';
 
 interface PatientListTableProps {
   style?: CSSProperties;
@@ -40,6 +48,12 @@ interface PatientListTableProps {
   };
   listType: string;
   handleCreate?: () => void;
+  error: Error;
+  totalResults: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  pageSize: number;
+  setPageSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const PatientListTable: React.FC<PatientListTableProps> = ({
@@ -52,7 +66,14 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
   search,
   listType,
   handleCreate,
+  error,
+  totalResults,
+  page,
+  setPage,
+  pageSize,
+  setPageSize,
 }) => {
+  const { t } = useTranslation();
   const userId = useSession()?.user.uuid;
   const layout = useLayoutType();
 
@@ -64,139 +85,172 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
     }
   };
 
-  const { results, goTo, currentPage } = usePagination(patientLists, 10);
-
-  const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(patientLists.length / 10);
-    return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * 10;
-    });
-  }, [patientLists]);
+  const pageSizes = [10, 20, 25, 50];
 
   if (loading) {
     return (
-      <div className={styles.container}>
+      <div>
+        <div id="table-tool-bar" className={styles.searchContainer}>
+          <div>{fetching && <InlineLoading />}</div>
+          <Search
+            id="patient-list-search"
+            placeholder={search.placeHolder}
+            labelText=""
+            size={isDesktop(layout) ? 'md' : 'lg'}
+            className={styles.search}
+            onChange={(evnt) => handleSearch(evnt.target.value)}
+            defaultValue={search.currentSearchTerm}
+            {...search?.otherSearchProps}
+          />
+        </div>
         <DataTableSkeleton
           style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
           showToolbar={false}
           showHeader={false}
-          rowCount={4}
-          columnCount={4}
+          rowCount={pageSize}
+          columnCount={headers.length}
           zebra
+        />
+        <Pagination
+          backwardText="Previous page"
+          forwardText="Next page"
+          itemsPerPageText="Items per page:"
+          page={page}
+          pageNumberText={t('pageNumber', 'Page Number')}
+          pageSize={pageSize}
+          onChange={({ page: newPage, pageSize: newPageSize }) => {
+            if (newPage !== page) {
+              setPage(newPage);
+            }
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+          }}
+          pageSizes={pageSizes}
+          totalItems={page * pageSize}
         />
       </div>
     );
   }
 
-  if (patientLists?.length) {
+  if (error) {
+    <ErrorState error={error} headerTitle={t('patientLists', 'Patient Lists')} />;
+  }
+
+  if (!patientLists?.length) {
     return (
-      <div>
-        <div id="table-tool-bar" className={styles.searchContainer}>
-          <div>{fetching && <InlineLoading />}</div>
-          <div>
-            <Layer>
-              <Search
-                id="patient-list-search"
-                placeholder={search.placeHolder}
-                labelText=""
-                size={isDesktop(layout) ? 'md' : 'lg'}
-                className={styles.search}
-                onChange={(evnt) => handleSearch(evnt.target.value)}
-                defaultValue={search.currentSearchTerm}
-                {...search?.otherSearchProps}
-              />
-            </Layer>
-          </div>
-        </div>
-        <DataTable rows={results} headers={headers}>
-          {({
-            rows,
-            headers,
-            getHeaderProps,
-            getRowProps,
-            getTableProps,
-            getTableContainerProps,
-          }: DataTableCustomRenderProps) => (
-            <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
-              <Table {...getTableProps()} isSortable useZebraStyles>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}
-                        key={header.key}
-                        {...getHeaderProps({ header })}
-                        isSortable>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody className={styles.tableBody}>
-                  {rows.map((row, index) => (
-                    <TableRow
-                      className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
-                      key={row.id}
-                      {...getRowProps({ row })}>
-                      {row.cells.map((cell) => {
-                        switch (cell.info.header) {
-                          case 'display':
-                            return (
-                              <TableCell className={styles.tableCell} key={cell.id}>
-                                <ConfigurableLink
-                                  className={styles.link}
-                                  to={`\${openmrsSpaBase}/patient-list/${patientLists[index]?.id}`}>
-                                  {cell.value}
-                                </ConfigurableLink>
-                              </TableCell>
-                            );
-
-                          case 'isStarred':
-                            return (
-                              <TableCell
-                                key={cell.id}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleToggleStarred(row.id, !cell.value)}>
-                                {cell.value ? (
-                                  <StarFilled size={16} className={styles.interactiveText01} />
-                                ) : (
-                                  <Star size={16} className={styles.interactiveText01} />
-                                )}
-                              </TableCell>
-                            );
-
-                          case 'type':
-                            return <TableCell key={cell.id}>{cell.value}</TableCell>;
-
-                          default:
-                            return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                        }
-                      })}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-        <Pagination
-          backwardText="Previous page"
-          forwardText="Next page"
-          itemsPerPageText="Items per page:"
-          page={currentPage}
-          pageNumberText="Page Number"
-          pageSize={10}
-          onChange={({ page }) => goTo(page)}
-          pageSizes={pageSizes}
-          totalItems={patientLists.length ?? 0}
-        />
+      <div className={styles.container}>
+        <PatientListEmptyState launchForm={handleCreate} listType={listType} />
       </div>
     );
   }
 
   return (
-    <div className={styles.container}>
-      <PatientListEmptyState launchForm={handleCreate} listType={listType} />
+    <div>
+      <div id="table-tool-bar" className={styles.searchContainer}>
+        <div>{fetching && <InlineLoading />}</div>
+        <Search
+          id="patient-list-search"
+          placeholder={search.placeHolder}
+          labelText=""
+          size={isDesktop(layout) ? 'md' : 'lg'}
+          className={styles.search}
+          onChange={(evnt) => handleSearch(evnt.target.value)}
+          defaultValue={search.currentSearchTerm}
+          {...search?.otherSearchProps}
+        />
+      </div>
+      <DataTable rows={patientLists} headers={headers}>
+        {({
+          rows,
+          headers,
+          getHeaderProps,
+          getRowProps,
+          getTableProps,
+          getTableContainerProps,
+        }: DataTableCustomRenderProps) => (
+          <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
+            <Table {...getTableProps()} isSortable useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader
+                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}
+                      key={header.key}
+                      {...getHeaderProps({ header })}
+                      isSortable>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody className={styles.tableBody}>
+                {rows.map((row, index) => (
+                  <TableRow
+                    className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
+                    key={row.id}
+                    {...getRowProps({ row })}>
+                    {row.cells.map((cell) => {
+                      switch (cell.info.header) {
+                        case 'display':
+                          return (
+                            <TableCell className={styles.tableCell} key={cell.id}>
+                              <ConfigurableLink
+                                className={styles.link}
+                                to={`\${openmrsSpaBase}/patient-list/${patientLists[index]?.id}`}>
+                                {cell.value}
+                              </ConfigurableLink>
+                            </TableCell>
+                          );
+
+                        case 'isStarred':
+                          return (
+                            <TableCell
+                              key={cell.id}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleToggleStarred(row.id, !cell.value)}>
+                              {cell.value ? (
+                                <StarFilled size={16} className={styles.interactiveText01} />
+                              ) : (
+                                <Star size={16} className={styles.interactiveText01} />
+                              )}
+                            </TableCell>
+                          );
+
+                        case 'type':
+                          return <TableCell key={cell.id}>{cell.value}</TableCell>;
+
+                        default:
+                          return <TableCell key={cell.id}>{cell.value}</TableCell>;
+                      }
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {totalResults > pageSize && (
+        <Pagination
+          backwardText="Previous page"
+          forwardText="Next page"
+          itemsPerPageText="Items per page:"
+          page={page}
+          pageNumberText={t('pageNumber', 'Page Number')}
+          pageSize={pageSize}
+          onChange={({ page: newPage, pageSize: newPageSize }) => {
+            if (newPage !== page) {
+              setPage(newPage);
+            }
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+          }}
+          pageSizes={pageSizes}
+          totalItems={totalResults}
+        />
+      )}
     </div>
   );
 };

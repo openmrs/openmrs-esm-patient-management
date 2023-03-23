@@ -3,6 +3,7 @@ import {
   AddPatientData,
   CohortResponse,
   NewCohortData,
+  NewCohortDataPayload,
   OpenmrsCohort,
   OpenmrsCohortMember,
   OpenmrsCohortRef,
@@ -50,6 +51,12 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
     query.push(['attribute', `starred:${filter.isStarred}`]);
   }
 
+  // if (filter.type === PatientListType.USER) {
+  //   query.push(['cohortType', config.myListCohortTypeUUID]);
+  // } else if (filter. type === PatientListType.SYSTEM) {
+  //   query.push(['cohortType', config.systemListCohortTypeUUID]);
+  // }
+
   //
   // ⚠️ TODO:
   // I commented the following out since it leads to crashes on dev3 (500 internal server error).
@@ -78,7 +85,7 @@ export async function getAllPatientLists(filter: PatientListFilter = {}, ac = ne
     id: cohort.uuid,
     display: cohort.name,
     description: cohort.description,
-    type: cohort.cohortType.display,
+    type: cohort.cohortType?.display,
     size: cohort.size,
     isStarred: false, // TODO
   }));
@@ -136,7 +143,7 @@ export async function addPatientToList(data: AddPatientData, ac = new AbortContr
   return postData(`${cohortUrl}/cohortmember`, data, ac);
 }
 
-export async function createPatientList(cohort: NewCohortData, ac = new AbortController()) {
+export async function createPatientList(cohort: NewCohortDataPayload, ac = new AbortController()) {
   return postData(
     `${cohortUrl}/cohort/`,
     {
