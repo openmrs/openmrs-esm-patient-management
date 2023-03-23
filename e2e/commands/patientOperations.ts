@@ -14,6 +14,7 @@ export interface Patient {
     dead: boolean;
     deathDate?: any;
     causeOfDeath?: any;
+    preferredAddress: any;
     attributes: any[];
     voided: boolean;
     birthtime?: any;

@@ -45,6 +45,8 @@ test('should be able to edit a patient', async ({ page, api }) => {
   await expect(person.gender).toBe(sex[0].toUpperCase());
   await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
   // TODO: Check other attributes
+  await expect(person.preferredAddress.display).toBe(formValues.address1);
+  await expect(person.attributes[0].display).toBe(`Telephone Number = ${formValues.phone}`);
 });
 
 test.afterEach(async ({ api }) => {
