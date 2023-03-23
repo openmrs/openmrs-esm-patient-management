@@ -174,7 +174,7 @@ const ActiveVisitsTable = () => {
     return (
       <div className={styles.activeVisitsContainer}>
         <Layer>
-          <Tile className={styles.emptyStateTile}>
+          <Tile className={styles.tile}>
             <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
               <h4>{t('activeVisits', 'Active Visits')}</h4>
             </div>
