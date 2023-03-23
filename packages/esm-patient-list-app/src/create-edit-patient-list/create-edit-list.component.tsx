@@ -1,12 +1,13 @@
 import React, { useCallback, SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Dropdown, Layer, OnChangeData, TextArea, TextInput, ButtonSet } from '@carbon/react';
-import { useLayoutType, showToast, useSession, isDesktop } from '@openmrs/esm-framework';
+import { useLayoutType, showToast, useSession, isDesktop, useConfig } from '@openmrs/esm-framework';
 import { createPatientList, editPatientList } from '../api/api-remote';
 import { useCohortTypes } from '../api/hooks';
 import { OpenmrsCohort, NewCohortData } from '../api/types';
 import Overlay from '../overlay.component';
 import styles from './create-edit-patient-list.scss';
+import { ConfigSchema } from '../config-schema';
 
 interface CreateEditPatientListProps {
   close: () => void;
@@ -22,11 +23,13 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   onSuccess = () => {},
 }) => {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigSchema;
+  const session = useSession();
   const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
     name: '',
     description: '',
-    cohortType: '',
-    location: '',
+    location: session?.sessionLocation?.uuid,
+    cohortType: config?.myListCohortTypeUUID,
   });
   const isTablet = useLayoutType() === 'tablet';
   const user = useSession();
@@ -151,21 +154,6 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             )}
             labelText={t('newPatientListDescriptionLabel', 'Describe the purpose of this list in a few words')}
             value={cohortDetails?.description}
-          />
-        </Layer>
-      </div>
-      <div className={styles.input}>
-        <Layer level={isTablet ? 1 : 0}>
-          <Dropdown
-            id="cohortType"
-            label={t('selectCohortType', 'Select patient list type')}
-            titleText={t('newPatientListCohortTypeLabel', 'Choose the type for the new patient list')}
-            items={cohortTypes?.map((type) => type?.display) || []}
-            selectedItem={
-              cohortTypes?.find((type) => type.uuid === cohortDetails?.cohortType)?.display ||
-              cohortTypes?.find((type) => type.uuid === patientListDetails?.cohortType?.uuid)?.display
-            }
-            onChange={handleTypeChange}
           />
         </Layer>
       </div>

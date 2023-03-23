@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { getPatientListName } from './api/api-remote';
+import { configSchema } from './config-schema';
 import { setupOffline } from './offline';
 
 declare var __VERSION__: string;
@@ -31,7 +32,7 @@ function setupOpenMRS() {
   }
 
   setupOffline();
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   registerBreadcrumbs([
     {

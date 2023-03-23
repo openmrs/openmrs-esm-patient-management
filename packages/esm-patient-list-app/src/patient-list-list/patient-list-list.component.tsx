@@ -54,6 +54,10 @@ const PatientListList: React.FC = () => {
         ?.map((searchParam) => searchParam?.split('=')),
     )['new_cohort'] === 'true';
 
+  // URL navigation is in place to know either to open the create list overlay or not
+  // The url /patient-list?new_cohort=true is being used in the "Add patient to list" widget
+  // in the patient chart. The button in the above mentioned widget "Create new list", navigates
+  // to /patient-list?new_cohort=true to open the overlay directly.
   const handleShowNewListOverlay = () => {
     navigate({
       to: '${openmrsSpaBase}/patient-list?new_cohort=true',
