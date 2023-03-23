@@ -118,25 +118,27 @@ const PatientListList: React.FC = () => {
             <Tab className={styles.tab}>{t('allLists', 'All lists')}</Tab>
           </TabList>
         </Tabs>
-        <PatientListTable
-          listType={patientListFilter.label}
-          loading={isLoading}
-          fetching={isValidating}
-          headers={tableHeaders}
-          patientLists={patientLists}
-          refetch={mutate}
-          error={error}
-          totalResults={totalResults}
-          page={page}
-          setPage={setPage}
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          search={{
-            onSearch: handleSearch,
-            placeHolder: t('search', 'Search'),
-            currentSearchTerm: searchString,
-          }}
-        />
+        <div className={styles.patientListTableContainer}>
+          <PatientListTable
+            listType={patientListFilter.label}
+            loading={isLoading}
+            fetching={isValidating}
+            headers={tableHeaders}
+            patientLists={patientLists}
+            refetch={mutate}
+            error={error}
+            totalResults={totalResults}
+            page={page}
+            setPage={setPage}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            search={{
+              onSearch: handleSearch,
+              placeHolder: t('search', 'Search'),
+              currentSearchTerm: searchString,
+            }}
+          />
+        </div>
       </section>
       <section>
         {createNewList && <CreateNewList close={handleHideNewListOverlay} onSuccess={() => mutate()} />}

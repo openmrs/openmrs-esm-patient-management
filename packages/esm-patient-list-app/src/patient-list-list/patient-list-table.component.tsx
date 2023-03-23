@@ -92,16 +92,18 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
       <div>
         <div id="table-tool-bar" className={styles.searchContainer}>
           <div>{fetching && <InlineLoading />}</div>
-          <Search
-            id="patient-list-search"
-            placeholder={search.placeHolder}
-            labelText=""
-            size={isDesktop(layout) ? 'md' : 'lg'}
-            className={styles.search}
-            onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={search.currentSearchTerm}
-            {...search?.otherSearchProps}
-          />
+          <Layer>
+            <Search
+              id="patient-list-search"
+              placeholder={search.placeHolder}
+              labelText=""
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              className={styles.search}
+              onChange={(evnt) => handleSearch(evnt.target.value)}
+              defaultValue={search.currentSearchTerm}
+              {...search?.otherSearchProps}
+            />
+          </Layer>
         </div>
         <DataTableSkeleton
           style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
@@ -110,25 +112,29 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
           rowCount={pageSize}
           columnCount={headers.length}
           zebra
+          compact={isDesktop(layout)}
         />
-        <Pagination
-          backwardText="Previous page"
-          forwardText="Next page"
-          itemsPerPageText="Items per page:"
-          page={page}
-          pageNumberText={t('pageNumber', 'Page Number')}
-          pageSize={pageSize}
-          onChange={({ page: newPage, pageSize: newPageSize }) => {
-            if (newPage !== page) {
-              setPage(newPage);
-            }
-            if (newPageSize !== pageSize) {
-              setPageSize(newPageSize);
-            }
-          }}
-          pageSizes={pageSizes}
-          totalItems={page * pageSize}
-        />
+        <Layer>
+          <Pagination
+            size={isDesktop(layout) ? 'sm' : 'lg'}
+            backwardText="Previous page"
+            forwardText="Next page"
+            itemsPerPageText="Items per page:"
+            page={page}
+            pageNumberText={t('pageNumber', 'Page Number')}
+            pageSize={pageSize}
+            onChange={({ page: newPage, pageSize: newPageSize }) => {
+              if (newPage !== page) {
+                setPage(newPage);
+              }
+              if (newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+            }}
+            pageSizes={pageSizes}
+            totalItems={page * pageSize}
+          />
+        </Layer>
       </div>
     );
   }
@@ -149,18 +155,20 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
     <div>
       <div id="table-tool-bar" className={styles.searchContainer}>
         <div>{fetching && <InlineLoading />}</div>
-        <Search
-          id="patient-list-search"
-          placeholder={search.placeHolder}
-          labelText=""
-          size={isDesktop(layout) ? 'md' : 'lg'}
-          className={styles.search}
-          onChange={(evnt) => handleSearch(evnt.target.value)}
-          defaultValue={search.currentSearchTerm}
-          {...search?.otherSearchProps}
-        />
+        <Layer>
+          <Search
+            id="patient-list-search"
+            placeholder={search.placeHolder}
+            labelText=""
+            size={isDesktop(layout) ? 'sm' : 'lg'}
+            className={styles.search}
+            onChange={(evnt) => handleSearch(evnt.target.value)}
+            defaultValue={search.currentSearchTerm}
+            {...search?.otherSearchProps}
+          />
+        </Layer>
       </div>
-      <DataTable rows={patientLists} headers={headers}>
+      <DataTable rows={patientLists} headers={headers} size={isDesktop(layout) ? 'sm' : 'lg'}>
         {({
           rows,
           headers,
@@ -232,24 +240,27 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
         )}
       </DataTable>
       {totalResults > pageSize && (
-        <Pagination
-          backwardText="Previous page"
-          forwardText="Next page"
-          itemsPerPageText="Items per page:"
-          page={page}
-          pageNumberText={t('pageNumber', 'Page Number')}
-          pageSize={pageSize}
-          onChange={({ page: newPage, pageSize: newPageSize }) => {
-            if (newPage !== page) {
-              setPage(newPage);
-            }
-            if (newPageSize !== pageSize) {
-              setPageSize(newPageSize);
-            }
-          }}
-          pageSizes={pageSizes}
-          totalItems={totalResults}
-        />
+        <Layer>
+          <Pagination
+            size={isDesktop(layout) ? 'sm' : 'lg'}
+            backwardText="Previous page"
+            forwardText="Next page"
+            itemsPerPageText="Items per page:"
+            page={page}
+            pageNumberText={t('pageNumber', 'Page Number')}
+            pageSize={pageSize}
+            onChange={({ page: newPage, pageSize: newPageSize }) => {
+              if (newPage !== page) {
+                setPage(newPage);
+              }
+              if (newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+            }}
+            pageSizes={pageSizes}
+            totalItems={totalResults}
+          />
+        </Layer>
       )}
     </div>
   );
