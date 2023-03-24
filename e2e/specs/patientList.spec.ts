@@ -65,7 +65,7 @@ test('should be able to delete a patient list', async ({ page }) => {
 
   await patientListPage.allListsButton().click();
   await patientListPage.searchPatientList(cohort.name);
-  await expect(patientListPage.patientListsTable()).toHaveText(new RegExp(cohort.name));
+  await expect(patientListPage.patientListsTable()).not.toHaveText(new RegExp(cohort.name));
 });
 
 test('should be able to manage patients in a patient list', async ({ page, api }) => {

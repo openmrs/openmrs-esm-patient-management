@@ -39,7 +39,7 @@ export class PatientListsPage {
   }
 
   async searchPatientList(listName: string) {
-    await this.page.getByRole('searchbox', { name: 'Search' }).fill(listName);
+    await this.page.getByRole('searchbox').fill(listName);
   }
 
   async deletePatientList() {
