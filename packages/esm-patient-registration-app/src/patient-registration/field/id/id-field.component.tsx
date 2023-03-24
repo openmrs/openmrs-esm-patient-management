@@ -98,7 +98,13 @@ export const Identifiers: React.FC = () => {
         });
       }
     }
-  }, [identifierTypes, setFieldValue, initializeIdentifier, defaultPatientIdentifierTypes, values.identifiers]);
+  }, [
+    identifierTypes,
+    setFieldValue,
+    defaultPatientIdentifierTypes,
+    values.identifiers,
+    initialFormValues.identifiers,
+  ]);
 
   if (isLoading) {
     return (
@@ -113,7 +119,7 @@ export const Identifiers: React.FC = () => {
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <UserHasAccess privilege="coreapps.systemAdministration">
+      <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
           <Button
