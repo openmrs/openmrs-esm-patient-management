@@ -51,7 +51,7 @@ test('should be able to create and edit a patient list', async ({ page }) => {
   // Edit the patient list
   const editedPatientListName = patientListName + ' edited';
   const editedPatientListDescription = patientListDescription + ' edited';
-  await patientListPage.editPatientList(editedPatientListName, editedPatientListDescription, cohortType.name);
+  await patientListPage.editPatientList(editedPatientListName, editedPatientListDescription);
 
   await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(editedPatientListName));
   await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(editedPatientListDescription));
