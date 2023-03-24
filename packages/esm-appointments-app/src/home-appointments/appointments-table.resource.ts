@@ -34,11 +34,14 @@ export function useTodaysAppointments() {
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   return {
     services: data ? data.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };

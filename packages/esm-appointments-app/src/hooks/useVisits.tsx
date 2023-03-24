@@ -10,6 +10,6 @@ export const useVisits = () => {
   const visitsUrl = `/ws/rest/v1/visit?includeInactive=false&${defaultRepresentation}&fromStartDate=${dayjs(
     startDateTime,
   ).format('YYYY-MM-DD')}&location=${session?.sessionLocation?.uuid}`;
-  const { data, error } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch);
-  return { isLoading: !data && !error, visits: data?.data?.results ?? [], error };
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch);
+  return { isLoading, visits: data?.data?.results ?? [], error };
 };

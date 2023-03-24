@@ -24,7 +24,7 @@ const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
   const appointmentDate = useAppointmentDate();
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/appointmentStatus?status=${appointmentStatus}&forDate=${forDate}`;
-  const { data, error } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch);
   const appointments = data?.data?.map((appointment) => ({
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,
@@ -34,7 +34,7 @@ const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
     provider: appointment?.providers[0]?.['name'] ?? '',
     serviceTypeUuid: appointment.service.uuid,
   }));
-  return { appointmentList: (appointments as Array<any>) ?? [], isLoading: !data && !error, error };
+  return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
 export default useAppointmentList;

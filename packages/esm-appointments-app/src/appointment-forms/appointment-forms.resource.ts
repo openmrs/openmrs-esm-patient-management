@@ -9,11 +9,14 @@ export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
-  const { data, error, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   return {
     services: data ? data.data : [],
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };
@@ -26,12 +29,15 @@ export function getAppointmentService(abortController: AbortController, uuid) {
 }
 
 export function useProviders() {
-  const { data, error } = useSWR<{ data: { results: Array<Provider> } }, Error>(`/ws/rest/v1/provider`, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Provider> } }, Error>(
+    `/ws/rest/v1/provider`,
+    openmrsFetch,
+  );
 
   return {
     data: data ? data.data.results : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 

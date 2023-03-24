@@ -19,14 +19,14 @@ interface CalendarEvent {
 export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
   const url = `/ws/rest/v1/appointment/appointmentCalendar?startDate=${startDate}&endDate=${endDate}`;
-  const { data, error } = useSWR<{ data: Array<CalendarEvent> }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: Array<CalendarEvent> }>(url, openmrsFetch);
   const results =
     data?.data.map((event) => ({
       appointmentDate: event.appointmentDate,
       service: event.services.map((s) => ({ serviceName: s.appointmentServiceName, count: s.allAppointmentsCount })),
     })) ?? [];
 
-  return { isLoading: !data && !error, calendarEvents: results, error };
+  return { isLoading, calendarEvents: results, error };
 };
 
 function evaluateAppointmentCalendarDates(forDate: string, period: string) {

@@ -8,11 +8,11 @@ export function useStatus() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     statuses: data?.data?.setMembers ?? [],
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
