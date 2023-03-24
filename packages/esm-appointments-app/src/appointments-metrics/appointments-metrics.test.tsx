@@ -1,28 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import AppointmentMetrics from './appointment-metrics.component';
-import {
-  mockAppointmentMetrics,
-  mockMappedAppointmentsData,
-  mockProvidersCount,
-  mockStartTime,
-} from '../../../../__mocks__/appointments.mock';
+import AppointmentsMetrics from './appointments-metrics.component';
+import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '../../../../__mocks__/appointments.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
-
-jest.mock('../appointments-tabs/appointments-table.resource', () => {
-  const originalModule = jest.requireActual('../appointments-tabs/appointments-table.resource');
-
-  return {
-    ...originalModule,
-    useAppointments: jest.fn().mockImplementation(() => ({
-      appointments: mockMappedAppointmentsData.data,
-      isLoading: false,
-      isValidating: false,
-    })),
-  };
-});
 
 jest.mock('../hooks/useClinicalMetrics', () => {
   const originalModule = jest.requireActual('../hooks/useClinicalMetrics.tsx');
@@ -48,39 +30,13 @@ jest.mock('../hooks/useClinicalMetrics', () => {
   };
 });
 
-jest.mock('../hooks/useVisits', () => {
-  const originalModule = jest.requireActual('../hooks/useVisits');
-
-  return {
-    ...originalModule,
-    useVisits: jest.fn().mockImplementation(() => ({
-      visits: [],
-      isLoading: false,
-      isValidating: false,
-    })),
-  };
-});
-
-jest.mock('../helpers/time', () => {
-  const originalModule = jest.requireActual('../helpers/time');
-
-  return {
-    ...originalModule,
-    getStartDate: jest.fn().mockReturnValue(new Date()),
-    useAppointmentDate: jest.fn().mockReturnValue(new Date()),
-  };
-});
-
 describe('Appointment metrics', () => {
-  it('renders the appointments dashboard', () => {
-    mockedOpenmrsFetch.mockReturnValue({ data: mockAppointmentMetrics });
+  it('renders metrics from appointment list', () => {
+    mockedOpenmrsFetch.mockResolvedValue({ data: [] });
 
     renderAppointmentMetrics();
 
-    expect(screen.getByRole('button', { name: /create appointment services/i })).toBeInTheDocument();
     expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/high volume service/i)).toBeInTheDocument();
-    expect(screen.getByText(/providers available/i)).toBeInTheDocument();
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     expect(screen.getAllByText(/view/i));
     expect(screen.getByText(/patients/i)).toBeInTheDocument();
@@ -90,5 +46,5 @@ describe('Appointment metrics', () => {
 });
 
 function renderAppointmentMetrics() {
-  render(<AppointmentMetrics />);
+  render(<AppointmentsMetrics serviceUuid="uuid" />);
 }

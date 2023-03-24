@@ -28,25 +28,17 @@
     border-right: 1px solid colors.$gray-20;
   }
 }
-.identifiers {
-  @include type.type-style('body-compact-02');
-  color: $ui-04;
-  display: list-item;
-
-  span:not(:first-child) {
-    margin: 0rem 0.75rem;
-  }
-}
-.identifierTag {
+.allDayComponent {
   display: flex;
-  align-items: center;
+  border: 1px solid colors.$gray-20;
 }
+
 .weekly-cell {
   position: relative;
   border-right: 1px solid colors.$gray-20;
   border-bottom: 1px solid colors.$gray-20;
   min-height: 120px;
-  color: colors.$white;
+  color: colors.$black;
 
   .week-time {
     display: none;
@@ -54,46 +46,47 @@
 
   &:nth-child(-n + 8) {
     border-top: 1px solid colors.$gray-20;
+    .allDay {
+      display: none;
+    }
   }
 
   &:first-child {
     border-top: none;
+    .allDay {
+      display: flex;
+      border-right: 1px solid colors.$gray-20;
+      padding-top: 50px;
+      padding-left: 5px;
+      padding-bottom: 50px;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
-  &:nth-child(8n + 1) {
+  &:nth-child(n) {
     border-bottom: none;
 
     .week-time {
       white-space: nowrap;
       display: inline;
-      color: colors.$white;
+      color: colors.$black;
+
       position: absolute;
       top: -11px;
-      height: layout.$spacing-06;
-      width: layout.$spacing-07;
+      height: 22px;
+      width: 30px;
     }
   }
 }
-
-.currentData {
-  margin: 2px;
-
-  & > span {
-    @include type.type-style('label-02');
-  }
-}
-
-.greyBackground {
-  background-color: colors.$gray-10;
-}
-
 .serviceArea {
-  padding: 0.0125rem;
   display: grid;
+  padding: 0.125rem;
+  column-gap: 2rem;
   grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
   text-align: left;
-  margin: 0.0125rem;
+  margin: 0.125rem;
   @include type.type-style('label-02');
   color: #020f1b;
   cursor: pointer;
@@ -102,15 +95,16 @@
     text-align: left;
     text-overflow: ellipsis;
   }
-
-  & > span:nth-child(2) {
-    text-align: right;
-  }
 }
 
 .serviceArea:hover {
   opacity: 0.8;
   border: 1px solid grey;
+}
+
+.currentData {
+  margin: 5px;
+  width: 100%;
 }
 
 .smallDesktop {
