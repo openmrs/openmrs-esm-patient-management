@@ -89,7 +89,7 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
 };
 
 export const getPatient = async (api: APIRequestContext, uuid: string): Promise<Patient> => {
-  const patientRes = await api.get(`patient/${uuid}`);
+  const patientRes = await api.get(`patient/${uuid}?v=full`);
   return await patientRes.json();
 };
 
