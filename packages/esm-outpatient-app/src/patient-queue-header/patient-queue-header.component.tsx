@@ -13,7 +13,7 @@ import {
   useSelectedQueueLocationName,
 } from '../helpers/helpers';
 
-const PatientQueueHeader: React.FC<{ title?: string }> = ({ title = 'Home' }) => {
+const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
