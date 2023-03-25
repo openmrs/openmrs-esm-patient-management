@@ -14,6 +14,14 @@ export interface Patient {
     dead: boolean;
     deathDate?: any;
     causeOfDeath?: any;
+    preferredAddress: {
+      address1: string;
+      cityVillage: string;
+      country: string;
+      postalCode: string;
+      stateProvince: string;
+      countyDistrict: string;
+    };
     attributes: any[];
     voided: boolean;
     birthtime?: any;
@@ -88,7 +96,7 @@ export const generateRandomPatient = async (api: APIRequestContext): Promise<Pat
 };
 
 export const getPatient = async (api: APIRequestContext, uuid: string): Promise<Patient> => {
-  const patientRes = await api.get(`patient/${uuid}`);
+  const patientRes = await api.get(`patient/${uuid}?v=full`);
   return await patientRes.json();
 };
 
