@@ -55,3 +55,8 @@
   display: flex;
   align-items: center;
 }
+
+.header4 {
+  @include type.type-style('heading-compact-01');
+  margin-bottom: 1rem;
+}

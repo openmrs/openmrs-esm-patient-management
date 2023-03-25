@@ -21,23 +21,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  registerBreadcrumbs([
-    {
-      path: `${window.spaBase}/appointments-list/:value?`,
-      title: ([x]) => `Patient Lists / ${x}`,
-      parent: `${window.spaBase}`,
-    },
-    {
-      path: `${window.spaBase}/queue-list/:value?`,
-      title: ([x]) => `Patient Lists / ${x}`,
-      parent: `${window.spaBase}`,
-    },
-    {
-      path: `${window.spaBase}/outpatient/home`,
-      title: 'Service Queues',
-      parent: `${window.spaBase}/home`,
-    },
-  ]);
+  registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
 
@@ -82,7 +66,7 @@ function setupOpenMRS() {
       },
       {
         id: 'home-db-link',
-        slot: 'outpatient-dashboard-slot',
+        slot: 'homepage-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(homeDashboardMeta), options),
         meta: homeDashboardMeta,
         online: true,
@@ -90,7 +74,7 @@ function setupOpenMRS() {
       },
       {
         id: 'home-dashboard',
-        slot: 'home-dashboard-slot',
+        slot: 'service-queues-dashboard-slot',
         load: getAsyncLifecycle(() => import('./home.component'), options),
         online: true,
         offline: true,

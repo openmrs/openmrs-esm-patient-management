@@ -1,0 +1,53 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+.container {
+  width: 100%;
+  padding-left: 50px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.daily-calendar {
+  display: grid;
+  grid-template-rows: repeat(1, minmax(0px, 1fr));
+  border-right: 1px solid colors.$gray-20;
+}
+.daily-calendar-all {
+  display: grid;
+  margin-top: 2px;
+  height: auto;
+  grid-template-columns: 60px repeat(0, minmax(0px, 1fr));
+  grid-template-rows: repeat(24, minmax(0px, 1fr));
+}
+.cellComponent {
+  display: flex;
+}
+.empty-cell {
+  position: relative;
+  border-right: 1px solid colors.$gray-20;
+  min-height: 40px;
+  width: 100%;
+  &:nth-child(-n + 24) {
+    // border-top: 1px solid colors.$gray-20;
+    border-bottom: 1px solid colors.$gray-20;
+  }
+}
+.daily-cell {
+  position: relative;
+  border-right: 1px solid colors.$gray-20;
+  border-left: 1px solid colors.$gray-20;
+  min-height: 40px;
+  width: 60px;
+  color: colors.$black;
+  text-align: center;
+
+  &:nth-child(-n + 24) {
+    // border-top: 1px solid colors.$gray-20;
+    border-bottom: 1px solid colors.$gray-20;
+  }
+
+  &:first-child {
+    border-top: 1px solid colors.$gray-20;
+  }
+}

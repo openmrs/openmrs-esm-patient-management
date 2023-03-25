@@ -12,7 +12,6 @@ export function useTodaysAppointments() {
   const startDate = useAppointmentDate();
 
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
-
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     startDate ? apiUrl : null,
     openmrsFetch,

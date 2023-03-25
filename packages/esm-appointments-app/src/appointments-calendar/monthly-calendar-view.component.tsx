@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { CalendarType } from '../types';
 import { monthDays } from '../helpers/functions';
@@ -11,11 +11,11 @@ dayjs.extend(isBetween);
 interface MonthlyCalendarViewProps {
   type: CalendarType;
   events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
+  currentDate: Dayjs;
+  setCurrentDate: (date) => void;
 }
 
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ type, events }) => {
-  const [currentDate, setCurrentDate] = useState(dayjs());
-
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ type, events, currentDate, setCurrentDate }) => {
   return (
     <div style={{ margin: '1rem' }}>
       <MonthlyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />

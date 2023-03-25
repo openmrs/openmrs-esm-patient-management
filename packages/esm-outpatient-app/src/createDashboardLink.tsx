@@ -12,17 +12,16 @@ export interface DashboardLinkConfig {
 export const createDashboardLink = (db: DashboardLinkConfig) => {
   const DashboardLink: React.FC = () => {
     return (
-      <div key={db.name}>
-        <SideNavLink
-          renderIcon={db.renderIcon}
-          href={`${spaBasePath}/${db.name}`}
-          onClick={(e) => {
-            e.preventDefault();
-            navigate({ to: `${spaBasePath}/${db.name}` });
-          }}>
-          {db.title}
-        </SideNavLink>
-      </div>
+      <SideNavLink
+        key={db.name}
+        renderIcon={db.renderIcon}
+        href={`${spaBasePath}/${db.name}`}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate({ to: `${spaBasePath}/${db.name}` });
+        }}>
+        {db.title}
+      </SideNavLink>
     );
   };
   return DashboardLink;

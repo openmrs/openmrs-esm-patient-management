@@ -11,10 +11,9 @@ import {
   updateSelectedQueueLocationName,
   updateSelectedServiceName,
   useSelectedQueueLocationName,
-  useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 
-const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
+const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
@@ -29,7 +28,6 @@ const PatientQueueHeader: React.FC<{ title: string }> = ({ title }) => {
 
   return (
     <>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
       <div className={styles.header}>
         <div className={styles['left-justified-items']}>
           <PatientQueueIllustration />

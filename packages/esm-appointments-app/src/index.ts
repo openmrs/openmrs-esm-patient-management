@@ -37,37 +37,16 @@ function setupOpenMRS() {
   ]);
 
   return {
-    pages: [
-      {
-        route: 'appointments',
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-        online: true,
-        offline: true,
-      },
-    ],
     extensions: [
       {
-        name: 'appointments-link',
-        slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./appointment-link'), options),
-        online: true,
-        offline: false,
-      },
-      {
-        id: 'home-appointments',
+        name: 'home-appointments',
         slot: 'homepage-widgets-slot',
+        order: 1,
         load: getAsyncLifecycle(() => import('./home-appointments'), options),
       },
       {
-        name: 'appointments-side-nav',
-        slot: 'appointments-sidebar-slot',
-        load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),
-        online: true,
-        offline: true,
-      },
-      {
         name: 'clinical-appointments-db-link',
-        slot: 'appointments-dashboard-slot',
+        slot: 'homepage-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(clinicalAppointmentsDashboardMeta), options),
         meta: clinicalAppointmentsDashboardMeta,
         online: true,
@@ -76,33 +55,22 @@ function setupOpenMRS() {
       {
         name: 'clinical-appointments-dashboard',
         slot: 'clinical-appointments-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./clinical-appointments.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments.component'), options),
         online: true,
         offline: true,
       },
       {
-        name: 'change-appointment-status-modal',
-        load: getAsyncLifecycle(
-          () => import('./change-appointment-status/change-appointment-status.component'),
-          options,
-        ),
+        name: 'todays-appointments-dashboard',
+        slot: 'todays-appointment-slot',
+        load: getAsyncLifecycle(() => import('./home-appointments/'), options),
         online: true,
-        offline: false,
+        offline: true,
       },
       {
         name: 'check-in-appointment-modal',
         load: getAsyncLifecycle(() => import('./home-appointments/checkin-modal'), options),
         online: true,
         offline: false,
-      },
-      {
-        name: 'patient-table',
-        load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
-          featureName: 'patient-table',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
       },
     ],
   };
