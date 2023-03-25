@@ -39,8 +39,9 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'home-appointments',
+        name: 'home-appointments',
         slot: 'homepage-widgets-slot',
+        order: 1,
         load: getAsyncLifecycle(() => import('./home-appointments'), options),
       },
       {
