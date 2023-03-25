@@ -14,7 +14,14 @@ export interface Patient {
     dead: boolean;
     deathDate?: any;
     causeOfDeath?: any;
-    preferredAddress: any;
+    preferredAddress: {
+      address1: string;
+      cityVillage: string;
+      country: string;
+      postalCode: string;
+      stateProvince: string;
+      countyDistrict: string;
+    };
     attributes: any[];
     voided: boolean;
     birthtime?: any;
