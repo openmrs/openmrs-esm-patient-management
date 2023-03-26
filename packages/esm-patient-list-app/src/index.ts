@@ -58,13 +58,6 @@ function setupOpenMRS() {
     ],
     extensions: [
       {
-        id: 'patient-list-link',
-        slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-link.component'), options),
-        online: true,
-        offline: true,
-      },
-      {
         id: 'patient-lists-dashboard-link',
         slot: 'homepage-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
