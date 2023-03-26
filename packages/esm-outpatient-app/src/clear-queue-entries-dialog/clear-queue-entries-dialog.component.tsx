@@ -18,7 +18,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
 
   const handleClearQueueBatchRequest = useCallback(() => {
     setIsSubmitting(true);
-    batchClearQueueEntries(visitQueueEntries, new AbortController()).then(
+    batchClearQueueEntries(visitQueueEntries).then(
       (response) => {
         closeModal();
         showToast({

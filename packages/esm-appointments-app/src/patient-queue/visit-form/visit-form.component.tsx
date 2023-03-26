@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import dayjs from 'dayjs';
+import isNull from 'lodash-es/isNull';
 import { first } from 'rxjs/operators';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -33,15 +35,13 @@ import {
   showToast,
   usePatient,
 } from '@openmrs/esm-framework';
-import styles from './visit-form.scss';
 import BaseVisitType from './base-visit-type.component';
-import { saveQueueEntry } from './queue.resource';
-import { useSWRConfig } from 'swr';
-import isNull from 'lodash-es/isNull';
 import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
+import { saveQueueEntry } from './queue.resource';
 import { usePriority, useQueues, useStatus } from './useVisit';
 import { MappedAppointment } from '../../types';
+import styles from './visit-form.scss';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -129,7 +129,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 },
               };
 
-              saveQueueEntry(queuePayload, abortController)
+              saveQueueEntry(queuePayload)
                 .pipe(first())
                 .subscribe(
                   async (response) => {

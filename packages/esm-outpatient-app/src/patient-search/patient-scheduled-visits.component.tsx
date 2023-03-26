@@ -127,6 +127,8 @@ const ScheduledVisits: React.FC<{
         });
         setIsSubmitting(false);
       } else {
+        const abortController = new AbortController();
+
         saveVisit(payload, abortController)
           .pipe(first())
           .subscribe(
@@ -139,7 +141,6 @@ const ScheduledVisits: React.FC<{
                   defaultStatus,
                   service,
                   appointment,
-                  abortController,
                   selectedQueueLocation,
                   visitQueueNumberAttributeUuid,
                 ).then(
@@ -197,6 +198,8 @@ const ScheduledVisits: React.FC<{
       t,
       priority,
       appointment,
+      selectedQueueLocation,
+      visitQueueNumberAttributeUuid,
       closePanel,
       mutate,
     ],
@@ -283,7 +286,7 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { appointments, isLoading, isError } = useScheduledVisits(patientUuid, new AbortController());
+  const { appointments, isLoading, isError } = useScheduledVisits(patientUuid);
 
   if (isError) {
     return <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;

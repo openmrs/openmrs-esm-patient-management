@@ -96,7 +96,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
 
     const abortController = new AbortController();
     setIsSubmitting(true);
-    saveAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload).then(
       ({ status }) => {
         if (status === 200) {
           showToast({
