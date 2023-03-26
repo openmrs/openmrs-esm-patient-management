@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { spaBasePath } from './constants';
@@ -14,7 +14,7 @@ const Root: React.FC = () => {
   return (
     <main>
       <SWRConfig value={swrConfiguration}>
-        <BrowserRouter basename={spaBasePath}>
+        <BrowserRouter basename={`${spaBasePath}/service-queues`}>
           <Routes>
             <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
             <Route path="/queue-list/:value/" element={<ServicesTable />} />

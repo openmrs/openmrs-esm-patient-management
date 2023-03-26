@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   DataTable,
   TableContainer,
@@ -20,7 +21,6 @@ import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, usePagination } from '@openmrs/esm-framework';
 import { EmptyState } from '../empty-state/empty-state.component';
 import { useUnscheduledAppointments } from '../hooks/useUnscheduledAppointments';
-import isEmpty from 'lodash-es/isEmpty';
 
 const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
@@ -72,8 +72,8 @@ const UnscheduledAppointments: React.FC = () => {
   if (isEmpty(unscheduledAppointments)) {
     return (
       <EmptyState
-        headerTitle={t('unscheduledAppointments_lower', 'unscheduled appointments')}
-        displayText={t('unscheduledAppointments', 'Unscheduled appointments')}
+        displayText={t('unscheduledAppointments_lower', 'unscheduled appointments')}
+        headerTitle={t('unscheduledAppointments', 'Unscheduled appointments')}
       />
     );
   }

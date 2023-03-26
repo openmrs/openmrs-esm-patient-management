@@ -7,8 +7,7 @@
   background-color: colors.$white;
   display: flex;
   justify-content: space-between;
-  margin: 0 spacing.$spacing-05 0 spacing.$spacing-05;
+  padding: 0rem 0.5rem 2rem;
   flex-flow: row wrap;
-  column-gap: spacing.$spacing-05;
-  row-gap: spacing.$spacing-05;
+  margin-top: -(spacing.$spacing-03);
 }

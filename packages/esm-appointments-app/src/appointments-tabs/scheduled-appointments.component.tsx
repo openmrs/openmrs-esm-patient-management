@@ -10,6 +10,7 @@ import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
+import styles from './scheduled-appointments.scss';
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
@@ -41,14 +42,15 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
   const filteredRow = appointmentServiceType
     ? rowData.filter((app) => app.serviceTypeUuid === appointmentServiceType)
     : rowData;
+
   return (
-    <div>
-      <div style={{ padding: '0.425rem 0 0.25rem 1rem' }}>
-        <ContentSwitcher style={{ maxWidth: '70%' }} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
-          <Switch name={'Pending'} text={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')} />
-        </ContentSwitcher>
+    <>
+      <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
+        <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
+        <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+        <Switch name={'Pending'} text={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')} />
+      </ContentSwitcher>
+      <div className={styles.container}>
         {scheduleType === 'Scheduled' && (
           <AppointmentsBaseTable
             appointments={filteredAppointments}
@@ -90,7 +92,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
           />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

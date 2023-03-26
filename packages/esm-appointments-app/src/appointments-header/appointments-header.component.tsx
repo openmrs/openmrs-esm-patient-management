@@ -51,7 +51,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
           </DatePicker>
         </div>
         {typeof onChange === 'function' && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight: '0.25rem' }}>
+          <div className={styles.dropdownContainer}>
             <Layer>
               <Dropdown
                 ariaLabel="Dropdown"

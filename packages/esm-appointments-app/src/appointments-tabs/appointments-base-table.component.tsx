@@ -27,7 +27,7 @@ import {
 } from '@carbon/react';
 import { ExtensionSlot, ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
-import { Add, Download, Hospital } from '@carbon/react/icons';
+import { Download, Hospital } from '@carbon/react/icons';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import styles from './appointments-base-table.scss';
 import { handleFilter } from './utils';
@@ -142,6 +142,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
       return (x + 1) * 10;
     });
   }, [appointments]);
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" row={5} />;
   }
@@ -150,7 +151,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
     return (
       <EmptyState
         headerTitle={`${tableHeading} appointments`}
-        displayText={`${tableHeading} appointments`}
+        displayText={`${tableHeading.toLowerCase()} appointments`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
       />
     );

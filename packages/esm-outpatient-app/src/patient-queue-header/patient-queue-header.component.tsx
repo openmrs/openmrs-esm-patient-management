@@ -2,9 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { Dropdown } from '@carbon/react';
-import { ExtensionSlot, formatDate, useSession } from '@openmrs/esm-framework';
+import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
-import styles from './patient-queue-header.scss';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   updateSelectedQueueLocationUuid,
@@ -12,6 +11,7 @@ import {
   updateSelectedServiceName,
   useSelectedQueueLocationName,
 } from '../helpers/helpers';
+import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
@@ -33,7 +33,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
           <PatientQueueIllustration />
           <div className={styles['page-labels']}>
             <p>{t('serviceQueue', 'Service queue')}</p>
-            <p className={styles['page-name']}>{title}</p>
+            <p className={styles['page-name']}>{title ?? t('home', 'Home')}</p>
           </div>
         </div>
         <div className={styles['right-justified-items']}>

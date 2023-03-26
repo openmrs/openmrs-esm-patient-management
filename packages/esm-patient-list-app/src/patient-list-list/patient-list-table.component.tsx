@@ -141,11 +141,12 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                       {row.cells.map((cell) => {
                         switch (cell.info.header) {
                           case 'display':
+                            const patientListUuid = patientLists[index]?.id;
                             return (
                               <TableCell className={styles.tableCell} key={cell.id}>
                                 <ConfigurableLink
                                   className={styles.link}
-                                  to={`\${openmrsSpaBase}/patient-list/${patientLists[index]?.id}`}>
+                                  to={`\${openmrsSpaBase}/home/patient-lists/${patientListUuid}`}>
                                   {cell.value}
                                 </ConfigurableLink>
                               </TableCell>
