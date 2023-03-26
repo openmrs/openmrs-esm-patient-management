@@ -6,7 +6,7 @@ import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-action-button.scss';
 
 const PatientListActionButton: React.FC = () => {
-  const navigateToPatientList = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-list' }), []);
+  const navigateToPatientList = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/home/patient-lists' }), []);
 
   const { t } = useTranslation();
   const layout = useLayoutType();

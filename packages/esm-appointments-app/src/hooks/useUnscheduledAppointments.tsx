@@ -2,7 +2,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { useAppointmentDate } from '../helpers';
 
-export interface UnscheduledAppointmentsResponse {
+export interface Response {
   age: number;
   dob: number;
   gender: string;
@@ -14,7 +14,7 @@ export interface UnscheduledAppointmentsResponse {
 
 export function useUnscheduledAppointments() {
   const fromData = useAppointmentDate();
-  const url = `/ws/rest/v1/appointment/unScheduledAppointment?forDate=${fromData}`;
-  const { data, error, isLoading } = useSWR<{ data: Array<UnscheduledAppointmentsResponse> }>(url, openmrsFetch);
+  const url = `/ws/rest/v1/appointment/unscheduledAppointment?forDate=${fromData}`;
+  const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch);
   return { isLoading, data: data?.data ?? [], error };
 }

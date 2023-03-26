@@ -3,27 +3,27 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.container {
+  flex-grow: 1;
+}
+
 .tileContainer {
   border: 0.0625rem solid $ui-03;
-  flex-grow: 1;
   height: 7.875rem;
-  padding: 0 spacing.$spacing-04;
-  background-color: colors.$white;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-03;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   margin-bottom: spacing.$spacing-03;
 }
 
 .headerLabel {
-  @include type.type-style('label-02');
-  color: colors.$gray-70;
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
 }
 
 .totalsLabel {
@@ -47,7 +47,8 @@
 .link {
   text-decoration: none;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  color: $interactive-01;
 }
 
 .metricsGrid {
@@ -60,6 +61,9 @@
   grid-template-columns: 1fr 1fr;
   justify-self: flex-end;
   column-gap: spacing.$spacing-03;
+  row-gap: spacing.$spacing-03;
+  margin: spacing.$spacing-03;
+
   & > span {
     font-size: 0.625rem !important;
     margin: 0;

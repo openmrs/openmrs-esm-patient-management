@@ -1,7 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
-import { clinicalAppointmentsDashboardMeta } from './dashboard.meta';
+import { dashboardMeta } from './dashboard.meta';
 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
@@ -13,26 +13,28 @@ const backendDependencies = {
   'webservices.rest': '^2.2.0',
 };
 
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-appointments-app';
+const moduleName = '@openmrs/esm-appointments-app';
 
-  const options = {
-    featureName: 'appointments',
-    moduleName,
-  };
+const options = {
+  featureName: 'appointments',
+  moduleName,
+};
+
+function setupOpenMRS() {
+  const appointmentsBasePath = `${window.spaBase}/home/appointments`;
 
   defineConfigSchema(moduleName, configSchema);
 
   registerBreadcrumbs([
     {
-      path: `${window.spaBase}/appointments`,
       title: 'Appointments',
+      path: appointmentsBasePath,
       parent: `${window.spaBase}/home`,
     },
     {
-      path: `${window.spaBase}/appointments/calendar`,
       title: 'Calendar',
-      parent: `${window.spaBase}/appointments`,
+      path: `${appointmentsBasePath}/calendar`,
+      parent: appointmentsBasePath,
     },
   ]);
 
@@ -45,10 +47,10 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./home-appointments'), options),
       },
       {
-        name: 'clinical-appointments-db-link',
+        name: 'clinical-appointments-dashboard-link',
         slot: 'homepage-dashboard-slot',
-        load: getSyncLifecycle(createDashboardLink(clinicalAppointmentsDashboardMeta), options),
-        meta: clinicalAppointmentsDashboardMeta,
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
         online: true,
         offline: true,
       },

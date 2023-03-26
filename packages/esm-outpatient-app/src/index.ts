@@ -1,7 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
-import { homeDashboardMeta } from './dashboard.meta';
+import { dashboardMeta } from './dashboard.meta';
 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
@@ -27,12 +27,6 @@ function setupOpenMRS() {
 
   return {
     pages: [
-      {
-        route: 'outpatient',
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-        online: true,
-        offline: true,
-      },
       {
         load: getAsyncLifecycle(
           () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
@@ -65,10 +59,10 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'home-db-link',
+        id: 'service-queues-dashboard-link',
         slot: 'homepage-dashboard-slot',
-        load: getSyncLifecycle(createDashboardLink(homeDashboardMeta), options),
-        meta: homeDashboardMeta,
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
         online: true,
         offline: true,
       },

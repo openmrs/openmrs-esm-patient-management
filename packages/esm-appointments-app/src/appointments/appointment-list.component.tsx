@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
-import ScheduledAppointments from '../appointments-tabs/schedule-appointment.component';
+import ScheduledAppointments from '../appointments-tabs/scheduled-appointments.component';
 import UnscheduledAppointments from '../appointments-tabs/unscheduled-appointments.component';
 import { useAppointments } from '../appointments-tabs/appointments-table.resource';
 import { useVisits } from '../hooks/useVisits';
@@ -27,18 +27,18 @@ const AppointmentList: React.FC<{ appointmentServiceType: string }> = ({ appoint
         onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
         className={styles.tabs}>
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Appointment tabs" contained>
-          <Tab style={{ minWidth: '12rem' }}>{t('scheduled', 'Scheduled')}</Tab>
-          <Tab style={{ minWidth: '12rem' }}>{t('unscheduled', 'Unscheduled')}</Tab>
+          <Tab className={styles.tab}>{t('scheduled', 'Scheduled')}</Tab>
+          <Tab className={styles.tab}>{t('unscheduled', 'Unscheduled')}</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel style={{ padding: 0 }}>
+          <TabPanel className={styles.tabPanel}>
             <ScheduledAppointments
               visits={visits}
               isLoading={isLoading}
               appointmentServiceType={appointmentServiceType}
             />
           </TabPanel>
-          <TabPanel style={{ padding: 0 }}>
+          <TabPanel className={styles.tabPanel}>
             <UnscheduledAppointments />
           </TabPanel>
         </TabPanels>

@@ -5,7 +5,7 @@ import { ConfigurableLink } from '@openmrs/esm-framework';
 export default function PatientListLink() {
   const { t } = useTranslation();
   return (
-    <ConfigurableLink to="${openmrsSpaBase}/patient-list">
+    <ConfigurableLink to="${openmrsSpaBase}/home/patient-lists">
       {t('patientListAppMenuLink', 'Patient Lists')}
     </ConfigurableLink>
   );
