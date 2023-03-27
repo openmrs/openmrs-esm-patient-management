@@ -31,7 +31,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
   const handleSubmit = async () => {
     const abortController = new AbortController();
     setIsSubmitting(true);
-    const { status } = await cancelAppointment('Cancelled', appointment.id, abortController);
+    const { status } = await cancelAppointment('Cancelled', appointment.id);
     if (status === 200) {
       showToast({
         critical: true,

@@ -1,6 +1,8 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 
-export function saveQueueRoom(name: string, description: string, queueUuid, abortController: AbortController) {
+export function saveQueueRoom(name: string, description: string, queueUuid: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/queueroom`, {
     method: 'POST',
     headers: {

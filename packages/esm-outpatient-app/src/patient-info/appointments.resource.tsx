@@ -5,7 +5,9 @@ import { AppointmentsFetchResponse } from '../types';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
-export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
+export function useAppointments(patientUuid: string, startDate: string) {
+  const abortController = new AbortController();
+
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',

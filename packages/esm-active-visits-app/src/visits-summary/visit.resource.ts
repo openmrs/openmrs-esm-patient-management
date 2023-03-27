@@ -140,8 +140,10 @@ export function useVisit(visitUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
+  const apiUrl = `/ws/rest/v1/visit/${visitUuid}?v=${customRepresentation}`;
+
   const { data, error, isLoading, isValidating } = useSWR<{ data: Visit }, Error>(
-    `/ws/rest/v1/visit/${visitUuid}?v=${customRepresentation}`,
+    visitUuid ? apiUrl : null,
     openmrsFetch,
   );
 
