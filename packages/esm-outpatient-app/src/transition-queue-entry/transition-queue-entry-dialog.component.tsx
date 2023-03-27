@@ -45,11 +45,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   );
 
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
-  const { upcomingAppointment, isLoading } = usePatientAppointments(
-    queueEntry?.patientUuid,
-    startDate,
-    new AbortController(),
-  );
+  const { upcomingAppointment, isLoading } = usePatientAppointments(queueEntry?.patientUuid, startDate);
   const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
   const obsToDisplay =
     !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
@@ -67,7 +63,6 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       defaultTransitionStatus,
       endedAt,
       queueEntry?.sortWeight,
-      new AbortController(),
     ).then(
       ({ status }) => {
         if (status === 201) {
@@ -94,12 +89,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   }, [queueEntry]);
 
   const handleRequeuePatient = useCallback(() => {
-    requeueQueueEntry(
-      priorityComment.REQUEUED,
-      queueEntry?.queueUuid,
-      queueEntry?.queueEntryUuid,
-      new AbortController(),
-    ).then(
+    requeueQueueEntry(priorityComment.REQUEUED, queueEntry?.queueUuid, queueEntry?.queueEntryUuid).then(
       ({ status }) => {
         if (status === 200) {
           showToast({

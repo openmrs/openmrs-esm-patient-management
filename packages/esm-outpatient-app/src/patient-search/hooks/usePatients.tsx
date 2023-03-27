@@ -10,10 +10,9 @@ interface FHIRResponse {
 }
 
 const usePatients = (searchTerm: string) => {
-  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(
-    searchTerm !== null ? `${fhirBaseUrl}/Patient?name=${searchTerm}&_summary=data` : null,
-    openmrsFetch,
-  );
+  const apiUrl = `${fhirBaseUrl}/Patient?name=${searchTerm}&_summary=data`;
+
+  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(searchTerm !== null ? apiUrl : null, openmrsFetch);
 
   const searchedPatients = useMemo(
     () => data?.data?.entry?.map((response) => response.resource) ?? [],

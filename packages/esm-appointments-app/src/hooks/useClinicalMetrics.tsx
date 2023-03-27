@@ -1,15 +1,15 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
+import uniqBy from 'lodash-es/uniqBy';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { Appointment, AppointmentSummary } from '../types';
+import { omrsDateFormat } from '../constants';
 import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
   useAppointmentDate,
 } from '../helpers';
-import { omrsDateFormat } from '../constants';
-import uniqBy from 'lodash-es/uniqBy';
 
 export const useClinicalMetrics = () => {
   const appointmentDate = useAppointmentDate();
@@ -63,7 +63,7 @@ export const useScheduledAppointment = (serviceUuid: string) => {
 
   const { data, error, isLoading, mutate } = useSWR<{
     data: Array<any>;
-  }>(url, openmrsFetch);
+  }>(serviceUuid ? url : null, openmrsFetch);
 
   const totalScheduledAppointments = serviceUuid
     ? data?.data?.filter((appt) => appt?.service?.uuid === serviceUuid)?.length ?? 0

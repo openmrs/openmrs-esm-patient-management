@@ -3,7 +3,8 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { AppointmentsFetchResponse } from '../../types';
 
-export function useScheduledVisits(patientUuid: string, abortController: AbortController) {
+export function useScheduledVisits(patientUuid: string) {
+  const abortController = new AbortController();
   let startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -20,8 +21,8 @@ export function useScheduledVisits(patientUuid: string, abortController: AbortCo
       },
     });
 
-  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
-    appointmentsSearchUrl,
+  const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(
+    patientUuid ? appointmentsSearchUrl : null,
     fetcher,
   );
 

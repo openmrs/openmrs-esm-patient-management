@@ -11,7 +11,7 @@ interface AppointmentDetailsProps {
 
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid, new AbortController());
+  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid);
 
   return (
     <div className={styles.appointmentDetailsContainer}>
