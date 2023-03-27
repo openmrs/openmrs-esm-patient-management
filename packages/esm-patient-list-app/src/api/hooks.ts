@@ -10,8 +10,10 @@ import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
 import { ConfigSchema } from '../config-schema';
+import { useEffect, useState } from 'react';
 
 export function useAllPatientLists({ name, isStarred, type }: PatientListFilter, page: number, size: number = 50) {
+  const [totalResults, setTotalResults] = useState(0);
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
@@ -41,6 +43,16 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter,
     openmrsFetch,
   );
 
+  useEffect(() => {
+    // This is done to keep the count of total results
+    // When a new request is made in pagination
+    // the data becomes undefined, but the count of total
+    // results is required for pagination to work properly.
+    if (data?.data?.totalCount) {
+      setTotalResults(data?.data?.totalCount);
+    }
+  }, [data]);
+
   const patientLists = data?.data?.results.map((cohort) => ({
     id: cohort.uuid,
     display: cohort.name,
@@ -55,7 +67,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter,
     isValidating,
     error,
     mutate,
-    totalResults: data?.data?.totalCount,
+    totalResults,
   };
 }
 
