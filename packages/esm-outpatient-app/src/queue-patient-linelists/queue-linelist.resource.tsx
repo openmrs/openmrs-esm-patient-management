@@ -19,6 +19,7 @@ export function useAppointments() {
 
 export function useCheckedInAppointments() {
   const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
+
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
   return {
@@ -45,7 +46,9 @@ export function useProviders() {
   };
 }
 
-export function usePatientAppointments(patientUuid: string, startDate, abortController: AbortController) {
+export function usePatientAppointments(patientUuid: string, startDate) {
+  const abortController = new AbortController();
+
   const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {

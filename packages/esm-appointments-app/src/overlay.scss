@@ -13,7 +13,7 @@
   background-color: $ui-01;
   overflow-y: auto;
   height: calc(100vh - 3rem);
-  z-index: 1;
+  z-index: 3;
 }
 
 .desktopOverlay::after {

@@ -53,14 +53,7 @@ const formValues: FormValues = {
 describe('FormManager', () => {
   describe('createIdentifiers', () => {
     it('uses the uuid of a field name if it exists', async () => {
-      const result = await FormManager.savePatientIdentifiers(
-        true,
-        undefined,
-        formValues.identifiers,
-        {},
-        'Nyc',
-        new AbortController(),
-      );
+      const result = await FormManager.savePatientIdentifiers(true, undefined, formValues.identifiers, {}, 'Nyc');
       expect(result).toEqual([
         {
           uuid: 'aUuid',

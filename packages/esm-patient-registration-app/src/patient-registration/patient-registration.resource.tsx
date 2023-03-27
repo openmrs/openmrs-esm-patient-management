@@ -1,8 +1,8 @@
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration-types';
-import { useMemo } from 'react';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
@@ -21,7 +21,9 @@ function dataURItoFile(dataURI: string) {
   return new File([blob], 'patient-photo.png');
 }
 
-export function savePatient(abortController: AbortController, patient: Patient, updatePatientUuid?: string) {
+export function savePatient(patient: Patient | null, updatePatientUuid?: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/patient/${updatePatientUuid || ''}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +34,9 @@ export function savePatient(abortController: AbortController, patient: Patient, 
   });
 }
 
-export function saveEncounter(abortController: AbortController, encounter: Encounter) {
+export function saveEncounter(encounter: Encounter) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/encounter`, {
     headers: {
       'Content-Type': 'application/json',
@@ -43,7 +47,9 @@ export function saveEncounter(abortController: AbortController, encounter: Encou
   });
 }
 
-export function generateIdentifier(source: string, abortController: AbortController) {
+export function generateIdentifier(source: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/idgen/identifiersource/${source}/identifier`, {
     headers: {
       'Content-Type': 'application/json',
@@ -54,14 +60,18 @@ export function generateIdentifier(source: string, abortController: AbortControl
   });
 }
 
-export function deletePersonName(nameUuid: string, personUuid: string, abortController: AbortController) {
+export function deletePersonName(nameUuid: string, personUuid: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/person/${personUuid}/name/${nameUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,
   });
 }
 
-export function saveRelationship(abortController: AbortController, relationship: Relationship) {
+export function saveRelationship(relationship: Relationship) {
+  const abortController = new AbortController();
+
   return openmrsFetch('/ws/rest/v1/relationship', {
     headers: {
       'Content-Type': 'application/json',
@@ -72,11 +82,9 @@ export function saveRelationship(abortController: AbortController, relationship:
   });
 }
 
-export function updateRelationship(
-  abortController: AbortController,
-  relationshipUuid,
-  relationship: { relationshipType: string },
-) {
+export function updateRelationship(relationshipUuid, relationship: { relationshipType: string }) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/relationship/${relationshipUuid}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -87,7 +95,9 @@ export function updateRelationship(
   });
 }
 
-export function deleteRelationship(abortController: AbortController, relationshipUuid) {
+export function deleteRelationship(relationshipUuid) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/relationship/${relationshipUuid}`, {
     headers: {
       'Content-Type': 'application/json',
@@ -103,8 +113,9 @@ export async function savePatientPhoto(
   url: string,
   date: string,
   conceptUuid: string,
-  abortController: AbortController,
 ) {
+  const abortController = new AbortController();
+
   const formData = new FormData();
   formData.append('patient', patientUuid);
   formData.append('file', dataURItoFile(content));
@@ -170,17 +181,16 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
   };
 }
 
-export async function fetchPerson(query: string, abortController: AbortController) {
+export async function fetchPerson(query: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
     signal: abortController.signal,
   });
 }
 
-export async function addPatientIdentifier(
-  patientUuid: string,
-  patientIdentifier: PatientIdentifier,
-  abortController: AbortController,
-) {
+export async function addPatientIdentifier(patientUuid: string, patientIdentifier: PatientIdentifier) {
+  const abortController = new AbortController();
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/`, {
     method: 'POST',
     headers: {
@@ -191,12 +201,8 @@ export async function addPatientIdentifier(
   });
 }
 
-export async function updatePatientIdentifier(
-  patientUuid: string,
-  identifierUuid: string,
-  identifier: string,
-  abortController: AbortController,
-) {
+export async function updatePatientIdentifier(patientUuid: string, identifierUuid: string, identifier: string) {
+  const abortController = new AbortController();
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${identifierUuid}`, {
     method: 'POST',
     headers: {
@@ -207,11 +213,8 @@ export async function updatePatientIdentifier(
   });
 }
 
-export async function deletePatientIdentifier(
-  patientUuid: string,
-  patientIdentifierUuid: string,
-  abortController: AbortController,
-) {
+export async function deletePatientIdentifier(patientUuid: string, patientIdentifierUuid: string) {
+  const abortController = new AbortController();
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/identifier/${patientIdentifierUuid}?purge`, {
     method: 'DELETE',
     headers: {
@@ -249,7 +252,7 @@ export function useAddressHierarchy(
       error,
       isLoading,
     }),
-    [data, error],
+    [data?.data, error, isLoading],
   );
   return results;
 }
@@ -286,7 +289,7 @@ export function useAdressHierarchyWithParentSearch(
       isLoading,
       addresses: data?.data ?? [],
     }),
-    [data, error],
+    [data?.data, error, isLoading],
   );
 
   return results;

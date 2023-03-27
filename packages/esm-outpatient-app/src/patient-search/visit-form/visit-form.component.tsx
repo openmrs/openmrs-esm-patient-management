@@ -115,6 +115,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       };
 
       const abortController = new AbortController();
+
       saveVisit(payload, abortController)
         .pipe(first())
         .subscribe(
@@ -128,7 +129,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 priority,
                 status,
                 sortWeight,
-                abortController,
                 queueLocation,
                 visitQueueNumberAttributeUuid,
               ).then(

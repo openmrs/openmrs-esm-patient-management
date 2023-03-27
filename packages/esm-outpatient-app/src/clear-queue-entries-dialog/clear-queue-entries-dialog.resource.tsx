@@ -1,10 +1,8 @@
 import { openmrsFetch, parseDate, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
 import { endPatientStatus, MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
-export async function batchClearQueueEntries(
-  queueEntries: Array<MappedVisitQueueEntry>,
-  abortController: AbortController,
-) {
+export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueueEntry>) {
+  const abortController = new AbortController();
   // number of concurrent requests in one batch
   const batchSize = 10;
   // request counter
@@ -16,7 +14,7 @@ export async function batchClearQueueEntries(
     const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
     for (let index = curReq; index < end; index++) {
       await Promise.all([
-        endPatientStatus(queueEntries[index]?.queueUuid, abortController, queueEntries[index]?.queueEntryUuid, endedAt),
+        endPatientStatus(queueEntries[index]?.queueUuid, queueEntries[index]?.queueEntryUuid, endedAt),
       ]);
 
       concurrentReq.push(

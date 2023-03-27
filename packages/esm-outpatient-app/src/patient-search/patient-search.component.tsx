@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SearchTypes } from '../types';
 import Overlay from '../overlay.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import VisitForm from './visit-form/visit-form.component';
-import { SearchTypes } from '../types';
 import QueueServiceForm from '../queue-services/queue-service-form.component';
 import QueueRoomForm from '../queue-rooms/queue-room-form.component';
+import VisitForm from './visit-form/visit-form.component';
 
 interface PatientSearchProps {
   closePanel: () => void;

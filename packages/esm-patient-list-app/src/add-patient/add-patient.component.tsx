@@ -28,7 +28,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 
   const handleCreateNewList = () => {
     navigate({
-      to: '${openmrsSpaBase}/patient-list?new_cohort=true',
+      to: '${openmrsSpaBase}/home/patient-lists?new_cohort=true',
     });
     closeModal();
   };

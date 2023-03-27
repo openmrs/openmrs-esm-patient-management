@@ -1,6 +1,8 @@
-import { defineConfigSchema, getAsyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { getPatientListName } from './api/api-remote';
 import { configSchema } from './config-schema';
+import { createDashboardLink } from './createDashboardLink';
+import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
 
 declare var __VERSION__: string;
@@ -24,8 +26,7 @@ const options = {
 };
 
 function setupOpenMRS() {
-  const route = `patient-list`;
-  const spaBasePath = `${window.spaBase}/${route}`;
+  const patientListsBasePath = `${window.spaBase}/home/patient-lists`;
 
   async function getListName(patientListUuid: string): Promise<string> {
     return (await getPatientListName(patientListUuid)) ?? '--';
@@ -36,14 +37,14 @@ function setupOpenMRS() {
 
   registerBreadcrumbs([
     {
-      path: spaBasePath,
       title: 'Patient Lists',
+      path: patientListsBasePath,
       parent: `${window.spaBase}/home`,
     },
     {
-      path: `${spaBasePath}/:uuid?`,
       title: ([patientListUuid]) => getListName(patientListUuid),
-      parent: spaBasePath,
+      path: `${patientListsBasePath}/:patientListUuid?`,
+      parent: patientListsBasePath,
     },
   ]);
 
@@ -51,16 +52,24 @@ function setupOpenMRS() {
     pages: [
       {
         load: getAsyncLifecycle(() => import('./root.component'), options),
-        route,
+        route: 'patient-lists',
         online: { syncUserPropertiesChangesOnLoad: true },
         offline: { syncUserPropertiesChangesOnLoad: false },
       },
     ],
     extensions: [
       {
-        id: 'patient-list-link',
-        slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-link.component'), options),
+        id: 'patient-lists-dashboard-link',
+        slot: 'homepage-dashboard-slot',
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'patient-lists-dashboard',
+        slot: 'patient-lists-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./root.component'), options),
         online: true,
         offline: true,
       },

@@ -28,7 +28,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
 
   return (
     <Layer className={`${children && styles.cardWithChildren} ${styles.container}`}>
-      <Tile className={`${styles.tileContainer}`}>
+      <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
             <label className={styles.headerLabel}>{headerLabel}</label>

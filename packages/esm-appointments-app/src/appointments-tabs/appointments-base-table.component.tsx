@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '../empty-state/empty-state.component';
-
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import PatientSearch from '../patient-search/patient-search.component';
 import { MappedAppointment } from '../types';
@@ -28,15 +27,17 @@ import {
 } from '@carbon/react';
 import { ExtensionSlot, ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
-import { Add } from '@carbon/react/icons';
+import { Download, Hospital } from '@carbon/react/icons';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
 import styles from './appointments-base-table.scss';
 import { handleFilter } from './utils';
 import AppointmentForm from '../appointment-forms/appointments-form.component';
-import CancelAppointment from '../appointment-forms/cancel-appointment.component';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
+import AppointmentButton from './appointments-button.component';
+import { useServiceQueues } from '../hooks/useServiceQueus';
+
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
@@ -45,6 +46,7 @@ interface AppointmentsBaseTableProps {
   isLoading: boolean;
   tableHeading: string;
   mutate?: () => void;
+  visits?: Array<any>;
 }
 
 const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
@@ -52,9 +54,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
   isLoading,
   tableHeading,
   mutate,
+  visits,
 }) => {
   const { t } = useTranslation();
-  const { results, goTo, currentPage } = usePagination(appointments, 10);
+  const [pageSize, setPageSize] = useState(10);
+  const { results, goTo, currentPage } = usePagination(appointments, pageSize);
 
   const launchCreateAppointmentForm = (patientUuid) => {
     closeOverlay();
@@ -64,14 +68,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
     );
   };
 
+  const { isLoading: isLoadingQueueEntries, queueEntries } = useServiceQueues();
   const headerData = [
     {
       header: t('patientName', 'Patient name'),
       key: 'patientName',
-    },
-    {
-      header: t('identifier', 'identifier'),
-      key: 'identifier',
     },
     {
       header: t('dateTime', 'Date & Time'),
@@ -86,7 +87,11 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
       key: 'actions',
     },
   ];
-
+  const patientQueueEntry = (patientUuid: string) => {
+    const queryEntries = queueEntries.find((entry) => entry.queueEntry.patient.uuid === patientUuid);
+    return ` ${queryEntries?.queueEntry?.status?.display ?? ''} ${queryEntries?.queueEntry?.queue?.display ?? ''}`;
+  };
+  const hasVisit = (patientUuid) => visits?.find((visit) => visit?.patient?.uuid === patientUuid)?.startDatetime;
   const rowData = results?.map((appointment, index) => ({
     id: `${index}`,
     patientName: {
@@ -103,7 +108,17 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
     serviceType: appointment.serviceType,
     provider: appointment.provider,
     actions: (
-      <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {}
+        {hasVisit(appointment.patientUuid) ? (
+          patientQueueEntry(appointment.patientUuid) ?? (
+            <Button size="sm" kind="ghost">
+              {t('checkIn', 'Visit active')}
+            </Button>
+          )
+        ) : (
+          <AppointmentButton patientUuid={appointment.patientUuid} appointment={appointment} />
+        )}
         {(dayjs(appointment.dateTime).isAfter(dayjs()) || dayjs(appointment.dateTime).isToday()) && (
           <OverflowMenu size="sm" flipped>
             <OverflowMenuItem
@@ -115,18 +130,9 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
                 )
               }
             />
-            <OverflowMenuItem
-              itemText={t('cancelAppointment', 'Cancel appointment')}
-              onClick={() =>
-                launchOverlay(
-                  t('cancelAppointment', 'Cancel appointment'),
-                  <CancelAppointment appointment={appointment} />,
-                )
-              }
-            />
           </OverflowMenu>
         )}
-      </>
+      </div>
     ),
   }));
 
@@ -136,6 +142,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
       return (x + 1) * 10;
     });
   }, [appointments]);
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" row={5} />;
   }
@@ -144,7 +151,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
     return (
       <EmptyState
         headerTitle={`${tableHeading} appointments`}
-        displayText={`${tableHeading} appointments`}
+        displayText={`${tableHeading.toLowerCase()} appointments`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
       />
     );
@@ -161,19 +168,27 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
             overlayHeader: t('createNewAppointment', 'Create new appointment'),
             buttonProps: {
               kind: 'secondary',
+              renderIcon: (props) => <Hospital size={16} {...props} />,
               size: 'sm',
-              renderIcon: (props) => <Add size={20} {...props} />,
             },
           }}
         />
       </div>
       <DataTable rows={rowData} headers={headerData} isSortable filterRows={handleFilter}>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getBatchActionProps, onInputChange }) => (
+        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, onInputChange }) => (
           <TableContainer
             title={`${startCase(tableHeading)} ${t('appointments', 'appointment')} ${appointments.length ?? 0}`}>
             <TableToolbar>
               <TableToolbarContent>
-                <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
+                <TableToolbarSearch
+                  size="sm"
+                  style={{ backgroundColor: '#f4f4f4' }}
+                  tabIndex={0}
+                  onChange={onInputChange}
+                />
+                <Button size="lg" kind="ghost" renderIcon={Download}>
+                  {t('download', 'Download')}
+                </Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()} size="sm" useZebraStyles>
@@ -190,9 +205,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell className="cds--table-column-menu" key={cell.id}>
-                          {cell.value?.content ?? cell.value}
-                        </TableCell>
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
@@ -214,7 +227,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
         page={currentPage}
         pageNumberText="Page Number"
         pageSize={10}
-        onChange={({ page }) => goTo(page)}
+        onChange={({ page, pageSize }) => {
+          goTo(page);
+          setPageSize(pageSize);
+        }}
         pageSizes={pageSizes}
         totalItems={appointments.length ?? 0}
       />

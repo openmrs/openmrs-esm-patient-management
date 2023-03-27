@@ -99,7 +99,6 @@ export class FormManager {
       values.identifiers,
       initialIdentifierValues,
       currentLocation,
-      abortController,
     );
 
     const createdPatient = FormManager.getPatientToCreate(
@@ -110,27 +109,19 @@ export class FormManager {
     );
 
     FormManager.getDeletedNames(values.patientUuid, patientUuidMap).forEach(async (name) => {
-      await deletePersonName(name.nameUuid, name.personUuid, abortController);
+      await deletePersonName(name.nameUuid, name.personUuid);
     });
 
     const savePatientResponse = await savePatient(
-      abortController,
       createdPatient,
       isNewPatient && !savePatientTransactionManager.patientSaved ? undefined : values.patientUuid,
     );
 
     if (savePatientResponse.ok) {
       savePatientTransactionManager.patientSaved = true;
-      await this.saveRelationships(values.relationships, savePatientResponse, abortController);
+      await this.saveRelationships(values.relationships, savePatientResponse);
 
-      await this.saveObservations(
-        values.obs,
-        savePatientResponse,
-        currentLocation,
-        currentUser,
-        config,
-        abortController,
-      );
+      await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
 
       if (config.concepts.patientPhotoUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
@@ -139,7 +130,6 @@ export class FormManager {
           '/ws/rest/v1/obs',
           capturePhotoProps.dateTime || new Date().toISOString(),
           config.concepts.patientPhotoUuid,
-          abortController,
         );
       }
     }
@@ -147,11 +137,7 @@ export class FormManager {
     return savePatientResponse.data.uuid;
   };
 
-  static async saveRelationships(
-    relationships: Array<RelationshipValue>,
-    savePatientResponse: FetchResponse,
-    abortController: AbortController,
-  ) {
+  static async saveRelationships(relationships: Array<RelationshipValue>, savePatientResponse: FetchResponse) {
     return Promise.all(
       relationships
         .filter((m) => m.relationshipType)
@@ -168,11 +154,11 @@ export class FormManager {
 
           switch (action) {
             case 'ADD':
-              return saveRelationship(abortController, relationshipToSave);
+              return saveRelationship(relationshipToSave);
             case 'UPDATE':
-              return updateRelationship(abortController, relationshipUuid, relationshipToSave);
+              return updateRelationship(relationshipUuid, relationshipToSave);
             case 'DELETE':
-              return deleteRelationship(abortController, relationshipUuid);
+              return deleteRelationship(relationshipUuid);
           }
         }),
     );
@@ -184,7 +170,6 @@ export class FormManager {
     currentLocation: string,
     currentUser: Session,
     config: RegistrationConfig,
-    abortController: AbortController,
   ) {
     if (obss && Object.keys(obss).length > 0) {
       if (!config.registrationObs.encounterTypeUuid) {
@@ -211,7 +196,7 @@ export class FormManager {
             value: obss[conceptUuid],
           })),
         };
-        return saveEncounter(abortController, encounterToSave);
+        return saveEncounter(encounterToSave);
       }
     }
   }
@@ -222,7 +207,6 @@ export class FormManager {
     patientIdentifiers: FormValues['identifiers'], // values.identifiers
     initialIdentifierValues: FormValues['identifiers'], // Initial identifiers assigned to the patient
     location: string,
-    abortController: AbortController,
   ): Promise<Array<PatientIdentifier>> {
     let identifierTypeRequests = Object.values(patientIdentifiers)
       /* Since default identifier-types will be present on the form and are also in the not-required state,
@@ -246,7 +230,7 @@ export class FormManager {
         const identifier = !autoGeneration
           ? identifierValue
           : await (
-              await generateIdentifier(selectedSource.uuid, abortController)
+              await generateIdentifier(selectedSource.uuid)
             ).data.identifier;
         const identifierToCreate = {
           uuid: identifierUuid,
@@ -258,9 +242,9 @@ export class FormManager {
 
         if (!isNewPatient) {
           if (!initialValue) {
-            await addPatientIdentifier(patientUuid, identifierToCreate, abortController);
+            await addPatientIdentifier(patientUuid, identifierToCreate);
           } else if (initialValue !== identifier) {
-            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier, abortController);
+            await updatePatientIdentifier(patientUuid, identifierUuid, identifierToCreate.identifier);
           }
         }
 
@@ -278,11 +262,7 @@ export class FormManager {
       Object.keys(initialIdentifierValues)
         .filter((identifierFieldName) => !patientIdentifiers[identifierFieldName])
         .forEach(async (identifierFieldName) => {
-          await deletePatientIdentifier(
-            patientUuid,
-            initialIdentifierValues[identifierFieldName].identifierUuid,
-            abortController,
-          );
+          await deletePatientIdentifier(patientUuid, initialIdentifierValues[identifierFieldName].identifierUuid);
         });
     }
 

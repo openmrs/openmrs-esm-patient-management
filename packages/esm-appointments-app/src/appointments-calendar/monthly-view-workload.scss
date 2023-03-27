@@ -88,12 +88,12 @@
 }
 
 .serviceArea {
+  padding: 0.0125rem;
   display: grid;
-  column-gap: 2rem;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
   text-align: left;
-  margin: 0.125rem;
+  margin: 0.0125rem;
   @include type.type-style('label-02');
   color: #020f1b;
   cursor: pointer;
@@ -101,8 +101,16 @@
   & > span:first-child {
     text-align: left;
     text-overflow: ellipsis;
-    width: layout.$spacing-06;
   }
+
+  & > span:nth-child(2) {
+    text-align: right;
+  }
+}
+
+.serviceArea:hover {
+  opacity: 0.8;
+  border: 1px solid grey;
 }
 
 .smallDesktop {
@@ -117,26 +125,22 @@
   background-color: colors.$red-70;
   color: colors.$white;
   font-weight: bold;
-  padding: 0.3rem;
 }
 
 .purple {
   background-color: colors.$yellow-70;
   color: colors.$white;
   font-weight: bold;
-  padding: 0.3rem;
 }
 
 .blue {
   background-color: colors.$blue-70;
   color: colors.$white;
   font-weight: bold;
-  padding: 0.3rem;
 }
 
 .green {
   background-color: colors.$green-70;
   color: colors.$white;
   font-weight: bold;
-  padding: 0.3rem;
 }
