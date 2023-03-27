@@ -52,7 +52,7 @@ describe('AppointmentsBaseTable', () => {
     expect(screen.queryByText(/There are no scheduled appointments to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/Patient name/, /Date & Time/, /Service Type/, /Identifier/];
+    const expectedColumnHeaders = [/Patient name/, /Date & Time/, /Service Type/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });

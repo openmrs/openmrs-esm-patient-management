@@ -1,4 +1,3 @@
-import { useReducer } from 'react';
 import { AdvancedPatientSearchAction, AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
 
 export const initialState: AdvancedPatientSearchState = {

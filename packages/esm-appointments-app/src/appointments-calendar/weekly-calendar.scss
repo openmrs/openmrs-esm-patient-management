@@ -1,0 +1,54 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+.container {
+  width: 100%;
+  padding-left: 50px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.weekly-calendar {
+  display: grid;
+  grid-template-columns: 60px repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(1, minmax(0px, 1fr));
+}
+.weekly-calendar-all {
+  display: grid;
+  margin-top: 2px;
+  height: auto;
+  grid-template-columns: 60px repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(26, minmax(0px, 1fr));
+}
+.weekly-cell {
+  position: relative;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  min-height: 40px;
+  color: colors.$black;
+
+  .week-time {
+    display: none;
+  }
+
+  &:nth-child(-n + 8) {
+    border-top: 1px solid colors.$gray-20;
+  }
+
+  &:first-child {
+    border-top: none;
+  }
+
+  &:nth-child(8n + 1) {
+    border-bottom: none;
+
+    .week-time {
+      white-space: nowrap;
+      display: inline;
+      margin-top: 10px;
+      color: colors.$black;
+      position: absolute;
+      height: 22px;
+    }
+  }
+}

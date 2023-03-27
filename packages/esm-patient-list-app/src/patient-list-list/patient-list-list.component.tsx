@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableHeader, Tab, Tabs, TabList, TabPanels, TabPanel } from '@carbon/react';
+import { Button, Tab, Tabs, TabList, TabPanels, TabPanel } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
-import { PatientList, PatientListFilter, PatientListType } from '../api/types';
+import { PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
+import Illustration from '../illo';
 import PatientListTable from './patient-list-table.component';
 import styles from './patient-list-list.scss';
-import { useLocation } from 'react-router-dom';
 
 const TabIndices = {
   STARRED_LISTS: 0,
@@ -16,12 +17,6 @@ const TabIndices = {
   MY_LISTS: 2,
   ALL_LISTS: 3,
 } as const;
-
-const headersWithoutType: Array<DataTableHeader<keyof PatientList>> = [
-  { key: 'display', header: 'List Name' },
-  { key: 'size', header: 'No. Patients' },
-  { key: 'isStarred', header: '' },
-];
 
 function usePatientListFilterForCurrentTab(selectedTab: number, search: string) {
   return useMemo<PatientListFilter>(() => {
@@ -56,13 +51,13 @@ const PatientListList: React.FC = () => {
 
   const handleShowNewListOverlay = () => {
     navigate({
-      to: '${openmrsSpaBase}/patient-list?new_cohort=true',
+      to: '${openmrsSpaBase}/home/patient-lists?new_cohort=true',
     });
   };
 
   const handleHideNewListOverlay = () => {
     navigate({
-      to: '${openmrsSpaBase}/patient-list',
+      to: '${openmrsSpaBase}/home/patient-lists',
     });
   };
 
@@ -85,15 +80,23 @@ const PatientListList: React.FC = () => {
       <section className={styles.patientListList}>
         <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
-          <h2 className={styles.productiveHeading03}>{t('patientLists', 'Patient Lists')}</h2>
-          <Button
-            className={styles.newListButton}
-            kind="ghost"
-            renderIcon={(props) => <Add {...props} size={16} />}
-            iconDescription="Add"
-            onClick={handleShowNewListOverlay}>
-            {t('newList', 'New List')}
-          </Button>
+          <div className={styles.leftJustifiedItems}>
+            <Illustration />
+            <div className={styles.pageLabels}>
+              <p>{t('patientLists', 'Patient lists')}</p>
+              <p className={styles.pageName}>{t('home', 'Home')}</p>
+            </div>
+          </div>
+          <div className={styles.rightJustifiedItems}>
+            <Button
+              className={styles.newListButton}
+              kind="ghost"
+              renderIcon={(props) => <Add {...props} size={16} />}
+              iconDescription="Add"
+              onClick={handleShowNewListOverlay}>
+              {t('newList', 'New list')}
+            </Button>
+          </div>
         </div>
         <Tabs
           className={styles.tabs}

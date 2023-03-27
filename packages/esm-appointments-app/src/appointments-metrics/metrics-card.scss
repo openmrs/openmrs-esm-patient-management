@@ -1,0 +1,76 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.container {
+  flex-grow: 1;
+}
+
+.tileContainer {
+  border: 0.0625rem solid $ui-03;
+  height: 7.875rem;
+  padding: spacing.$spacing-05;
+  margin: spacing.$spacing-03 spacing.$spacing-03;
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.totalsLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.totalsValue {
+  @include type.type-style('heading-04');
+  color: $ui-05;
+}
+
+.headerLabelContainer {
+  display: flex;
+  align-items: center;
+  height: spacing.$spacing-07;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: $interactive-01;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.countGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-self: flex-end;
+  column-gap: spacing.$spacing-03;
+  row-gap: spacing.$spacing-03;
+  margin: spacing.$spacing-03;
+
+  & > span {
+    font-size: 0.625rem !important;
+    margin: 0;
+    color: colors.$gray-70;
+  }
+
+  & > p {
+    margin: 0;
+  }
+}
