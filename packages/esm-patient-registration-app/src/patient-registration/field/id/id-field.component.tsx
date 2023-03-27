@@ -98,13 +98,8 @@ export const Identifiers: React.FC = () => {
         });
       }
     }
-  }, [
-    identifierTypes,
-    setFieldValue,
-    defaultPatientIdentifierTypes,
-    values.identifiers,
-    initialFormValues.identifiers,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers, initializeIdentifier]);
 
   if (isLoading) {
     return (

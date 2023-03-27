@@ -49,7 +49,8 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       selectedSource: null,
       autoGeneration: false,
     } as PatientIdentifierValue);
-  }, [fieldName, initialValue, patientIdentifier, setFieldValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValue, setHideInputField]);
 
   const handleEdit = () => {
     setHideInputField(false);
