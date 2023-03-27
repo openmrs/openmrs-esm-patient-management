@@ -49,7 +49,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       selectedSource: null,
       autoGeneration: false,
     } as PatientIdentifierValue);
-  }, [fieldName, initialValue, patientIdentifier, setFieldValue, setHideInputField]);
+  }, [fieldName, initialValue, patientIdentifier, setFieldValue]);
 
   const handleEdit = () => {
     setHideInputField(false);
@@ -134,8 +134,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
             </Button>
           </UserHasAccess>
         )}
-        {/* checks if patientIdentifier exists, and if it does, it shows the delete button only if the user has the privilege to delete patient identifiers */}
-        {patientIdentifier ? (
+        {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
               kind="danger--ghost"
@@ -146,16 +145,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
               <TrashCan size={16} />
             </Button>
           </UserHasAccess>
-        ) : (
-          // identifer does not exist, it shows the remove button that allows the user to remove the identifier they added before submitting the form
-          <Button
-            kind="danger--ghost"
-            onClick={handleDelete}
-            iconDescription={t('removeIdentifierTooltip', 'Remove')}
-            disabled={disabled}
-            hasIconOnly>
-            <TrashCan size={16} />
-          </Button>
         )}
       </div>
     </div>
