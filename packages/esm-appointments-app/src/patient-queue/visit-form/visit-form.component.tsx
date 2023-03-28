@@ -42,6 +42,7 @@ import { saveQueueEntry } from './queue.resource';
 import { MappedAppointment } from '../../types';
 import styles from './visit-form.scss';
 import { useAppointments } from '../../appointments-tabs/appointments-table.resource';
+import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -67,10 +68,14 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
   const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+  const { defaultFacility } = useDefaultLoginLocation();
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
+    } else {
+      setSelectedLocation(defaultFacility?.uuid);
       setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
   }, [locations, sessionUser]);
