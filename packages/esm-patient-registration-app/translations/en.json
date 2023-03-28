@@ -74,6 +74,7 @@
   "relationshipToPatient": "Relationship to patient",
   "relativeFullNameLabelText": "Full name",
   "relativeNamePlaceholder": "Firstname Familyname",
+  "removeIdentifierTooltip": "Remove",
   "resetIdentifierTooltip": "Reset",
   "restoreRelationshipActionButton": "Undo",
   "searchAddress": "Search address",
