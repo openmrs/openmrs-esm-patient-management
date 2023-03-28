@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import dayjs from 'dayjs';
+import isNull from 'lodash-es/isNull';
 import { first } from 'rxjs/operators';
+import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -21,7 +23,6 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  useLocations,
   useSession,
   ExtensionSlot,
   useLayoutType,
@@ -34,16 +35,13 @@ import {
   showToast,
   usePatient,
 } from '@openmrs/esm-framework';
-import styles from './visit-form.scss';
 import BaseVisitType from './base-visit-type.component';
-import { saveQueueEntry } from './queue.resource';
-import { useSWRConfig } from 'swr';
-import isNull from 'lodash-es/isNull';
 import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
+import { saveQueueEntry } from './queue.resource';
 import { usePriority, useQueues, useStatus } from './useVisit';
 import { MappedAppointment } from '../../types';
-import { changeAppointmentStatus } from '../../change-appointment-status/appointment-status.resource';
+import styles from './visit-form.scss';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -54,11 +52,11 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
   const startDate = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
+  const locations = sessionUser?.sessionLocation ? [{ ...sessionUser?.sessionLocation }] : [];
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState(sessionUser?.sessionLocation?.uuid ?? '');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
@@ -72,12 +70,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { mutate } = useSWRConfig();
   const [service, setSelectedService] = useState('');
   const { isLoading, patient } = usePatient(patientUuid);
-
-  useEffect(() => {
-    if (locations && sessionUser?.sessionLocation?.uuid) {
-      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
-    }
-  }, [locations, sessionUser]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -137,7 +129,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 },
               };
 
-              saveQueueEntry(queuePayload, abortController)
+              saveQueueEntry(queuePayload)
                 .pipe(first())
                 .subscribe(
                   async (response) => {
@@ -151,7 +143,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                           `${hours} : ${minutes}`,
                         ),
                       });
-                      await changeAppointmentStatus('CheckedIn', appointment.id, new AbortController());
                       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
                       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=CheckedIn`);
                       mutate(`/ws/rest/v1/appointment/all?forDate=${startDate}`);
@@ -193,7 +184,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
       priority,
       queues,
       t,
-      appointment.id,
       mutate,
       startDate,
     ],

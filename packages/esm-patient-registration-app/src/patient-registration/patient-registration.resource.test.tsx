@@ -14,13 +14,13 @@ describe('savePatient', () => {
 
   it('appends patient uuid in url if provided', () => {
     mockOpenmrsFetch.mockImplementationOnce((url) => url);
-    savePatient(new AbortController(), undefined, '1234');
+    savePatient(null, '1234');
     expect(mockOpenmrsFetch.mock.calls[0][0]).toEqual('/ws/rest/v1/patient/1234');
   });
 
   it('does not append patient uuid in url', () => {
     mockOpenmrsFetch.mockImplementationOnce(() => {});
-    savePatient(new AbortController(), undefined, undefined);
+    savePatient(null);
     expect(mockOpenmrsFetch.mock.calls[0][0]).toEqual('/ws/rest/v1/patient/');
   });
 });

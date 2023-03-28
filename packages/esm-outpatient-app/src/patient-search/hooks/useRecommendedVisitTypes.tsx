@@ -19,12 +19,11 @@ export const useRecommendedVisitTypes = (
 ) => {
   const { visitTypeResourceUrl } = useConfig() as OutpatientConfig;
   const { showRecommendedVisitTypeTab } = useConfig() as ConfigObject;
+
+  const apiUrl = `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`;
+
   const { data, error, isLoading } = useSWR<{ data: EnrollmentVisitType }>(
-    showRecommendedVisitTypeTab &&
-      patientUuid &&
-      enrollmentUuid &&
-      programUuid &&
-      `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
+    showRecommendedVisitTypeTab && patientUuid && enrollmentUuid && programUuid ? apiUrl : null,
     openmrsFetch,
   );
 

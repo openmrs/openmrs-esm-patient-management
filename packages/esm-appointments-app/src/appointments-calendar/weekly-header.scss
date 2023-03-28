@@ -1,0 +1,45 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '~carbon-components/src/globals/scss/vars';
+@import '~carbon-components/src/globals/scss/mixins';
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-10;
+}
+.workLoadCard {
+  display: flex;
+  color: colors.$black;
+  padding-left: 60px;
+}
+.tileContainer {
+  height: layout.$spacing-10;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+
+  & > span {
+    font-size: spacing.$spacing-05;
+    color: colors.$gray-70;
+  }
+}
+.bold {
+  font-weight: bold;
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: spacing.$spacing-05;
+}
+
+.headerLabel {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+}

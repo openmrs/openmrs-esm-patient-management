@@ -8,8 +8,7 @@
   color: $text-02;
   height: spacing.$spacing-12;
   background-color: $ui-02;
-  border: 1px solid $ui-03;
-  border-left: 0px;
+  border-bottom: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
 }
@@ -18,12 +17,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: pointer;
 }
 
 .right-justified-items {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  padding-top: 1rem;
+  margin: 0.5rem;
 }
 
 .page-name {
@@ -31,6 +31,8 @@
 }
 
 .page-labels {
+  margin: 1rem 0;
+
   p:first-of-type {
     margin-bottom: 0.25rem;
   }
@@ -40,7 +42,11 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 1rem;
+}
+
+.dropdownContainer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .value {
@@ -53,22 +59,6 @@
 
 .view {
   @include type.type-style('label-01');
-}
-
-.dropdown {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 0.25rem;
-
-  :global(.cds--dropdown__wrapper--inline) {
-    align-items: center;
-    display: flex;
-  }
-
-  :global(.cds--list-box__menu) {
-    left: -10.15rem;
-  }
 }
 
 .datePicker {

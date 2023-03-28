@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag } from '@carbon/react';
 import { MappedAppointment } from '../types/index';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../hooks/usePatientAppointmentHistory';
@@ -12,18 +11,12 @@ interface AppointmentDetailsProps {
 
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid, new AbortController());
+  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patientUuid);
 
   return (
     <div className={styles.appointmentDetailsContainer}>
       <p className={styles.title}>{appointment.serviceType}</p>
       <p className={styles.subTitle}>{formatDate(new Date(appointment.dateTime))}</p>
-
-      <div className={styles.tags}>
-        <Tag type="red" title={appointment.appointmentKind}>
-          {appointment.appointmentKind}
-        </Tag>
-      </div>
 
       <div className={styles.patientInfoGrid}>
         <div>

@@ -26,10 +26,34 @@
 }
 
 .patientListHeader {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  height: spacing.$spacing-12;
+  background-color: $ui-02;
   display: flex;
   justify-content: space-between;
+}
+
+.leftJustifiedItems {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  margin-left: spacing.$spacing-05;
+}
+
+.rightJustifiedItems {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  padding-top: 1rem;
+}
+
+.pageName {
+  @include type.type-style('heading-04');
+}
+
+.pageLabels {
+  p:first-of-type {
+    margin-bottom: 0.25rem;
+  }
 }
 
 .newListButton {

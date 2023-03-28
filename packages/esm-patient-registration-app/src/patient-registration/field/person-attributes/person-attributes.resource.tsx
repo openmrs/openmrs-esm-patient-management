@@ -5,20 +5,16 @@ import { PersonAttributeTypeResponse } from '../../patient-registration-types';
 export function usePersonAttributeType(personAttributeTypeUuid: string): {
   data: PersonAttributeTypeResponse;
   isLoading: boolean;
+  error: any;
 } {
   const { data, error, isLoading } = useSWRImmutable<FetchResponse<PersonAttributeTypeResponse>>(
     `/ws/rest/v1/personattributetype/${personAttributeTypeUuid}`,
     openmrsFetch,
   );
-  if (error) {
-    showToast({
-      title: error.name,
-      description: error.message,
-      kind: 'error',
-    });
-  }
+
   return {
     data: data?.data,
     isLoading,
+    error,
   };
 }

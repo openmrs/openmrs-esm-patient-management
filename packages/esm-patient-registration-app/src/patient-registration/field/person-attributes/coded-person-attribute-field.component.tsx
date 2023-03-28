@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 
 export interface CodedPersonAttributeFieldProps {
+  id: string;
   personAttributeType: PersonAttributeTypeResponse;
   answerConceptSetUuid: string;
   label?: string;
 }
 
 export function CodedPersonAttributeField({
+  id,
   personAttributeType,
   answerConceptSetUuid,
   label,
@@ -30,7 +32,8 @@ export function CodedPersonAttributeField({
             {({ field, form: { touched, errors }, meta }) => {
               return (
                 <Select
-                  id={`person-attribute-${personAttributeType.uuid}`}
+                  id={id}
+                  name={`person-attribute-${personAttributeType.uuid}`}
                   labelText={label ?? personAttributeType?.display}
                   invalid={errors[fieldName] && touched[fieldName]}
                   {...field}>
@@ -49,7 +52,8 @@ export function CodedPersonAttributeField({
             {({ field, form: { touched, errors }, meta }) => {
               return (
                 <Input
-                  id={`person-attribute-${personAttributeType.uuid}`}
+                  id={id}
+                  name={`person-attribute-${personAttributeType.uuid}`}
                   labelText={label ?? personAttributeType?.display}
                   invalid={errors[fieldName] && touched[fieldName]}
                   {...field}

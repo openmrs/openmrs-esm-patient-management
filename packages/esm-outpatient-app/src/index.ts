@@ -1,7 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
-import { homeDashboardMeta } from './dashboard.meta';
+import { dashboardMeta } from './dashboard.meta';
 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
@@ -21,34 +21,12 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  registerBreadcrumbs([
-    {
-      path: `${window.spaBase}/appointments-list/:value?`,
-      title: ([x]) => `Patient Lists / ${x}`,
-      parent: `${window.spaBase}`,
-    },
-    {
-      path: `${window.spaBase}/queue-list/:value?`,
-      title: ([x]) => `Patient Lists / ${x}`,
-      parent: `${window.spaBase}`,
-    },
-    {
-      path: `${window.spaBase}/outpatient/home`,
-      title: 'Service Queues',
-      parent: `${window.spaBase}/home`,
-    },
-  ]);
+  registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
 
   return {
     pages: [
-      {
-        route: 'outpatient',
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-        online: true,
-        offline: true,
-      },
       {
         load: getAsyncLifecycle(
           () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
@@ -67,13 +45,6 @@ function setupOpenMRS() {
     ],
     extensions: [
       {
-        id: 'outpatient-link',
-        slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./outpatient-link'), options),
-        online: true,
-        offline: false,
-      },
-      {
         id: 'outpatient-side-nav-ext',
         slot: 'outpatient-sidebar-slot',
         load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),
@@ -81,16 +52,16 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'home-db-link',
-        slot: 'outpatient-dashboard-slot',
-        load: getSyncLifecycle(createDashboardLink(homeDashboardMeta), options),
-        meta: homeDashboardMeta,
+        id: 'service-queues-dashboard-link',
+        slot: 'homepage-dashboard-slot',
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
         online: true,
         offline: true,
       },
       {
         id: 'home-dashboard',
-        slot: 'home-dashboard-slot',
+        slot: 'service-queues-dashboard-slot',
         load: getAsyncLifecycle(() => import('./home.component'), options),
         online: true,
         offline: true,

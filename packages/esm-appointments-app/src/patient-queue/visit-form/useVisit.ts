@@ -1,4 +1,4 @@
-import { useConfig, FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { useConfig, FetchResponse, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 
 export function useStatus() {
@@ -30,8 +30,9 @@ export function usePriority() {
   };
 }
 
-export function useQueues(location: string) {
+export function useQueues(location?: string) {
   const apiUrl = `/ws/rest/v1/queue?location=${location}`;
+
   const { data } = useSWRImmutable<{ data: { results: Array<any> } }, Error>(location ? apiUrl : null, openmrsFetch);
 
   return {

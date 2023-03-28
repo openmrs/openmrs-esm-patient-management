@@ -2,9 +2,13 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { ProvidersQueueRoom, QueueRoom } from '../types';
 
-export function useQueueRooms(location: string, queueUuid) {
+export function useQueueRooms(location: string, queueUuid: string) {
   const apiUrl = `/ws/rest/v1/queueroom?location=${location}&queue=${queueUuid}`;
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(apiUrl, openmrsFetch);
+
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(
+    location && queueUuid ? apiUrl : null,
+    openmrsFetch,
+  );
 
   return {
     rooms: data ? data?.data?.results : [],
@@ -13,7 +17,9 @@ export function useQueueRooms(location: string, queueUuid) {
   };
 }
 
-export function addProviderToQueueRoom(queueRoomUuid: string, providerUuid, abortController: AbortController) {
+export function addProviderToQueueRoom(queueRoomUuid: string, providerUuid) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/roomprovidermap`, {
     method: 'POST',
     headers: {
@@ -31,12 +37,9 @@ export function addProviderToQueueRoom(queueRoomUuid: string, providerUuid, abor
   });
 }
 
-export function updateProviderToQueueRoom(
-  queueProviderMapUuid: string,
-  queueRoomUuid: string,
-  providerUuid,
-  abortController: AbortController,
-) {
+export function updateProviderToQueueRoom(queueProviderMapUuid: string, queueRoomUuid: string, providerUuid) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/roomprovidermap/${queueProviderMapUuid}`, {
     method: 'POST',
     headers: {
@@ -56,8 +59,9 @@ export function updateProviderToQueueRoom(
 
 export function useProvidersQueueRoom(providerUuid: string) {
   const apiUrl = `/ws/rest/v1/roomprovidermap?provider=${providerUuid}`;
+
   const { data, error, isLoading, mutate } = useSWR<{ data: { results: Array<ProvidersQueueRoom> } }, Error>(
-    apiUrl,
+    providerUuid ? apiUrl : null,
     openmrsFetch,
   );
 

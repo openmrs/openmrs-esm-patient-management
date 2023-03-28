@@ -28,8 +28,9 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'active-visits-widget',
+        name: 'active-visits-widget',
         slot: 'homepage-widgets-slot',
+        order: 0,
         load: getAsyncLifecycle(() => import('./active-visits-widget/active-visits.component'), options),
       },
       {
