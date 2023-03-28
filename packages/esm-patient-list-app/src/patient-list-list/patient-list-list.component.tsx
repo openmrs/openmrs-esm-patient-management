@@ -60,6 +60,8 @@ const PatientListList: React.FC = () => {
         ?.map((searchParam) => searchParam?.split('=')),
     )['new_cohort'] === 'true';
 
+  const showCohortType = selectedTab === TabIndices.ALL_LISTS || selectedTab === TabIndices.STARRED_LISTS;
+
   // URL navigation is in place to know either to open the create list overlay or not
   // The url /patient-list?new_cohort=true is being used in the "Add patient to list" widget
   // in the patient chart. The button in the above mentioned widget "Create new list", navigates
@@ -81,12 +83,18 @@ const PatientListList: React.FC = () => {
     setSearchString(str);
   };
 
-  const tableHeaders = [
-    { id: 1, key: 'display', header: t('listName', 'List name') },
-    { id: 2, key: 'type', header: t('listType', 'List type') },
-    { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
-    { id: 4, key: 'isStarred', header: '' },
-  ];
+  const tableHeaders = showCohortType
+    ? [
+        { id: 1, key: 'display', header: t('listName', 'List name') },
+        { id: 2, key: 'type', header: t('listType', 'List type') },
+        { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
+        { id: 4, key: 'isStarred', header: '' },
+      ]
+    : [
+        { id: 1, key: 'display', header: t('listName', 'List name') },
+        { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
+        { id: 4, key: 'isStarred', header: '' },
+      ];
 
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
