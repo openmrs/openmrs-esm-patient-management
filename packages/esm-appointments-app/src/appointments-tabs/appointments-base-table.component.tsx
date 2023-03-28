@@ -57,7 +57,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
   visits,
 }) => {
   const { t } = useTranslation();
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const { results, goTo, currentPage } = usePagination(appointments, pageSize);
 
   const launchCreateAppointmentForm = (patientUuid) => {

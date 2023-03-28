@@ -14,7 +14,7 @@ export interface Response {
 
 export function useUnscheduledAppointments() {
   const fromData = useAppointmentDate();
-  const url = `/ws/rest/v1/appointment/unscheduledAppointment?forDate=${fromData}`;
+  const url = `/ws/rest/v1/appointment/unScheduledAppointment?forDate=${fromData}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch);
   return { isLoading, data: data?.data ?? [], error };
 }
