@@ -32,6 +32,7 @@ export function usePriority() {
 
 export function useQueues(location?: string) {
   const apiUrl = `/ws/rest/v1/queue?location=${location}`;
+
   const { data } = useSWRImmutable<{ data: { results: Array<any> } }, Error>(location ? apiUrl : null, openmrsFetch);
 
   return {

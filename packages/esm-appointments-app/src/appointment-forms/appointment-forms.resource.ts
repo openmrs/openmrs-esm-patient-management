@@ -9,6 +9,7 @@ export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useServices() {
   const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
+
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
     apiUrl,
     openmrsFetch,
@@ -22,7 +23,9 @@ export function useServices() {
   };
 }
 
-export function getAppointmentService(abortController: AbortController, uuid) {
+export function getAppointmentService(uuid: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,
   });
@@ -41,7 +44,9 @@ export function useProviders() {
   };
 }
 
-export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
+export function saveAppointment(appointment: AppointmentPayload) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,
@@ -54,7 +59,8 @@ export function saveAppointment(appointment: AppointmentPayload, abortController
 
 export const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-export const cancelAppointment = async (toStatus: string, appointmentUuid: string, ac: AbortController) => {
+export const cancelAppointment = async (toStatus: string, appointmentUuid: string) => {
+  const abortController = new AbortController();
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
   const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
@@ -62,6 +68,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal: abortController.signal,
   });
 };
 

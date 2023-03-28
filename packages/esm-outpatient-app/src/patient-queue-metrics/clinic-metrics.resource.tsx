@@ -35,7 +35,11 @@ export function useActiveVisits() {
 
 export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
   const apiUrl = `/ws/rest/v1/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(apiUrl, openmrsFetch);
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(
+    serviceUuid && statusUuid ? apiUrl : null,
+    openmrsFetch,
+  );
 
   return {
     waitTime: data ? data?.data : null,

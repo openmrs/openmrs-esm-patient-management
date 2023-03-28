@@ -4,7 +4,8 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { useAppointmentDate } from '../helpers';
 
-export function usePatientAppointmentHistory(patientUuid: string, abortController: AbortController) {
+export function usePatientAppointmentHistory(patientUuid: string) {
+  const abortController = new AbortController();
   const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
   const startDate = useAppointmentDate();
   const fetcher = () =>
@@ -21,7 +22,7 @@ export function usePatientAppointmentHistory(patientUuid: string, abortControlle
     });
 
   const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
-    appointmentsSearchUrl,
+    patientUuid ? appointmentsSearchUrl : null,
     fetcher,
   );
 

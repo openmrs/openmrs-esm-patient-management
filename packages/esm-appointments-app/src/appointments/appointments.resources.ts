@@ -4,7 +4,8 @@ import { AppointmentService, AppointmentsFetchResponse, Provider } from '../type
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
-export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
+export function useAppointments(patientUuid: string, startDate: string) {
+  const abortController = new AbortController();
   /*
     SWR isn't meant to make POST requests for data fetching. This is a consequence of the API only exposing this resource via POST.
     This works but likely isn't recommended.
@@ -52,18 +53,22 @@ export function useAppointmentService() {
   };
 }
 
-export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
+export function getAppointmentsByUuid(appointmentUuid: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
     signal: abortController.signal,
   });
 }
 
-export function getAppointmentService(abortController: AbortController, uuid) {
+export function getAppointmentService(uuid) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,
   });
 }
 
-export function getTimeSlots(abortController: AbortController) {
+export function getTimeSlots() {
   //https://openmrs-spa.org/openmrs/ws/rest/v1/appointment/all?forDate=2020-03-02T21:00:00.000Z
 }

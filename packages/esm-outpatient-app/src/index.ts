@@ -45,13 +45,6 @@ function setupOpenMRS() {
     ],
     extensions: [
       {
-        id: 'outpatient-link',
-        slot: 'app-menu-slot',
-        load: getAsyncLifecycle(() => import('./outpatient-link'), options),
-        online: true,
-        offline: false,
-      },
-      {
         id: 'outpatient-side-nav-ext',
         slot: 'outpatient-sidebar-slot',
         load: getAsyncLifecycle(() => import('./side-menu/side-menu.component'), options),

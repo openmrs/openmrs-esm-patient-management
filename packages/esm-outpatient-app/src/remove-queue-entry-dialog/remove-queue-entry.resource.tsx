@@ -10,20 +10,24 @@ const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
 
 export async function voidQueueEntry(
   queueUuid: string,
-  abortController: AbortController,
+
   queueEntryUuid: string,
   endedAt: Date,
   endCurrentVisitPayload: EndVisitPayload,
   visitUuid: string,
   appointments: any,
 ) {
+  const abortController = new AbortController();
+
   if (endCurrentVisitPayload) {
     if (appointments?.length) {
       appointments.forEach(async (appointment) => {
         await Promise.all([changeAppointmentStatus('Completed', appointment.uuid)]);
       });
     }
-    await Promise.all([endPatientStatus(queueUuid, abortController, queueEntryUuid, endedAt)]);
+
+    await Promise.all([endPatientStatus(queueUuid, queueEntryUuid, endedAt)]);
+
     return updateVisit(visitUuid, endCurrentVisitPayload, abortController)
       .pipe(first())
       .subscribe(
@@ -35,7 +39,7 @@ export async function voidQueueEntry(
         },
       );
   } else {
-    return await Promise.all([endPatientStatus(queueUuid, abortController, queueEntryUuid, endedAt)])
+    return await Promise.all([endPatientStatus(queueUuid, queueEntryUuid, endedAt)])
       .then((res) => {
         return res;
       })
@@ -45,7 +49,9 @@ export async function voidQueueEntry(
   }
 }
 
-export function useCheckedInAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
+export function useCheckedInAppointments(patientUuid: string, startDate: string) {
+  const abortController = new AbortController();
+
   const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {

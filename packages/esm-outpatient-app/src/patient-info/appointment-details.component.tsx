@@ -84,7 +84,7 @@ const UpcomingAppointmentDetails: React.FC<UpcomingAppointmentDetailsProps> = ({
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
-  const { upcomingAppointment, isLoading } = useAppointments(patientUuid, startDate, new AbortController());
+  const { upcomingAppointment, isLoading } = useAppointments(patientUuid, startDate);
   const { visits, isLoading: loading } = usePastVisits(patientUuid);
 
   return (
