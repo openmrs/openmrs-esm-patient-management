@@ -22,6 +22,7 @@ const StartVisitQueueFields: React.FC = () => {
   const [priority, setPriority] = useState(defaultPriority);
   const [status, setStatus] = useState(defaultStatus);
   const [sortWeight, setSortWeight] = useState(0);
+  const [service, setSelectedService] = useState('');
 
   useEffect(() => {
     if (priority === emergencyPriorityConceptUuid) {
@@ -29,12 +30,17 @@ const StartVisitQueueFields: React.FC = () => {
     }
   }, [priority]);
 
-  const [service, setSelectedService] = useState(() => {
+  useEffect(() => {
     if (allServices?.length > 0) {
-      return allServices[0].uuid;
+      setSelectedService(allServices[0].uuid);
     }
-    return '';
-  });
+  }, [allServices]);
+
+  useEffect(() => {
+    if (queueLocations?.length > 0) {
+      setSelectedQueueLocation(queueLocations[0].id);
+    }
+  }, [queueLocations]);
 
   return (
     <div className={styles.container}>

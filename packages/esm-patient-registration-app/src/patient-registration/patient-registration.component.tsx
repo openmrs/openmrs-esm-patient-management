@@ -171,7 +171,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 {sections.map((section) => (
                   <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
                     <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                      <XAxis size={16} /> {section.name}
+                      <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
                     </Link>
                   </div>
                 ))}
