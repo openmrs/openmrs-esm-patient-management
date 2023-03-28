@@ -10,6 +10,7 @@ import {
   getServiceCountByAppointmentType,
   useAppointmentDate,
 } from '../helpers';
+import isEmpty from 'lodash-es/isEmpty';
 
 export const useClinicalMetrics = () => {
   const appointmentDate = useAppointmentDate();
@@ -63,9 +64,9 @@ export const useScheduledAppointment = (serviceUuid: string) => {
 
   const { data, error, isLoading, mutate } = useSWR<{
     data: Array<any>;
-  }>(serviceUuid ? url : null, openmrsFetch);
+  }>(url, openmrsFetch);
 
-  const totalScheduledAppointments = serviceUuid
+  const totalScheduledAppointments = !isEmpty(serviceUuid)
     ? data?.data?.filter((appt) => appt?.service?.uuid === serviceUuid)?.length ?? 0
     : data?.data?.length ?? 0;
 
