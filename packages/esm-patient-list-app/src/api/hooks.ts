@@ -82,9 +82,10 @@ export function useAllPatientListMembers(patientListId: string) {
  * This is intended for displaying all lists to which a given patient can still be added.
  */
 export function useAllPatientListsWhichDoNotIncludeGivenPatient(patientUuid: string) {
+  const config = useConfig() as ConfigSchema;
   return useSWR(['patientListWithoutPatient', patientUuid], async () => {
     const [allLists, listsIdsOfThisPatient] = await Promise.all([
-      getAllPatientLists(),
+      getAllPatientLists({}, config?.myListCohortTypeUUID, config?.systemListCohortTypeUUID),
       getPatientListIdsForPatient(patientUuid),
     ]);
 
