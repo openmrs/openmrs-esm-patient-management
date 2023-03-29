@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
 import {
   DataTable,
   DataTableSkeleton,
@@ -13,8 +13,6 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-  TableToolbar,
-  TableToolbarContent,
   TableExpandRow,
   TableExpandHeader,
   TableExpandedRow,
@@ -26,21 +24,15 @@ import {
   useConfig,
   usePagination,
   ExtensionSlot,
-  formatDatetime,
-  parseDate,
   interpolateUrl,
   navigate,
+  ErrorState,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { ActiveVisit, useActiveVisits, getOriginFromPathName } from './active-visits.resource';
 import styles from './active-visits.scss';
 
-interface PaginationData {
-  goTo: (page: number) => void;
-  results: Array<ActiveVisit>;
-  currentPage: number;
-}
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
   from: string;
@@ -63,9 +55,9 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const { activeVisits, isLoading, isValidating } = useActiveVisits();
+  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
+  const { activeVisits, isLoading, isValidating, isError } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
 
   const currentPathName = window.location.pathname;
@@ -107,50 +99,73 @@ const ActiveVisitsTable = () => {
     [t],
   );
 
-  const rowData = activeVisits.map((visit) => ({
-    ...visit,
-    visitStartTime: formatDatetime(parseDate(visit.visitStartTime)),
-  }));
-
   const searchResults = useMemo(() => {
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
-      return rowData.filter((activeVisitRow) =>
-        Object.keys(activeVisitRow).some((header) => {
+      return activeVisits.filter((activeVisitRow) =>
+        Object.entries(activeVisitRow).some(([header, value]) => {
           if (header === 'patientUuid') {
             return false;
           }
-          return `${activeVisitRow[header]}`.toLowerCase().includes(search);
+          return `${value}`.toLowerCase().includes(search);
         }),
       );
-    } else {
-      return rowData;
     }
-  }, [searchString, rowData]);
 
-  const {
-    goTo,
-    results: paginatedActiveVisits,
-    currentPage,
-  }: PaginationData = usePagination(searchResults, currentPageSize);
+    return activeVisits;
+  }, [searchString, activeVisits]);
 
-  const handleSearch = useCallback((e) => setSearchString(e.target.value), []);
+  const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
-  useEffect(() => {
-    if (currentPage !== 1) {
+  const handleSearch = useCallback(
+    (e) => {
       goTo(1);
-    }
-  }, [searchString]);
+      setSearchString(e.target.value);
+    },
+    [goTo, setSearchString],
+  );
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
-        <DataTableSkeleton role="progressbar" />
+      <div className={styles.activeVisitsContainer}>
+        <div className={styles.activeVisitsDetailHeaderContainer}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('activeVisits', 'Active Visits')}</h4>
+          </div>
+          <div className={styles.backgroundDataFetchingIndicator}>
+            <span>{isValidating ? <InlineLoading /> : null}</span>
+          </div>
+        </div>
+        <Search
+          labelText=""
+          placeholder={t('filterTable', 'Filter table')}
+          onChange={handleSearch}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          disabled
+        />
+        <DataTableSkeleton
+          rowCount={pageSize}
+          showHeader={false}
+          showToolbar={false}
+          zebra
+          columnCount={headerData?.length}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+        />
       </div>
     );
   }
 
-  if (activeVisits.length === 0) {
+  if (isError) {
+    return (
+      <div className={styles.activeVisitsContainer}>
+        <Layer>
+          <ErrorState error={isError} headerTitle={t('activeVisits', 'Active Visits')} />
+        </Layer>
+      </div>
+    );
+  }
+
+  if (!activeVisits.length) {
     return (
       <div className={styles.activeVisitsContainer}>
         <Layer>
@@ -168,116 +183,113 @@ const ActiveVisitsTable = () => {
     );
   }
 
-  if (activeVisits?.length) {
-    return (
-      <div className={styles.activeVisitsContainer}>
-        <div className={styles.activeVisitsDetailHeaderContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('activeVisits', 'Active Visits')}</h4>
-          </div>
-          <div className={styles.backgroundDataFetchingIndicator}>
-            <span>{isValidating ? <InlineLoading /> : null}</span>
-          </div>
+  return (
+    <div className={styles.activeVisitsContainer}>
+      <div className={styles.activeVisitsDetailHeaderContainer}>
+        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+          <h4>{t('activeVisits', 'Active Visits')}</h4>
         </div>
-        <DataTable
-          rows={paginatedActiveVisits}
-          headers={headerData}
-          size={isDesktop(layout) ? 'xs' : 'md'}
-          useZebraStyles={activeVisits?.length > 1 ? true : false}>
-          {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps }) => (
-            <TableContainer className={styles.tableContainer}>
-              <TableToolbar>
-                <TableToolbarContent>
-                  <Search
-                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                    labelText=""
-                    placeholder={t('filterTable', 'Filter table')}
-                    onChange={handleSearch}
-                  />
-                </TableToolbarContent>
-              </TableToolbar>
-              <Table className={styles.activeVisitsTable} {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader />
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => (
-                    <React.Fragment key={index}>
-                      <TableExpandRow
-                        {...getRowProps({ row })}
-                        data-testid={`activeVisitRow${paginatedActiveVisits?.[index]?.patientUuid}`}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id} data-testid={cell.id}>
-                            {cell.info.header === 'name' ? (
-                              <PatientNameLink
-                                from={fromPage}
-                                to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
-                                {cell.value}
-                              </PatientNameLink>
-                            ) : (
-                              cell.value
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableRow className={styles.expandedActiveVisitRow}>
-                          <th colSpan={headers.length + 2}>
-                            <ExtensionSlot
-                              className={styles.visitSummaryContainer}
-                              extensionSlotName="visit-summary-slot"
-                              state={{
-                                visitUuid: paginatedActiveVisits[index]?.visitUuid,
-                                patientUuid: paginatedActiveVisits[index]?.patientUuid,
-                              }}
-                            />
-                          </th>
-                        </TableRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-              {rows.length === 0 && (
-                <p
-                  style={{
-                    height: isDesktop(layout) ? '2rem' : '3rem',
-                    margin: '1rem 1.5rem',
-                  }}
-                  className={`${styles.emptyRow} ${styles.bodyLong01}`}>
-                  {t('noVisitsFound', 'No matching visits found')}
-                </p>
-              )}
-              <Pagination
-                forwardText="Next page"
-                backwardText="Previous page"
-                page={currentPage}
-                pageSize={currentPageSize}
-                pageSizes={pageSizes}
-                totalItems={searchResults.length}
-                className={styles.pagination}
-                onChange={({ pageSize, page }) => {
-                  if (pageSize !== currentPageSize) {
-                    setPageSize(pageSize);
-                  }
-                  if (page !== currentPage) {
-                    goTo(page);
-                  }
-                }}
-              />
-            </TableContainer>
-          )}
-        </DataTable>
+        <div className={styles.backgroundDataFetchingIndicator}>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+        </div>
       </div>
-    );
-  }
+      <Search
+        labelText=""
+        placeholder={t('filterTable', 'Filter table')}
+        onChange={handleSearch}
+        size={isDesktop(layout) ? 'sm' : 'lg'}
+      />
+      <DataTable
+        rows={results}
+        headers={headerData}
+        size={isDesktop(layout) ? 'sm' : 'lg'}
+        useZebraStyles={activeVisits?.length > 1 ? true : false}>
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getExpandHeaderProps }) => (
+          <TableContainer className={styles.tableContainer}>
+            <Table className={styles.activeVisitsTable} {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, index) => (
+                  <React.Fragment key={index}>
+                    <TableExpandRow
+                      {...getRowProps({ row })}
+                      data-testid={`activeVisitRow${activeVisits?.[index]?.patientUuid}`}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id} data-testid={cell.id}>
+                          {cell.info.header === 'name' ? (
+                            <PatientNameLink
+                              from={fromPage}
+                              to={`\${openmrsSpaBase}/patient/${activeVisits?.[index]?.patientUuid}/chart/`}>
+                              {cell.value}
+                            </PatientNameLink>
+                          ) : (
+                            cell.value
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableExpandRow>
+                    {row.isExpanded ? (
+                      <TableRow className={styles.expandedActiveVisitRow}>
+                        <th colSpan={headers.length + 2}>
+                          <ExtensionSlot
+                            className={styles.visitSummaryContainer}
+                            extensionSlotName="visit-summary-slot"
+                            state={{
+                              visitUuid: activeVisits[index]?.visitUuid,
+                              patientUuid: activeVisits[index]?.patientUuid,
+                            }}
+                          />
+                        </th>
+                      </TableRow>
+                    ) : (
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {searchResults.length === 0 && (
+        <div className={styles.filterEmptyState}>
+          <Layer level={0}>
+            <Tile className={styles.filterEmptyStateTile}>
+              <p className={styles.filterEmptyStateContent}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+              <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+            </Tile>
+          </Layer>
+        </div>
+      )}
+      {paginated && (
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={pageSizes}
+          totalItems={searchResults?.length}
+          className={styles.pagination}
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+            if (newPage !== currentPage) {
+              goTo(newPage);
+            }
+          }}
+        />
+      )}
+    </div>
+  );
 };
 
 export default ActiveVisitsTable;
