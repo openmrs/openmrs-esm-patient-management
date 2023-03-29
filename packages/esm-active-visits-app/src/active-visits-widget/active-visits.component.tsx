@@ -33,11 +33,6 @@ import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { ActiveVisit, useActiveVisits, getOriginFromPathName } from './active-visits.resource';
 import styles from './active-visits.scss';
 
-interface PaginationData {
-  goTo: (page: number) => void;
-  results: Array<ActiveVisit>;
-  currentPage: number;
-}
 interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   to: string;
   from: string;
@@ -62,7 +57,7 @@ const ActiveVisitsTable = () => {
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const { activeVisits, isLoading, totalResults, isValidating, isError } = useActiveVisits();
+  const { activeVisits, isLoading, isValidating, isError } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
 
   const currentPathName = window.location.pathname;
@@ -120,7 +115,7 @@ const ActiveVisitsTable = () => {
     return activeVisits;
   }, [searchString, activeVisits]);
 
-  const { paginated, goTo, results, totalPages, currentPage } = usePagination(searchResults, pageSize);
+  const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
   const handleSearch = useCallback(
     (e) => {
@@ -199,7 +194,6 @@ const ActiveVisitsTable = () => {
         </div>
       </div>
       <Search
-        // tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
         labelText=""
         placeholder={t('filterTable', 'Filter table')}
         onChange={handleSearch}
@@ -210,7 +204,7 @@ const ActiveVisitsTable = () => {
         headers={headerData}
         size={isDesktop(layout) ? 'sm' : 'lg'}
         useZebraStyles={activeVisits?.length > 1 ? true : false}>
-        {({ rows, headers, getHeaderProps, getTableProps, getBatchActionProps, getRowProps, getExpandHeaderProps }) => (
+        {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getExpandHeaderProps }) => (
           <TableContainer className={styles.tableContainer}>
             <Table className={styles.activeVisitsTable} {...getTableProps()}>
               <TableHead>
