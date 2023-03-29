@@ -3,17 +3,10 @@ import { spaBasePath } from './constants';
 
 export const configSchema = {
   concepts: {
-    priorityConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
-    },
-    serviceConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-    },
-    statusConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
+    visitQueueNumberAttributeUuid: {
+      _type: Type.String,
+      _description: 'The UUID of the visit attribute that contains the visit queue number.',
+      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
     },
   },
   appointmentTypes: {
@@ -63,12 +56,16 @@ export const configSchema = {
     _description: 'Array of form controls to be hidden on form load',
     _default: [],
   },
+  showServiceQueueFields: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display service queue fields`',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
   concepts: {
-    priorityConceptSetUuid: string;
-    serviceConceptSetUuid: string;
+    visitQueueNumberAttributeUuid: string;
   };
   appointmentTypes: Array<string>;
   daysOfTheWeek: Array<string>;
@@ -78,4 +75,5 @@ export interface ConfigObject {
   fullViewPrivilege: string;
   appointmentComments: Array<string>;
   hiddenFormFields: Array<string>;
+  showServiceQueueFields: boolean;
 }

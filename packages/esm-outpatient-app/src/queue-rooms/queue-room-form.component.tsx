@@ -52,7 +52,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
       setMissingRoomName(false);
       setMissingQueueRoomService(false);
 
-      saveQueueRoom(queueRoomName, queueRoomName, queueRoomService, new AbortController()).then(
+      saveQueueRoom(queueRoomName, queueRoomName, queueRoomService).then(
         ({ status }) => {
           if (status === 201) {
             showToast({

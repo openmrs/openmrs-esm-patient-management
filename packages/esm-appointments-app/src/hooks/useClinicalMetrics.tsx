@@ -1,21 +1,22 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
+import uniqBy from 'lodash-es/uniqBy';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { Appointment, AppointmentSummary } from '../types';
+import { omrsDateFormat } from '../constants';
 import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
   useAppointmentDate,
 } from '../helpers';
-import { omrsDateFormat } from '../constants';
-import uniqBy from 'lodash-es/uniqBy';
+import isEmpty from 'lodash-es/isEmpty';
 
 export const useClinicalMetrics = () => {
   const appointmentDate = useAppointmentDate();
   const endDate = dayjs(new Date(appointmentDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
   const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${appointmentDate}&endDate=${endDate}`;
-  const { data, isLoading, error } = useSWR<{
+  const { data, error, isLoading, mutate } = useSWR<{
     data: Array<AppointmentSummary>;
   }>(url, openmrsFetch);
 
@@ -57,15 +58,17 @@ export function useAllAppointmentsByDate() {
   };
 }
 
-export const useScheduledAppointment = () => {
+export const useScheduledAppointment = (serviceUuid: string) => {
   const startDate = useAppointmentDate();
   const url = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
 
-  const { data, error, isLoading } = useSWR<{
-    data: Array<AppointmentSummary>;
+  const { data, error, isLoading, mutate } = useSWR<{
+    data: Array<any>;
   }>(url, openmrsFetch);
 
-  const totalScheduledAppointments = data?.data.length ?? 0;
+  const totalScheduledAppointments = !isEmpty(serviceUuid)
+    ? data?.data?.filter((appt) => appt?.service?.uuid === serviceUuid)?.length ?? 0
+    : data?.data?.length ?? 0;
 
   return {
     isLoading,

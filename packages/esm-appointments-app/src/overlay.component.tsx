@@ -8,6 +8,7 @@ import styles from './overlay.scss';
 const Overlay: React.FC = () => {
   const { header, component, isOverlayOpen } = useOverlay();
   const layout = useLayoutType();
+
   return (
     <>
       {isOverlayOpen && (

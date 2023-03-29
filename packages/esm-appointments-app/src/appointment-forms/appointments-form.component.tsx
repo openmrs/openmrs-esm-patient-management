@@ -96,7 +96,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
 
     const abortController = new AbortController();
     setIsSubmitting(true);
-    saveAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload).then(
       ({ status }) => {
         if (status === 200) {
           showToast({
@@ -109,6 +109,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
           mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=CheckedIn`);
           mutate(`/ws/rest/v1/appointment/all?forDate=${appointmentStartDate}`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Scheduled&forDate=${appointmentStartDate}`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Pending&forDate=${appointmentStartDate}`);
           closeOverlay();
         }
       },
@@ -389,7 +391,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </RadioButtonGroup>
       </div>
 
-      <Layer>
+      <Layer style={{ margin: '0.25rem 0' }}>
         <TextArea
           cols={50}
           id="comment"

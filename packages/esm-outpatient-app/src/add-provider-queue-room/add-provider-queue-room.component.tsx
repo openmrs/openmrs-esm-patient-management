@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   ModalBody,
@@ -13,8 +14,6 @@ import {
 } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { useServices, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
-import { useTranslation } from 'react-i18next';
-import styles from './add-provider-queue-room.scss';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -34,6 +33,7 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
+import styles from './add-provider-queue-room.scss';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;
@@ -51,12 +51,13 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
   const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
   const [queueRoomUuid, setQueueRoomUuid] = useState('');
   const [queueProviderMapUuid, setQueueProviderMapUuid] = useState('');
+
   useEffect(() => {
     if (providerRoom?.length > 0) {
       setQueueRoomUuid(providerRoom?.[0].queueRoom?.uuid);
       setQueueProviderMapUuid(providerRoom?.[0].uuid);
     }
-  });
+  }, [providerRoom]);
 
   const { mutate } = useProvidersQueueRoom(providerUuid);
   const { services } = useServices(currentLocationUuid);
@@ -91,7 +92,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
     setIsMissingQueueRoom(false);
 
     if (providerRoom?.length > 0) {
-      updateProviderToQueueRoom(queueProviderMapUuid, queueRoomUuid, providerUuid, new AbortController()).then(
+      updateProviderToQueueRoom(queueProviderMapUuid, queueRoomUuid, providerUuid).then(
         ({ status }) => {
           if (status === 200) {
             showToast({
@@ -117,7 +118,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
         },
       );
     } else {
-      addProviderToQueueRoom(queueRoomUuid, providerUuid, new AbortController()).then(
+      addProviderToQueueRoom(queueRoomUuid, providerUuid).then(
         ({ status }) => {
           if (status === 201) {
             showToast({
@@ -142,7 +143,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
         },
       );
     }
-  }, [providerUuid, queueRoomUuid, t, closeModal, mutate]);
+  }, [queueRoomUuid, providerRoom?.length, queueProviderMapUuid, providerUuid, t, closeModal, mutate]);
 
   return (
     <div>

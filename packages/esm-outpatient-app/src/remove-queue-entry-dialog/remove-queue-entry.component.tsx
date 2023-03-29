@@ -26,7 +26,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
   const { mutate } = useVisitQueueEntries('', '');
   const abortController = new AbortController();
 
-  const { data: appointments } = useCheckedInAppointments(queueEntry.patientUuid, startOfDay, abortController);
+  const { data: appointments } = useCheckedInAppointments(queueEntry.patientUuid, startOfDay);
 
   const removeQueueEntry = () => {
     const endCurrentVisitPayload = {
@@ -40,7 +40,6 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
 
     voidQueueEntry(
       queueEntry.queueUuid,
-      abortController,
       queueEntry.queueEntryUuid,
       endedAt,
       endCurrentVisitPayload,
