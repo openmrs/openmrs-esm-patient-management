@@ -26,13 +26,13 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
 }) => {
   const { t } = useTranslation();
   const appointmentDate = useAppointmentDate();
-  const { appointments, isLoading } = useAppointments();
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
-  const { appointmentList } = useAppointmentList(scheduleType);
+  const { appointmentList, isLoading } = useAppointmentList(scheduleType);
   const isDateInPast = !dayjs(appointmentDate).isBefore(dayjs(), 'date');
+
   const filteredAppointments = appointmentServiceType
-    ? appointments.filter(({ serviceUuid }) => serviceUuid === appointmentServiceType)
-    : appointments;
+    ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
+    : appointmentList;
   const rowData = appointmentList.map((appointment, index) => {
     return {
       id: `${index}`,
