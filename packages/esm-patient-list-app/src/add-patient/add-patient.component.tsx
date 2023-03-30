@@ -122,6 +122,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
                     key={patientList.id}
                     onChange={(e) => handleSelectionChanged(patientList.id, e.target.checked)}
                     checked={selected.find((id) => id === patientList.id)}
+                    disabled={patientList.disabled}
                     labelText={patientList.displayName}
                     id={patientList.id}
                   />
@@ -197,6 +198,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 interface AddablePatientListViewModel {
   id: string;
   displayName: string;
+  disabled?: boolean;
   addPatient(): Promise<void>;
 }
 
@@ -229,19 +231,18 @@ async function findRealPatientListsWithoutPatient(
     getPatientListIdsForPatient(patientUuid),
   ]);
 
-  return allLists
-    .filter((list) => !listsIdsOfThisPatient.includes(list.id))
-    .map((list) => ({
-      id: list.id,
-      displayName: list.display,
-      async addPatient() {
-        await addPatientToList({
-          cohort: list.id,
-          patient: patientUuid,
-          startDate: toOmrsIsoString(new Date()),
-        });
-      },
-    }));
+  return allLists.map((list) => ({
+    id: list.id,
+    displayName: list.display,
+    disabled: listsIdsOfThisPatient.includes(list.id),
+    async addPatient() {
+      await addPatientToList({
+        cohort: list.id,
+        patient: patientUuid,
+        startDate: toOmrsIsoString(new Date()),
+      });
+    },
+  }));
 }
 
 async function findFakePatientListsWithoutPatient(
