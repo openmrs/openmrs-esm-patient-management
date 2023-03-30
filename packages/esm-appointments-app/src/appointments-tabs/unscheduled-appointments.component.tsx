@@ -21,6 +21,7 @@ import { Download } from '@carbon/react/icons';
 import { ConfigurableLink, usePagination } from '@openmrs/esm-framework';
 import { EmptyState } from '../empty-state/empty-state.component';
 import { useUnscheduledAppointments } from '../hooks/useUnscheduledAppointments';
+import { DownloadAppointmentAsExcel, DownloadUnscheduleAppointments } from '../helpers/excel';
 
 const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
@@ -86,7 +87,11 @@ const UnscheduledAppointments: React.FC = () => {
             <TableToolbar>
               <TableToolbarContent>
                 <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
-                <Button size="lg" kind="ghost" renderIcon={Download}>
+                <Button
+                  size="lg"
+                  kind="ghost"
+                  renderIcon={Download}
+                  onClick={() => DownloadUnscheduleAppointments(unscheduledAppointments)}>
                   {t('download', 'Download')}
                 </Button>
               </TableToolbarContent>

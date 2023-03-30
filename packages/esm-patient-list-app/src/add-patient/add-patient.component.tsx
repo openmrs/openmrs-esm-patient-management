@@ -9,11 +9,13 @@ import {
   toOmrsIsoString,
   usePagination,
   navigate,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { Button, Checkbox, Pagination, Search, SkeletonText, CheckboxSkeleton } from '@carbon/react';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
 import { TFunction } from 'i18next';
 import styles from './add-patient.scss';
+import { ConfigSchema } from '../config-schema';
 
 interface AddPatientProps {
   closeModal: () => void;
@@ -200,13 +202,14 @@ interface AddablePatientListViewModel {
 
 export function useAddablePatientLists(patientUuid: string) {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigSchema;
   return useSWR(['addablePatientLists', patientUuid], async () => {
     // Using Promise.allSettled instead of Promise.all here because some distros might not have the
     // cohort module installed, leading to the real patient list call failing.
     // In that case we still want to show fake lists and *not* error out here.
     const [fakeLists, realLists] = await Promise.allSettled([
       findFakePatientListsWithoutPatient(patientUuid, t),
-      findRealPatientListsWithoutPatient(patientUuid),
+      findRealPatientListsWithoutPatient(patientUuid, config.myListCohortTypeUUID, config.systemListCohortTypeUUID),
     ]);
 
     return [
@@ -216,9 +219,13 @@ export function useAddablePatientLists(patientUuid: string) {
   });
 }
 
-async function findRealPatientListsWithoutPatient(patientUuid: string): Promise<Array<AddablePatientListViewModel>> {
+async function findRealPatientListsWithoutPatient(
+  patientUuid: string,
+  myListCohortUUID,
+  systemListCohortType,
+): Promise<Array<AddablePatientListViewModel>> {
   const [allLists, listsIdsOfThisPatient] = await Promise.all([
-    getAllPatientLists(),
+    getAllPatientLists({}, myListCohortUUID, systemListCohortType),
     getPatientListIdsForPatient(patientUuid),
   ]);
 
