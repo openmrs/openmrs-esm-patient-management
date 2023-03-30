@@ -37,6 +37,9 @@ const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',
     serviceTypeUuid: appointment.service.uuid,
+    gender: appointment.patient?.gender,
+    phoneNumber: appointment.patient?.phoneNumber,
+    age: appointment.patient?.age,
   }));
   return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
