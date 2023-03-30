@@ -17,7 +17,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Copy test environment variables
-        run: cp example.env .env
+        run: |
+          cp example.env .env
+          sed -i 's/8080/8180/g' .env
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -39,7 +41,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run dev server
-        run: yarn start --sources 'packages/esm-*-app/'&
+        run: yarn start --sources 'packages/esm-*-app/' --port 8180 &
 
       - name: Run E2E tests
         run: yarn playwright test
