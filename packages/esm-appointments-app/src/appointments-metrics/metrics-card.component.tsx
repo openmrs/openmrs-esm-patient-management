@@ -8,6 +8,7 @@ import { Tile, Layer } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import styles from './metrics-card.scss';
+import { spaBasePath, spaRoot } from '../constants';
 
 interface MetricsCardProps {
   label: string;
@@ -47,9 +48,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           </div>
           {view && (
             <div className={styles.link}>
-              <ConfigurableLink
-                className={styles.link}
-                to={`\${openmrsSpaBase}/home/appointments/${metricsLink[view]}`}>
+              <ConfigurableLink className={styles.link} to={`/openmrs/spa/${metricsLink[view]}`}>
                 <span style={{ fontSize: '0.825rem', marginRight: '0.325rem' }}>{t('view', 'View')}</span>{' '}
                 <ArrowRight size={16} className={styles.viewListBtn} />
               </ConfigurableLink>

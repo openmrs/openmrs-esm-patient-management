@@ -25,7 +25,7 @@ import {
   OverflowMenu,
   OverflowMenuItem,
 } from '@carbon/react';
-import { ExtensionSlot, ConfigurableLink, formatDatetime, usePagination } from '@openmrs/esm-framework';
+import { ExtensionSlot, ConfigurableLink, formatDatetime, usePagination, formatDate } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
 import { Download, Hospital } from '@carbon/react/icons';
 import AppointmentDetails from '../appointment-details/appointment-details.component';
@@ -37,6 +37,7 @@ import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
 import AppointmentButton from './appointments-button.component';
 import { useServiceQueues } from '../hooks/useServiceQueus';
+import { DownloadAppointmentAsExcel } from '../helpers/excel';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -57,7 +58,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
   visits,
 }) => {
   const { t } = useTranslation();
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const { results, goTo, currentPage } = usePagination(appointments, pageSize);
 
   const launchCreateAppointmentForm = (patientUuid) => {
@@ -186,7 +187,16 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
                   tabIndex={0}
                   onChange={onInputChange}
                 />
-                <Button size="lg" kind="ghost" renderIcon={Download}>
+                <Button
+                  size="lg"
+                  kind="ghost"
+                  renderIcon={Download}
+                  onClick={() =>
+                    DownloadAppointmentAsExcel(
+                      appointments,
+                      `${tableHeading} Appointments ${formatDate(new Date(appointments[0]?.dateTime), { year: true })}`,
+                    )
+                  }>
                   {t('download', 'Download')}
                 </Button>
               </TableToolbarContent>
