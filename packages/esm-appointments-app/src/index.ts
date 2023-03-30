@@ -1,7 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
-import { dashboardMeta } from './dashboard.meta';
+import { dashboardMeta, appointmentCalendarDashboardMeta } from './dashboard.meta';
 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
@@ -31,14 +31,20 @@ function setupOpenMRS() {
       path: appointmentsBasePath,
       parent: `${window.spaBase}/home`,
     },
-    {
-      title: 'Calendar',
-      path: `${appointmentsBasePath}/calendar`,
-      parent: appointmentsBasePath,
-    },
   ]);
 
   return {
+    pages: [
+      {
+        load: getAsyncLifecycle(
+          () => import('./appointments-calendar/appointments-calendar-list-view.component'),
+          options,
+        ),
+        route: /^calendar/,
+        online: true,
+        offline: true,
+      },
+    ],
     extensions: [
       {
         name: 'home-appointments',
@@ -51,6 +57,13 @@ function setupOpenMRS() {
         slot: 'homepage-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
+      },
+      {
+        name: 'appointments-calendar-dashboard-link',
+        slot: 'calendar-dashboard-slot',
+        load: getSyncLifecycle(createDashboardLink(appointmentCalendarDashboardMeta), options),
         online: true,
         offline: true,
       },
