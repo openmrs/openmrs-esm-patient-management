@@ -4,6 +4,7 @@ import { MappedAppointment } from '../types/index';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../hooks/usePatientAppointmentHistory';
 import { formatDate } from '@openmrs/esm-framework';
+import { getGender } from '../helpers';
 
 interface AppointmentDetailsProps {
   appointment: MappedAppointment;
@@ -21,11 +22,26 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
       <div className={styles.patientInfoGrid}>
         <div>
           <p className={styles.gridTitle}>{t('patientDetails', 'Patient details')}</p>
-          <p className={styles.label}>{appointment.name}</p>
-          <p className={styles.label}>{appointment.age}</p>
-          <p className={styles.label}>{appointment.gender}</p>
-          <p className={styles.label}>{appointment.dob}</p>
-          <p className={styles.label}>{appointment.phoneNumber}</p>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('patientName', 'Patient name')} : </p>
+            <p className={styles.label}>{appointment.name}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('age', 'Age')} : </p>
+            <p className={styles.label}>{appointment.age}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('gender', 'Gender')} : </p>
+            <p className={styles.label}>{getGender(appointment.gender, t)}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('dob', 'Dob')} : </p>
+            <p className={styles.label}>{appointment.dob}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('phoneNumber', 'Phone number')} :</p>
+            <p className={styles.label}>{appointment.phoneNumber}</p>
+          </div>
         </div>
         <div>
           <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
