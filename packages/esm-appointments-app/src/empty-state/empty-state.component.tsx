@@ -24,8 +24,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
-          <Trans i18nKey="emptyStateText" values={{ displayText: displayText.toLowerCase() }}>
-            There are no {displayText.toLowerCase()} to display
+          <Trans i18nKey="emptyStateText" values={{ displayText: displayText }}>
+            There are no {displayText} to display
           </Trans>
         </p>
         <p className={styles.action}>

@@ -41,8 +41,6 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
   const [cohortDetails, setCohortDetails] = useState<NewCohortData>({
     name: '',
     description: '',
-    cohortType: '',
-    location: '',
   });
 
   const layout = useLayoutType();
@@ -53,15 +51,17 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     setCohortDetails({
       name: patientListDetails?.name || '',
       description: patientListDetails?.description || '',
-      cohortType: patientListDetails?.cohortType?.uuid || '',
-      location: user?.sessionLocation?.uuid,
     });
   }, [user, patientListDetails]);
 
   const createPL = useCallback(() => {
     // set loading
     if (!edit) {
-      createPatientList(cohortDetails)
+      createPatientList({
+        ...cohortDetails,
+        location: session?.sessionLocation?.uuid,
+        cohortType: config?.myListCohortTypeUUID,
+      })
         .then(() =>
           showToast({
             title: t('successCreatedPatientList', 'Created patient list'),

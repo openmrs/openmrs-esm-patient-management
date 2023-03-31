@@ -1,8 +1,14 @@
-import { Home } from '@carbon/react/icons';
+import { Calendar } from '@carbon/react/icons';
 
-export const clinicalAppointmentsDashboardMeta = {
-  name: '',
+export const dashboardMeta = {
+  name: 'appointments',
   slot: 'clinical-appointments-dashboard-slot',
-  title: 'Clinical Appointments',
-  renderIcon: Home,
+  title: 'Appointments',
+};
+
+export const appointmentCalendarDashboardMeta = {
+  name: 'calendar',
+  slot: 'clinical-appointments-dashboard-slot',
+  title: 'Appointments Calendar',
+  renderIcon: Calendar,
 };

@@ -23,7 +23,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
   const handleSubmit = async () => {
     const abortController = new AbortController();
     setIsSubmitting(true);
-    const { status } = await updateAppointmentStatus('CheckedIn', appointmentUuid, abortController);
+    const { status } = await updateAppointmentStatus('CheckedIn', appointmentUuid);
     if (status === 200) {
       closeCheckInModal();
       showActionableNotification({

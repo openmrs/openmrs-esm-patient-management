@@ -49,6 +49,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       selectedSource: null,
       autoGeneration: false,
     } as PatientIdentifierValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValue, setHideInputField]);
 
   const handleEdit = () => {
@@ -60,10 +61,10 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
   };
 
   const handleDelete = () => {
-    /* 
-    If there is an initialValue to the identifier, a confirmation modal seeking 
-    confirmation to delete the identifier should be shown, else in the other case, 
-    we can directly delete the identifier. 
+    /*
+    If there is an initialValue to the identifier, a confirmation modal seeking
+    confirmation to delete the identifier should be shown, else in the other case,
+    we can directly delete the identifier.
     */
 
     if (initialValue) {
@@ -111,27 +112,31 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
       )}
       <div>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
-          <Button
-            kind="ghost"
-            onClick={handleEdit}
-            iconDescription={t('editIdentifierTooltip', 'Edit')}
-            disabled={disabled}
-            hasIconOnly>
-            <Edit size={16} />
-          </Button>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleEdit}
+              iconDescription={t('editIdentifierTooltip', 'Edit')}
+              disabled={disabled}
+              hasIconOnly>
+              <Edit size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {initialValue && initialValue !== identifierValue && (
-          <Button
-            kind="ghost"
-            onClick={handleReset}
-            iconDescription={t('resetIdentifierTooltip', 'Reset')}
-            disabled={disabled}
-            hasIconOnly>
-            <Reset size={16} />
-          </Button>
+          <UserHasAccess privilege="Edit Patient Identifiers">
+            <Button
+              kind="ghost"
+              onClick={handleReset}
+              iconDescription={t('resetIdentifierTooltip', 'Reset')}
+              disabled={disabled}
+              hasIconOnly>
+              <Reset size={16} />
+            </Button>
+          </UserHasAccess>
         )}
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
-          <UserHasAccess privilege="coreapps.systemAdministration">
+          <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
               kind="danger--ghost"
               onClick={handleDelete}

@@ -17,13 +17,9 @@ export function useServiceConcepts() {
   };
 }
 
-export function saveQueue(
-  queueName: string,
-  queueConcept: string,
-  queueDescription: string,
-  queueLocation: string,
-  abortController: AbortController,
-) {
+export function saveQueue(queueName: string, queueConcept: string, queueDescription: string, queueLocation: string) {
+  const abortController = new AbortController();
+
   return openmrsFetch(`/ws/rest/v1/queue`, {
     method: 'POST',
     headers: {

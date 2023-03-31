@@ -13,7 +13,6 @@ export interface PatientList {
   description: string;
   type: string;
   size: number;
-  isStarred: boolean;
   options?: Array<PatientListOption>;
 }
 
@@ -25,6 +24,7 @@ export interface PatientListFilter {
   isStarred?: boolean;
   name?: string;
   type?: PatientListType;
+  label?: string;
 }
 
 export interface PatientListOption {
@@ -79,12 +79,17 @@ export interface OpenmrsCohortMember {
 export interface CohortResponse<T> {
   results: Array<T>;
   error: any;
+  totalCount: number;
 }
 
 export interface NewCohortData {
   name: string;
   description: string;
-  location: string;
+}
+
+export interface NewCohortDataPayload {
+  name: string;
+  description: string;
   cohortType: string;
   information?: string[];
 }

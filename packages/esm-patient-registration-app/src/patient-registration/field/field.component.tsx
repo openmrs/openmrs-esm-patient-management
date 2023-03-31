@@ -1,5 +1,4 @@
 import React from 'react';
-import { PhoneEmailField } from './email/email-field.component';
 import { NameField } from './name/name-field.component';
 import { GenderField } from './gender/gender-field.component';
 import { Identifiers } from './id/id-field.component';
@@ -39,8 +38,6 @@ export function Field({ name }: FieldProps) {
       return <AddressHierarchy />;
     case 'id':
       return <Identifiers />;
-    case 'phone & email':
-      return <PhoneEmailField />;
     default:
       return <CustomField name={name} />;
   }

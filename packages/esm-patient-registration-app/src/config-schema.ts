@@ -12,6 +12,7 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder: string;
+  showHeading: boolean;
   validation: {
     required: boolean;
     matches?: string;
@@ -77,7 +78,7 @@ export const builtInSections: Array<SectionDefinition> = [
     name: 'Basic Info',
     fields: ['name', 'gender', 'dob', 'id'],
   },
-  { id: 'contact', name: 'Contact Details', fields: ['address', 'phone & email'] },
+  { id: 'contact', name: 'Contact Details', fields: ['address', 'phone'] },
   { id: 'death', name: 'Death Info', fields: [] },
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
@@ -136,6 +137,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.UUID,
         _description: "Person attribute type UUID that this field's data should be saved to.",
       },
+      showHeading: {
+        _type: Type.Boolean,
+        _description: 'Whether to show a heading above the person attribute field.',
+        _default: false,
+      },
       label: {
         _type: Type.String,
         _default: null,
@@ -177,7 +183,17 @@ export const esmPatientRegistrationSchema = {
         _description: 'For coded questions only. Provide ability to add custom concept answers.',
       },
     },
-    _default: [],
+    _default: [
+      {
+        id: 'phone',
+        type: 'person attribute',
+        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        showHeading: false,
+        validation: {
+          matches: '',
+        },
+      },
+    ],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
