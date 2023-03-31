@@ -5,7 +5,7 @@ import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment }
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import { useAppointmentDate } from '../helpers';
-import useAppointmentList from '../hooks/useAppointmentList';
+import { useAppointmentList } from '../hooks/useAppointmentList';
 import styles from './appointments-metrics.scss';
 
 const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid }) => {
