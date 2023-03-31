@@ -1,10 +1,12 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
 
 .titleContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-left: 1rem;
 
   & > p {
     @include type.type-style('heading-02');
@@ -20,4 +22,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0;
+  @include type.type-style('body-compact-01');
+
+  button {
+    display: flex;
+    padding: 0;
+
+    svg {
+      order: 1;
+      margin-right: 0.5rem;
+      margin-left: 0rem !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
 }
