@@ -140,7 +140,7 @@ export const esmPatientRegistrationSchema = {
       showHeading: {
         _type: Type.Boolean,
         _description: 'Whether to show a heading above the person attribute field.',
-        _default: true,
+        _default: false,
       },
       label: {
         _type: Type.String,
@@ -188,7 +188,7 @@ export const esmPatientRegistrationSchema = {
         id: 'phone',
         type: 'person attribute',
         uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-        showHeading: true,
+        showHeading: false,
         validation: {
           matches: '',
         },
