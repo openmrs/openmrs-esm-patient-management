@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-outpatient-app",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "Outpatient front-end module for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-outpatient-app.js",
   "main": "src/index.ts",
