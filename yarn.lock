@@ -3686,6 +3686,7 @@ __metadata:
     react-dom: ^18.1.0
     react-i18next: ^11.0.0
     react-router-dom: ^6.3.0
+    react-to-print: ^2.14.12
     sass: ^1.29.0
     sass-loader: ^10.1.0
     swr: ^1.0.1
@@ -15765,7 +15766,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.7.2":
+"prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -16071,6 +16072,18 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: c229d65d9b0df88dd4e8c57bd59793e371f2c84b4cb200b77ead9f601c8fd7758f72acfffc9a2fc5cb31877af3a0e08ae24aeb75ab2b20681f3b1d33ca671552
+  languageName: node
+  linkType: hard
+
+"react-to-print@npm:^2.14.12":
+  version: 2.14.12
+  resolution: "react-to-print@npm:2.14.12"
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: d88e93121fc95ae95ca3ad9a8b2bc1b305d6270d1330f0222d4843527a7925182d6f1e96b7a1df0403d2d6820d116c85f4a7c122956fe2dbc81dbbb09970efe2
   languageName: node
   linkType: hard
 

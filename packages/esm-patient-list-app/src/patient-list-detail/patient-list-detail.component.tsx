@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,9 @@ import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-ed
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import styles from './patient-list-detail.scss';
+import ReactToPrint from 'react-to-print';
+import { Button, Printer } from '@carbon/react';
+import { PrintComponent } from '../print-component/print-component';
 
 function getPatientListUuidFromUrl(): string {
   const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
@@ -37,6 +40,36 @@ const PatientListDetailComponent = () => {
     currentPageSize,
   );
   const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
+  const componentRef = useRef(null);
+
+  function customisedContent() {
+    return (
+      <>
+        <PatientListTable
+          patients={patients}
+          columns={headers}
+          isLoading={!patientListMembers && !patients}
+          isFetching={!patientListMembers}
+          search={{
+            onSearch: handleSearch,
+            placeHolder: 'Search',
+          }}
+          pagination={{
+            usePagination: patientListDetails?.size > currentPageSize,
+            currentPage,
+            onChange: ({ page, pageSize }) => {
+              setPageCount(page);
+              setCurrentPageSize(pageSize);
+            },
+            pageSize: 10,
+            totalItems: patientListDetails?.size,
+            pagesUnknown: true,
+            lastPage: patients?.length < currentPageSize || currentPage * currentPageSize === patientListDetails?.size,
+          }}
+        />
+      </>
+    );
+  }
 
   const patients: PatientListMemberRow[] = useMemo(
     () =>
@@ -122,6 +155,24 @@ const PatientListDetailComponent = () => {
               </>
             )}
           </div>
+
+          <ReactToPrint
+            trigger={() => {
+              return (
+                <Button kind="ghost" size="sm" renderIcon={Printer}>
+                  {t('print', 'Print')}
+                </Button>
+              );
+            }}
+            content={() => componentRef.current}
+          />
+          <PrintComponent
+            optionalData={'INCLUDE DATA OF YOU CHOICE'}
+            title={patientListDetails?.name}
+            message={customisedContent()}
+            ref={(el) => (componentRef.current = el)}
+          />
+
           <CustomOverflowMenuComponent
             menuTitle={
               <>
