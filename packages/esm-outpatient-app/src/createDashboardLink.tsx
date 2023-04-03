@@ -13,7 +13,7 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
   const spaBasePath = `${window.spaBase}/home`;
 
   const navLink = useMemo(() => {
-    const pathArray = location.pathname.split('/');
+    const pathArray = location.pathname.split('/home');
     const lastElement = pathArray[pathArray.length - 1];
     return decodeURIComponent(lastElement);
   }, [location.pathname]);
@@ -21,7 +21,7 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
   return (
     <ConfigurableLink
       to={`${spaBasePath}/${name}`}
-      className={`cds--side-nav__link ${name === navLink && 'active-left-nav-link'}`}>
+      className={`cds--side-nav__link ${navLink.match(name) && 'active-left-nav-link'}`}>
       {title}
     </ConfigurableLink>
   );
