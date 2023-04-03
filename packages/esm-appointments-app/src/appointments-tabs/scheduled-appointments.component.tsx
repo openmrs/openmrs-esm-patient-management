@@ -57,6 +57,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('scheduled', 'Scheduled')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'CameEarly' && (
@@ -65,6 +66,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('cameEarly', 'Came Early')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Honoured' && (
@@ -73,6 +75,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('honored', 'Honored')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Rescheduled' && (
@@ -81,6 +84,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('rescheduled', 'Rescheduled')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Pending' && (
@@ -89,6 +93,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
       </div>

@@ -75,9 +75,9 @@ function AddMenu({ visitDetails }: { visitDetails: ActiveVisit }) {
     <Button
       kind="ghost"
       onClick={launchAddVisitToQueueModal}
-      iconDescription={t('addisitToQueueTooltip', 'Add')}
+      iconDescription={t('addisitToQueueTooltip', 'Add to queue')}
       renderIcon={(props) => <Add size={16} {...props} />}>
-      {t('add', 'Add')}
+      {t('addToQueue', 'Add to queue')}
     </Button>
   );
 }
