@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
 import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from '@carbon/react';
+import { OverflowMenuItem, Button, Printer } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import PatientListTable from '../patient-table/patient-table.component';
 import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
@@ -10,7 +10,6 @@ import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import styles from './patient-list-detail.scss';
 import ReactToPrint from 'react-to-print';
-import { Button, Printer } from '@carbon/react';
 import { PrintComponent } from '../print-component/print-component';
 
 function getPatientListUuidFromUrl(): string {

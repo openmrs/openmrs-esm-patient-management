@@ -34,12 +34,18 @@ export class PrintComponent extends React.Component<Props> {
 
           <div className={`${styles.reportsign} `}>
             <div className={`${styles.labinchargesign} `}>
-              <img src="https://labsmart-healthcare-trial.s3.us-west-2.amazonaws.com/diagnostic_lab_524/sample_lab_incharge_sign.jpg" />
+              <img
+                src="https://labsmart-healthcare-trial.s3.us-west-2.amazonaws.com/diagnostic_lab_524/sample_lab_incharge_sign.jpg"
+                alt="footer"
+              />
               <figcaption>Mr. Sachin Sharma</figcaption>
             </div>
 
             <div className={`${styles.labdoctorsign} `}>
-              <img src="https://labsmart-healthcare-trial.s3.us-west-2.amazonaws.com/diagnostic_lab_524/sample_pathologist_sign.jpg" />
+              <img
+                src="https://labsmart-healthcare-trial.s3.us-west-2.amazonaws.com/diagnostic_lab_524/sample_pathologist_sign.jpg"
+                alt=""
+              />
               <figcaption>Dr. A.K. Asthana</figcaption>
             </div>
           </div>
