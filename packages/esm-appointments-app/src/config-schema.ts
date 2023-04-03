@@ -61,6 +61,11 @@ export const configSchema = {
     _description: 'Whether start visit form should display service queue fields`',
     _default: false,
   },
+  defaultFacilityUrl: {
+    _type: Type.String,
+    _default: '/ws/rest/v1/kenyaemr/default-facility',
+    _description: 'Custom URL to load default facility if it is not in the session',
+  },
 };
 
 export interface ConfigObject {
@@ -76,4 +81,5 @@ export interface ConfigObject {
   appointmentComments: Array<string>;
   hiddenFormFields: Array<string>;
   showServiceQueueFields: boolean;
+  defaultFacilityUrl: string;
 }
