@@ -20,7 +20,7 @@ interface AppointmentPatientList {
   startDateTime: string;
 }
 
-const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
+export const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
   const appointmentDate = useAppointmentDate();
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/appointmentStatus?status=${appointmentStatus}&forDate=${forDate}`;
@@ -44,4 +44,23 @@ const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
   return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-export default useAppointmentList;
+export const useEarlyAppointmentList = (startDate?: string) => {
+  const appointmentDate = useAppointmentDate();
+  const forDate = startDate ? startDate : appointmentDate;
+  const url = `/ws/rest/v1/appointment/earlyAppointment?forDate=${forDate}`;
+
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch);
+  const appointments = data?.data?.map((appointment) => ({
+    name: appointment.patient.name,
+    patientUuid: appointment.patient.uuid,
+    identifier: appointment.patient?.identifier,
+    dateTime: appointment.startDateTime,
+    serviceType: appointment.service?.name,
+    provider: appointment?.providers[0]?.['name'] ?? '',
+    serviceTypeUuid: appointment.service.uuid,
+    gender: appointment.patient?.gender,
+    phoneNumber: appointment.patient?.phoneNumber,
+    age: appointment.patient?.age,
+  }));
+  return { earlyAppointmentList: (appointments as Array<any>) ?? [], isLoading, error };
+};

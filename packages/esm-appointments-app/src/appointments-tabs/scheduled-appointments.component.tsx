@@ -4,7 +4,7 @@ import { useAppointments } from './appointments-table.resource';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useQueues } from '../patient-queue/visit-form/useVisit';
 import { useSession } from '@openmrs/esm-framework';
-import useAppointmentList from '../hooks/useAppointmentList';
+import { useAppointmentList, useEarlyAppointmentList } from '../hooks/useAppointmentList';
 import AppointmentsBaseTable from './appointments-base-table.component';
 import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
@@ -28,7 +28,9 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
   const appointmentDate = useAppointmentDate();
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
   const { appointmentList, isLoading } = useAppointmentList(scheduleType);
+  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList();
   const isDateInPast = !dayjs(appointmentDate).isBefore(dayjs(), 'date');
+  const isDateInFuture = !dayjs(appointmentDate).isAfter(dayjs(), 'date');
 
   const filteredAppointments = appointmentServiceType
     ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
@@ -49,6 +51,8 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
         <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
         <Switch name={'Honoured'} text={t('honored', 'Honored')} />
         <Switch name={'Pending'} text={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')} />
+        {/* {isDateInFuture && <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />} */}
+        <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
       </ContentSwitcher>
       <div className={styles.container}>
         {scheduleType === 'Scheduled' && (
@@ -59,11 +63,11 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             visits={visits}
           />
         )}
-        {scheduleType === 'CameEarly' && (
+        {scheduleType === 'CameEarly' && isDateInFuture && (
           <AppointmentsBaseTable
-            appointments={filteredRow}
-            isLoading={isLoading}
-            tableHeading={t('cameEarly', 'Came Early')}
+            appointments={earlyAppointmentList}
+            isLoading={loading}
+            tableHeading={t('cameEarly', 'Came early')}
             visits={visits}
           />
         )}
