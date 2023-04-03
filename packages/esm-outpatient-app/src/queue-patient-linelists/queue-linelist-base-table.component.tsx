@@ -53,7 +53,7 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showOverlay, setShowOverlay] = useState(false);
-  const { results, currentPage, goTo } = usePagination(patientData ?? [], 10);
+  const { results, currentPage, goTo } = usePagination(patientData ?? [], 100);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -82,9 +82,9 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   };
 
   const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(patientData?.length / 10);
+    const numberOfPages = Math.ceil(patientData?.length / 100);
     return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * 10;
+      return (x + 1) * 100;
     });
   }, [patientData]);
 
@@ -216,9 +216,9 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
         forwardText="Next page"
         page={currentPage}
         pageNumberText="Page Number"
-        pageSize={10}
+        pageSize={100}
         onChange={({ page }) => goTo(page)}
-        pageSizes={pageSizes?.length > 0 ? pageSizes : [10]}
+        pageSizes={pageSizes?.length > 0 ? pageSizes : [100]}
         totalItems={patientData?.length ?? 0}
       />
 
