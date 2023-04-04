@@ -48,6 +48,7 @@ interface AppointmentsBaseTableProps {
   tableHeading: string;
   mutate?: () => void;
   visits?: Array<any>;
+  scheduleType?: string;
 }
 
 const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
@@ -56,6 +57,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
   tableHeading,
   mutate,
   visits,
+  scheduleType,
 }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(100);
@@ -154,6 +156,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
         headerTitle={`${tableHeading} appointments`}
         displayText={`${tableHeading.toLowerCase()} appointments`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+        scheduleType={scheduleType}
       />
     );
   }
