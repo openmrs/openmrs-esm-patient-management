@@ -6,8 +6,9 @@ import { startOfDay } from '../constants';
 
 export function useServices(location: string) {
   const apiUrl = `/ws/rest/v1/queue?location=${location}`;
+
   const { data, isLoading } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
-    apiUrl,
+    location ? apiUrl : null,
     openmrsFetch,
   );
 

@@ -44,6 +44,7 @@ import { MemoizedRecommendedVisitType } from './recommended-visit-type.component
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { SearchTypes, PatientProgram, NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
+import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -57,7 +58,8 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
-  const sessionLocation = sessionUser?.sessionLocation?.uuid;
+  const { defaultFacility } = useDefaultLoginLocation();
+
   const config = useConfig() as ConfigObject;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
@@ -78,6 +80,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   useEffect(() => {
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
+    } else {
+      setSelectedLocation(defaultFacility?.uuid);
       setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
   }, [locations, sessionUser]);
@@ -115,6 +120,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       };
 
       const abortController = new AbortController();
+
       saveVisit(payload, abortController)
         .pipe(first())
         .subscribe(
@@ -128,7 +134,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 priority,
                 status,
                 sortWeight,
-                abortController,
                 queueLocation,
                 visitQueueNumberAttributeUuid,
               ).then(

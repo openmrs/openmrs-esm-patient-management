@@ -98,7 +98,8 @@ export const Identifiers: React.FC = () => {
         });
       }
     }
-  }, [identifierTypes, setFieldValue, initializeIdentifier, defaultPatientIdentifierTypes, values.identifiers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers, initializeIdentifier]);
 
   if (isLoading) {
     return (
@@ -113,7 +114,7 @@ export const Identifiers: React.FC = () => {
 
   return (
     <div className={styles.halfWidthInDesktopView}>
-      <UserHasAccess privilege="coreapps.systemAdministration">
+      <UserHasAccess privilege={['Get Identifier Types', 'Add Patient Identifiers']}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
           <Button

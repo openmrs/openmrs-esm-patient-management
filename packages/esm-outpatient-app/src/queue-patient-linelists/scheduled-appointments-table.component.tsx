@@ -157,9 +157,9 @@ const AppointmentsTable: React.FC = () => {
   };
 
   const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(appointmentQueueEntries?.length / 20);
+    const numberOfPages = Math.ceil(appointmentQueueEntries?.length / 100);
     return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * 20;
+      return (x + 1) * 100;
     });
   }, [appointmentQueueEntries]);
 
@@ -286,9 +286,9 @@ const AppointmentsTable: React.FC = () => {
         forwardText="Next page"
         page={currentPage}
         pageNumberText="Page Number"
-        pageSize={20}
+        pageSize={100}
         onChange={({ page }) => goTo(page)}
-        pageSizes={pageSizes?.length > 0 ? pageSizes : [20]}
+        pageSizes={pageSizes?.length > 0 ? pageSizes : [100]}
         totalItems={appointmentQueueEntries?.length ?? 0}
       />
 

@@ -2,24 +2,23 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
-import { formatAppointmentData, useAppointmentDate } from '../helpers';
+import { getAppointment, useAppointmentDate } from '../helpers';
 
-export function useAppointments(status?: string) {
-  const startDate = useAppointmentDate();
-  const appointmentsByStatusUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
+export function useAppointments(status?: string, forDate?: string) {
+  const appointmentDate = useAppointmentDate();
+  const startDate = forDate ? forDate : appointmentDate;
+  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
+
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
-    status ? allAppointmentsUrl : appointmentsByStatusUrl,
+    status ? allAppointmentsUrl : apiUrl,
     openmrsFetch,
   );
 
-  const formattedAppointments = useMemo(
-    () => data?.data?.map((appointment) => formatAppointmentData(appointment)) ?? [],
-    [data?.data],
-  );
+  const appointments = useMemo(() => data?.data?.map((appointment) => getAppointment(appointment)) ?? [], [data?.data]);
 
   return {
-    appointments: formattedAppointments,
+    appointments,
     isLoading,
     isError: error,
     isValidating,

@@ -62,7 +62,6 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
         queueEntry?.statusUuid,
         endDate,
         sortWeight,
-        new AbortController(),
       ).then(
         ({ status }) => {
           if (status === 201) {
@@ -99,7 +98,6 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       t,
       closeModal,
       mutate,
-      selectedQueueLocation,
     ],
   );
 

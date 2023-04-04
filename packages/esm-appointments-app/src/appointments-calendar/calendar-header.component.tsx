@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ArrowRight, Filter } from '@carbon/react/icons';
+import { ArrowRight, Filter, ArrowLeft } from '@carbon/react/icons';
 import styles from './calendar-header.scss';
+import { spaBasePath } from '../constants';
+import { navigate } from '@openmrs/esm-framework';
 
 interface CalendarHeaderProps {
   onChangeView: (CalendarView) => void;
@@ -14,8 +16,20 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarV
   return (
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.titleContainer}>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeft size={48} {...props} />}
+            iconDescription="Back"
+            size="lg"
+            onClick={() => {
+              navigate({ to: `${spaBasePath}/home/appointments` });
+            }}>
+            <span>{t('back', 'Back')}</span>
+          </Button>
+        </div>
         <p>{t('calendar', 'Calendar')}</p>
-        <Button size="md" kind="ghost" renderIcon={ArrowRight}>
+        <Button size="md " kind="ghost" renderIcon={ArrowRight}>
           {t('addNewClinicDay', 'Add new clinic day')}
         </Button>
       </div>

@@ -73,7 +73,6 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
       priority,
       status,
       sortWeight,
-      new AbortController(),
       selectedQueueLocation,
       visitQueueNumberAttributeUuid,
     ).then(

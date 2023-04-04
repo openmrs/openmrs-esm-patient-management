@@ -22,7 +22,7 @@ export interface Appointment {
     dob?: string;
     birthDate?: string;
     gender?: string;
-    contact?: string;
+    phoneNumber?: string;
   };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
@@ -175,6 +175,7 @@ export interface Provider {
   comments: string;
   response?: string;
   person: OpenmrsResource;
+  name?: string;
 }
 
 export enum DurationPeriod {

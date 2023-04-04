@@ -66,7 +66,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
       setMissingQueue(false);
       setMissingLocation(false);
 
-      saveQueue(queueName, queueConcept, queueName, userLocation, new AbortController()).then(
+      saveQueue(queueName, queueConcept, queueName, userLocation).then(
         ({ status }) => {
           if (status === 201) {
             showToast({

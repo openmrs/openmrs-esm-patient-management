@@ -10,7 +10,7 @@ export const launchCheckInAppointmentModal = (appointmentUuid: string) => {
 
 export const handleUndoAction = async (appointmentUuid, mutate) => {
   const abortController = new AbortController();
-  const { status } = await undoAppointmentStatus(appointmentUuid, abortController);
+  const { status } = await undoAppointmentStatus(appointmentUuid);
   if (status === 200) {
     mutate(`/ws/rest/v1/appointment/appointment/all`);
   } else {
@@ -34,7 +34,7 @@ export const handleUpdateStatus = async (
   t,
 ) => {
   const abortController = new AbortController();
-  const { status } = await updateAppointmentStatus(toStatus, appointmentUuid, abortController);
+  const { status } = await updateAppointmentStatus(toStatus, appointmentUuid);
   if (status === 200) {
     showActionableNotification({
       critical: true,

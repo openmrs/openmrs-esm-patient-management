@@ -67,3 +67,14 @@
   margin-top: spacing.$spacing-01;
   color: colors.$red-60;
 }
+
+.labelBold {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  font-weight: bold;
+  margin-right: spacing.$spacing-02;
+}
+
+.labelContainer {
+  display: flex;
+}

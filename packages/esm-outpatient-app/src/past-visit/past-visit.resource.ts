@@ -12,8 +12,10 @@ export function usePastVisits(patientUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
+  const apiUrl = `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`;
+
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
-    `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    patientUuid ? apiUrl : null,
     openmrsFetch,
   );
 

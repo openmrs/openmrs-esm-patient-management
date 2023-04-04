@@ -1,19 +1,15 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ExtensionSlot, showToast, navigate, formatDate, parseDate } from '@openmrs/esm-framework';
-import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
-import PatientListTable from '../patient-table/patient-table.component';
+import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
+import PatientListTable from '../patient-table/patient-table.component';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import styles from './patient-list-detail.scss';
-
-function getPatientListUuidFromUrl(): string {
-  const match = /\/patient-list\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
-  return match && match[1];
-}
 
 interface PatientListMemberRow {
   name: string;
@@ -24,7 +20,8 @@ interface PatientListMemberRow {
 }
 
 const PatientListDetailComponent = () => {
-  const patientListUuid = getPatientListUuidFromUrl();
+  const params = useParams();
+  const patientListUuid = params.patientListUuid;
   const { t } = useTranslation();
   const [currentPage, setPageCount] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(10);

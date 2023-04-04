@@ -9,13 +9,15 @@ export async function addQueueEntry(
   status: string,
   queueServiceUuid: string,
   appointment: Appointment,
-  abortController: AbortController,
+
   locationUuid: string,
   visitQueueNumberAttributeUuid: string,
 ) {
+  const abortController = new AbortController();
+
   await Promise.all([
-    saveAppointment(appointment, abortController),
-    generateVisitQueueNumber(locationUuid, visitUuid, queueServiceUuid, abortController, visitQueueNumberAttributeUuid),
+    saveAppointment(appointment),
+    generateVisitQueueNumber(locationUuid, visitUuid, queueServiceUuid, visitQueueNumberAttributeUuid),
   ]);
 
   return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
@@ -45,7 +47,9 @@ export async function addQueueEntry(
   });
 }
 
-export async function saveAppointment(appointment: Appointment, abortController: AbortController) {
+export async function saveAppointment(appointment: Appointment) {
+  const abortController = new AbortController();
+
   await openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,
