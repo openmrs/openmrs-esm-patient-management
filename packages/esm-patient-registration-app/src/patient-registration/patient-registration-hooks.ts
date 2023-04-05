@@ -41,7 +41,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     addNameInLocalLanguage: false,
     gender: '',
     birthdate: null,
-    yearsEstimated: null,
+    yearsEstimated: 0,
     monthsEstimated: 0,
     birthdateEstimated: false,
     telephoneNumber: '',
