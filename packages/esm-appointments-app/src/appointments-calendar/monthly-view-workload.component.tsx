@@ -2,6 +2,7 @@ import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { spaBasePath } from '../constants';
 import { isSameMonth } from '../helpers';
 import { CalendarType } from '../types';
 import styles from './monthly-view-workload.scss';
@@ -36,7 +37,7 @@ const MonthlyWorkload: React.FC<MonthlyCellProps> = ({ type, dateTime, currentDa
                     <div
                       role="button"
                       tabIndex={0}
-                      onClick={() => navigate({ to: `${window.spaBase}/patient-list/${dateTime}/${serviceName}` })}
+                      onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` })}
                       key={serviceName}
                       className={`${styles.serviceArea} ${styles[colorCoding[serviceName]]}`}>
                       <span>{serviceName}</span>
@@ -46,7 +47,7 @@ const MonthlyWorkload: React.FC<MonthlyCellProps> = ({ type, dateTime, currentDa
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate({ to: `${window.spaBase}/patient-list/${dateTime}/Total` })}
+                    onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/Total` })}
                     className={`${styles.serviceArea} ${styles.green}`}>
                     <span>{t('total', 'Total')}</span>
                     <span>{currentData?.service.reduce((sum, currentValue) => sum + currentValue?.count ?? 0, 0)}</span>

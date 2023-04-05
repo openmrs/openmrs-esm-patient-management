@@ -39,26 +39,6 @@ function setupOpenMRS() {
   ]);
 
   return {
-    pages: [
-      {
-        load: getAsyncLifecycle(
-          () => import('./appointments-calendar/appointments-calendar-list-view.component'),
-          options,
-        ),
-        route: /^calendar/,
-        online: true,
-        offline: true,
-      },
-      {
-        load: getAsyncLifecycle(
-          () => import('./appointments-calendar/calendar-patient-list/calendar-patient-list.component'),
-          options,
-        ),
-        route: /^patient-list/,
-        online: true,
-        offline: true,
-      },
-    ],
     extensions: [
       {
         name: 'home-appointments',
