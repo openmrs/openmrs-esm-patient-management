@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Appointment } from '../types';
 import { getAppointment, useAppointmentDate } from '../helpers';
+import { isEmpty } from 'lodash-es';
 
 export function useAppointments(status?: string, forDate?: string) {
   const appointmentDate = useAppointmentDate();
@@ -11,7 +12,7 @@ export function useAppointments(status?: string, forDate?: string) {
   const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
-    status ? allAppointmentsUrl : apiUrl,
+    isEmpty(status) ? allAppointmentsUrl : apiUrl,
     openmrsFetch,
   );
 

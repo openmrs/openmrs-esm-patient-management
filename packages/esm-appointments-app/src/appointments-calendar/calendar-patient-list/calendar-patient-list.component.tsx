@@ -20,13 +20,13 @@ import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './calenar-patient-list.scss';
 import { useAppointments } from '../../appointments-tabs/appointments-table.resource';
 
-interface CalendarPatientListProps {
-  forDate: string;
-  serviceName: string;
-}
+interface CalendarPatientListProps {}
 
-const CalendarPatientList: React.FC<CalendarPatientListProps> = ({ forDate, serviceName }) => {
+const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
   const { t } = useTranslation();
+  const currentPathName: string = decodeURI(window.location.pathname);
+  const serviceName = currentPathName.split('/')[5];
+  const forDate = currentPathName.split('/')[4];
   const { appointments, isLoading } = useAppointments(
     '',
     dayjs(new Date(forDate).setHours(0, 0, 0, 0)).format(omrsDateFormat),
@@ -76,6 +76,7 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = ({ forDate, serv
 
   return (
     <>
+      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
       <div className={styles.container}>
         <div className={styles.header}>
           <h2>{serviceName === 'Total' ? 'All Services' : `${serviceName} ${t('list', 'List')}`}</h2>
