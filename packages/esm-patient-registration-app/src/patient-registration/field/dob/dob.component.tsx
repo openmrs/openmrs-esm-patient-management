@@ -38,7 +38,7 @@ export const DobField: React.FC = () => {
   const onToggle = (e) => {
     setFieldValue('birthdateEstimated', e.name === 'unknown');
     setFieldValue('birthdate', '');
-    setFieldValue('yearsEstimated', '');
+    setFieldValue('yearsEstimated', 0);
     setFieldValue('monthsEstimated', '');
   };
 
@@ -58,10 +58,18 @@ export const DobField: React.FC = () => {
   const onEstimatedMonthsChange = (e) => {
     const months = +e.target.value;
 
-    if (!isNaN(months) && months <= 11 && months >= 0) {
+    if (!isNaN(months)) {
       setFieldValue('monthsEstimated', months);
       setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
     }
+  };
+
+  const calculateBirthdate = () => {
+    const months = +monthsEstimateMeta.value % 12;
+    const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
+    setFieldValue('yearsEstimated', years);
+    setFieldValue('monthsEstimated', months > 0 ? months : '');
+    setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
   };
 
   return (
@@ -104,6 +112,8 @@ export const DobField: React.FC = () => {
             value={yearsEstimated.value}
             min={0}
             required
+            {...yearsEstimated}
+            onBlur={calculateBirthdate}
           />
           <TextInput
             id="monthsEstimated"
@@ -116,6 +126,9 @@ export const DobField: React.FC = () => {
             invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
             value={monthsEstimated.value}
             min={0}
+            {...monthsEstimated}
+            required={!yearsEstimateMeta.value}
+            onBlur={calculateBirthdate}
           />
         </div>
       )}
