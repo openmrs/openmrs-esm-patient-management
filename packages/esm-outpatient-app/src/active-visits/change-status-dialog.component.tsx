@@ -73,7 +73,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             });
             closeModal();
             mutate();
-            navigate({ to: `${window.spaBase}/home` });
+            navigate({ to: `${window.spaBase}/home/service-queues` });
           }
         },
         (error) => {
