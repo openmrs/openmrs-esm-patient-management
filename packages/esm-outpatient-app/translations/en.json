@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "activeTickets": "Active tickets",
   "activeVisits": "Active Visits",
   "activeVisitsNotInQueue": "Active visits not in queue",
   "addEntry": "Add entry",
@@ -187,6 +188,7 @@
   "requeue": "Requeue",
   "retainLocation": "",
   "returnDate": "Return date",
+  "room": "Room",
   "rRate": "R. Rate",
   "save": "Save",
   "scheduledAppointmentsList": "Scheduled appointments patient list",
@@ -226,6 +228,7 @@
   "success": "Success",
   "tcaDate": "Tca date",
   "temperature": "Temperature",
+  "ticketNumber": "Ticket Number",
   "time": "Time",
   "tirageNotYetCompleted": "Triage has not yet been completed",
   "today": "Today",
