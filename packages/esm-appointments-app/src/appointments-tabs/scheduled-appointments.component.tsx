@@ -29,8 +29,9 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
   const { appointmentList, isLoading } = useAppointmentList(scheduleType);
   const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList();
-  const isDateInPast = !dayjs(appointmentDate).isBefore(dayjs(), 'date');
-  const isDateInFuture = !dayjs(appointmentDate).isAfter(dayjs(), 'date');
+  const isDateInPast = dayjs(appointmentDate).isBefore(dayjs(), 'date');
+  const isDateInFuture = dayjs(appointmentDate).isAfter(dayjs(), 'date');
+  const isToday = dayjs(appointmentDate).isSame(dayjs(), 'date');
 
   const filteredAppointments = appointmentServiceType
     ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
@@ -47,13 +48,26 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
 
   return (
     <>
-      <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-        <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-        <Switch name={'Honoured'} text={t('honored', 'Honored')} />
-        <Switch name={'Pending'} text={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')} />
-        {/* {isDateInFuture && <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />} */}
-        <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
-      </ContentSwitcher>
+      {isToday && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
+          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
+          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+          <Switch name={'Pending'} text={t('notArrived', 'Not arrived')} />
+          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
+        </ContentSwitcher>
+      )}
+      {isDateInPast && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
+          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
+          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+          <Switch name={'Pending'} text={t('missed', 'Missed')} />
+        </ContentSwitcher>
+      )}
+      {isDateInFuture && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
+          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
+        </ContentSwitcher>
+      )}
       <div className={styles.container}>
         {scheduleType === 'Scheduled' && (
           <AppointmentsBaseTable
@@ -61,14 +75,16 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('scheduled', 'Scheduled')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
-        {scheduleType === 'CameEarly' && isDateInFuture && (
+        {scheduleType === 'CameEarly' && (
           <AppointmentsBaseTable
             appointments={earlyAppointmentList}
             isLoading={loading}
             tableHeading={t('cameEarly', 'Came early')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Honoured' && (
@@ -77,6 +93,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('honored', 'Honored')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Rescheduled' && (
@@ -85,6 +102,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={t('rescheduled', 'Rescheduled')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
         {scheduleType === 'Pending' && (
@@ -93,6 +111,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
             isLoading={isLoading}
             tableHeading={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}
             visits={visits}
+            scheduleType={scheduleType}
           />
         )}
       </div>

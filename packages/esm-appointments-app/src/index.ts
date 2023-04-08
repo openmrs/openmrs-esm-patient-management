@@ -31,6 +31,11 @@ function setupOpenMRS() {
       path: appointmentsBasePath,
       parent: `${window.spaBase}/home`,
     },
+    {
+      path: `${window.spaBase}/patient-list/:forDate/:serviceName`,
+      title: ([date, serviceName]) => `Patient Lists / ${decodeURI(serviceName)}`,
+      parent: `${window.spaBase}`,
+    },
   ]);
 
   return {
@@ -41,6 +46,15 @@ function setupOpenMRS() {
           options,
         ),
         route: /^calendar/,
+        online: true,
+        offline: true,
+      },
+      {
+        load: getAsyncLifecycle(
+          () => import('./appointments-calendar/calendar-patient-list/calendar-patient-list.component'),
+          options,
+        ),
+        route: /^patient-list/,
         online: true,
         offline: true,
       },
