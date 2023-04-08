@@ -5,27 +5,22 @@ import {
   addPatientToCohort,
   Cohort,
   CohortMember,
-  CohortType,
   deleteCohort,
-  deleteCohortType,
   deletePatient,
   generateRandomCohort,
-  generateRandomCohortType,
   generateRandomPatient,
   Patient,
   removePatientFromCohort,
 } from '../commands';
 
 let patient: Patient;
-let cohortType: CohortType;
 let cohort: Cohort;
 let createdCohortUuid: string;
 let createdCohortMember: CohortMember;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
-  cohortType = await generateRandomCohortType(api);
-  cohort = await generateRandomCohort(api, cohortType.uuid);
+  cohort = await generateRandomCohort(api);
 });
 
 test('should be able to create and edit a patient list', async ({ page }) => {
@@ -35,14 +30,14 @@ test('should be able to create and edit a patient list', async ({ page }) => {
   // Create a new patient list
   const patientListName = `Cohort ${Math.floor(Math.random() * 10000)}`;
   const patientListDescription = `Cohort Description ${Math.floor(Math.random() * 10000)}`;
-  await patientListPage.addNewPatientList(patientListName, patientListDescription, cohortType.name);
+  await patientListPage.addNewPatientList(patientListName, patientListDescription);
 
   await patientListPage.allListsButton().click();
   await patientListPage.searchPatientList(patientListName);
   await patientListPage.patientListsTable().getByText(patientListName).click();
 
-  await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient-list\\/[\\w\\d-]+$'));
-  createdCohortUuid = /patient-list\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
+  await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient-lists\\/[\\w\\d-]+$'));
+  createdCohortUuid = /patient-lists\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
 
   await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListName));
   await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListDescription));
@@ -65,7 +60,7 @@ test('should be able to delete a patient list', async ({ page }) => {
 
   await patientListPage.allListsButton().click();
   await patientListPage.searchPatientList(cohort.name);
-  await expect(patientListPage.patientListsTable()).not.toHaveText(new RegExp(cohort.name));
+  await expect(patientListPage.page.getByText('There are no patient lists to display')).toBeVisible();
 });
 
 test('should be able to manage patients in a patient list', async ({ page, api }) => {
@@ -94,5 +89,4 @@ test.afterEach(async ({ api }) => {
   }
   await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
-  await deleteCohortType(api, cohortType.uuid);
 });

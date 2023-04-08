@@ -4,16 +4,15 @@ export class PatientListsPage {
   constructor(readonly page: Page) {}
 
   readonly allListsButton = () => this.page.getByRole('tab', { name: 'All lists' });
-  readonly patientListsTable = () =>
-    this.page.getByRole('tabpanel', { name: 'All lists' }).getByTestId('patientListsTable');
-  readonly patientListHeader = () => this.page.locator('[data-testid="patientListHeader"]');
-  readonly patientsTable = () => this.page.locator('[data-testid="patientsTable"]');
+  readonly patientListsTable = () => this.page.getByTestId('patientListsTable');
+  readonly patientListHeader = () => this.page.getByTestId('patientListHeader');
+  readonly patientsTable = () => this.page.getByTestId('patientsTable');
 
   async goto(patientListUuid?: string) {
-    await this.page.goto(`patient-list/${patientListUuid ?? ''}`);
+    await this.page.goto(`home/patient-lists/${patientListUuid ?? ''}`);
   }
 
-  async addNewPatientList(listName: string, description: string, cohortType: string) {
+  async addNewPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'New List' }).click();
     await this.page.getByRole('textbox', { name: 'List name' }).type(listName);
     await this.page
@@ -21,8 +20,6 @@ export class PatientListsPage {
         'e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study',
       )
       .type(description);
-    await this.page.getByRole('button', { name: 'Select patient list type' }).click();
-    await this.page.getByRole('option', { name: cohortType }).click();
     await this.page.getByRole('button', { name: 'Create list' }).click();
   }
 

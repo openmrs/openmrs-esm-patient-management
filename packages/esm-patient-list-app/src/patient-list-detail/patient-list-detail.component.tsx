@@ -91,7 +91,7 @@ const PatientListDetailComponent = () => {
           kind: 'success',
         }),
       )
-      .then(() => navigate({ to: `${window.spaBase}/patient-list/` }))
+      .then(() => navigate({ to: `${window.spaBase}/home/patient-lists/` }))
       .catch(() =>
         showToast({
           title: t('error', 'Error'),
