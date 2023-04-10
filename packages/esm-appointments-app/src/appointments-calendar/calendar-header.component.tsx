@@ -23,7 +23,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarV
             iconDescription="Back"
             size="lg"
             onClick={() => {
-              navigate({ to: `${spaBasePath}/home/appointments` });
+              navigate({ to: `${spaBasePath}/appointments` });
             }}>
             <span>{t('back', 'Back')}</span>
           </Button>

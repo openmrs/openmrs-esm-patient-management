@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppointments } from './appointments-table.resource';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useQueues } from '../patient-queue/visit-form/useVisit';
-import { useSession } from '@openmrs/esm-framework';
-import { useAppointmentList, useEarlyAppointmentList } from '../hooks/useAppointmentList';
-import AppointmentsBaseTable from './appointments-base-table.component';
-import { useAppointmentDate } from '../helpers';
+import { useAppointmentList, useEarlyAppointmentList } from '../../hooks/useAppointmentList';
+import { useAppointmentDate } from '../../helpers';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import styles from './scheduled-appointments.scss';
+import AppointmentsBaseTable from '../common-components/appointments-base-table.component';
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
@@ -19,11 +16,7 @@ interface ScheduledAppointmentsProps {
 }
 type scheduleType = 'CameEarly' | 'Rescheduled' | 'Honoured' | 'Pending' | 'Scheduled';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
-  isLoading: isLoadingVisit,
-  visits,
-  appointmentServiceType,
-}) => {
+const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
   const { t } = useTranslation();
   const appointmentDate = useAppointmentDate();
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
@@ -45,6 +38,46 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
   const filteredRow = appointmentServiceType
     ? rowData.filter((app) => app.serviceTypeUuid === appointmentServiceType)
     : rowData;
+
+  const appointmentsBaseTableConfig = {
+    Scheduled: {
+      appointments: filteredAppointments,
+      isLoading,
+      tableHeading: t('scheduled', 'Scheduled'),
+      visits,
+      scheduleType,
+    },
+    CameEarly: {
+      appointments: earlyAppointmentList,
+      isLoading: loading,
+      tableHeading: t('cameEarly', 'Came early'),
+      visits,
+      scheduleType,
+    },
+    Honoured: {
+      appointments: filteredRow,
+      isLoading,
+      tableHeading: t('honored', 'Honored'),
+      visits,
+      scheduleType,
+    },
+    Rescheduled: {
+      appointments: filteredRow,
+      isLoading,
+      tableHeading: t('rescheduled', 'Rescheduled'),
+      visits,
+      scheduleType,
+    },
+    Pending: {
+      appointments: filteredRow,
+      isLoading,
+      tableHeading: isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed'),
+      visits,
+      scheduleType,
+    },
+  };
+
+  const currentConfig = appointmentsBaseTableConfig[scheduleType];
 
   return (
     <>
@@ -69,51 +102,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({
         </ContentSwitcher>
       )}
       <div className={styles.container}>
-        {scheduleType === 'Scheduled' && (
-          <AppointmentsBaseTable
-            appointments={filteredAppointments}
-            isLoading={isLoading}
-            tableHeading={t('scheduled', 'Scheduled')}
-            visits={visits}
-            scheduleType={scheduleType}
-          />
-        )}
-        {scheduleType === 'CameEarly' && (
-          <AppointmentsBaseTable
-            appointments={earlyAppointmentList}
-            isLoading={loading}
-            tableHeading={t('cameEarly', 'Came early')}
-            visits={visits}
-            scheduleType={scheduleType}
-          />
-        )}
-        {scheduleType === 'Honoured' && (
-          <AppointmentsBaseTable
-            appointments={filteredRow}
-            isLoading={isLoading}
-            tableHeading={t('honored', 'Honored')}
-            visits={visits}
-            scheduleType={scheduleType}
-          />
-        )}
-        {scheduleType === 'Rescheduled' && (
-          <AppointmentsBaseTable
-            appointments={filteredRow}
-            isLoading={isLoading}
-            tableHeading={t('rescheduled', 'Rescheduled')}
-            visits={visits}
-            scheduleType={scheduleType}
-          />
-        )}
-        {scheduleType === 'Pending' && (
-          <AppointmentsBaseTable
-            appointments={filteredRow}
-            isLoading={isLoading}
-            tableHeading={isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}
-            visits={visits}
-            scheduleType={scheduleType}
-          />
-        )}
+        <AppointmentsBaseTable {...currentConfig} />
       </div>
     </>
   );
