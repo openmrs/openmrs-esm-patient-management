@@ -110,10 +110,11 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           )}
         </div>
       )}
-      <div>
+      <div style={{ marginBottom: '1rem' }}>
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button
+              size="md"
               kind="ghost"
               onClick={handleEdit}
               iconDescription={t('editIdentifierTooltip', 'Edit')}
@@ -126,6 +127,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {initialValue && initialValue !== identifierValue && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button
+              size="md"
               kind="ghost"
               onClick={handleReset}
               iconDescription={t('resetIdentifierTooltip', 'Reset')}
@@ -138,7 +140,6 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
-              style={{ marginBottom: '1rem' }}
               size="md"
               kind="danger--ghost"
               onClick={handleDelete}
