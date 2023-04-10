@@ -3,8 +3,7 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './patient-search.scss';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import { useTranslation } from 'react-i18next';
-
-import AppointmentForm from '../appointment-forms/appointments-form.component';
+import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
 
 const PatientSearch: React.FC = () => {
   const { t } = useTranslation();

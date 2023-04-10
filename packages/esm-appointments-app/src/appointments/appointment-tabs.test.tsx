@@ -3,20 +3,20 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import AppointmentList from './appointment-list.component';
+import AppointmentTabs from './appointment-tabs.component';
 import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.setTimeout(15000);
 
-describe('AppointmentList', () => {
+describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockAppointmentsData.data });
 
-    renderAppointmentList();
+    renderAppointmentTabs();
 
     await waitForLoadingToFinish();
 
@@ -60,6 +60,6 @@ describe('AppointmentList', () => {
   });
 });
 
-function renderAppointmentList() {
-  renderWithSwr(<AppointmentList />);
+function renderAppointmentTabs() {
+  renderWithSwr(<AppointmentTabs />);
 }
