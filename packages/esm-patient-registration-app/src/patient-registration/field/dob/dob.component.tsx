@@ -101,36 +101,40 @@ export const DobField: React.FC = () => {
           </div>
         ) : (
           <div className={styles.grid}>
-            <TextInput
-              id="yearsEstimated"
-              type="number"
-              name={yearsEstimated.name}
-              light
-              onChange={onEstimatedYearsChange}
-              labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-              invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-              invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
-              value={yearsEstimated.value}
-              min={0}
-              required
-              {...yearsEstimated}
-              onBlur={updateBirthdate}
-            />
-            <TextInput
-              id="monthsEstimated"
-              type="number"
-              name={monthsEstimated.name}
-              light
-              onChange={onEstimatedMonthsChange}
-              labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-              invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-              invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-              value={monthsEstimated.value}
-              min={0}
-              {...monthsEstimated}
-              required={!yearsEstimateMeta.value}
-              onBlur={updateBirthdate}
-            />
+            <div className={styles.dobField}>
+              <TextInput
+                id="yearsEstimated"
+                type="number"
+                name={yearsEstimated.name}
+                light
+                onChange={onEstimatedYearsChange}
+                labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
+                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
+                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
+                value={yearsEstimated.value}
+                min={0}
+                required
+                {...yearsEstimated}
+                onBlur={updateBirthdate}
+              />
+            </div>
+            <div className={styles.dobField}>
+              <TextInput
+                id="monthsEstimated"
+                type="number"
+                name={monthsEstimated.name}
+                light
+                onChange={onEstimatedMonthsChange}
+                labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
+                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+                value={monthsEstimated.value}
+                min={0}
+                {...monthsEstimated}
+                required={!yearsEstimateMeta.value}
+                onBlur={updateBirthdate}
+              />
+            </div>
           </div>
         )}
       </Layer>
