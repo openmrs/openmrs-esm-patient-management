@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput } from '@carbon/react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput, Layer } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
@@ -38,7 +38,7 @@ export const DobField: React.FC = () => {
   const onToggle = (e) => {
     setFieldValue('birthdateEstimated', e.name === 'unknown');
     setFieldValue('birthdate', '');
-    setFieldValue('yearsEstimated', '');
+    setFieldValue('yearsEstimated', 0);
     setFieldValue('monthsEstimated', '');
   };
 
@@ -58,10 +58,18 @@ export const DobField: React.FC = () => {
   const onEstimatedMonthsChange = (e) => {
     const months = +e.target.value;
 
-    if (!isNaN(months) && months <= 11 && months >= 0) {
+    if (!isNaN(months)) {
       setFieldValue('monthsEstimated', months);
       setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
     }
+  };
+
+  const updateBirthdate = () => {
+    const months = +monthsEstimateMeta.value % 12;
+    const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
+    setFieldValue('yearsEstimated', years);
+    setFieldValue('monthsEstimated', months > 0 ? months : '');
+    setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
   };
 
   return (
@@ -76,49 +84,60 @@ export const DobField: React.FC = () => {
           <Switch name="unknown" text={t('no', 'No')} />
         </ContentSwitcher>
       </div>
-      {dobKnown ? (
-        <div className={styles.dobField}>
-          <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
-            <DatePickerInput
-              id="birthdate"
-              {...birthdate}
-              placeholder={placeHolder}
-              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
-              value={format(birthdate.value)}
-            />
-          </DatePicker>
-        </div>
-      ) : (
-        <div className={styles.grid}>
-          <TextInput
-            id="yearsEstimated"
-            type="number"
-            name={yearsEstimated.name}
-            light
-            onChange={onEstimatedYearsChange}
-            labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-            invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-            invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
-            value={yearsEstimated.value}
-            min={0}
-            required
-          />
-          <TextInput
-            id="monthsEstimated"
-            type="number"
-            name={monthsEstimated.name}
-            light
-            onChange={onEstimatedMonthsChange}
-            labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-            invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-            invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-            value={monthsEstimated.value}
-            min={0}
-          />
-        </div>
-      )}
+      <Layer>
+        {dobKnown ? (
+          <div className={styles.dobField}>
+            <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
+              <DatePickerInput
+                id="birthdate"
+                {...birthdate}
+                placeholder={placeHolder}
+                labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+                invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+                invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+                value={format(birthdate.value)}
+              />
+            </DatePicker>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            <div className={styles.dobField}>
+              <TextInput
+                id="yearsEstimated"
+                type="number"
+                name={yearsEstimated.name}
+                light
+                onChange={onEstimatedYearsChange}
+                labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
+                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
+                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
+                value={yearsEstimated.value}
+                min={0}
+                required
+                {...yearsEstimated}
+                onBlur={updateBirthdate}
+              />
+            </div>
+            <div className={styles.dobField}>
+              <TextInput
+                id="monthsEstimated"
+                type="number"
+                name={monthsEstimated.name}
+                light
+                onChange={onEstimatedMonthsChange}
+                labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
+                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+                value={monthsEstimated.value}
+                min={0}
+                {...monthsEstimated}
+                required={!yearsEstimateMeta.value}
+                onBlur={updateBirthdate}
+              />
+            </div>
+          </div>
+        )}
+      </Layer>
     </div>
   );
 };
