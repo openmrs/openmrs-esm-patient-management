@@ -141,6 +141,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
       <div className={styles.input}>
         <Layer level={isTablet ? 1 : 0}>
           <TextArea
+            id="list_description"
             name="description"
             onChange={handleChange}
             placeholder={t(
