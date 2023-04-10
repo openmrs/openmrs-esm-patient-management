@@ -165,12 +165,14 @@ const CustomIdentifier: React.FC<{ patient: SearchedPatient; identifierName: str
 }) => {
   const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
   return (
-    <>
-      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.display}>
-        {identifier.identifierType.display}
-      </Tag>
-      <span className={styles.configuredLabel}>{identifier.identifier}</span>
-    </>
+    identifier && (
+      <>
+        <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.display}>
+          {identifier.identifierType.display}
+        </Tag>
+        <span className={styles.configuredLabel}>{identifier.identifier}</span>
+      </>
+    )
   );
 };
 
