@@ -4,17 +4,22 @@ import ClinicMetrics from './appointments-metrics/appointments-metrics.component
 import AppointmentsHeader from './appointments-header/appointments-header.component';
 import { useTranslation } from 'react-i18next';
 import Overlay from './overlay.component';
-import { navigate, useSession } from '@openmrs/esm-framework';
+import AppointmentsCalendarListView from './appointments-calendar/appointments-calendar-list-view.component';
+import CalendarPatientList from './appointments-calendar/calendar-patient-list/calendar-patient-list.component';
 
 const ClinicalAppointments: React.FC = () => {
   const { t } = useTranslation();
   const [appointmentServiceType, setAppointmentServiceType] = useState<string>('');
-  const session = useSession();
+  const pathName = window.location.pathname;
+  const calendarLink = pathName.includes('calendar') ? true : false;
+  const calendarListLink = pathName.includes('list') ? true : false;
 
-  if (session.sessionLocation === null) {
-    navigate({
-      to: `\${openmrsSpaBase}/login/location?returnToUrl=${window.location.pathname}`,
-    });
+  if (calendarLink) {
+    return <AppointmentsCalendarListView />;
+  }
+
+  if (calendarListLink) {
+    return <CalendarPatientList />;
   }
 
   return (

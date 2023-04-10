@@ -9,6 +9,7 @@ import { ConfigurableLink } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import AppointmentServices from '../admin/appointment-services/appointment-services.component';
 import styles from './metrics-header.scss';
+import { spaBasePath } from '../constants';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ const MetricsHeader: React.FC = () => {
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <div className={styles.metricsContent}>
-        <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/appointments/calendar`}>
+        <ConfigurableLink className={styles.link} to={`${spaBasePath}/appointments/calendar`}>
           <span style={{ fontSize: '0.825rem', marginRight: '0.325rem' }}>{t('calendar', 'Calendar')}</span>{' '}
           <ArrowRight size={16} className={styles.viewListBtn} />
         </ConfigurableLink>
