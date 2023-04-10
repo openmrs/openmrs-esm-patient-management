@@ -61,7 +61,6 @@ import {
   updateSelectedServiceUuid,
   useSelectedServiceName,
   useSelectedQueueLocationUuid,
-  useSelectedProviderRoomTimestamp,
   useIsPermanentProviderQueueRoom,
 } from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';

@@ -58,10 +58,18 @@ export const DobField: React.FC = () => {
   const onEstimatedMonthsChange = (e) => {
     const months = +e.target.value;
 
-    if (!isNaN(months) && months <= 11 && months >= 0) {
+    if (!isNaN(months)) {
       setFieldValue('monthsEstimated', months);
       setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
     }
+  };
+
+  const updateBirthdate = () => {
+    const months = +monthsEstimateMeta.value % 12;
+    const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
+    setFieldValue('yearsEstimated', years);
+    setFieldValue('monthsEstimated', months > 0 ? months : '');
+    setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
   };
 
   return (
@@ -93,35 +101,36 @@ export const DobField: React.FC = () => {
           </div>
         ) : (
           <div className={styles.grid}>
-            <div className={styles.dobField}>
-              <TextInput
-                id="yearsEstimated"
-                type="number"
-                name={yearsEstimated.name}
-                light
-                onChange={onEstimatedYearsChange}
-                labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
-                value={yearsEstimated.value}
-                min={0}
-                required
-              />
-            </div>
-            <div className={styles.dobField}>
-              <TextInput
-                id="monthsEstimated"
-                type="number"
-                name={monthsEstimated.name}
-                light
-                onChange={onEstimatedMonthsChange}
-                labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-                value={monthsEstimated.value}
-                min={0}
-              />
-            </div>
+            <TextInput
+              id="yearsEstimated"
+              type="number"
+              name={yearsEstimated.name}
+              light
+              onChange={onEstimatedYearsChange}
+              labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
+              invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
+              invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
+              value={yearsEstimated.value}
+              min={0}
+              required
+              {...yearsEstimated}
+              onBlur={updateBirthdate}
+            />
+            <TextInput
+              id="monthsEstimated"
+              type="number"
+              name={monthsEstimated.name}
+              light
+              onChange={onEstimatedMonthsChange}
+              labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
+              invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+              invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+              value={monthsEstimated.value}
+              min={0}
+              {...monthsEstimated}
+              required={!yearsEstimateMeta.value}
+              onBlur={updateBirthdate}
+            />
           </div>
         )}
       </Layer>

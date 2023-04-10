@@ -37,9 +37,7 @@ const MonthlyWorkload: React.FC<MonthlyCellProps> = ({ type, dateTime, currentDa
                     <div
                       role="button"
                       tabIndex={0}
-                      onClick={() =>
-                        navigate({ to: `${spaBasePath}/calendar?forDate=${dateTime}&serviceName=${serviceName}` })
-                      }
+                      onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` })}
                       key={serviceName}
                       className={`${styles.serviceArea} ${styles[colorCoding[serviceName]]}`}>
                       <span>{serviceName}</span>
@@ -49,7 +47,7 @@ const MonthlyWorkload: React.FC<MonthlyCellProps> = ({ type, dateTime, currentDa
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate({ to: `${spaBasePath}/calendar?forDate=${dateTime}&serviceName=Total` })}
+                    onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/Total` })}
                     className={`${styles.serviceArea} ${styles.green}`}>
                     <span>{t('total', 'Total')}</span>
                     <span>{currentData?.service.reduce((sum, currentValue) => sum + currentValue?.count ?? 0, 0)}</span>

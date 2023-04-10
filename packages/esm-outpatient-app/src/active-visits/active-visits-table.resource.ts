@@ -420,3 +420,20 @@ export async function generateVisitQueueNumber(
     },
   );
 }
+
+export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
+  const abortController = new AbortController();
+
+  return openmrsFetch(`/ws/rest/v1/queueutil/assignticket`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      servicePointName,
+      ticketNumber,
+      status,
+    },
+  });
+}

@@ -7,11 +7,10 @@
 }
 
 .suggestions {
-  position: relative;
   border-top-width: 0;
   list-style: none;
   margin-top: 0;
-  max-height: 143px;
+  max-height: 20rem;
   overflow-y: auto;
   padding-left: 0;
   width: 100%;
@@ -20,6 +19,7 @@
   background-color: #fff;
   margin-bottom: 20px;
   z-index: 99;
+  border: 1px solid $ui-03;
 }
 
 .suggestions li {

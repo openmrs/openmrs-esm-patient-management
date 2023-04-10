@@ -8,22 +8,14 @@ import WeeklyCalendarView from './weekly-calendar-view.component';
 import DailyCalendarView from './daily-calendar-view.component';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import dayjs from 'dayjs';
-import CalendarPatientList from './calendar-patient-list/calendar-patient-list.component';
 
 type AppointmentsCalendarListView = 'daily' | 'weekly' | 'monthly';
 
 const AppointmentsCalendarListView: React.FC = () => {
   const { t } = useTranslation();
-  const queryParams = new URLSearchParams(window.location.search);
-  const forDate = queryParams.get('forDate');
-  const serviceName = queryParams.get('serviceName');
   const [calendarView, setCalendarView] = useState<AppointmentsCalendarListView>('monthly');
   const [currentDate, setCurrentDate] = useState(dayjs());
   const { calendarEvents, isLoading } = useAppointmentsCalendar(currentDate.toISOString(), calendarView);
-
-  if (serviceName && forDate) {
-    return <CalendarPatientList forDate={forDate} serviceName={serviceName} />;
-  }
 
   return (
     <div className={styles.backgroundColor}>

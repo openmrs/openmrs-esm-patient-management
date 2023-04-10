@@ -91,7 +91,7 @@ const PatientListDetailComponent = () => {
           kind: 'success',
         }),
       )
-      .then(() => navigate({ to: `${window.spaBase}/patient-list/` }))
+      .then(() => navigate({ to: `${window.spaBase}/home/patient-lists/` }))
       .catch(() =>
         showToast({
           title: t('error', 'Error'),
@@ -105,7 +105,7 @@ const PatientListDetailComponent = () => {
     <main className={`omrs-main-content ${styles.patientListDetailsPage}`}>
       <section>
         <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-        <div className={styles.cohortHeader}>
+        <div className={styles.cohortHeader} data-testid="patientListHeader">
           <div>
             {patientListDetails && (
               <>

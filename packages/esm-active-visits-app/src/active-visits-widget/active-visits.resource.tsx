@@ -1,11 +1,9 @@
-import useSWR from 'swr';
+import { useEffect } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
 import { openmrsFetch, Visit, useSession, FetchResponse, formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useEffect, useMemo } from 'react';
-
 dayjs.extend(isToday);
 
 export interface ActiveVisit {
@@ -28,9 +26,9 @@ interface VisitResponse {
 }
 
 export function useActiveVisits() {
-  const currentUserSession = useSession();
+  const session = useSession();
   const startDate = dayjs().format('YYYY-MM-DD');
-  const sessionLocation = currentUserSession?.sessionLocation?.uuid;
+  const sessionLocation = session?.sessionLocation?.uuid;
 
   const customRepresentation =
     'custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),' +
@@ -57,7 +55,7 @@ export function useActiveVisits() {
     isValidating,
     size: pageNumber,
     setSize,
-  } = useSWRInfinite<FetchResponse<VisitResponse>, Error>(getUrl, openmrsFetch);
+  } = useSWRInfinite<FetchResponse<VisitResponse>, Error>(sessionLocation ? getUrl : null, openmrsFetch);
 
   useEffect(() => {
     if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
