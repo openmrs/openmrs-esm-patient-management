@@ -70,6 +70,7 @@
   "errorAddingQueueRoom": "Error adding queue room",
   "errorClearingQueues": "Error clearing queues",
   "errorFetchingAppoinments": "Error fetching appointments",
+  "errorPostingToScreen": "Error posting to screen",
   "facility": "Facility",
   "female": "Female",
   "femaleLabelText": "Female",
