@@ -46,7 +46,6 @@ export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
         <TextInput
           {...props}
           {...field}
-          style={{ height: '3rem' }}
           labelText={labelText}
           invalid={!!(meta.touched && meta.error)}
           invalidText={invalidText}

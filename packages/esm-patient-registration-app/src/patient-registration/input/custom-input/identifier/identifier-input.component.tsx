@@ -138,7 +138,8 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
-              style={{ marginTop: '1.5rem' }}
+              style={{ marginBottom: '1rem' }}
+              size="md"
               kind="danger--ghost"
               onClick={handleDelete}
               iconDescription={t('deleteIdentifierTooltip', 'Delete')}
