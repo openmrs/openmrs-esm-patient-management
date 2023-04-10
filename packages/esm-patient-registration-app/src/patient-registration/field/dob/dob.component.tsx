@@ -64,7 +64,7 @@ export const DobField: React.FC = () => {
     }
   };
 
-  const calculateBirthdate = () => {
+  const updateBirthdate = () => {
     const months = +monthsEstimateMeta.value % 12;
     const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
     setFieldValue('yearsEstimated', years);
@@ -113,7 +113,7 @@ export const DobField: React.FC = () => {
             min={0}
             required
             {...yearsEstimated}
-            onBlur={calculateBirthdate}
+            onBlur={updateBirthdate}
           />
           <TextInput
             id="monthsEstimated"
@@ -128,7 +128,7 @@ export const DobField: React.FC = () => {
             min={0}
             {...monthsEstimated}
             required={!yearsEstimateMeta.value}
-            onBlur={calculateBirthdate}
+            onBlur={updateBirthdate}
           />
         </div>
       )}
