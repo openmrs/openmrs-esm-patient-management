@@ -6,7 +6,6 @@ import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 
-import { useServiceQueues } from '../../hooks/useServiceQueus';
 import { launchOverlay } from '../../hooks/useOverlay';
 import AppointmentForm from '../forms/create-edit-form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
@@ -50,30 +49,41 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
     launchOverlay('CCC Defaulter tracing form', <DefaulterTracingForm patientUuid={appointment.patientUuid} />);
   };
 
+  /**
+   * Renders the appropriate visit status button based on the current appointment state.
+   * @returns {JSX.Element} The rendered button.
+   */
   const renderVisitStatus = () => {
-    if (hasCheckedOut) {
-      return (
-        <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
-          {t('checkedOut', 'Checked out')}
-        </Button>
-      );
-    }
-    if (hasActiveVisit && isTodayAppointment) {
-      return (
-        <Button onClick={handleCheckout} size="sm" kind="danger--tertiary">
-          {t('checkOut', 'Check out')}
-        </Button>
-      );
-    }
-    if (isTodayAppointment) {
-      if (scheduleType === 'Pending' && new Date().getHours() > 12) {
+    const followUpButtonText = t('launchFormUpForm', 'Follow up');
+
+    switch (true) {
+      case hasCheckedOut:
         return (
-          <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
-            {t('launchFormUpForm', 'Follow up')}
+          <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
+            {t('checkedOut', 'Checked out')}
           </Button>
         );
-      }
-      return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
+      case hasActiveVisit && isTodayAppointment:
+        return (
+          <Button onClick={handleCheckout} size="sm" kind="danger--tertiary">
+            {t('checkOut', 'Check out')}
+          </Button>
+        );
+      case isTodayAppointment:
+        if (scheduleType === 'Pending' && new Date().getHours() > 12) {
+          return (
+            <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
+              {followUpButtonText}
+            </Button>
+          );
+        }
+        return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
+      default:
+        return (
+          <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
+            {followUpButtonText}
+          </Button>
+        );
     }
   };
 
@@ -81,7 +91,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
       {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisit)) ? (
-        <OverflowMenu size="sm" flipped>
+        <OverflowMenu ariaLabel="Actions" size="sm" flipped>
           <OverflowMenuItem
             itemText={t('editAppointments', 'Edit Appointment')}
             onClick={() =>
