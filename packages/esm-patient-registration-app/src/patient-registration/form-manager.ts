@@ -1,4 +1,4 @@
-import { FetchResponse, queueSynchronizationItem, Session } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, queueSynchronizationItem, Session } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   FormValues,
@@ -304,7 +304,7 @@ export class FormManager {
         gender: values.gender.charAt(0),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(values),
+        attributes: FormManager.getPatientAttributes(values, patientUuidMap),
         addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values),
       },
@@ -336,15 +336,17 @@ export class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues) {
+  static getPatientAttributes(values: FormValues, patientUuidMap: PatientUuidMapType) {
     const attributes: Array<AttributeValue> = [];
     if (values.attributes) {
-      for (const [key, value] of Object.entries(values.attributes)) {
-        attributes.push({
-          attributeType: key,
-          value,
+      Object.entries(values.attributes)
+        .filter(([, value]) => !!value)
+        .forEach(([key, value]) => {
+          attributes.push({
+            attributeType: key,
+            value,
+          });
         });
-      }
     }
     if (values.unidentifiedPatient) {
       attributes.push({
@@ -352,6 +354,17 @@ export class FormManager {
         attributeType: '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47',
         value: 'true',
       });
+    }
+
+    if (values.patientUuid) {
+      Object.entries(values.attributes)
+        .filter(([, value]) => !value)
+        .forEach(([key]) => {
+          const attributeUuid = patientUuidMap[`attribute.${key}`];
+          openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+            method: 'DELETE',
+          });
+        });
     }
 
     return attributes;
