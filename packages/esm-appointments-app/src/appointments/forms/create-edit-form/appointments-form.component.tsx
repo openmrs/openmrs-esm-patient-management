@@ -31,24 +31,25 @@ import {
   useConfig,
   showNotification,
   showToast,
+  ConfigObject,
 } from '@openmrs/esm-framework';
-import { AppointmentPayload, MappedAppointment } from '../types';
-import { convertTime12to24, useAppointmentDate } from '../helpers';
-import {
-  useServices,
-  useAppointmentSummary,
-  saveAppointment,
-  toAppointmentDateTime,
-} from './appointment-forms.resource';
-import { ConfigObject } from '../config-schema';
-import { useProviders } from '../hooks/useProviders';
-import { closeOverlay } from '../hooks/useOverlay';
-import WorkloadCard from './workload.component';
+
 import first from 'lodash-es/first';
 import styles from './appointments-form.scss';
-import { useCalendarDistribution } from './workload-helper';
-import { PatientAppointment, useInitialAppointmentFormValue } from './useInitialFormValues';
 import { mutate } from 'swr';
+import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
+import { closeOverlay } from '../../../hooks/useOverlay';
+import { MappedAppointment, AppointmentPayload } from '../../../types';
+import {
+  useProviders,
+  useServices,
+  useAppointmentSummary,
+  toAppointmentDateTime,
+  saveAppointment,
+} from '../forms.resource';
+import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
+import { useCalendarDistribution } from '../workload-helper';
+import WorkloadCard from '../workload.component';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;

@@ -88,8 +88,7 @@
 .IDInput {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: center;
-  max-width: 27rem;
+  align-items: end;
 }
 
 .trashCan {

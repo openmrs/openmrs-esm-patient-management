@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { useAppointmentDate } from '../helpers';
-import { useAppointmentSummary } from './appointment-forms.resource';
+import { useAppointmentSummary } from './forms.resource';
+import { useAppointmentDate } from '../../helpers';
 interface AppointmentCount {
   date: string;
   count: number;

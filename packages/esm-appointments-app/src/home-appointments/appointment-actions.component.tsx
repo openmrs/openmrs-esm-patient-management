@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { MappedAppointment } from '../types';
-import AppointmentForm from '../appointment-forms/appointments-form.component';
-import CancelAppointment from '../appointment-forms/cancel-appointment.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
 import styles from './appointments-list.scss';
 import { spaBasePath } from '../constants';
 import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } from './common';
 import { useSWRConfig } from 'swr';
+import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
+import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
 
 interface ActionMenuProps {
   appointment: MappedAppointment;

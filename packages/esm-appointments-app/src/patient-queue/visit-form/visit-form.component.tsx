@@ -41,8 +41,9 @@ import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { MappedAppointment } from '../../types';
 import styles from './visit-form.scss';
-import { useAppointments } from '../../appointments-tabs/appointments-table.resource';
+import { useAppointments } from '../../appointments/appointments-table.resource';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
+import { useVisits } from '../../hooks/useVisits';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -65,6 +66,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const { mutate } = useAppointments(startDate);
+  const { mutateVisit } = useVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
   const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
@@ -118,7 +120,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 const priority = event?.target['priority']?.value;
                 const status = event?.target['status']?.value;
                 const sortWeight = event?.target['sortWeight']?.value;
-
                 saveQueueEntry(
                   response.data.uuid,
                   serviceUuid,
@@ -155,6 +156,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 );
               }
               mutate();
+              mutateVisit();
               closeOverlay();
             }
           },
