@@ -130,6 +130,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                   setSelectedQueueLocation(event.target.value);
                   setEditLocation(true);
                 }}>
+                {!selectedQueueLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
                 {queueLocations?.length > 0 &&
                   queueLocations.map((location) => (
                     <SelectItem key={location.id} text={location.name} value={location.id}>
