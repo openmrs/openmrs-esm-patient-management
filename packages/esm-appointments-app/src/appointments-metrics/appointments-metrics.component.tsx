@@ -37,7 +37,7 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
-          view="patients"
+          view=""
           count={{ pendingAppointments: filteredPendingAppointment, arrivedAppointments: filteredArrivedAppointment }}
           appointmentDate={startDate}
         />

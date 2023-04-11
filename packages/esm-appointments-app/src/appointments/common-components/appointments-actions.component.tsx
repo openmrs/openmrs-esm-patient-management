@@ -54,13 +54,14 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
    * @returns {JSX.Element} The rendered button.
    */
   const renderVisitStatus = () => {
+    const checkedOutText = t('checkedOut', 'Checked out');
     const followUpButtonText = t('launchFormUpForm', 'Follow up');
 
     switch (true) {
       case hasCheckedOut:
         return (
           <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
-            {t('checkedOut', 'Checked out')}
+            {checkedOutText}
           </Button>
         );
       case hasActiveVisit && isTodayAppointment:
@@ -70,20 +71,26 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
           </Button>
         );
       case isTodayAppointment:
-        if (scheduleType === 'Pending' && new Date().getHours() > 12) {
+        const isAfterNoon = new Date().getHours() > 12;
+
+        if (scheduleType === 'Pending' && isAfterNoon) {
           return (
             <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
               {followUpButtonText}
             </Button>
           );
         }
+
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       default:
-        return (
-          <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
-            {followUpButtonText}
-          </Button>
-        );
+        if (!isFutureAppointment) {
+          return (
+            <Button onClick={handleOpenDefaulterForm} size="sm" kind="tertiary">
+              {followUpButtonText}
+            </Button>
+          );
+        }
+        return null;
     }
   };
 
