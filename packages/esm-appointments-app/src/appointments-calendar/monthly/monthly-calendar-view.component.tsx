@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { CalendarType } from '../types';
-import { monthDays } from '../helpers/functions';
-import styles from './appointments-calendar-list-view.scss';
-import MonthlyWorkload from './monthly-view-workload.component';
+import { CalendarType } from '../../types';
+import { monthDays } from '../../helpers/functions';
+import MonthlyViewWorkload from './monthly-view-workload.component';
 import MonthlyHeader from './monthly-header.module';
+import styles from '../appointments-calendar-view-view.scss';
+
 dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {
@@ -17,13 +18,13 @@ interface MonthlyCalendarViewProps {
 
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ type, events, currentDate, setCurrentDate }) => {
   return (
-    <div style={{ margin: '1rem' }}>
+    <div className={styles.calendarViewContainer}>
       <MonthlyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
       <div className={styles.wrapper}>
         {type === 'monthly' ? (
-          <div className={styles['monthly-calendar']}>
+          <div className={styles.monthlyCalendar}>
             {monthDays(currentDate).map((dateTime, i) => (
-              <MonthlyWorkload type={type} key={i} dateTime={dateTime} currentDate={currentDate} events={events} />
+              <MonthlyViewWorkload type={type} key={i} dateTime={dateTime} currentDate={currentDate} events={events} />
             ))}
           </div>
         ) : null}

@@ -4,8 +4,8 @@ import AppointmentList from './appointments/appointment-tabs.component';
 import ClinicMetrics from './appointments-metrics/appointments-metrics.component';
 import AppointmentsHeader from './appointments-header/appointments-header.component';
 import Overlay from './overlay.component';
-import AppointmentsCalendarListView from './appointments-calendar/appointments-calendar-list-view.component';
-import CalendarPatientList from './appointments-calendar/calendar-patient-list/calendar-patient-list.component';
+import AppointmentsCalendarListView from './appointments-calendar/appointments-calendar-view.component';
+import CalendarPatientList from './appointments-calendar/patient-list/calendar-patient-list.component';
 
 const ClinicalAppointments: React.FC = () => {
   const { t } = useTranslation();

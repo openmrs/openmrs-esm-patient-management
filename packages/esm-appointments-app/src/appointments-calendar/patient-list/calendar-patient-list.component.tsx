@@ -52,20 +52,13 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
     },
   ];
 
-  const rowData =
-    serviceName !== 'Total'
-      ? appointments
-          ?.map((appointment) => ({
-            id: `${appointment.identifier}`,
-            ...appointment,
-            dateTime: formatDatetime(new Date(appointment.dateTime)),
-          }))
-          .filter(({ serviceType }) => serviceName === serviceType)
-      : appointments?.map((appointment) => ({
-          id: `${appointment.identifier}`,
-          ...appointment,
-          dateTime: formatDatetime(new Date(appointment.dateTime)),
-        }));
+  const rowData = appointments
+    ?.filter(({ serviceType }) => serviceName === 'Total' || serviceName === serviceType)
+    .map((appointment) => ({
+      id: `${appointment.identifier}`,
+      ...appointment,
+      dateTime: formatDatetime(new Date(appointment.dateTime)),
+    }));
 
   if (isLoading) {
     return (
