@@ -13,6 +13,15 @@ describe('AppointmentActions', () => {
     scheduleType: 'Pending',
   };
 
+  beforeAll(() => {
+    jest.useFakeTimers('modern');
+    jest.setSystemTime(new Date('2023-04-11T12:00:00Z'));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   it('renders the correct button when the patient has checked out', () => {
     const visits = [
       {
