@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, TextArea } from '@carbon/react';
-import { useSession, showToast, showNotification, ExtensionSlot, usePatient, parseDate } from '@openmrs/esm-framework';
-import { MappedAppointment } from '../types';
-import { cancelAppointment } from './appointment-forms.resource';
-import { closeOverlay } from '../hooks/useOverlay';
+import { useSession, showToast, showNotification, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { cancelAppointment } from '../forms.resource';
 import styles from './cancel-appointment.scss';
 import { useSWRConfig } from 'swr';
-import { useAppointmentDate } from '../helpers';
+import { useAppointmentDate } from '../../../helpers';
+import { closeOverlay } from '../../../hooks/useOverlay';
+import { MappedAppointment } from '../../../types';
 
 interface CancelAppointmentProps {
   appointment: MappedAppointment;
@@ -29,7 +29,6 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
   }, [selectedLocation, session]);
 
   const handleSubmit = async () => {
-    const abortController = new AbortController();
     setIsSubmitting(true);
     const { status } = await cancelAppointment('Cancelled', appointment.id);
     if (status === 200) {

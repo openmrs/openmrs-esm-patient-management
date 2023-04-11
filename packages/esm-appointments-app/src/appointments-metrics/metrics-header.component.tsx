@@ -3,33 +3,48 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 import { useTranslation } from 'react-i18next';
-import { Add, ArrowRight } from '@carbon/react/icons';
+import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { ConfigurableLink } from '@openmrs/esm-framework';
-import { launchOverlay } from '../hooks/useOverlay';
-import AppointmentServices from '../admin/appointment-services/appointment-services.component';
+import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import styles from './metrics-header.scss';
 import { spaBasePath } from '../constants';
+import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
+import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
+
+  const launchCreateAppointmentForm = (patientUuid) => {
+    closeOverlay();
+    launchOverlay(
+      t('appointmentForm', 'Create Appointment'),
+      <AppointmentForm patientUuid={patientUuid} context="creating" />,
+    );
+  };
 
   return (
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{t('appointmentMetrics', 'Appointment metrics')}</span>
       <div className={styles.metricsContent}>
-        <ConfigurableLink className={styles.link} to={`${spaBasePath}/appointments/calendar`}>
-          <span style={{ fontSize: '0.825rem', marginRight: '0.325rem' }}>{t('calendar', 'Calendar')}</span>{' '}
-          <ArrowRight size={16} className={styles.viewListBtn} />
-        </ConfigurableLink>
         <Button
-          renderIcon={Add}
-          onClick={() =>
-            launchOverlay(t('createAppointmentService', 'Create appointment services'), <AppointmentServices />)
-          }
-          kind="ghost">
-          {t('createAppointmentService', 'Create appointment services')}
+          kind="tertiary"
+          renderIcon={Calendar}
+          onClick={() => navigate({ to: `${spaBasePath}/appointments/calendar` })}>
+          {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
+        <ExtensionSlot
+          extensionSlotName="patient-search-button-slot"
+          state={{
+            selectPatientAction: launchCreateAppointmentForm,
+            buttonText: t('createNewAppointment', 'Create new appointment'),
+            overlayHeader: t('createNewAppointment', 'Create new appointment'),
+            buttonProps: {
+              kind: 'primary',
+              renderIcon: (props) => <Hospital size={32} {...props} />,
+              size: 'lg',
+            },
+          }}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
-import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
+import { mockMappedAppointmentsData } from '../../../../../__mocks__/appointments.mock';
 import AppointmentDetails from './appointment-details.component';
 
 describe('AppointmentTablePatientDetails ', () => {

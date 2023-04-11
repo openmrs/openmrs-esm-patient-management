@@ -1,8 +1,8 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, AppointmentSummary, Provider } from '../types';
+import { AppointmentPayload, AppointmentService, AppointmentSummary, Provider } from '../../types';
 import dayjs from 'dayjs';
-import { omrsDateFormat } from '../constants';
+import { omrsDateFormat } from '../../constants';
 import first from 'lodash-es/first';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
@@ -38,7 +38,7 @@ export function useProviders() {
   );
 
   return {
-    data: data ? data.data.results : null,
+    providers: data ? data.data.results : null,
     isError: error,
     isLoading,
   };

@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
 import styles from './calenar-patient-list.scss';
-import { useAppointments } from '../../appointments-tabs/appointments-table.resource';
+import { useAppointments } from '../../appointments/appointments-table.resource';
 
 interface CalendarPatientListProps {}
 
