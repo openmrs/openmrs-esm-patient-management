@@ -41,7 +41,10 @@ import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { MappedAppointment } from '../../types';
 import styles from './visit-form.scss';
-import { useAppointments } from '../../appointments-tabs/appointments-table.resource';
+import { useAppointments } from '../../appointments/appointments-table.resource';
+import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
+import { useVisits } from '../../hooks/useVisits';
+import isEmpty from 'lodash-es/isEmpty';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -64,16 +67,21 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const { mutate } = useAppointments(startDate);
+  const { mutateVisit } = useVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
   const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
       setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
+    } else if (!loadingDefaultFacility && defaultFacility) {
+      setSelectedLocation(defaultFacility?.uuid);
+      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
-  }, [locations, sessionUser]);
+  }, [locations, sessionUser, loadingDefaultFacility]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -113,7 +121,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 const priority = event?.target['priority']?.value;
                 const status = event?.target['status']?.value;
                 const sortWeight = event?.target['sortWeight']?.value;
-
                 saveQueueEntry(
                   response.data.uuid,
                   serviceUuid,
@@ -150,6 +157,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 );
               }
               mutate();
+              mutateVisit();
               closeOverlay();
             }
           },
@@ -270,32 +278,49 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             {isTablet ? (
               <Layer>
                 <Select
-                  labelText={t('selectLocation', 'Select a location')}
+                  labelText={t('selectFacility', 'Select a facility')}
                   id="location"
                   invalidText="Required"
                   value={selectedLocation}
+                  defaultSelected={selectedLocation}
                   onChange={(event) => setSelectedLocation(event.target.value)}>
-                  {locations?.length > 0 &&
+                  {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
+                  {!isEmpty(defaultFacility) ? (
+                    <SelectItem
+                      key={defaultFacility?.uuid}
+                      text={defaultFacility?.display}
+                      value={defaultFacility?.uuid}>
+                      {defaultFacility?.display}
+                    </SelectItem>
+                  ) : locations?.length > 0 ? (
                     locations.map((location) => (
                       <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                         {location.display}
                       </SelectItem>
-                    ))}
+                    ))
+                  ) : null}
                 </Select>
               </Layer>
             ) : (
               <Select
-                labelText={t('selectLocation', 'Select a location')}
+                labelText={t('selectFacility', 'Select a facility')}
                 id="location"
                 invalidText="Required"
                 value={selectedLocation}
+                defaultSelected={selectedLocation}
                 onChange={(event) => setSelectedLocation(event.target.value)}>
-                {locations?.length > 0 &&
+                {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
+                {!isEmpty(defaultFacility) ? (
+                  <SelectItem key={defaultFacility?.uuid} text={defaultFacility?.display} value={defaultFacility?.uuid}>
+                    {defaultFacility?.display}
+                  </SelectItem>
+                ) : locations?.length > 0 ? (
                   locations.map((location) => (
                     <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                       {location.display}
                     </SelectItem>
-                  ))}
+                  ))
+                ) : null}
               </Select>
             )}
           </section>

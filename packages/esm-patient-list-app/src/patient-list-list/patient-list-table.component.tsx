@@ -87,7 +87,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
         getTableContainerProps,
       }: DataTableCustomRenderProps) => (
         <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
-          <Table {...getTableProps()} isSortable useZebraStyles>
+          <Table {...getTableProps()} data-testid="patientListsTable" isSortable useZebraStyles>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
@@ -114,7 +114,7 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
                           <TableCell className={styles.tableCell} key={cell.id}>
                             <ConfigurableLink
                               className={styles.link}
-                              to={`\${openmrsSpaBase}/patient-list/${patientLists[index]?.id}`}>
+                              to={`\${openmrsSpaBase}/home/patient-lists/${patientLists[index]?.id}`}>
                               {cell.value}
                             </ConfigurableLink>
                           </TableCell>

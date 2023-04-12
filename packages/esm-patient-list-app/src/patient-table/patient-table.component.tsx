@@ -113,7 +113,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
       <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer>
-            <Table {...getTableProps()}>
+            <Table {...getTableProps()} data-testid="patientsTable">
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

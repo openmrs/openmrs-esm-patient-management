@@ -185,6 +185,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           </Layer>
         ) : (
           <TextArea
+            id="list_description"
             name="description"
             onChange={handleChange}
             placeholder={t(

@@ -128,6 +128,11 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to fetch patient with id',
   },
+  defaultFacilityUrl: {
+    _type: Type.String,
+    _default: '/ws/rest/v1/kenyaemr/default-facility',
+    _description: 'Custom URL to load default facility if it is not in the session',
+  },
 };
 
 export interface ConfigObject {
@@ -158,6 +163,7 @@ export interface ConfigObject {
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
   customPatientIdUrl: string;
+  defaultFacilityUrl: string;
 }
 
 export interface OutpatientConfig {

@@ -4,18 +4,18 @@ import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import isEmpty from 'lodash-es/isEmpty';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 import { Tile, Layer } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { basePath, spaBasePath, spaRoot } from '../constants';
 import styles from './metrics-card.scss';
-import { spaBasePath, spaRoot } from '../constants';
 
 interface MetricsCardProps {
   label: string;
   value: number;
   headerLabel: string;
   children?: React.ReactNode;
-  view: string;
+  view?: string;
   count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
   appointmentDate?: string;
 }
@@ -48,7 +48,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           </div>
           {view && (
             <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={`/openmrs/spa/${metricsLink[view]}`}>
+              <ConfigurableLink className={styles.link} to={`${spaBasePath}${basePath}/${metricsLink[view]}`}>
                 <span style={{ fontSize: '0.825rem', marginRight: '0.325rem' }}>{t('view', 'View')}</span>{' '}
                 <ArrowRight size={16} className={styles.viewListBtn} />
               </ConfigurableLink>

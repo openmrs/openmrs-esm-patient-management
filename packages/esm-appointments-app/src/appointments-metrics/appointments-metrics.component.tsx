@@ -5,28 +5,33 @@ import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment }
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import { useAppointmentDate } from '../helpers';
-import useAppointmentList from '../hooks/useAppointmentList';
+import { useAppointmentList } from '../hooks/useAppointmentList';
 import styles from './appointments-metrics.scss';
 
 const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid }) => {
   const { t } = useTranslation();
-  const { highestServiceLoad, error } = useClinicalMetrics();
-  const { totalProviders, isLoading: loading } = useAllAppointmentsByDate();
+
+  const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
+  const { totalProviders, isLoading: allAppointmentsLoading } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(serviceUuid);
+
   const startDate = useAppointmentDate();
   const formattedStartDate = formatDate(parseDate(startDate), { mode: 'standard', time: false });
+
   const { appointmentList: arrivedAppointments } = useAppointmentList('Honoured');
   const { appointmentList: pendingAppointments } = useAppointmentList('Pending');
-  const filteredArrivedAppointment = serviceUuid
-    ? arrivedAppointments.filter((arrivedAppt) => arrivedAppt.serviceTypeUuid === serviceUuid)
-    : arrivedAppointments;
 
-  const filteredPendingAppointment = serviceUuid
-    ? pendingAppointments.filter((arrivedAppt) => arrivedAppt.serviceTypeUuid === serviceUuid)
+  const filteredArrivedAppointments = serviceUuid
+    ? arrivedAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
+    : arrivedAppointments;
+  const filteredPendingAppointments = serviceUuid
+    ? pendingAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
     : pendingAppointments;
 
-  if (error) {
-    <ErrorState headerTitle={t('appointmentMetricsLoadError')} error={error} />;
+  if (clinicalMetricsError) {
+    return (
+      <ErrorState headerTitle={t('appointmentMetricsLoadError', 'Metrics load error')} error={clinicalMetricsError} />
+    );
   }
 
   return (
@@ -37,8 +42,7 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
-          view="patients"
-          count={{ pendingAppointments: filteredPendingAppointment, arrivedAppointments: filteredArrivedAppointment }}
+          count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
           appointmentDate={startDate}
         />
         <MetricsCard
@@ -47,13 +51,11 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
           }
           value={highestServiceLoad?.count ?? '--'}
           headerLabel={t('highestServiceVolume', 'High volume service: {time}', { time: formattedStartDate })}
-          view=""
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
           headerLabel={t('providersAvailableToday', 'Providers available: {time}', { time: formattedStartDate })}
-          view=""
         />
       </div>
     </>

@@ -61,7 +61,6 @@ import {
   updateSelectedServiceUuid,
   useSelectedServiceName,
   useSelectedQueueLocationUuid,
-  useSelectedProviderRoomTimestamp,
   useIsPermanentProviderQueueRoom,
 } from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
@@ -256,7 +255,7 @@ function ActiveVisitsTable() {
   }, [providerUuid]);
 
   useEffect(() => {
-    if (differenceInTime >= 1 && isPermanentProviderQueueRoom == 'false') {
+    if (differenceInTime >= 1 && (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null)) {
       launchAddProviderRoomModal();
     }
   }, []);

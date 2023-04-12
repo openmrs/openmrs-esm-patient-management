@@ -31,20 +31,14 @@ function setupOpenMRS() {
       path: appointmentsBasePath,
       parent: `${window.spaBase}/home`,
     },
+    {
+      path: `${window.spaBase}/patient-list/:forDate/:serviceName`,
+      title: ([date, serviceName]) => `Patient Lists / ${decodeURI(serviceName)}`,
+      parent: `${window.spaBase}`,
+    },
   ]);
 
   return {
-    pages: [
-      {
-        load: getAsyncLifecycle(
-          () => import('./appointments-calendar/appointments-calendar-list-view.component'),
-          options,
-        ),
-        route: /^calendar/,
-        online: true,
-        offline: true,
-      },
-    ],
     extensions: [
       {
         name: 'home-appointments',

@@ -23,6 +23,7 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const { data, error, isLoading } = useSWR<{ data: Array<CalendarEvent> }>(
     startDate && endDate ? url : null,
     openmrsFetch,
+    { errorRetryCount: 2 },
   );
   const results =
     data?.data.map((event) => ({

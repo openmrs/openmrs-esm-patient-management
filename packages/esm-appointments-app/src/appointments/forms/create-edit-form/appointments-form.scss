@@ -1,0 +1,76 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../../../root.scss';
+
+.formContainer {
+  margin: 0 spacing.$spacing-05;
+}
+
+.stickyFormHeader {
+  position: sticky;
+  top: spacing.$spacing-09;
+  z-index: 10;
+}
+
+.row {
+  display: flex;
+  margin: spacing.$spacing-03;
+}
+
+.select {
+  width: 90%;
+  margin-right: 60%;
+}
+
+.inputContainer {
+  margin: spacing.$spacing-05 0;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.timePickerInput {
+  width: 8rem;
+}
+
+.datePickerInput {
+  padding-bottom: 1rem;
+  margin-left: 12.5rem;
+}
+
+.workLoadCard {
+  display: flex;
+  margin: 0 1rem;
+  color: #525252;
+}
+.monthlyWorkLoadCard {
+  color: #525252;
+  display: flex;
+  flex-wrap: wrap;
+}
+.workLoadContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding-bottom: 1rem;
+}
+
+.workLoadTitle {
+  padding-top: spacing.$spacing-05;
+  color: #525252;
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
+  @include type.type-style('legal-01');
+  font-weight: 400;
+}
+.input {
+  width: 13.5rem;
+}
+
+.hide {
+  display: none;
+}
