@@ -255,7 +255,7 @@ function ActiveVisitsTable() {
   }, [providerUuid]);
 
   useEffect(() => {
-    if (differenceInTime >= 1 && isPermanentProviderQueueRoom == 'false') {
+    if (differenceInTime >= 1 && (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null)) {
       launchAddProviderRoomModal();
     }
   }, []);
