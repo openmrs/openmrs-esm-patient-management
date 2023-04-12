@@ -11,6 +11,7 @@ interface ComboInputProps extends Omit<ComboBoxProps, 'items'> {
   setSelectedValue: any;
   selected: string;
   textFieldName: string;
+  required?: boolean;
 }
 
 export const ComboInput: React.FC<ComboInputProps> = ({
@@ -20,12 +21,14 @@ export const ComboInput: React.FC<ComboInputProps> = ({
   setSelectedValue,
   selected,
   textFieldName,
+  required,
 }) => {
   const { t } = useTranslation();
   const [field, _, helpers] = useField(name);
   const [listItems, setListItems] = useState([]);
   const [error, setError] = useState<Error>();
   const { setValue } = helpers;
+  const comboLabelText = !required ? `${labelText} (${t('optional', 'optional')})` : labelText;
   const comboBoxEvent = (text, id) => {
     if (text == '') {
     } else {
@@ -65,8 +68,7 @@ export const ComboInput: React.FC<ComboInputProps> = ({
             }
           }}
           placeholder={placeholder}
-          titleText={labelText}
-          light
+          titleText={comboLabelText}
         />
       </Layer>
     </div>
