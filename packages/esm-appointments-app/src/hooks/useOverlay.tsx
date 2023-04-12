@@ -1,25 +1,24 @@
 import { getGlobalStore } from '@openmrs/esm-framework';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-interface OverlayStore {
+export interface OverlayStore {
   isOverlayOpen: boolean;
-  // TODO: Fix this more conclusively
   component?: any;
   header: string;
 }
 
-const initialState = { isOverlayOpen: false, component: Function, header: '' };
+const initialState: OverlayStore = { isOverlayOpen: false, header: '' };
 
 const getOverlayStore = () => {
   return getGlobalStore('appointment-store', initialState);
 };
 
-export const launchOverlay = (headerTitle: string, componentToRender) => {
+export const launchOverlay = (headerTitle: string, componentToRender: any) => {
   const store = getOverlayStore();
   store.setState({ isOverlayOpen: true, component: componentToRender, header: headerTitle });
 };
 
-export const closeOverlay = () => {
+export const closeOverlay = (): void => {
   const store = getOverlayStore();
   store.setState({ component: null, isOverlayOpen: false });
 };
@@ -27,17 +26,20 @@ export const closeOverlay = () => {
 export const useOverlay = () => {
   const [overlay, setOverlay] = useState<OverlayStore>();
 
-  useEffect(() => {
-    function update(state: OverlayStore) {
-      setOverlay(state);
-    }
-    update(getOverlayStore().getState());
-    getOverlayStore().subscribe(update);
+  const update = useCallback((state: OverlayStore) => {
+    setOverlay(state);
   }, []);
 
+  useEffect(() => {
+    update(getOverlayStore().getState());
+    getOverlayStore().subscribe(update);
+  }, [update]);
+
+  const { isOverlayOpen, component, header } = overlay ?? {};
+
   return {
-    isOverlayOpen: overlay?.isOverlayOpen,
-    component: overlay?.component,
-    header: overlay?.header,
+    isOverlayOpen,
+    component,
+    header,
   };
 };

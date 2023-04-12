@@ -6,10 +6,14 @@
 .wrapper {
   position: relative;
 }
-.monthly-calendar {
+.monthlyCalendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0px, 1fr));
   grid-template-rows: repeat(6, minmax(0px, 1fr));
+}
+
+.calendarViewContainer {
+  margin: spacing.$spacing-05;
 }
 .backgroundColor {
   margin: 1px 0 0;

@@ -1,21 +1,19 @@
 import { Button } from '@carbon/react';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { weekDays } from '../helpers';
-import { CalendarType } from '../types';
-import styles from './weekly-header.scss';
+import styles from './daily-header.scss';
+import { CalendarType } from '../../types';
 
 const Format = {
   monthly: 'month',
   weekly: 'week',
   daily: 'day',
 } as const;
-const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-const dateFormat = 'D MMM';
-const monthFormat = 'MMMM, YYYY';
+const dateFormat = 'MMMM DD, YYYY';
 const yearFormat = 'YYYY';
-function WeeklyHeader({
+const now = dayjs();
+function DailyHeader({
   type,
   currentDate,
   setCurrentDate,
@@ -33,33 +31,22 @@ function WeeklyHeader({
         <Button size="sm" onClick={() => setCurrentDate(currentDate.subtract(1, Format[type]))} kind="tertiary">
           {t('prev', 'Prev')}
         </Button>
-        <span>
-          {type === 'monthly'
-            ? currentDate.format(monthFormat)
-            : type === 'daily'
+        <h2>
+          {type === 'daily'
             ? currentDate.format(dateFormat)
             : `${currentDate.startOf('week').format(dateFormat)} - ${currentDate
                 .endOf('week')
                 .format(dateFormat)} , ${currentDate.format(yearFormat)}`}
-        </span>
+        </h2>
         <Button size="sm" onClick={() => setCurrentDate(currentDate.add(1, Format[type]))} kind="tertiary">
           {t('next', 'Next')}
         </Button>
       </div>
-      <div className={styles.workLoadCard}>
-        {weekDays(currentDate).map((dateTime, i) => (
-          <>
-            {i !== 0 && (
-              <div tabIndex={0} role="button" className={`${styles.tileContainer} `}>
-                <span>
-                  {dateTime.format('dddd')} {dateTime.format('DD')}
-                </span>
-              </div>
-            )}
-          </>
-        ))}
+      <div className={styles.dayDate}>
+        <div className={styles.dayDateColumn1}></div>
+        <div className={styles.dayDateColumn2}> {type === 'daily' ? currentDate.format('dddd') : ''}</div>
       </div>
     </>
   );
 }
-export default WeeklyHeader;
+export default DailyHeader;

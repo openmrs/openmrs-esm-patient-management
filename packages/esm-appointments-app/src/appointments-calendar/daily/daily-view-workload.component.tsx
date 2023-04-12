@@ -1,21 +1,20 @@
 import dayjs, { Dayjs } from 'dayjs';
-import styles from './weekly-workload-module.scss';
+import styles from './daily-workload-module.scss';
 import React from 'react';
-import { CalendarType } from '../types';
-import { isSameMonth } from '../helpers';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { spaBasePath } from '../constants';
+import { spaBasePath } from '../../constants';
+import { isSameMonth } from '../../helpers';
+import { CalendarType } from '../../types';
 
 interface WeeklyCellProps {
   type: CalendarType;
   dateTime: Dayjs;
   currentDate: Dayjs;
   events: Array<any>;
-  index?: number;
 }
 
-const WeeklyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, currentDate, events, index }) => {
+const DailyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, currentDate, events }) => {
   const layout = useLayoutType();
   const currentData = events?.find(
     (event) => dayjs(event.appointmentDate).format('YYYY-MM-DD') === dayjs(dateTime).format('YYYY-MM-DD'),
@@ -27,20 +26,20 @@ const WeeklyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, current
     <div
       className={
         styles[
-          type === 'weekly'
+          type === 'daily'
             ? 'weekly-cell'
             : isSameMonth(dateTime, currentDate)
             ? 'monthly-cell'
             : 'monthly-cell-disabled'
         ]
       }>
-      {type === 'weekly' ? (
+      {type === 'daily' ? (
         <>
           <div className={styles.allDayComponent}>
             <small className={styles.allDay}>All Day</small>
-            {index !== 0 && currentData?.service && (
+            {currentData?.service && (
               <div className={styles.currentData}>
-                {currentData?.service.map(({ serviceName, count }, index) => (
+                {currentData?.service.map(({ serviceName, count, i }) => (
                   <div
                     role="button"
                     tabIndex={0}
@@ -67,4 +66,4 @@ const WeeklyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, current
     </div>
   );
 };
-export default WeeklyWorkloadView;
+export default DailyWorkloadView;

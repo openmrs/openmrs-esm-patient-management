@@ -3,8 +3,8 @@ import { Dayjs } from 'dayjs';
 import styles from './monthly-header.module.scss';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { CalendarType } from '../types';
-import DaysOfWeekCard from './days-of-week.component';
+import { CalendarType } from '../../types';
+import DaysOfWeekCard from '../daily/days-of-week.component';
 
 const Format = {
   monthly: 'month',
