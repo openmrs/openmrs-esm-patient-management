@@ -15,7 +15,11 @@ describe('AppointmentActions', () => {
 
   beforeAll(() => {
     jest.useFakeTimers('modern');
-    jest.setSystemTime(new Date('2023-04-11T12:00:00Z'));
+    const currentDateTime = new Date();
+    currentDateTime.setHours(12);
+    currentDateTime.setMinutes(0);
+
+    jest.setSystemTime(currentDateTime);
   });
 
   afterAll(() => {
