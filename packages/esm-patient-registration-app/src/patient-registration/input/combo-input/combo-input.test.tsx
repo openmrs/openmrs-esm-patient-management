@@ -18,7 +18,7 @@ describe('Combo box input', () => {
             name="text"
             textFieldName="text"
             placeholder="Enter text"
-            light
+            required
           />
         </Form>
       </Formik>,
