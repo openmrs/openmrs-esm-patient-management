@@ -45,6 +45,7 @@ import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment'
 import { SearchTypes, PatientProgram, NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
+import isEmpty from 'lodash-es/isEmpty';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -58,7 +59,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
-  const { defaultFacility } = useDefaultLoginLocation();
+  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const config = useConfig() as ConfigObject;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
@@ -81,11 +82,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
       setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
-    } else {
+    } else if (!loadingDefaultFacility && defaultFacility) {
       setSelectedLocation(defaultFacility?.uuid);
       setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
-  }, [locations, sessionUser]);
+  }, [locations, sessionUser, loadingDefaultFacility]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -259,13 +260,20 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               id="location"
               invalidText="Required"
               value={selectedLocation}
+              defaultSelected={selectedLocation}
               onChange={(event) => setSelectedLocation(event.target.value)}>
-              {locations?.length > 0 &&
+              {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
+              {!isEmpty(defaultFacility) ? (
+                <SelectItem key={defaultFacility?.uuid} text={defaultFacility?.display} value={defaultFacility?.uuid}>
+                  {defaultFacility?.display}
+                </SelectItem>
+              ) : locations?.length > 0 ? (
                 locations.map((location) => (
                   <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                     {location.display}
                   </SelectItem>
-                ))}
+                ))
+              ) : null}
             </Select>
           </section>
 

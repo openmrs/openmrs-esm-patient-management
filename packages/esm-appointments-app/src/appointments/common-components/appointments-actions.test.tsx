@@ -45,25 +45,26 @@ describe('AppointmentActions', () => {
       {
         patient: { uuid: '123' },
         startDatetime: new Date().toISOString(),
+        stopDatetime: null,
       },
     ];
-    const props = { ...defaultProps, visits };
-    render(<AppointmentActions {...props} />);
-    const button = screen.getByText('Check out');
+    const props = { ...defaultProps, visits, scheduleType: 'Scheduled' };
+    const { getByText } = render(<AppointmentActions {...props} />);
+    const button = getByText('Check out');
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
-    const props = { ...defaultProps };
+    const props = { ...defaultProps, scheduleType: 'Pending' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: 'CheckIn' });
+    const button = screen.getByRole('button', { name: 'Actions' });
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
     const props = { ...defaultProps, scheduleType: 'Confirmed' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: 'CheckIn' });
+    const button = screen.getByRole('button', { name: 'Actions' });
     expect(button).toBeInTheDocument();
   });
 
