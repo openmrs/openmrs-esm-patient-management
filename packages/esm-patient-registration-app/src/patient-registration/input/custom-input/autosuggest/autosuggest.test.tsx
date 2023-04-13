@@ -73,7 +73,7 @@ describe('autosuggest', () => {
     expect(list[1].textContent).toBe('John Smith');
   });
 
-  xit('triggers onSuggestionSelected with correct values when li is clicked', async () => {
+  it('triggers onSuggestionSelected with correct values when li is clicked', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -82,7 +82,7 @@ describe('autosuggest', () => {
     expect(handleSuggestionSelected).toHaveBeenNthCalledWith(1, 'person', 'randomuuid1');
   });
 
-  it.skip('sets search box value to selected suggestion', async () => {
+  it('sets search box value to selected suggestion', async () => {
     setup();
     let searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -92,7 +92,7 @@ describe('autosuggest', () => {
     expect(searchbox.textContent).toBe('John Doe');
   });
 
-  xit('clears suggestions when a suggestion is selected', async () => {
+  it('clears suggestions when a suggestion is selected', async () => {
     setup();
     // screen.getByRole('x');
     let list = screen.queryByRole('list');
