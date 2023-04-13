@@ -60,6 +60,10 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
       key: 'patientName',
     },
     {
+      header: t('identifier', 'Identifier'),
+      key: 'identifier',
+    },
+    {
       header: t('nextAppointmentDate', 'Next appointment date'),
       key: 'nextAppointmentDate',
     },

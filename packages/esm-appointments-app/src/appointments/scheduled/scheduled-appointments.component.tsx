@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useAppointmentList, useEarlyAppointmentList } from '../../hooks/useAppointmentList';
@@ -25,6 +25,10 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   const isDateInPast = dayjs(appointmentDate).isBefore(dayjs(), 'date');
   const isDateInFuture = dayjs(appointmentDate).isAfter(dayjs(), 'date');
   const isToday = dayjs(appointmentDate).isSame(dayjs(), 'date');
+
+  useEffect(() => {
+    setScheduleType('Scheduled');
+  }, [appointmentDate]);
 
   const filteredAppointments = appointmentServiceType
     ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
