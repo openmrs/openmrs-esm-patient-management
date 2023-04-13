@@ -13,14 +13,17 @@ export function downloadAppointmentsAsExcel(
     time: true,
   })}`,
 ) {
-  const appointmentsJSON = appointments?.map(({ name, gender, age, serviceType, dateTime, phoneNumber }) => ({
-    'Patient name': name,
-    Gender: gender === 'F' ? 'Female' : 'Male',
-    Age: age,
-    'Appointment type': serviceType,
-    Date: formatDate(new Date(dateTime), { mode: 'wide' }),
-    'Phone Number': phoneNumber || '--',
-  }));
+  const appointmentsJSON = appointments?.map(
+    ({ name, gender, age, serviceType, dateTime, phoneNumber, identifier }) => ({
+      'Patient name': name,
+      Gender: gender === 'F' ? 'Female' : 'Male',
+      Age: age,
+      Identifier: identifier ?? '--',
+      'Appointment type': serviceType,
+      Date: formatDate(new Date(dateTime), { mode: 'wide' }),
+      'Phone Number': phoneNumber || '--',
+    }),
+  );
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');

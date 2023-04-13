@@ -249,11 +249,11 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   if (!currServiceName || currServiceName == t('all', 'All')) {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter(({ visitStartDateTime }) => dayjs(visitStartDateTime).isToday());
+      .filter(({ visitStartDateTime }) => dayjs(visitStartDateTime).isSame(dayjs()));
   } else {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime).isToday());
+      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime)?.isSame(dayjs()));
   }
 
   return {
