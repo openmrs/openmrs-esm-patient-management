@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
+import { SearchedPatient } from '../types';
 
 const useArrowNavigation = (
   totalResults: number,
-  enterCallback: (evt: any, index: number) => void,
+  enterCallback: (evt: any, index: number, patients?: Array<SearchedPatient>) => void,
   resetFocusCallback: () => void,
   initalFocussedResult: number = -1,
 ) => {

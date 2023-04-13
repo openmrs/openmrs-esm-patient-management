@@ -6,16 +6,12 @@ import EmptyDataIllustration from '../ui-components/empty-data-illustration.comp
 import styles from './patient-search.scss';
 import { PatientSearchResponse, SearchedPatient } from '../types';
 
-interface PatientSearchProps extends PatientSearchResponse {
-  query: string;
+interface RecentPatientSearchProps extends PatientSearchResponse {
   selectPatientAction?: (evt: any, index: number, patients: Array<SearchedPatient>) => void;
 }
 
-const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  (
-    { selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults },
-    ref,
-  ) => {
+const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
+  ({ selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
     const loadingIconRef = useCallback(
@@ -81,7 +77,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>
-              {t('searchResultsCount', '{count} search result{plural}', {
+              {t('recentSearchResultsCount', '{count} recent search result{plural}', {
                 count: searchResults.length,
                 plural: searchResults.length === 0 || searchResults.length > 1 ? 's' : '',
               })}
@@ -119,4 +115,4 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
   },
 );
 
-export default PatientSearch;
+export default RecentPatientSearch;

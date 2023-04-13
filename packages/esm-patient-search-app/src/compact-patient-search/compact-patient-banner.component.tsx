@@ -7,7 +7,7 @@ import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
-  selectPatientAction?: (evt: any, index: number) => void;
+  selectPatientAction?: (evt: any, index: number, patients: Array<SearchedPatient>) => void;
 }
 
 const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(
@@ -75,7 +75,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
           const isDeceased = Boolean(patient?.deceasedDateTime);
           return (
             <ConfigurableLink
-              onClick={(evt) => selectPatientAction(evt, indx)}
+              onClick={(evt) => selectPatientAction(evt, indx, patients)}
               to={`${interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
               })}`}
