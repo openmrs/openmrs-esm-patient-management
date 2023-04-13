@@ -107,6 +107,20 @@ describe('autosuggest', () => {
     expect(list).toBeNull();
   });
 
+  it('suggestions changes when a search input is changed', async () => {
+    setup();
+    // screen.getByRole('x');
+    let list = screen.queryByRole('list');
+    expect(list).toBeNull();
+    const searchbox = screen.getByRole('searchbox');
+    fireEvent.change(searchbox, { target: { value: 'john' } });
+    const suggestion = await screen.findByText('John Doe');
+    expect(suggestion).toBeInTheDocument();
+    fireEvent.change(searchbox, { target: { value: '' } });
+    list = screen.queryByRole('list');
+    expect(list).toBeNull();
+  });
+
   it('should hide suggestions when clicked outside of component', async () => {
     setup();
     const input = screen.getByRole('searchbox');
