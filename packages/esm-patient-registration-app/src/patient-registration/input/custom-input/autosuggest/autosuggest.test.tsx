@@ -106,4 +106,13 @@ describe('autosuggest', () => {
     list = screen.queryByRole('list');
     expect(list).toBeNull();
   });
+
+  it('should hide suggestions when clicked outside of component', async () => {
+    setup();
+    const input = screen.getByRole('searchbox');
+    fireEvent.change(input, { target: { value: 'john' } });
+    await screen.findByText('John Doe');
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+  });
 });
