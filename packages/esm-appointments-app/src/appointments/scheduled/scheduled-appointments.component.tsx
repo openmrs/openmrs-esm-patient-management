@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import styles from './scheduled-appointments.scss';
-import AppointmentsBaseTable from '../common-components/appointments-base-table.component';
+import AppointmentsTable from '../common-components/appointments-table.component';
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
@@ -75,7 +75,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     Pending: {
       appointments: filteredRow,
       isLoading,
-      tableHeading: isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed'),
+      tableHeading: isDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived'),
       visits,
       scheduleType,
     },
@@ -106,7 +106,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
         </ContentSwitcher>
       )}
       <div className={styles.container}>
-        <AppointmentsBaseTable {...currentConfig} />
+        <AppointmentsTable {...currentConfig} />
       </div>
     </>
   );

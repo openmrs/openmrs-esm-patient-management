@@ -27,7 +27,7 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
       } ${layout === 'small-desktop' ? styles.smallDesktop : styles.largeDesktop}`}>
       {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
         <p>
-          <b>{dateTime.format('D')}</b>
+          <b className={styles.calendarDate}>{dateTime.format('D')}</b>
           {currentData?.service && (
             <div className={styles.currentData}>
               {currentData.service.map(({ serviceName, count }) => (
@@ -36,7 +36,7 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
                   role="button"
                   tabIndex={0}
                   onClick={() => serviceAreaOnClick(serviceName)}
-                  className={`${styles.serviceArea} ${styles[colorCoding[serviceName]]}`}>
+                  className={`${styles.serviceArea}`}>
                   <span>{serviceName}</span>
                   <span>{count}</span>
                 </div>
