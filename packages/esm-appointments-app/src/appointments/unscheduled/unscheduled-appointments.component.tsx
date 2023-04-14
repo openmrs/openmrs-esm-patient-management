@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import {
@@ -22,10 +22,15 @@ import { ConfigurableLink, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import { EmptyState } from '../../empty-state/empty-state.component';
+import { getPageSizes, useSearchResults } from '../utils';
 
 const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
+  const [pageSize, setPageSize] = useState(25);
+
+  const [searchString, setSearchString] = useState('');
   const { data: unscheduledAppointments, isLoading, error } = useUnscheduledAppointments();
+  const searchResults = useSearchResults(unscheduledAppointments, searchString);
   const headerData = [
     {
       header: 'Patient Name',
@@ -45,7 +50,7 @@ const UnscheduledAppointments: React.FC = () => {
     },
   ];
 
-  const { results, currentPage, goTo } = usePagination(unscheduledAppointments, 10);
+  const { results, currentPage, goTo } = usePagination(searchResults, pageSize);
 
   const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
@@ -59,18 +64,11 @@ const UnscheduledAppointments: React.FC = () => {
     phoneNumber: visit.phoneNumber === '' ? '--' : visit.phoneNumber,
   }));
 
-  const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(unscheduledAppointments.length / 10);
-    return [...Array(numberOfPages).keys()].map((x) => {
-      return (x + 1) * 10;
-    });
-  }, [unscheduledAppointments]);
-
   if (isLoading) {
     return <DataTableSkeleton />;
   }
 
-  if (isEmpty(unscheduledAppointments)) {
+  if (!unscheduledAppointments?.length) {
     return (
       <EmptyState
         displayText={t('unscheduledAppointments_lower', 'unscheduled appointments')}
@@ -83,14 +81,20 @@ const UnscheduledAppointments: React.FC = () => {
   return (
     <div>
       <DataTable rows={rowData} headers={headerData} isSortable>
-        {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
-          <TableContainer title={`${t('unscheduledAppointments', 'Unscheduled appointments')} ${rowData.length}`}>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer
+            title={`${t('unscheduledAppointments', 'Unscheduled appointments')} ${unscheduledAppointments.length}`}
+            description={`${t(`Total ${unscheduledAppointments.length ?? 0}`)}`}>
             <TableToolbar>
               <TableToolbarContent>
-                <TableToolbarSearch style={{ backgroundColor: '#f4f4f4' }} tabIndex={0} onChange={onInputChange} />
+                <TableToolbarSearch
+                  style={{ backgroundColor: '#f4f4f4' }}
+                  tabIndex={0}
+                  onChange={(event) => setSearchString(event.target.value)}
+                />
                 <Button
                   size="lg"
-                  kind="ghost"
+                  kind="tertiary"
                   renderIcon={Download}
                   onClick={() => downloadUnscheduledAppointments(unscheduledAppointments)}>
                   {t('download', 'Download')}
@@ -124,9 +128,12 @@ const UnscheduledAppointments: React.FC = () => {
         forwardText="Next page"
         page={currentPage}
         pageNumberText="Page Number"
-        pageSize={10}
-        onChange={({ page }) => goTo(page)}
-        pageSizes={pageSizes.length > 0 ? pageSizes : [10]}
+        pageSize={pageSize}
+        onChange={({ page, pageSize }) => {
+          goTo(page);
+          setPageSize(pageSize);
+        }}
+        pageSizes={getPageSizes(unscheduledAppointments, pageSize) ?? []}
         totalItems={unscheduledAppointments.length ?? 0}
       />
     </div>

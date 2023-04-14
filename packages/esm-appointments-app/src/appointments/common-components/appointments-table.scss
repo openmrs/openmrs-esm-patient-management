@@ -1,0 +1,18 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.expandedActiveVisitRow > td > div {
+  max-height: max-content !important;
+}
+
+.expandedActiveVisitRow td {
+  padding: 0 2rem;
+}
+
+.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
+  padding: 0 1rem;
+}
+
+.hiddenRow {
+  display: none;
+}

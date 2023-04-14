@@ -19,21 +19,18 @@ export function getPageSizes<T>(data: Array<T>, pageSize: number = 10): Array<nu
 }
 
 /**
- * Returns a filtered array of appointments based on a search string.
- * If the search string is empty or null, the original appointments array is returned.
- *
- * @param {Array<MappedAppointment>} appointments The array of appointments to search.
- * @param {string} searchString The search string to use for filtering.
- * @returns {Array<MappedAppointment>} The filtered array of appointments.
- */
-export function useSearchResults(
-  appointments: Array<MappedAppointment>,
-  searchString: string,
-): Array<MappedAppointment> {
+
+Returns an array of filtered data that contains search string
+@template T
+@param {T[]} data - The array of data to filter
+@param {string} searchString - The string to search for in the data
+@returns {T[]} The filtered array of data
+*/
+export function useSearchResults<T>(data: T[], searchString: string): T[] {
   const searchResults = useMemo(() => {
     if (searchString && searchString.trim() !== '') {
       const search = searchString.toLowerCase();
-      return appointments.filter((appointment) =>
+      return data.filter((appointment) =>
         Object.entries(appointment).some(([header, value]) => {
           if (header === 'patientUuid') {
             return false;
@@ -43,8 +40,8 @@ export function useSearchResults(
       );
     }
 
-    return appointments;
-  }, [searchString, appointments]);
+    return data;
+  }, [searchString, data]);
 
   return searchResults;
 }
