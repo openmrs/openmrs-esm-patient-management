@@ -1,16 +1,18 @@
-import { Button } from '@carbon/react';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
-  children?: React.ReactNode;
   menuTitle: React.ReactNode;
   dropDownMenu: boolean;
+  children: React.ReactNode;
+  deceased?: boolean;
 }
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
   dropDownMenu,
   menuTitle,
   children,
+  deceased,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const wrapperRef = useRef(null);
@@ -43,49 +45,25 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   }, [wrapperRef]);
 
   return (
-    <div
-      data-overflow-menu
-      className="cds--overflow-menu"
-      style={{
-        width: 'auto',
-        height: 'auto',
-      }}
-      ref={wrapperRef}>
-      <Button
-        kind="ghost"
-        className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'}`}
+    <div data-overflow-menu className={`cds--overflow-menu ${styles.container}`} ref={wrapperRef}>
+      <button
+        className={`cds--btn cds--btn--ghost cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
+          deceased && styles.deceased
+        } ${styles.overflowMenuButton}`}
         aria-haspopup="true"
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
         aria-controls="custom-actions-overflow-menu"
-        onClick={toggleShowMenu}
-        style={{
-          width: 'auto',
-          height: 'auto',
-          padding: '1rem',
-          color: '#0f62fe',
-          outline: '2rem solid transparent',
-          boxShadow: showMenu ? '0 2px 6px 0 rgb(0 0 0 / 30%)' : 'none',
-        }}>
+        onClick={toggleShowMenu}>
         {menuTitle}
-      </Button>
+      </button>
       <div
-        className="cds--overflow-menu-options cds--overflow-menu--flip"
+        className={`cds--overflow-menu-options cds--overflow-menu--flip ${styles.menu} ${showMenu && styles.show}`}
         tabIndex={0}
         data-floating-menu-direction="bottom"
         role="menu"
         aria-labelledby="custom-actions-overflow-menu-trigger"
-        id="custom-actions-overflow-menu"
-        style={{
-          display: showMenu ? 'block' : 'none',
-          top: '3.125rem',
-          minWidth: 'initial',
-          left: 'auto',
-          right: '0',
-          backgroundColor: '#f4f4f4',
-          marginRight: '0.2rem',
-          boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
-        }}>
+        id="custom-actions-overflow-menu">
         <ul className="cds--overflow-menu-options__content">{children}</ul>
         <span />
       </div>
