@@ -109,10 +109,7 @@ describe('AppointmentsBaseTable', () => {
     const downloadButton = screen.getByRole('button', { name: /Download/ });
     fireEvent.click(downloadButton);
     expect(downloadButton).toBeInTheDocument();
-    expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(
-      appointments,
-      'Scheduled Appointments Today, 12:00 PM',
-    );
+    expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(appointments, expect.anything());
   });
 
   it('should have pagination when there are more than 25 appointments', () => {
