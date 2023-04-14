@@ -16,11 +16,13 @@ import {
 } from '@openmrs/esm-framework';
 import { Identifer, MappedServiceQueueEntry, QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import isToday from 'dayjs/plugin/isToday';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
 export type QueueService = 'Clinical consultation' | 'Triage';
 export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+dayjs.extend(isToday);
 
 export interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
@@ -249,11 +251,11 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   if (!currServiceName || currServiceName == t('all', 'All')) {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter(({ visitStartDateTime }) => dayjs(visitStartDateTime).isSame(dayjs()));
+      .filter((data) => dayjs(data.visitStartDateTime).isToday());
   } else {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime)?.isSame(dayjs()));
+      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime).isToday());
   }
 
   return {
