@@ -9,11 +9,11 @@ describe.skip('number input', () => {
     render(
       <Formik initialValues={{ number: 0 }} onSubmit={null}>
         <Form>
-          <Input id="number" labelText="Number" name="number" />
+          <Input id="number" type="number" labelText="Number" name="number" />
         </Form>
       </Formik>,
     );
-    return screen.getByLabelText('number') as HTMLInputElement;
+    return screen.getByLabelText('Number (optional)') as HTMLInputElement;
   };
 
   it('exists', async () => {
@@ -34,16 +34,27 @@ describe.skip('number input', () => {
   });
 });
 
-describe.skip('text input', () => {
+describe('text input', () => {
   const setupInput = async () => {
     render(
-      <Formik initialValues={{ text: '' }} onSubmit={null}>
+      <Formik initialValues={{ text: '' }} onSubmit={() => {}}>
         <Form>
-          <Input id="text" labelText="Text" name="text" placeholder="Enter text" />
+          <Input
+            id="text"
+            labelText="Text"
+            name="text"
+            placeholder="Enter text"
+            required
+            checkWarning={(value) => {
+              if (value.length > 5) {
+                return 'name should be of 5 char';
+              }
+            }}
+          />
         </Form>
       </Formik>,
     );
-    return screen.getByLabelText('text') as HTMLInputElement;
+    return screen.getByLabelText('Text') as HTMLInputElement;
   };
 
   it('exists', async () => {
@@ -61,6 +72,29 @@ describe.skip('text input', () => {
     await user.tab();
 
     expect(input.value).toEqual(expected);
+  });
+  it('shows warning when wrong input is entered', async () => {
+    const user = userEvent.setup();
+
+    const input = await setupInput();
+    const expected = 123456;
+
+    await userEvent.clear(input);
+
+    await user.type(input, expected.toString());
+    await user.tab();
+
+    expect(screen.getByText('name should be of 5 char')).toBeInTheDocument();
+  });
+  it('should show the correct label text if the field is not required', () => {
+    render(
+      <Formik initialValues={{ text: '' }} onSubmit={() => {}}>
+        <Form>
+          <Input id="text" labelText="Text" name="text" placeholder="Enter text" />
+        </Form>
+      </Formik>,
+    );
+    expect(screen.getByLabelText('Text (optional)')).toBeInTheDocument();
   });
 });
 
