@@ -24,7 +24,6 @@ import {
   updatePatientIdentifier,
   saveEncounter,
 } from './patient-registration.resource';
-import isEqual from 'lodash-es/isEqual';
 import { RegistrationConfig } from '../config-schema';
 
 export type SavePatientForm = (
@@ -359,10 +358,12 @@ export class FormManager {
     if (values.patientUuid) {
       Object.entries(values.attributes)
         .filter(([, value]) => !value)
-        .forEach(([key]) => {
+        .forEach(async ([key]) => {
           const attributeUuid = patientUuidMap[`attribute.${key}`];
-          openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+          await openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
             method: 'DELETE',
+          }).catch((err) => {
+            console.error(err);
           });
         });
     }
