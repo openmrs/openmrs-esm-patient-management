@@ -108,7 +108,7 @@ export const AddressHierarchy: React.FC = () => {
                   key={`combo_input_${index}`}
                   textFieldName={attributes.name}
                   name={`address.${attributes.name}`}
-                  labelText={t(attributes.name)}
+                  labelText={t(attributes.label)}
                   id={attributes.name}
                   setSelectedValue={setSelectedValue}
                   selected={selected}
@@ -117,7 +117,7 @@ export const AddressHierarchy: React.FC = () => {
                 <Input
                   key={`combo_input_${index}`}
                   name={`address.${attributes.name}`}
-                  labelText={t(attributes.name)}
+                  labelText={t(attributes.label)}
                   id={attributes.name}
                   setSelectedValue={setSelectedValue}
                   selected={selected}
@@ -130,7 +130,7 @@ export const AddressHierarchy: React.FC = () => {
             <Input
               key={`combo_input_${index}`}
               name={`address.${attributes.name}`}
-              labelText={t(attributes.name)}
+              labelText={t(attributes.label)}
               id={attributes.name}
               setSelectedValue={setSelectedValue}
               selected={selected}

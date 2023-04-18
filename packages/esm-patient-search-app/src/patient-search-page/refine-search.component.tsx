@@ -189,7 +189,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                       onChange={handleDateOfBirthChange}
                       className={styles.dobField}
                       type="number"
-                      label={t('day', 'Day')}
+                      label={t('dayOfBirth', 'Day of Birth')}
                       min={1}
                       max={31}
                       allowEmpty
@@ -203,7 +203,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                       onChange={handleMonthOfBirthChange}
                       className={styles.dobField}
                       type="number"
-                      label={t('month', 'Month')}
+                      label={t('monthOfBirth', 'Month of Birth')}
                       min={1}
                       max={12}
                       allowEmpty
@@ -217,7 +217,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                       onChange={handleYearOfBirthChange}
                       className={styles.dobField}
                       type="number"
-                      label={t('year', 'Year')}
+                      label={t('yearOfBirth', 'Year of Birth')}
                       allowEmpty
                       hideSteppers
                       min={1800}
@@ -314,7 +314,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           onChange={handleDateOfBirthChange}
           className={styles.dobField}
           type="number"
-          label={t('day', 'Day')}
+          label={t('dayOfBirth', 'Day of Birth')}
           min={1}
           max={31}
           light
@@ -328,7 +328,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           onChange={handleMonthOfBirthChange}
           className={styles.dobField}
           type="number"
-          label={t('month', 'Month')}
+          label={t('monthOfBirth', 'Month of Birth')}
           min={1}
           max={12}
           allowEmpty
@@ -342,7 +342,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           onChange={handleYearOfBirthChange}
           className={styles.dobField}
           type="number"
-          label={t('year', 'Year')}
+          label={t('yearOfBirth', 'Year of Birth')}
           allowEmpty
           hideSteppers
           light

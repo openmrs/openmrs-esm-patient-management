@@ -63,7 +63,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Copy test environment variables
-        run: cp example.env .env
+        run: |
+          cp example.env .env
+          sed -i 's/8080/8180/g' .env
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -93,7 +95,7 @@ jobs:
         run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:9000/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
       - name: Run dev server
-        run: yarn start --sources 'packages/esm-*-app/' --backend "http://localhost:9000" &
+        run: yarn start --sources 'packages/esm-*-app/' --backend "http://localhost:9000" --port 8180 & # Refer to O3-1994
 
       - name: Run E2E tests
         run: yarn playwright test

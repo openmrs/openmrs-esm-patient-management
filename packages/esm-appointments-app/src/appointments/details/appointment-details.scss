@@ -1,0 +1,81 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+
+.appointmentDetailsContainer {
+  min-height: fit-content;
+  background-color: colors.$white;
+  padding: spacing.$spacing-05;
+  margin: spacing.$spacing-03;
+}
+
+.title {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-90;
+}
+
+.subTitle {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.tags {
+  margin-top: spacing.$spacing-05;
+  display: flex;
+  column-gap: spacing.$spacing-03;
+
+  & > div {
+    margin: 0;
+  }
+}
+
+.patientInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
+}
+
+.gridTitle {
+  @include type.type-style('label-02');
+  margin-bottom: spacing.$spacing-06;
+  color: colors.$gray-70;
+}
+
+.label {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: spacing.$spacing-05;
+}
+
+.historyGridLabel {
+  @include type.type-style('legal-01');
+  color: colors.$gray-70;
+}
+.historyGridCount {
+  @include type.type-style('heading-02');
+  margin-top: spacing.$spacing-01;
+  color: colors.$blue-60;
+}
+
+.historyGridCountRed {
+  @include type.type-style('heading-02');
+  margin-top: spacing.$spacing-01;
+  color: colors.$red-60;
+}
+
+.labelBold {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  font-weight: bold;
+  margin-right: spacing.$spacing-02;
+}
+
+.labelContainer {
+  display: flex;
+}

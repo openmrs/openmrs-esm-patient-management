@@ -8,19 +8,12 @@ import styles from './overlay.scss';
 const Overlay: React.FC = () => {
   const { header, component, isOverlayOpen } = useOverlay();
   const layout = useLayoutType();
-
+  const overlayClass = layout !== 'tablet' ? styles.desktopOverlay : styles.tabletOverlay;
   return (
     <>
       {isOverlayOpen && (
-        <div className={layout !== 'tablet' ? styles.desktopOverlay : styles.tabletOverlay}>
-          {layout !== 'tablet' ? (
-            <div className={styles.desktopHeader}>
-              <div className={styles.headerContent}>{header}</div>
-              <Button className={styles.closePanelButton} onClick={() => closeOverlay()} kind="ghost" hasIconOnly>
-                <Close size={16} />
-              </Button>
-            </div>
-          ) : (
+        <div className={overlayClass}>
+          {layout === 'tablet' && (
             <Header onClick={() => closeOverlay()} aria-label="Tablet overlay" className={styles.tabletOverlayHeader}>
               <Button hasIconOnly>
                 <ArrowLeft size={16} />
@@ -28,7 +21,16 @@ const Overlay: React.FC = () => {
               <div className={styles.headerContent}>{header}</div>
             </Header>
           )}
-          <div>{component}</div>
+
+          {layout !== 'tablet' && (
+            <div className={styles.desktopHeader}>
+              <div className={styles.headerContent}>{header}</div>
+              <Button className={styles.closePanelButton} onClick={() => closeOverlay()} kind="ghost" hasIconOnly>
+                <Close size={16} />
+              </Button>
+            </div>
+          )}
+          {component}
         </div>
       )}
     </>

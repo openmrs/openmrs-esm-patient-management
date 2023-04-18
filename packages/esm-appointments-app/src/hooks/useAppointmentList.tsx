@@ -28,6 +28,7 @@ export const useAppointmentList = (appointmentStatus: string, startDate?: string
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(
     appointmentStatus ? url : null,
     openmrsFetch,
+    { errorRetryCount: 2 },
   );
   const appointments = data?.data?.map((appointment) => ({
     name: appointment.patient.name,
@@ -49,7 +50,9 @@ export const useEarlyAppointmentList = (startDate?: string) => {
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/earlyAppointment?forDate=${forDate}`;
 
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
+    errorRetryCount: 2,
+  });
   const appointments = data?.data?.map((appointment) => ({
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,

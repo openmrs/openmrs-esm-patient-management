@@ -15,7 +15,7 @@ interface MetricsCardProps {
   value: number;
   headerLabel: string;
   children?: React.ReactNode;
-  view: string;
+  view?: string;
   count?: { pendingAppointments: Array<any>; arrivedAppointments: Array<any> };
   appointmentDate?: string;
 }
