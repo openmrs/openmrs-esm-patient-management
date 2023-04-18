@@ -216,7 +216,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             <Checkbox
               onChange={handleRetainLocation}
               checked={currentIsPermanentProviderQueueRoom}
-              labelText={t('retainLocation', `Retail location?`)}
+              labelText={t('retainLocation', 'Retain location')}
               id="retianLocation"
               className={styles.checkbox}
             />

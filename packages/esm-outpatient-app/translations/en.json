@@ -187,7 +187,7 @@
   "removeFromQueueAndEndVisit": "Remove patient from queue and end active visit",
   "removeQueueEntryError": "Error removing queue entry",
   "requeue": "Requeue",
-  "retainLocation": "",
+  "retainLocation": "Retain location",
   "returnDate": "Return date",
   "room": "Room",
   "rRate": "R. Rate",
