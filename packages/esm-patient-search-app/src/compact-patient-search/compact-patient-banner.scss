@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
@@ -16,6 +17,27 @@
     background-color: $ui-01;
     border: 0;
     outline: 0;
+  }
+}
+
+.deceased.patientSearchResult {
+  background-color: colors.$gray-70;
+
+  .patientName {
+    color: $ui-01;
+  }
+
+  .demographics,
+  .patientIdentifiers,
+  .identifierTag {
+    color: $ui-02;
+
+    &:hover,
+    &:focus {
+      background-color: colors.$gray-70;
+      border: 0;
+      outline: 0;
+    }
   }
 }
 

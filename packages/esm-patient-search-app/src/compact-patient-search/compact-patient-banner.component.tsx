@@ -72,6 +72,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
           const patientIdentifiers = patient.identifier.filter((identifier) =>
             config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
           );
+          const isDeceased = !!patient.deceasedDateTime || !!patient.deceasedBoolean;
           return (
             <ConfigurableLink
               onClick={(evt) => selectPatientAction(evt, indx)}
@@ -79,7 +80,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                 patientUuid: patient.id,
               })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
               key={patient.id}
-              className={styles.patientSearchResult}>
+              className={`${styles.patientSearchResult} ${isDeceased ? styles.deceased : ''}`}>
               <div className={styles.patientAvatar} role="img">
                 <ExtensionSlot
                   extensionSlotName="patient-photo-slot"
