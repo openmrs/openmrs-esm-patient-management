@@ -15,3 +15,8 @@
   @include type.type-style('heading-03');
   color: $ui-05;
 }
+
+.actionBtn {
+  display: flex;
+  column-gap: 0.5rem;
+}

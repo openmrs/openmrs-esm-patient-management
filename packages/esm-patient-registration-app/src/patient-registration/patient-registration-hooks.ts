@@ -153,6 +153,7 @@ export function usePatientUuidMap(
   fallback: PatientUuidMapType = {},
 ): [PatientUuidMapType, Dispatch<PatientUuidMapType>] {
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
+  const { data: attributes } = useInitialPersonAttributes(patientUuid);
   const [patientUuidMap, setPatientUuidMap] = useState(fallback);
 
   useEffect(() => {
@@ -164,6 +165,15 @@ export function usePatientUuidMap(
       );
     }
   }, [isLoadingPatientToEdit, patientToEdit, patientUuid]);
+
+  useEffect(() => {
+    if (attributes) {
+      setPatientUuidMap((prevPatientUuidMap) => ({
+        ...prevPatientUuidMap,
+        ...getPatientAttributeUuidMapForPatient(attributes),
+      }));
+    }
+  }, [attributes]);
 
   return [patientUuidMap, setPatientUuidMap];
 }
@@ -245,4 +255,12 @@ function useInitialPersonAttributes(personUuid: string) {
     };
   }, [data, error]);
   return result;
+}
+
+function getPatientAttributeUuidMapForPatient(attributes: Array<PersonAttributeResponse>) {
+  const attributeUuidMap = {};
+  attributes.forEach((attribute) => {
+    attributeUuidMap[`attribute.${attribute?.attributeType?.uuid}`] = attribute?.uuid;
+  });
+  return attributeUuidMap;
 }
