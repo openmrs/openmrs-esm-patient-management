@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, Tabs, TabPanels, TabPanel, TabList } from '@carbon/react';
-import { Add, ArrowRight } from '@carbon/react/icons';
-import { ExtensionSlot, UserHasAccess } from '@openmrs/esm-framework';
+import { Add } from '@carbon/react/icons';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './active-visits-table.scss';
 import { SearchTypes } from '../types';
@@ -20,34 +20,6 @@ function ActiveVisitsTabs() {
   return (
     <div className={styles.container}>
       <div className={styles.headerBtnContainer}>
-        <UserHasAccess privilege="Manage Forms">
-          <Button
-            size="sm"
-            kind="ghost"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
-            onClick={(selectedPatientUuid) => {
-              setShowOverlay(true);
-              setView(SearchTypes.QUEUE_SERVICE_FORM);
-              setViewState({ selectedPatientUuid });
-              setOverlayTitle(t('addNewQueueService', 'Add new queue service'));
-            }}
-            iconDescription={t('addNewQueueService', 'Add new queue service')}>
-            {t('addNewService', 'Add new service')}
-          </Button>
-          <Button
-            size="sm"
-            kind="ghost"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
-            onClick={(selectedPatientUuid) => {
-              setShowOverlay(true);
-              setView(SearchTypes.QUEUE_ROOM_FORM);
-              setViewState({ selectedPatientUuid });
-              setOverlayTitle(t('addNewQueueServiceRoom', 'Add new queue service room'));
-            }}
-            iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
-            {t('addNewServiceRoom', 'Add new service room')}
-          </Button>
-        </UserHasAccess>
         <ExtensionSlot
           extensionSlotName="patient-search-button-slot"
           state={{

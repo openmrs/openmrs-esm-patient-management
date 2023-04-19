@@ -77,14 +77,12 @@
 
 .currentData {
   margin: 2px;
+  padding-top: 2px;
+  background-color: colors.$gray-10;
 
   & > span {
     @include type.type-style('label-02');
   }
-}
-
-.greyBackground {
-  background-color: colors.$gray-10;
 }
 
 .serviceArea {
@@ -93,8 +91,8 @@
   grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
   text-align: left;
-  margin: 0.0125rem;
-  @include type.type-style('label-02');
+  margin: 0.125rem;
+  @include type.type-style('label-01');
   color: #020f1b;
   cursor: pointer;
 
@@ -143,4 +141,8 @@
   background-color: colors.$green-70;
   color: colors.$white;
   font-weight: bold;
+}
+
+.calendarDate {
+  @include type.type-style('heading-compact-01');
 }

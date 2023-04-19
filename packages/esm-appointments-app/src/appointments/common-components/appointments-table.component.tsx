@@ -30,9 +30,9 @@ import PatientSearch from '../../patient-search/patient-search.component';
 import { MappedAppointment } from '../../types';
 import { getPageSizes, useSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
-import styles from './appointments-base-table.scss';
+import styles from './appointments-table.scss';
 
-interface AppointmentsBaseTableProps {
+interface AppointmentsTableProps {
   appointments: Array<MappedAppointment>;
   isLoading: boolean;
   tableHeading: string;
@@ -41,7 +41,7 @@ interface AppointmentsBaseTableProps {
   scheduleType?: string;
 }
 
-const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
   isLoading,
   tableHeading,
@@ -62,14 +62,6 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
     {
       header: t('identifier', 'Identifier'),
       key: 'identifier',
-    },
-    {
-      header: t('nextAppointmentDate', 'Next appointment date'),
-      key: 'nextAppointmentDate',
-    },
-    {
-      header: t('dateTime', 'Date & Time'),
-      key: 'dateTime',
     },
     {
       header: t('serviceType', 'Service Type'),
@@ -115,7 +107,7 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
 
   return (
     <>
-      <DataTable rows={rowData} headers={headerData} isSortable>
+      <DataTable rows={rowData} headers={headerData} isSortable useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
           <TableContainer
             title={`${startCase(tableHeading)} ${t('appointments', 'appointment')}`}
@@ -158,10 +150,14 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableExpandRow>
-                    {row.isExpanded && (
-                      <TableExpandedRow colSpan={headers.length + 1}>
-                        <AppointmentDetails appointment={appointments[row.id]} />
-                      </TableExpandedRow>
+                    {row.isExpanded ? (
+                      <TableRow className={styles.expandedActiveVisitRow}>
+                        <th colSpan={headers.length + 2}>
+                          <AppointmentDetails appointment={appointments[row.id]} />
+                        </th>
+                      </TableRow>
+                    ) : (
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                     )}
                   </React.Fragment>
                 ))}
@@ -188,4 +184,4 @@ const AppointmentsBaseTable: React.FC<AppointmentsBaseTableProps> = ({
   );
 };
 
-export default AppointmentsBaseTable;
+export default AppointmentsTable;
