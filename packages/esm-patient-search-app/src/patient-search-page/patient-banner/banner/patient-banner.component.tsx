@@ -120,11 +120,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           {!hideActionsOverflow && (
             <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
               <CustomOverflowMenuComponent
-                deceased={isDeceased}
+                isDeceased={isDeceased}
                 menuTitle={
                   <>
                     <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem', fill: '#78A9FF' }} />
+                    <OverflowMenuVertical size={16} />
                   </>
                 }
                 dropDownMenu={showDropdown}>

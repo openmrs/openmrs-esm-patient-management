@@ -1,18 +1,19 @@
+import { Button } from '@carbon/react';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
   dropDownMenu: boolean;
-  children: React.ReactNode;
-  deceased?: boolean;
+  children?: React.ReactNode;
+  isDeceased?: boolean;
 }
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
   dropDownMenu,
   menuTitle,
   children,
-  deceased,
+  isDeceased,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const wrapperRef = useRef(null);
@@ -46,9 +47,10 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
 
   return (
     <div data-overflow-menu className={`cds--overflow-menu ${styles.container}`} ref={wrapperRef}>
-      <button
-        className={`cds--btn cds--btn--ghost cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
-          deceased && styles.deceased
+      <Button
+        kind="ghost"
+        className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
+          isDeceased ? styles.isDeceased : ''
         } ${styles.overflowMenuButton}`}
         aria-haspopup="true"
         aria-expanded={showMenu}
@@ -56,7 +58,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         aria-controls="custom-actions-overflow-menu"
         onClick={toggleShowMenu}>
         {menuTitle}
-      </button>
+      </Button>
       <div
         className={`cds--overflow-menu-options cds--overflow-menu--flip ${styles.menu} ${showMenu && styles.show}`}
         tabIndex={0}
