@@ -346,26 +346,27 @@ export class FormManager {
             value,
           });
         });
+
+      if (values.patientUuid) {
+        Object.entries(values.attributes)
+          .filter(([, value]) => !value)
+          .forEach(async ([key]) => {
+            const attributeUuid = patientUuidMap[`attribute.${key}`];
+            await openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+              method: 'DELETE',
+            }).catch((err) => {
+              console.error(err);
+            });
+          });
+      }
     }
+
     if (values.unidentifiedPatient) {
       attributes.push({
         // The UUID of the 'Unknown Patient' attribute-type will always be static across all implementations of OpenMRS
         attributeType: '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47',
         value: 'true',
       });
-    }
-
-    if (values.patientUuid) {
-      Object.entries(values.attributes)
-        .filter(([, value]) => !value)
-        .forEach(async ([key]) => {
-          const attributeUuid = patientUuidMap[`attribute.${key}`];
-          await openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
-            method: 'DELETE',
-          }).catch((err) => {
-            console.error(err);
-          });
-        });
     }
 
     return attributes;
