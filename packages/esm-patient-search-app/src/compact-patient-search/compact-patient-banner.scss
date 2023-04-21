@@ -21,7 +21,7 @@
 }
 
 .deceased.patientSearchResult {
-  background-color: colors.$gray-70;
+  background-color: colors.$gray-80;
 
   .patientName {
     color: $ui-01;
@@ -39,6 +39,11 @@
       outline: 0;
     }
   }
+
+  &:focus,
+  &:hover {
+    background-color: colors.$gray-90;
+  }
 }
 
 .patientBanner {
@@ -48,6 +53,7 @@
 .patientName {
   @include type.type-style('heading-02');
   color: $text-02;
+  margin-right: 0.25rem;
 }
 
 .patientAvatar {
@@ -98,4 +104,14 @@
 .configuredLabel {
   @include type.type-style('label-01');
   color: $ui-05;
+}
+
+.deceased .configuredLabel {
+  color: $ui-01;
+}
+
+.flexRow {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
 }

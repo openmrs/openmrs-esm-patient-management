@@ -72,7 +72,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
           const patientIdentifiers = patient.identifier.filter((identifier) =>
             config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
           );
-          const isDeceased = !!patient.deceasedDateTime || !!patient.deceasedBoolean;
+          const isDeceased = Boolean(patient?.deceasedDateTime);
           return (
             <ConfigurableLink
               onClick={(evt) => selectPatientAction(evt, indx)}
@@ -92,9 +92,16 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                 />
               </div>
               <div>
-                <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
-                  patient.name?.[0]?.family
-                }`}</h2>
+                <div className={styles.flexRow}>
+                  <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
+                    patient.name?.[0]?.family
+                  }`}</h2>
+                  <ExtensionSlot
+                    extensionSlotName="patient-banner-tags-slot"
+                    state={{ patient }}
+                    className={styles.flexRow}
+                  />
+                </div>
                 <p className={styles.demographics}>
                   {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
                   <span className={styles.middot}>&middot;</span>
