@@ -53,7 +53,7 @@ export class FormManager {
   ) => {
     const syncItem: PatientRegistration = {
       fhirPatient: FormManager.mapPatientToFhirPatient(
-        FormManager.getPatientToCreate(values, patientUuidMap, initialAddressFieldValues, []),
+        FormManager.getPatientToCreate(isNewPatient, values, patientUuidMap, initialAddressFieldValues, []),
       ),
       _patientRegistrationData: {
         isNewPatient,
@@ -101,6 +101,7 @@ export class FormManager {
     );
 
     const createdPatient = FormManager.getPatientToCreate(
+      isNewPatient,
       values,
       patientUuidMap,
       initialAddressFieldValues,
@@ -281,6 +282,7 @@ export class FormManager {
   }
 
   static getPatientToCreate(
+    isNewPatient: boolean,
     values: FormValues,
     patientUuidMap: PatientUuidMapType,
     initialAddressFieldValues: Record<string, any>,
@@ -303,7 +305,7 @@ export class FormManager {
         gender: values.gender.charAt(0),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
-        attributes: FormManager.getPatientAttributes(values, patientUuidMap),
+        attributes: FormManager.getPatientAttributes(isNewPatient, values, patientUuidMap),
         addresses: [values.address],
         ...FormManager.getPatientDeathInfo(values),
       },
@@ -335,7 +337,7 @@ export class FormManager {
     return names;
   }
 
-  static getPatientAttributes(values: FormValues, patientUuidMap: PatientUuidMapType) {
+  static getPatientAttributes(isNewPatient: boolean, values: FormValues, patientUuidMap: PatientUuidMapType) {
     const attributes: Array<AttributeValue> = [];
     if (values.attributes) {
       Object.entries(values.attributes)
@@ -347,7 +349,7 @@ export class FormManager {
           });
         });
 
-      if (values.patientUuid) {
+      if (!isNewPatient && values.patientUuid) {
         Object.entries(values.attributes)
           .filter(([, value]) => !value)
           .forEach(async ([key]) => {
