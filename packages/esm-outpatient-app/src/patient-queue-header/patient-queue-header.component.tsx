@@ -48,7 +48,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
             <label className={styles.view}>{t('view', 'View')}:</label>
             <Dropdown
               id="typeOfCare"
-              label={currentQueueLocationName ?? ''}
+              label={currentQueueLocationName ?? queueLocations?.[0]?.name}
               items={[{ display: `${t('all', 'All')}` }, ...queueLocations]}
               itemToString={(item) => (item ? item.name : '')}
               type="inline"
