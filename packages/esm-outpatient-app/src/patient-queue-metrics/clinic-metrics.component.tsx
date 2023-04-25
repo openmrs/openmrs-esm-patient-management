@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import MetricsCard from './metrics-card.component';
@@ -14,6 +14,7 @@ import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount, useServices } from './queue-metrics.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import styles from './clinic-metrics.scss';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 export interface Service {
   uuid: string;
@@ -24,7 +25,8 @@ function ClinicMetrics() {
   const { t } = useTranslation();
 
   const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { allServices } = useServices(currentQueueLocation);
+  const { queueLocations } = useQueueLocations();
+  const { allServices } = useServices(currentQueueLocation ?? queueLocations?.[0]?.id);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
@@ -32,6 +34,8 @@ function ClinicMetrics() {
     if (currentServiceName && currentServiceUuid) {
       return false;
     } else if (currentServiceName === t('all', 'All')) {
+      return true;
+    } else {
       return true;
     }
   });
@@ -42,7 +46,11 @@ function ClinicMetrics() {
   const handleServiceChange = ({ selectedItem }) => {
     updateSelectedServiceUuid(selectedItem.uuid);
     updateSelectedServiceName(selectedItem.display);
-    setInitialSelectItem(false);
+    if (selectedItem.uuid == undefined) {
+      setInitialSelectItem(true);
+    } else {
+      setInitialSelectItem(false);
+    }
   };
 
   return (
@@ -65,7 +73,7 @@ function ClinicMetrics() {
           <Dropdown
             id="inline"
             type="inline"
-            label={currentServiceName}
+            label={currentServiceName ?? `${t('all', 'All')}`}
             items={[{ display: `${t('all', 'All')}` }, ...allServices]}
             itemToString={(item) => (item ? item.display : '')}
             onChange={handleServiceChange}
