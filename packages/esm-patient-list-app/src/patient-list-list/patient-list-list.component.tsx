@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ConfigSchema } from '../config-schema';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, Tabs, TabList, Layer, Pagination, InlineLoading, Search } from '@carbon/react';
+import { Button, Tab, Tabs, TabList, Layer, InlineLoading, Search } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, navigate, useConfig, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate, useConfig, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
@@ -44,7 +44,7 @@ const PatientListList: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
   const [searchString, setSearchString] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(config.patientListsToShow);
+  const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
   const { patientLists, isLoading, isValidating, error, mutate, totalResults } = useAllPatientLists(
     patientListFilter,
@@ -154,31 +154,7 @@ const PatientListList: React.FC = () => {
             patientLists={patientLists}
             refetch={mutate}
             error={error}
-            pageSize={pageSize}
           />
-          {totalResults > pageSize && (
-            <Layer>
-              <Pagination
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-                backwardText="Previous page"
-                forwardText="Next page"
-                itemsPerPageText="Items per page:"
-                page={page}
-                pageNumberText={t('pageNumber', 'Page number')}
-                pageSize={pageSize}
-                onChange={({ page: newPage, pageSize: newPageSize }) => {
-                  if (newPage !== page) {
-                    setPage(newPage);
-                  }
-                  if (newPageSize !== pageSize) {
-                    setPageSize(newPageSize);
-                  }
-                }}
-                pageSizes={pageSizes}
-                totalItems={totalResults}
-              />
-            </Layer>
-          )}
         </div>
       </section>
       <section>
