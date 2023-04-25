@@ -29,6 +29,7 @@ describe('the select input', () => {
 
     await waitFor(() => expect(input.value).toEqual(expected));
   });
+
   it('should show optional label if the input is not required', () => {
     render(
       <Formik initialValues={{ select: '' }} onSubmit={null}>
