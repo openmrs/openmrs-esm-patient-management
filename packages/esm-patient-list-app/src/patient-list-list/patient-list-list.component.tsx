@@ -38,7 +38,6 @@ function usePatientListFilterForCurrentTab(selectedTab: number, search: string) 
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const pageSizes = [10, 20, 25, 50];
   const layout = useLayoutType();
   const config = useConfig() as ConfigSchema;
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
@@ -46,7 +45,7 @@ const PatientListList: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
-  const { patientLists, isLoading, isValidating, error, mutate, totalResults } = useAllPatientLists(
+  const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(
     patientListFilter,
     page,
     pageSize,

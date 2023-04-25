@@ -176,9 +176,9 @@ const PatientListTable: React.FC<PatientListTableProps> = ({
         <Layer>
           <Pagination
             size={isDesktop(layout) ? 'sm' : 'lg'}
-            backwardText="Previous page"
-            forwardText="Next page"
-            itemsPerPageText="Items per page:"
+            backwardText={t('previousPage', 'Previous page')}
+            forwardText={t('nextPage', 'Next page')}
+            itemsPerPageText={t('itemsPerPage', 'Items per page:')}
             page={currentPage}
             pageNumberText={t('pageNumber', 'Page number')}
             pageSize={pageSize}

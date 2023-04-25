@@ -57,8 +57,10 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             kind: 'success',
           }),
         )
-        .then(onSuccess)
-        .then(() => setSubmitting(false))
+        .then(() => {
+          onSuccess();
+          setSubmitting(false);
+        })
         .then(close)
         .catch(() =>
           showToast({
@@ -78,8 +80,10 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             kind: 'success',
           }),
         )
-        .then(onSuccess)
-        .then(() => setSubmitting(false))
+        .then(() => {
+          onSuccess();
+          setSubmitting(false);
+        })
         .then(close)
         .catch(() =>
           showToast({
