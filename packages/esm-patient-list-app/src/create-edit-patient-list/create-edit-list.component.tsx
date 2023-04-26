@@ -62,15 +62,16 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           setSubmitting(false);
         })
         .then(close)
-        .catch(() =>
+        .catch(() => {
           showToast({
             title: t('error', 'Error'),
             description: `${t('errorCreatePatientListDescription', "Couldn't create patient list")} : ${
               cohortDetails?.name
             }`,
             kind: 'error',
-          }),
-        );
+          });
+          setSubmitting(false);
+        });
     } else {
       editPatientList(patientListDetails.uuid, cohortDetails)
         .then(() =>
@@ -85,15 +86,16 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           setSubmitting(false);
         })
         .then(close)
-        .catch(() =>
+        .catch(() => {
           showToast({
             title: t('error', 'Error'),
             description: `${t('errorUpdatePatientListDescription', "Couldn't update patient list")} : ${
               cohortDetails?.name
             }`,
             kind: 'error',
-          }),
-        );
+          });
+          setSubmitting(false);
+        });
     }
   }, [
     close,

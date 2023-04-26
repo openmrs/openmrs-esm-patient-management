@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ConfigSchema } from '../config-schema';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, Tabs, TabList, Layer, InlineLoading, Search } from '@carbon/react';
+import { Button, Tab, Tabs, TabList } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, navigate, useConfig, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
 import Illustration from '../illo';
-import PatientListTable from './patient-list-table.component';
+import PatientListTableContainer from './patient-list-table.component';
 import styles from './patient-list-list.scss';
 
 const TabIndices = {
@@ -38,18 +37,10 @@ function usePatientListFilterForCurrentTab(selectedTab: number, search: string) 
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
-  const config = useConfig() as ConfigSchema;
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
   const [searchString, setSearchString] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
-  const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(
-    patientListFilter,
-    page,
-    pageSize,
-  );
+  const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
   const createNewList =
     Object.fromEntries(
@@ -75,11 +66,6 @@ const PatientListList: React.FC = () => {
     navigate({
       to: '${openmrsSpaBase}/home/patient-lists',
     });
-  };
-
-  const handleSearch = (str) => {
-    setPage(1);
-    setSearchString(str);
   };
 
   const tableHeaders = showCohortType
@@ -131,26 +117,14 @@ const PatientListList: React.FC = () => {
           </TabList>
         </Tabs>
         <div className={styles.patientListTableContainer}>
-          <div id="table-tool-bar" className={styles.searchContainer}>
-            <div>{isValidating && <InlineLoading />}</div>
-            <Layer>
-              <Search
-                id="patient-list-search"
-                labelText=""
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-                className={styles.search}
-                onChange={(evnt) => handleSearch(evnt.target.value)}
-                defaultValue={searchString}
-                placeholder={t('searchThisList', 'Search this list')}
-                currentSearchTerm={searchString}
-              />
-            </Layer>
-          </div>
-          <PatientListTable
+          <PatientListTableContainer
             listType={patientListFilter.label}
             loading={isLoading}
+            isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
+            searchString={searchString}
+            setSearchString={setSearchString}
             refetch={mutate}
             error={error}
           />

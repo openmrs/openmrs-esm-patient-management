@@ -19,13 +19,13 @@ interface PatientListResponse {
   totalCount: number;
 }
 
-export function useAllPatientLists({ name, isStarred, type }: PatientListFilter, page: number, size: number = 50) {
+export function useAllPatientLists({ name, isStarred, type }: PatientListFilter) {
   const [totalResults, setTotalResults] = useState(0);
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
-    ['limit', `${size}`],
+    ['limit', '50'],
   ];
   const config = useConfig() as ConfigSchema;
 
@@ -49,7 +49,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter,
     let url = `${cohortUrl}/cohort?${params}`;
 
     if (pageIndex) {
-      url += `&startIndex=${pageIndex * 10}`;
+      url += `&startIndex=${pageIndex * 50}`;
     }
 
     return url;
