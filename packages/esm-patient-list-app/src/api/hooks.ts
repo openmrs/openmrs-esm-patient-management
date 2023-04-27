@@ -8,17 +8,23 @@ import {
 } from './types';
 import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
 import { ConfigSchema } from '../config-schema';
 import { useEffect, useState } from 'react';
 
-export function useAllPatientLists({ name, isStarred, type }: PatientListFilter, page: number, size: number = 50) {
+interface PatientListResponse {
+  results: CohortResponse<OpenmrsCohort>;
+  links: Array<{ rel: 'prev' | 'next' }>;
+  totalCount: number;
+}
+
+export function useAllPatientLists({ name, isStarred, type }: PatientListFilter) {
   const [totalResults, setTotalResults] = useState(0);
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
-    ['limit', `${size}`],
   ];
   const config = useConfig() as ConfigSchema;
 
@@ -32,37 +38,47 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter,
     query.push(['cohortType', config.systemListCohortTypeUUID]);
   }
 
-  if (page > 1) {
-    query.push(['startIndex', `${(page - 1) * size}`]);
-  }
-
   const params = query.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
 
-  const { data, error, mutate, isValidating, isLoading } = useSWR<FetchResponse<CohortResponse<OpenmrsCohort>>, Error>(
-    `${cohortUrl}/cohort?${params}`,
-    openmrsFetch,
-  );
+  const getUrl = (pageIndex, previousPageData: FetchResponse<PatientListResponse>) => {
+    if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
+      return null;
+    }
+
+    let url = `${cohortUrl}/cohort?${params}`;
+
+    if (pageIndex) {
+      url += `&startIndex=${pageIndex * 50}`;
+    }
+
+    return url;
+  };
+  const {
+    data,
+    error,
+    mutate,
+    isValidating,
+    isLoading,
+    size: pageNumber,
+    setSize,
+  } = useSWRInfinite<FetchResponse<PatientListResponse>, Error>(getUrl, openmrsFetch);
 
   useEffect(() => {
-    // This is done to keep the count of total results
-    // When a new request is made in pagination
-    // the data becomes undefined, but the count of total
-    // results is required for pagination to work properly.
-    if (data?.data?.totalCount) {
-      setTotalResults(data?.data?.totalCount);
+    if (data && data?.[pageNumber - 1]?.data?.links?.some((link) => link.rel === 'next')) {
+      setSize((currentSize) => currentSize + 1);
     }
-  }, [data]);
+  }, [data, pageNumber, setSize]);
 
-  const patientLists = data?.data?.results.map((cohort) => ({
-    id: cohort.uuid,
-    display: cohort.name,
-    description: cohort.description,
-    type: cohort.cohortType?.display,
-    size: cohort.size,
-  }));
+  const patientListsData = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
 
   return {
-    patientLists,
+    patientLists: patientListsData.map((cohort) => ({
+      id: cohort.uuid,
+      display: cohort.name,
+      description: cohort.description,
+      type: cohort.cohortType?.display,
+      size: cohort.size,
+    })),
     isLoading,
     isValidating,
     error,
