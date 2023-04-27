@@ -87,6 +87,7 @@ describe('text input', () => {
 
     expect(screen.getByText('name should be of 5 char')).toBeInTheDocument();
   });
+  
   it('should show the correct label text if the field is not required', () => {
     render(
       <Formik initialValues={{ text: '' }} onSubmit={() => {}}>
