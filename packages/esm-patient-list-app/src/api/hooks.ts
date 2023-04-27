@@ -24,7 +24,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
-    ['totalCount', 'true']
+    ['totalCount', 'true'],
   ];
   const config = useConfig() as ConfigSchema;
 
