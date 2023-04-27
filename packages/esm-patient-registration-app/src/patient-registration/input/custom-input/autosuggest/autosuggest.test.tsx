@@ -107,7 +107,7 @@ describe('autosuggest', () => {
     expect(list).toBeNull();
   });
 
-  it('suggestions changes when a search input is changed', async () => {
+  it('should change suggestions when a search input is changed', async () => {
     setup();
     // screen.getByRole('x');
     let list = screen.queryByRole('list');
