@@ -73,7 +73,8 @@ describe('text input', () => {
 
     expect(input.value).toEqual(expected);
   });
-  it('shows warning when wrong input is entered', async () => {
+
+  it('should show a warning when the  wrong input is entered', async () => {
     const user = userEvent.setup();
 
     const input = await setupInput();
