@@ -53,7 +53,7 @@
 .patientName {
   @include type.type-style('heading-02');
   color: $text-02;
-  margin-right: 0.25rem;
+  margin-right: spacing.$spacing-02;
 }
 
 .patientAvatar {

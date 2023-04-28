@@ -100,6 +100,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                     extensionSlotName="patient-banner-tags-slot"
                     state={{ patient }}
                     className={styles.flexRow}
+                    select={(extensions) => extensions.filter((ext) => ext.name === 'deceased-patient-tag')}
                   />
                 </div>
                 <p className={styles.demographics}>
