@@ -62,31 +62,33 @@ describe('text input', () => {
     expect(input.type).toEqual('text');
   });
 
-  it('can input data', async () => {
+  it('can input valid data without warning', async () => {
     const user = userEvent.setup();
 
     const input = await setupInput();
-    const expected = 'Some text';
+    const expected = 'text';
 
     await user.type(input, expected);
     await user.tab();
 
     expect(input.value).toEqual(expected);
+    expect(screen.queryByText('name should be of 5 char')).not.toBeInTheDocument();
   });
 
-  it('should show a warning when the  wrong input is entered', async () => {
+  it('should show a warning when the invalid input is entered', async () => {
     const user = userEvent.setup();
 
     const input = await setupInput();
-    const expected = 123456;
+    const expected = 'Hello World';
 
     await userEvent.clear(input);
 
-    await user.type(input, expected.toString());
+    await user.type(input, expected);
     await user.tab();
 
     expect(screen.getByText('name should be of 5 char')).toBeInTheDocument();
   });
+
   it('should show the correct label text if the field is not required', () => {
     render(
       <Formik initialValues={{ text: '' }} onSubmit={() => {}}>
