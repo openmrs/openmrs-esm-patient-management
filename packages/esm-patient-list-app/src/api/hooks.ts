@@ -6,12 +6,28 @@ import {
   PatientListFilter,
   PatientListType,
 } from './types';
-import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
+import {
+  openmrsFetch,
+  FetchResponse,
+  useConfig,
+  getDynamicOfflineDataEntries,
+  putDynamicOfflineData,
+  syncDynamicOfflineData,
+  toOmrsIsoString,
+} from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
+import {
+  addPatientToList,
+  cohortUrl,
+  getAllPatientLists,
+  getPatientListIdsForPatient,
+  getPatientListMembers,
+} from './api-remote';
 import { ConfigSchema } from '../config-schema';
 import { useEffect, useState } from 'react';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface PatientListResponse {
   results: CohortResponse<OpenmrsCohort>;
@@ -69,7 +85,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const patientListsData: Array<OpenmrsCohort> = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
 
   return {
     patientLists: patientListsData.map((cohort) => ({
@@ -143,4 +159,85 @@ export function usePatientListMembers(
 export function useCohortTypes() {
   const swrResult = useSWR<FetchResponse<CohortResponse<CohortType>>, Error>(`${cohortUrl}/cohorttype`, openmrsFetch);
   return { ...swrResult, data: swrResult?.data?.data?.results };
+}
+
+export function useAddablePatientLists(patientUuid: string, name: string = '') {
+  const { t } = useTranslation();
+  const {
+    patientLists: realLists,
+    isLoading: isLoadingRealLists,
+    isValidating: isValidatingAllLists,
+  } = useAllPatientLists({ name });
+
+  const {
+    data,
+    error,
+    isLoading: isLoadingFakeLists,
+    isValidating: isValidatingFakeLists,
+  } = useSWR<
+    {
+      listsIdsOfThisPatient: string[];
+      fakeLists: AddablePatientListViewModel[];
+    },
+    Error
+  >(['addablePatientLists', patientUuid], async () => {
+    const [listsIdsOfThisPatient, fakeLists] = await Promise.all([
+      getPatientListIdsForPatient(patientUuid),
+      findFakePatientListsWithoutPatient(patientUuid, t),
+    ]);
+
+    return { listsIdsOfThisPatient, fakeLists };
+  });
+
+  function toPatientListViewModel(): AddablePatientListViewModel[] {
+    if (!data || !realLists) {
+      return [];
+    }
+    return realLists.map((list) => ({
+      id: list.id,
+      displayName: list.display,
+      checked: data?.listsIdsOfThisPatient.includes(list.id),
+      async addPatient() {
+        await addPatientToList({
+          cohort: list.id,
+          patient: patientUuid,
+          startDate: toOmrsIsoString(new Date()),
+        });
+      },
+    }));
+  }
+
+  return {
+    addableLists: [...(name ? [] : data?.fakeLists ?? []), ...toPatientListViewModel()],
+    isLoadingLists: isLoadingRealLists || isLoadingFakeLists,
+    isValidating: isValidatingAllLists || isValidatingFakeLists,
+    error,
+  };
+}
+
+async function findFakePatientListsWithoutPatient(
+  patientUuid: string,
+  t: TFunction,
+): Promise<Array<AddablePatientListViewModel>> {
+  const offlinePatients = await getDynamicOfflineDataEntries('patient');
+  const isPatientOnOfflineList = offlinePatients.some((x) => x.identifier === patientUuid);
+  return isPatientOnOfflineList
+    ? []
+    : [
+        {
+          id: 'fake-offline-patient-list',
+          displayName: t('offlinePatients', 'Offline patients'),
+          async addPatient() {
+            await putDynamicOfflineData('patient', patientUuid);
+            await syncDynamicOfflineData('patient', patientUuid);
+          },
+        },
+      ];
+}
+
+interface AddablePatientListViewModel {
+  id: string;
+  displayName: string;
+  checked?: boolean;
+  addPatient(): Promise<void>;
 }

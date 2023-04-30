@@ -1,21 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSWR from 'swr';
-import {
-  getDynamicOfflineDataEntries,
-  putDynamicOfflineData,
-  syncDynamicOfflineData,
-  showToast,
-  toOmrsIsoString,
-  usePagination,
-  navigate,
-  useConfig,
-} from '@openmrs/esm-framework';
-import { Button, Checkbox, Pagination, Search, SkeletonText, CheckboxSkeleton } from '@carbon/react';
-import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
-import { TFunction } from 'i18next';
+import { showToast, usePagination, navigate } from '@openmrs/esm-framework';
+import { Button, Checkbox, Pagination, Search, CheckboxSkeleton } from '@carbon/react';
 import styles from './add-patient.scss';
-import { ConfigSchema } from '../config-schema';
+import { useAddablePatientLists } from '../api/hooks';
 
 interface AddPatientProps {
   closeModal: () => void;
@@ -26,7 +14,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
-  const { data, isLoading } = useAddablePatientLists(patientUuid);
+  const { addableLists, isLoadingLists } = useAddablePatientLists(patientUuid, searchValue);
 
   const handleCreateNewList = () => {
     navigate({
@@ -45,7 +33,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 
   const handleSubmit = useCallback(() => {
     for (const selectedId of selected) {
-      const patientList = data.find((list) => list.id === selectedId);
+      const patientList = addableLists.find((list) => list.id === selectedId);
       if (!patientList) {
         continue;
       }
@@ -69,22 +57,9 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
     }
 
     closeModal();
-  }, [data, selected, closeModal, t]);
+  }, [addableLists, selected, closeModal, t]);
 
-  const searchResults = useMemo(() => {
-    if (!data) {
-      return [];
-    }
-
-    if (searchValue?.trim().length > 0) {
-      const search = searchValue.toLowerCase();
-      return data.filter((patientList) => patientList.displayName.toLowerCase().includes(search));
-    }
-
-    return data;
-  }, [searchValue, data]);
-
-  const { results, goTo, currentPage, paginated } = usePagination(searchResults, 5);
+  const { results, goTo, currentPage, paginated } = usePagination(addableLists, 5);
 
   useEffect(() => {
     if (currentPage !== 1) {
@@ -114,7 +89,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       <div className={styles.patientListList}>
         <fieldset className="cds--fieldset">
           <p className="cds--label">Patient Lists</p>
-          {!isLoading && results ? (
+          {!isLoadingLists && results ? (
             results.length > 0 ? (
               results.map((patientList) => (
                 <div key={patientList.id} className={styles.checkbox}>
@@ -155,7 +130,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       {paginated && (
         <div className={styles.paginationContainer}>
           <span className={`${styles.itemsCountDisplay} ${styles.bodyLong01}`}>
-            {results.length * currentPage} / {searchResults.length} {t('items', 'items')}
+            {results.length * currentPage} / {addableLists.length} {t('items', 'items')}
           </span>
           <Pagination
             className={styles.pagination}
@@ -164,7 +139,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
             page={currentPage}
             pageSize={5}
             pageSizes={[5]}
-            totalItems={searchResults.length}
+            totalItems={addableLists.length}
             onChange={({ page }) => goTo(page)}
           />
         </div>
@@ -194,75 +169,5 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 // This is why the following abstracts away the differences between the real and the fake patient lists.
 // The component doesn't really care about which is which - the only thing that matters is that the
 // data can be fetched and that there is an "add patient" function.
-
-interface AddablePatientListViewModel {
-  id: string;
-  displayName: string;
-  checked?: boolean;
-  addPatient(): Promise<void>;
-}
-
-export function useAddablePatientLists(patientUuid: string) {
-  const { t } = useTranslation();
-  const config = useConfig() as ConfigSchema;
-  return useSWR(['addablePatientLists', patientUuid], async () => {
-    // Using Promise.allSettled instead of Promise.all here because some distros might not have the
-    // cohort module installed, leading to the real patient list call failing.
-    // In that case we still want to show fake lists and *not* error out here.
-    const [fakeLists, realLists] = await Promise.allSettled([
-      findFakePatientListsWithoutPatient(patientUuid, t),
-      findRealPatientListsWithoutPatient(patientUuid, config.myListCohortTypeUUID, config.systemListCohortTypeUUID),
-    ]);
-
-    return [
-      ...(fakeLists.status === 'fulfilled' ? fakeLists.value : []),
-      ...(realLists.status === 'fulfilled' ? realLists.value : []),
-    ];
-  });
-}
-
-async function findRealPatientListsWithoutPatient(
-  patientUuid: string,
-  myListCohortUUID,
-  systemListCohortType,
-): Promise<Array<AddablePatientListViewModel>> {
-  const [allLists, listsIdsOfThisPatient] = await Promise.all([
-    getAllPatientLists({}, myListCohortUUID, systemListCohortType),
-    getPatientListIdsForPatient(patientUuid),
-  ]);
-
-  return allLists.map((list) => ({
-    id: list.id,
-    displayName: list.display,
-    checked: listsIdsOfThisPatient.includes(list.id),
-    async addPatient() {
-      await addPatientToList({
-        cohort: list.id,
-        patient: patientUuid,
-        startDate: toOmrsIsoString(new Date()),
-      });
-    },
-  }));
-}
-
-async function findFakePatientListsWithoutPatient(
-  patientUuid: string,
-  t: TFunction,
-): Promise<Array<AddablePatientListViewModel>> {
-  const offlinePatients = await getDynamicOfflineDataEntries('patient');
-  const isPatientOnOfflineList = offlinePatients.some((x) => x.identifier === patientUuid);
-  return isPatientOnOfflineList
-    ? []
-    : [
-        {
-          id: 'fake-offline-patient-list',
-          displayName: t('offlinePatients', 'Offline patients'),
-          async addPatient() {
-            await putDynamicOfflineData('patient', patientUuid);
-            await syncDynamicOfflineData('patient', patientUuid);
-          },
-        },
-      ];
-}
 
 export default AddPatient;
