@@ -11,7 +11,7 @@ import Illustration from '../illo';
 import PatientListTableContainer from './patient-list-table.component';
 import styles from './patient-list-list.scss';
 
-export const TabIndices = {
+const TabIndices = {
   STARRED_LISTS: 0,
   SYSTEM_LISTS: 1,
   MY_LISTS: 2,
@@ -87,6 +87,13 @@ const PatientListList: React.FC = () => {
         { id: 4, key: 'isStarred', header: '' },
       ];
 
+  const handleSearch = (searchString: string) => {
+    setSearchTerms((prevSearchTerms) => ({
+      ...prevSearchTerms,
+      [selectedTab]: searchString,
+    }));
+  };
+
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
       <section className={styles.patientListList}>
@@ -129,9 +136,8 @@ const PatientListList: React.FC = () => {
             isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
-            searchTerms={searchTerms}
-            selectedTab={selectedTab}
-            setSearchTerms={setSearchTerms}
+            searchTerm={currentSearchTerm}
+            setSearchTerm={handleSearch}
             refetch={mutate}
             error={error}
           />
