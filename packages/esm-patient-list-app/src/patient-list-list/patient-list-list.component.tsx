@@ -11,7 +11,7 @@ import Illustration from '../illo';
 import PatientListTableContainer from './patient-list-table.component';
 import styles from './patient-list-list.scss';
 
-const TabIndices = {
+export const TabIndices = {
   STARRED_LISTS: 0,
   SYSTEM_LISTS: 1,
   MY_LISTS: 2,
@@ -38,8 +38,14 @@ function usePatientListFilterForCurrentTab(selectedTab: number, search: string) 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
-  const [searchString, setSearchString] = useState('');
-  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
+  const [searchTerms, setSearchTerms] = useState({
+    [TabIndices.STARRED_LISTS]: '',
+    [TabIndices.SYSTEM_LISTS]: '',
+    [TabIndices.MY_LISTS]: '',
+    [TabIndices.ALL_LISTS]: '',
+  });
+  const currentSearchTerm = searchTerms[selectedTab];
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, currentSearchTerm);
   const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
   const createNewList =
@@ -123,8 +129,9 @@ const PatientListList: React.FC = () => {
             isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
-            searchString={searchString}
-            setSearchString={setSearchString}
+            searchTerms={searchTerms}
+            selectedTab={selectedTab}
+            setSearchTerms={setSearchTerms}
             refetch={mutate}
             error={error}
           />

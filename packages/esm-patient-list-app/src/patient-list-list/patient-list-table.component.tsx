@@ -33,6 +33,14 @@ import { PatientList } from '../api/types';
 import { updatePatientList } from '../api/api-remote';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
 import { useTranslation } from 'react-i18next';
+import { TabIndices } from './patient-list-list.component';
+
+type SearchTerms = {
+  0: string;
+  1: string;
+  2: string;
+  3: string;
+};
 
 interface PatientListTableContainerProps {
   style?: CSSProperties;
@@ -44,8 +52,9 @@ interface PatientListTableContainerProps {
   handleCreate?: () => void;
   error: Error;
   isValidating: boolean;
-  searchString: string;
-  setSearchString: (searchString) => void;
+  searchTerms: SearchTerms;
+  setSearchTerms: React.Dispatch<React.SetStateAction<SearchTerms>>;
+  selectedTab: number;
 }
 
 const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
@@ -58,8 +67,9 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   handleCreate,
   error,
   isValidating,
-  searchString,
-  setSearchString,
+  searchTerms,
+  setSearchTerms,
+  selectedTab,
 }) => {
   const { t } = useTranslation();
   const userId = useSession()?.user.uuid;
@@ -85,27 +95,40 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   }
   const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
-  const handleSearch = (str) => {
-    setSearchString(str);
+  const handleSearch = (searchString: string) => {
+    setSearchTerms((prevSearchTerms) => ({
+      ...prevSearchTerms,
+      [selectedTab]: searchString,
+    }));
     goTo(1);
   };
 
-  return (
-    <div>
-      <div id="table-tool-bar" className={styles.searchContainer}>
-        <div>{isValidating && <InlineLoading />}</div>
-        <Layer>
+  function renderSearchComponent() {
+    return Object.keys(TabIndices).map((tab) => {
+      if (selectedTab === TabIndices[tab]) {
+        return (
           <Search
             id="patient-list-search"
             labelText=""
             size={isDesktop(layout) ? 'sm' : 'lg'}
             className={styles.search}
             onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={searchString}
+            defaultValue={searchTerms[selectedTab]}
             placeholder={t('searchThisList', 'Search this list')}
-            currentSearchTerm={searchString}
+            currentSearchTerm={searchTerms[selectedTab]}
           />
-        </Layer>
+        );
+      } else {
+        return null;
+      }
+    });
+  }
+
+  return (
+    <div>
+      <div id="table-tool-bar" className={styles.searchContainer}>
+        <div>{isValidating && <InlineLoading />}</div>
+        <Layer>{renderSearchComponent()}</Layer>
       </div>
       {loading ? (
         <DataTableSkeleton
