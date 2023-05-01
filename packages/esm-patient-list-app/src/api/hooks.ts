@@ -161,42 +161,33 @@ export function useCohortTypes() {
   return { ...swrResult, data: swrResult?.data?.data?.results };
 }
 
+export function usePatientListIdsForPatient(patientUuid: string) {
+  return useSWR('patientListIdsForPatient', async () => await getPatientListIdsForPatient(patientUuid));
+}
+
 export function useAddablePatientLists(patientUuid: string, name: string = '') {
   const { t } = useTranslation();
   const {
-    patientLists: realLists,
+    patientLists: realPatientLists,
     isLoading: isLoadingRealLists,
     isValidating: isValidatingAllLists,
   } = useAllPatientLists({ name });
-
+  const { data: listsIdsOfThisPatient } = usePatientListIdsForPatient(patientUuid);
   const {
-    data,
-    error,
+    data: fakePatientLists,
     isLoading: isLoadingFakeLists,
     isValidating: isValidatingFakeLists,
-  } = useSWR<
-    {
-      listsIdsOfThisPatient: string[];
-      fakeLists: AddablePatientListViewModel[];
-    },
-    Error
-  >(['addablePatientLists', patientUuid], async () => {
-    const [listsIdsOfThisPatient, fakeLists] = await Promise.all([
-      getPatientListIdsForPatient(patientUuid),
-      findFakePatientListsWithoutPatient(patientUuid, t),
-    ]);
+    error,
+  } = useSWR('fakePatientLists', async () => await findFakePatientListsWithoutPatient(patientUuid, t));
 
-    return { listsIdsOfThisPatient, fakeLists };
-  });
-
-  function toPatientListViewModel(): AddablePatientListViewModel[] {
-    if (!data || !realLists) {
+  const addableRealPatientList = (() => {
+    if (!fakePatientLists || !realPatientLists || !listsIdsOfThisPatient) {
       return [];
     }
-    return realLists.map((list) => ({
+    return realPatientLists.map((list) => ({
       id: list.id,
       displayName: list.display,
-      checked: data?.listsIdsOfThisPatient.includes(list.id),
+      checked: listsIdsOfThisPatient.includes(list.id),
       async addPatient() {
         await addPatientToList({
           cohort: list.id,
@@ -205,10 +196,10 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
         });
       },
     }));
-  }
+  })();
 
   return {
-    addableLists: [...(name ? [] : data?.fakeLists ?? []), ...toPatientListViewModel()],
+    addableLists: [...(name ? [] : fakePatientLists ?? []), ...addableRealPatientList],
     isLoadingLists: isLoadingRealLists || isLoadingFakeLists,
     isValidating: isValidatingAllLists || isValidatingFakeLists,
     error,
