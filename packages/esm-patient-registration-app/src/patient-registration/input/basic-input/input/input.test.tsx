@@ -66,12 +66,12 @@ describe('text input', () => {
     const user = userEvent.setup();
 
     const input = await setupInput();
-    const expected = 'text';
+    const userInput = 'text';
 
-    await user.type(input, expected);
+    await user.type(input, userInput);
     await user.tab();
 
-    expect(input.value).toEqual(expected);
+    expect(input.value).toEqual(userInput);
     expect(screen.queryByText('name should be of 5 char')).not.toBeInTheDocument();
   });
 
@@ -79,11 +79,11 @@ describe('text input', () => {
     const user = userEvent.setup();
 
     const input = await setupInput();
-    const expected = 'Hello World';
+    const userInput = 'Hello World';
 
     await userEvent.clear(input);
 
-    await user.type(input, expected);
+    await user.type(input, userInput);
     await user.tab();
 
     expect(screen.getByText('name should be of 5 char')).toBeInTheDocument();
