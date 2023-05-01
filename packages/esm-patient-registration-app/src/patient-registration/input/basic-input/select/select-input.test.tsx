@@ -3,16 +3,16 @@ import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { SelectInput } from './select-input.component';
 
-describe.skip('select input', () => {
+describe('the select input', () => {
   const setupSelect = async () => {
     render(
       <Formik initialValues={{ select: '' }} onSubmit={null}>
         <Form>
-          <SelectInput label="Select" name="select" options={['A Option', 'B Option']} />
+          <SelectInput label="Select" name="select" options={['A Option', 'B Option']} required />
         </Form>
       </Formik>,
     );
-    return screen.getByLabelText('select') as HTMLInputElement;
+    return screen.getByLabelText('Select') as HTMLInputElement;
   };
 
   it('exists', async () => {
@@ -28,5 +28,18 @@ describe.skip('select input', () => {
     fireEvent.blur(input);
 
     await waitFor(() => expect(input.value).toEqual(expected));
+  });
+
+  it('should show optional label if the input is not required', () => {
+    render(
+      <Formik initialValues={{ select: '' }} onSubmit={null}>
+        <Form>
+          <SelectInput label="Select" name="select" options={['A Option', 'B Option']} />
+        </Form>
+      </Formik>,
+    );
+    const selectInput = screen.getByRole('combobox', { name: 'Select (optional)' }) as HTMLSelectElement;
+    expect(selectInput.labels).toHaveLength(1);
+    expect(selectInput.labels[0]).toHaveTextContent('Select (optional)');
   });
 });

@@ -62,7 +62,7 @@ export const mapAppointmentProperties = (appointment: Appointment, t?: Function)
     location: appointment.location ? appointment.location.name : '--',
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
-    color: appointment.service.color,
+    color: appointment?.service?.color ?? '',
     identifier: appointment.patient?.identifier,
     duration: appointment.service?.durationMins
       ? appointment?.service?.durationMins + t('minutes', 'min')

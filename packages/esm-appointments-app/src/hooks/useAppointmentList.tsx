@@ -37,7 +37,7 @@ export const useAppointmentList = (appointmentStatus: string, startDate?: string
     dateTime: appointment.startDateTime,
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',
-    serviceTypeUuid: appointment.service.uuid,
+    serviceTypeUuid: appointment?.service?.uuid,
     gender: appointment.patient?.gender,
     phoneNumber: appointment.patient?.phoneNumber,
     age: appointment.patient?.age,
