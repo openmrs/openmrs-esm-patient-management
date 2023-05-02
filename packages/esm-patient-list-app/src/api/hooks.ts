@@ -3,6 +3,7 @@ import {
   CohortType,
   OpenmrsCohort,
   OpenmrsCohortMember,
+  OpenmrsCohortRef,
   PatientListFilter,
   PatientListType,
 } from './types';
@@ -162,7 +163,16 @@ export function useCohortTypes() {
 }
 
 export function usePatientListIdsForPatient(patientUuid: string) {
-  return useSWR('patientListIdsForPatient', async () => await getPatientListIdsForPatient(patientUuid));
+  const { data, isLoading, isValidating } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortRef>>>(
+    `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
+    openmrsFetch,
+  );
+
+  return {
+    listsIdsOfThisPatient: data?.data?.results.map((ref) => ref.cohort.uuid),
+    isLoadingPatientListIdsForPatient: isLoading,
+    isvalidatingPatientListIdsForPatient: isValidating,
+  };
 }
 
 export function useAddablePatientLists(patientUuid: string, name: string = '') {
@@ -173,7 +183,8 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
     isValidating: isValidatingAllLists,
   } = useAllPatientLists({ name });
 
-  const { data: listsIdsOfThisPatient, isLoading: isLoadingPatientListIds } = usePatientListIdsForPatient(patientUuid);
+  const { listsIdsOfThisPatient, isLoadingPatientListIdsForPatient, isvalidatingPatientListIdsForPatient } =
+    usePatientListIdsForPatient(patientUuid);
 
   const {
     data: fakePatientLists,
@@ -212,8 +223,8 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
 
   return {
     addableLists: addableLists,
-    isLoadingLists: isLoadingRealLists || isLoadingFakeLists || isLoadingPatientListIds,
-    isValidating: isValidatingAllLists || isValidatingFakeLists,
+    isLoadingLists: isLoadingRealLists || isLoadingFakeLists || isLoadingPatientListIdsForPatient,
+    isValidating: isValidatingAllLists || isValidatingFakeLists || isvalidatingPatientListIdsForPatient,
     error,
   };
 }
