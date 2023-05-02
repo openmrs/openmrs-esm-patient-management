@@ -38,8 +38,14 @@ function usePatientListFilterForCurrentTab(selectedTab: number, search: string) 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
-  const [searchString, setSearchString] = useState('');
-  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
+  const [searchTerms, setSearchTerms] = useState({
+    [TabIndices.STARRED_LISTS]: '',
+    [TabIndices.SYSTEM_LISTS]: '',
+    [TabIndices.MY_LISTS]: '',
+    [TabIndices.ALL_LISTS]: '',
+  });
+  const currentSearchTerm = searchTerms[selectedTab];
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, currentSearchTerm);
   const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
   const createNewList =
@@ -80,6 +86,13 @@ const PatientListList: React.FC = () => {
         { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
         { id: 4, key: 'isStarred', header: '' },
       ];
+
+  const handleSearch = (searchString: string) => {
+    setSearchTerms((prevSearchTerms) => ({
+      ...prevSearchTerms,
+      [selectedTab]: searchString,
+    }));
+  };
 
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
@@ -123,8 +136,8 @@ const PatientListList: React.FC = () => {
             isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
-            searchString={searchString}
-            setSearchString={setSearchString}
+            searchTerm={currentSearchTerm}
+            setSearchTerm={handleSearch}
             refetch={mutate}
             error={error}
           />

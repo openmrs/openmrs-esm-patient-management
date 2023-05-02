@@ -44,8 +44,8 @@ interface PatientListTableContainerProps {
   handleCreate?: () => void;
   error: Error;
   isValidating: boolean;
-  searchString: string;
-  setSearchString: (searchString) => void;
+  searchTerm: string;
+  setSearchTerm: (searchString: string) => void;
 }
 
 const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
@@ -58,8 +58,8 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   handleCreate,
   error,
   isValidating,
-  searchString,
-  setSearchString,
+  searchTerm,
+  setSearchTerm,
 }) => {
   const { t } = useTranslation();
   const userId = useSession()?.user.uuid;
@@ -86,7 +86,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
   const handleSearch = (str) => {
-    setSearchString(str);
+    setSearchTerm(str);
     goTo(1);
   };
 
@@ -101,9 +101,8 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
             size={isDesktop(layout) ? 'sm' : 'lg'}
             className={styles.search}
             onChange={(evnt) => handleSearch(evnt.target.value)}
-            defaultValue={searchString}
+            value={searchTerm}
             placeholder={t('searchThisList', 'Search this list')}
-            currentSearchTerm={searchString}
           />
         </Layer>
       </div>
