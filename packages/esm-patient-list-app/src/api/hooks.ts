@@ -172,7 +172,9 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
     isLoading: isLoadingRealLists,
     isValidating: isValidatingAllLists,
   } = useAllPatientLists({ name });
-  const { data: listsIdsOfThisPatient } = usePatientListIdsForPatient(patientUuid);
+
+  const { data: listsIdsOfThisPatient, isLoading: isLoadingPatientListIds } = usePatientListIdsForPatient(patientUuid);
+
   const {
     data: fakePatientLists,
     isLoading: isLoadingFakeLists,
@@ -198,9 +200,19 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
     }));
   })();
 
+  const addableLists =
+    fakePatientLists && realPatientLists && listsIdsOfThisPatient
+      ? [
+          ...(name
+            ? fakePatientLists.filter((list) => list.displayName.toLowerCase().includes(name))
+            : fakePatientLists),
+          ...addableRealPatientList,
+        ]
+      : [];
+
   return {
-    addableLists: [...(name ? [] : fakePatientLists ?? []), ...addableRealPatientList],
-    isLoadingLists: isLoadingRealLists || isLoadingFakeLists,
+    addableLists: addableLists,
+    isLoadingLists: isLoadingRealLists || isLoadingFakeLists || isLoadingPatientListIds,
     isValidating: isValidatingAllLists || isValidatingFakeLists,
     error,
   };

@@ -14,7 +14,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
-  const { addableLists, isLoadingLists } = useAddablePatientLists(patientUuid, searchValue);
+  const { addableLists, isLoadingLists } = useAddablePatientLists(patientUuid, searchValue.toLowerCase());
 
   const handleCreateNewList = () => {
     navigate({
