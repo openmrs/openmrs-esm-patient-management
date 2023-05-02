@@ -43,10 +43,6 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     resultsToShow,
   );
 
-  useEffect(() => {
-    goTo(1);
-  }, [query, goTo]);
-
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
       evt.preventDefault();
