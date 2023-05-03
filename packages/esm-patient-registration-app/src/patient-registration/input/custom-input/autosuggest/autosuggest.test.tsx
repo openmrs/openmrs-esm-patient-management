@@ -55,7 +55,7 @@ describe('autosuggest', () => {
     expect(screen.queryByRole('list')).toBeNull();
   });
 
-  it('shows search results in an ul', async () => {
+  it('should show the search results in an ul', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -64,7 +64,7 @@ describe('autosuggest', () => {
     expect(list.children).toHaveLength(2);
   });
 
-  it('creates li items whose inner text is gotten through getDisplayValue', async () => {
+  it('should creates the li items whose inner text is gotten through getDisplayValue', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -73,7 +73,7 @@ describe('autosuggest', () => {
     expect(list[1].textContent).toBe('John Smith');
   });
 
-  it('triggers onSuggestionSelected with correct values when li is clicked', async () => {
+  it('should trigger the onSuggestionSelected with correct values when li is clicked', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -82,7 +82,7 @@ describe('autosuggest', () => {
     expect(handleSuggestionSelected).toHaveBeenNthCalledWith(1, 'person', 'randomuuid1');
   });
 
-  it('clears suggestions when a suggestion is selected', async () => {
+  it('should clear the suggestions when a suggestion is selected', async () => {
     setup();
     let list = screen.queryByRole('list');
     expect(list).toBeNull();
