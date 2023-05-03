@@ -55,7 +55,7 @@ describe('autosuggest', () => {
     expect(screen.queryByRole('list')).toBeNull();
   });
 
-  it('should show the search results in an ul', async () => {
+  it('should show the search results in a list', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
