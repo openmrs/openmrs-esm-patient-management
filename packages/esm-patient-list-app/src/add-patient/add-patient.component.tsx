@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showToast, usePagination, navigate } from '@openmrs/esm-framework';
-import { Button, Checkbox, Pagination, Search, CheckboxSkeleton } from '@carbon/react';
+import { Button, Checkbox, Pagination, Search, CheckboxSkeleton, InlineNotification } from '@carbon/react';
 import styles from './add-patient.scss';
 import { useAddablePatientLists } from '../api/hooks';
 
@@ -14,7 +14,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [selected, setSelected] = useState<Array<string>>([]);
-  const { addableLists, isLoadingLists } = useAddablePatientLists(patientUuid, searchValue.toLowerCase());
+  const { addableLists, isLoadingLists, error } = useAddablePatientLists(patientUuid, searchValue.toLowerCase());
 
   const handleCreateNewList = () => {
     navigate({
@@ -86,6 +86,18 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           value={searchValue}
         />
       </div>
+      {Object.keys(error).find((key) => {
+        console.error(error[key]);
+        return error[key];
+      }) && (
+        <div>
+          <InlineNotification
+            title="Error Loading lists"
+            subtitle="An error occurred while loading patient lists. Check the dev tools for more info"
+            hideCloseButton
+          />
+        </div>
+      )}
       <div className={styles.patientListList}>
         <fieldset className="cds--fieldset">
           <p className="cds--label">Patient Lists</p>

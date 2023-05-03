@@ -163,7 +163,7 @@ export function useCohortTypes() {
 }
 
 export function usePatientListIdsForPatient(patientUuid: string) {
-  const { data, isLoading, isValidating } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortRef>>>(
+  const { data, isLoading, isValidating, error } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortRef>>, Error>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     openmrsFetch,
   );
@@ -172,6 +172,7 @@ export function usePatientListIdsForPatient(patientUuid: string) {
     listsIdsOfThisPatient: data?.data?.results.map((ref) => ref.cohort.uuid),
     isLoadingPatientListIdsForPatient: isLoading,
     isvalidatingPatientListIdsForPatient: isValidating,
+    errorLoadingPatientListIdsForPatient: error,
   };
 }
 
@@ -181,17 +182,25 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
     patientLists: realPatientLists,
     isLoading: isLoadingRealLists,
     isValidating: isValidatingAllLists,
+    error: errorLoadingRealLists,
   } = useAllPatientLists({ name });
 
-  const { listsIdsOfThisPatient, isLoadingPatientListIdsForPatient, isvalidatingPatientListIdsForPatient } =
-    usePatientListIdsForPatient(patientUuid);
+  const {
+    listsIdsOfThisPatient,
+    isLoadingPatientListIdsForPatient,
+    isvalidatingPatientListIdsForPatient,
+    errorLoadingPatientListIdsForPatient,
+  } = usePatientListIdsForPatient(patientUuid);
 
   const {
     data: fakePatientLists,
     isLoading: isLoadingFakeLists,
     isValidating: isValidatingFakeLists,
-    error,
-  } = useSWR('fakePatientLists', async () => await findFakePatientListsWithoutPatient(patientUuid, t));
+    error: errorLoadingFakeLists,
+  } = useSWR<Array<AddablePatientListViewModel>, Error>(
+    'fakePatientLists',
+    async () => await findFakePatientListsWithoutPatient(patientUuid, t),
+  );
 
   const addableRealPatientList = (() => {
     if (!fakePatientLists || !realPatientLists || !listsIdsOfThisPatient) {
@@ -225,7 +234,7 @@ export function useAddablePatientLists(patientUuid: string, name: string = '') {
     addableLists: addableLists,
     isLoadingLists: isLoadingRealLists || isLoadingFakeLists || isLoadingPatientListIdsForPatient,
     isValidating: isValidatingAllLists || isValidatingFakeLists || isvalidatingPatientListIdsForPatient,
-    error,
+    error: { errorLoadingFakeLists, errorLoadingPatientListIdsForPatient, errorLoadingRealLists },
   };
 }
 
