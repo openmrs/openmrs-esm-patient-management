@@ -8,12 +8,12 @@ export const configSchema = {
   },
   systemListCohortTypeUUID: {
     _type: Type.UUID,
-    _description: 'The UUID of the `My List` cohort type',
+    _description: 'The UUID of the `System List` cohort type',
     _default: 'eee9970e-7ca0-4e8c-a280-c33e9d5f6a04',
   },
   patientListsToShow: {
     _type: Type.Number,
-    _description: 'The UUID of the `My List` cohort type',
+    _description: 'The number of Patient lists to show per page',
     _default: '10',
   },
 };
