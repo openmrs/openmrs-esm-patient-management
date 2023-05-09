@@ -40,7 +40,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { currentVisit } = useVisit(patientUuid);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const config = useConfig();
-  const isDeceased = patient.person.dead;
 
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, selectPatientAction, onTransition, launchPatientChart: true }),

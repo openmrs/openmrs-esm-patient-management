@@ -3,7 +3,6 @@ export interface SearchedPatient {
   uuid: string;
   identifiers: Array<Identifier>;
   person: {
-    [x: string]: any;
     addresses: Array<Address>;
     age: number;
     birthdate: string;
