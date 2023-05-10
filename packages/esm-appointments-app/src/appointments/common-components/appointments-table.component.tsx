@@ -64,6 +64,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       key: 'identifier',
     },
     {
+      header: t('phoneNumber', 'Phone number'),
+      key: 'phoneNumber',
+    },
+    {
       header: t('serviceType', 'Service Type'),
       key: 'serviceType',
     },
@@ -84,6 +88,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     ),
     nextAppointmentDate: '--',
     identifier: appointment.identifier,
+    phoneNumber: appointment.phoneNumber,
     dateTime: formatDatetime(new Date(appointment.dateTime)),
     serviceType: appointment.serviceType,
     provider: appointment.provider,
