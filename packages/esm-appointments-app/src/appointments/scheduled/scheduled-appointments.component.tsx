@@ -103,6 +103,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {isDateInFuture && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
           <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
+          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
         </ContentSwitcher>
       )}
       <div className={styles.container}>

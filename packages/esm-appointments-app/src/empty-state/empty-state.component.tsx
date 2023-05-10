@@ -29,7 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText
             There are no {displayText} to display
           </Trans>
         </p>
-        {scheduleType === 'Scheduled' || scheduleType === 'CameEarly' ? (
+        {scheduleType === 'Scheduled' ? (
           <p className={styles.action}>
             {launchForm && (
               <span>
