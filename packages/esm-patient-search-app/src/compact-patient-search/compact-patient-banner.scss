@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
@@ -19,6 +20,25 @@
   }
 }
 
+.deceased.patientSearchResult {
+  background-color: colors.$gray-80;
+
+  .patientName {
+    color: $ui-01;
+  }
+
+  .demographics,
+  .patientIdentifiers,
+  .identifierTag {
+    color: $ui-02;
+  }
+
+  &:focus,
+  &:hover {
+    background-color: colors.$gray-90;
+  }
+}
+
 .patientBanner {
   display: flex;
 }
@@ -26,6 +46,7 @@
 .patientName {
   @include type.type-style('heading-02');
   color: $text-02;
+  margin-right: spacing.$spacing-02;
 }
 
 .patientAvatar {
@@ -76,4 +97,14 @@
 .configuredLabel {
   @include type.type-style('label-01');
   color: $ui-05;
+}
+
+.deceased .configuredLabel {
+  color: $ui-01;
+}
+
+.flexRow {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
 }
