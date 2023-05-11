@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useAppointmentList, useEarlyAppointmentList } from '../../hooks/useAppointmentList';
+import {
+  useAppointmentList,
+  useCompletedAppointmentList,
+  useEarlyAppointmentList,
+} from '../../hooks/useAppointmentList';
 import { useAppointmentDate } from '../../helpers';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -22,6 +26,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
   const { appointmentList, isLoading } = useAppointmentList(scheduleType);
   const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList();
+  const { completedAppointments } = useCompletedAppointmentList();
   const isDateInPast = dayjs(appointmentDate).isBefore(dayjs(), 'date');
   const isDateInFuture = dayjs(appointmentDate).isAfter(dayjs(), 'date');
   const isToday = dayjs(appointmentDate).isSame(dayjs(), 'date');
@@ -79,6 +84,13 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       visits,
       scheduleType,
     },
+    Completed: {
+      appointments: completedAppointments,
+      isLoading,
+      tableHeading: t('completed', 'Completed'),
+      visits,
+      scheduleType,
+    },
   };
 
   const currentConfig = appointmentsBaseTableConfig[scheduleType];
@@ -90,6 +102,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
           <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
           <Switch name={'Honoured'} text={t('honored', 'Honored')} />
           <Switch name={'Pending'} text={t('notArrived', 'Not arrived')} />
+          <Switch name={'Completed'} text={t('completed', 'Completed')} />
           <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
         </ContentSwitcher>
       )}
@@ -97,6 +110,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
           <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
           <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+          <Switch name={'Completed'} text={t('completed', 'Completed')} />
           <Switch name={'Pending'} text={t('missed', 'Missed')} />
         </ContentSwitcher>
       )}
