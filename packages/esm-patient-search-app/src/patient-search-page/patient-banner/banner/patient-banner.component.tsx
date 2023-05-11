@@ -23,7 +23,6 @@ interface PatientBannerProps {
   onTransition?: () => void;
   hideActionsOverflow?: boolean;
   selectPatientAction: (evt: any, patientUuid: string) => void;
-  isActivePatient?: boolean;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
