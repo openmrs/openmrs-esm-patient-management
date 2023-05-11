@@ -2,7 +2,6 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
-  padding: 0.875rem 1rem;
   width: auto;
   height: auto;
 }
@@ -20,6 +19,7 @@
 
 .show {
   display: block;
+  left: -6rem !important;
 }
 
 .overflowMenuButton {
@@ -35,4 +35,8 @@
 
 .deceased {
   color: colors.$blue-40;
+
+  > svg {
+    fill: colors.$blue-40 !important;
+  }
 }

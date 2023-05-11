@@ -14,8 +14,14 @@
   background-color: $ui-02;
 }
 
+.menu {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+}
+
 .deceasedPatientContainer {
-  background-color: colors.$gray-70;
+  background-color: colors.$gray-80;
 
   .patientName {
     color: $ui-01;
@@ -30,21 +36,14 @@
     color: colors.$blue-40;
   }
 
-  .OverflowMenuVertical {
-    width: 16px;
-    height: 16px;
-    margin-left: 0.5rem;
-    fill: #78a9ff;
+  .menu {
+    fill: colors.$blue-40;
   }
 
   &:focus,
   &:hover {
-    background-color: colors.$gray-70;
+    background-color: colors.$gray-90;
   }
-}
-
-.overflowMenuContainer {
-  margin: -0.75rem 0;
 }
 
 .patientBanner {

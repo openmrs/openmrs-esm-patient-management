@@ -50,7 +50,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
       <Button
         kind="ghost"
         className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
-          isDeceased ? styles.isDeceased : ''
+          isDeceased ? styles.deceased : ''
         } ${styles.overflowMenuButton}`}
         aria-haspopup="true"
         aria-expanded={showMenu}

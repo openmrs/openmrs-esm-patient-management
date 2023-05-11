@@ -122,14 +122,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 menuTitle={
                   <>
                     <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical size={16} />
+                    <OverflowMenuVertical className={styles.menu} size={16} />
                   </>
                 }
                 dropDownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
                   extensionSlotName="patient-search-actions-slot"
-                  className={styles.overflowMenuItemList}
                   state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
