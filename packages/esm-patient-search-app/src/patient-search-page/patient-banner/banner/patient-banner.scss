@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
@@ -7,6 +8,42 @@
   background-color: $ui-02;
   display: grid;
   grid-template-columns: 1fr auto;
+}
+
+.activePatientContainer {
+  background-color: $ui-02;
+}
+
+.menu {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+}
+
+.deceasedPatientContainer {
+  background-color: colors.$gray-80;
+
+  .patientName {
+    color: $ui-01;
+  }
+
+  .demographics,
+  .identifiers {
+    color: $ui-02;
+  }
+
+  .actionsButtonText {
+    color: colors.$blue-40;
+  }
+
+  .menu {
+    fill: colors.$blue-40;
+  }
+
+  &:focus,
+  &:hover {
+    background-color: colors.$gray-90;
+  }
 }
 
 .patientBanner {
@@ -87,8 +124,4 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-
-  :global(.cds--tooltip--definition .cds--tooltip__trigger) {
-    border-bottom: none;
-  }
 }

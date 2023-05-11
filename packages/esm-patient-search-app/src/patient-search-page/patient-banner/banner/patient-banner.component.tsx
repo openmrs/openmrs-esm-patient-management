@@ -33,7 +33,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   selectPatientAction,
 }) => {
   const { t } = useTranslation();
-  const overFlowMenuRef = React.useRef(null);
+  const overflowMenuRef = React.useRef(null);
   const showContactDetailsRef = React.useRef(null);
   const startVisitButtonRef = React.useRef(null);
   const { currentVisit } = useVisit(patientUuid);
@@ -84,7 +84,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   return (
     <>
-      <div className={styles.container} role="banner">
+      <div
+        className={`${styles.container} ${
+          isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer
+        }`}
+        role="banner">
         <ConfigurableLink
           to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
@@ -112,19 +116,19 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
         </ConfigurableLink>
         <div className={styles.buttonCol}>
           {!hideActionsOverflow && (
-            <div ref={overFlowMenuRef}>
+            <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
               <CustomOverflowMenuComponent
+                isDeceased={isDeceased}
                 menuTitle={
                   <>
                     <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
+                    <OverflowMenuVertical className={styles.menu} size={16} />
                   </>
                 }
                 dropDownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
                   extensionSlotName="patient-search-actions-slot"
-                  className={styles.overflowMenuItemList}
                   state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
