@@ -31,13 +31,6 @@
   .patientIdentifiers,
   .identifierTag {
     color: $ui-02;
-
-    &:hover,
-    &:focus {
-      background-color: colors.$gray-70;
-      border: 0;
-      outline: 0;
-    }
   }
 
   &:focus,
