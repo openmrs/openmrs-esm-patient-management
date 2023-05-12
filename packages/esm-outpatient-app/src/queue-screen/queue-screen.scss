@@ -1,3 +1,39 @@
-.queueScreen {
-  margin: 1rem;
+.gridFlow {
+  display: flex;
+  flex-direction: row;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  border-radius: 0.9rem;
+  border: 1px solid #343332;
+  margin: 1.5rem;
+  padding: 1.3rem;
+  width: 30%;
+  text-align: center;
+  justify-content: center;
+}
+
+.header {
+  font-size: 2rem;
+  font-weight: bold;
+  color: black;
+}
+
+.headerBlinking {
+  font-size: 2rem;
+  font-weight: bold;
+  color: red;
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.subheader {
+  font-size: medium;
 }

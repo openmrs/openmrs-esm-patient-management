@@ -53,7 +53,6 @@
   "loadingResults": "Loading results",
   "male": "Male",
   "middleNameLabelText": "Middle Name",
-  "months": "Months",
   "negativeMonths": "Negative months",
   "negativeYears": "Negative years",
   "no": "No",
@@ -82,12 +81,10 @@
   "stateProvince": "State",
   "stroke": "Stroke",
   "unableToFetch": "Unable to fetch person attribute type {personattributetype}",
-  "unidentifiedPatient": "Unidentified Patient",
   "unknown": "Unknown",
   "updatePatient": "Update Patient",
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
-  "years": "Years",
   "yearsEstimateRequired": "Years estimate required",
   "yes": "Yes"
 }
