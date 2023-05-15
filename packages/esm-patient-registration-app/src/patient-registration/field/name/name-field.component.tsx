@@ -19,17 +19,18 @@ function checkNumber(value: string) {
 }
 
 export const NameField = () => {
-  const {
-    fieldConfigurations: {
-      name: { displayCapturePhoto },
-    },
-  } = useConfig() as RegistrationConfig;
+  const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
-  const { fieldConfigurations } = useConfig();
+  const { setCapturePhotoProps, currentPhoto, setFieldValue, initialFormValues } =
+    useContext(PatientRegistrationContext);
   const fieldConfigs = fieldConfigurations?.name;
   const [{ value: unidentified }] = useField('unidentifiedPatient');
   const nameKnown = !unidentified;
+  const showToggleUnknownName =
+    fieldConfigs?.unidentifiedPatient ||
+    (initialFormValues?.familyName === 'UNKNOWN' && initialFormValues?.givenName === 'UNKNOWN')
+      ? true
+      : false;
 
   const onCapturePhoto = useCallback(
     (dataUri: string, photoDateTime: string) => {
@@ -59,7 +60,7 @@ export const NameField = () => {
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
       <div className={styles.grid}>
-        {displayCapturePhoto && (
+        {fieldConfigurations?.name?.displayCapturePhoto && (
           <ExtensionSlot
             className={styles.photoExtension}
             extensionSlotName="capture-patient-photo-slot"
@@ -68,13 +69,20 @@ export const NameField = () => {
         )}
 
         <div className={styles.nameField}>
-          <div className={styles.dobContentSwitcherLabel}>
-            <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
-          </div>
-          <ContentSwitcher className={styles.contentSwitcher} onChange={toggleNameKnown}>
-            <Switch name="known" text={t('yes', 'Yes')} />
-            <Switch name="unknown" text={t('no', 'No')} />
-          </ContentSwitcher>
+          {showToggleUnknownName && (
+            <>
+              <div className={styles.dobContentSwitcherLabel}>
+                <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
+              </div>
+              <ContentSwitcher
+                className={styles.contentSwitcher}
+                onChange={toggleNameKnown}
+                selectedIndex={nameKnown ? 0 : 1}>
+                <Switch name="known" text={t('yes', 'Yes')} />
+                <Switch name="unknown" text={t('no', 'No')} />
+              </ContentSwitcher>
+            </>
+          )}
           {nameKnown && (
             <>
               <Input
