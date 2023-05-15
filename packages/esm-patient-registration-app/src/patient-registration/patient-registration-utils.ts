@@ -103,7 +103,7 @@ export function scrollIntoView(viewId: string) {
 }
 
 export function cancelRegistration() {
-  navigate({ to: `${window.spaBase}/home` });
+  window.history.back();
 }
 
 export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
