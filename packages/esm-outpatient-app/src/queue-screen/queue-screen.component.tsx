@@ -1,15 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  DataTableSkeleton,
-} from '@carbon/react';
+import React from 'react';
+import { DataTableSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useActiveTickets } from './useActiveTickets';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
@@ -29,21 +19,6 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
     return <div>Error</div>;
   }
 
-  const headerData = [
-    {
-      header: t('room', 'Room'),
-      key: 'room',
-    },
-    {
-      header: t('ticketNumber', 'Ticket Number'),
-      key: 'ticketNumber',
-    },
-    {
-      header: t('status', 'Status'),
-      key: 'status',
-    },
-  ];
-
   const rowData = activeTickets.map((ticket, index) => ({
     id: `${index}}`,
     room: ticket.room,
@@ -54,31 +29,16 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
   return (
     <div>
       <PatientQueueHeader />
-      <div className={styles.queueScreen}>
-        <DataTable rows={rowData} headers={headerData} isSortable>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <TableContainer title={t('activeTickets', 'Active tickets')}>
-              <Table {...getTableProps()} size="lg" useZebraStyles>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
+      <div className={styles.gridFlow}>
+        {rowData.map((row) => (
+          <div className={styles.card}>
+            <p className={styles.subHeader}>{t('ticketNumber', 'Ticket number')}</p>
+            <p className={row.status === 'calling' ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
+            <p className={styles.subHeader}>
+              {t('room', 'Room')} &nbsp; : &nbsp; {row.room}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
