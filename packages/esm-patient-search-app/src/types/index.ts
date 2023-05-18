@@ -1,6 +1,5 @@
 import { FetchResponse, OpenmrsResource } from '@openmrs/esm-framework';
 export interface SearchedPatient {
-  extension: any;
   uuid: string;
   identifiers: Array<Identifier>;
   person: {
@@ -88,7 +87,6 @@ export interface PatientSearchResponse {
 }
 
 export interface AdvancedPatientSearchState {
-  extension: boolean;
   gender: 'any' | 'male' | 'female' | 'other' | 'unknown';
   dateOfBirth: number;
   monthOfBirth: number;

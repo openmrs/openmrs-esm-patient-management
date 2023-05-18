@@ -8,7 +8,6 @@ export const initialState: AdvancedPatientSearchState = {
   phoneNumber: 0,
   postcode: '',
   age: 0,
-  extension: false,
 };
 
 const reducer: (
