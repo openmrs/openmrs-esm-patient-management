@@ -109,6 +109,13 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
           }
         }
 
+        if (
+          !patient.extension ||
+          (patient.extension.name !== 'deceased-patient-tag' && patient.extension.name !== 'active-visit-tag')
+        ) {
+          return false;
+        }
+
         return true;
       });
     }
