@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
-import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
+import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
+import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
 import { updateAppointmentStatus } from '../appointments-table.resource';
 import { handleUndoAction } from '../common';
-import { useSWRConfig } from 'swr';
-
-import styles from './index.scss';
+import styles from './check-in-modal.scss';
 
 interface ChangeStatusDialogProps {
   closeCheckInModal: () => void;
@@ -16,12 +15,11 @@ interface ChangeStatusDialogProps {
 
 const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheckInModal, appointmentUuid }) => {
   const { t } = useTranslation();
-  const [checkInTime, setCheckInTime] = useState(dayjs(new Date()).format('hh:mm'));
   const { mutate } = useSWRConfig();
+  const [checkInTime, setCheckInTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    const abortController = new AbortController();
     setIsSubmitting(true);
     const { status } = await updateAppointmentStatus('CheckedIn', appointmentUuid);
     if (status === 200) {
@@ -51,7 +49,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
     <div>
       <ModalHeader
         closeModal={closeCheckInModal}
-        title={t('checkInAppointment', 'Are you sure, you want to mark appointment as Checked-in?')}
+        title={t('checkInAppointment', 'Are you sure you want to mark appointment as Checked-in?')}
       />
       <ModalBody>
         <div className={styles.checkInTime}>
