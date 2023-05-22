@@ -2,12 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, Calendar } from '@carbon/react/icons';
-
 import { useConfig, navigate } from '@openmrs/esm-framework';
-import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
 import { spaBasePath } from '../constants';
-
+import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-list.scss';
 
 const SeeAllAppointmentsLink = () => {
@@ -36,25 +34,28 @@ const AddAppointmentLink = () => {
 
   const { t } = useTranslation();
 
-  return useBahmniUI ? (
-    <Button
-      size="md"
-      target="_blank"
-      kind="ghost"
-      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
-      renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
-      {t('addNewAppointment', 'Add ')}
-    </Button>
-  ) : (
-    <Button
-      kind="ghost"
-      renderIcon={(props) => <Add size={16} {...props} />}
-      onClick={() => {
-        navigate({ to: `${spaBasePath}/appointments` });
-        launchOverlay(t('search', 'Search'), <PatientSearch />);
-      }}>
-      {t('addNewAppointment', 'Add ')}
-    </Button>
+  return (
+    <div className={styles.addButtonContainer}>
+      {useBahmniUI ? (
+        <Button
+          target="_blank"
+          kind="ghost"
+          href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
+          renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
+          {t('add', 'Add')}
+        </Button>
+      ) : (
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <Add size={16} {...props} />}
+          onClick={() => {
+            navigate({ to: `${spaBasePath}/appointments` });
+            launchOverlay(t('search', 'Search'), <PatientSearch />);
+          }}>
+          {t('add', 'Add')}
+        </Button>
+      )}
+    </div>
   );
 };
 
