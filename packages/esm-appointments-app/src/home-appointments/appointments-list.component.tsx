@@ -27,13 +27,12 @@ import {
   userHasAccess,
 } from '@openmrs/esm-framework';
 import { ActionsMenu } from './appointment-actions.component';
-import { EmptyDataIllustration } from './emptyData';
+import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
-import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links';
+import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
 import { MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
-import { useAppointmentDate } from '../helpers';
 
 interface PaginationData {
   goTo: (page: number) => void;
