@@ -9,6 +9,9 @@ import {
   Switch,
   Select,
   SelectItem,
+  InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,7 +24,13 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { MappedQueueEntry } from '../types';
-import { updateQueueEntry, usePriority, useServices, useVisitQueueEntries } from './active-visits-table.resource';
+import {
+  updateQueueEntry,
+  usePriority,
+  useServices,
+  useStatus,
+  useVisitQueueEntries,
+} from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
 
@@ -42,6 +51,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const { queueLocations } = useQueueLocations();
   const [editLocation, setEditLocation] = useState(false);
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
+  const { statuses } = useStatus();
+  const [queueStatus, setQueueStatus] = useState(queueEntry?.statusUuid);
 
   const changeQueueStatus = useCallback(
     (event) => {
@@ -59,7 +70,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
         queueEntry?.queueEntryUuid,
         queueEntry?.patientUuid,
         queuePriority,
-        queueEntry?.statusUuid,
+        queueStatus,
         endDate,
         sortWeight,
       ).then(
@@ -94,7 +105,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       queueEntry?.queueUuid,
       queueEntry?.queueEntryUuid,
       queueEntry?.patientUuid,
-      queueEntry?.statusUuid,
+      queueStatus,
       t,
       closeModal,
       mutate,
@@ -159,6 +170,30 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                     </SelectItem>
                   ))}
               </Select>
+            </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
+              {!statuses?.length ? (
+                <InlineNotification
+                  className={styles.inlineNotification}
+                  kind={'error'}
+                  lowContrast
+                  subtitle={t('configureStatus', 'Please configure status to continue.')}
+                  title={t('noStatusConfigured', 'No status configured')}
+                />
+              ) : (
+                <RadioButtonGroup
+                  className={styles.radioButtonWrapper}
+                  name="status"
+                  defaultSelected={queueStatus}
+                  onChange={(uuid) => {
+                    setQueueStatus(uuid);
+                  }}>
+                  {statuses?.length > 0 &&
+                    statuses.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
+                </RadioButtonGroup>
+              )}
             </section>
 
             <section className={styles.section}>

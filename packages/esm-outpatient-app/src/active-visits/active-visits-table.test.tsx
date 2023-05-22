@@ -6,14 +6,16 @@ import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visi
 import ActiveVisitsTable from './active-visits-table.component';
 import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
 import { useVisitQueueEntries } from './active-visits-table.resource';
-import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { mockSession } from '../../../../__mocks__/session.mock';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
 const mockUseVisitQueueEntries = useVisitQueueEntries as jest.Mock;
-const mockUseProvidersQueueRoom = useProvidersQueueRoom as jest.Mock;
+const mockQueueLocations = useQueueLocations as jest.Mock;
+const mockUseQueueRooms = useQueueRooms as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -34,12 +36,21 @@ jest.mock('./active-visits-table.resource', () => {
   };
 });
 
+jest.mock('../patient-search/hooks/useQueueLocations', () => {
+  const originalModule = jest.requireActual('../patient-search/hooks/useQueueLocations');
+
+  return {
+    ...originalModule,
+    useQueueLocations: jest.fn(),
+  };
+});
+
 jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => {
   const originalModule = jest.requireActual('../add-provider-queue-room/add-provider-queue-room.resource');
 
   return {
     ...originalModule,
-    useProvidersQueueRoom: jest.fn(),
+    useQueueRooms: jest.fn(),
   };
 });
 
@@ -59,8 +70,9 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders an empty state view if data is unavailable', async () => {
+    mockQueueLocations.mockReturnValueOnce({ queueLocations: [] });
+    mockUseQueueRooms.mockReturnValue({ rooms: [] });
     mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: [], isLoading: false });
-    mockUseProvidersQueueRoom.mockReturnValue({ providers: mockSession });
 
     renderActiveVisitsTable();
 
@@ -70,13 +82,14 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
+    mockQueueLocations.mockReturnValueOnce({ queueLocations: mockQueueLocations });
+    mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
     mockUseVisitQueueEntries.mockReturnValue({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
     mockUsePagination.mockReturnValue({
       results: mockMappedQueueEntries.data.slice(0, 2),
       goTo: mockGoToPage,
       currentPage: 1,
     });
-    mockUseProvidersQueueRoom.mockReturnValue({ providers: mockSession });
 
     renderActiveVisitsTable();
 
