@@ -108,7 +108,7 @@ jest.mock('../input/basic-input/input/input.component', () => {
               onBlur={() => {
                 // I had to do this because the error message was not showing up
                 helpers.setTouched(true);
-                if (!field.value) {
+                if (!field.value && props.required) {
                   console.log('props.name', props.name);
                   helpers.setError(`${labelText} is required`);
                 }
@@ -134,7 +134,6 @@ describe('Name input', () => {
         familyNameValue,
       async () => {
         const error = await updateNameAndReturnError(givenNameValue, middleNameValue, familyNameValue);
-        console.log('error', error);
         Object.values(error).map((currentError) => expect(currentError).toBeNull());
       },
     );
@@ -207,6 +206,7 @@ describe('Name input', () => {
     fireEvent.blur(givenNameInput);
     fireEvent.change(middleNameInput, { target: { value: middleNameValue } });
     fireEvent.blur(middleNameInput);
+    console.log('familyNameInput', familyNameValue);
     fireEvent.change(familyNameInput, { target: { value: familyNameValue } });
     fireEvent.blur(familyNameInput);
     screen.debug();
@@ -219,9 +219,9 @@ describe('Name input', () => {
   };
 
   testValidName('Aaron', 'A', 'Aaronson');
-  // testValidName('No', '', 'Middle Name');   // this test fails because the error message is showing up for the middle name
+  testValidName('No', '', 'Mishra');
   testInvalidName('', '', '', 'First Name is required', 'givenNameError');
   testInvalidName('', '', '', 'Family Name is required', 'familyNameError');
-  // testInvalidName('5', 'No', 'Given Name', 'First Name is required', 'givenNameError');  // this test fails because the error message
+  // testInvalidName('5', 'No', 'Given Name', 'First Name is required', 'givenNameError');  // this test fails because this will show the warnt text numberInNameDubious instead of the error message
   testInvalidName('No', 'Family Name', '', 'Family Name is required', 'familyNameError');
 });
