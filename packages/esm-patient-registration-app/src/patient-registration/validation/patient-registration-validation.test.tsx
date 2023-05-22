@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import React from 'react';
-import { render, fireEvent, screen, waitForDomChange, waitFor } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form, useField } from 'formik';
 import { useConfig } from '@openmrs/esm-framework';
@@ -104,7 +104,6 @@ jest.mock('../input/basic-input/input/input.component', () => {
               invalid={!!(meta.touched && meta.error)}
               value={field.value}
               onChange={(e) => helpers.setValue(e.target.value)} // I had to this because the value was not being set
-              on
               invalidText={meta.error || ''}
               onBlur={() => {
                 // I had to do this because the error message was not showing up
