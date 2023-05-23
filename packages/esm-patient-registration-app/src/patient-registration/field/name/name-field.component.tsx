@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 export const NameField = () => {
   const {
     fieldConfigurations: {
-      name: { displayCapturePhoto },
+      name: { displayCapturePhoto, displayKnownNameToggle },
     },
   } = useConfig() as RegistrationConfig;
   const { t } = useTranslation();
@@ -68,13 +68,17 @@ export const NameField = () => {
         )}
 
         <div className={styles.nameField}>
-          <div className={styles.dobContentSwitcherLabel}>
-            <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
-          </div>
-          <ContentSwitcher className={styles.contentSwitcher} onChange={toggleNameKnown}>
-            <Switch name="known" text={t('yes', 'Yes')} />
-            <Switch name="unknown" text={t('no', 'No')} />
-          </ContentSwitcher>
+          {displayKnownNameToggle && (
+            <>
+              <div className={styles.dobContentSwitcherLabel}>
+                <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
+              </div>
+              <ContentSwitcher className={styles.contentSwitcher} onChange={toggleNameKnown}>
+                <Switch name="known" text={t('yes', 'Yes')} />
+                <Switch name="unknown" text={t('no', 'No')} />
+              </ContentSwitcher>
+            </>
+          )}
           {nameKnown && (
             <>
               <Input

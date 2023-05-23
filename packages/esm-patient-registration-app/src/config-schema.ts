@@ -41,6 +41,7 @@ export interface RegistrationConfig {
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
       displayCapturePhoto: boolean;
+      displayKnownNameToggle: boolean;
     };
     gender: Array<Gender>;
     address: {
@@ -219,6 +220,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.Boolean,
         _default: true,
         _description: 'Whether to display capture patient photo slot on name field',
+      },
+      displayKnownNameToggle: {
+        _type: Type.Boolean,
+        _default: true,
+        _description: 'Determines whether to display the toggle switch for known patient names.',
       },
     },
     gender: {
