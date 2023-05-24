@@ -82,6 +82,12 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const isDeceased = !!patient.person.deathDate;
 
+  const fhirPatient = React.useMemo(() => {
+    return {
+      deceasedDateTime: patient.person.deathDate,
+    };
+  }, [patient]);
+
   return (
     <>
       <div
@@ -101,7 +107,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
                 extensionSlotName="patient-banner-tags-slot"
-                state={{ patientUuid, patient }}
+                state={{ patientUuid, patient: fhirPatient }}
                 className={styles.flexRow}
               />
             </div>
