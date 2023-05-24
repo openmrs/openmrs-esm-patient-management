@@ -37,7 +37,7 @@ export interface RegistrationConfig {
   fieldConfigurations: {
     name: {
       displayMiddleName: boolean;
-      unidentifiedPatient: boolean;
+      allowUnidentifiedPatients: boolean;
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
       displayCapturePhoto: boolean;
@@ -200,7 +200,7 @@ export const esmPatientRegistrationSchema = {
   fieldConfigurations: {
     name: {
       displayMiddleName: { _type: Type.Boolean, _default: true },
-      unidentifiedPatient: {
+      allowUnidentifiedPatient: {
         _type: Type.Boolean,
         _default: true,
         _description: 'Whether to allow patients to be registered without names.',
