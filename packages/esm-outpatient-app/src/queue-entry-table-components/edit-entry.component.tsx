@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { Collaborate } from '@carbon/react/icons';
 import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
@@ -20,13 +19,9 @@ const EditMenu: React.FC<EditMenuProps> = ({ queueEntry, closeModal }) => {
   }, [queueEntry]);
 
   return (
-    <Button
-      onClick={launchEditPriorityModal}
-      className={styles.editIcon}
-      iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
-      hasIconOnly
-      renderIcon={(props) => <Collaborate size={16} {...props} />}
-    />
+    <Button onClick={launchEditPriorityModal} className={styles.editIcon} kind="ghost">
+      {t('transfer', 'Transfer')}
+    </Button>
   );
 };
 

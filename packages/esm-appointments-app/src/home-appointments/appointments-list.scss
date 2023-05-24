@@ -40,6 +40,10 @@
   display: none;
 }
 
+.addButtonContainer {
+  margin: -(spacing.$spacing-05);
+}
+
 .tableContainer {
   a {
     text-decoration: none;
@@ -176,6 +180,7 @@
   justify-content: space-between;
   text-align: left;
   text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
 
   h4 {
     @include type.type-style('heading-compact-02');

@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
-  ContentSwitcher,
   Form,
   InlineNotification,
   ModalBody,
@@ -10,7 +9,8 @@ import {
   ModalHeader,
   Select,
   SelectItem,
-  Switch,
+  RadioButtonGroup,
+  RadioButton,
 } from '@carbon/react';
 import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import {
@@ -32,7 +32,6 @@ interface AddVisitToQueueDialogProps {
 const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, closeModal }) => {
   const { t } = useTranslation();
 
-  const [priority, setPriority] = useState('');
   const visitUuid = visitDetails?.visitUuid;
   const [queueUuid, setQueueUuid] = useState('');
   const patientUuid = visitDetails?.patientUuid;
@@ -48,6 +47,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const [isMissingService, setIsMissingService] = useState(false);
   const config = useConfig() as ConfigObject;
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
+  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
 
   const addVisitToQueue = useCallback(() => {
     if (!queueUuid) {
@@ -169,25 +169,27 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
           )}
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
-            <ContentSwitcher
-              size="sm"
-              selectedIndex={1}
-              onChange={(event) => {
-                setPriority(event.name as any);
-              }}>
-              {priorities?.length > 0 ? (
-                priorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
-                })
-              ) : (
-                <Switch
-                  name={t('noPriorityFound', 'No priority found')}
-                  text={t('noPriorityFound', 'No priority found')}
-                  value={null}
-                />
-              )}
-            </ContentSwitcher>
+            <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
+            {!priorities?.length ? (
+              <InlineNotification
+                className={styles.inlineNotification}
+                kind={'error'}
+                lowContrast
+                subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                title={t('noPriorityFound', 'No priority found')}
+              />
+            ) : (
+              <RadioButtonGroup
+                className={styles.radioButtonWrapper}
+                name="priority"
+                defaultSelected={priority}
+                onChange={(uuid) => {
+                  setPriority(uuid);
+                }}>
+                {priorities?.length > 0 &&
+                  priorities.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
+              </RadioButtonGroup>
+            )}
           </section>
           {isMissingPriority && (
             <section>

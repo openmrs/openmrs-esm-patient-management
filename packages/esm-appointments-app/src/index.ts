@@ -77,7 +77,7 @@ function setupOpenMRS() {
       },
       {
         name: 'check-in-appointment-modal',
-        load: getAsyncLifecycle(() => import('./home-appointments/checkin-modal'), options),
+        load: getAsyncLifecycle(() => import('./home-appointments/check-in-modal/check-in-modal.component'), options),
         online: true,
         offline: false,
       },
