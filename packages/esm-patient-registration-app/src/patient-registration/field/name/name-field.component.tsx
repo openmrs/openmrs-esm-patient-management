@@ -7,6 +7,7 @@ import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
 import { RegistrationConfig } from '../../../config-schema';
+import { unidentifiedPatientAttributeTypeUuid } from '../../patient-registration.resource';
 
 const containsNoNumbers = /^([^0-9]*)$/;
 
@@ -19,18 +20,25 @@ function checkNumber(value: string) {
 }
 
 export const NameField = () => {
-  const { fieldConfigurations } = useConfig<RegistrationConfig>();
   const { t } = useTranslation();
-  const { setCapturePhotoProps, currentPhoto, setFieldValue, initialFormValues } =
-    useContext(PatientRegistrationContext);
-  const fieldConfigs = fieldConfigurations?.name;
-  const [{ value: unidentified }] = useField('unidentifiedPatient');
-  const nameKnown = !unidentified;
-  const showToggleUnknownName =
-    fieldConfigs?.unidentifiedPatient ||
-    (initialFormValues?.familyName === 'UNKNOWN' && initialFormValues?.givenName === 'UNKNOWN')
-      ? true
-      : false;
+  const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
+  const {
+    fieldConfigurations: {
+      name: {
+        displayCapturePhoto,
+        allowUnidentifiedPatients,
+        defaultUnknownGivenName,
+        defaultUnknownFamilyName,
+        displayMiddleName,
+      },
+    },
+  } = useConfig() as RegistrationConfig;
+
+  const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
+    `attributes.${unidentifiedPatientAttributeTypeUuid}`,
+  );
+
+  const isPatientUnknown = isPatientUnknownValue === 'true';
 
   const onCapturePhoto = useCallback(
     (dataUri: string, photoDateTime: string) => {
@@ -48,11 +56,11 @@ export const NameField = () => {
     if (e.name === 'known') {
       setFieldValue('givenName', '');
       setFieldValue('familyName', '');
-      setFieldValue('unidentifiedPatient', false);
+      setUnknownPatient('false');
     } else {
-      setFieldValue('givenName', fieldConfigs.defaultUnknownGivenName);
-      setFieldValue('familyName', fieldConfigs.defaultUnknownFamilyName);
-      setFieldValue('unidentifiedPatient', true);
+      setFieldValue('givenName', defaultUnknownGivenName);
+      setFieldValue('familyName', defaultUnknownFamilyName);
+      setUnknownPatient('true');
     }
   };
 
@@ -60,7 +68,7 @@ export const NameField = () => {
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
       <div className={styles.grid}>
-        {fieldConfigurations?.name?.displayCapturePhoto && (
+        {displayCapturePhoto && (
           <ExtensionSlot
             className={styles.photoExtension}
             extensionSlotName="capture-patient-photo-slot"
@@ -69,21 +77,21 @@ export const NameField = () => {
         )}
 
         <div className={styles.nameField}>
-          {showToggleUnknownName && (
+          {(allowUnidentifiedPatients || isPatientUnknown) && (
             <>
               <div className={styles.dobContentSwitcherLabel}>
                 <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
               </div>
               <ContentSwitcher
                 className={styles.contentSwitcher}
-                onChange={toggleNameKnown}
-                selectedIndex={nameKnown ? 0 : 1}>
+                selectedIndex={isPatientUnknown ? 1 : 0}
+                onChange={toggleNameKnown}>
                 <Switch name="known" text={t('yes', 'Yes')} />
                 <Switch name="unknown" text={t('no', 'No')} />
               </ContentSwitcher>
             </>
           )}
-          {nameKnown && (
+          {!isPatientUnknown && (
             <>
               <Input
                 id="givenName"
@@ -92,7 +100,7 @@ export const NameField = () => {
                 checkWarning={checkNumber}
                 required
               />
-              {fieldConfigs.displayMiddleName && (
+              {displayMiddleName && (
                 <Input
                   id="middleName"
                   name="middleName"

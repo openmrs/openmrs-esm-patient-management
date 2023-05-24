@@ -34,7 +34,6 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
     givenName: '',
     middleName: '',
     familyName: '',
-    unidentifiedPatient: false,
     additionalGivenName: '',
     additionalMiddleName: '',
     additionalFamilyName: '',
@@ -107,6 +106,7 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
             ? attribute.value?.uuid
             : attribute.value;
       });
+
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,
         attributes: personAttributes,

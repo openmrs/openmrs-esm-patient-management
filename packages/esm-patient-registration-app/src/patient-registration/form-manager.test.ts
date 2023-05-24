@@ -8,7 +8,6 @@ const formValues: FormValues = {
   givenName: '',
   middleName: '',
   familyName: '',
-  unidentifiedPatient: false,
   additionalGivenName: '',
   additionalMiddleName: '',
   additionalFamilyName: '',

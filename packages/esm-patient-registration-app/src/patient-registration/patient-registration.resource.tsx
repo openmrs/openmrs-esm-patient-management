@@ -6,6 +6,7 @@ import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-r
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
+export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 
 function dataURItoFile(dataURI: string) {
   const byteString = atob(dataURI.split(',')[1]);
