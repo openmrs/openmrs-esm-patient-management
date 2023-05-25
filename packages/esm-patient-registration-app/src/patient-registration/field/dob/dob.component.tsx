@@ -76,12 +76,12 @@ export const DobField: React.FC = () => {
   return (
     <div className={styles.halfWidthInDesktopView}>
       <h4 className={styles.productiveHeading02Light}>{t('birthFieldLabelText', 'Birth')}</h4>
-      {allowEstimatedBirthDate && (
+      {(allowEstimatedBirthDate || !dobKnown) && (
         <div className={styles.dobField}>
           <div className={styles.dobContentSwitcherLabel}>
             <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
           </div>
-          <ContentSwitcher onChange={onToggle}>
+          <ContentSwitcher onChange={onToggle} selectedIndex={dobKnown ? 0 : 1}>
             <Switch name="known" text={t('yes', 'Yes')} />
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>

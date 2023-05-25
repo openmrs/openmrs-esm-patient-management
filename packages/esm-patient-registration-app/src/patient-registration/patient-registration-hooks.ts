@@ -21,6 +21,7 @@ import {
   latestFirstEncounter,
 } from './patient-registration-utils';
 import { useInitialPatientRelationships } from './section/patient-relationships/relationships.resource';
+import dayjs from 'dayjs';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
@@ -55,11 +56,19 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   useEffect(() => {
     (async () => {
       if (patientToEdit) {
+        const birthdateEstimated = !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate);
+        const [years = 0, months = 0] = patientToEdit.birthDate.split('-').map((val) => parseInt(val));
+        const yearsEstimated = birthdateEstimated ? dayjs().diff(patientToEdit.birthDate, 'years') - 1 : 0;
+        const monthsEstimated = birthdateEstimated ? (dayjs().diff(patientToEdit.birthDate, 'month') % 12) + 1 : 0;
+
         setInitialFormValues({
           ...initialFormValues,
           ...getFormValuesFromFhirPatient(patientToEdit),
           address: getAddressFieldValuesFromFhirPatient(patientToEdit),
           ...getPhonePersonAttributeValueFromFhirPatient(patientToEdit),
+          birthdateEstimated: !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate),
+          yearsEstimated,
+          monthsEstimated,
         });
       } else if (!isLoadingPatientToEdit && patientUuid) {
         const registration = await getPatientRegistration(patientUuid);
