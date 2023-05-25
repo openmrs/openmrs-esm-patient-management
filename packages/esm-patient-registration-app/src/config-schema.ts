@@ -200,7 +200,7 @@ export const esmPatientRegistrationSchema = {
   fieldConfigurations: {
     name: {
       displayMiddleName: { _type: Type.Boolean, _default: true },
-      allowUnidentifiedPatient: {
+      allowUnidentifiedPatients: {
         _type: Type.Boolean,
         _default: true,
         _description: 'Whether to allow patients to be registered without names.',
