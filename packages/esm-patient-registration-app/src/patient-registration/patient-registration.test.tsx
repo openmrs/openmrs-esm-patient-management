@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
@@ -35,6 +35,7 @@ jest.mock('react-router-dom', () => ({
     pathname: 'openmrs/spa/patient-registration',
   }),
   useHistory: () => [],
+  useParams: jest.fn().mockReturnValue({ patientUuid: undefined }),
 }));
 
 jest.mock('./patient-registration.resource', () => {
@@ -269,7 +270,11 @@ describe('patient registration', () => {
 
     mockedSavePatient.mockResolvedValue({});
 
-    mockedUsePatient.mockReturnValueOnce({
+    const mockedUseParams = useParams as jest.Mock;
+
+    mockedUseParams.mockReturnValue({ patientUuid: mockPatient.id });
+
+    mockedUsePatient.mockReturnValue({
       isLoading: false,
       patient: mockPatient,
       patientUuid: mockPatient.id,
@@ -288,13 +293,15 @@ describe('patient registration', () => {
     const familyNameInput = screen.getByLabelText(/Family Name/) as HTMLInputElement;
     const middleNameInput = screen.getByLabelText(/Middle Name/) as HTMLInputElement;
     const dateOfBirthInput = screen.getByLabelText('Date of Birth') as HTMLInputElement;
+    const genderInput = screen.getByLabelText(/Male/) as HTMLSelectElement;
     const address1 = screen.getByLabelText('Location.address1 (optional)') as HTMLInputElement;
 
     // assert initial values
     expect(givenNameInput.value).toBe('John');
     expect(familyNameInput.value).toBe('Wilson');
     expect(middleNameInput.value).toBeFalsy();
-    expect(dateOfBirthInput.value).toBe('04/04/1972');
+    expect(dateOfBirthInput.value).toBe('4/4/1972');
+    expect(genderInput.value).toBe('Male');
 
     // do some edits
     await user.clear(givenNameInput);
@@ -305,55 +312,70 @@ describe('patient registration', () => {
     await user.type(familyNameInput, 'Smith');
     await user.type(address1, 'Bom Jesus Street');
     await user.click(screen.getByText('Update Patient'));
+    // screen.debug(undefined, 20000);
 
-    expect(mockedSavePatient).toHaveBeenCalledWith(
-      expect.anything(),
-      {
-        uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
-        identifiers: [
-          {
-            uuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
-            identifier: '100GEJ',
-            identifierType: 'e5af9a9c-ff9d-486d-900c-5fbf66a5ba3c',
-            preferred: true,
-          },
-          {
-            uuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
-            identifier: '100732HE',
-            identifierType: '3ff0063c-dd45-4d98-8af4-0c094f26166c',
-            preferred: false,
-          },
-        ],
-        person: {
-          addresses: [
+    // await waitFor(() => expect(mockedSavePatient).toHaveBeenCalled());
+    //TODO: fix this test. It is failing because the savePatient method is not being called.
+    // I tried debugging if after adding all the mocks the savePatientFormOnline method is being called but savePatient method is not.
+
+    await waitFor(() =>
+      expect(mockedSavePatient).toHaveBeenCalledWith(
+        expect.anything(),
+        {
+          uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+          identifiers: [
             {
-              address1: 'Bom Jesus Street',
-              address2: '',
-              cityVillage: 'City0351',
-              country: 'Country0351',
-              postalCode: '60351',
-              stateProvince: 'State0351tested',
-            },
-          ],
-          attributes: [],
-          birthdate: new Date('1972-04-04'),
-          birthdateEstimated: false,
-          gender: 'M',
-          names: [
-            {
-              uuid: 'efdb246f-4142-4c12-a27a-9be60b9592e9',
-              givenName: 'Eric',
-              middleName: 'Johnson',
-              familyName: 'Smith',
+              uuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+              identifier: '100GEJ',
+              identifierType: 'e5af9a9c-ff9d-486d-900c-5fbf66a5ba3c',
               preferred: true,
             },
+            {
+              uuid: '1f0ad7a1-430f-4397-b571-59ea654a52db',
+              identifier: '100732HE',
+              identifierType: '3ff0063c-dd45-4d98-8af4-0c094f26166c',
+              preferred: false,
+            },
           ],
-          dead: false,
-          uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+          person: {
+            addresses: [
+              {
+                address1: 'Bom Jesus Street',
+                address2: '',
+                cityVillage: 'City0351',
+                country: 'Country0351',
+                postalCode: '60351',
+                stateProvince: 'State0351tested',
+              },
+            ],
+            attributes: [],
+            birthdate: new Date('1972-04-04'),
+            birthdateEstimated: false,
+            gender: 'M',
+            names: [
+              {
+                uuid: 'efdb246f-4142-4c12-a27a-9be60b9592e9',
+                givenName: 'Eric',
+                middleName: 'Johnson',
+                familyName: 'Smith',
+                preferred: true,
+              },
+            ],
+            dead: false,
+            uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+          },
         },
-      },
-      '8673ee4f-e2ab-4077-ba55-4980f408773e',
+        '8673ee4f-e2ab-4077-ba55-4980f408773e',
+      ),
     );
+    /** The mock of useParams hook is not getting reset which is resulting in the below tests to fail.
+     * These are the ways I tried to reset the mock but none of them worked.
+     * If I will not mock the useParams the update patient button will not be visible. There will be Register Patient button
+    // mockedUseParams.mockRestore();
+    // mockedUseParams.mockReset();
+    // mockedUseParams.mockClear();
+    // mockedUseParams.mockReturnValue({ patientUuid: undefined });
+    **/
   });
 
   it('renders and saves registration obs', async () => {
