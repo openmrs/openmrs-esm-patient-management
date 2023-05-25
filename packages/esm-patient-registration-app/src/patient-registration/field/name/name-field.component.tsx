@@ -32,7 +32,7 @@ export const NameField = () => {
         displayMiddleName,
       },
     },
-  } = useConfig() as RegistrationConfig;
+  } = useConfig<RegistrationConfig>();
 
   const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
     `attributes.${unidentifiedPatientAttributeTypeUuid}`,
