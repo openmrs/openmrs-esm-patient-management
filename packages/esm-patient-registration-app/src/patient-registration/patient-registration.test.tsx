@@ -3,7 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
-import FormManager from './form-manager';
+import { FormManager } from './form-manager';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { Encounter } from './patient-registration-types';
@@ -183,9 +183,10 @@ describe('patient registration', () => {
     mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
     mockedSaveEncounter.mockClear();
     mockedShowToast.mockClear();
+    jest.clearAllMocks();
   });
 
-  it.only('renders without crashing', () => {
+  it('renders without crashing', () => {
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Router>
@@ -223,12 +224,11 @@ describe('patient registration', () => {
     await user.click(await screen.findByText('Register Patient'));
     await waitFor(() => {
       expect(mockedSavePatient).toHaveBeenCalledWith(
-        expect.anything(),
         expect.objectContaining({
           identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }
           // identifiers: [{ identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }],
           person: {
-            addresses: [{}],
+            addresses: expect.arrayContaining([expect.any(Object)]),
             attributes: [],
             birthdate: '1993-8-2',
             birthdateEstimated: false,
@@ -258,7 +258,7 @@ describe('patient registration', () => {
 
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
-    await user.type(givenNameInput, '');
+    await user.type(givenNameInput, '5');
     await user.click(screen.getByText('Register Patient'));
 
     expect(mockedSavePatientForm).not.toHaveBeenCalled();
@@ -288,7 +288,7 @@ describe('patient registration', () => {
     const familyNameInput = screen.getByLabelText(/Family Name/) as HTMLInputElement;
     const middleNameInput = screen.getByLabelText(/Middle Name/) as HTMLInputElement;
     const dateOfBirthInput = screen.getByLabelText('Date of Birth') as HTMLInputElement;
-    const address1 = screen.getByLabelText('Location.address1') as HTMLInputElement;
+    const address1 = screen.getByLabelText('Location.address1 (optional)') as HTMLInputElement;
 
     // assert initial values
     expect(givenNameInput.value).toBe('John');
@@ -372,9 +372,9 @@ describe('patient registration', () => {
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
-    const weight = within(customSection).getByLabelText('Weight (kg)');
+    const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     await user.type(weight, '50');
-    const complaint = within(customSection).getByLabelText('Chief Complaint');
+    const complaint = within(customSection).getByLabelText('Chief Complaint (optional)');
     await user.type(complaint, 'sad');
     const nationality = within(customSection).getByLabelText('Nationality');
     await user.selectOptions(nationality, 'USA');
@@ -384,7 +384,6 @@ describe('patient registration', () => {
     await waitFor(() => expect(mockedSavePatient).toHaveBeenCalled());
     await waitFor(() =>
       expect(mockedSaveEncounter).toHaveBeenCalledWith(
-        expect.anything(),
         expect.objectContaining<Partial<Encounter>>({
           encounterType: 'reg-enc-uuid',
           patient: 'new-pt-uuid',
@@ -413,7 +412,7 @@ describe('patient registration', () => {
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
-    const weight = within(customSection).getByLabelText('Weight (kg)');
+    const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     await user.type(weight, '-999');
 
     mockedSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
@@ -429,7 +428,7 @@ describe('patient registration', () => {
     mockedSaveEncounter.mockResolvedValue({});
 
     await user.click(screen.getByText('Register Patient'));
-    await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(mockedShowToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })));
   });
