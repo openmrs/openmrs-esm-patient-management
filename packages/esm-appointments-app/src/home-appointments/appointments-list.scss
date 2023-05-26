@@ -280,3 +280,66 @@
     background-color: $ui-02;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .headerContainer {
+    padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
+    svg {
+      margin-left: 0;
+      margin-right: spacing.$spacing-03;
+    }
+    h4 {
+      text-align: right;
+    }
+  }
+  .pagination {
+    & > :nth-child(1) {
+      & > span {
+        margin-left: 0;
+        margin-right: spacing.$spacing-05;
+      }
+      & > :nth-child(2) {
+        select {
+          border-right: none;
+          border-left: 1px solid var(--cds-border-subtle);
+        }
+      }
+    }
+    & > :nth-child(2) {
+      & > :first-child {
+        select {
+          border-left: none;
+        }
+      }
+      & > span {
+        margin-right: 0.0625rem;
+        margin-left: spacing.$spacing-05;
+      }
+      & > :last-child {
+        & > :first-child {
+          border-right: 1px solid var(--cds-border-subtle);
+        }
+        svg {
+          transform: scaleX(-1);
+        }
+      }
+    }
+  }
+  .tableContainer {
+    th > div {
+      text-align: right;
+    }
+    td {
+      text-align: right;
+      .serviceColor {
+        margin-right: 0;
+        margin-left: spacing.$spacing-03;
+      }
+      button {
+        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        text-align: right;
+      }
+    }
+  }
+}

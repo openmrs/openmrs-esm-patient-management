@@ -240,3 +240,33 @@
   margin-left: spacing.$spacing-05;
   height: spacing.$spacing-09;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .headerContainer {
+    padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
+    svg {
+      margin-left: 0;
+      margin-right: spacing.$spacing-03;
+    }
+    h4 {
+      text-align: right;
+    }
+  }
+  .tableContainer {
+    th > div {
+      text-align: right;
+    }
+    td {
+      text-align: right;
+      .serviceColor {
+        margin-right: 0;
+        margin-left: spacing.$spacing-03;
+      }
+      button {
+        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        text-align: right;
+      }
+    }
+  }
+}
