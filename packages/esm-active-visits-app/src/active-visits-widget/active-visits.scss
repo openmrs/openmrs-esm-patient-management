@@ -133,3 +133,42 @@
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .activeVisitsContainer {
+    .activeVisitsDetailHeaderContainer {
+      padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
+      h4 {
+        text-align: right;
+      }
+    }
+    div[role='search'] {
+      & :first-child {
+        svg {
+          left: unset;
+          right: spacing.$spacing-03;
+        }
+      }
+      & :last-child {
+        right: unset;
+        left: 0;
+      }
+    }
+    .tableContainer {
+      th > div {
+        text-align: right;
+      }
+      td {
+        text-align: right;
+        .serviceColor {
+          margin-right: 0;
+          margin-left: spacing.$spacing-03;
+        }
+        button {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
