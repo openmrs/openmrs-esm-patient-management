@@ -139,6 +139,9 @@ html[dir='rtl'] {
   .activeVisitsContainer {
     .activeVisitsDetailHeaderContainer {
       padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
+    }
+    .desktopHeading,
+    .tabletHeading {
       h4 {
         text-align: right;
       }
