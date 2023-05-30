@@ -1,4 +1,5 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
+import _default from 'yup/lib/locale';
 
 export interface SectionDefinition {
   id: string;
@@ -51,6 +52,7 @@ export interface RegistrationConfig {
       };
     };
     dateOfBirth: {
+      allowEstimatedDateOfBirth: boolean;
       useEstimatedDateOfBirth: {
         enabled: boolean;
         dayOfMonth: number;
@@ -290,6 +292,11 @@ export const esmPatientRegistrationSchema = {
       },
     },
     dateOfBirth: {
+      allowEstimatedDateOfBirth: {
+        _type: Type.Boolean,
+        _description: 'Whether to allow estimated date of birth during registration',
+        _default: true,
+      },
       useEstimatedDateOfBirth: {
         enabled: {
           _type: Type.Boolean,
@@ -303,7 +310,7 @@ export const esmPatientRegistrationSchema = {
         },
         month: {
           _type: Type.Number,
-          _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan 11 = Dec',
+          _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
       },

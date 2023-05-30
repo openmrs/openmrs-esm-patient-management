@@ -58,8 +58,11 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       if (patientToEdit) {
         const birthdateEstimated = !/^\d{4}-\d{2}-\d{2}$/.test(patientToEdit.birthDate);
         const [years = 0, months = 0] = patientToEdit.birthDate.split('-').map((val) => parseInt(val));
-        const yearsEstimated = birthdateEstimated ? dayjs().diff(patientToEdit.birthDate, 'years') - 1 : 0;
-        const monthsEstimated = birthdateEstimated ? (dayjs().diff(patientToEdit.birthDate, 'month') % 12) + 1 : 0;
+        // Please refer: https://github.com/openmrs/openmrs-esm-patient-management/pull/697#issuecomment-1562706118
+        const estimatedMonthsAvailable = patientToEdit.birthDate.split('-').length > 1;
+        const yearsEstimated = birthdateEstimated ? Math.floor(dayjs().diff(patientToEdit.birthDate, 'month') / 12) : 0;
+        const monthsEstimated =
+          birthdateEstimated && estimatedMonthsAvailable ? dayjs().diff(patientToEdit.birthDate, 'month') % 12 : 0;
 
         setInitialFormValues({
           ...initialFormValues,
