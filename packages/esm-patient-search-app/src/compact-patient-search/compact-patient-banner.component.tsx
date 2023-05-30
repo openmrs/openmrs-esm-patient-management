@@ -98,9 +98,8 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                   }`}</h2>
                   <ExtensionSlot
                     extensionSlotName="patient-banner-tags-slot"
-                    state={{ patient }}
+                    state={{ patient, patientUuid: patient.id }}
                     className={styles.flexRow}
-                    select={(extensions) => extensions.filter((ext) => ext.name === 'deceased-patient-tag')}
                   />
                 </div>
                 <p className={styles.demographics}>
