@@ -7,8 +7,8 @@ import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
 import { RegistrationConfig } from '../../../config-schema';
-import { unidentifiedPatientAttributeTypeUuid } from '../../patient-registration.resource';
 
+export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 const containsNoNumbers = /^([^0-9]*)$/;
 
 function checkNumber(value: string) {
