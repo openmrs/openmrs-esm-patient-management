@@ -7,6 +7,9 @@ import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, RegistrationConfig } from '../../config-schema';
 import { CustomField } from './custom-field.component';
 import { AddressHierarchy } from './address/address-hierarchy.component';
+import { NationalityField } from './nationality/nationality-field.component';
+import { MaritalStatusField } from './marital-status/marital-status-field.component';
+import { OccupationField } from './occupation/occupation-field.component';
 
 export interface FieldProps {
   name: string;
@@ -38,6 +41,13 @@ export function Field({ name }: FieldProps) {
       return <AddressHierarchy />;
     case 'id':
       return <Identifiers />;
+    case 'maritalStatus':
+      return <MaritalStatusField />;
+    case 'nationality':
+      return <NationalityField />;
+
+    case 'occupation':
+      return <OccupationField />;
     default:
       return <CustomField name={name} />;
   }

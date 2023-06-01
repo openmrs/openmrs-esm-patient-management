@@ -1,9 +1,22 @@
 import { Type, validator, validators } from '@openmrs/esm-framework';
 
+let showDetails = false;
+
 export interface SectionDefinition {
   id: string;
   name?: string;
   fields: Array<string>;
+}
+
+export interface maritalStatus {
+  label?: string;
+  value: string;
+  id: string;
+}
+export interface Nationality {
+  label?: string;
+  value: string;
+  id: string;
 }
 
 export interface FieldDefinition {
@@ -43,6 +56,10 @@ export interface RegistrationConfig {
       displayCapturePhoto: boolean;
     };
     gender: Array<Gender>;
+    maritalStatus: Array<maritalStatus>;
+    nationality: Array<Nationality>;
+    occupation: string;
+
     address: {
       useAddressHierarchy: {
         enabled: boolean;
@@ -81,14 +98,26 @@ export const builtInSections: Array<SectionDefinition> = [
   { id: 'contact', name: 'Contact Details', fields: ['address', 'phone'] },
   { id: 'death', name: 'Death Info', fields: [] },
   { id: 'relationships', name: 'Relationships', fields: [] },
+
+  { id: 'otherDetails', name: 'Other Details', fields: ['maritalStatus', 'nationality', 'occupation'] },
 ];
 
-export const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'phone & email'] as const;
+export const builtInFields = [
+  'name',
+  'gender',
+  'dob',
+  'address',
+  'id',
+  'phone & email',
+  'maritalStatus',
+  'nationality',
+  'occupation',
+] as const;
 
 export const esmPatientRegistrationSchema = {
   sections: {
     _type: Type.Array,
-    _default: ['demographics', 'contact', 'relationships'],
+    _default: ['demographics', 'contact', 'relationships', 'otherDetails'],
     _description: `An array of strings which are the keys from 'sectionDefinitions' or any of the following built-in sections: '${builtInSections
       .map((s) => s.id)
       .join("', '")}'.`,
@@ -193,6 +222,15 @@ export const esmPatientRegistrationSchema = {
           matches: '',
         },
       },
+      {
+        id: 'occupation',
+        type: 'person attribute',
+        uuid: 'b0868a16-4f8e-43da-abfc-6338c9d8f56a',
+        showHeading: false,
+        validation: {
+          matches: '',
+        },
+      },
     ],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
@@ -262,6 +300,107 @@ export const esmPatientRegistrationSchema = {
         },
       ],
       _description: 'Provide ability to configure sex options.',
+    },
+
+    maritalStatus: {
+      _type: Type.Array,
+      _elements: {
+        value: {
+          _type: Type.String,
+          _description: 'The value for sex option',
+        },
+        label: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The label displayed for sex option.',
+        },
+        id: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The id for sex option.',
+        },
+      },
+      _default: [
+        {
+          id: 'child',
+          value: 'Child',
+          label: 'Child',
+        },
+
+        {
+          id: 'never-married',
+          value: 'neverMarried',
+          label: 'Never Married',
+        },
+
+        {
+          id: 'living-together',
+          value: 'livingTogether',
+          label: 'Living-together',
+        },
+
+        {
+          id: 'married',
+          value: 'married',
+          label: 'Married',
+        },
+        {
+          id: 'divorced',
+          value: 'divorced',
+          label: 'Divorced',
+        },
+        {
+          id: 'separated',
+          value: 'separated',
+          label: 'Separated',
+        },
+        {
+          id: 'widowed',
+          value: 'widowed',
+          label: 'Widowed',
+        },
+      ],
+      _description: 'Provide ability to configure sex options.',
+    },
+
+    nationality: {
+      _type: Type.Array,
+      _elements: {
+        value: {
+          _type: Type.String,
+          _description: 'The value for sex option',
+        },
+        label: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The label displayed for sex option.',
+        },
+        id: {
+          _type: Type.String,
+          _default: null,
+          _description: 'The id for sex option.',
+        },
+      },
+      _default: [
+        {
+          id: 'national',
+          value: 'national',
+          label: 'National',
+        },
+
+        {
+          id: 'foreigner',
+          value: 'foreigner',
+          label: 'Foreigner',
+        },
+
+        {
+          id: 'refugee',
+          value: 'refugee',
+          label: 'Refugee',
+        },
+      ],
+      _description: 'Provide ability to configure nationality options.',
     },
     address: {
       useAddressHierarchy: {
