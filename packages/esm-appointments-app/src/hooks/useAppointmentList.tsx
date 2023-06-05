@@ -13,14 +13,14 @@ interface AppointmentPatientList {
     name: string;
     uuid: string;
     age: number;
-    identifier: string;
+    identifiers: Array<{ identifierName: string; identifier: string }>;
   };
   providers: Array<Provider>;
   service: AppointmentService;
   startDateTime: string;
 }
 
-export const useAppointmentList = (appointmentStatus: string, startDate?: string) => {
+export const useAppointmentList = (appointmentStatus: string, startDate?: string, identifierType?: string) => {
   const appointmentDate = useAppointmentDate();
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/appointmentStatus?status=${appointmentStatus}&forDate=${forDate}`;
@@ -30,22 +30,12 @@ export const useAppointmentList = (appointmentStatus: string, startDate?: string
     openmrsFetch,
     { errorRetryCount: 2 },
   );
-  const appointments = data?.data?.map((appointment) => ({
-    name: appointment.patient.name,
-    patientUuid: appointment.patient.uuid,
-    identifier: appointment.patient?.identifier,
-    dateTime: appointment.startDateTime,
-    serviceType: appointment.service?.name,
-    provider: appointment?.providers[0]?.['name'] ?? '',
-    serviceTypeUuid: appointment?.service?.uuid,
-    gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.phoneNumber,
-    age: appointment.patient?.age,
-  }));
+
+  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
   return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-export const useEarlyAppointmentList = (startDate?: string) => {
+export const useEarlyAppointmentList = (startDate?: string, identifierType?: string) => {
   const appointmentDate = useAppointmentDate();
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/earlyAppointment?forDate=${forDate}`;
@@ -53,22 +43,11 @@ export const useEarlyAppointmentList = (startDate?: string) => {
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
-  const appointments = data?.data?.map((appointment) => ({
-    name: appointment.patient.name,
-    patientUuid: appointment.patient.uuid,
-    identifier: appointment.patient?.identifier,
-    dateTime: appointment.startDateTime,
-    serviceType: appointment.service?.name,
-    provider: appointment?.providers[0]?.['name'] ?? '',
-    serviceTypeUuid: appointment.service.uuid,
-    gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.phoneNumber,
-    age: appointment.patient?.age,
-  }));
+  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
   return { earlyAppointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-export const useCompletedAppointmentList = (startDate?: string) => {
+export const useCompletedAppointmentList = (startDate?: string, identifierType?: string) => {
   const appointmentDate = useAppointmentDate();
   const forDate = startDate ? startDate : appointmentDate;
   const url = `/ws/rest/v1/appointment/completedAppointment?forDate=${forDate}`;
@@ -76,10 +55,18 @@ export const useCompletedAppointmentList = (startDate?: string) => {
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
-  const appointments = data?.data?.map((appointment) => ({
+  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
+  return { completedAppointments: (appointments as Array<any>) ?? [], isLoading, error };
+};
+
+function toAppointmentObject(appointment: AppointmentPatientList, identifierType: string) {
+  const patientIdentifier = appointment.patient.identifiers.find(
+    (identifier) => identifier.identifierName === identifierType,
+  );
+  return {
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,
-    identifier: appointment.patient?.identifier,
+    identifier: patientIdentifier?.identifier ?? '',
     dateTime: appointment.startDateTime,
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',
@@ -87,6 +74,5 @@ export const useCompletedAppointmentList = (startDate?: string) => {
     gender: appointment.patient?.gender,
     phoneNumber: appointment.patient?.phoneNumber,
     age: appointment.patient?.age,
-  }));
-  return { completedAppointments: (appointments as Array<any>) ?? [], isLoading, error };
-};
+  };
+}
