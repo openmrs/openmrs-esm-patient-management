@@ -1,7 +1,7 @@
 {
   "name": "@openmrs/esm-patient-management",
   "private": true,
-  "description": "Patient Management MicroFrontend for OpenMRS SPA",
+  "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
     "packages/*"
   ],
@@ -76,5 +76,5 @@
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
   },
-  "packageManager": "yarn@3.2.3"
+  "packageManager": "yarn@3.6.0"
 }
