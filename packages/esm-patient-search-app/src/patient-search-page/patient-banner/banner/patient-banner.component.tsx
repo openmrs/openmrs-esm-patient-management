@@ -140,8 +140,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               </CustomOverflowMenuComponent>
             </div>
           )}
-          {!isDeceased &&
-            (!currentVisit ? (
+          {!isDeceased ? (
+            !currentVisit ? (
               <ExtensionSlot
                 extensionSlotName="start-visit-button-slot"
                 state={{
@@ -150,18 +150,31 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               />
             ) : (
               <Button
-                ref={showContactDetailsRef}
+                className={styles.toggleContactDetailsButton}
                 kind="ghost"
                 renderIcon={showContactDetails ? ChevronUp : ChevronDown}
                 iconDescription="Toggle contact details"
                 onClick={toggleContactDetails}
                 style={{ marginTop: '-0.25rem' }}>
-                {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+                {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
               </Button>
-            ))}
+            )
+          ) : (
+            <Button
+              className={styles.toggleContactDetailsButton}
+              kind="ghost"
+              renderIcon={showContactDetails ? ChevronUp : ChevronDown}
+              iconDescription="Toggle contact details"
+              onClick={toggleContactDetails}
+              style={{ marginTop: '-0.25rem' }}>
+              {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
+            </Button>
+          )}
         </div>
       </div>
-      {showContactDetails && <ContactDetails address={patient.person.addresses} patientId={patient.uuid} />}
+      {showContactDetails && (
+        <ContactDetails address={patient.person.addresses} patientId={patient.uuid} isDeceased={isDeceased} />
+      )}
     </>
   );
 };

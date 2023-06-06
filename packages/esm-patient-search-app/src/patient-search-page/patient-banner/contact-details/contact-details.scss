@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
@@ -11,6 +12,25 @@
 .heading {
   @include type.type-style('heading-compact-01');
   color: $text-02;
+}
+
+.deceased {
+  .contactDetails,
+  .heading,
+  .row,
+  .row > .col {
+    color: $ui-02;
+    background-color: colors.$gray-80;
+  }
+
+  .menu {
+    fill: colors.$blue-40;
+  }
+
+  &:focus,
+  &:hover {
+    background-color: colors.$gray-90;
+  }
 }
 
 .row {

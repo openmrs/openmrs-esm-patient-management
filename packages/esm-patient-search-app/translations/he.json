@@ -35,8 +35,8 @@
   "searchResults": "תוצאות חיפוש",
   "searchResultsText": "תוצאות חיפוש",
   "sex": "מין",
-  "showAllDetails": "הצג את כל הפרטים",
-  "showLess": "הצג פחות",
+  "showDetails": "הראה פרטים",
+  "hideDetails": "הסתר פרטים",
   "trySearchWithPatientUniqueID": "נסה לחפש עם מספר הזיהוי הייחודי של המטופל",
   "unknown": "לא ידוע",
   "year": "שנה"
