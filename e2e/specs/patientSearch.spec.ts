@@ -25,7 +25,7 @@ test('Search patient by patient identifier', async ({ page, api }) => {
   });
 
   await test.step('Then I should see only the patient with the entered identifier', async () => {
-    await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search result/);
+    await expect(homePage.floatingSearchResultsContainer()).toHaveText(/1 search results/);
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(firstName));
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(lastName));
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(openmrsIdentifier));

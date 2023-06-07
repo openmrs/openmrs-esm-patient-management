@@ -32,7 +32,7 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
+
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
@@ -88,7 +88,7 @@ jobs:
 
       - name: Run db and web containers
         run: |
-          cd e2e/support
+          cd e2e/support/github
           docker-compose up -d
 
       - name: Wait for OpenMRS instance to start
