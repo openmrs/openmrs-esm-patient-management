@@ -244,7 +244,6 @@
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .headerContainer {
-    padding: spacing.$spacing-04 spacing.$spacing-05 spacing.$spacing-04 0;
     svg {
       margin-left: 0;
       margin-right: spacing.$spacing-03;

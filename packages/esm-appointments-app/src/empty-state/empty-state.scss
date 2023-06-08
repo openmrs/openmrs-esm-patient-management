@@ -60,3 +60,11 @@
   @include type.type-style('heading-compact-01');
   margin-bottom: 1rem;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .desktopHeading,
+  .tabletHeading {
+    text-align: right;
+  }
+}

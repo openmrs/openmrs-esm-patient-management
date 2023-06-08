@@ -69,3 +69,15 @@
     color: colors.$blue-10;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .date-and-location {
+    & > svg {
+      order: -1;
+    }
+    & > span:nth-child(2) {
+      order: -2;
+    }
+  }
+}
