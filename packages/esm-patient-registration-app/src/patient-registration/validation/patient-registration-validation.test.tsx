@@ -25,15 +25,11 @@ describe('Patient Registration Validation', () => {
     };
 
     const validateFormValues = async (formValues) => {
-      let validationError;
-
       try {
         await validationSchema.validate(formValues, { abortEarly: false });
       } catch (err) {
-        validationError = err;
+        return err;
       }
-
-      return validationError;
     };
 
     it('should allow valid form values', async () => {
@@ -105,6 +101,7 @@ describe('Patient Registration Validation', () => {
       const validationError = await validateFormValues(validFormValuesWithOtherGender);
       expect(validationError).toBeFalsy();
     });
+
     it('birthdays should not be in the future', async () => {
       const invalidFormValues = {
         ...validFormValues,
@@ -113,6 +110,7 @@ describe('Patient Registration Validation', () => {
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain('birthdayNotInTheFuture');
     });
+
     it('should require yearsEstimated when birthdateEstimated is true', async () => {
       const invalidFormValues = {
         ...validFormValues,
@@ -121,6 +119,7 @@ describe('Patient Registration Validation', () => {
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain('yearsEstimateRequired');
     });
+
     it('should throw error when monthEstimated is negative', async () => {
       const invalidFormValues = {
         ...validFormValues,
@@ -131,6 +130,7 @@ describe('Patient Registration Validation', () => {
       const validationError = await validateFormValues(invalidFormValues);
       expect(validationError.errors).toContain('negativeMonths');
     });
+
     it('should throw error when deathDate is not in future', async () => {
       const invalidFormValues = {
         ...validFormValues,
