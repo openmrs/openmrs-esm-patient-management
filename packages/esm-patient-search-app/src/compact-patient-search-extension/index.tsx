@@ -48,7 +48,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patients[index].uuid,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+          })}`,
         });
       }
       handleReset();
