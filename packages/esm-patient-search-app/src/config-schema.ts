@@ -9,7 +9,7 @@ export const configSchema = {
     },
     redirectToPatientDashboard: {
       _type: Type.String,
-      _default: 'Patient Summary',
+      _default: '',
       _description:
         'On clicking the patient banner in the search results, which should be the default patient chart dashboard to redirect to.',
     },
