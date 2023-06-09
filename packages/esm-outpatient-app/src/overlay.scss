@@ -86,3 +86,11 @@
     overflow-y: auto;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .desktopOverlay {
+    right: unset;
+    left: 0;
+  }
+}

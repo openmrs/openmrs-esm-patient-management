@@ -90,3 +90,11 @@
   text-align: center;
   border: 1px solid $ui-03;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .desktopHeading,
+  .tabletHeading {
+    text-align: right;
+  }
+}
