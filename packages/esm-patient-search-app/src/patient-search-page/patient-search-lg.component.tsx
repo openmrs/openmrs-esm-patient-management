@@ -56,7 +56,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+          })}`,
         });
       }
       if (hidePanel) {
