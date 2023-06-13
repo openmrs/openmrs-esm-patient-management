@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
-import { ComboInput } from '../../input/combo-input/combo-input.component';
-import { SkeletonText } from '@carbon/react';
+import { SkeletonText, InlineNotification } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
 import AddressSearchComponent from './address-search.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
+import AddressHierarchyLevels from './address-hierarchy-levels.component';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
@@ -20,7 +21,14 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 
 export const AddressHierarchy: React.FC = () => {
   const [selected, setSelected] = useState('');
-  const [addressLayout, setAddressLayout] = useState([]);
+  const [addressLayout, setAddressLayout] = useState<
+    Array<{
+      id: string;
+      name: string;
+      value: string;
+      label: string;
+    }>
+  >([]);
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate?.results[0].value;
@@ -37,6 +45,7 @@ export const AddressHierarchy: React.FC = () => {
   } = config;
 
   const { setFieldValue, values } = useContext(PatientRegistrationContext);
+  const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
     const templateXmlDoc = parseString(addressTemplateXml);
@@ -70,9 +79,9 @@ export const AddressHierarchy: React.FC = () => {
         t('countyDistrict', 'District')
       */
       const value = defaultValues[name];
-      if (!values?.address?.[name] && value) {
-        setFieldValue(`address.${name}`, value);
-      }
+      // if (!values?.address?.[name] && value) {
+      //   setFieldValue(`address.${name}`, value);
+      // }
       return {
         id: name,
         name,
@@ -83,11 +92,84 @@ export const AddressHierarchy: React.FC = () => {
     setAddressLayout(propertiesObj);
   }, [t, addressTemplateXml, setFieldValue, values]);
 
+  const orderedAddressFields = useMemo(() => {
+    if (isLoadingFieldOrder || errorFetchingFieldOrder) {
+      return [];
+    }
+
+    const orderMap = Object.fromEntries(orderedFields.map((field, indx) => [field, indx]));
+
+    return [...addressLayout].sort(
+      (existingField1, existingField2) => orderMap[existingField1.name] - orderMap[existingField2.name],
+    );
+  }, [isLoadingFieldOrder, errorFetchingFieldOrder, orderedFields, addressLayout]);
+
   if (!addressTemplate) {
     return (
       <div>
         <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-        <SkeletonText />
+        <div
+          style={{
+            paddingBottom: '5%',
+          }}>
+          <SkeletonText />
+        </div>
+      </div>
+    );
+  }
+
+  if (!enabled) {
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+        <div
+          style={{
+            paddingBottom: '5%',
+          }}>
+          {addressLayout.map((attributes, index) => (
+            <Input
+              key={`combo_input_${index}`}
+              name={`address.${attributes.name}`}
+              labelText={t(attributes.label)}
+              id={attributes.name}
+              setSelectedValue={setSelectedValue}
+              selected={selected}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoadingFieldOrder) {
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+        <div
+          style={{
+            paddingBottom: '5%',
+          }}>
+          <SkeletonText />
+        </div>
+      </div>
+    );
+  }
+
+  if (errorFetchingFieldOrder) {
+    return (
+      <div>
+        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
+        <div
+          style={{
+            paddingBottom: '5%',
+          }}>
+          <InlineNotification
+            style={{ margin: '0', minWidth: '100%' }}
+            kind="error"
+            lowContrast={true}
+            title={t('errorFetchingOrderedFields', 'Error occured fetching ordered fields for address hierarchy')}
+          />
+        </div>
       </div>
     );
   }
@@ -99,34 +181,11 @@ export const AddressHierarchy: React.FC = () => {
         style={{
           paddingBottom: '5%',
         }}>
-        {enabled ? (
-          <>
-            {useQuickSearch && <AddressSearchComponent addressLayout={addressLayout} />}
-            {addressLayout.map((attributes, index) =>
-              searchAddressByLevel ? (
-                <ComboInput
-                  key={`combo_input_${index}`}
-                  textFieldName={attributes.name}
-                  name={`address.${attributes.name}`}
-                  labelText={t(attributes.label)}
-                  id={attributes.name}
-                  setSelectedValue={setSelectedValue}
-                  selected={selected}
-                />
-              ) : (
-                <Input
-                  key={`combo_input_${index}`}
-                  name={`address.${attributes.name}`}
-                  labelText={t(attributes.label)}
-                  id={attributes.name}
-                  setSelectedValue={setSelectedValue}
-                  selected={selected}
-                />
-              ),
-            )}
-          </>
+        {useQuickSearch && <AddressSearchComponent addressLayout={orderedAddressFields} />}
+        {searchAddressByLevel ? (
+          <AddressHierarchyLevels orderedAddressFields={orderedAddressFields} />
         ) : (
-          addressLayout.map((attributes, index) => (
+          orderedAddressFields.map((attributes, index) => (
             <Input
               key={`combo_input_${index}`}
               name={`address.${attributes.name}`}

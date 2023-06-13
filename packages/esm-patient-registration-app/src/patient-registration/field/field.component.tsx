@@ -6,7 +6,7 @@ import { DobField } from './dob/dob.component';
 import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, RegistrationConfig } from '../../config-schema';
 import { CustomField } from './custom-field.component';
-import { AddressHierarchy } from './address/address-hierarchy.component';
+import { AddressHierarchy } from './address/address-fields.component';
 
 export interface FieldProps {
   name: string;
