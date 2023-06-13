@@ -102,7 +102,7 @@ describe('Patient Registration Validation', () => {
       expect(validationError).toBeFalsy();
     });
 
-    it('birthdays should not be in the future', async () => {
+    it('date of birth should not be in the future', async () => {
       const invalidFormValues = {
         ...validFormValues,
         birthdate: new Date('2100-01-01'),
