@@ -78,7 +78,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
               onClick={(evt) => selectPatientAction(evt, indx)}
               to={`${interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
-              })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
+              })}`}
               key={patient.id}
               className={`${styles.patientSearchResult} ${isDeceased ? styles.deceased : ''}`}>
               <div className={styles.patientAvatar} role="img">

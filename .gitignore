@@ -81,3 +81,4 @@ dist
 /playwright-report/
 /playwright/.cache/
 e2e/storageState.json
+results.xml
