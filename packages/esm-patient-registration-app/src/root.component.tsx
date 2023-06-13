@@ -1,24 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Grid, Row } from '@carbon/react';
-import { ExtensionSlot, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
 import {
-  Resources,
   ResourcesContext,
   fetchAddressTemplate,
   fetchAllRelationshipTypes,
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
-import { SavePatientForm } from './patient-registration/form-manager';
+import { FormManager } from './patient-registration/form-manager';
 import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
 import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
-export interface RootProps extends PatientRegistrationProps, Resources {
-  savePatientForm: SavePatientForm;
-  isOffline: boolean;
-}
 
-export default function Root({ savePatientForm, isOffline }: RootProps) {
+export default function Root() {
+  const isOffline = useConnectivity();
   const currentSession = useSession();
   const { data: addressTemplate } = useSWRImmutable('patientRegistrationAddressTemplate', fetchAddressTemplate);
   const { data: relationshipTypes } = useSWRImmutable(
@@ -28,6 +24,10 @@ export default function Root({ savePatientForm, isOffline }: RootProps) {
   const { data: identifierTypes } = useSWRImmutable(
     'patientRegistrationPatientIdentifiers',
     fetchPatientIdentifierTypesWithSources,
+  );
+  const savePatientForm = useMemo(
+    () => (isOffline ? FormManager.savePatientFormOffline : FormManager.savePatientFormOnline),
+    [isOffline],
   );
 
   return (
