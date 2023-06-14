@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
-import { ComboBox, Layer } from '@carbon/react';
 import { useField } from 'formik';
+import ComboInput from '../../input/combo-input/combo-input.component';
 
 interface AddressHierarchyLevelsProps {
   orderedAddressFields: Array<any>;
@@ -40,16 +40,12 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
     searchString,
   );
 
-  const filteredEntries = useMemo(
-    () =>
-      meta?.value && entries
-        ? entries.filter((entry) => entry.toLowerCase().includes(meta.value?.toLowerCase()))
-        : entries,
-    [entries, meta?.value],
-  );
+  const handleInputChange = useCallback((newValue) => {
+    helpers.setValue(newValue);
+  }, []);
 
-  const handleChange = useCallback(
-    ({ selectedItem }) => {
+  const handleSelection = useCallback(
+    (selectedItem) => {
       if (meta.value !== selectedItem) {
         helpers.setValue(selectedItem);
         updateChildElements();
@@ -69,21 +65,18 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   }, [isLoadingAddressEntries, errorFetchingAddressEntries]);
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
-      <Layer>
-        <ComboBox
-          {...field}
-          titleText={attribute.label}
-          items={filteredEntries ?? []}
-          onInputChange={(inputText) => {
-            helpers.setValue(inputText);
-          }}
-          itemToString={(item) => item}
-          onChange={handleChange}
-          helperText={helperText}
-          onBlur={() => {}}
-        />
-      </Layer>
-    </div>
+    <>
+      <ComboInput
+        entries={entries}
+        handleSelection={handleSelection}
+        name={`address.${attribute.name}`}
+        fieldProps={{
+          ...field,
+          labelText: attribute.label,
+          helperText: helperText,
+        }}
+        handleInputChange={handleInputChange}
+      />
+    </>
   );
 };
