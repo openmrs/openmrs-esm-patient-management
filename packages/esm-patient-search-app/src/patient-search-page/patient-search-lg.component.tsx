@@ -43,6 +43,10 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     resultsToShow,
   );
 
+  useEffect(() => {
+    goTo(1);
+  }, [query, goTo]);
+
   const handlePatientSelection = useCallback(
     (evt, patientUuid: string) => {
       evt.preventDefault();
@@ -52,7 +56,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+          })}`,
         });
       }
       if (hidePanel) {

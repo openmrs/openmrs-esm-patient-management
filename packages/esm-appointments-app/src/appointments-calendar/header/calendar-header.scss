@@ -46,3 +46,10 @@
     }
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .titleContent {
+    margin-left: 1rem;
+  }
+}

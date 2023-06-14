@@ -135,6 +135,7 @@ function ActiveVisitsTable() {
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
   const [overlayHeader, setOverlayTitle] = useState('');
+  const [providerRoomModalShown, setProviderRoomModalShown] = useState(false);
 
   const {
     goTo,
@@ -256,6 +257,7 @@ function ActiveVisitsTable() {
       closeModal: () => dispose(),
       providerUuid,
     });
+    setProviderRoomModalShown(true);
   }, [providerUuid]);
 
   useEffect(() => {
@@ -263,11 +265,12 @@ function ActiveVisitsTable() {
       !loading &&
       rooms?.length > 0 &&
       differenceInTime >= 1 &&
-      (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null)
+      (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null) &&
+      !providerRoomModalShown
     ) {
       launchAddProviderRoomModal();
     }
-  }, [currentServiceUuid, rooms]);
+  }, [currentServiceUuid, rooms, providerRoomModalShown]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
