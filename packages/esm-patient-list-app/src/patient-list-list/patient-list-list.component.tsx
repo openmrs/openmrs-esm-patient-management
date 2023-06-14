@@ -97,7 +97,7 @@ const PatientListList: React.FC = () => {
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
       <section className={styles.patientListList}>
-        <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
+        <ExtensionSlot name="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
           <div className={styles.leftJustifiedItems}>
             <Illustration />
