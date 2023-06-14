@@ -102,7 +102,7 @@ describe('Patient Registration Validation', () => {
       expect(validationError).toBeFalsy();
     });
 
-    it('date of birth should not be in the future', async () => {
+    it('should throw error when date of birth is a future date', async () => {
       const invalidFormValues = {
         ...validFormValues,
         birthdate: new Date('2100-01-01'),
@@ -131,7 +131,7 @@ describe('Patient Registration Validation', () => {
       expect(validationError.errors).toContain('negativeMonths');
     });
 
-    it('should throw error when deathDate is not in future', async () => {
+    it('should throw error when deathDate is in future', async () => {
       const invalidFormValues = {
         ...validFormValues,
         deathDate: new Date('2100-01-01'),
