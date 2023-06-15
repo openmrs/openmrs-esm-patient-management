@@ -66,6 +66,11 @@ export const configSchema = {
     _default: '/ws/rest/v1/kenyaemr/default-facility',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  patientIdentifierType: {
+    _type: Type.String,
+    _description: 'The name of the patient identifier type to be used for the patient identifier field',
+    _default: 'OpenMRS ID',
+  },
 };
 
 export interface ConfigObject {
@@ -82,4 +87,5 @@ export interface ConfigObject {
   hiddenFormFields: Array<string>;
   showServiceQueueFields: boolean;
   defaultFacilityUrl: string;
+  patientIdentifierType: string;
 }

@@ -70,7 +70,7 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
 
   return (
     <>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+      <ExtensionSlot name="breadcrumbs-slot" />
       <div className={styles.container}>
         <div className={styles.header}>
           <h2>{serviceName === 'Total' ? 'All Services' : `${serviceName} ${t('list', 'List')}`}</h2>

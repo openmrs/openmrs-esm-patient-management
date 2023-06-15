@@ -12,6 +12,8 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import styles from './scheduled-appointments.scss';
 import AppointmentsTable from '../common-components/appointments-table.component';
+import { useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../../config-schema';
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
@@ -22,11 +24,12 @@ type scheduleType = 'CameEarly' | 'Rescheduled' | 'Honoured' | 'Pending' | 'Sche
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
   const { t } = useTranslation();
+  const { patientIdentifierType } = useConfig<ConfigObject>();
   const appointmentDate = useAppointmentDate();
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
-  const { appointmentList, isLoading } = useAppointmentList(scheduleType);
-  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList();
-  const { completedAppointments } = useCompletedAppointmentList();
+  const { appointmentList, isLoading } = useAppointmentList(scheduleType, appointmentDate, patientIdentifierType);
+  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList(appointmentDate, patientIdentifierType);
+  const { completedAppointments } = useCompletedAppointmentList(appointmentDate, patientIdentifierType);
   const isDateInPast = dayjs(appointmentDate).isBefore(dayjs(), 'date');
   const isDateInFuture = dayjs(appointmentDate).isAfter(dayjs(), 'date');
   const isToday = dayjs(appointmentDate).isSame(dayjs(), 'date');
