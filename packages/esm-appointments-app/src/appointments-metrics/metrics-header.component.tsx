@@ -33,7 +33,7 @@ const MetricsHeader: React.FC = () => {
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot
-          extensionSlotName="patient-search-button-slot"
+          name="patient-search-button-slot"
           state={{
             selectPatientAction: launchCreateAppointmentForm,
             buttonText: t('createNewAppointment', 'Create new appointment'),
