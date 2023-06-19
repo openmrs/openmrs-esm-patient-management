@@ -55,6 +55,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
           {...fieldProps}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => setShowEntries(true)}
+          autoComplete={'off'}
         />
       </Layer>
       <div
