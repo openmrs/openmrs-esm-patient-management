@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { TextInput, Layer } from '@carbon/react';
 import SelectionTick from './selection-tick.component';
+import styles from '../input.scss';
 
 interface ComboInputProps {
   entries: Array<string>;
@@ -16,10 +17,19 @@ interface ComboInputProps {
 }
 
 const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInputChange, handleSelection }) => {
+  const [highlightedEntry, setHighlightedEntry] = useState(-1);
   const { value = '' } = fieldProps;
   const [showEntries, setShowEntries] = useState(false);
-  const comboInputRef = useRef(null);
-  const inputRef = useRef(null);
+
+  const handleFocus = useCallback(() => {
+    setShowEntries(true);
+    setHighlightedEntry(-1);
+  }, [setShowEntries, setHighlightedEntry]);
+
+  const handleBlur = useCallback(() => {
+    setShowEntries(false);
+    setHighlightedEntry(-1);
+  }, [setShowEntries, setHighlightedEntry]);
 
   const filteredEntries = useMemo(() => {
     if (!entries) {
@@ -31,44 +41,51 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
     return entries.filter((entry) => entry.toLowerCase().includes(value.toLowerCase()));
   }, [entries, value]);
 
-  const handleOptionClick = (newSelection) => {
-    handleSelection(newSelection);
-    setShowEntries(false);
-  };
+  const handleOptionClick = useCallback(
+    (newSelection: string, e: KeyboardEvent = null) => {
+      e?.preventDefault();
+      handleSelection(newSelection);
+      setShowEntries(false);
+    },
+    [handleSelection, setShowEntries],
+  );
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (comboInputRef.current && !comboInputRef.current.contains(event.target)) {
-        setShowEntries(false);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      const totalResults = filteredEntries.length ?? 0;
+      if (e.key === 'ArrowUp') {
+        setHighlightedEntry((prev) => Math.max(-1, prev - 1));
+      } else if (e.key === 'ArrowDown') {
+        setHighlightedEntry((prev) => Math.min(totalResults - 1, prev + 1));
+      } else if (e.key === 'Enter' && highlightedEntry > -1) {
+        handleOptionClick(filteredEntries[highlightedEntry], e);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    },
+    [highlightedEntry, handleOptionClick, filteredEntries, setHighlightedEntry],
+  );
 
   return (
-    <div style={{ marginBottom: '1rem' }} ref={comboInputRef}>
+    <div className={styles.comboInput}>
       <Layer>
         <TextInput
           {...fieldProps}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => setShowEntries(true)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           autoComplete={'off'}
+          onKeyDown={handleKeyPress}
         />
       </Layer>
-      <div
-        style={{
-          position: 'relative',
-        }}>
+      <div className={styles.comboInputEntries}>
         {showEntries && (
-          <div id="downshift-1-menu" className="cds--list-box__menu" role="listbox" aria-label="Choose an item">
-            {filteredEntries.map((entry) => (
+          <div id="downshift-1-menu" className="cds--list-box__menu" role="listbox">
+            {filteredEntries.map((entry, indx) => (
               <div
                 id="downshift-1-item-0"
                 role="option"
-                className="cds--list-box__menu-item"
+                className={`cds--list-box__menu-item ${
+                  indx === highlightedEntry && 'cds--list-box__menu-item--highlighted'
+                }`}
                 tabIndex={-1}
                 aria-selected="true"
                 onClick={() => handleOptionClick(entry)}>
@@ -89,5 +106,3 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
 };
 
 export default ComboInput;
-
-// cds--list-box__menu-item--highlighted
