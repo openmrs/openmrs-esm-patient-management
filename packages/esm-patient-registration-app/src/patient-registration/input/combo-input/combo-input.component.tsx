@@ -88,6 +88,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
           <div id="downshift-1-menu" className="cds--list-box__menu" role="listbox">
             {filteredEntries.map((entry, indx) => (
               <div
+                key={indx}
                 id="downshift-1-item-0"
                 role="option"
                 className={`cds--list-box__menu-item ${

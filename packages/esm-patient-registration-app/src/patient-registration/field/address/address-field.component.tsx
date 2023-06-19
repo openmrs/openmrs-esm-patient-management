@@ -87,7 +87,6 @@ export const AddressHierarchy: React.FC = () => {
           [name]: value,
         },
       }));
-      // (`address.${name}`, value);
       return {
         id: name,
         name,
