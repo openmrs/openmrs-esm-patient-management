@@ -1,6 +1,6 @@
+import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage } from '../pages';
-import { expect } from '@playwright/test';
 import { generateRandomPatient, deletePatient, Patient } from '../commands';
 
 let patient: Patient;
@@ -31,11 +31,11 @@ test('Search patient by patient identifier', async ({ page, api }) => {
     await expect(homePage.floatingSearchResultsContainer()).toHaveText(new RegExp(openmrsIdentifier));
   });
 
-  await test.step('When I click on the patient', async () => {
+  await test.step('When I click on the patient record', async () => {
     await homePage.clickOnPatientResult(firstName);
   });
 
-  await test.step("Then I should be in the patient's chart page", async () => {
+  await test.step("Then I should be redirected to the patient's chart page", async () => {
     await expect(homePage.page).toHaveURL(
       `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
     );
