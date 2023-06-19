@@ -169,7 +169,7 @@ const AppointmentsTable: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+      <ExtensionSlot name="breadcrumbs-slot" />
 
       <div className={styles.headerContainer}>
         <div>
