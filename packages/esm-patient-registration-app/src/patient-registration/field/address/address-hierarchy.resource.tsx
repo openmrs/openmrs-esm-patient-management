@@ -1,6 +1,6 @@
 import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useField } from 'formik';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
@@ -34,6 +34,13 @@ export function useAddressEntries(fetchResults, searchString) {
       : null,
     openmrsFetch,
   );
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
   const results = useMemo(
     () => ({
       entries: data?.data?.map((item) => item.name),
@@ -45,6 +52,11 @@ export function useAddressEntries(fetchResults, searchString) {
   return results;
 }
 
+/**
+ * This hook is being used to fetch ordered address fields as configured in the address hierarchy
+ * This hook returns the valid search term for valid fields to get suitable entries for the field
+ * This also returns the function to reset the lower ordered fields if the value of a field is changed.
+ */
 export function useAddressEntryFetchConfig(addressField: string) {
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
   const { setFieldValue } = useContext(PatientRegistrationContext);

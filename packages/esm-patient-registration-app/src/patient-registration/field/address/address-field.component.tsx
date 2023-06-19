@@ -106,74 +106,73 @@ export const AddressHierarchy: React.FC = () => {
 
   if (!addressTemplate) {
     return (
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-        <div
-          style={{
-            paddingBottom: '5%',
-          }}>
-          <SkeletonText />
-        </div>
-      </div>
+      <AddressComponentContainer>
+        <SkeletonText />
+      </AddressComponentContainer>
     );
   }
 
   if (!enabled) {
     return (
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-        <div
-          style={{
-            paddingBottom: '5%',
-          }}>
-          {addressLayout.map((attributes, index) => (
-            <Input
-              key={`combo_input_${index}`}
-              name={`address.${attributes.name}`}
-              labelText={t(attributes.label)}
-              id={attributes.name}
-              setSelectedValue={setSelectedValue}
-              selected={selected}
-            />
-          ))}
-        </div>
-      </div>
+      <AddressComponentContainer>
+        {addressLayout.map((attributes, index) => (
+          <Input
+            key={`combo_input_${index}`}
+            name={`address.${attributes.name}`}
+            labelText={t(attributes.label)}
+            id={attributes.name}
+            setSelectedValue={setSelectedValue}
+            selected={selected}
+          />
+        ))}
+      </AddressComponentContainer>
     );
   }
 
   if (isLoadingFieldOrder) {
     return (
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-        <div
-          style={{
-            paddingBottom: '5%',
-          }}>
-          <SkeletonText />
-        </div>
-      </div>
+      <AddressComponentContainer>
+        <SkeletonText />
+      </AddressComponentContainer>
     );
   }
 
   if (errorFetchingFieldOrder) {
     return (
-      <div>
-        <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
-        <div
-          style={{
-            paddingBottom: '5%',
-          }}>
-          <InlineNotification
-            style={{ margin: '0', minWidth: '100%' }}
-            kind="error"
-            lowContrast={true}
-            title={t('errorFetchingOrderedFields', 'Error occured fetching ordered fields for address hierarchy')}
-          />
-        </div>
-      </div>
+      <AddressComponentContainer>
+        <InlineNotification
+          style={{ margin: '0', minWidth: '100%' }}
+          kind="error"
+          lowContrast={true}
+          title={t('errorFetchingOrderedFields', 'Error occured fetching ordered fields for address hierarchy')}
+        />
+      </AddressComponentContainer>
     );
   }
 
+  return (
+    <AddressComponentContainer>
+      {useQuickSearch && <AddressSearchComponent addressLayout={orderedAddressFields} />}
+      {searchAddressByLevel ? (
+        <AddressHierarchyLevels orderedAddressFields={orderedAddressFields} />
+      ) : (
+        orderedAddressFields.map((attributes, index) => (
+          <Input
+            key={`combo_input_${index}`}
+            name={`address.${attributes.name}`}
+            labelText={t(attributes.label)}
+            id={attributes.name}
+            setSelectedValue={setSelectedValue}
+            selected={selected}
+          />
+        ))
+      )}
+    </AddressComponentContainer>
+  );
+};
+
+const AddressComponentContainer = ({ children }) => {
+  const { t } = useTranslation();
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('addressHeader', 'Address')}</h4>
@@ -181,21 +180,7 @@ export const AddressHierarchy: React.FC = () => {
         style={{
           paddingBottom: '5%',
         }}>
-        {useQuickSearch && <AddressSearchComponent addressLayout={orderedAddressFields} />}
-        {searchAddressByLevel ? (
-          <AddressHierarchyLevels orderedAddressFields={orderedAddressFields} />
-        ) : (
-          orderedAddressFields.map((attributes, index) => (
-            <Input
-              key={`combo_input_${index}`}
-              name={`address.${attributes.name}`}
-              labelText={t(attributes.label)}
-              id={attributes.name}
-              setSelectedValue={setSelectedValue}
-              selected={selected}
-            />
-          ))
-        )}
+        {children}
       </div>
     </div>
   );

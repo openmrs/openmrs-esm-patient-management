@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
 import { useField } from 'formik';
 import ComboInput from '../../input/combo-input/combo-input.component';
+import { InlineNotification } from '@carbon/react';
 
 interface AddressHierarchyLevelsProps {
   orderedAddressFields: Array<any>;
@@ -35,10 +36,7 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const { t } = useTranslation();
   const [field, meta, helpers] = useField(`address.${attribute.name}`);
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
-  const { entries, isLoadingAddressEntries, errorFetchingAddressEntries } = useAddressEntries(
-    fetchEntriesForField,
-    searchString,
-  );
+  const { entries } = useAddressEntries(fetchEntriesForField, searchString);
 
   const handleInputChange = useCallback((newValue) => {
     helpers.setValue(newValue);
@@ -54,16 +52,6 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
     [updateChildElements, helpers.setValue],
   );
 
-  const helperText = useMemo(() => {
-    if (isLoadingAddressEntries) {
-      return t('isLoadingEntries', 'Loading available entries');
-    }
-    if (errorFetchingAddressEntries) {
-      return t('errorOccurredFetchingEntries', 'Error occurred while fetching available entries');
-    }
-    return '';
-  }, [isLoadingAddressEntries, errorFetchingAddressEntries]);
-
   return (
     <>
       <ComboInput
@@ -73,7 +61,6 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
         fieldProps={{
           ...field,
           labelText: attribute.label,
-          helperText: helperText,
         }}
         handleInputChange={handleInputChange}
       />

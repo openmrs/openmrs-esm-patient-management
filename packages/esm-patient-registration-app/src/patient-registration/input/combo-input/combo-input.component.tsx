@@ -9,7 +9,6 @@ interface ComboInputProps {
   fieldProps: {
     value: string;
     labelText: string;
-    helperText: string;
     [x: string]: any;
   };
   handleInputChange: (newValue: string) => void;
