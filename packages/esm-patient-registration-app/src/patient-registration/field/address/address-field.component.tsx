@@ -9,6 +9,7 @@ import AddressSearchComponent from './address-search.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
+import { FormValues } from '../../patient-registration-types';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
@@ -44,7 +45,7 @@ export const AddressHierarchy: React.FC = () => {
     },
   } = config;
 
-  const { setFieldValue, values } = useContext(PatientRegistrationContext);
+  const { setFieldValue, values, setInitialFormValues } = useContext(PatientRegistrationContext);
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
@@ -79,9 +80,14 @@ export const AddressHierarchy: React.FC = () => {
         t('countyDistrict', 'District')
       */
       const value = defaultValues[name];
-      // if (!values?.address?.[name] && value) {
-      //   setFieldValue(`address.${name}`, value);
-      // }
+      setInitialFormValues((initialFormValues) => ({
+        ...initialFormValues,
+        address: {
+          ...(initialFormValues.address ?? {}),
+          [name]: value,
+        },
+      }));
+      // (`address.${name}`, value);
       return {
         id: name,
         name,
@@ -90,7 +96,7 @@ export const AddressHierarchy: React.FC = () => {
       };
     });
     setAddressLayout(propertiesObj);
-  }, [t, addressTemplateXml, setFieldValue, values]);
+  }, [t, addressTemplateXml, setFieldValue, values, setInitialFormValues]);
 
   const orderedAddressFields = useMemo(() => {
     if (isLoadingFieldOrder || errorFetchingFieldOrder) {

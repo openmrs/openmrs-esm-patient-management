@@ -19,16 +19,24 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
   const [highlightedEntry, setHighlightedEntry] = useState(-1);
   const { value = '' } = fieldProps;
   const [showEntries, setShowEntries] = useState(false);
+  const comboInputRef = useRef(null);
 
   const handleFocus = useCallback(() => {
     setShowEntries(true);
     setHighlightedEntry(-1);
   }, [setShowEntries, setHighlightedEntry]);
 
-  const handleBlur = useCallback(() => {
-    setShowEntries(false);
-    setHighlightedEntry(-1);
-  }, [setShowEntries, setHighlightedEntry]);
+  const handleBlur = useCallback(
+    (e) => {
+      // This check is in place to not hide the entries when an entry is clicked
+      // Else the onClick of the entry will not be counted.
+      if (!comboInputRef?.current?.contains(e.target)) {
+        setShowEntries(false);
+      }
+      setHighlightedEntry(-1);
+    },
+    [setShowEntries, setHighlightedEntry],
+  );
 
   const filteredEntries = useMemo(() => {
     if (!entries) {
@@ -64,7 +72,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
   );
 
   return (
-    <div className={styles.comboInput}>
+    <div className={styles.comboInput} ref={comboInputRef}>
       <Layer>
         <TextInput
           {...fieldProps}
