@@ -33,7 +33,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   selectPatientAction,
 }) => {
   const { t } = useTranslation();
-  const overFlowMenuRef = React.useRef(null);
+  const overflowMenuRef = React.useRef(null);
   const showContactDetailsRef = React.useRef(null);
   const startVisitButtonRef = React.useRef(null);
   const { currentVisit } = useVisit(patientUuid);
@@ -56,7 +56,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+      <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
     </div>
   );
 
@@ -80,13 +80,25 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     }
   };
 
+  const isDeceased = !!patient.person.deathDate;
+
+  const fhirPatient = React.useMemo(() => {
+    return {
+      deceasedDateTime: patient.person.deathDate,
+    };
+  }, [patient]);
+
   return (
     <>
-      <div className={styles.container} role="banner">
+      <div
+        className={`${styles.container} ${
+          isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer
+        }`}
+        role="banner">
         <ConfigurableLink
           to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
+          })}`}
           onClick={(evt) => selectPatientAction(evt, patientUuid)}
           className={`${styles.patientBanner} ${selectPatientAction && styles.patientAvatarButton}`}>
           {patientAvatar}
@@ -94,8 +106,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
-                extensionSlotName="patient-banner-tags-slot"
-                state={{ patientUuid, patient }}
+                name="patient-banner-tags-slot"
+                state={{ patientUuid, patient: fhirPatient }}
                 className={styles.flexRow}
               />
             </div>
@@ -110,45 +122,59 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
         </ConfigurableLink>
         <div className={styles.buttonCol}>
           {!hideActionsOverflow && (
-            <div ref={overFlowMenuRef}>
+            <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
               <CustomOverflowMenuComponent
+                isDeceased={isDeceased}
                 menuTitle={
                   <>
                     <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
+                    <OverflowMenuVertical className={styles.menu} size={16} />
                   </>
                 }
                 dropDownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
-                  extensionSlotName="patient-search-actions-slot"
-                  className={styles.overflowMenuItemList}
+                  name="patient-search-actions-slot"
                   state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
             </div>
           )}
-          {!currentVisit ? (
-            <ExtensionSlot
-              extensionSlotName="start-visit-button-slot"
-              state={{
-                patientUuid,
-              }}
-            />
+          {!isDeceased ? (
+            !currentVisit ? (
+              <ExtensionSlot
+                name="start-visit-button-slot"
+                state={{
+                  patientUuid,
+                }}
+              />
+            ) : (
+              <Button
+                className={styles.toggleContactDetailsButton}
+                kind="ghost"
+                renderIcon={showContactDetails ? ChevronUp : ChevronDown}
+                iconDescription="Toggle contact details"
+                onClick={toggleContactDetails}
+                style={{ marginTop: '-0.25rem' }}>
+                {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
+              </Button>
+            )
           ) : (
             <Button
-              ref={showContactDetailsRef}
+              className={styles.toggleContactDetailsButton}
               kind="ghost"
               renderIcon={showContactDetails ? ChevronUp : ChevronDown}
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}>
-              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+              {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
             </Button>
           )}
         </div>
       </div>
-      {showContactDetails && <ContactDetails address={patient.person.addresses} patientId={patient.uuid} />}
+      {showContactDetails && (
+        <ContactDetails address={patient.person.addresses} patientId={patient.uuid} isDeceased={isDeceased} />
+      )}
     </>
   );
 };

@@ -62,14 +62,16 @@ import {
   useSelectedServiceName,
   useSelectedQueueLocationUuid,
   useIsPermanentProviderQueueRoom,
+  useSelectedServiceUuid,
 } from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import { useProvidersQueueRoom } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -109,6 +111,7 @@ function ActiveVisitsTable() {
   const { services } = useServices(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
+  const currentServiceUuid = useSelectedServiceUuid();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
@@ -118,11 +121,12 @@ function ActiveVisitsTable() {
   const useQueueTableTabs = config.showQueueTableTab;
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
-  const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
   const differenceInTime = timeDiffInMinutes(
     new Date(),
     new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
   );
+  const { queueLocations } = useQueueLocations();
+  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
 
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const currentPathName: string = window.location.pathname;
@@ -131,6 +135,7 @@ function ActiveVisitsTable() {
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
   const [overlayHeader, setOverlayTitle] = useState('');
+  const [providerRoomModalShown, setProviderRoomModalShown] = useState(false);
 
   const {
     goTo,
@@ -252,13 +257,20 @@ function ActiveVisitsTable() {
       closeModal: () => dispose(),
       providerUuid,
     });
+    setProviderRoomModalShown(true);
   }, [providerUuid]);
 
   useEffect(() => {
-    if (differenceInTime >= 1 && (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null)) {
+    if (
+      !loading &&
+      rooms?.length > 0 &&
+      differenceInTime >= 1 &&
+      (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null) &&
+      !providerRoomModalShown
+    ) {
       launchAddProviderRoomModal();
     }
-  }, []);
+  }, [currentServiceUuid, rooms, providerRoomModalShown]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -276,7 +288,7 @@ function ActiveVisitsTable() {
               </div>
               <div className={styles.headerButtons}>
                 <ExtensionSlot
-                  extensionSlotName="patient-search-button-slot"
+                  name="patient-search-button-slot"
                   state={{
                     buttonText: t('addPatientToQueue', 'Add patient to queue'),
                     overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
@@ -456,7 +468,7 @@ function ActiveVisitsTable() {
             </div>
             <div className={styles.headerButtons}>
               <ExtensionSlot
-                extensionSlotName="patient-search-button-slot"
+                name="patient-search-button-slot"
                 state={{
                   buttonText: t('addPatientToQueue', 'Add patient to queue'),
                   overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
@@ -481,7 +493,7 @@ function ActiveVisitsTable() {
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
           <ExtensionSlot
-            extensionSlotName="patient-search-button-slot"
+            name="patient-search-button-slot"
             state={{
               buttonText: t('addPatientToQueue', 'Add patient to queue'),
               overlayHeader: t('addPatientToQueue', 'Add patient to queue'),

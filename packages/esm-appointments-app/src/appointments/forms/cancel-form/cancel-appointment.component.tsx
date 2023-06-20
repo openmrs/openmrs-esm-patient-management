@@ -56,7 +56,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
     <div className={styles.formContainer}>
       {patient && (
         <ExtensionSlot
-          extensionSlotName="patient-header-slot"
+          name="patient-header-slot"
           state={{
             patient,
             patientUuid: appointment.patientUuid,

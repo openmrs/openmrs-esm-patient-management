@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ConfigSchema } from '../config-schema';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, Tabs, TabList, Layer, Pagination, InlineLoading, Search } from '@carbon/react';
+import { Button, Tab, Tabs, TabList } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, navigate, useConfig, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
 import Illustration from '../illo';
-import PatientListTable from './patient-list-table.component';
+import PatientListTableContainer from './patient-list-table.component';
 import styles from './patient-list-list.scss';
 
 const TabIndices = {
@@ -38,19 +37,16 @@ function usePatientListFilterForCurrentTab(selectedTab: number, search: string) 
 
 const PatientListList: React.FC = () => {
   const { t } = useTranslation();
-  const pageSizes = [10, 20, 25, 50];
-  const layout = useLayoutType();
-  const config = useConfig() as ConfigSchema;
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
-  const [searchString, setSearchString] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(config.patientListsToShow);
-  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, searchString);
-  const { patientLists, isLoading, isValidating, error, mutate, totalResults } = useAllPatientLists(
-    patientListFilter,
-    page,
-    pageSize,
-  );
+  const [searchTerms, setSearchTerms] = useState({
+    [TabIndices.STARRED_LISTS]: '',
+    [TabIndices.SYSTEM_LISTS]: '',
+    [TabIndices.MY_LISTS]: '',
+    [TabIndices.ALL_LISTS]: '',
+  });
+  const currentSearchTerm = searchTerms[selectedTab];
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, currentSearchTerm);
+  const { patientLists, isLoading, isValidating, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
   const createNewList =
     Object.fromEntries(
@@ -78,11 +74,6 @@ const PatientListList: React.FC = () => {
     });
   };
 
-  const handleSearch = (str) => {
-    setPage(1);
-    setSearchString(str);
-  };
-
   const tableHeaders = showCohortType
     ? [
         { id: 1, key: 'display', header: t('listName', 'List name') },
@@ -96,10 +87,17 @@ const PatientListList: React.FC = () => {
         { id: 4, key: 'isStarred', header: '' },
       ];
 
+  const handleSearch = (searchString: string) => {
+    setSearchTerms((prevSearchTerms) => ({
+      ...prevSearchTerms,
+      [selectedTab]: searchString,
+    }));
+  };
+
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
       <section className={styles.patientListList}>
-        <ExtensionSlot extensionSlotName="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
+        <ExtensionSlot name="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
           <div className={styles.leftJustifiedItems}>
             <Illustration />
@@ -132,53 +130,17 @@ const PatientListList: React.FC = () => {
           </TabList>
         </Tabs>
         <div className={styles.patientListTableContainer}>
-          <div id="table-tool-bar" className={styles.searchContainer}>
-            <div>{isValidating && <InlineLoading />}</div>
-            <Layer>
-              <Search
-                id="patient-list-search"
-                labelText=""
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-                className={styles.search}
-                onChange={(evnt) => handleSearch(evnt.target.value)}
-                defaultValue={searchString}
-                placeholder={t('searchThisList', 'Search this list')}
-                currentSearchTerm={searchString}
-              />
-            </Layer>
-          </div>
-          <PatientListTable
+          <PatientListTableContainer
             listType={patientListFilter.label}
             loading={isLoading}
+            isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
+            searchTerm={currentSearchTerm}
+            setSearchTerm={handleSearch}
             refetch={mutate}
             error={error}
-            pageSize={pageSize}
           />
-          {totalResults > pageSize && (
-            <Layer>
-              <Pagination
-                size={isDesktop(layout) ? 'sm' : 'lg'}
-                backwardText="Previous page"
-                forwardText="Next page"
-                itemsPerPageText="Items per page:"
-                page={page}
-                pageNumberText={t('pageNumber', 'Page number')}
-                pageSize={pageSize}
-                onChange={({ page: newPage, pageSize: newPageSize }) => {
-                  if (newPage !== page) {
-                    setPage(newPage);
-                  }
-                  if (newPageSize !== pageSize) {
-                    setPageSize(newPageSize);
-                  }
-                }}
-                pageSizes={pageSizes}
-                totalItems={totalResults}
-              />
-            </Layer>
-          )}
         </div>
       </section>
       <section>

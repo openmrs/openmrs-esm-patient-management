@@ -67,3 +67,14 @@
     margin-left: spacing.$spacing-03;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .link {
+    svg {
+      margin-right: spacing.$spacing-03;
+      margin-left: unset;
+      transform: scale(-1, 1);
+    }
+  }
+}

@@ -31,17 +31,19 @@ export function CodedPersonAttributeField({
           <Field name={fieldName}>
             {({ field, form: { touched, errors }, meta }) => {
               return (
-                <Select
-                  id={id}
-                  name={`person-attribute-${personAttributeType.uuid}`}
-                  labelText={label ?? personAttributeType?.display}
-                  invalid={errors[fieldName] && touched[fieldName]}
-                  {...field}>
-                  <SelectItem value={null} text={t('selectAnOption', 'Select an option')} />
-                  {conceptAnswers.map((answer) => (
-                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
-                  ))}
-                </Select>
+                <>
+                  <Select
+                    id={id}
+                    name={`person-attribute-${personAttributeType.uuid}`}
+                    labelText={label ?? personAttributeType?.display}
+                    invalid={errors[fieldName] && touched[fieldName]}
+                    {...field}>
+                    <SelectItem value={''} text={t('selectAnOption', 'Select an option')} />
+                    {conceptAnswers.map((answer) => (
+                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+                    ))}
+                  </Select>
+                </>
               );
             }}
           </Field>

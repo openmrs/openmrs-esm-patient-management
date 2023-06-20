@@ -55,7 +55,7 @@ describe('autosuggest', () => {
     expect(screen.queryByRole('list')).toBeNull();
   });
 
-  it('shows search results in an ul', async () => {
+  it('should show the search results in a list', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -64,7 +64,7 @@ describe('autosuggest', () => {
     expect(list.children).toHaveLength(2);
   });
 
-  it('creates li items whose inner text is gotten through getDisplayValue', async () => {
+  it('should creates the li items whose inner text is gotten through getDisplayValue', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -73,7 +73,7 @@ describe('autosuggest', () => {
     expect(list[1].textContent).toBe('John Smith');
   });
 
-  xit('triggers onSuggestionSelected with correct values when li is clicked', async () => {
+  it('should trigger the onSuggestionSelected with correct values when li is clicked', async () => {
     setup();
     const searchbox = screen.getByRole('searchbox');
     fireEvent.change(searchbox, { target: { value: 'john' } });
@@ -82,19 +82,8 @@ describe('autosuggest', () => {
     expect(handleSuggestionSelected).toHaveBeenNthCalledWith(1, 'person', 'randomuuid1');
   });
 
-  it.skip('sets search box value to selected suggestion', async () => {
+  it('should clear the suggestions when a suggestion is selected', async () => {
     setup();
-    let searchbox = screen.getByRole('searchbox');
-    fireEvent.change(searchbox, { target: { value: 'john' } });
-    const listitems = await waitFor(() => screen.getAllByRole('listitem'));
-    fireEvent.click(listitems[0]);
-    searchbox = screen.getByRole('searchbox');
-    expect(searchbox.textContent).toBe('John Doe');
-  });
-
-  xit('clears suggestions when a suggestion is selected', async () => {
-    setup();
-    // screen.getByRole('x');
     let list = screen.queryByRole('list');
     expect(list).toBeNull();
     const searchbox = screen.getByRole('searchbox');
@@ -105,5 +94,27 @@ describe('autosuggest', () => {
     fireEvent.click(listitems[0]);
     list = screen.queryByRole('list');
     expect(list).toBeNull();
+  });
+
+  it('should change suggestions when a search input is changed', async () => {
+    setup();
+    let list = screen.queryByRole('list');
+    expect(list).toBeNull();
+    const searchbox = screen.getByRole('searchbox');
+    fireEvent.change(searchbox, { target: { value: 'john' } });
+    const suggestion = await screen.findByText('John Doe');
+    expect(suggestion).toBeInTheDocument();
+    fireEvent.change(searchbox, { target: { value: '' } });
+    list = screen.queryByRole('list');
+    expect(list).toBeNull();
+  });
+
+  it('should hide suggestions when clicked outside of component', async () => {
+    setup();
+    const input = screen.getByRole('searchbox');
+    fireEvent.change(input, { target: { value: 'john' } });
+    await screen.findByText('John Doe');
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
   });
 });

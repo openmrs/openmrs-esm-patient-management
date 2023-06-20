@@ -43,7 +43,7 @@ const AddAppointmentLink = () => {
       kind="ghost"
       href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
       renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
-      {t('addNewAppointment', 'Add new appointment')}
+      {t('addNewAppointment', 'Add ')}
     </Button>
   ) : (
     <Button
@@ -53,7 +53,7 @@ const AddAppointmentLink = () => {
         navigate({ to: `${spaBasePath}/appointments` });
         launchOverlay(t('search', 'Search'), <PatientSearch />);
       }}>
-      {t('addNewAppointment', 'Add new appointment')}
+      {t('addNewAppointment', 'Add ')}
     </Button>
   );
 };

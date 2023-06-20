@@ -34,11 +34,8 @@ describe('QueueScreen component', () => {
       error: undefined,
     });
     render(<QueueScreen />);
-    expect(screen.getByText('Room')).toBeInTheDocument();
-    expect(screen.getByText('Ticket Number')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('Room A')).toBeInTheDocument();
+    expect(screen.getByText('Room : Room A')).toBeInTheDocument();
+    expect(screen.getByText('Ticket number')).toBeInTheDocument();
     expect(screen.getByText('123')).toBeInTheDocument();
-    expect(screen.getByText('Pending')).toBeInTheDocument();
   });
 });

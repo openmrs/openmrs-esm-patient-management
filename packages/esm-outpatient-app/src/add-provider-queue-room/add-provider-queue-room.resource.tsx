@@ -3,10 +3,12 @@ import useSWR from 'swr';
 import { ProvidersQueueRoom, QueueRoom } from '../types';
 
 export function useQueueRooms(location: string, queueUuid: string) {
-  const apiUrl = `/ws/rest/v1/queueroom?location=${location}&queue=${queueUuid}`;
+  const apiUrl = queueUuid
+    ? `/ws/rest/v1/queueroom?location=${location}&queue=${queueUuid}`
+    : `/ws/rest/v1/queueroom?location=${location}`;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(
-    location && queueUuid ? apiUrl : null,
+    location ? apiUrl : null,
     openmrsFetch,
   );
 

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { ConfigObject, navigate, useConfig } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
 import styles from './open-chart.scss';
-import { ArrowRight } from '@carbon/react/icons';
 import usePatientId from './open-chart.resource';
 
 interface OpenChartMenuProps {
@@ -18,20 +17,16 @@ const OpenChartMenu: React.FC<OpenChartMenuProps> = ({ patientUuid }) => {
     if (!isLoading) {
       navigate({
         to: config.customPatientChartUrl
-          ? `${config.customPatientChartUrl}=${patient?.patientId}`
+          ? `${config.customPatientChartUrl}=${patient?.patientId}&`
           : `\${openmrsSpaBase}/patient/${patientUuid}/chart`,
       });
     }
   }, [patient, config.customPatientChartUrl]);
 
   return (
-    <Button
-      onClick={redirectPatientChart}
-      className={styles.editIcon}
-      iconDescription={t('openChartTooltip', 'Open')}
-      hasIconOnly
-      renderIcon={(props) => <ArrowRight size={16} {...props} />}
-    />
+    <Button onClick={redirectPatientChart} className={styles.editIcon} kind="ghost">
+      {config.customPatientChartText ? config.customPatientChartText : t('profile', 'Profile')}
+    </Button>
   );
 };
 

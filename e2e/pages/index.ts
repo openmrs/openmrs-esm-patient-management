@@ -1,3 +1,3 @@
-export * from './homePage';
-export * from './registrationAndEditPage';
-export * from './patientListsPage';
+export * from './home-page';
+export * from './registration-and-edit-page';
+export * from './patient-lists-page';

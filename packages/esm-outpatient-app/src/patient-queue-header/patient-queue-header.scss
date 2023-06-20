@@ -69,3 +69,20 @@
     left: -10.15rem;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .date-and-location {
+    margin-right: unset;
+    margin-left: spacing.$spacing-05;
+    & > svg:first-child {
+      order: -1;
+    }
+    & > svg:nth-child(4) {
+      order: 1;
+    }
+    & > span:nth-child(2) {
+      order: -2;
+    }
+  }
+}

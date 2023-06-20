@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-appointments-app",
-  "version": "4.3.0",
+  "version": "4.5.0",
   "description": "Appointments front-end module for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-appointments-app.js",
   "main": "src/index.ts",

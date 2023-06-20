@@ -13,7 +13,7 @@ const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encoun
 
   return (
     <div className={`${styles.bodyLong01} ${styles.testSummaryExtension}`}>
-      <ExtensionSlot extensionSlotName="test-results-filtered-overview" state={{ filter, patientUuid }} />
+      <ExtensionSlot name="test-results-filtered-overview" state={{ filter, patientUuid }} />
     </div>
   );
 };

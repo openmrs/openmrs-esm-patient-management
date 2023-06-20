@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -8,12 +8,11 @@ import {
   TextInput,
   Select,
   SelectItem,
-  TextArea,
   ButtonSet,
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import { showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
 import styles from './queue-service.scss';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { SearchTypes } from '../types';
@@ -29,21 +28,13 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { queueConcepts } = useServiceConcepts();
-  const locations = useLocations();
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
   const [isMissingName, setMissingName] = useState(false);
   const [isMissingQueue, setMissingQueue] = useState(false);
   const [isMissingLocation, setMissingLocation] = useState(false);
   const [userLocation, setUserLocation] = useState('');
-  const session = useSession();
   const { queueLocations } = useQueueLocations();
-
-  useEffect(() => {
-    if (!userLocation && session?.sessionLocation !== null) {
-      setUserLocation(session?.sessionLocation?.uuid);
-    }
-  }, [session, locations, userLocation]);
 
   const createQueue = useCallback(
     (event) => {
@@ -156,6 +147,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               value={userLocation}
               onChange={(event) => setUserLocation(event.target.value)}
               light>
+              {!userLocation && <SelectItem text={t('selectLocation', 'Select a location')} />}
               {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
               {queueLocations?.length > 0 &&
                 queueLocations.map((location) => (
