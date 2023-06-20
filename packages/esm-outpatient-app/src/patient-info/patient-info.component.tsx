@@ -29,7 +29,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
   return (
     <ClickableTile className={styles.container} onClick={handlePatientInfoClick}>
       <div className={`${showContactDetails ? styles.activePatientInfoContainer : styles.patientInfoContainer}`}>
-        <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+        <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
         <div className={styles.patientInfoContent}>
           <div className={styles.patientInfoRow}>
             <span className={styles.patientName}>{patientName}</span>

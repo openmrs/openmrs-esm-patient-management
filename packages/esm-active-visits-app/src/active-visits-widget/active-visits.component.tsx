@@ -268,7 +268,7 @@ const ActiveVisitsTable = () => {
                           <th colSpan={headers.length + 2}>
                             <ExtensionSlot
                               className={styles.visitSummaryContainer}
-                              extensionSlotName="visit-summary-slot"
+                              name="visit-summary-slot"
                               state={{
                                 visitUuid: activeVisits[index]?.visitUuid,
                                 patientUuid: activeVisits[index]?.patientUuid,

@@ -21,7 +21,7 @@ function ActiveVisitsTabs() {
     <div className={styles.container}>
       <div className={styles.headerBtnContainer}>
         <ExtensionSlot
-          extensionSlotName="patient-search-button-slot"
+          name="patient-search-button-slot"
           state={{
             buttonText: t('addPatientToQueue', 'Add patient to queue'),
             overlayHeader: t('addPatientToQueue', 'Add patient to queue'),

@@ -1,5 +1,5 @@
 import { APIRequestContext, expect } from '@playwright/test';
-import { Patient } from './patientOperations';
+import { Patient } from './patient-operations';
 
 export interface CohortType {
   uuid: string;

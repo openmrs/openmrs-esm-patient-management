@@ -23,7 +23,7 @@ const DefaulterTracingForm: React.FC<DefaulterTracingForm> = ({ patientUuid }) =
     [patientUuid, patient],
   );
 
-  return <>{patient && <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />}</>;
+  return <>{patient && <ExtensionSlot name="form-widget-slot" state={state} />}</>;
 };
 
 export default DefaulterTracingForm;

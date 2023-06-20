@@ -62,7 +62,7 @@ export const NameField = () => {
         {displayCapturePhoto && (
           <ExtensionSlot
             className={styles.photoExtension}
-            extensionSlotName="capture-patient-photo-slot"
+            name="capture-patient-photo-slot"
             state={{ onCapturePhoto, initialState: currentPhoto }}
           />
         )}

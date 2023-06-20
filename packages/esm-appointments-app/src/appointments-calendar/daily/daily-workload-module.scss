@@ -138,3 +138,15 @@
   color: colors.$white;
   font-weight: bold;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .weekly-cell {
+    &:first-child {
+      .allDay {
+        border-left: 1px solid colors.$gray-20;
+        border-right: none;
+      }
+    }
+  }
+}
