@@ -92,3 +92,17 @@
     max-width: unset;
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .linkName {
+    & > svg {
+      transform: scale(-1, 1);
+    }
+  }
+
+  .infoGrid {
+    padding-left: unset;
+    padding-right: spacing.$spacing-07;
+  }
+}

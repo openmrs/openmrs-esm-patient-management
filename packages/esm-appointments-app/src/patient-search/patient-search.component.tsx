@@ -19,7 +19,7 @@ const PatientSearch: React.FC = () => {
     <div className="omrs-main-content">
       <span className={styles.searchBarWrapper}>
         <ExtensionSlot
-          extensionSlotName="patient-search-bar-slot"
+          name="patient-search-bar-slot"
           state={{
             selectPatientAction: launchCreateAppointmentForm,
             buttonProps: {
