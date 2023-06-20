@@ -52,3 +52,16 @@
     }
   }
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .container {
+    padding-left: unset;
+    padding-right: 50px;
+  }
+
+  .weekly-cell {
+    border-right: unset;
+    border-left: 1px solid colors.$gray-20;
+  }
+}
