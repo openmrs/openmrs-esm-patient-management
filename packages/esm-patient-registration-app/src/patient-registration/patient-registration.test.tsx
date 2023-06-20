@@ -178,8 +178,8 @@ const fillRequiredFields = async () => {
   fireEvent.click(genderInput);
 };
 
-describe('Patient Registration Component', () => {
-  describe('Registering a New Patient', () => {
+describe('patient registration component', () => {
+  describe('when registering a new patient', () => {
     beforeEach(() => {
       mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
       mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
@@ -344,7 +344,7 @@ describe('Patient Registration Component', () => {
     });
   });
 
-  describe('Updating an Existing Patient', () => {
+  describe('when updating an existing patient details', () => {
     beforeEach(() => {
       mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
       mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
