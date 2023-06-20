@@ -58,7 +58,7 @@
   "loadingResults": "Loading results",
   "male": "Male",
   "middleNameLabelText": "Middle Name",
-  "months": "Months",
+  "nascopNumber": "Nascop facility no",
   "nationalId": "National ID",
   "negativeMonths": "Negative months",
   "negativeYears": "Negative years",
@@ -72,8 +72,6 @@
   "patientName": "Patient name",
   "patientNameKnown": "Patient's Name is Known?",
   "patientNotFound": "The patient records could not be found in Client registry, do you want to continue to create and post patient to registry",
-  "phoneEmailLabelText": "Phone, Email, etc.",
-  "phoneNumberInputLabelText": "Phone number",
   "postalCode": "Postcode",
   "postToRegistry": "Post to registry",
   "registerPatient": "Register Patient",
@@ -89,6 +87,7 @@
   "resetIdentifierTooltip": "Reset",
   "restoreRelationshipActionButton": "Undo",
   "searchAddress": "Search address",
+  "selectAnOption": "Select an option",
   "selectCountry": "Select country",
   "selectIdentifierType": "Select identifier type",
   "sexFieldLabelText": "Sex",
@@ -100,7 +99,6 @@
   "updationSuccessToastTitle": "Patient Details Updated",
   "useValues": "Use values",
   "validate": "Validate",
-  "years": "Years",
   "yearsEstimateRequired": "Years estimate required",
   "yes": "Yes"
 }

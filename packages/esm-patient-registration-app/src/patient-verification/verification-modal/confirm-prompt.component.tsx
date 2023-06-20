@@ -53,6 +53,7 @@ const ConfirmPrompt: React.FC<ConfirmPromptProps> = ({ close, onConfirm, patient
             <PatientInfo label={t('age', 'Age')} value={age(patient?.dateOfBirth)} />
             <PatientInfo label={t('dateOfBirth', 'Date of birth')} value={formatDate(new Date(patient?.dateOfBirth))} />
             <PatientInfo label={t('gender', 'Gender')} value={capitalize(patient?.gender)} />
+            <PatientInfo label={t('nascopNumber', 'Nascop facility no')} value={capitalize(patient?.nascopCCCNumber)} />
           </div>
         </div>
       </div>
