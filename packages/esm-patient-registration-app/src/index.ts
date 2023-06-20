@@ -66,3 +66,13 @@ export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
   () => import('./widgets/delete-identifier-confirmation-modal'),
   options,
 );
+
+export const confirmClientRegistryModal = getAsyncLifecycle(
+  () => import('./patient-verification/verification-modal/confirm-prompt.component'),
+  options,
+);
+
+export const emptyClientRegistryModal = getAsyncLifecycle(
+  () => import('./patient-verification/verification-modal/empty-prompt.component'),
+  options,
+);

@@ -1,8 +1,8 @@
 import { FetchResponse, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
-import { ConceptAnswers, ConceptResponse, FormValues } from '../patient-registration/patient-registration-types';
 import { generateNUPIPayload, handleClientRegistryResponse } from './patient-verification-utils';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
+import { ConceptAnswers, ConceptResponse, FormValues } from '../patient-registration/patient-registration.types';
 
 export function searchClientRegistry(identifierType: string, searchTerm: string, token: string) {
   const url = `https://afyakenyaapi.health.go.ke/partners/registry/search/KE/${identifierType}/${searchTerm}`;

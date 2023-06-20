@@ -6,8 +6,8 @@ import { countries, verificationIdentifierTypes } from './assets/verification-as
 import { searchClientRegistry, useGlobalProperties } from './patient-verification-hook';
 import { showToast } from '@openmrs/esm-framework';
 import { handleClientRegistryResponse } from './patient-verification-utils';
-import { FormValues } from '../patient-registration/patient-registration-types';
 import { FormikProps } from 'formik';
+import { FormValues } from '../patient-registration/patient-registration.types';
 
 interface PatientVerificationProps {
   props: FormikProps<FormValues>;
