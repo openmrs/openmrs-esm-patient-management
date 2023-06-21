@@ -203,6 +203,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   currentPhoto: photo?.imageSrc,
                   isOffline,
                   initialFormValues: props.initialValues,
+                  setInitialFormValues,
                 }}>
                 {sections.map((section, index) => (
                   <SectionWrapper
