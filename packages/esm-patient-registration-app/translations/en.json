@@ -31,6 +31,7 @@
   "editIdentifierTooltip": "Edit",
   "editPatientDetails": "Edit patient details",
   "error": "Error",
+  "errorFetchingOrderedFields": "Error occured fetching ordered fields for address hierarchy",
   "estimatedAgeInMonthsLabelText": "Estimated age in months",
   "estimatedAgeInYearsLabelText": "Estimated age in years",
   "familyNameLabelText": "Family Name",
