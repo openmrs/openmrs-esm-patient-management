@@ -312,6 +312,7 @@ html[dir='rtl'] {
       text-align: right;
     }
   }
+
   .pagination {
     & > :nth-child(1) {
       & > span {
@@ -345,6 +346,7 @@ html[dir='rtl'] {
       }
     }
   }
+
   .tableContainer {
     th > div {
       text-align: right;
@@ -360,5 +362,9 @@ html[dir='rtl'] {
         text-align: right;
       }
     }
+  }
+
+  .seeAllLink {
+    left: -22rem;
   }
 }
