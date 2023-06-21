@@ -1,17 +1,4 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { AddressHierarchy } from './address-hierarchy.component';
-import { Formik, Form } from 'formik';
-import { Resources, ResourcesContext } from '../../../offline.resources';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import { useConfig } from '@openmrs/esm-framework';
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
-}));
-
-const mockResponse1 = {
+export const mockResponse1 = {
   results: [
     {
       value:
@@ -44,7 +31,7 @@ const mockResponse1 = {
   ],
 };
 
-const mockResponse2 = {
+export const mockResponse2 = {
   results: [
     {
       value:
@@ -114,68 +101,4 @@ const mockResponse2 = {
   ],
 };
 
-async function testAddressHierarchy(mockResponse) {
-  await render(
-    <ResourcesContext.Provider value={{ addressTemplate: mockResponse } as Resources}>
-      <Formik initialValues={{}} onSubmit={null}>
-        <Form>
-          <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() }}>
-            <AddressHierarchy />
-          </PatientRegistrationContext.Provider>
-        </Form>
-      </Formik>
-    </ResourcesContext.Provider>,
-  );
-  const countryInput = screen.getByLabelText('Country (optional)');
-  expect(countryInput).toBeInTheDocument();
-  expect(countryInput).toHaveAttribute('name', 'address.country');
-  const stateInput = screen.getByLabelText('State (optional)');
-  expect(stateInput).toBeInTheDocument();
-  expect(stateInput).toHaveAttribute('name', 'address.stateProvince');
-  const cityInput = screen.getByLabelText('City (optional)');
-  expect(cityInput).toBeInTheDocument();
-  expect(cityInput).toHaveAttribute('name', 'address.cityVillage');
-  const address1Input = screen.getByLabelText('Address line 1 (optional)');
-  expect(address1Input).toBeInTheDocument();
-  expect(address1Input).toHaveAttribute('name', 'address.address1');
-  const address2Input = screen.getByLabelText('Address line 2 (optional)');
-  expect(address2Input).toBeInTheDocument();
-  expect(address2Input).toHaveAttribute('name', 'address.address2');
-  const postalCodeInput = screen.getByLabelText('Postcode (optional)');
-  expect(postalCodeInput).toBeInTheDocument();
-  expect(postalCodeInput).toHaveAttribute('name', 'address.postalCode');
-}
-
-describe('address hierarchy', () => {
-  it('renders text input fields matching addressTemplate config', async () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
-      fieldConfigurations: {
-        address: {
-          useAddressHierarchy: {
-            enabled: false,
-            useQuickSearch: false,
-            searchAddressByLevel: false,
-          },
-        },
-      },
-    }));
-    testAddressHierarchy(mockResponse1);
-    testAddressHierarchy(mockResponse2);
-  });
-
-  it('renders combo input fields matching addressTemplate config', async () => {
-    (useConfig as jest.Mock).mockImplementation(() => ({
-      fieldConfigurations: {
-        address: {
-          useAddressHierarchy: {
-            enabled: true,
-            useQuickSearch: false,
-            searchAddressByLevel: true,
-          },
-        },
-      },
-    }));
-    testAddressHierarchy(mockResponse1);
-    testAddressHierarchy(mockResponse2);
-  });
-});
+export const mockedOrderedFields = ['country', 'stateProvince', 'cityVillage', 'postalCode', 'address1', 'address2'];

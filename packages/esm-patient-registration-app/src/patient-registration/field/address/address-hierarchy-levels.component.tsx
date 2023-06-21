@@ -53,17 +53,16 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   );
 
   return (
-    <>
-      <ComboInput
-        entries={entries}
-        handleSelection={handleSelection}
-        name={`address.${attribute.name}`}
-        fieldProps={{
-          ...field,
-          labelText: attribute.label,
-        }}
-        handleInputChange={handleInputChange}
-      />
-    </>
+    <ComboInput
+      entries={entries}
+      handleSelection={handleSelection}
+      name={`address.${attribute.name}`}
+      fieldProps={{
+        ...field,
+        id: attribute.name,
+        labelText: `${attribute.label} (${t('optional', 'optional')})`,
+      }}
+      handleInputChange={handleInputChange}
+    />
   );
 };

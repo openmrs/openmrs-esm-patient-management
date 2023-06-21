@@ -10,10 +10,7 @@ interface AddressFields {
 
 export function useOrderedAddressHierarchyLevels() {
   const url = '/module/addresshierarchy/ajax/getOrderedAddressHierarchyLevels.form';
-  const { data, isLoading, error, isValidating } = useSWRImmutable<FetchResponse<Array<AddressFields>>>(
-    url,
-    openmrsFetch,
-  );
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<AddressFields>>>(url, openmrsFetch);
 
   const results = useMemo(
     () => ({
@@ -69,7 +66,7 @@ export function useAddressEntryFetchConfig(addressField: string) {
 
   const addressFieldSearchConfig = useMemo(() => {
     let fetchEntriesForField = true;
-    const previousSelectedFields = orderedFields.slice(0, index);
+    const previousSelectedFields = orderedFields?.slice(0, index) ?? [];
     let previousSelectedValues = [];
     for (const fieldName of previousSelectedFields) {
       if (!addressValues[fieldName]) {

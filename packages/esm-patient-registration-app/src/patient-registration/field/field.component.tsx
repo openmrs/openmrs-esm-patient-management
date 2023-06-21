@@ -6,7 +6,7 @@ import { DobField } from './dob/dob.component';
 import { reportError, useConfig } from '@openmrs/esm-framework';
 import { builtInFields, RegistrationConfig } from '../../config-schema';
 import { CustomField } from './custom-field.component';
-import { AddressHierarchy } from './address/address-field.component';
+import { AddressComponent } from './address/address-field.component';
 
 export interface FieldProps {
   name: string;
@@ -35,7 +35,7 @@ export function Field({ name }: FieldProps) {
     case 'dob':
       return <DobField />;
     case 'address':
-      return <AddressHierarchy />;
+      return <AddressComponent />;
     case 'id':
       return <Identifiers />;
     default:

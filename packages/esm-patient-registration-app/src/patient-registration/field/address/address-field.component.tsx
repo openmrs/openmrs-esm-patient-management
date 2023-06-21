@@ -9,7 +9,6 @@ import AddressSearchComponent from './address-search.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
-import { FormValues } from '../../patient-registration-types';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
@@ -20,7 +19,7 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
   return tmp ? parseString(tmp.outerHTML) : parseString('');
 }
 
-export const AddressHierarchy: React.FC = () => {
+export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
   const [addressLayout, setAddressLayout] = useState<
     Array<{
