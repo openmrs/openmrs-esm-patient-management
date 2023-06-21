@@ -288,7 +288,7 @@ function ActiveVisitsTable() {
               </div>
               <div className={styles.headerButtons}>
                 <ExtensionSlot
-                  extensionSlotName="patient-search-button-slot"
+                  name="patient-search-button-slot"
                   state={{
                     buttonText: t('addPatientToQueue', 'Add patient to queue'),
                     overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
@@ -468,7 +468,7 @@ function ActiveVisitsTable() {
             </div>
             <div className={styles.headerButtons}>
               <ExtensionSlot
-                extensionSlotName="patient-search-button-slot"
+                name="patient-search-button-slot"
                 state={{
                   buttonText: t('addPatientToQueue', 'Add patient to queue'),
                   overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
@@ -493,7 +493,7 @@ function ActiveVisitsTable() {
         <Tile className={styles.tile}>
           <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
           <ExtensionSlot
-            extensionSlotName="patient-search-button-slot"
+            name="patient-search-button-slot"
             state={{
               buttonText: t('addPatientToQueue', 'Add patient to queue'),
               overlayHeader: t('addPatientToQueue', 'Add patient to queue'),

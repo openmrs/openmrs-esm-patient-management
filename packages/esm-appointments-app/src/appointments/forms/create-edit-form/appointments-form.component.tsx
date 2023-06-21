@@ -134,7 +134,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       ) : (
         <div className={styles.stickyFormHeader}>
           <ExtensionSlot
-            extensionSlotName="patient-header-slot"
+            name="patient-header-slot"
             state={{
               patient,
               patientUuid: patientAppointment.patientUuid,

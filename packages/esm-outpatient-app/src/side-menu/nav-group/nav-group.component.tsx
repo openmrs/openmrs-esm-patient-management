@@ -16,7 +16,7 @@ const NavGroupExtension = ({ title, slotName, renderIcon }: NavGroupExtensionPro
 
   return (
     <SideNavMenu renderIcon={renderIcon} title={title}>
-      <ExtensionSlot extensionSlotName={slotName} />
+      <ExtensionSlot name={slotName} />
     </SideNavMenu>
   );
 };

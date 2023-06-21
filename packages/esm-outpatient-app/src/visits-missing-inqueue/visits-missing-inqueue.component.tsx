@@ -231,7 +231,7 @@ const MissingQueueEntries = () => {
                           <th colSpan={headers.length + 2}>
                             <ExtensionSlot
                               className={styles.visitSummaryContainer}
-                              extensionSlotName="visit-summary-slot"
+                              name="visit-summary-slot"
                               state={{
                                 visitUuid: paginatedActiveVisits[index]?.visitUuid,
                                 patientUuid: paginatedActiveVisits[index]?.patientUuid,

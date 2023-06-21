@@ -56,7 +56,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
+      <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
     </div>
   );
 
@@ -106,7 +106,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
-                extensionSlotName="patient-banner-tags-slot"
+                name="patient-banner-tags-slot"
                 state={{ patientUuid, patient: fhirPatient }}
                 className={styles.flexRow}
               />
@@ -134,7 +134,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 dropDownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
-                  extensionSlotName="patient-search-actions-slot"
+                  name="patient-search-actions-slot"
                   state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
@@ -143,7 +143,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           {!isDeceased &&
             (!currentVisit ? (
               <ExtensionSlot
-                extensionSlotName="start-visit-button-slot"
+                name="start-visit-button-slot"
                 state={{
                   patientUuid,
                 }}
