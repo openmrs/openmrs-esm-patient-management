@@ -24,8 +24,9 @@ export const AddressHierarchy: React.FC = () => {
   const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
   const addressTemplateXml = addressTemplate?.results[0].value;
-  const setSelectedValue = (value: string) => {
+  const setSelectedValue = (value: string, name: string) => {
     setSelected(value);
+    resetChildAddressFields(name.replace('address.', ''));
   };
   const config = useConfig();
   const {
@@ -82,6 +83,23 @@ export const AddressHierarchy: React.FC = () => {
     });
     setAddressLayout(propertiesObj);
   }, [t, addressTemplateXml, setFieldValue, values]);
+
+  function resetChildAddressFields(parentId: string) {
+    let parentFound = false;
+
+    for (let i = 0; i < addressLayout.length; i++) {
+      if (addressLayout[i].id === parentId) {
+        parentFound = true;
+        continue;
+      }
+
+      if (parentFound) {
+        setFieldValue(`address.${addressLayout[i].id}`, '');
+      }
+    }
+
+    return addressLayout;
+  }
 
   if (!addressTemplate) {
     return (

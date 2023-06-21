@@ -60,10 +60,10 @@ export const ComboInput: React.FC<ComboInputProps> = ({
           {...field}
           onChange={(e) => {
             if (Boolean(e.selectedItem)) {
-              setSelectedValue(e.selectedItem.id);
+              setSelectedValue(e.selectedItem.id, name);
               setValue(e.selectedItem.text);
             } else {
-              setSelectedValue(undefined);
+              setSelectedValue(undefined, name);
               setValue(undefined);
             }
           }}
