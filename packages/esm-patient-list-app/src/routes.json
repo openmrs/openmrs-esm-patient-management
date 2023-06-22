@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "pages": [
+    {
+      "component": "root",
+      "route": "patient-lists"
+    }
+  ],
+  "extensions": [
+    {
+      "name": "patient-lists-dashboard-link",
+      "component": "patientListDashboardLink",
+      "meta": {
+        "name": "patient-lists",
+        "slot": "patient-lists-dashboard-slot",
+        "title": "Patient lists"
+      }
+    },
+    {
+      "name": "patient-table",
+      "component": "patientTable"
+    },
+    {
+      "name": "add-patient-to-patient-list-modal",
+      "component": "addPatientToListModal"
+    },
+    {
+      "name": "patient-list-action-menu",
+      "component": "patientListActionButton",
+      "slot": "action-menu-non-chart-items-slot"
+    },
+    {
+      "name": "add-patient-to-patient-list-button",
+      "slot": "patient-actions-slot",
+      "component": "addPatientToPatientListMenuItem"
+    }
+  ]
+}

@@ -5,27 +5,16 @@ import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
-
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
-};
-
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
 const moduleName = '@openmrs/esm-patient-list-app';
+
 const options = {
   featureName: 'patient list',
   moduleName,
 };
 
-function setupOpenMRS() {
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+export function startupApp() {
   const patientListsBasePath = `${window.spaBase}/home/patient-lists`;
 
   async function getListName(patientListUuid: string): Promise<string> {
@@ -47,66 +36,32 @@ function setupOpenMRS() {
       parent: patientListsBasePath,
     },
   ]);
-
-  return {
-    pages: [
-      {
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-        route: 'patient-lists',
-        online: { syncUserPropertiesChangesOnLoad: true },
-        offline: { syncUserPropertiesChangesOnLoad: false },
-      },
-    ],
-    extensions: [
-      {
-        id: 'patient-lists-dashboard-link',
-        slot: 'homepage-dashboard-slot',
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
-        meta: dashboardMeta,
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'patient-lists-dashboard',
-        slot: 'patient-lists-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'add-patient-to-patient-list-button',
-        slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./add-patient-to-patient-list-menu-item.component'), {
-          featureName: 'patient-actions-slot',
-          moduleName,
-        }),
-      },
-      {
-        name: 'patient-list-action-menu',
-        slot: 'action-menu-non-chart-items-slot',
-        load: getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
-          featureName: 'patient-list-action-menu-item',
-          moduleName,
-        }),
-      },
-      {
-        id: 'add-patient-to-patient-list-modal',
-        load: getAsyncLifecycle(() => import('./add-patient/add-patient.component'), {
-          featureName: 'patient-actions-modal',
-          moduleName,
-        }),
-      },
-      {
-        id: 'patient-table',
-        load: getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
-          featureName: 'patient-table',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-    ],
-  };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS, version };
+export const root = () => getAsyncLifecycle(() => import('./root.component'), options);
+
+export const addPatientToListModal = () =>
+  getAsyncLifecycle(() => import('./add-patient/add-patient.component'), {
+    featureName: 'patient-actions-modal',
+    moduleName,
+  });
+
+export const addPatientToPatientListMenuItem = () =>
+  getAsyncLifecycle(() => import('./add-patient-to-patient-list-menu-item.component'), {
+    featureName: 'patient-actions-slot',
+    moduleName,
+  });
+
+export const patientListActionButton = () =>
+  getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
+    featureName: 'patient-list-action-menu-item',
+    moduleName,
+  });
+
+export const patientListDashboardLink = () => getSyncLifecycle(createDashboardLink(dashboardMeta), options);
+
+export const patientTable = () =>
+  getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
+    featureName: 'patient-table',
+    moduleName,
+  });
