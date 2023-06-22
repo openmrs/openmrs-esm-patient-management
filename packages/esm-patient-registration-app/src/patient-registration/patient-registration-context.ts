@@ -14,6 +14,7 @@ export interface PatientRegistrationContextProps {
   currentPhoto: string;
   isOffline: boolean;
   initialFormValues: FormValues;
+  setInitialFormValues?: React.Dispatch<SetStateAction<FormValues>>;
 }
 
 export const PatientRegistrationContext = createContext<PatientRegistrationContextProps | undefined>(undefined);

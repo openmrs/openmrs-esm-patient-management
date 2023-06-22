@@ -34,7 +34,7 @@ export default function Root() {
     <main className={`omrs-main-content ${styles.root}`}>
       <Grid className={styles.grid}>
         <Row>
-          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+          <ExtensionSlot name="breadcrumbs-slot" />
         </Row>
         <ResourcesContext.Provider
           value={{

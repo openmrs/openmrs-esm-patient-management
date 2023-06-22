@@ -78,12 +78,12 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
               onClick={(evt) => selectPatientAction(evt, indx)}
               to={`${interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
-              })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`}
+              })}`}
               key={patient.id}
               className={`${styles.patientSearchResult} ${isDeceased ? styles.deceased : ''}`}>
               <div className={styles.patientAvatar} role="img">
                 <ExtensionSlot
-                  extensionSlotName="patient-photo-slot"
+                  name="patient-photo-slot"
                   state={{
                     patientUuid: patient.id,
                     patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
@@ -97,7 +97,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                     patient.name?.[0]?.family
                   }`}</h2>
                   <ExtensionSlot
-                    extensionSlotName="patient-banner-tags-slot"
+                    name="patient-banner-tags-slot"
                     state={{ patient, patientUuid: patient.id }}
                     className={styles.flexRow}
                   />

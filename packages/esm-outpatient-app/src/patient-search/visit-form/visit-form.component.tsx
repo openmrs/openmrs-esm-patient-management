@@ -197,7 +197,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
         <div className={styles.backButton}>
@@ -345,7 +345,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             </section>
           )}
         </Stack>
-        <ExtensionSlot extensionSlotName="add-queue-entry-slot" />
+        <ExtensionSlot name="add-queue-entry-slot" />
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={closePanel}>

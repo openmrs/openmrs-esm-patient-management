@@ -9,6 +9,7 @@ import styles from './contact-details.scss';
 interface ContactDetailsProps {
   address: Array<AddressType>;
   patientId: string;
+  isDeceased: boolean;
 }
 
 const Address: React.FC<{ address: AddressType }> = ({ address }) => {
@@ -86,11 +87,11 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({ address, patientId }) => {
+const ContactDetails: React.FC<ContactDetailsProps> = ({ address, patientId, isDeceased }) => {
   const currentAddress = address ? address.find((a) => a.preferred) : undefined;
 
   return (
-    <div className={styles.contactDetails}>
+    <div className={`${styles.contactDetails} ${isDeceased ? styles.deceased : ''}`}>
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />
