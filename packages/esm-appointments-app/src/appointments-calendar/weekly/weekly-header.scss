@@ -43,3 +43,17 @@
   @include carbon--type-style('productive-heading-01');
   color: $text-02;
 }
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .container {
+    & > span {
+      direction: ltr;
+    }
+  }
+
+  .workLoadCard {
+    padding-left: unset;
+    padding-right: 60px;
+  }
+}
