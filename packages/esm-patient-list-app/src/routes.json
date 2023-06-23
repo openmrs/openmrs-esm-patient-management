@@ -13,11 +13,17 @@
     {
       "name": "patient-lists-dashboard-link",
       "component": "patientListDashboardLink",
+      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "patient-lists",
         "slot": "patient-lists-dashboard-slot",
         "title": "Patient lists"
       }
+    },
+    {
+      "name": "patient-lists-dashboard",
+      "component": "root",
+      "slot": "patient-lists-dashboard-slot"
     },
     {
       "name": "patient-table",
