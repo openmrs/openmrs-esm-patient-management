@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "active-visits-widget",
+      "slot": "homepage-widget-slot",
+      "component": "activeVisits",
+      "order": 0
+    },
+    {
+      "name": "visit-summary-widget",
+      "slot": "visit-summary-slot",
+      "component": "visitDetail",
+      "order": 0
+    }
+  ],
+  "pages": []
+}

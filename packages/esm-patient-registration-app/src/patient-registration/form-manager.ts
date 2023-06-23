@@ -39,6 +39,7 @@ export type SavePatientForm = (
   savePatientTransactionManager: SavePatientTransactionManager,
   abortController?: AbortController,
 ) => Promise<string | void>;
+
 export class FormManager {
   static savePatientFormOffline: SavePatientForm = async (
     isNewPatient,
