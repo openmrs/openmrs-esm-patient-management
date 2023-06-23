@@ -6,7 +6,7 @@
   "extensions": [
     {
       "name": "active-visits-widget",
-      "slot": "homepage-widget-slot",
+      "slot": "homepage-widgets-slot",
       "component": "activeVisits",
       "order": 0
     },
