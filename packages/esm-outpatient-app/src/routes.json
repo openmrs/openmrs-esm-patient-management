@@ -6,13 +6,13 @@
   "pages": [
     {
       "component": "appointmentsList",
-      "route": "appointments-list",
+      "routeRegex": "^appointments-list",
       "online": true,
       "offline": true
     }, 
     {
       "component": "queueList",
-      "route": "queue-list",
+      "routeRegex": "^queue-list",
       "online": true,
       "offline": true
     }
