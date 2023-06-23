@@ -13,8 +13,7 @@
     {
       "name": "visit-summary-widget",
       "slot": "visit-summary-slot",
-      "component": "visitDetail",
-      "order": 0
+      "component": "visitDetail"
     }
   ],
   "pages": []
