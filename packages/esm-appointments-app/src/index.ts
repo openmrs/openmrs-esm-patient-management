@@ -31,14 +31,16 @@ export function startupApp() {
   ]);
 }
 
-export const appointmentsDashboardLink = () => getSyncLifecycle(createDashboardLink(dashboardMeta), options);
+export const appointmentsDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const appointmentsCalendarDashboardLink = () =>
   getSyncLifecycle(createDashboardLink(appointmentCalendarDashboardMeta), options);
 
-export const appointmentsDashboard = () => getAsyncLifecycle(() => import('./appointments.component'), options);
+export const appointmentsDashboard = getAsyncLifecycle(() => import('./appointments.component'), options);
 
-export const checkInModal = () =>
-  getAsyncLifecycle(() => import('./home-appointments/check-in-modal/check-in-modal.component'), options);
+export const checkInModal = getAsyncLifecycle(
+  () => import('./home-appointments/check-in-modal/check-in-modal.component'),
+  options,
+);
 
-export const homeAppointments = () => getAsyncLifecycle(() => import('./home-appointments'), options);
+export const homeAppointments = getAsyncLifecycle(() => import('./home-appointments'), options);
