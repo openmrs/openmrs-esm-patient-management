@@ -1,4 +1,4 @@
-import { OpenmrsResource } from '@openmrs/esm-api';
+import type { OpenmrsResource } from '@openmrs/esm-framework';
 
 export enum PatientListType {
   STARRED = 'Starred',
