@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 export const NameField = () => {
   const {
     fieldConfigurations: {
-      name: { displayCapturePhoto },
+      name: { displayCapturePhoto, displayFamilyNameFieldFirst },
     },
   } = useConfig() as RegistrationConfig;
   const { t } = useTranslation();
@@ -55,6 +55,36 @@ export const NameField = () => {
     }
   };
 
+  const firstNameField = (
+    <Input
+      id="givenName"
+      name="givenName"
+      labelText={t('givenNameLabelText', 'First Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
+
+  const middleNameField = (
+    <Input
+      id="middleName"
+      name="middleName"
+      labelText={t('middleNameLabelText', 'Middle Name')}
+      light
+      checkWarning={checkNumber}
+    />
+  );
+
+  const familyNameField = (
+    <Input
+      id="familyName"
+      name="familyName"
+      labelText={t('familyNameLabelText', 'Family Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
+
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
@@ -75,33 +105,20 @@ export const NameField = () => {
             <Switch name="known" text={t('yes', 'Yes')} />
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>
-          {nameKnown && (
-            <>
-              <Input
-                id="givenName"
-                name="givenName"
-                labelText={t('givenNameLabelText', 'First Name')}
-                checkWarning={checkNumber}
-                required
-              />
-              {fieldConfigs.displayMiddleName && (
-                <Input
-                  id="middleName"
-                  name="middleName"
-                  labelText={t('middleNameLabelText', 'Middle Name')}
-                  light
-                  checkWarning={checkNumber}
-                />
-              )}
-              <Input
-                id="familyName"
-                name="familyName"
-                labelText={t('familyNameLabelText', 'Family Name')}
-                checkWarning={checkNumber}
-                required
-              />
-            </>
-          )}
+          {nameKnown &&
+            (!displayFamilyNameFieldFirst ? (
+              <>
+                {firstNameField}
+                {fieldConfigs.displayMiddleName && middleNameField}
+                {familyNameField}
+              </>
+            ) : (
+              <>
+                {familyNameField}
+                {fieldConfigs.displayMiddleName && middleNameField}
+                {firstNameField}
+              </>
+            ))}
         </div>
       </div>
     </div>

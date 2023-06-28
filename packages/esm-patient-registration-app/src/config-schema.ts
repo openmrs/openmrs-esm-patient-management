@@ -41,6 +41,7 @@ export interface RegistrationConfig {
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
       displayCapturePhoto: boolean;
+      displayFamilyNameFieldFirst: boolean;
     };
     gender: Array<Gender>;
     address: {
@@ -219,6 +220,11 @@ export const esmPatientRegistrationSchema = {
         _type: Type.Boolean,
         _default: true,
         _description: 'Whether to display capture patient photo slot on name field',
+      },
+      displayFamilyNameFieldFirst: {
+        _type: Type.Boolean,
+        _default: false,
+        _description: "Whether to display the name fields in the order 'Family name' -> 'Middle name' -> 'First name'",
       },
     },
     gender: {
