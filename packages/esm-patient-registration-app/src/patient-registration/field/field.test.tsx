@@ -219,10 +219,38 @@ describe('Field', () => {
     expect(screen.getByText('Address')).toBeInTheDocument();
   });
 
-  it.skip('should render Identifiers component when name prop is "id"', () => {
+  it('should render Identifiers component when name prop is "id"', () => {
     (useConfig as jest.Mock).mockImplementation(() => ({
       defaultPatientIdentifierTypes: ['OpenMRS ID'],
     }));
+    // initial value for the identifiers field
+    const openmrsID = {
+      name: 'OpenMRS ID',
+      fieldName: 'openMrsId',
+      required: true,
+      uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+      format: null,
+      isPrimary: true,
+      identifierSources: [
+        {
+          uuid: '691eed12-c0f1-11e2-94be-8c13b969e334',
+          name: 'Generator 1 for OpenMRS ID',
+          autoGenerationOption: {
+            manualEntryEnabled: false,
+            automaticGenerationEnabled: true,
+          },
+        },
+        {
+          uuid: '01af8526-cea4-4175-aa90-340acb411771',
+          name: 'Generator 2 for OpenMRS ID',
+          autoGenerationOption: {
+            manualEntryEnabled: true,
+            automaticGenerationEnabled: true,
+          },
+        },
+      ],
+      autoGenerationSource: null,
+    };
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
@@ -230,29 +258,10 @@ describe('Field', () => {
             <PatientRegistrationContext.Provider
               value={{
                 setFieldValue: jest.fn(),
+                initialFormValues: { identifiers: { openmrsID } },
                 setInitialFormValues: jest.fn(),
                 values: {
-                  patientUuid: '',
-                  givenName: '',
-                  middleName: '',
-                  familyName: '',
-                  unidentifiedPatient: false,
-                  additionalGivenName: '',
-                  additionalMiddleName: '',
-                  additionalFamilyName: '',
-                  addNameInLocalLanguage: false,
-                  gender: '',
-                  birthdate: '',
-                  yearsEstimated: 0,
-                  monthsEstimated: 0,
-                  birthdateEstimated: false,
-                  telephoneNumber: '',
-                  isDead: false,
-                  deathDate: '',
-                  deathCause: '',
-                  relationships: [],
-                  identifiers: { mockedIdentifierTypes },
-                  address: {},
+                  identifiers: { openmrsID },
                 },
               }}>
               <Field name="id" />
@@ -261,7 +270,7 @@ describe('Field', () => {
         </Formik>
       </ResourcesContext.Provider>,
     );
-    expect(screen.getByTestId('identifiers')).toBeInTheDocument();
+    expect(screen.getByText('Identifiers')).toBeInTheDocument();
   });
 
   it('should return null and report an error for an invalid field name', () => {
