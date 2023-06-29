@@ -381,7 +381,6 @@ describe('patient registration component', () => {
       const middleNameInput = screen.getByLabelText(/Middle Name/) as HTMLInputElement;
       const dateOfBirthInput = screen.getByLabelText('Date of Birth') as HTMLInputElement;
       const genderInput = screen.getByLabelText(/Male/) as HTMLSelectElement;
-      const address1 = screen.getByLabelText('Location.address1 (optional)') as HTMLInputElement;
 
       // assert initial values
       expect(givenNameInput.value).toBe('John');
@@ -397,7 +396,6 @@ describe('patient registration component', () => {
       await user.type(givenNameInput, 'Eric');
       await user.type(middleNameInput, 'Johnson');
       await user.type(familyNameInput, 'Smith');
-      await user.type(address1, 'Bom Jesus Street');
       await user.click(screen.getByText('Update Patient'));
 
       await waitFor(() =>
@@ -405,24 +403,22 @@ describe('patient registration component', () => {
           false,
           {
             '0': {
-              'Old Identification Number': '100732HE',
+              oldIdentificationNumber: '100732HE',
             },
             '1': {
-              'OpenMRS ID': '100GEJ',
+              openMrsId: '100GEJ',
             },
             addNameInLocalLanguage: undefined,
             additionalFamilyName: '',
             additionalGivenName: '',
             additionalMiddleName: '',
-            address: {
-              address1: '',
-            },
+            address: {},
             birthdate: new Date('1972-04-04T00:00:00.000Z'),
             birthdateEstimated: false,
             deathCause: '',
             deathDate: '',
             familyName: 'Smith',
-            gender: expect.anything(),
+            gender: 'Male',
             givenName: 'Eric',
             identifiers: {},
             isDead: false,

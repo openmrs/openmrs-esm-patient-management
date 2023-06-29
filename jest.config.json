@@ -8,7 +8,7 @@
   "moduleNameMapper": {
     "\\.(s?css)$": "identity-obj-proxy",
     "@openmrs/esm-framework": "@openmrs/esm-framework/mock",
-    "lodash-es": "lodash"
+    "^lodash-es/(.*)$": "lodash/$1"
   },
   "collectCoverageFrom": [
     "**/packages/**/*.tsx",
