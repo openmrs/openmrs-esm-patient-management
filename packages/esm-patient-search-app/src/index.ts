@@ -8,28 +8,29 @@ import {
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
-declare var __VERSION__: string;
-// __VERSION__ is replaced by Webpack with the version from package.json
-const version = __VERSION__;
+const moduleName = '@openmrs/esm-patient-search-app';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
+const options = {
+  featureName: 'patient-search',
+  moduleName,
 };
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-patient-search-app';
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
-  const options = {
-    featureName: 'patient-search',
-    moduleName,
-  };
+export const patientSearchIcon = getAsyncLifecycle(() => import('./patient-search-icon'), options);
 
+// This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
+export const patientSearchButton = getAsyncLifecycle(
+  () => import('./patient-search-button/patient-search-button.component'),
+  options,
+);
+
+// P.S. This extension is not compatible with the tablet view.
+export const patientSearchBar = getAsyncLifecycle(() => import('./compact-patient-search-extension'), options);
+
+export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
   setupDynamicOfflineDataHandler({
@@ -52,37 +53,4 @@ function setupOpenMRS() {
       await fetchCurrentPatient(patientUuid);
     },
   });
-
-  return {
-    pages: [
-      {
-        route: /^search/,
-        load: getAsyncLifecycle(() => import('./root.component'), options),
-      },
-    ],
-    extensions: [
-      {
-        id: 'patient-search-icon',
-        slot: 'top-nav-actions-slot',
-        order: 0,
-        load: getAsyncLifecycle(() => import('./patient-search-icon'), options),
-      },
-      {
-        // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
-        id: 'patient-search-button',
-        slot: 'patient-search-button-slot',
-        load: getAsyncLifecycle(() => import('./patient-search-button/patient-search-button.component'), options),
-        offline: true,
-      },
-      {
-        // P.S. This extension is not compatible with the tablet view.
-        id: 'patient-search-bar',
-        slot: 'patient-search-bar-slot',
-        load: getAsyncLifecycle(() => import('./compact-patient-search-extension'), options),
-        offline: true,
-      },
-    ],
-  };
 }
-
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS, version };

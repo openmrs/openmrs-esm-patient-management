@@ -38,7 +38,7 @@
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "4.x",
+    "@openmrs/esm-framework": "5.x",
     "dayjs": "1.x",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
