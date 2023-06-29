@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+    {
+      "name": "home-appointments",
+      "slot": "homepage-widgets-slot",
+      "component": "homeAppointments",
+      "order": 1
+    },
+    {
+      "name": "clinical-appointments-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "appointmentsDashboardLink",
+      "meta": {
+        "name": "appointments",
+        "slot": "clinical-appointments-dashboard-slot",
+        "title": "Appointments"
+      }
+    },
+    {
+      "name": "appointments-calendar-dashboard-link",
+      "slot": "calendar-dashboard-slot",
+      "component": "appointmentsCalendarDashboardLink"
+    },
+    {
+      "name": "check-in-appointment-modal",
+      "slot": "todays-appointment-slot",
+      "component": "checkInModal"
+    },
+    {
+      "name": "clinical-appointments-dashboard",
+      "slot": "clinical-appointments-dashboard-slot",
+      "component": "appointmentsDashboard"
+    },
+    {
+      "name": "todays-appointments-dashboard",
+      "slot": "todays-appointment-slot",
+      "component": "homeAppointments"
+    }
+  ],
+  "pages": []
+}
