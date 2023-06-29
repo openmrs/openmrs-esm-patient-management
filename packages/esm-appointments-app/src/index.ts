@@ -33,8 +33,10 @@ export function startupApp() {
 
 export const appointmentsDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const appointmentsCalendarDashboardLink = () =>
-  getSyncLifecycle(createDashboardLink(appointmentCalendarDashboardMeta), options);
+export const appointmentsCalendarDashboardLink = getSyncLifecycle(
+  createDashboardLink(appointmentCalendarDashboardMeta),
+  options,
+);
 
 export const appointmentsDashboard = getAsyncLifecycle(() => import('./appointments.component'), options);
 
