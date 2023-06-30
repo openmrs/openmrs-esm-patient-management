@@ -65,7 +65,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
           navigate({
             to: `${interpolateString(config.search.patientResultUrl, {
               patientUuid: patients[index].uuid,
-            })}/${encodeURIComponent(config.search.redirectToPatientDashboard)}`,
+            })}`,
           });
           registerPatientToUser(patients[index].uuid, user).then(() => {
             setSessionLocation(currentLocation, new AbortController());
@@ -75,15 +75,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         handleCloseSearchResults();
       }
     },
-    [
-      selectPatientAction,
-      handleCloseSearchResults,
-      config.search.patientResultUrl,
-      config.search.redirectToPatientDashboard,
-      user,
-      currentLocation,
-      mutateUser,
-    ],
+    [selectPatientAction, handleCloseSearchResults, config.search.patientResultUrl, user, currentLocation, mutateUser],
   );
   const focussedResult = useArrowNavigation(
     !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,

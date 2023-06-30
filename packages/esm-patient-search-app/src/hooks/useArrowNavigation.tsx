@@ -3,7 +3,7 @@ import { SearchedPatient } from '../types';
 
 const useArrowNavigation = (
   totalResults: number,
-  enterCallback: (evt: any, index: number, patients?: Array<SearchedPatient>) => void,
+  enterCallback: (evt: React.MouseEvent<HTMLAnchorElement>, index: number, patients?: Array<SearchedPatient>) => void,
   resetFocusCallback: () => void,
   initalFocussedResult: number = -1,
 ) => {

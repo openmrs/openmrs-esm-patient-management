@@ -7,7 +7,11 @@ import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
-  selectPatientAction?: (evt: any, index: number, patients: Array<SearchedPatient>) => void;
+  selectPatientAction?: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    index: number,
+    patients: Array<SearchedPatient>,
+  ) => void;
 }
 
 const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(
@@ -68,14 +72,14 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
     return (
       <div ref={ref}>
-        {fhirPatients.map((patient, indx) => {
+        {fhirPatients.map((patient, index) => {
           const patientIdentifiers = patient.identifier.filter((identifier) =>
             config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
           );
           const isDeceased = Boolean(patient?.deceasedDateTime);
           return (
             <ConfigurableLink
-              onClick={(evt) => selectPatientAction(evt, indx, patients)}
+              onClick={(event) => selectPatientAction(event, index, patients)}
               to={`${interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
               })}`}
@@ -110,7 +114,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                       {patientIdentifiers.length > 1 ? (
                         <PatientIdentifier identifiers={patientIdentifiers} />
                       ) : (
-                        <CustomIdentifier patient={patients[indx]} identifierName={config.defaultIdentifier} />
+                        <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
                       )}
                     </>
                   ) : (
