@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TextInput, Layer } from '@carbon/react';
 import SelectionTick from './selection-tick.component';
 import styles from '../input.scss';
-import { useOnClickOutside } from '@openmrs/esm-framework';
 
 interface ComboInputProps {
   entries: Array<string>;
@@ -65,8 +64,6 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
     },
     [highlightedEntry, handleOptionClick, filteredEntries, setHighlightedEntry, setShowEntries],
   );
-
-  useOnClickOutside;
 
   useEffect(() => {
     const listener = (e) => {
