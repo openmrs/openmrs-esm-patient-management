@@ -25,9 +25,10 @@ export function useOrderedAddressHierarchyLevels() {
 }
 
 export function useAddressEntries(fetchResults, searchString) {
+  const encodedSearchString = encodeURIComponent(searchString);
   const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<{ name: string }>>>(
     fetchResults
-      ? `module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form?searchString=${searchString}`
+      ? `module/addresshierarchy/ajax/getChildAddressHierarchyEntries.form?searchString=${encodedSearchString}`
       : null,
     openmrsFetch,
   );
