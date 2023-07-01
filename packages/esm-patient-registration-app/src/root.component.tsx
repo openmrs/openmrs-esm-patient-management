@@ -14,7 +14,7 @@ import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
 
 export default function Root() {
-  const isOffline = useConnectivity();
+  const isOnline = useConnectivity();
   const currentSession = useSession();
   const { data: addressTemplate } = useSWRImmutable('patientRegistrationAddressTemplate', fetchAddressTemplate);
   const { data: relationshipTypes } = useSWRImmutable(
@@ -26,8 +26,8 @@ export default function Root() {
     fetchPatientIdentifierTypesWithSources,
   );
   const savePatientForm = useMemo(
-    () => (isOffline ? FormManager.savePatientFormOffline : FormManager.savePatientFormOnline),
-    [isOffline],
+    () => (isOnline ? FormManager.savePatientFormOnline : FormManager.savePatientFormOffline),
+    [isOnline],
   );
 
   return (
@@ -47,11 +47,11 @@ export default function Root() {
             <Routes>
               <Route
                 path="patient-registration"
-                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />}
               />
               <Route
                 path="patient/:patientUuid/edit"
-                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={isOffline} />}
+                element={<PatientRegistration savePatientForm={savePatientForm} isOffline={!isOnline} />}
               />
             </Routes>
           </BrowserRouter>
