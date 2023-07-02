@@ -15,7 +15,7 @@ describe('DisplayPatientPhoto', () => {
   it('should render the component with the patient photo', () => {
     const patientUuid = '12345';
     const patientName = 'John Doe';
-    const { getByTitle, getByTestId } = render(
+    const { getByTitle } = render(
       <DisplayPatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />,
     );
 
