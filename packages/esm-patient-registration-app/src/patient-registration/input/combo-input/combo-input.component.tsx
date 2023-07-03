@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TextInput, Layer } from '@carbon/react';
 import SelectionTick from './selection-tick.component';
 import styles from '../input.scss';
@@ -26,18 +26,6 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
     setHighlightedEntry(-1);
   }, [setShowEntries, setHighlightedEntry]);
 
-  const handleBlur = useCallback(
-    (e) => {
-      // This check is in place to not hide the entries when an entry is clicked
-      // Else the onClick of the entry will not be counted.
-      if (!comboInputRef?.current?.contains(e.target)) {
-        setShowEntries(false);
-      }
-      setHighlightedEntry(-1);
-    },
-    [setShowEntries, setHighlightedEntry],
-  );
-
   const filteredEntries = useMemo(() => {
     if (!entries) {
       return [];
@@ -60,6 +48,12 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
       const totalResults = filteredEntries.length ?? 0;
+
+      if (e.key === 'Tab') {
+        setShowEntries(false);
+        setHighlightedEntry(-1);
+      }
+
       if (e.key === 'ArrowUp') {
         setHighlightedEntry((prev) => Math.max(-1, prev - 1));
       } else if (e.key === 'ArrowDown') {
@@ -68,17 +62,32 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
         handleOptionClick(filteredEntries[highlightedEntry], e);
       }
     },
-    [highlightedEntry, handleOptionClick, filteredEntries, setHighlightedEntry],
+    [highlightedEntry, handleOptionClick, filteredEntries, setHighlightedEntry, setShowEntries],
   );
+
+  useEffect(() => {
+    const listener = (e) => {
+      if (!comboInputRef.current.contains(e.target as Node)) {
+        setShowEntries(false);
+        setHighlightedEntry(-1);
+      }
+    };
+    window.addEventListener('click', listener);
+    return () => {
+      window.removeEventListener('click', listener);
+    };
+  });
 
   return (
     <div className={styles.comboInput} ref={comboInputRef}>
       <Layer>
         <TextInput
           {...fieldProps}
-          onChange={(e) => handleInputChange(e.target.value)}
+          onChange={(e) => {
+            setHighlightedEntry(-1);
+            handleInputChange(e.target.value);
+          }}
           onFocus={handleFocus}
-          onBlur={handleBlur}
           autoComplete={'off'}
           onKeyDown={handleKeyPress}
         />
@@ -98,7 +107,7 @@ const ComboInput: React.FC<ComboInputProps> = ({ entries, fieldProps, handleInpu
                 aria-selected="true"
                 onClick={() => handleOptionClick(entry)}>
                 <div
-                  className={`cds--list-box__menu-item__option ${
+                  className={`cds--list-box__menu-item__option ${styles.comboInputItemOption} ${
                     entry === value && 'cds--list-box__menu-item--active'
                   }`}>
                   {entry}

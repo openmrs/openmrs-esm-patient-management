@@ -22,6 +22,8 @@
   "phoneNumber": "Phone number",
   "postcode": "Postcode",
   "previousPage": "Previous page",
+  "recentSearchResultsCount": "{count} recent search result{plural}",
+  "recentSearchResultsCount_plural": "{count} recent search result{plural}",
   "refineSearch": "Refine search",
   "refineSearchHeaderText": "Add additional search criteria",
   "refineSearchTabletBannerText": "Can't find who you're looking for?",
