@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react';
 import * as esmFramework from '@openmrs/esm-framework';
 import Root from './add-patient-link';
 
-describe('Root component', () => {
+describe('Add patient link component', () => {
   it('renders an "Add Patient" button and triggers navigation on click', () => {
     const navigateMock = jest.fn();
     jest.spyOn(esmFramework, 'navigate').mockImplementation(navigateMock);
