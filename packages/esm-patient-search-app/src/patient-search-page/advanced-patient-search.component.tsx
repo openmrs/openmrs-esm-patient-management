@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useGetPatientAttributePhoneUuid, usePatientSearchInfinite } from '../patient-search.resource';
+import { useInfinitePatientSearch } from '../patient-search.resource';
 import { AdvancedPatientSearchState } from '../types';
 import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
@@ -39,7 +39,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
     hasMore,
     isLoading,
     fetchError,
-  } = usePatientSearchInfinite(query, false, !!query, 50);
+  } = useInfinitePatientSearch(query, false, !!query, 50);
 
   useEffect(() => {
     if (searchResults?.length === currentPage * 50 && hasMore) {

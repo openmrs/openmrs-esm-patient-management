@@ -4,7 +4,7 @@ import { SearchedPatient } from '../types';
 import { Search, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './compact-patient-search.scss';
-import { usePatientSearchInfinite } from '../patient-search.resource';
+import { useInfinitePatientSearch } from '../patient-search.resource';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 
@@ -24,7 +24,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleChange = useCallback((val) => setSearchTerm(val), [setSearchTerm]);
   const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
   const config = useConfig();
-  const patientSearchResponse = usePatientSearchInfinite(searchTerm, config.includeDead, showSearchResults);
+  const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
   const { data: patients } = patientSearchResponse;
 
   const handleSubmit = useCallback((evt) => {
