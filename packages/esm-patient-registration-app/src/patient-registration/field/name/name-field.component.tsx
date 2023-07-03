@@ -21,7 +21,7 @@ function checkNumber(value: string) {
 export const NameField = () => {
   const {
     fieldConfigurations: {
-      name: { displayCapturePhoto, displayFamilyNameFieldFirst },
+      name: { displayCapturePhoto, displayReverseFieldOrder },
     },
   } = useConfig() as RegistrationConfig;
   const { t } = useTranslation();
@@ -65,7 +65,7 @@ export const NameField = () => {
     />
   );
 
-  const middleNameField = (
+  const middleNameField = fieldConfigs.displayMiddleName && (
     <Input
       id="middleName"
       name="middleName"
@@ -106,16 +106,16 @@ export const NameField = () => {
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>
           {nameKnown &&
-            (!displayFamilyNameFieldFirst ? (
+            (!displayReverseFieldOrder ? (
               <>
                 {firstNameField}
-                {fieldConfigs.displayMiddleName && middleNameField}
+                {middleNameField}
                 {familyNameField}
               </>
             ) : (
               <>
                 {familyNameField}
-                {fieldConfigs.displayMiddleName && middleNameField}
+                {middleNameField}
                 {firstNameField}
               </>
             ))}
