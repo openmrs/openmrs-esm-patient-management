@@ -22,6 +22,8 @@
   "phoneNumber": "Numéro de téléphone",
   "postcode": "Code postal",
   "previousPage": "Page précédente",
+  "recentSearchResultsCount": "{count} recent search result{plural}",
+  "recentSearchResultsCount_plural": "{count} recent search result{plural}",
   "refineSearch": "Affiner la recherche",
   "refineSearchHeaderText": "Ajouter un critère de recherche supplémentaire",
   "refineSearchTabletBannerText": "Vous ne trouvez pas la personne recherchée?",

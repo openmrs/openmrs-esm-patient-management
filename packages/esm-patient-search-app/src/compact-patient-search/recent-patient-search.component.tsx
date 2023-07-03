@@ -1,25 +1,17 @@
 import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
+import type { PatientSearchResponse, SearchedPatient } from '../types';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
-import type { PatientSearchResponse, SearchedPatient } from '../types';
 import styles from './patient-search.scss';
 
-interface PatientSearchProps extends PatientSearchResponse {
-  query: string;
-  selectPatientAction?: (
-    evt: React.MouseEvent<HTMLAnchorElement>,
-    index: number,
-    patients: Array<SearchedPatient>,
-  ) => void;
+interface RecentPatientSearchProps extends PatientSearchResponse {
+  selectPatientAction?: (evt: any, index: number, patients: Array<SearchedPatient>) => void;
 }
 
-const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  (
-    { selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults },
-    ref,
-  ) => {
+const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
+  ({ selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
     const loadingIconRef = useCallback(
@@ -83,7 +75,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>
-              {t('searchResultsCount', '{count} search result{plural}', {
+              {t('recentSearchResultsCount', '{count} recent search result{plural}', {
                 count: searchResults.length,
                 plural: searchResults.length === 0 || searchResults.length > 1 ? 's' : '',
               })}
@@ -121,4 +113,4 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
   },
 );
 
-export default PatientSearch;
+export default RecentPatientSearch;
