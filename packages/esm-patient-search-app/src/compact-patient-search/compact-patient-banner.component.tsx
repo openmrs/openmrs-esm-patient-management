@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
-import { Identifier, SearchedPatient } from '../types/index';
+import type { Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
@@ -19,7 +19,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
     const config = useConfig();
     const { t } = useTranslation();
 
-    const getGender = (gender) => {
+    const getGender = (gender: string) => {
       switch (gender) {
         case 'M':
           return t('male', 'Male');
@@ -77,6 +77,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
             config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
           );
           const isDeceased = Boolean(patient?.deceasedDateTime);
+
           return (
             <ConfigurableLink
               onClick={(event) => selectPatientAction(event, index, patients)}
@@ -176,6 +177,7 @@ const CustomIdentifier: React.FC<{ patient: SearchedPatient; identifierName: str
   identifierName,
 }) => {
   const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
+
   return identifier ? (
     <>
       <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.display}>

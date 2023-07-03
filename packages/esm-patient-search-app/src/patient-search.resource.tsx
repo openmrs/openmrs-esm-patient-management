@@ -1,18 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import useSWRImmutable from 'swr/immutable';
-import {
-  openmrsFetch,
-  useConfig,
-  FetchResponse,
-  showToast,
-  LoggedInUser,
-  showNotification,
-  useSession,
-} from '@openmrs/esm-framework';
-import { PatientSearchResponse, SearchedPatient, User } from './types';
-import { useTranslation } from 'react-i18next';
+import { openmrsFetch, showNotification, useSession, FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
+import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
 const v =
   'custom:(patientId,uuid,identifiers,display,' +
@@ -20,49 +11,7 @@ const v =
   'person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),' +
   'attributes:(value,attributeType:(uuid,display)))';
 
-export function usePatientSearchPaginated(
-  searchTerm: string,
-  searching: boolean = true,
-  resultsToFetch: number,
-  page: number,
-  customRepresentation: string = v,
-) {
-  const config = useConfig();
-  let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&limit=${resultsToFetch}&totalCount=true`;
-  if (config.includeDead) {
-    url += `&includeDead=${config?.includeDead}`;
-  }
-  if (page > 1) {
-    url += `&startIndex=${(page - 1) * resultsToFetch}`;
-  }
-
-  const { data, isValidating, error } = useSWR<
-    FetchResponse<{ results: Array<SearchedPatient>; links: Array<{ rel: 'prev' | 'next' }>; totalCount: number }>
-  >(searching ? url : null, openmrsFetch);
-
-  const results: {
-    data: Array<SearchedPatient>;
-    isLoading: boolean;
-    fetchError: any;
-    hasMore: boolean;
-    loadingNewData: boolean;
-    totalResults: number;
-  } = useMemo(
-    () => ({
-      data: data?.data?.results,
-      isLoading: !data?.data && !error,
-      fetchError: error,
-      hasMore: data?.data?.links?.some((link) => link.rel === 'next'),
-      loadingNewData: isValidating,
-      totalResults: data?.data?.totalCount,
-    }),
-    [data, isValidating, error],
-  );
-
-  return results;
-}
-
-export function usePatientSearchInfinite(
+export function useInfinitePatientSearch(
   searchTerm: string,
   includeDead: boolean,
   searching: boolean = true,
@@ -108,25 +57,7 @@ export function usePatientSearchInfinite(
   return results;
 }
 
-export function useGetPatientAttributePhoneUuid(): string {
-  const { t } = useTranslation();
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<{ uuid: string }> }>>(
-    '/ws/rest/v1/personattributetype?q=Telephone Number',
-    openmrsFetch,
-  );
-  if (error) {
-    showToast({
-      description: `${t(
-        'fetchingPhoneNumberUuidFailed',
-        'Fetching Phone number attribute type UUID failed with error',
-      )}: ${error?.message}`,
-      kind: 'error',
-    });
-  }
-  return data?.data?.results?.[0]?.uuid;
-}
-
-export function useUserVisitedPatients() {
+export function useRecentlyViewedPatients() {
   const { t } = useTranslation();
   const { user } = useSession();
   const userUuid = user?.uuid;
@@ -139,7 +70,7 @@ export function useUserVisitedPatients() {
     if (error) {
       showNotification({
         kind: 'error',
-        title: t('fetchingSessionFailed', 'Fetching session details failed'),
+        title: t('errorFetchingUserProperties', 'Error fetching user properties'),
         description: error.message,
       });
     }
@@ -148,8 +79,8 @@ export function useUserVisitedPatients() {
   const result = useMemo(
     () => ({
       isLoadingPatients: !data && !error,
-      patientsVisited: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
-      mutate,
+      recentlyViewedPatients: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
+      mutateUserProperties: mutate,
     }),
     [data, error, mutate],
   );
@@ -207,9 +138,9 @@ export function useRESTPatients(
   return results;
 }
 
-export function registerPatientToUser(patientUuid: string, user: LoggedInUser) {
-  const patientsVisited: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
-  const restPatients = patientsVisited.filter((uuid) => uuid !== patientUuid);
+export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedInUser) {
+  const recentlyViewedPatients: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
+  const restPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
   const newPatientsVisited = [patientUuid, ...restPatients].join(',');
 
   return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
