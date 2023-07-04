@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, getByRole } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation-modal';
 
 describe('DeleteIdentifierConfirmationModal component', () => {
@@ -12,7 +12,7 @@ describe('DeleteIdentifierConfirmationModal component', () => {
   });
 
   it('renders the modal and triggers deleteIdentifier function', () => {
-    const { getByRole } = render(
+    render(
       <DeleteIdentifierConfirmationModal
         deleteIdentifier={mockDeleteIdentifier}
         identifierName={mockIdentifierName}
@@ -20,11 +20,12 @@ describe('DeleteIdentifierConfirmationModal component', () => {
       />,
     );
 
-    const cancelButton = getByRole('button', { name: /cancel/i });
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
     fireEvent.click(cancelButton);
     expect(mockDeleteIdentifier).toHaveBeenCalledWith(false);
+    screen.debug();
 
-    const removeButton = getByRole('button', { name: /remove identifier/i });
+    const removeButton = screen.getByRole('button', { name: /remove identifier/i });
     fireEvent.click(removeButton);
     expect(mockDeleteIdentifier).toHaveBeenCalledWith(true);
   });
