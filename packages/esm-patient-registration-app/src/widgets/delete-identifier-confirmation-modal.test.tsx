@@ -23,7 +23,6 @@ describe('DeleteIdentifierConfirmationModal component', () => {
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     fireEvent.click(cancelButton);
     expect(mockDeleteIdentifier).toHaveBeenCalledWith(false);
-    screen.debug();
 
     const removeButton = screen.getByRole('button', { name: /remove identifier/i });
     fireEvent.click(removeButton);
