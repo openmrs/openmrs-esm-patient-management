@@ -226,8 +226,7 @@ describe('patient registration component', () => {
       await waitFor(() => {
         expect(mockedSavePatient).toHaveBeenCalledWith(
           expect.objectContaining({
-            identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }
-            // identifiers: [{ identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' }],
+            identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' },
             person: {
               addresses: expect.arrayContaining([expect.any(Object)]),
               attributes: [],
