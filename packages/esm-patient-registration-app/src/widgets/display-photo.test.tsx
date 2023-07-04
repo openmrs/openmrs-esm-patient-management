@@ -11,7 +11,7 @@ jest.mock('geopattern', () => ({
   }),
 }));
 
-describe('DisplayPatientPhoto', () => {
+describe('DisplayPatientPhoto Component', () => {
   it('should render the component with the patient photo', () => {
     const patientUuid = '12345';
     const patientName = 'John Doe';
