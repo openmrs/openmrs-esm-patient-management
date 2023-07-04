@@ -1,6 +1,12 @@
 import { isUniqueIdentifierTypeForOffline, shouldBlockPatientIdentifierInOfflineMode } from './utils';
 
-function createIdentifierType(options: any = {}) {
+interface IdentifierTypeOptions {
+  uniquenessBehavior?: 'UNIQUE' | 'LOCATION' | 'NON_UNIQUE';
+  manualEntryEnabled?: boolean;
+  automaticGenerationEnabled?: boolean;
+}
+
+function createIdentifierType(options: IdentifierTypeOptions) {
   return {
     uniquenessBehavior: (options.uniquenessBehavior as 'UNIQUE' | 'LOCATION' | 'NON_UNIQUE') || null,
     identifierSources: [
@@ -22,15 +28,7 @@ function createIdentifierType(options: any = {}) {
   };
 }
 
-describe('shouldBlockPatientIdentifierInOfflineMode', () => {
-  it('should return false if identifierType is unique and no manual entry is enabled', () => {
-    const identifierType = createIdentifierType({ uniquenessBehavior: null });
-
-    const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
-
-    expect(result).toBe(false);
-  });
-
+describe('shouldBlockPatientIdentifierInOfflineMode function', () => {
   it('should return false if identifierType is not unique', () => {
     const identifierType = createIdentifierType({ uniquenessBehavior: null });
 
@@ -39,7 +37,15 @@ describe('shouldBlockPatientIdentifierInOfflineMode', () => {
     expect(result).toBe(false);
   });
 
-  it('should return true if manual entry is enabled and identifierType is unique', () => {
+  it('should return false if identifierType is unique and no manual entry is enabled', () => {
+    const identifierType = createIdentifierType({ uniquenessBehavior: null });
+
+    const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
+
+    expect(result).toBe(false);
+  });
+
+  it('should return true if identifierType is unique and manual entry is enabled', () => {
     const identifierType = createIdentifierType({ manualEntryEnabled: true, uniquenessBehavior: 'UNIQUE' });
 
     const result = shouldBlockPatientIdentifierInOfflineMode(identifierType);
@@ -48,7 +54,7 @@ describe('shouldBlockPatientIdentifierInOfflineMode', () => {
   });
 });
 
-describe('isUniqueIdentifierTypeForOffline', () => {
+describe('isUniqueIdentifierTypeForOffline function', () => {
   it('should return true if uniquenessBehavior is UNIQUE', () => {
     const identifierType = createIdentifierType({ uniquenessBehavior: 'UNIQUE' });
 
