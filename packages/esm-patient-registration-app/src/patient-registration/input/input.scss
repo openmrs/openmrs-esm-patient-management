@@ -18,7 +18,8 @@
   color: $text-02;
 }
 
-.textID {
+.textID,
+.comboInput {
   margin-bottom: spacing.$spacing-05;
 }
 
@@ -105,4 +106,13 @@
 .dangerLabel01 {
   @include type.type-style('label-01');
   color: $danger;
+}
+
+.comboInputEntries {
+  position: relative;
+}
+
+.comboInputItemOption {
+  margin: 0;
+  padding-left: 1rem;
 }

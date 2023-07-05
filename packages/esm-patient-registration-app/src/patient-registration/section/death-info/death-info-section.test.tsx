@@ -4,6 +4,7 @@ import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { DeathInfoSection } from './death-info-section.component';
 import { FormValues } from '../../patient-registration-types';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -15,16 +16,18 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 // TODO: Implement feature and get tests to pass
-describe.skip('death info section', () => {
+describe('death info section', () => {
   const formValues: FormValues = initialFormValues;
 
   const setupSection = async (isDead?: boolean) => {
     render(
-      <Formik initialValues={{ ...initialFormValues, isDead }} onSubmit={null}>
-        <Form>
-          <DeathInfoSection />
-        </Form>
-      </Formik>,
+      <PatientRegistrationContext.Provider value={{ values: { isDead: isDead || false } }}>
+        <Formik initialValues={{ ...initialFormValues, isDead }} onSubmit={null}>
+          <Form>
+            <DeathInfoSection />
+          </Form>
+        </Formik>
+      </PatientRegistrationContext.Provider>,
     );
     const allInputs = screen.queryAllByLabelText(
       (content, element) => element.tagName.toLowerCase() === 'input',

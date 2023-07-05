@@ -30,6 +30,7 @@ export const NameField = () => {
         defaultUnknownGivenName,
         defaultUnknownFamilyName,
         displayMiddleName,
+        displayReverseFieldOrder,
       },
     },
   } = useConfig<RegistrationConfig>();
@@ -64,6 +65,36 @@ export const NameField = () => {
     }
   };
 
+  const firstNameField = (
+    <Input
+      id="givenName"
+      name="givenName"
+      labelText={t('givenNameLabelText', 'First Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
+
+  const middleNameField = displayMiddleName && (
+    <Input
+      id="middleName"
+      name="middleName"
+      labelText={t('middleNameLabelText', 'Middle Name')}
+      light
+      checkWarning={checkNumber}
+    />
+  );
+
+  const familyNameField = (
+    <Input
+      id="familyName"
+      name="familyName"
+      labelText={t('familyNameLabelText', 'Family Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
+
   return (
     <div>
       <h4 className={styles.productiveHeading02Light}>{t('fullNameLabelText', 'Full Name')}</h4>
@@ -71,7 +102,7 @@ export const NameField = () => {
         {displayCapturePhoto && (
           <ExtensionSlot
             className={styles.photoExtension}
-            extensionSlotName="capture-patient-photo-slot"
+            name="capture-patient-photo-slot"
             state={{ onCapturePhoto, initialState: currentPhoto }}
           />
         )}
@@ -91,33 +122,20 @@ export const NameField = () => {
               </ContentSwitcher>
             </>
           )}
-          {!isPatientUnknown && (
-            <>
-              <Input
-                id="givenName"
-                name="givenName"
-                labelText={t('givenNameLabelText', 'First Name')}
-                checkWarning={checkNumber}
-                required
-              />
-              {displayMiddleName && (
-                <Input
-                  id="middleName"
-                  name="middleName"
-                  labelText={t('middleNameLabelText', 'Middle Name')}
-                  light
-                  checkWarning={checkNumber}
-                />
-              )}
-              <Input
-                id="familyName"
-                name="familyName"
-                labelText={t('familyNameLabelText', 'Family Name')}
-                checkWarning={checkNumber}
-                required
-              />
-            </>
-          )}
+          {isPatientUnknown &&
+            (!displayReverseFieldOrder ? (
+              <>
+                {firstNameField}
+                {middleNameField}
+                {familyNameField}
+              </>
+            ) : (
+              <>
+                {familyNameField}
+                {middleNameField}
+                {firstNameField}
+              </>
+            ))}
         </div>
       </div>
     </div>

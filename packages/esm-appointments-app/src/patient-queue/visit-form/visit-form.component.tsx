@@ -179,13 +179,13 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
       <div>
         {isTablet ? (
           <Row className={styles.headerGridRow}>
-            <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+            <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         ) : isLoading ? (
           <SkeletonText />
         ) : (
           <ExtensionSlot
-            extensionSlotName="patient-header-slot"
+            name="patient-header-slot"
             state={{
               patient,
               patientUuid: appointment.patientUuid,
@@ -351,7 +351,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           )}
 
           {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
-          {config.showServiceQueueFields && <ExtensionSlot extensionSlotName="add-queue-entry-slot" />}
+          {config.showServiceQueueFields && <ExtensionSlot name="add-queue-entry-slot" />}
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
