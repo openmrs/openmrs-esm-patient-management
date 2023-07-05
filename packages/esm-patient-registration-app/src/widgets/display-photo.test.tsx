@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import DisplayPatientPhoto from './display-photo.component';
 
 jest.mock('../patient-registration/patient-registration.resource', () => ({
@@ -12,15 +12,25 @@ jest.mock('geopattern', () => ({
 }));
 
 describe('DisplayPatientPhoto Component', () => {
-  it('should render the component with the patient photo', () => {
+  it('should render the component with the patient photo and size should not be small', () => {
     const patientUuid = '12345';
     const patientName = 'John Doe';
-    const { getByTitle } = render(
-      <DisplayPatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />,
-    );
+    render(<DisplayPatientPhoto patientUuid={patientUuid} patientName={patientName} />);
 
-    const avatarImage = getByTitle(`${patientName}`);
+    const avatarImage = screen.getByTitle(`${patientName}`);
 
     expect(avatarImage).toBeInTheDocument();
+    expect(avatarImage).toHaveAttribute('style', expect.stringContaining('width: 80px; height: 80px'));
+  });
+
+  it('should render the component with the patient photo and size should be small i.e. 48px', () => {
+    const patientUuid = '12345';
+    const patientName = 'John Doe';
+    render(<DisplayPatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />);
+
+    const avatarImage = screen.getByTitle(`${patientName}`);
+
+    expect(avatarImage).toBeInTheDocument();
+    expect(avatarImage).toHaveAttribute('style', expect.stringContaining('width: 48px; height: 48px'));
   });
 });
