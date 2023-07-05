@@ -5,6 +5,7 @@ import { Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
+import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -12,66 +13,6 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('Identifiers', () => {
-  const mockedIdentifierTypes = [
-    {
-      fieldName: 'openMrsId',
-      format: null,
-      identifierSources: [
-        {
-          uuid: '8549f706-7e85-4c1d-9424-217d50a2988b',
-          name: 'Generator for OpenMRS ID',
-          description: 'Generator for OpenMRS ID',
-          baseCharacterSet: '0123456789ACDEFGHJKLMNPRTUVWXY',
-          prefix: '',
-        },
-      ],
-      isPrimary: true,
-      name: 'OpenMRS ID',
-      required: true,
-      uniquenessBehavior: 'UNIQUE',
-      uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-    },
-    {
-      fieldName: 'idCard',
-      format: null,
-      identifierSources: [],
-      isPrimary: false,
-      name: 'ID Card',
-      required: false,
-      uniquenessBehavior: 'UNIQUE',
-      uuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
-    },
-    {
-      fieldName: 'legacyId',
-      format: null,
-      identifierSources: [],
-      isPrimary: false,
-      name: 'Legacy ID',
-      required: false,
-      uniquenessBehavior: null,
-      uuid: '22348099-3873-459e-a32e-d93b17eda533',
-    },
-    {
-      fieldName: 'oldIdentificationNumber',
-      format: '',
-      identifierSources: [],
-      isPrimary: false,
-      name: 'Old Identification Number',
-      required: false,
-      uniquenessBehavior: null,
-      uuid: '8d79403a-c2cc-11de-8d13-0010c6dffd0f',
-    },
-    {
-      fieldName: 'openMrsIdentificationNumber',
-      format: '',
-      identifierSources: [],
-      isPrimary: false,
-      name: 'OpenMRS Identification Number',
-      required: false,
-      uniquenessBehavior: null,
-      uuid: '8d793bee-c2cc-11de-8d13-0010c6dffd0f',
-    },
-  ];
   const mockResourcesContextValue = {
     addressTemplate: [],
     currentSession: {
@@ -110,6 +51,7 @@ describe('Identifiers', () => {
     ],
     autoGenerationSource: null,
   };
+
   (useConfig as jest.Mock).mockImplementation(() => ({
     defaultPatientIdentifierTypes: ['OpenMRS ID'],
   }));
@@ -159,8 +101,9 @@ describe('Identifiers', () => {
     );
 
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
-    expect(screen.getByText('Configure')).toBeInTheDocument();
-    expect(screen.getByText('Configure')).toBeEnabled();
+    const configureButton = screen.getByRole('button', { name: 'Configure' });
+    expect(configureButton).toBeInTheDocument();
+    expect(configureButton).toBeEnabled();
   });
 
   it('should open identifier selection overlay when "Configure" button is clicked', () => {
@@ -184,11 +127,12 @@ describe('Identifiers', () => {
       </ResourcesContext.Provider>,
     );
 
-    const configureButton = screen.getByText('Configure');
+    const configureButton = screen.getByRole('button', { name: 'Configure' });
     fireEvent.click(configureButton);
 
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
   });
+
   it('should close identifier selection overlay when "close overlay" button is clicked', () => {
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
