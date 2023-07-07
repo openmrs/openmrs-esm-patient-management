@@ -122,7 +122,7 @@ export const NameField = () => {
               </ContentSwitcher>
             </>
           )}
-          {isPatientUnknown &&
+          {!isPatientUnknown &&
             (!displayReverseFieldOrder ? (
               <>
                 {firstNameField}
