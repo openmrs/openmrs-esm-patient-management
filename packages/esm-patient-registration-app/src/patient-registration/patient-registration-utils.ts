@@ -97,7 +97,7 @@ function findElementValueInXmlDoc(fieldName: string, elementSelector: string, do
 export function scrollIntoView(viewId: string) {
   document.getElementById(viewId).scrollIntoView({
     behavior: 'smooth',
-    block: 'center',
+    block: 'start',
     inline: 'center',
   });
 }

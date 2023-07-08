@@ -46,7 +46,19 @@
 }
 
 .space05 {
-  margin: spacing.$spacing-05 0 spacing.$spacing-05 0;
+  padding: 5px 0;
+}
+
+.linkContainer {
+  div:first-child {
+    padding-top: 0;
+  }
+
+  div:last-child {
+    padding-bottom: 1.8rem;
+    border-bottom: 1px solid $grey-2;
+    margin-bottom: 2rem;
+  }
 }
 
 .formContainer {
@@ -71,7 +83,7 @@
   font-size: spacing.$spacing-05;
   font-weight: 600;
 
-  &:active {
+  &.activeLink {
     text-decoration: none;
     color: $color-gray-100;
   }
@@ -90,6 +102,18 @@
 :global(.omrs-breakpoint-lt-desktop) {
   .infoGrid {
     max-width: unset;
+  }
+
+  .space05 {
+    padding: 13px 0;
+  }
+
+  .linkContainer {
+    div:last-child {
+      padding-bottom: 2.3rem;
+      border-bottom: 1px solid $grey-2;
+      margin-bottom: 1.5rem;
+    }
   }
 }
 

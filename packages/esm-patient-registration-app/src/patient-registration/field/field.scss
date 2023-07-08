@@ -18,9 +18,9 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: spacing.$spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: spacing.$spacing-05;
 }
 
 .halfWidthInDesktopView {

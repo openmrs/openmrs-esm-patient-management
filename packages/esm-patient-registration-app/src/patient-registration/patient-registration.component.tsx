@@ -36,6 +36,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
+  const [activeLink, setActiveLink] = useState<string>('');
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
@@ -157,13 +158,20 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 </h4>
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
-                {sections.map((section) => (
-                  <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
-                    <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
-                      <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
-                    </Link>
-                  </div>
-                ))}
+                <div className={styles.linkContainer}>
+                  {sections.map((section) => (
+                    <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
+                      <Link
+                        className={`${styles.linkName} ${activeLink === section.id && styles.activeLink}`}
+                        onClick={() => {
+                          setActiveLink(section.id);
+                          scrollIntoView(section.id);
+                        }}>
+                        <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
                 <Button
                   className={styles.submitButton}
                   type="submit"
