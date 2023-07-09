@@ -205,7 +205,7 @@ export const esmPatientRegistrationSchema = {
       allowUnidentifiedPatients: {
         _type: Type.Boolean,
         _default: true,
-        _description: 'Whether to allow patients to be registered without names.',
+        _description: 'Whether to allow registering unidentified patients.',
       },
       defaultUnknownGivenName: {
         _type: Type.String,
