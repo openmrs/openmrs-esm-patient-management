@@ -299,13 +299,13 @@ export const esmPatientRegistrationSchema = {
     dateOfBirth: {
       allowEstimatedDateOfBirth: {
         _type: Type.Boolean,
-        _description: 'Whether to allow estimated date of birth during registration',
+        _description: 'Whether to allow estimated date of birth for a patient during registration',
         _default: true,
       },
       useEstimatedDateOfBirth: {
         enabled: {
           _type: Type.Boolean,
-          _description: 'Whether to use custom day and month for estimated date of birth',
+          _description: 'Whether to use a fixed day and month for estimated date of birth',
           _default: false,
         },
         dayOfMonth: {
