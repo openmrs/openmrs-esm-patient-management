@@ -37,7 +37,6 @@ interface VisitResponse {
 export function useActiveVisits() {
   const session = useSession();
   const config = useConfig();
-  const startDate = dayjs().format('YYYY-MM-DD');
   const sessionLocation = session?.sessionLocation?.uuid;
 
   const customRepresentation =
@@ -49,7 +48,7 @@ export function useActiveVisits() {
       return null;
     }
 
-    let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&totalCount=true&fromStartDate=${startDate}&location=${sessionLocation}`;
+    let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&totalCount=true&location=${sessionLocation}`;
 
     if (pageIndex) {
       url += `&startIndex=${pageIndex * 50}`;
