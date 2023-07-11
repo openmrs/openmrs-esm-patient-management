@@ -27,8 +27,7 @@ export const DobField: React.FC = () => {
     fieldConfigurations: { dateOfBirth },
   } = useConfig<RegistrationConfig>();
   const allowEstimatedBirthDate = dateOfBirth?.allowEstimatedDateOfBirth;
-  const [dobUnknown] = useField('birthdateEstimated');
-  const dobKnown = !dobUnknown.value;
+  const [field: {value: dobUnknown}] = useField('birthdateEstimated');
   const [birthdate, birthdateMeta] = useField('birthdate');
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
@@ -76,12 +75,12 @@ export const DobField: React.FC = () => {
   return (
     <div className={styles.halfWidthInDesktopView}>
       <h4 className={styles.productiveHeading02Light}>{t('birthFieldLabelText', 'Birth')}</h4>
-      {(allowEstimatedBirthDate || !dobKnown) && (
+      {(allowEstimatedBirthDate || dobUnknown) && (
         <div className={styles.dobField}>
           <div className={styles.dobContentSwitcherLabel}>
             <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
           </div>
-          <ContentSwitcher onChange={onToggle} selectedIndex={dobKnown ? 0 : 1}>
+          <ContentSwitcher onChange={onToggle} selectedIndex={dobUnknown ? 1 : 0}>
             <Switch name="known" text={t('yes', 'Yes')} />
             <Switch name="unknown" text={t('no', 'No')} />
           </ContentSwitcher>
