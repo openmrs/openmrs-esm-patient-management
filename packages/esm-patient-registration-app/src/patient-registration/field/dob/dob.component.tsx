@@ -27,7 +27,7 @@ export const DobField: React.FC = () => {
     fieldConfigurations: { dateOfBirth },
   } = useConfig<RegistrationConfig>();
   const allowEstimatedBirthDate = dateOfBirth?.allowEstimatedDateOfBirth;
-  const [{value: dobUnknown}] = useField('birthdateEstimated');
+  const [{ value: dobUnknown }] = useField('birthdateEstimated');
   const [birthdate, birthdateMeta] = useField('birthdate');
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
