@@ -87,7 +87,7 @@ export const DobField: React.FC = () => {
         </div>
       )}
       <Layer>
-        {dobKnown ? (
+        {!dobUnknown ? (
           <div className={styles.dobField}>
             <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
               <DatePickerInput
