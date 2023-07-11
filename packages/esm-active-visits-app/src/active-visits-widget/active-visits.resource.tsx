@@ -87,11 +87,11 @@ export function useActiveVisits() {
       visitUuid: visit.uuid,
     };
 
-    //in case no configuration is given the previsous behavior remanes the same
+    //in case no configuration is given the previous behavior remains the same
     if (!config?.activeVisits?.identifiers) {
-      activeVisits.idNumber = visit?.patient?.identifiers[0].identifier;
+      activeVisits.idNumber = visit?.patient?.identifiers[0]?.identifier ?? '--';
     } else {
-      //map identifires on config
+      //map identifiers on config
       config?.activeVisits?.identifiers?.map((configIdentifier) => {
         //check if in the current visit the patient has in his identifiers the current identifierType name
         const visitIdentifier = visit?.patient?.identifiers.find(
@@ -99,7 +99,7 @@ export function useActiveVisits() {
         );
 
         //add the new identifier or rewrite existing one to activeVisit object
-        //the parameter will corresponde to the name of the key value of the configuration
+        //the parameter will corresponds to the name of the key value of the configuration
         //and the respective value is the visit identifier
         //If there isn't a identifier we display this default text '--'
         activeVisits[configIdentifier.header?.key] = visitIdentifier?.identifier ?? '--';
@@ -114,7 +114,7 @@ export function useActiveVisits() {
       );
 
       //add the new attribute or rewrite existing one to activeVisit object
-      //the parameter will corresponde to the name of the key value of the configuration
+      //the parameter will correspond to the name of the key value of the configuration
       //and the respective value is the persons value
       //If there isn't a attribute we display this default text '--'
       activeVisits[header?.key] = personAttributes?.value ?? '--';
@@ -124,12 +124,7 @@ export function useActiveVisits() {
   };
 
   const formattedActiveVisits: Array<ActiveVisit> = data
-    ? [].concat(
-        ...data?.map(
-          (res) => res?.data?.results?.map(mapVisitProperties),
-          // ?.filter(({ visitStartTime }) => dayjs(visitStartTime).isToday()),
-        ),
-      )
+    ? [].concat(...data?.map((res) => res?.data?.results?.map(mapVisitProperties)))
     : [];
 
   return {
