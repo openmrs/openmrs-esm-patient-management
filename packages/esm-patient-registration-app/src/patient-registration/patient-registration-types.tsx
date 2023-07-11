@@ -158,7 +158,6 @@ export interface FormValues {
   givenName: string;
   middleName: string;
   familyName: string;
-  unidentifiedPatient: boolean;
   additionalGivenName: string;
   additionalMiddleName: string;
   additionalFamilyName: string;
