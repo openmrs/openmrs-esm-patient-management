@@ -25,9 +25,9 @@ export const DobField: React.FC = () => {
   const { t } = useTranslation();
   const {
     fieldConfigurations: { dateOfBirth },
-  } = useConfig() as RegistrationConfig;
-  const [dobUnknown] = useField('birthdateEstimated');
-  const dobKnown = !dobUnknown.value;
+  } = useConfig<RegistrationConfig>();
+  const allowEstimatedBirthDate = dateOfBirth?.allowEstimatedDateOfBirth;
+  const [{ value: dobUnknown }] = useField('birthdateEstimated');
   const [birthdate, birthdateMeta] = useField('birthdate');
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
@@ -75,17 +75,19 @@ export const DobField: React.FC = () => {
   return (
     <div className={styles.halfWidthInDesktopView}>
       <h4 className={styles.productiveHeading02Light}>{t('birthFieldLabelText', 'Birth')}</h4>
-      <div className={styles.dobField}>
-        <div className={styles.dobContentSwitcherLabel}>
-          <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
+      {(allowEstimatedBirthDate || dobUnknown) && (
+        <div className={styles.dobField}>
+          <div className={styles.dobContentSwitcherLabel}>
+            <span className={styles.label01}>{t('dobToggleLabelText', 'Date of Birth Known?')}</span>
+          </div>
+          <ContentSwitcher onChange={onToggle} selectedIndex={dobUnknown ? 1 : 0}>
+            <Switch name="known" text={t('yes', 'Yes')} />
+            <Switch name="unknown" text={t('no', 'No')} />
+          </ContentSwitcher>
         </div>
-        <ContentSwitcher onChange={onToggle}>
-          <Switch name="known" text={t('yes', 'Yes')} />
-          <Switch name="unknown" text={t('no', 'No')} />
-        </ContentSwitcher>
-      </div>
+      )}
       <Layer>
-        {dobKnown ? (
+        {!dobUnknown ? (
           <div className={styles.dobField}>
             <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
               <DatePickerInput

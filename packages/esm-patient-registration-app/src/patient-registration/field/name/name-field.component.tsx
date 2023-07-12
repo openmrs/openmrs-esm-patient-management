@@ -8,6 +8,7 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
 import { RegistrationConfig } from '../../../config-schema';
 
+export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 const containsNoNumbers = /^([^0-9]*)$/;
 
 function checkNumber(value: string) {
@@ -19,17 +20,26 @@ function checkNumber(value: string) {
 }
 
 export const NameField = () => {
-  const {
-    fieldConfigurations: {
-      name: { displayCapturePhoto },
-    },
-  } = useConfig() as RegistrationConfig;
   const { t } = useTranslation();
   const { setCapturePhotoProps, currentPhoto, setFieldValue } = useContext(PatientRegistrationContext);
-  const { fieldConfigurations } = useConfig();
-  const fieldConfigs = fieldConfigurations?.name;
-  const [{ value: unidentified }] = useField('unidentifiedPatient');
-  const nameKnown = !unidentified;
+  const {
+    fieldConfigurations: {
+      name: {
+        displayCapturePhoto,
+        allowUnidentifiedPatients,
+        defaultUnknownGivenName,
+        defaultUnknownFamilyName,
+        displayMiddleName,
+        displayReverseFieldOrder,
+      },
+    },
+  } = useConfig<RegistrationConfig>();
+
+  const [{ value: isPatientUnknownValue }, , { setValue: setUnknownPatient }] = useField<string>(
+    `attributes.${unidentifiedPatientAttributeTypeUuid}`,
+  );
+
+  const isPatientUnknown = isPatientUnknownValue === 'true';
 
   const onCapturePhoto = useCallback(
     (dataUri: string, photoDateTime: string) => {
@@ -47,13 +57,43 @@ export const NameField = () => {
     if (e.name === 'known') {
       setFieldValue('givenName', '');
       setFieldValue('familyName', '');
-      setFieldValue('unidentifiedPatient', false);
+      setUnknownPatient('false');
     } else {
-      setFieldValue('givenName', fieldConfigs.defaultUnknownGivenName);
-      setFieldValue('familyName', fieldConfigs.defaultUnknownFamilyName);
-      setFieldValue('unidentifiedPatient', true);
+      setFieldValue('givenName', defaultUnknownGivenName);
+      setFieldValue('familyName', defaultUnknownFamilyName);
+      setUnknownPatient('true');
     }
   };
+
+  const firstNameField = (
+    <Input
+      id="givenName"
+      name="givenName"
+      labelText={t('givenNameLabelText', 'First Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
+
+  const middleNameField = displayMiddleName && (
+    <Input
+      id="middleName"
+      name="middleName"
+      labelText={t('middleNameLabelText', 'Middle Name')}
+      light
+      checkWarning={checkNumber}
+    />
+  );
+
+  const familyNameField = (
+    <Input
+      id="familyName"
+      name="familyName"
+      labelText={t('familyNameLabelText', 'Family Name')}
+      checkWarning={checkNumber}
+      required
+    />
+  );
 
   return (
     <div>
@@ -68,40 +108,34 @@ export const NameField = () => {
         )}
 
         <div className={styles.nameField}>
-          <div className={styles.dobContentSwitcherLabel}>
-            <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
-          </div>
-          <ContentSwitcher className={styles.contentSwitcher} onChange={toggleNameKnown}>
-            <Switch name="known" text={t('yes', 'Yes')} />
-            <Switch name="unknown" text={t('no', 'No')} />
-          </ContentSwitcher>
-          {nameKnown && (
+          {(allowUnidentifiedPatients || isPatientUnknown) && (
             <>
-              <Input
-                id="givenName"
-                name="givenName"
-                labelText={t('givenNameLabelText', 'First Name')}
-                checkWarning={checkNumber}
-                required
-              />
-              {fieldConfigs.displayMiddleName && (
-                <Input
-                  id="middleName"
-                  name="middleName"
-                  labelText={t('middleNameLabelText', 'Middle Name')}
-                  light
-                  checkWarning={checkNumber}
-                />
-              )}
-              <Input
-                id="familyName"
-                name="familyName"
-                labelText={t('familyNameLabelText', 'Family Name')}
-                checkWarning={checkNumber}
-                required
-              />
+              <div className={styles.dobContentSwitcherLabel}>
+                <span className={styles.label01}>{t('patientNameKnown', "Patient's Name is Known?")}</span>
+              </div>
+              <ContentSwitcher
+                className={styles.contentSwitcher}
+                selectedIndex={isPatientUnknown ? 1 : 0}
+                onChange={toggleNameKnown}>
+                <Switch name="known" text={t('yes', 'Yes')} />
+                <Switch name="unknown" text={t('no', 'No')} />
+              </ContentSwitcher>
             </>
           )}
+          {!isPatientUnknown &&
+            (!displayReverseFieldOrder ? (
+              <>
+                {firstNameField}
+                {middleNameField}
+                {familyNameField}
+              </>
+            ) : (
+              <>
+                {familyNameField}
+                {middleNameField}
+                {firstNameField}
+              </>
+            ))}
         </div>
       </div>
     </div>
