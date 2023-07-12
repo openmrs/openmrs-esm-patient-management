@@ -141,6 +141,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
                     </TableHeader>
                   ))}
                 </TableRow>
+                
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
