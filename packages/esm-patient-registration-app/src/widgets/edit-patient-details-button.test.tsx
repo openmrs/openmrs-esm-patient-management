@@ -1,12 +1,16 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
-import * as esmFramework from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 
 describe('EditPatientDetailsButton', () => {
   it('should navigate to the edit page when clicked', () => {
-    const navigateMock = jest.fn();
-    jest.spyOn(esmFramework, 'navigate').mockImplementation(navigateMock);
+    jest.mock('@openmrs/esm-framework', () => {
+      const originalModule = jest.requireActual('@openmrs/esm-framework');
+      return {
+        ...originalModule,
+      };
+    });
 
     const patientUuid = '12345';
     render(<EditPatientDetailsButton patientUuid={patientUuid} />);
@@ -14,7 +18,7 @@ describe('EditPatientDetailsButton', () => {
     const button = screen.getByRole('menuitem');
     fireEvent.click(button);
 
-    expect(navigateMock).toHaveBeenCalledWith({ to: expect.stringContaining(`/patient/${patientUuid}/edit`) });
+    expect(navigate).toHaveBeenCalledWith({ to: expect.stringContaining(`/patient/${patientUuid}/edit`) });
   });
 
   it('should call the onTransition function when provided', () => {
