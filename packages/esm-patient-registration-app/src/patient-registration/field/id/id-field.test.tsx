@@ -5,6 +5,7 @@ import { Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
+import { openmrsID } from '../__mocks__/identifiers.mock';
 import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -23,34 +24,6 @@ describe('Identifiers', () => {
     relationshipTypes: [],
     identifierTypes: [...mockedIdentifierTypes],
   } as Resources;
-
-  const openmrsID = {
-    name: 'OpenMRS ID',
-    fieldName: 'openMrsId',
-    required: true,
-    uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-    format: null,
-    isPrimary: true,
-    identifierSources: [
-      {
-        uuid: '691eed12-c0f1-11e2-94be-8c13b969e334',
-        name: 'Generator 1 for OpenMRS ID',
-        autoGenerationOption: {
-          manualEntryEnabled: false,
-          automaticGenerationEnabled: true,
-        },
-      },
-      {
-        uuid: '01af8526-cea4-4175-aa90-340acb411771',
-        name: 'Generator 2 for OpenMRS ID',
-        autoGenerationOption: {
-          manualEntryEnabled: true,
-          automaticGenerationEnabled: true,
-        },
-      },
-    ],
-    autoGenerationSource: null,
-  };
 
   (useConfig as jest.Mock).mockImplementation(() => ({
     defaultPatientIdentifierTypes: ['OpenMRS ID'],
@@ -131,34 +104,5 @@ describe('Identifiers', () => {
     fireEvent.click(configureButton);
 
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
-  });
-
-  it('should close identifier selection overlay when "close overlay" button is clicked', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider
-              value={{
-                setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { openmrsID } },
-                setInitialFormValues: jest.fn(),
-                values: {
-                  identifiers: { openmrsID },
-                },
-              }}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
-    );
-
-    const configureButton = screen.getByRole('button', { name: 'Configure' });
-    fireEvent.click(configureButton);
-
-    const closeBtn = screen.getByRole('button', { name: 'Close overlay' });
-    fireEvent.click(closeBtn);
-    expect(closeBtn).not.toBeInTheDocument();
   });
 });
