@@ -8,14 +8,14 @@ interface IdentifierTypeOptions {
 
 function createIdentifierType(options: IdentifierTypeOptions) {
   return {
-    uniquenessBehavior: (options.uniquenessBehavior as 'UNIQUE' | 'LOCATION' | 'NON_UNIQUE') || null,
+    uniquenessBehavior: options.uniquenessBehavior,
     identifierSources: [
       {
         uuid: 'identifier-source-uuid',
         name: 'Identifier Source Name',
         autoGenerationOption: {
-          manualEntryEnabled: (options.manualEntryEnabled as boolean) || false,
-          automaticGenerationEnabled: (options.automaticGenerationEnabled as boolean) || true,
+          manualEntryEnabled: options.manualEntryEnabled,
+          automaticGenerationEnabled: options.automaticGenerationEnabled,
         },
       },
     ],
