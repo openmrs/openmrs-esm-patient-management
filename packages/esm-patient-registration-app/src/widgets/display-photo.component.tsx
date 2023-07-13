@@ -7,9 +7,10 @@ interface DisplayPatientPhotoProps {
   patientName: string;
   patientUuid: string;
   size?: string;
+  editing?: boolean;
 }
 
-export default function DisplayPatientPhoto({ patientUuid, patientName, size }: DisplayPatientPhotoProps) {
+export default function DisplayPatientPhoto({ editing, patientUuid, patientName, size }: DisplayPatientPhotoProps) {
   const { data: photo } = usePatientPhoto(patientUuid);
   const patternUrl: string = GeoPattern.generate(patientUuid).toDataUri();
 
@@ -19,8 +20,8 @@ export default function DisplayPatientPhoto({ patientUuid, patientName, size }: 
       color="rgba(0,0,0,0)"
       name={patientName}
       src={photo?.imageSrc}
-      size={size === 'small' ? '48' : '80'}
-      textSizeRatio={size === 'small' ? 1 : 2}
+      size={editing ? '120' : size === 'small' ? '48' : '80'}
+      textSizeRatio={editing ? 3.75 : size === 'small' ? 1 : 2}
       style={{
         backgroundImage: `url(${patternUrl})`,
         backgroundRepeat: 'round',
