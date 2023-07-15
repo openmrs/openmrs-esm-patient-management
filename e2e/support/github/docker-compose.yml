@@ -1,4 +1,5 @@
-# This docker compose file is used to create a backend environment for the e2e.yml workflow.
+# This docker compose file is used to create a backend environment for the e2e.yml workflow. 
+# The images are pre-filled with data so that the backend environemt can be started within a short time.
 version: "3.7"
 
 services:
