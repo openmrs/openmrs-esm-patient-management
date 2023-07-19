@@ -2,10 +2,13 @@ import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
 import { navigate } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../__mocks__/appointments.mock';
 
 describe('EditPatientDetailsButton', () => {
+  const patientUuid = mockPatient.uuid;
   it('should navigate to the edit page when clicked', () => {
     const mockNavigate = navigate as jest.Mock;
+
     jest.mock('@openmrs/esm-framework', () => {
       const originalModule = jest.requireActual('@openmrs/esm-framework');
       return {
@@ -13,7 +16,6 @@ describe('EditPatientDetailsButton', () => {
       };
     });
 
-    const patientUuid = '12345';
     render(<EditPatientDetailsButton patientUuid={patientUuid} />);
 
     const button = screen.getByRole('menuitem');
