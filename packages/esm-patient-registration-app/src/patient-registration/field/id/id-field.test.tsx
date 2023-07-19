@@ -10,7 +10,9 @@ import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(),
+  useConfig: jest.fn().mockImplementation(() => ({
+    defaultPatientIdentifierTypes: ['OpenMRS ID'],
+  })),
 }));
 
 describe('Identifiers', () => {
@@ -24,10 +26,6 @@ describe('Identifiers', () => {
     relationshipTypes: [],
     identifierTypes: [...mockedIdentifierTypes],
   } as Resources;
-
-  (useConfig as jest.Mock).mockImplementation(() => ({
-    defaultPatientIdentifierTypes: ['OpenMRS ID'],
-  }));
 
   it('should render loading skeleton when identifier types are loading', () => {
     render(
