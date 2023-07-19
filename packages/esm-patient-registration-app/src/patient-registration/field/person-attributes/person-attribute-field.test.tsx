@@ -8,8 +8,8 @@ import { Form, Formik } from 'formik';
 jest.mock('./person-attributes.resource'); // Mock the usePersonAttributeType hook
 jest.mock('../field.resource'); // Mock the useConceptAnswers hook
 
-jest.mock('Formik', () => ({
-  ...jest.requireActual('Formik'),
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
 }));
 
 const mockedUsePersonAttributeType = usePersonAttributeType as jest.Mock;
