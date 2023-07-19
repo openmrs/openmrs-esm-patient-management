@@ -25,7 +25,6 @@ describe('EditPatientDetailsButton', () => {
   });
 
   it('should call the onTransition function when provided', () => {
-    const patientUuid = '12345';
     const onTransitionMock = jest.fn();
     render(<EditPatientDetailsButton patientUuid={patientUuid} onTransition={onTransitionMock} />);
 
