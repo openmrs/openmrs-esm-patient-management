@@ -375,11 +375,11 @@ describe('patient registration component', () => {
         </ResourcesContext.Provider>,
       );
 
-      const givenNameInput = screen.getByLabelText(/First Name/) as HTMLInputElement;
-      const familyNameInput = screen.getByLabelText(/Family Name/) as HTMLInputElement;
-      const middleNameInput = screen.getByLabelText(/Middle Name/) as HTMLInputElement;
-      const dateOfBirthInput = screen.getByLabelText('Date of Birth') as HTMLInputElement;
-      const genderInput = screen.getByLabelText(/Male/) as HTMLSelectElement;
+      const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
+      const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
+      const middleNameInput: HTMLInputElement = screen.getByLabelText(/Middle Name/);
+      const dateOfBirthInput: HTMLInputElement = screen.getByLabelText('Date of Birth');
+      const genderInput: HTMLInputElement = screen.getByLabelText(/Male/);
 
       // assert initial values
       expect(givenNameInput.value).toBe('John');
