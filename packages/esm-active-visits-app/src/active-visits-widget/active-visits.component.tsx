@@ -249,9 +249,7 @@ const ActiveVisitsTable = () => {
 
                     return (
                       <React.Fragment key={index}>
-                        <TableExpandRow
-                          {...getRowProps({ row })}
-                          data-testid={`activeVisitRow${activeVisits?.[index]?.patientUuid}`}>
+                        <TableExpandRow {...getRowProps({ row })} data-testid={`activeVisitRow${visit.patientUuid}`}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id} data-testid={cell.id}>
                               {cell.info.header === 'name' ? (
