@@ -48,9 +48,10 @@ export function useActiveVisits() {
       return null;
     }
 
-    let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&`;
+    let url = `/ws/rest/v1/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
 
+    urlSearchParams.append('includeInactive', 'false');
     urlSearchParams.append('totalCount', 'true');
     urlSearchParams.append('location', `${sessionLocation}`);
 
