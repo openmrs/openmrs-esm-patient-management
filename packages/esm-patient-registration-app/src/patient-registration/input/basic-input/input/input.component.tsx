@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, TextInput, TextInputProps } from '@carbon/react';
 import { useField } from 'formik';
+import { useLayoutType } from '@openmrs/esm-framework';
+import styles from '../../input.scss';
 
 interface InputProps extends TextInputProps {
   checkWarning?(value: string): string;
@@ -10,6 +12,7 @@ interface InputProps extends TextInputProps {
 export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
   const [field, meta] = useField(props.name);
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   /*
     Do not remove these comments
@@ -44,6 +47,7 @@ export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
     <div style={{ marginBottom: '1rem' }}>
       <Layer>
         <TextInput
+          className={styles.Input}
           {...props}
           {...field}
           labelText={labelText}
@@ -51,6 +55,7 @@ export const Input: React.FC<any> = ({ checkWarning, ...props }) => {
           invalidText={invalidText}
           warn={!!warnText}
           warnText={warnText}
+          size={isTablet ? 'lg' : 'md'}
           value={value}
         />
       </Layer>

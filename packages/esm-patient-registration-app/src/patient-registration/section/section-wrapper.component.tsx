@@ -31,9 +31,13 @@ export const SectionWrapper = ({ sectionDefinition, index }: SectionWrapperProps
         {t('allFieldsRequiredText', 'All fields are required unless marked optional')}
       </span>
       <div style={{ margin: '1rem 0 1rem' }}>
-        <Tile>
+        {sectionDefinition.id === 'relationships' ? (
           <Section sectionDefinition={sectionDefinition} />
-        </Tile>
+        ) : (
+          <Tile>
+            <Section sectionDefinition={sectionDefinition} />
+          </Tile>
+        )}
       </div>
     </div>
   );

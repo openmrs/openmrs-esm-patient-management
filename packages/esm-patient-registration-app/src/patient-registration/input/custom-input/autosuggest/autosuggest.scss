@@ -6,6 +6,10 @@
   @include type.type-style('label-01');
 }
 
+.autocomplete {
+  width: 18.75rem;
+}
+
 .suggestions {
   position: relative;
   border-top-width: 0;

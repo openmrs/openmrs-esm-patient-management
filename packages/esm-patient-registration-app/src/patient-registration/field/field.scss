@@ -55,6 +55,17 @@
   justify-content: flex-start;
 }
 
+.dobField {
+  :global(.cds--date-picker-input__wrapper) {
+    max-width: 8.125rem;
+
+    :global(.cds--date-picker__icon) {
+      right: unset;
+      left: 10.5rem;
+    }
+  }
+}
+
 .photoExtension {
   margin-bottom: 1rem;
   grid-row: 1;
@@ -92,6 +103,10 @@
   margin-bottom: spacing.$spacing-05;
 }
 
+.radioButton {
+  padding-block: spacing.$spacing-03 !important;
+}
+
 :global(.omrs-breakpoint-lt-desktop) {
   .grid {
     grid-template-columns: 1fr;
@@ -105,9 +120,6 @@
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
-  }
-  .radioButton label {
-    height: spacing.$spacing-09 !important;
   }
   .halfWidthInDesktopView {
     width: 100%;
@@ -124,4 +136,8 @@
   letter-spacing: 0.32px;
   line-height: 1.34;
   margin: 0.25rem 0 0;
+}
+
+.numberInput {
+  width: 13.125rem;
 }

@@ -7,6 +7,7 @@ import {
   InlineNotification,
   NotificationActionButton,
   SkeletonText,
+  Tile,
 } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
 import { FieldArray } from 'formik';
@@ -16,6 +17,7 @@ import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
 import { RelationshipValue } from '../../patient-registration.types';
+import { useLayoutType } from '@openmrs/esm-framework';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 
@@ -116,6 +118,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
+  const isTablet = useLayoutType() === 'tablet';
 
   const newRelationship = !relationship.uuid;
 
@@ -156,7 +159,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
   }, [index]);
 
   return relationship.action !== 'DELETE' ? (
-    <div className={styles.relationship}>
+    <Tile className={styles.relationship}>
       <div className={styles.searchBox}>
         <div className={styles.relationshipHeader}>
           <h4 className={styles.productiveHeading}>
@@ -181,6 +184,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
               getSearchResults={searchPerson}
               getDisplayValue={(item) => item.display}
               getFieldValue={(item) => item.uuid}
+              isTablet={isTablet}
               required
             />
           ) : (
@@ -195,6 +199,8 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
         <Layer>
           <Select
             id="select"
+            size={isTablet ? 'lg' : 'md'}
+            className={styles.relationshipSelector}
             labelText={t('relationship', 'Relationship')}
             onChange={handleRelationshipTypeChange}
             name={`relationships[${index}].relationshipType`}
@@ -211,7 +217,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
           </Select>
         </Layer>
       </div>
-    </div>
+    </Tile>
   ) : (
     <InlineNotification
       kind="info"

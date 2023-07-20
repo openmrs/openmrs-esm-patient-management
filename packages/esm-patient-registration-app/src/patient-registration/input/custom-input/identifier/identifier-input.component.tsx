@@ -4,7 +4,7 @@ import { useField } from 'formik';
 import { Button } from '@carbon/react';
 import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { ResourcesContext } from '../../../../offline.resources';
-import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
+import { showModal, useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
 import { PatientIdentifierValue } from '../../../patient-registration.types';
@@ -19,6 +19,7 @@ interface IdentifierInputProps {
 
 export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
   const { isOffline, values, setFieldValue } = useContext(PatientRegistrationContext);
@@ -114,7 +115,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {!patientIdentifier.required && patientIdentifier.initialValue && hideInputField && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button
-              size="md"
+              size={isTablet ? 'lg' : 'md'}
               kind="ghost"
               onClick={handleEdit}
               iconDescription={t('editIdentifierTooltip', 'Edit')}
@@ -127,7 +128,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {initialValue && initialValue !== identifierValue && (
           <UserHasAccess privilege="Edit Patient Identifiers">
             <Button
-              size="md"
+              size={isTablet ? 'lg' : 'md'}
               kind="ghost"
               onClick={handleReset}
               iconDescription={t('resetIdentifierTooltip', 'Reset')}
@@ -140,7 +141,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
         {!patientIdentifier.required && !defaultPatientIdentifierTypesMap[patientIdentifier.identifierTypeUuid] && (
           <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
-              size="md"
+              size={isTablet ? 'lg' : 'md'}
               kind="danger--ghost"
               onClick={handleDelete}
               iconDescription={t('deleteIdentifierTooltip', 'Delete')}

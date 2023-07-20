@@ -182,7 +182,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   disabled={!currentSession || !identifierTypes}>
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
-                <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
+                <Button className={styles.cancelButton} kind="secondary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
                 </Button>
               </div>

@@ -99,6 +99,8 @@
 :global(.omrs-breakpoint-lt-desktop) {
   .IDInput {
     max-width: unset;
+    display: flex;
+    gap: 0.25rem;
     width: 100%;
   }
 }
@@ -115,4 +117,8 @@
 .comboInputItemOption {
   margin: 0;
   padding-left: 1rem;
+}
+
+.Input {
+  max-width: 300px;
 }

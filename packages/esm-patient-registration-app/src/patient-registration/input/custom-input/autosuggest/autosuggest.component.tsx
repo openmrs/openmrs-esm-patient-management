@@ -11,6 +11,7 @@ interface AutosuggestProps extends SearchProps {
 }
 
 export const Autosuggest: React.FC<any> = ({
+  isTablet,
   getDisplayValue,
   getFieldValue,
   getSearchResults,
@@ -62,6 +63,7 @@ export const Autosuggest: React.FC<any> = ({
       <Layer>
         <Search
           id="autosuggest"
+          size={isTablet ? 'lg' : 'md'}
           onChange={handleChange}
           ref={searchBox}
           className={styles.autocompleteSearch}
@@ -69,7 +71,7 @@ export const Autosuggest: React.FC<any> = ({
         />
       </Layer>
       {suggestions.length > 0 && (
-        <ul className={styles.suggestions}>
+        <ul className={`${styles.suggestions} ${isTablet && styles.tabletSuggestions}`}>
           {suggestions.map((suggestion, index) => (
             <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
               key={index}

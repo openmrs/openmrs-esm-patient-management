@@ -14,9 +14,17 @@
   margin-bottom: spacing.$spacing-05;
 }
 
+.relationship {
+  margin-block: spacing.$spacing-05;
+}
+
 .relationshipHeader {
   display: flex;
   align-items: center;
+
+  .trashCan {
+    fill: $danger !important;
+  }
 }
 
 .productiveHeading {
@@ -24,12 +32,6 @@
   color: $text-02;
 }
 
-.trashCan {
-  color: $danger !important;
-}
-
-:global(.omrs-breakpoint-lt-desktop) {
-  .relationshipHeader {
-    justify-content: space-between;
-  }
+.relationshipSelector {
+  max-width: 18.75rem;
 }

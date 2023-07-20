@@ -3,6 +3,7 @@ import { useAddressHierarchy } from './address-hierarchy.resource';
 import { Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
+import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './address-search.scss';
 
 interface AddressSearchComponentProps {
@@ -14,6 +15,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
   const separator = ' > ';
   const searchBox = useRef(null);
   const wrapper = useRef(null);
+  const isTablet = useLayoutType() === 'tablet';
   const [searchString, setSearchString] = useState<string>('');
   const { addresses, isLoading, error } = useAddressHierarchy(searchString, separator);
   const addressOptions: Array<string> = useMemo(() => {
@@ -62,6 +64,8 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
   return (
     <div className={styles.autocomplete} ref={wrapper} style={{ marginBottom: '1rem' }}>
       <Search
+        light
+        size={isTablet ? 'lg' : 'md'}
         onChange={handleInputChange}
         labelText={t('searchAddress', 'Search address')}
         placeholder={t('searchAddress', 'Search address')}
