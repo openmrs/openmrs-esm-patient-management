@@ -290,7 +290,7 @@ const ActiveVisitsTable = () => {
           <div className={styles.filterEmptyState}>
             <Layer level={0}>
               <Tile className={styles.filterEmptyStateTile}>
-                <p className={styles.filterEmptyStateContent}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                <p className={styles.filterEmptyStateContent}>{t('noVisitsToDisplay', 'No visits to display')}</p>
                 <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
               </Tile>
             </Layer>
