@@ -26,7 +26,8 @@ export const AddressComponent: React.FC = () => {
     if (!addressTemplate) {
       return [];
     }
-    const fields = addressTemplate.lines?.[0]?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
+    const allFields = addressTemplate.lines.flat();
+    const fields = allFields?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
 
     return fields.map(({ displayText, codeName }) => ({
       id: codeName,
@@ -52,7 +53,7 @@ export const AddressComponent: React.FC = () => {
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
-    if (addressTemplate) {
+    if (addressTemplate?.elementDefaults) {
       Object.entries(addressTemplate.elementDefaults).forEach(([name, defaultValue]) => {
         setFieldValue(`address.${name}`, defaultValue);
       });
