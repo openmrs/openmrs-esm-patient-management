@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Grid, Row } from '@carbon/react';
-import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, FetchResponse, useConnectivity, useSession } from '@openmrs/esm-framework';
 import {
   ResourcesContext,
   fetchAddressTemplate,
@@ -9,14 +9,18 @@ import {
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
-import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
+import { PatientRegistration } from './patient-registration/patient-registration.component';
 import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
+import { AddressTemplate } from './patient-registration/patient-registration-types';
 
 export default function Root() {
   const isOnline = useConnectivity();
   const currentSession = useSession();
-  const { data: addressTemplate } = useSWRImmutable('patientRegistrationAddressTemplate', fetchAddressTemplate);
+  const { data: addressTemplate } = useSWRImmutable<AddressTemplate>(
+    'patientRegistrationAddressTemplate',
+    fetchAddressTemplate,
+  );
   const { data: relationshipTypes } = useSWRImmutable(
     'patientRegistrationRelationshipTypes',
     fetchAllRelationshipTypes,

@@ -263,3 +263,36 @@ export interface ConceptAnswers {
   display: string;
   uuid: string;
 }
+
+export interface AddressTemplate {
+  displayName: null;
+  codeName: string;
+  country: string;
+  lines: Array<
+    Array<{
+      isToken: 'IS_NOT_ADDR_TOKEN' | 'IS_ADDR_TOKEN';
+      displayText: string;
+      codeName?: string;
+      displaySize?: string;
+    }>
+  >;
+  lineByLineFormat: Array<string>;
+  nameMappings: {
+    [x: string]: string;
+  };
+  sizeMappings: {
+    [x: string]: string;
+  };
+  elementDefaults: {
+    [x: string]: string;
+  };
+  elementRegex: {
+    [x: string]: string;
+  };
+  elementRegexFormats: {
+    [x: string]: string;
+  };
+  requiredElements: {
+    [x: string]: string;
+  };
+}

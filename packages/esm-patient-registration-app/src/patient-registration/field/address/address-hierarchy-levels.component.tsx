@@ -1,9 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAddressEntries, useAddressEntryFetchConfig } from './address-hierarchy.resource';
 import { useField } from 'formik';
 import ComboInput from '../../input/combo-input/combo-input.component';
-import { InlineNotification } from '@carbon/react';
 
 interface AddressHierarchyLevelsProps {
   orderedAddressFields: Array<any>;
@@ -34,22 +33,25 @@ interface AddressComboBoxProps {
 
 const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const { t } = useTranslation();
-  const [field, meta, helpers] = useField(`address.${attribute.name}`);
+  const [field, meta, { setValue }] = useField(`address.${attribute.name}`);
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
   const { entries } = useAddressEntries(fetchEntriesForField, searchString);
 
-  const handleInputChange = useCallback((newValue) => {
-    helpers.setValue(newValue);
-  }, []);
+  const handleInputChange = useCallback(
+    (newValue) => {
+      setValue(newValue);
+    },
+    [setValue],
+  );
 
   const handleSelection = useCallback(
     (selectedItem) => {
       if (meta.value !== selectedItem) {
-        helpers.setValue(selectedItem);
+        setValue(selectedItem);
         updateChildElements();
       }
     },
-    [updateChildElements, helpers.setValue],
+    [updateChildElements, meta.value, setValue],
   );
 
   return (

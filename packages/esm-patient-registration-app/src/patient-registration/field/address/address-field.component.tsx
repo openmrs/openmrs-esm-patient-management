@@ -21,17 +21,21 @@ function getTagAsDocument(tagName: string, template: XMLDocument) {
 
 export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
-  const [addressLayout, setAddressLayout] = useState<
-    Array<{
-      id: string;
-      name: string;
-      value: string;
-      label: string;
-    }>
-  >([]);
-  const { t } = useTranslation();
   const { addressTemplate } = useContext(ResourcesContext);
-  const addressTemplateXml = addressTemplate?.results[0].value;
+  const addressLayout = useMemo(() => {
+    if (!addressTemplate) {
+      return [];
+    }
+    const fields = addressTemplate.lines?.[0]?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
+
+    return fields.map(({ displayText, codeName }) => ({
+      id: codeName,
+      name: codeName,
+      label: displayText,
+    }));
+  }, [addressTemplate]);
+
+  const { t } = useTranslation();
   const setSelectedValue = (value: string) => {
     setSelected(value);
   };
@@ -39,7 +43,7 @@ export const AddressComponent: React.FC = () => {
   const {
     fieldConfigurations: {
       address: {
-        useAddressHierarchy: { enabled, useQuickSearch, searchAddressByLevel },
+        useAddressHierarchy: { enabled: addressHierarchyEnabled, useQuickSearch, searchAddressByLevel },
       },
     },
   } = config;
@@ -48,53 +52,61 @@ export const AddressComponent: React.FC = () => {
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
-    const templateXmlDoc = parseString(addressTemplateXml);
-    const elementDefaults = getTagAsDocument('elementDefaults', templateXmlDoc);
-    const defaultValuesEntries = elementDefaults.getElementsByTagName('entry');
-    const defaultValues = Object.fromEntries(
-      Array.prototype.map.call(defaultValuesEntries, (entry: Element) => {
-        const [name, value] = Array.from(entry.getElementsByTagName('string'));
-        return [name.innerHTML, value.innerHTML];
-      }),
-    );
-    const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-    const properties =
-      Array.from(nameMappings.getElementsByTagName('property')).length > 0
-        ? nameMappings.getElementsByTagName('property')
-        : nameMappings.getElementsByTagName('entry');
+    if (addressTemplate) {
+      Object.entries(addressTemplate.elementDefaults).forEach(([name, defaultValue]) => {
+        setFieldValue(`address.${name}`, defaultValue);
+      });
+    }
+  }, [addressTemplate, setFieldValue]);
 
-    const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-      const name = property.getAttribute('name') ?? property.getElementsByTagName('string')[0].innerHTML;
-      const label = property.getAttribute('value') ?? property.getElementsByTagName('string')[1].innerHTML;
-      /*
-        DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+  // useEffect(() => {
+  //   const templateXmlDoc = parseString(addressTemplateXml);
+  //   const elementDefaults = getTagAsDocument('elementDefaults', templateXmlDoc);
+  //   const defaultValuesEntries = elementDefaults.getElementsByTagName('entry');
+  //   const defaultValues = Object.fromEntries(
+  //     Array.prototype.map.call(defaultValuesEntries, (entry: Element) => {
+  //       const [name, value] = Array.from(entry.getElementsByTagName('string'));
+  //       return [name.innerHTML, value.innerHTML];
+  //     }),
+  //   );
+  //   const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
+  //   const properties =
+  //     Array.from(nameMappings.getElementsByTagName('property')).length > 0
+  //       ? nameMappings.getElementsByTagName('property')
+  //       : nameMappings.getElementsByTagName('entry');
 
-        t('postalCode', 'Postal code')
-        t('address1', 'Address line 1')
-        t('address2', 'Address line 2')
-        t('countyDistrict', 'District')
-        t('stateProvince', 'State')
-        t('cityVillage', 'city')
-        t('country', 'Country')
-        t('countyDistrict', 'District')
-      */
-      const value = defaultValues[name];
-      setInitialFormValues((initialFormValues) => ({
-        ...initialFormValues,
-        address: {
-          ...(initialFormValues.address ?? {}),
-          [name]: value,
-        },
-      }));
-      return {
-        id: name,
-        name,
-        value,
-        label,
-      };
-    });
-    setAddressLayout(propertiesObj);
-  }, [t, addressTemplateXml, setFieldValue, values, setInitialFormValues]);
+  //   const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
+  //     const name = property.getAttribute('name') ?? property.getElementsByTagName('string')[0].innerHTML;
+  //     const label = property.getAttribute('value') ?? property.getElementsByTagName('string')[1].innerHTML;
+  //     /*
+  //       DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+
+  //       t('postalCode', 'Postal code')
+  //       t('address1', 'Address line 1')
+  //       t('address2', 'Address line 2')
+  //       t('countyDistrict', 'District')
+  //       t('stateProvince', 'State')
+  //       t('cityVillage', 'city')
+  //       t('country', 'Country')
+  //       t('countyDistrict', 'District')
+  //     */
+  //     const value = defaultValues[name];
+  //     setInitialFormValues((initialFormValues) => ({
+  //       ...initialFormValues,
+  //       address: {
+  //         ...(initialFormValues.address ?? {}),
+  //         [name]: value,
+  //       },
+  //     }));
+  //     return {
+  //       id: name,
+  //       name,
+  //       value,
+  //       label,
+  //     };
+  //   });
+  //   setAddressLayout(propertiesObj);
+  // }, [t, addressTemplateXml, setFieldValue, values, setInitialFormValues]);
 
   const orderedAddressFields = useMemo(() => {
     if (isLoadingFieldOrder || errorFetchingFieldOrder) {
@@ -116,7 +128,7 @@ export const AddressComponent: React.FC = () => {
     );
   }
 
-  if (!enabled) {
+  if (!addressHierarchyEnabled) {
     return (
       <AddressComponentContainer>
         {addressLayout.map((attributes, index) => (
@@ -125,7 +137,6 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            setSelectedValue={setSelectedValue}
             selected={selected}
           />
         ))}
@@ -166,7 +177,6 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            setSelectedValue={setSelectedValue}
             selected={selected}
           />
         ))
