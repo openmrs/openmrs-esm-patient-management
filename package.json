@@ -10,7 +10,7 @@
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
-    "verify": "turbo lint && turbo typescript && turbo test",
+    "verify": "turbo lint && turbo typescript && turbo test --color --concurrency=5",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "test-e2e": "playwright test",
     "postinstall": "husky install",
