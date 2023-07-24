@@ -1,6 +1,7 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
+import { of } from 'rxjs';
 import { renderWithSwr } from '../../../../tools/test-helpers';
 import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
 import ActiveVisitsTable from './active-visits-table.component';
@@ -54,6 +55,15 @@ jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => {
   };
 });
 
+jest.mock('../helpers/helpers', () => {
+  const originalModule = jest.requireActual('../helpers/helpers');
+
+  return {
+    ...originalModule,
+    getSelectedServiceName: jest.fn().mockReturnValue(of('All')),
+  };
+});
+
 jest.setTimeout(20000);
 
 describe('ActiveVisitsTable: ', () => {
@@ -93,9 +103,10 @@ describe('ActiveVisitsTable: ', () => {
 
     renderActiveVisitsTable();
 
+    await waitFor(() => screen.getByRole('table'));
+
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
-    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
 

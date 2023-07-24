@@ -6,22 +6,20 @@
       "outputs": ["dist/**"]  
     },
     "test": {
-      "dependsOn": [],
-      "outputs": []
+      "dependsOn": ["^test"]
+    },
+    "test:watch": {
+      "dependsOn": ["^test:watch"]
+    },
+    "coverage": {
+      "dependsOn": ["^coverage"]
     },
     "lint": {
-      "dependsOn": ["^lint"],
-      "outputs": []
+      "dependsOn": ["^lint"]
     },
     "typescript": {
-      "dependsOn": ["^typescript"],
-      "outputs": []
+      "dependsOn": ["^typescript"]
     },
-    "extract-translations": {
-      "outputs": []
-    },
-    "dev": {
-      "cache": false
-    }
+    "extract-translations": {}
   }
 }

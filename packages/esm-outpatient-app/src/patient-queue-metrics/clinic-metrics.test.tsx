@@ -58,7 +58,7 @@ jest.mock('../active-visits/active-visits-table.resource.ts', () => {
 });
 
 describe('Clinic metrics', () => {
-  it('renders a dashboard outlining metrics from the outpatient clinic', () => {
+  it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     mockedUseConfig.mockReturnValue({
       concepts: {
         visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
@@ -69,7 +69,7 @@ describe('Clinic metrics', () => {
 
     renderClinicMetrics();
 
-    expect(screen.getByText(/Checked in patients/i)).toBeInTheDocument();
+    await screen.findByText(/Checked in patients/i);
     expect(screen.getByText(/100/i)).toBeInTheDocument();
     expect(screen.getAllByText(/patient list/i));
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();

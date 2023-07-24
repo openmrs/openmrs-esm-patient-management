@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, TextArea } from '@carbon/react';
+import { Button, Layer, TextArea } from '@carbon/react';
 import { useSession, showToast, showNotification, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
-import styles from './cancel-appointment.scss';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
 import { MappedAppointment } from '../../../types';
+import styles from './cancel-appointment.scss';
 
 interface CancelAppointmentProps {
   appointment: MappedAppointment;
@@ -64,14 +64,15 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         />
       )}
 
-      <TextArea
-        id="reason"
-        light
-        value={reason}
-        className={styles.inputContainer}
-        labelText={t('reasonForChanges', 'Reason For Changes')}
-        onChange={(event) => setReason(event.target.value)}
-      />
+      <Layer>
+        <TextArea
+          id="reason"
+          value={reason}
+          className={styles.inputContainer}
+          labelText={t('reasonForChanges', 'Reason For Changes')}
+          onChange={(event) => setReason(event.target.value)}
+        />
+      </Layer>
 
       <div className={styles.buttonContainer}>
         <Button onClick={() => closeOverlay()} kind="secondary">

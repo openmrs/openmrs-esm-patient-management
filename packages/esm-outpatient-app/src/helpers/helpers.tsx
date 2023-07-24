@@ -96,8 +96,9 @@ export const useSelectedServiceName = () => {
   const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName);
 
   useEffect(() => {
-    getSelectedServiceName().subscribe(({ serviceName }) => setCurrentServiceName(serviceName));
+    getSelectedServiceName().subscribe(({ serviceName }) => setCurrentServiceName(serviceName ?? ''));
   }, []);
+
   return currentServiceName;
 };
 
