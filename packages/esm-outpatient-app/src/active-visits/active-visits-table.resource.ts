@@ -253,9 +253,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
       ?.map(mapVisitQueueEntryProperties)
       .filter((data) => dayjs(data.visitStartDateTime).isToday());
   } else {
-    mappedVisitQueueEntries = data?.data?.results
-      ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service === currServiceName && dayjs(data.visitStartDateTime).isToday());
+    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
   }
 
   return {
@@ -349,9 +347,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
     patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
   });
 
-  const mappedServiceQueueEntries = data?.data?.results
-    ?.map(mapServiceQueueEntryProperties)
-    .filter(({ returnDate }) => dayjs(returnDate).isToday());
+  const mappedServiceQueueEntries = data?.data?.results?.map(mapServiceQueueEntryProperties);
 
   return {
     serviceQueueEntries: mappedServiceQueueEntries ? mappedServiceQueueEntries : [],

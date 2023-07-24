@@ -37,7 +37,7 @@ export interface RegistrationConfig {
   fieldConfigurations: {
     name: {
       displayMiddleName: boolean;
-      unidentifiedPatient: boolean;
+      allowUnidentifiedPatients: boolean;
       defaultUnknownGivenName: string;
       defaultUnknownFamilyName: string;
       displayCapturePhoto: boolean;
@@ -52,6 +52,7 @@ export interface RegistrationConfig {
       };
     };
     dateOfBirth: {
+      allowEstimatedDateOfBirth: boolean;
       useEstimatedDateOfBirth: {
         enabled: boolean;
         dayOfMonth: number;
@@ -201,10 +202,10 @@ export const esmPatientRegistrationSchema = {
   fieldConfigurations: {
     name: {
       displayMiddleName: { _type: Type.Boolean, _default: true },
-      unidentifiedPatient: {
+      allowUnidentifiedPatients: {
         _type: Type.Boolean,
         _default: true,
-        _description: 'Whether to allow patients to be registered without names.',
+        _description: 'Whether to allow registering unidentified patients.',
       },
       defaultUnknownGivenName: {
         _type: Type.String,
@@ -296,10 +297,15 @@ export const esmPatientRegistrationSchema = {
       },
     },
     dateOfBirth: {
+      allowEstimatedDateOfBirth: {
+        _type: Type.Boolean,
+        _description: 'Whether to allow estimated date of birth for a patient during registration',
+        _default: true,
+      },
       useEstimatedDateOfBirth: {
         enabled: {
           _type: Type.Boolean,
-          _description: 'Whether to use custom day and month for estimated date of birth',
+          _description: 'Whether to use a fixed day and month for estimated date of birth',
           _default: false,
         },
         dayOfMonth: {
@@ -309,7 +315,7 @@ export const esmPatientRegistrationSchema = {
         },
         month: {
           _type: Type.Number,
-          _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan 11 = Dec',
+          _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
       },

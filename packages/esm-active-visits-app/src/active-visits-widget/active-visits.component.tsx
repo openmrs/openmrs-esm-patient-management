@@ -116,9 +116,9 @@ const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const { activeVisits, isLoading, isValidating, isError } = useActiveVisits();
+  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
+  const { activeVisits, isLoading, isValidating, error } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
 
   const currentPathName = window.location.pathname;
@@ -184,11 +184,11 @@ const ActiveVisitsTable = () => {
     );
   }
 
-  if (isError) {
+  if (error) {
     return (
       <div className={styles.activeVisitsContainer}>
         <Layer>
-          <ErrorState error={isError} headerTitle={t('activeVisits', 'Active Visits')} />
+          <ErrorState error={error} headerTitle={t('activeVisits', 'Active Visits')} />
         </Layer>
       </div>
     );
@@ -244,43 +244,45 @@ const ActiveVisitsTable = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, index) => (
-                    <React.Fragment key={index}>
-                      <TableExpandRow
-                        {...getRowProps({ row })}
-                        data-testid={`activeVisitRow${activeVisits?.[index]?.patientUuid}`}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id} data-testid={cell.id}>
-                            {cell.info.header === 'name' ? (
-                              <PatientNameLink
-                                from={fromPage}
-                                to={`\${openmrsSpaBase}/patient/${activeVisits?.[index]?.patientUuid}/chart/`}>
-                                {cell.value}
-                              </PatientNameLink>
-                            ) : (
-                              cell.value
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableRow className={styles.expandedActiveVisitRow}>
-                          <th colSpan={headers.length + 2}>
-                            <ExtensionSlot
-                              className={styles.visitSummaryContainer}
-                              name="visit-summary-slot"
-                              state={{
-                                visitUuid: activeVisits[index]?.visitUuid,
-                                patientUuid: activeVisits[index]?.patientUuid,
-                              }}
-                            />
-                          </th>
-                        </TableRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  ))}
+                  {rows.map((row, index) => {
+                    const visit = activeVisits.find((visit) => visit.id === row.id);
+
+                    return (
+                      <React.Fragment key={index}>
+                        <TableExpandRow {...getRowProps({ row })} data-testid={`activeVisitRow${visit.patientUuid}`}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id} data-testid={cell.id}>
+                              {cell.info.header === 'name' ? (
+                                <PatientNameLink
+                                  from={fromPage}
+                                  to={`\${openmrsSpaBase}/patient/${visit.patientUuid}/chart/Patient%20Summary`}>
+                                  {cell.value}
+                                </PatientNameLink>
+                              ) : (
+                                cell.value
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableExpandRow>
+                        {row.isExpanded ? (
+                          <TableRow className={styles.expandedActiveVisitRow}>
+                            <th colSpan={headers.length + 2}>
+                              <ExtensionSlot
+                                className={styles.visitSummaryContainer}
+                                name="visit-summary-slot"
+                                state={{
+                                  visitUuid: activeVisits[index]?.visitUuid,
+                                  patientUuid: activeVisits[index]?.patientUuid,
+                                }}
+                              />
+                            </th>
+                          </TableRow>
+                        ) : (
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -290,7 +292,7 @@ const ActiveVisitsTable = () => {
           <div className={styles.filterEmptyState}>
             <Layer level={0}>
               <Tile className={styles.filterEmptyStateTile}>
-                <p className={styles.filterEmptyStateContent}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                <p className={styles.filterEmptyStateContent}>{t('noVisitsToDisplay', 'No visits to display')}</p>
                 <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
               </Tile>
             </Layer>
