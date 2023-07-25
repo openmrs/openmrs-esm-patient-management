@@ -2,6 +2,18 @@
 version: "3.7"
 
 services:
+  gateway:
+    image: openmrs/openmrs-reference-application-3-gateway:${TAG:-nightly}
+    ports:
+      - "8180:80"
+
+  frontend:
+    build:
+      context: .
+    environment:
+      SPA_PATH: /openmrs/spa
+      API_URL: /openmrs
+
   backend:
     image: openmrs/openmrs-reference-application-3-backend:${TAG:-nightly}
     depends_on:
@@ -19,8 +31,6 @@ services:
       timeout: 5s
     volumes:
       - openmrs-data:/openmrs/data
-    ports:
-      - 9000:8080
 
   # MariaDB
   db:

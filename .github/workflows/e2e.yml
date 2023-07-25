@@ -12,6 +12,7 @@ jobs:
   testOnPR:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -24,7 +25,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: "18.x"
 
       - name: Cache dependencies
         id: cache
@@ -40,11 +41,21 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
+      - name: Build apps
+        run: yarn turbo run build --color --concurrency=5
+
       - name: Run dev server
-        run: yarn start --sources 'packages/esm-*-app/' --port 8180 & # Refer to O3-1994
+        run: bash e2e/support/run-e2e-docker-env.sh
+
+      - name: Wait for OpenMRS instance to start
+        run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8180/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
       - name: Run E2E tests
         run: yarn playwright test
+
+      - name: Stop dev server
+        if: "!cancelled()"
+        run: docker stop $(docker ps -a -q)
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
@@ -56,8 +67,8 @@ jobs:
 
   testOnPush:
     if: ${{ github.event_name == 'push' }}
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -86,16 +97,14 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
-      - name: Run db and web containers
-        run: |
-          cd e2e/support/github
-          docker-compose up -d
-
-      - name: Wait for OpenMRS instance to start
-        run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:9000/openmrs/login.htm)" != "200" ]]; do sleep 10; done
+      - name: Build apps
+        run: yarn turbo run build --color --concurrency=5
 
       - name: Run dev server
-        run: yarn start --sources 'packages/esm-*-app/' --backend "http://localhost:9000" --port 8180 & # Refer to O3-1994
+        run: bash e2e/support/run-e2e-docker-env.sh
+
+      - name: Wait for OpenMRS instance to start
+        run: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8180/openmrs/login.htm)" != "200" ]]; do sleep 10; done
 
       - name: Run E2E tests
         run: yarn playwright test
