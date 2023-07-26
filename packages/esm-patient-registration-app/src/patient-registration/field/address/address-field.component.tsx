@@ -19,10 +19,10 @@ export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
   const { addressTemplate } = useContext(ResourcesContext);
   const addressLayout = useMemo(() => {
-    if (!addressTemplate) {
+    if (!addressTemplate?.lines) {
       return [];
     }
-    const allFields = addressTemplate.lines.flat();
+    const allFields = addressTemplate?.lines?.flat();
     const fields = allFields?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
 
     return fields.map(({ displayText, codeName }) => ({

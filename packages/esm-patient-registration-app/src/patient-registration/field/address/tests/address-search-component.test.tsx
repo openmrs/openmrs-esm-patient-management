@@ -5,7 +5,7 @@ import { Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { mockResponse, mockedAddressOptions, mockedOrderedFields } from './mocks';
+import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from './mocks';
 import AddressSearchComponent from '../address-search.component';
 import userEvent from '@testing-library/user-event';
 
@@ -31,7 +31,7 @@ jest.mock('formik', () => ({
   useFormikContext: jest.fn(() => ({})),
 }));
 
-const allFields = mockResponse.lines
+const allFields = mockedAddressTemplate.lines
   .flat()
   .filter((field) => field.isToken === 'IS_ADDR_TOKEN')
   .map(({ codeName, displayText }) => ({
@@ -42,7 +42,7 @@ const allFields = mockResponse.lines
 const orderMap = Object.fromEntries(mockedOrderedFields.map((field, indx) => [field, indx]));
 allFields.sort((existingField1, existingField2) => orderMap[existingField1.name] - orderMap[existingField2.name]);
 
-async function renderAddressHierarchy(addressTemplate = mockResponse) {
+async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
   await render(
     <ResourcesContext.Provider value={{ addressTemplate } as Resources}>
       <Formik initialValues={{}} onSubmit={null}>

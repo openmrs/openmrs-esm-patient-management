@@ -6,7 +6,7 @@ import { Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { mockResponse, mockedOrderedFields } from './mocks';
+import { mockedAddressTemplate, mockedOrderedFields } from './mocks';
 
 // Mocking the AddressSearchComponent
 jest.mock('../address-search.component', () => jest.fn(() => <div data-testid="address-search-bar" />));
@@ -29,7 +29,7 @@ jest.mock('../address-hierarchy.resource', () => ({
   useOrderedAddressHierarchyLevels: jest.fn(),
 }));
 
-async function renderAddressHierarchy(addressTemplate = mockResponse) {
+async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
   await render(
     <ResourcesContext.Provider value={{ addressTemplate } as Resources}>
       <Formik initialValues={{}} onSubmit={null}>
@@ -131,7 +131,7 @@ describe('Testing address hierarchy', () => {
       errorFetchingFieldOrder: null,
     }));
     renderAddressHierarchy();
-    const allFields = mockResponse.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
+    const allFields = mockedAddressTemplate.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
     allFields.forEach((field) => {
       const textFieldInput = screen.getByLabelText(`${field.displayText} (optional)`);
       expect(textFieldInput).toBeInTheDocument();
@@ -156,10 +156,11 @@ describe('Testing address hierarchy', () => {
       errorFetchingFieldOrder: null,
     }));
     renderAddressHierarchy();
-    const allFields = mockResponse.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
+    const allFields = mockedAddressTemplate.lines.flat().filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
     const orderMap = Object.fromEntries(mockedOrderedFields.map((field, indx) => [field, indx]));
     allFields.sort(
-      (existingField1, existingField2) => orderMap[existingField1.codeName] - orderMap[existingField2.codeName],
+      (existingField1, existingField2) =>
+        orderMap[existingField1.codeName ?? 0] - orderMap[existingField2.codeName ?? 0],
     );
     allFields.forEach((field) => {
       const textFieldInput = screen.getByLabelText(`${field.displayText} (optional)`);

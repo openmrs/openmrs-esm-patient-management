@@ -1,6 +1,6 @@
 import { AddressTemplate } from '../../../patient-registration-types';
 
-export const mockResponse: AddressTemplate = {
+export const mockedAddressTemplate: AddressTemplate = {
   displayName: null,
   codeName: 'default',
   country: null,
