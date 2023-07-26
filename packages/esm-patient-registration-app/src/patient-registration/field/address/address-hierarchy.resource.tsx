@@ -101,3 +101,74 @@ export function useAddressEntryFetchConfig(addressField: string) {
 
   return results;
 }
+
+export function useAddressHierarchy(
+  searchString,
+  separator,
+): {
+  addresses: Array<string>;
+  isLoading: boolean;
+  error: Error;
+} {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<
+      Array<{
+        address: string;
+      }>
+    >,
+    Error
+  >(
+    searchString
+      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=${separator}&searchString=${searchString}`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      addresses: data?.data?.map((address) => address.address) ?? [],
+      error,
+      isLoading,
+    }),
+    [data?.data, error, isLoading],
+  );
+  return results;
+}
+
+export function useAdressHierarchyWithParentSearch(
+  addressField,
+  parentid,
+  query,
+): {
+  error: Error;
+  isLoading: boolean;
+  addresses: Array<{
+    uuid: string;
+    name: string;
+  }>;
+} {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<
+      Array<{
+        uuid: string;
+        name: string;
+      }>
+    >
+  >(
+    query
+      ? `/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      error: error,
+      isLoading,
+      addresses: data?.data ?? [],
+    }),
+    [data?.data, error, isLoading],
+  );
+
+  return results;
+}

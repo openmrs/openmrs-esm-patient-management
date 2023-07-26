@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { useAddressHierarchy } from '../../patient-registration.resource';
+import { useAddressHierarchy } from './address-hierarchy.resource';
 import { Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';

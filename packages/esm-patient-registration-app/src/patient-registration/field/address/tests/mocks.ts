@@ -86,3 +86,13 @@ export const mockResponse: AddressTemplate = {
 };
 
 export const mockedOrderedFields = ['country', 'stateProvince', 'cityVillage', 'postalCode', 'address1', 'address2'];
+export const mockedAddressOptions = [
+  'Cambodia > Banteay Meanchey > Mongkol Borei > Banteay Neang > Ou Thum',
+  'Cambodia > Battambang > Banan > Ta Kream > Andoung Neang',
+  'Cambodia > Banteay Meanchey > Mongkol Borei > Banteay Neang > Phnum',
+  'Cambodia > Kampong Cham > Chamkar Leu > Ta Prok > Neang Laeung',
+  'Cambodia > Battambang > Thma Koul > Ta Meun > Tumneab',
+  'Cambodia > Banteay Meanchey > Mongkol Borei > Banteay Neang > Banteay Neang',
+  'Cambodia > Banteay Meanchey > Phnum Srok > Spean Sraeng > Mukh Chhneang',
+  'Cambodia > Kampong Cham > Cheung Prey > Phdau Chum > Cham Neang',
+];
