@@ -1,14 +1,14 @@
 # This docker compose file is used to create a backend environment for the e2e.yml workflow. 
-# The images are pre-filled with data so that the backend environemt can be started within a short time.
+# The images are pre-filled with data so that the backend environment can be started within a short time.
 version: "3.7"
 
 services:
   backend:
-    image: piumal1999/openmrs-reference-application-3-backend-amd64:nightly-with-data #TODO: replace with OMRS docker image
+    image: piumal1999/openmrs-reference-application-3-backend:nightly-with-data #TODO: replace with OMRS docker image
     depends_on:
       - db
     ports:
       - 9000:8080
 
   db:
-    image: piumal1999/openmrs-reference-application-3-db-amd64:nightly-with-data #TODO: replace with OMRS docker image
+    image: piumal1999/openmrs-reference-application-3-db:nightly-with-data #TODO: replace with OMRS docker image
