@@ -2,7 +2,7 @@ import React from 'react';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
-import { CodedPersonAttributeConfig } from '../../patient-registration-types';
+import { CodedPersonAttributeConfig } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
 import { usePersonAttributeType } from './person-attributes.resource';
 import styles from './../field.scss';

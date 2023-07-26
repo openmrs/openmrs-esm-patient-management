@@ -3,7 +3,7 @@ import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { ConceptResponse } from '../../patient-registration-types';
+import { ConceptResponse } from '../../patient-registration.types';
 import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';

@@ -1,4 +1,4 @@
-import { AddressTemplate } from '../../../patient-registration-types';
+import { AddressTemplate } from '../../../patient-registration.types';
 
 export const mockedAddressTemplate: AddressTemplate = {
   displayName: null,

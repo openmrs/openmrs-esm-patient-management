@@ -2,12 +2,12 @@ import React from 'react';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { FetchResponse, messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
-import {
+import { messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
+import type {
   PatientIdentifierType,
   FetchedPatientIdentifierType,
   AddressTemplate,
-} from './patient-registration/patient-registration-types';
+} from './patient-registration/patient-registration.types';
 import { cacheForOfflineHeaders } from './constants';
 
 export interface Resources {
@@ -25,7 +25,7 @@ export async function fetchCurrentSession(): Promise<Session> {
 }
 
 export async function fetchAddressTemplate() {
-  const { data } = await cacheAndFetch('/ws/rest/v1/addresstemplate');
+  const { data } = await cacheAndFetch<AddressTemplate>('/ws/rest/v1/addresstemplate');
   return data;
 }
 
