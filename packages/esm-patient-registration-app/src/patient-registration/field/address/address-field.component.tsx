@@ -14,10 +14,6 @@ function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();
   return parser.parseFromString(xmlDockAsString, 'text/xml');
 }
-function getTagAsDocument(tagName: string, template: XMLDocument) {
-  const tmp = template.getElementsByTagName(tagName)[0];
-  return tmp ? parseString(tmp.outerHTML) : parseString('');
-}
 
 export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
@@ -37,9 +33,6 @@ export const AddressComponent: React.FC = () => {
   }, [addressTemplate]);
 
   const { t } = useTranslation();
-  const setSelectedValue = (value: string) => {
-    setSelected(value);
-  };
   const config = useConfig();
   const {
     fieldConfigurations: {
@@ -49,7 +42,7 @@ export const AddressComponent: React.FC = () => {
     },
   } = config;
 
-  const { setFieldValue, values, setInitialFormValues } = useContext(PatientRegistrationContext);
+  const { setFieldValue } = useContext(PatientRegistrationContext);
   const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
 
   useEffect(() => {
@@ -59,55 +52,6 @@ export const AddressComponent: React.FC = () => {
       });
     }
   }, [addressTemplate, setFieldValue]);
-
-  // useEffect(() => {
-  //   const templateXmlDoc = parseString(addressTemplateXml);
-  //   const elementDefaults = getTagAsDocument('elementDefaults', templateXmlDoc);
-  //   const defaultValuesEntries = elementDefaults.getElementsByTagName('entry');
-  //   const defaultValues = Object.fromEntries(
-  //     Array.prototype.map.call(defaultValuesEntries, (entry: Element) => {
-  //       const [name, value] = Array.from(entry.getElementsByTagName('string'));
-  //       return [name.innerHTML, value.innerHTML];
-  //     }),
-  //   );
-  //   const nameMappings = getTagAsDocument('nameMappings', templateXmlDoc);
-  //   const properties =
-  //     Array.from(nameMappings.getElementsByTagName('property')).length > 0
-  //       ? nameMappings.getElementsByTagName('property')
-  //       : nameMappings.getElementsByTagName('entry');
-
-  //   const propertiesObj = Array.prototype.map.call(properties, (property: Element) => {
-  //     const name = property.getAttribute('name') ?? property.getElementsByTagName('string')[0].innerHTML;
-  //     const label = property.getAttribute('value') ?? property.getElementsByTagName('string')[1].innerHTML;
-  //     /*
-  //       DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
-
-  //       t('postalCode', 'Postal code')
-  //       t('address1', 'Address line 1')
-  //       t('address2', 'Address line 2')
-  //       t('countyDistrict', 'District')
-  //       t('stateProvince', 'State')
-  //       t('cityVillage', 'city')
-  //       t('country', 'Country')
-  //       t('countyDistrict', 'District')
-  //     */
-  //     const value = defaultValues[name];
-  //     setInitialFormValues((initialFormValues) => ({
-  //       ...initialFormValues,
-  //       address: {
-  //         ...(initialFormValues.address ?? {}),
-  //         [name]: value,
-  //       },
-  //     }));
-  //     return {
-  //       id: name,
-  //       name,
-  //       value,
-  //       label,
-  //     };
-  //   });
-  //   setAddressLayout(propertiesObj);
-  // }, [t, addressTemplateXml, setFieldValue, values, setInitialFormValues]);
 
   const orderedAddressFields = useMemo(() => {
     if (isLoadingFieldOrder || errorFetchingFieldOrder) {
