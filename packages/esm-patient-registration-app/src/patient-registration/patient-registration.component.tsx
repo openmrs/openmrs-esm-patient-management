@@ -65,17 +65,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
       .filter((s) => s);
   }, [config.sections, config.sectionDefinitions]);
 
-  // useEffect(() => {
-  //   if (addressTemplate) {
-  //     const addressTemplateXml = addressTemplate?.results[0].value;
-  //     if (!addressTemplateXml) {
-  //       return;
-  //     }
-  //     const { addressValidationSchema } = parseAddressTemplateXml(addressTemplateXml);
-  //     setValidationSchema((validationSchema) => validationSchema.concat(addressValidationSchema));
-  //   }
-  // }, [inEditMode, addressTemplate, initialAddressFieldValues]);
-
   const onFormSubmit = async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
     const abortController = new AbortController();
     helpers.setSubmitting(true);
