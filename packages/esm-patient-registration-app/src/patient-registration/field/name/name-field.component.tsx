@@ -80,7 +80,6 @@ export const NameField = () => {
       id="middleName"
       name="middleName"
       labelText={t('middleNameLabelText', 'Middle Name')}
-      light
       checkWarning={checkNumber}
     />
   );

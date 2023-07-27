@@ -285,7 +285,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
                       return (
                         <WorkloadCard
                           onClick={() => setPatientAppointment({ ...patientAppointment, visitDate: new Date(date) })}
-                          key={date}
+                          key={`${date}-${index}`}
                           date={dayjs(date).format('DD/MM')}
                           count={count}
                           isActive={

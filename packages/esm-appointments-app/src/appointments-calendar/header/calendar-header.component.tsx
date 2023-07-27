@@ -2,10 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
 import { ArrowRight, Filter, ArrowLeft } from '@carbon/react/icons';
-import styles from './calendar-header.scss';
-import { spaBasePath } from '../../constants';
 import { navigate } from '@openmrs/esm-framework';
-import { CalendarType } from '../../types';
+import { spaBasePath } from '../../constants';
+import type { CalendarType } from '../../types';
+import styles from './calendar-header.scss';
 
 enum CalendarView {
   Daily = 'daily',
@@ -50,7 +50,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarV
           </Button>
         </div>
         <p>{t('calendar', 'Calendar')}</p>
-        <Button size="md " kind="ghost" renderIcon={ArrowRight} onClick={addNewClinicDayOnClick}>
+        <Button size="md" kind="ghost" renderIcon={ArrowRight} onClick={addNewClinicDayOnClick}>
           {t('addNewClinicDay', 'Add new clinic day')}
         </Button>
       </div>

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Switch, TextInput, Layer } from '@carbon/react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import styles from '../field.scss';
 import { useConfig } from '@openmrs/esm-framework';
 import { RegistrationConfig } from '../../../config-schema';
+import styles from '../field.scss';
 
 const calcBirthdate = (yearDelta, monthDelta, dateOfBirth) => {
   const { enabled, month, dayOfMonth } = dateOfBirth.useEstimatedDateOfBirth;
@@ -104,38 +104,40 @@ export const DobField: React.FC = () => {
         ) : (
           <div className={styles.grid}>
             <div className={styles.dobField}>
-              <TextInput
-                id="yearsEstimated"
-                type="number"
-                name={yearsEstimated.name}
-                light
-                onChange={onEstimatedYearsChange}
-                labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
-                invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
-                invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
-                value={yearsEstimated.value}
-                min={0}
-                required
-                {...yearsEstimated}
-                onBlur={updateBirthdate}
-              />
+              <Layer>
+                <TextInput
+                  id="yearsEstimated"
+                  type="number"
+                  name={yearsEstimated.name}
+                  onChange={onEstimatedYearsChange}
+                  labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
+                  invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
+                  invalidText={yearsEstimateMeta.error && t(yearsEstimateMeta.error)}
+                  value={yearsEstimated.value}
+                  min={0}
+                  required
+                  {...yearsEstimated}
+                  onBlur={updateBirthdate}
+                />
+              </Layer>
             </div>
             <div className={styles.dobField}>
-              <TextInput
-                id="monthsEstimated"
-                type="number"
-                name={monthsEstimated.name}
-                light
-                onChange={onEstimatedMonthsChange}
-                labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
-                invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
-                invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
-                value={monthsEstimated.value}
-                min={0}
-                {...monthsEstimated}
-                required={!yearsEstimateMeta.value}
-                onBlur={updateBirthdate}
-              />
+              <Layer>
+                <TextInput
+                  id="monthsEstimated"
+                  type="number"
+                  name={monthsEstimated.name}
+                  onChange={onEstimatedMonthsChange}
+                  labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
+                  invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
+                  invalidText={monthsEstimateMeta.error && t(monthsEstimateMeta.error)}
+                  value={monthsEstimated.value}
+                  min={0}
+                  {...monthsEstimated}
+                  required={!yearsEstimateMeta.value}
+                  onBlur={updateBirthdate}
+                />
+              </Layer>
             </div>
           </div>
         )}
