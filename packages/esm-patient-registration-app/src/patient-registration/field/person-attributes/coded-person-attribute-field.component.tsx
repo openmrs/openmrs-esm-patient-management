@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { Input } from '../../input/basic-input/input/input.component';
-import { PersonAttributeTypeResponse } from '../../patient-registration-types';
+import { PersonAttributeTypeResponse } from '../../patient-registration.types';
 import { useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 import { useTranslation } from 'react-i18next';

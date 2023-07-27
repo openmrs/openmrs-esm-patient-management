@@ -271,8 +271,8 @@ const ActiveVisitsTable = () => {
                                 className={styles.visitSummaryContainer}
                                 name="visit-summary-slot"
                                 state={{
-                                  visitUuid: activeVisits[index]?.visitUuid,
-                                  patientUuid: activeVisits[index]?.patientUuid,
+                                  visitUuid: visit.visitUuid,
+                                  patientUuid: visit.patientUuid,
                                 }}
                               />
                             </th>
