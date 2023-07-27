@@ -39,8 +39,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('../helpers/helpers.tsx', () => {
-  const originalModule = jest.requireActual('../helpers/helpers.tsx');
+jest.mock('../helpers/helpers.ts', () => {
+  const originalModule = jest.requireActual('../helpers/helpers.ts');
 
   return {
     ...originalModule,
