@@ -62,7 +62,7 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
       fieldProps={{
         ...field,
         id: attribute.name,
-        labelText: `${attribute.label} (${t('optional', 'optional')})`,
+        labelText: `${t(attribute.label)} (${t('optional', 'optional')})`,
       }}
       handleInputChange={handleInputChange}
     />
