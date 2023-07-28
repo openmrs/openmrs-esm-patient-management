@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
@@ -60,13 +60,15 @@ describe('TextPersonAttributeField', () => {
 
     // Valid input: "ABC"
     await user.type(textbox, 'ABC');
+    await user.tab();
+
     expect(screen.queryByText(/invalid input/i)).not.toBeInTheDocument();
-
-    // Invalid input: "abc" (contains lowercase letters)
     await user.clear(textbox);
-    await user.type(textbox, 'abc');
 
-    // // await waitFor(() => expect(screen.getByText(/Invalid Input/i)).toBeInTheDocument());
+    // // Invalid input: "abc" (contains lowercase letters)
+    await user.type(textbox, 'abc');
+    await user.tab();
+    expect(screen.getByText(/invalid input/i)).toBeInTheDocument();
   });
 
   it('renders the input field as required when required prop is true', () => {
