@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { RelationshipsSection } from './relationships-section.component';
 import { Form, Formik } from 'formik';
-import { Resources, ResourcesContext } from '../../../offline.resources';
-import { RegistrationConfig } from '../../../config-schema';
+import { render, screen } from '@testing-library/react';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { Resources, ResourcesContext } from '../../../offline.resources';
+import { RelationshipsSection } from './relationships-section.component';
 
 jest.mock('../../patient-registration.resource', () => ({
   fetchPerson: jest.fn().mockResolvedValue({
@@ -28,52 +27,8 @@ let mockResourcesContextValue = {
   relationshipTypes: null,
 } as Resources;
 
-let mockOpenmrsConfig: RegistrationConfig = {
-  sections: ['demographics', 'contact'],
-  sectionDefinitions: [
-    { id: 'demographics', name: 'Demographics', fields: ['name', 'gender', 'dob'] },
-    { id: 'contact', name: 'Contact Info', fields: ['address'] },
-    { id: 'relationships', name: 'Relationships', fields: ['relationship'] },
-  ],
-  fieldDefinitions: [],
-  fieldConfigurations: {
-    name: {
-      displayMiddleName: true,
-      unidentifiedPatient: true,
-      defaultUnknownGivenName: 'UNKNOWN',
-      defaultUnknownFamilyName: 'UNKNOWN',
-    },
-    gender: [
-      {
-        value: 'Male',
-        label: 'Male',
-        id: 'male',
-      },
-    ],
-    address: {
-      useAddressHierarchy: {
-        enabled: true,
-        useQuickSearch: true,
-        searchAddressByLevel: true,
-      },
-    },
-  },
-  concepts: {
-    patientPhotoUuid: '736e8771-e501-4615-bfa7-570c03f4bef5',
-  },
-  links: {
-    submitButton: '#',
-  },
-  defaultPatientIdentifierTypes: [],
-  registrationObs: {
-    encounterTypeUuid: null,
-    encounterProviderRoleUuid: 'asdf',
-    registrationFormUuid: null,
-  },
-};
-
 describe('RelationshipsSection', () => {
-  it('renders skeleton text when relationshipTypes are not available', () => {
+  it('renders a loader when relationshipTypes are not available', () => {
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
@@ -83,10 +38,13 @@ describe('RelationshipsSection', () => {
         </Formik>
       </ResourcesContext.Provider>,
     );
-    expect(screen.queryByText(/Add Relationship/i)).not.toBeInTheDocument();
+
+    expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
+    expect(screen.getByRole(/progressbar/i)).toBeInTheDocument();
+    expect(screen.queryByText(/add relationship/i)).not.toBeInTheDocument();
   });
 
-  it.skip('renders relationships when relationshipTypes are available', () => {
+  it('renders relationships when relationshipTypes are available', () => {
     const relationshipTypes = {
       results: [
         { aIsToB: 'Mother', bIsToA: 'Child', uuid: 'uuid1' },
@@ -97,7 +55,7 @@ describe('RelationshipsSection', () => {
       ...mockResourcesContextValue,
       relationshipTypes: relationshipTypes,
     };
-    jest.spyOn(React, 'useContext').mockReturnValue({ relationshipTypes });
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Formik
@@ -117,8 +75,14 @@ describe('RelationshipsSection', () => {
         </Formik>
       </ResourcesContext.Provider>,
     );
-    // expect(container.querySelectorAll('.relationship')).toHaveLength(0);
-    screen.debug();
-    expect(screen.getByText(/Add Relationship/i)).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/relationships section/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /relationship/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add relationship/i })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: /full name/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /mother/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /father/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('option', { name: /child/i }).length).toEqual(2);
   });
 });
