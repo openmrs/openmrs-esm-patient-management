@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { Button, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
+import { Button, Layer, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
 import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
@@ -54,14 +54,16 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
       <ModalBody>
         <div className={styles.checkInTime}>
           <span className={styles.checkInLabel}>{t('checkinTime', 'Check-in time')}:</span>
-          <TimePicker
-            required
-            light
-            className={styles.timePickerInput}
-            pattern="([\d]+:[\d]{2})"
-            onChange={(event) => setCheckInTime(event.target.value)}
-            value={checkInTime}
-            id="end-time-picker"></TimePicker>
+          <Layer>
+            <TimePicker
+              required
+              className={styles.timePickerInput}
+              pattern="([\d]+:[\d]{2})"
+              onChange={(event) => setCheckInTime(event.target.value)}
+              value={checkInTime}
+              id="end-time-picker"
+            />
+          </Layer>
         </div>
       </ModalBody>
       <ModalFooter>

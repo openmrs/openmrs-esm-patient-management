@@ -1,10 +1,10 @@
+import React from 'react';
 import { Button } from '@carbon/react';
 import { Dayjs } from 'dayjs';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './weekly-header.scss';
 import { weekDays } from '../../helpers';
-import { CalendarType } from '../../types';
+import type { CalendarType } from '../../types';
+import styles from './weekly-header.scss';
 
 const Format = {
   monthly: 'month',
@@ -48,7 +48,7 @@ function WeeklyHeader({
       </div>
       <div className={styles.workLoadCard}>
         {weekDays(currentDate).map((dateTime, i) => (
-          <>
+          <React.Fragment key={`weekDay-${i}`}>
             {i !== 0 && (
               <div tabIndex={0} role="button" className={`${styles.tileContainer} `}>
                 <span>
@@ -56,7 +56,7 @@ function WeeklyHeader({
                 </span>
               </div>
             )}
-          </>
+          </React.Fragment>
         ))}
       </div>
     </>

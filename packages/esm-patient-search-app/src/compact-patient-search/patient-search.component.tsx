@@ -1,14 +1,18 @@
 import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
-import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
+import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
+import type { PatientSearchResponse, SearchedPatient } from '../types';
 import styles from './patient-search.scss';
-import { PatientSearchResponse } from '../types';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
-  selectPatientAction?: (evt: any, index: number) => void;
+  selectPatientAction?: (
+    evt: React.MouseEvent<HTMLAnchorElement>,
+    index: number,
+    patients: Array<SearchedPatient>,
+  ) => void;
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
@@ -46,11 +50,9 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
     if (isLoading) {
       return (
         <div className={styles.searchResultsContainer}>
-          <SearchResultSkeleton />
-          <SearchResultSkeleton />
-          <SearchResultSkeleton />
-          <SearchResultSkeleton />
-          <SearchResultSkeleton />
+          {[...Array(5)].map((_, index) => (
+            <SearchResultSkeleton key={index} />
+          ))}
         </div>
       );
     }
