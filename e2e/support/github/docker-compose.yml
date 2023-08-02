@@ -5,7 +5,7 @@ services:
   gateway:
     image: openmrs/openmrs-reference-application-3-gateway:${TAG:-nightly}
     ports:
-      - "8180:80"
+      - "8080:80"
 
   frontend:
     build:

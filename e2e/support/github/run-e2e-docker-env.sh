@@ -29,7 +29,7 @@ echo "Creating dynamic spa-assemble-config.json..."
 jq -n \
   --arg apps "$apps" \
   --arg app_names "$(echo ${app_names[@]})" \
-  '{"@openmrs/esm-login-app": "next", "@openmrs/esm-primary-navigation-app": "next"} + (
+  '{"@openmrs/esm-login-app": "next", "@openmrs/esm-offline-tools-app": "next", "@openmrs/esm-primary-navigation-app": "next", "@openmrs/esm-home-app": "next", "@openmrs/esm-form-entry-app": "next", "@openmrs/esm-generic-patient-widgets-app": "next", "@openmrs/esm-patient-allergies-app": "next", "@openmrs/esm-patient-appointments-app": "next", "@openmrs/esm-patient-attachments-app": "next", "@openmrs/esm-patient-banner-app": "next", "@openmrs/esm-patient-biometrics-app": "next", "@openmrs/esm-patient-chart-app": "next", "@openmrs/esm-patient-conditions-app": "next", "@openmrs/esm-patient-forms-app": "next", "@openmrs/esm-patient-flags-app": "next", "@openmrs/esm-patient-medications-app": "next", "@openmrs/esm-patient-notes-app": "next", "@openmrs/esm-patient-programs-app": "next", "@openmrs/esm-patient-test-results-app": "next", "@openmrs/esm-patient-vitals-app": "next"} + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
     | [$apps, $app_files]
     | transpose
