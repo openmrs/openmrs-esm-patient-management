@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, waitFor, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
 import { SelectInput } from './select-input.component';
 
@@ -21,16 +22,16 @@ describe('the select input', () => {
   });
 
   it('can input data', async () => {
+    const user = userEvent.setup();
     const input = await setupSelect();
     const expected = 'A Option';
 
-    fireEvent.change(input, { target: { value: expected } });
-    fireEvent.blur(input);
+    await user.selectOptions(input, expected);
 
     await waitFor(() => expect(input.value).toEqual(expected));
   });
 
-  it('should show optional label if the input is not required', () => {
+  it('should show optional label if the input is not required', async () => {
     render(
       <Formik initialValues={{ select: '' }} onSubmit={null}>
         <Form>
@@ -38,6 +39,9 @@ describe('the select input', () => {
         </Form>
       </Formik>,
     );
+
+    await waitFor(() => expect(screen.findByRole('combobox')));
+
     const selectInput = screen.getByRole('combobox', { name: 'Select (optional)' }) as HTMLSelectElement;
     expect(selectInput.labels).toHaveLength(1);
     expect(selectInput.labels[0]).toHaveTextContent('Select (optional)');

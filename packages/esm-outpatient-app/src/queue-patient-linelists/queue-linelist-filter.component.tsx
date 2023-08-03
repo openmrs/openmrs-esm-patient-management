@@ -93,28 +93,30 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
                 />
               </Layer>
               <Layer className={styles.numberInputs}>
-                <NumberInput
-                  id="startAge"
-                  light
-                  invalidText={t('startAgeRangeInvalid', 'Start age range is not valid')}
-                  label={t('between', 'Between')}
-                  max={100}
-                  min={0}
-                  onChange={(event) => setStartAge(event.target.value)}
-                  size="md"
-                  value={startAge}
-                />
-                <NumberInput
-                  id="endAge"
-                  light
-                  invalidText={t('endAgeRangeInvalid', 'End age range is not valid')}
-                  label={t('and', 'And')}
-                  max={100}
-                  min={0}
-                  onChange={(event) => setEndAge(event.target.value)}
-                  size="md"
-                  value={endAge}
-                />
+                <Layer>
+                  <NumberInput
+                    id="startAge"
+                    invalidText={t('startAgeRangeInvalid', 'Start age range is not valid')}
+                    label={t('between', 'Between')}
+                    max={100}
+                    min={0}
+                    onChange={(event) => setStartAge(event.target.value)}
+                    size="md"
+                    value={startAge}
+                  />
+                </Layer>
+                <Layer>
+                  <NumberInput
+                    id="endAge"
+                    invalidText={t('endAgeRangeInvalid', 'End age range is not valid')}
+                    label={t('and', 'And')}
+                    max={100}
+                    min={0}
+                    onChange={(event) => setEndAge(event.target.value)}
+                    size="md"
+                    value={endAge}
+                  />
+                </Layer>
               </Layer>
             </Column>
           </Stack>
@@ -122,9 +124,11 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
           <Stack gap={4} className={styles.grid}>
             <Column md={2}>
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
-              <DatePicker datePickerType="single" value={returnDate} onChange={([date]) => setReturnDate(date)} light>
-                <DatePickerInput id="returnDate" placeholder="mm/dd/yyyy" labelText={t('date', 'Date')} type="date" />
-              </DatePicker>
+              <Layer>
+                <DatePicker datePickerType="single" value={returnDate} onChange={([date]) => setReturnDate(date)}>
+                  <DatePickerInput id="returnDate" placeholder="mm/dd/yyyy" labelText={t('date', 'Date')} type="date" />
+                </DatePicker>
+              </Layer>
               <Button
                 kind="ghost"
                 onClick={() => {
@@ -138,15 +142,16 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
           <Stack gap={4} className={styles.grid}>
             <Column>
               <p className={styles.heading}>{t('visitType', 'Visit Type')}</p>
-              <Dropdown
-                id="visitType"
-                light
-                label={t('selectVisitTyoe', 'Select visit type')}
-                items={allVisitTypes}
-                onChange={(event) => setVisitType(event.selectedItem.toString)}
-                size="sm"
-                itemToElement={(item) => (item ? <span>{item.display}</span> : null)}
-              />
+              <Layer>
+                <Dropdown
+                  id="visitType"
+                  label={t('selectVisitTyoe', 'Select visit type')}
+                  items={allVisitTypes}
+                  onChange={(event) => setVisitType(event.selectedItem.toString)}
+                  size="sm"
+                  itemToElement={(item) => (item ? <span>{item.display}</span> : null)}
+                />
+              </Layer>
             </Column>
           </Stack>
         </div>

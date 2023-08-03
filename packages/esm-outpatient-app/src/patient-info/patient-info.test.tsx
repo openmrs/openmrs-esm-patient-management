@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { age } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../tools/test-helpers';
 import PatientInfo from './patient-info.component';
 
 const mockAge = age as jest.Mock;

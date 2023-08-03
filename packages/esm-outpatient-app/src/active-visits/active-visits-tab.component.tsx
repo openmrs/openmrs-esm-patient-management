@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Tab, Tabs, TabPanels, TabPanel, TabList } from '@carbon/react';
+import { Tab, Tabs, TabPanels, TabPanel, TabList } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import PatientSearch from '../patient-search/patient-search.component';
-import styles from './active-visits-table.scss';
 import { SearchTypes } from '../types';
+import PatientSearch from '../patient-search/patient-search.component';
 import MissingQueueEntries from '../visits-missing-inqueue/visits-missing-inqueue.component';
 import ActiveVisitsTable from './active-visits-table.component';
+import styles from './active-visits-table.scss';
 
 function ActiveVisitsTabs() {
   const { t } = useTranslation();
