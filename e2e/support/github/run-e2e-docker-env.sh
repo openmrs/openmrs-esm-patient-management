@@ -29,14 +29,14 @@ echo "Creating dynamic spa-assemble-config.json..."
 jq -n \
   --arg apps "$apps" \
   --arg app_names "$(echo ${app_names[@]})" \
-  '{"@openmrs/esm-login-app": "next", "@openmrs/esm-primary-navigation-app": "next", "@openmrs/esm-patient-chart-app": "next"} + (
+  '{"@openmrs/esm-login-app": "next", "@openmrs/esm-home-app": "next"} + (
     ($apps | split("\n")) as $apps | ($app_names | split(" ") | map("/app/" + .)) as $app_files
     | [$apps, $app_files]
     | transpose
     | map({"key": .[0], "value": .[1]})
     | from_entries
   )' | jq '{"frontendModules": .}' > "$working_dir/spa-assemble-config.json"
-echo "Created dynamic spa-sssemble-config.json"
+echo "Created dynamic spa-assemble-config.json"
 
 echo "Copying Docker configuration..."
 cp "$script_dir/Dockerfile" "$working_dir/Dockerfile"
