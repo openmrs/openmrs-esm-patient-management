@@ -29,7 +29,6 @@ test('Register a new patient', async ({ page, api }) => {
 
   await test.step('When I visit the registration page', async () => {
     await patientRegistrationPage.goto();
-    await patientRegistrationPage.waitUntilTheFormIsLoaded();
   });
 
   await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
