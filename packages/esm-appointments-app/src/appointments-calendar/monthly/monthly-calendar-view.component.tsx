@@ -24,7 +24,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ type, events,
         {type === 'monthly' ? (
           <div className={styles.monthlyCalendar}>
             {monthDays(currentDate).map((dateTime, i) => (
-              <MonthlyViewWorkload type={type} key={i} dateTime={dateTime} currentDate={currentDate} events={events} />
+              <MonthlyViewWorkload key={i} type={type} dateTime={dateTime} currentDate={currentDate} events={events} />
             ))}
           </div>
         ) : null}

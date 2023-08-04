@@ -1,11 +1,11 @@
 import React, { useCallback, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ContentSwitcher, Switch, TextInput, DatePicker, DatePickerInput, Button, NumberInput } from '@carbon/react';
+import { Button, ContentSwitcher, Layer, NumberInput, Switch, TextInput } from '@carbon/react';
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
-import styles from './refine-search.scss';
 import reducer, { initialState } from './advanced-search-reducer';
-import { AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
+import { AdvancedPatientSearchActionTypes, type AdvancedPatientSearchState } from '../types';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './refine-search.scss';
 
 interface RefineSearchProps {
   inTabletOrOverlay: boolean;
@@ -307,83 +307,91 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
         </ContentSwitcher>
       </div>
       <div className={`${styles.field} ${styles.dobFields}`}>
-        <NumberInput
-          id="dateOfBirth"
-          placeholder="DD"
-          value={formState.dateOfBirth || ''}
-          onChange={handleDateOfBirthChange}
-          className={styles.dobField}
-          type="number"
-          label={t('dayOfBirth', 'Day of Birth')}
-          min={1}
-          max={31}
-          light
-          allowEmpty
-          hideSteppers
-        />
-        <NumberInput
-          id="monthOfBirth"
-          placeholder="MM"
-          value={formState.monthOfBirth || ''}
-          onChange={handleMonthOfBirthChange}
-          className={styles.dobField}
-          type="number"
-          label={t('monthOfBirth', 'Month of Birth')}
-          min={1}
-          max={12}
-          allowEmpty
-          hideSteppers
-          light
-        />
-        <NumberInput
-          id="yearOfBirth"
-          placeholder="YYYY"
-          value={formState.yearOfBirth || ''}
-          onChange={handleYearOfBirthChange}
-          className={styles.dobField}
-          type="number"
-          label={t('yearOfBirth', 'Year of Birth')}
-          allowEmpty
-          hideSteppers
-          light
-          min={1800}
-          max={new Date().getFullYear()}
-        />
+        <Layer>
+          <NumberInput
+            id="dateOfBirth"
+            placeholder="DD"
+            value={formState.dateOfBirth || ''}
+            onChange={handleDateOfBirthChange}
+            className={styles.dobField}
+            type="number"
+            label={t('dayOfBirth', 'Day of Birth')}
+            min={1}
+            max={31}
+            allowEmpty
+            hideSteppers
+          />
+        </Layer>
+
+        <Layer>
+          <NumberInput
+            id="monthOfBirth"
+            placeholder="MM"
+            value={formState.monthOfBirth || ''}
+            onChange={handleMonthOfBirthChange}
+            className={styles.dobField}
+            type="number"
+            label={t('monthOfBirth', 'Month of Birth')}
+            min={1}
+            max={12}
+            allowEmpty
+            hideSteppers
+          />
+        </Layer>
+
+        <Layer>
+          <NumberInput
+            id="yearOfBirth"
+            placeholder="YYYY"
+            value={formState.yearOfBirth || ''}
+            onChange={handleYearOfBirthChange}
+            className={styles.dobField}
+            type="number"
+            label={t('yearOfBirth', 'Year of Birth')}
+            allowEmpty
+            hideSteppers
+            min={1800}
+            max={new Date().getFullYear()}
+          />
+        </Layer>
       </div>
       <div className={styles.field}>
-        <NumberInput
-          id="age"
-          value={formState.age || ''}
-          onChange={handleAgeChange}
-          size={isTablet ? 'lg' : 'md'}
-          label={t('age', 'Age')}
-          min={0}
-          light
-          allowEmpty
-          hideSteppers
-        />
+        <Layer>
+          <NumberInput
+            id="age"
+            value={formState.age || ''}
+            onChange={handleAgeChange}
+            size={isTablet ? 'lg' : 'md'}
+            label={t('age', 'Age')}
+            min={0}
+            allowEmpty
+            hideSteppers
+          />
+        </Layer>
       </div>
       <div className={styles.field}>
-        <NumberInput
-          id="phoneNumber"
-          label={t('phoneNumber', 'Phone number')}
-          onChange={handlePhoneNumberChange}
-          type="number"
-          value={formState.phoneNumber || ''}
-          light
-          allowEmpty
-          hideSteppers
-          min={1}
-        />
+        <Layer>
+          <NumberInput
+            id="phoneNumber"
+            label={t('phoneNumber', 'Phone number')}
+            onChange={handlePhoneNumberChange}
+            type="number"
+            value={formState.phoneNumber || ''}
+            allowEmpty
+            hideSteppers
+            min={1}
+          />
+        </Layer>
       </div>
       <div className={styles.field}>
-        <TextInput
-          id="postcode"
-          labelText={t('postcode', 'Postcode')}
-          onChange={handlePostCodeChange}
-          value={formState.postcode}
-          light
-        />
+        <Layer>
+          <TextInput
+            id="postcode"
+            labelText={t('postcode', 'Postcode')}
+            onChange={handlePostCodeChange}
+            value={formState.postcode}
+          />
+        </Layer>
       </div>
       <hr className={`${styles.field} ${styles.horizontalDivider}`} />
       <Button type="submit" kind="primary" size="md" className={`${styles.field} ${styles.button}`}>

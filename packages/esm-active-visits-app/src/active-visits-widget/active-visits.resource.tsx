@@ -48,13 +48,18 @@ export function useActiveVisits() {
       return null;
     }
 
-    let url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}&totalCount=true&location=${sessionLocation}`;
+    let url = `/ws/rest/v1/visit?v=${customRepresentation}&`;
+    let urlSearchParams = new URLSearchParams();
+
+    urlSearchParams.append('includeInactive', 'false');
+    urlSearchParams.append('totalCount', 'true');
+    urlSearchParams.append('location', `${sessionLocation}`);
 
     if (pageIndex) {
-      url += `&startIndex=${pageIndex * 50}`;
+      urlSearchParams.append('startIndex', `${pageIndex * 50}`);
     }
 
-    return url;
+    return url + urlSearchParams.toString();
   };
 
   const {
@@ -73,7 +78,7 @@ export function useActiveVisits() {
   }, [data, pageNumber]);
 
   const mapVisitProperties = (visit: Visit): ActiveVisit => {
-    //create base object
+    // create base object
     const activeVisits: ActiveVisit = {
       age: visit?.patient?.person?.age,
       id: visit.uuid,
@@ -87,36 +92,36 @@ export function useActiveVisits() {
       visitUuid: visit.uuid,
     };
 
-    //in case no configuration is given the previous behavior remains the same
+    // in case no configuration is given the previous behavior remains the same
     if (!config?.activeVisits?.identifiers) {
       activeVisits.idNumber = visit?.patient?.identifiers[0]?.identifier ?? '--';
     } else {
-      //map identifiers on config
+      // map identifiers on config
       config?.activeVisits?.identifiers?.map((configIdentifier) => {
-        //check if in the current visit the patient has in his identifiers the current identifierType name
+        // check if in the current visit the patient has in his identifiers the current identifierType name
         const visitIdentifier = visit?.patient?.identifiers.find(
           (visitIdentifier) => visitIdentifier?.identifierType?.name === configIdentifier?.identifierName,
         );
 
-        //add the new identifier or rewrite existing one to activeVisit object
-        //the parameter will corresponds to the name of the key value of the configuration
-        //and the respective value is the visit identifier
-        //If there isn't a identifier we display this default text '--'
+        // add the new identifier or rewrite existing one to activeVisit object
+        // the parameter will corresponds to the name of the key value of the configuration
+        // and the respective value is the visit identifier
+        // If there isn't a identifier we display this default text '--'
         activeVisits[configIdentifier.header?.key] = visitIdentifier?.identifier ?? '--';
       });
     }
 
-    //map attributes on config
+    // map attributes on config
     config?.activeVisits?.attributes?.map(({ display, header }) => {
-      //check if in the current visit the person has in his attributes the current display
+      // check if in the current visit the person has in his attributes the current display
       const personAttributes = visit?.patient?.person?.attributes.find(
         (personAttributes) => personAttributes?.attributeType?.display === display,
       );
 
-      //add the new attribute or rewrite existing one to activeVisit object
-      //the parameter will correspond to the name of the key value of the configuration
-      //and the respective value is the persons value
-      //If there isn't a attribute we display this default text '--'
+      // add the new attribute or rewrite existing one to activeVisit object
+      // the parameter will correspond to the name of the key value of the configuration
+      // and the respective value is the persons value
+      // If there isn't a attribute we display this default text '--'
       activeVisits[header?.key] = personAttributes?.value ?? '--';
     });
 
@@ -129,9 +134,9 @@ export function useActiveVisits() {
 
   return {
     activeVisits: formattedActiveVisits,
+    error,
     isLoading,
     isValidating,
-    isError: error,
     totalResults: data?.[0]?.data?.totalCount ?? 0,
   };
 }

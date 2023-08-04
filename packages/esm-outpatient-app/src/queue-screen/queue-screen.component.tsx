@@ -31,7 +31,7 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
       <PatientQueueHeader />
       <div className={styles.gridFlow}>
         {rowData.map((row) => (
-          <div className={styles.card}>
+          <div className={styles.card} key={row.id}>
             <p className={styles.subHeader}>{t('ticketNumber', 'Ticket number')}</p>
             <p className={row.status === 'calling' ? styles.headerBlinking : styles.header}>{row.ticketNumber}</p>
             <p className={styles.subHeader}>
