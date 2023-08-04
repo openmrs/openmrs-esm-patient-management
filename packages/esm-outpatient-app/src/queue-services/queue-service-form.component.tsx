@@ -115,8 +115,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               id="queueConcept"
               invalidText="Required"
               value={queueConcept}
-              onChange={(event) => setQueueConcept(event.target.value)}
-              light>
+              onChange={(event) => setQueueConcept(event.target.value)}>
               {!queueConcept && <SelectItem text={t('selectServiceType', 'Select a service type')} />}
               {queueConcepts.length === 0 && <SelectItem text={t('noServicesAvailable', 'No services available')} />}
               {queueConcepts?.length > 0 &&
@@ -145,8 +144,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               id="location"
               invalidText="Required"
               value={userLocation}
-              onChange={(event) => setUserLocation(event.target.value)}
-              light>
+              onChange={(event) => setUserLocation(event.target.value)}>
               {!userLocation && <SelectItem text={t('selectLocation', 'Select a location')} />}
               {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
               {queueLocations?.length > 0 &&

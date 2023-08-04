@@ -30,9 +30,9 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
           {currentData?.service && (
             <div className={styles.currentData}>
-              {currentData.service.map(({ serviceName, count }) => (
+              {currentData.service.map(({ serviceName, count, i }) => (
                 <div
-                  key={serviceName}
+                  key={`${serviceName}-${count}-${i}`}
                   role="button"
                   tabIndex={0}
                   onClick={() => serviceAreaOnClick(serviceName)}

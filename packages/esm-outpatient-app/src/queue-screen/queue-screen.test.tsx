@@ -8,14 +8,19 @@ jest.mock('./useActiveTickets');
 describe('QueueScreen component', () => {
   test('renders loading skeleton when data is loading', () => {
     const mockedUseActiveTickets = useActiveTickets as jest.MockedFunction<typeof useActiveTickets>;
-    mockedUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined });
+    mockedUseActiveTickets.mockReturnValue({ isLoading: true, activeTickets: [], error: undefined, mutate: jest.fn() });
     render(<QueueScreen />);
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   test('renders error message when there is an error fetching data', () => {
     const mockedUseActiveTickets = useActiveTickets as jest.MockedFunction<typeof useActiveTickets>;
-    mockedUseActiveTickets.mockReturnValue({ error: new Error('Error'), isLoading: false, activeTickets: [] });
+    mockedUseActiveTickets.mockReturnValue({
+      error: new Error('Error'),
+      isLoading: false,
+      activeTickets: [],
+      mutate: jest.fn(),
+    });
     render(<QueueScreen />);
     expect(screen.getByText('Error')).toBeInTheDocument();
   });
@@ -32,6 +37,7 @@ describe('QueueScreen component', () => {
       ],
       isLoading: false,
       error: undefined,
+      mutate: jest.fn(),
     });
     render(<QueueScreen />);
     expect(screen.getByText('Room : Room A')).toBeInTheDocument();

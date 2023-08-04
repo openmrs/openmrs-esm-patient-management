@@ -1,7 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { mockPatient, renderWithSwr } from '../../../../tools/test-helpers';
 import AppointmentDetails from './appointment-details.component';
 import { usePastVisits } from './../past-visit/past-visit.resource';
 import { useAppointments } from './appointments.resource';
