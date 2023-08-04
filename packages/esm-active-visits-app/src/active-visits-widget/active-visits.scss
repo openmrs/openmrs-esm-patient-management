@@ -9,10 +9,10 @@
 .activeVisitsContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;
-  border-bottom: none;
   width: 100%;
   margin: 0 auto;
   max-width: 95vw;
+  padding-bottom: 0;
 }
 
 .activeVisitsDetailHeaderContainer {
@@ -116,6 +116,7 @@
   justify-content: center;
   align-items: center;
   padding: spacing.$spacing-05;
+  margin: spacing.$spacing-11;
   text-align: center;
 }
 

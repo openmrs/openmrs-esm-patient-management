@@ -3,13 +3,13 @@ import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
-import { FormManager } from './form-manager';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import FormManager from './form-manager';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { Encounter } from './patient-registration-types';
 import { Resources, ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
 import { RegistrationConfig } from '../config-schema';
+import { mockPatient } from '../../../../tools/test-helpers';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
