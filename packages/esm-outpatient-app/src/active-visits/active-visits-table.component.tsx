@@ -30,7 +30,7 @@ import {
   Tile,
   Pagination,
 } from '@carbon/react';
-import { Add, ArrowRight } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   useLayoutType,
   navigate,
@@ -40,7 +40,6 @@ import {
   usePagination,
   useConfig,
   ConfigObject,
-  UserHasAccess,
   useSession,
   showModal,
 } from '@openmrs/esm-framework';
@@ -50,12 +49,7 @@ import {
   getOriginFromPathName,
   MappedVisitQueueEntry,
 } from './active-visits-table.resource';
-import CurrentVisit from '../current-visit/current-visit-summary.component';
-import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
-import styles from './active-visits-table.scss';
 import { SearchTypes } from '../types';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -65,13 +59,18 @@ import {
   useSelectedServiceUuid,
 } from '../helpers/helpers';
 import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
-import EditMenu from '../queue-entry-table-components/edit-entry.component';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
+import EditMenu from '../queue-entry-table-components/edit-entry.component';
+import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
+import PatientSearch from '../patient-search/patient-search.component';
+import PastVisit from '../past-visit/past-visit.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import styles from './active-visits-table.scss';
 
 type FilterProps = {
   rowIds: Array<string>;
@@ -270,7 +269,15 @@ function ActiveVisitsTable() {
     ) {
       launchAddProviderRoomModal();
     }
-  }, [currentServiceUuid, rooms, providerRoomModalShown]);
+  }, [
+    currentServiceUuid,
+    rooms,
+    providerRoomModalShown,
+    loading,
+    differenceInTime,
+    isPermanentProviderQueueRoom,
+    launchAddProviderRoomModal,
+  ]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;

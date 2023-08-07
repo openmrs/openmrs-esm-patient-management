@@ -148,18 +148,19 @@ function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldPr
           {({ field, form: { touched, errors }, meta }) => {
             if (fieldDefinition?.customConceptAnswers?.length) {
               return (
-                <Select
-                  id={fieldName}
-                  name={fieldName}
-                  labelText={label ?? concept?.display}
-                  light
-                  invalid={errors[fieldName] && touched[fieldName]}
-                  {...field}>
-                  <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                  {fieldDefinition?.customConceptAnswers.map((answer) => (
-                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                  ))}
-                </Select>
+                <Layer>
+                  <Select
+                    id={fieldName}
+                    name={fieldName}
+                    labelText={label ?? concept?.display}
+                    invalid={errors[fieldName] && touched[fieldName]}
+                    {...field}>
+                    <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
+                    {fieldDefinition?.customConceptAnswers.map((answer) => (
+                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
+                    ))}
+                  </Select>
+                </Layer>
               );
             }
             return (

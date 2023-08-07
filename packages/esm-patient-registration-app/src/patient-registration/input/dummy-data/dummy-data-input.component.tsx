@@ -12,7 +12,6 @@ export const dummyFormValues: FormValues = {
   givenName: 'John',
   middleName: '',
   familyName: 'Smith',
-  unidentifiedPatient: false,
   additionalGivenName: 'Joey',
   additionalMiddleName: '',
   additionalFamilyName: 'Smitty',

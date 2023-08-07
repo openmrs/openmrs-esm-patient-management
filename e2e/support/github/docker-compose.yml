@@ -3,12 +3,22 @@
 version: "3.7"
 
 services:
+  gateway:
+    image: openmrs/openmrs-reference-application-3-gateway:${TAG:-nightly}
+    ports:
+      - "8080:80"
+
+  frontend:
+    build:
+      context: .
+    environment:
+      SPA_PATH: /openmrs/spa
+      API_URL: /openmrs
+
   backend:
     image: piumal1999/openmrs-reference-application-3-backend:nightly-with-data #TODO: replace with OMRS docker image
     depends_on:
       - db
-    ports:
-      - 9000:8080
 
   db:
     image: piumal1999/openmrs-reference-application-3-db:nightly-with-data #TODO: replace with OMRS docker image
