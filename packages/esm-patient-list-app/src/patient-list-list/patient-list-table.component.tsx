@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useMemo, useState } from 'react';
 import {
   DataTable,
   DataTableCustomRenderProps,
@@ -28,11 +28,12 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { ConfigSchema } from '../config-schema';
-import styles from './patient-list-list.scss';
 import { PatientList } from '../api/types';
 import { updatePatientList } from '../api/api-remote';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash-es/debounce';
+import styles from './patient-list-list.scss';
 
 interface PatientListTableContainerProps {
   style?: CSSProperties;
@@ -44,7 +45,6 @@ interface PatientListTableContainerProps {
   handleCreate?: () => void;
   error: Error;
   isValidating: boolean;
-  searchTerm: string;
   setSearchTerm: (searchString: string) => void;
 }
 
@@ -58,7 +58,6 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   handleCreate,
   error,
   isValidating,
-  searchTerm,
   setSearchTerm,
 }) => {
   const { t } = useTranslation();
@@ -85,10 +84,14 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   }
   const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
-  const handleSearch = (str) => {
-    setSearchTerm(str);
-    goTo(1);
-  };
+  const handleSearch = useMemo(
+    () =>
+      debounce((searchTerm) => {
+        goTo(1);
+        setSearchTerm(searchTerm);
+      }, 300),
+    [],
+  );
 
   return (
     <div>
@@ -101,7 +104,6 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
             size={isDesktop(layout) ? 'sm' : 'lg'}
             className={styles.search}
             onChange={(evnt) => handleSearch(evnt.target.value)}
-            value={searchTerm}
             placeholder={t('searchThisList', 'Search this list')}
           />
         </Layer>

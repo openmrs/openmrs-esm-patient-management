@@ -136,7 +136,6 @@ const PatientListList: React.FC = () => {
             isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientLists}
-            searchTerm={currentSearchTerm}
             setSearchTerm={handleSearch}
             refetch={mutate}
             error={error}

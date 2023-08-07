@@ -101,7 +101,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
               id="patient-list-search"
               placeholder={search.placeHolder}
               labelText=""
-              size={isDesktop(layout) ? 'sm' : 'xl'}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
               className={styles.searchOverrides}
               onChange={(evnt) => handleSearch(evnt.target.value)}
               defaultValue={search.currentSearchTerm}
