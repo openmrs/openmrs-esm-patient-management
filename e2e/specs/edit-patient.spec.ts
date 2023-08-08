@@ -32,6 +32,7 @@ test('Edit a patient', async ({ page, api }) => {
 
   await test.step("When I visit the registration page to a patient's details", async () => {
     await patientEditPage.goto(patient.uuid);
+    await patientEditPage.waitUntilTheFormIsLoaded();
   });
 
   await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {

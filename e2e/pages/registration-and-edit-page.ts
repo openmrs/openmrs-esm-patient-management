@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 export type PatientRegistrationSex = 'male' | 'female' | 'other' | 'unknown';
 
@@ -38,6 +38,10 @@ export class RegistrationAndEditPage {
 
   async goto(editPatientUuid?: string) {
     await this.page.goto(editPatientUuid ? `patient/${editPatientUuid}/edit` : 'patient-registration');
+  }
+
+  async waitUntilTheFormIsLoaded() {
+    await expect(this.createPatientButton()).toBeEnabled();
   }
 
   async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {
