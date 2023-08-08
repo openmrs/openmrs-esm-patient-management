@@ -1,17 +1,18 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import VisitDetailComponent from './visit-detail.component';
+import { useVisit } from './visit.resource';
 
-jest.mock('./visit.resource', () => ({
-  useVisit: jest.fn(),
-}));
+jest.mock('./visit.resource');
+
+const mockedUseVisit = useVisit as jest.Mock;
 
 describe('VisitDetailComponent', () => {
-  const visitUuid = 'some-visit-uuid';
-  const patientUuid = 'some-patient-uuid';
+  const visitUuid = '497b8b17-54ec-4726-87ec-3c4da8cdcaeb';
+  const patientUuid = '691eed12-c0f1-11e2-94be-8c13b969e334';
 
   it('renders loading indicator when data is loading', () => {
-    require('./visit.resource').useVisit.mockReturnValue({
+    mockedUseVisit.mockReturnValueOnce({
       visit: null,
       isLoading: true,
     });
@@ -22,7 +23,7 @@ describe('VisitDetailComponent', () => {
   });
 
   it('should render visit details and switches when data is available', () => {
-    require('./visit.resource').useVisit.mockReturnValue({
+    mockedUseVisit.mockReturnValueOnce({
       visit: {
         uuid: visitUuid,
         visitType: { display: 'Some Visit Type' },
@@ -36,14 +37,13 @@ describe('VisitDetailComponent', () => {
 
     expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
     expect(screen.getByText(/29-Jul-2023, 12:34 PM/)).toBeInTheDocument();
-    screen.debug();
 
     expect(screen.getByText('All Encounters')).toBeInTheDocument();
     expect(screen.getByText('Visit Summary')).toBeInTheDocument();
   });
 
   it('should render EncounterLists when "All Encounters" switch is selected', () => {
-    require('./visit.resource').useVisit.mockReturnValue({
+    mockedUseVisit.mockReturnValue({
       visit: {
         uuid: visitUuid,
         visitType: { display: 'Some Visit Type' },
@@ -71,7 +71,7 @@ describe('VisitDetailComponent', () => {
   });
 
   it('should render VisitSummaries when "Visit Summary" switch is selected', () => {
-    require('./visit.resource').useVisit.mockReturnValue({
+    mockedUseVisit.mockReturnValue({
       visit: {
         uuid: visitUuid,
         visitType: { display: 'Some Visit Type' },
@@ -108,7 +108,7 @@ describe('VisitDetailComponent', () => {
   });
 
   it('should render loading indicator when data is loading', () => {
-    require('./visit.resource').useVisit.mockReturnValue({
+    mockedUseVisit.mockReturnValue({
       visit: null,
       isLoading: false,
     });
