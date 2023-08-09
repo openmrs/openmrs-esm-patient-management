@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { type LoggedInUser, openmrsFetch, setSessionLocation } from '@openmrs/esm-framework';
 import {
   AddPatientData,
   CohortResponse,
@@ -84,11 +84,34 @@ export async function getAllPatientLists(
   }));
 }
 
-export function updatePatientList(id: string, update: PatientListUpdate) {
-  // TODO: Support updating a full patient list, i.e. including the `isStarred` value.
-  // Basically implement the (missing) functionality which was previously declared as "TODO" here:
-  // https://github.com/openmrs/openmrs-esm-patient-management/blob/25ec687afd37c383a0dbd4d8be8b8e09c8c53129/packages/esm-patient-list-app/src/api/api.ts#L89
-  return Promise.resolve();
+export function starPatientList(
+  user: LoggedInUser['userProperties'],
+  cohortUuid: string,
+  starPatientList: boolean,
+  sessionLocationUuid: string,
+  onSuccess: () => void,
+) {
+  let starredPatientLists: Array<string> = user?.userProperties?.starredPatientLists?.split(',') ?? [];
+  if (starPatientList) {
+    starredPatientLists.push(cohortUuid);
+  } else {
+    starredPatientLists = starredPatientLists.filter((uuid) => uuid !== cohortUuid);
+  }
+  return openmrsFetch(`/ws/rest/v1/user/${user.uuid}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: {
+      userProperties: {
+        ...(user.userProperties ?? {}),
+        starredPatientLists: starredPatientLists.join(','),
+      },
+    },
+  }).then(() => {
+    setSessionLocation(sessionLocationUuid, new AbortController());
+    onSuccess();
+  });
 }
 
 export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {

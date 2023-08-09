@@ -87,6 +87,18 @@ const PatientListList: React.FC = () => {
         { id: 4, key: 'isStarred', header: '' },
       ];
 
+  const patientListRows = useMemo(
+    () =>
+      patientLists.map((cohort) => ({
+        id: cohort.uuid,
+        display: cohort.name,
+        description: cohort.description,
+        type: cohort.cohortType?.display,
+        size: cohort.size,
+      })),
+    [patientLists],
+  );
+
   const handleSearch = (searchString: string) => {
     setSearchTerms((prevSearchTerms) => ({
       ...prevSearchTerms,
@@ -135,7 +147,7 @@ const PatientListList: React.FC = () => {
             loading={isLoading}
             isValidating={isValidating}
             headers={tableHeaders}
-            patientLists={patientLists}
+            patientLists={patientListRows}
             searchTerm={currentSearchTerm}
             setSearchTerm={handleSearch}
             refetch={mutate}

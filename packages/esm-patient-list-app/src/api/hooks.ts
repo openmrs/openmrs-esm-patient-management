@@ -6,7 +6,7 @@ import {
   PatientListFilter,
   PatientListType,
 } from './types';
-import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, FetchResponse, useConfig, useSession, LoggedInUser } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
@@ -14,7 +14,7 @@ import { ConfigSchema } from '../config-schema';
 import { useEffect, useState } from 'react';
 
 interface PatientListResponse {
-  results: CohortResponse<OpenmrsCohort>;
+  results: Array<OpenmrsCohort>;
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
 }
@@ -69,16 +69,13 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const patientListsData: Array<OpenmrsCohort> = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const { user } = useCurrentUser();
 
   return {
-    patientLists: patientListsData.map((cohort) => ({
-      id: cohort.uuid,
-      display: cohort.name,
-      description: cohort.description,
-      type: cohort.cohortType?.display,
-      size: cohort.size,
-    })),
+    patientLists: isStarred
+      ? patientListsData.filter(({ uuid }) => user?.userProperties?.starredPatientLists?.includes(uuid))
+      : patientListsData,
     isLoading,
     isValidating,
     error,
@@ -143,4 +140,20 @@ export function usePatientListMembers(
 export function useCohortTypes() {
   const swrResult = useSWR<FetchResponse<CohortResponse<CohortType>>, Error>(`${cohortUrl}/cohorttype`, openmrsFetch);
   return { ...swrResult, data: swrResult?.data?.data?.results };
+}
+
+export function useCurrentUser() {
+  const {
+    user: { uuid },
+  } = useSession();
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<LoggedInUser>>(
+    uuid ? `ws/rest/v1/user/${uuid}` : null,
+    openmrsFetch,
+  );
+  return {
+    user: data?.data,
+    isLoading,
+    errorFetchingUser: error,
+    mutateUser: mutate,
+  };
 }

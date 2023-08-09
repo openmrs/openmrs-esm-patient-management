@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useMemo, useState } from 'react';
 import {
   DataTable,
   DataTableCustomRenderProps,
@@ -13,7 +13,9 @@ import {
   TableRow,
   Layer,
   Pagination,
+  Button,
   InlineLoading,
+  SkeletonIcon,
   Search,
 } from '@carbon/react';
 import orderBy from 'lodash-es/orderBy';
@@ -30,9 +32,10 @@ import {
 import { ConfigSchema } from '../config-schema';
 import styles from './patient-list-list.scss';
 import { PatientList } from '../api/types';
-import { updatePatientList } from '../api/api-remote';
+import { starPatientList } from '../api/api-remote';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
 import { useTranslation } from 'react-i18next';
+import { useCurrentUser } from '../api/hooks';
 
 interface PatientListTableContainerProps {
   style?: CSSProperties;
@@ -68,13 +71,6 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   const pageSizes = [10, 20, 25, 50];
   const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
-
-  const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
-    if (userId) {
-      await updatePatientList(patientListId, { isStarred });
-      refetch();
-    }
-  };
 
   const { key, order } = sortParams;
   const sortedData = order === 'DESC' ? orderBy(patientLists, [key], ['desc']) : orderBy(patientLists, [key], ['asc']);
@@ -166,18 +162,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
                               );
 
                             case 'isStarred':
-                              return (
-                                <TableCell
-                                  key={cell.id}
-                                  style={{ cursor: 'pointer' }}
-                                  onClick={() => handleToggleStarred(row.id, !cell.value)}>
-                                  {cell.value ? (
-                                    <StarFilled size={16} className={styles.interactiveText01} />
-                                  ) : (
-                                    <Star size={16} className={styles.interactiveText01} />
-                                  )}
-                                </TableCell>
-                              );
+                              return <PatientListStarIcon cohortUuid={row.id} />;
 
                             case 'type':
                               return <TableCell key={cell.id}>{cell.value}</TableCell>;
@@ -219,6 +204,49 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
         </>
       )}
     </div>
+  );
+};
+
+interface PatientListStarIconProps {
+  cohortUuid: string;
+}
+
+const PatientListStarIcon = ({ cohortUuid }) => {
+  const [userActionInProgress, setUserActionInProgress] = useState(false);
+  const { sessionLocation } = useSession();
+  const { user, mutateUser } = useCurrentUser();
+  const isPatientListStarred = useMemo(
+    () => !!user?.userProperties?.starredPatientLists?.includes(cohortUuid),
+    [user?.userProperties?.starredPatientLists, cohortUuid],
+  );
+  const isTablet = useLayoutType() === 'tablet';
+
+  const onSucess = () => {
+    mutateUser().then(() => setUserActionInProgress(false));
+  };
+
+  const handleToggleStarred = () => {
+    setUserActionInProgress(true);
+
+    starPatientList(user, cohortUuid, !isPatientListStarred, sessionLocation.uuid, onSucess);
+  };
+  return (
+    <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
+      {userActionInProgress ? (
+        <Button size={isTablet ? 'lg' : 'sm'} kind="ghost" hasIconOnly>
+          <SkeletonIcon />
+        </Button>
+      ) : (
+        <Button
+          size={isTablet ? 'lg' : 'sm'}
+          kind="ghost"
+          hasIconOnly
+          renderIcon={isPatientListStarred ? StarFilled : Star}
+          iconDescription={''}
+          onClick={handleToggleStarred}
+        />
+      )}
+    </TableCell>
   );
 };
 
