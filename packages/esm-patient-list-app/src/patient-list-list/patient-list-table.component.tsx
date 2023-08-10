@@ -90,7 +90,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
         goTo(1);
         setSearchTerm(searchTerm);
       }, 300),
-    [],
+    [goTo, setSearchTerm],
   );
 
   return (
