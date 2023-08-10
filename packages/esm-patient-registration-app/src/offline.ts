@@ -15,7 +15,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
-import { PatientRegistration } from './patient-registration/patient-registration-types';
+import { PatientRegistration } from './patient-registration/patient-registration.types';
 
 export function setupOffline() {
   setupOfflineSync(patientRegistration, [], syncPatientRegistration, {

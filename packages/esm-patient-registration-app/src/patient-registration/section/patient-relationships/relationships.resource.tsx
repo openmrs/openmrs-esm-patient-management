@@ -1,5 +1,5 @@
 import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
-import { RelationshipValue } from '../../patient-registration-types';
+import { RelationshipValue } from '../../patient-registration.types';
 import useSWR from 'swr';
 import { useMemo } from 'react';
 import { personRelationshipRepresentation } from '../../../constants';
