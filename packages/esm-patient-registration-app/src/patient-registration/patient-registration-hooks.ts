@@ -12,7 +12,7 @@ import {
   PersonAttributeResponse,
   PatientIdentifierResponse,
   Encounter,
-} from './patient-registration-types';
+} from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,
   getFormValuesFromFhirPatient,

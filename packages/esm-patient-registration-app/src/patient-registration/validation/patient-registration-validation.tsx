@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import mapValues from 'lodash/mapValues';
-import { FormValues } from '../patient-registration-types';
+import { FormValues } from '../patient-registration.types';
 
 export const validationSchema = Yup.object({
   givenName: Yup.string().required('givenNameRequired'),
