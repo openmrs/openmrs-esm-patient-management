@@ -9,7 +9,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
-import { PatientRegistration, PatientRegistrationProps } from './patient-registration/patient-registration.component';
+import { PatientRegistration } from './patient-registration/patient-registration.component';
 import useSWRImmutable from 'swr/immutable';
 import styles from './root.scss';
 

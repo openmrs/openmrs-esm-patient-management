@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration-types';
+import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration.types';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
@@ -222,75 +222,4 @@ export async function deletePatientIdentifier(patientUuid: string, patientIdenti
     },
     signal: abortController.signal,
   });
-}
-
-export function useAddressHierarchy(
-  searchString,
-  separator,
-): {
-  addresses: Array<string>;
-  isLoading: boolean;
-  error: Error;
-} {
-  const { data, error, isLoading } = useSWRImmutable<
-    FetchResponse<
-      Array<{
-        address: string;
-      }>
-    >,
-    Error
-  >(
-    searchString
-      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=${separator}&searchString=${searchString}`
-      : null,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      addresses: data?.data?.map((address) => address.address) ?? [],
-      error,
-      isLoading,
-    }),
-    [data?.data, error, isLoading],
-  );
-  return results;
-}
-
-export function useAdressHierarchyWithParentSearch(
-  addressField,
-  parentid,
-  query,
-): {
-  error: Error;
-  isLoading: boolean;
-  addresses: Array<{
-    uuid: string;
-    name: string;
-  }>;
-} {
-  const { data, error, isLoading } = useSWRImmutable<
-    FetchResponse<
-      Array<{
-        uuid: string;
-        name: string;
-      }>
-    >
-  >(
-    query
-      ? `/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`
-      : null,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      error: error,
-      isLoading,
-      addresses: data?.data ?? [],
-    }),
-    [data?.data, error, isLoading],
-  );
-
-  return results;
 }
