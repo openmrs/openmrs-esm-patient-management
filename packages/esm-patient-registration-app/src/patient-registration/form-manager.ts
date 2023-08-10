@@ -10,7 +10,7 @@ import {
   PatientRegistration,
   RelationshipValue,
   Encounter,
-} from './patient-registration-types';
+} from './patient-registration.types';
 import {
   addPatientIdentifier,
   deletePatientIdentifier,
