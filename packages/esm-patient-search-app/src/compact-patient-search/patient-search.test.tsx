@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PatientSearch from './patient-search.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
