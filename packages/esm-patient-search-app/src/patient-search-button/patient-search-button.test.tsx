@@ -30,18 +30,4 @@ describe('PatientSearchButton', () => {
 
     expect(overlayHeader).toBeInTheDocument();
   });
-
-  // it.only('calls selectPatientAction when patient is selected', () => {
-  //   const selectPatientMock = jest.fn();
-  //   render(<PatientSearchButton selectPatientAction={selectPatientMock} />);
-
-  //   const searchButton = screen.getByLabelText('Search Patient Button');
-  //   screen.debug();
-
-  //   fireEvent.click(searchButton);
-
-  //   const overlayButton = screen.getByRole('button', { name: 'Search' });
-  //   fireEvent.click(overlayButton);
-  //   expect(selectPatientMock).toHaveBeenCalled();
-  // });
 });
