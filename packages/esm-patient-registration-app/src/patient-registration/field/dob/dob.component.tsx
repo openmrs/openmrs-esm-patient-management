@@ -109,7 +109,6 @@ export const DobField: React.FC = () => {
                 type="number"
                 className={styles.numberInput}
                 name={yearsEstimated.name}
-                light
                 onChange={onEstimatedYearsChange}
                 labelText={t('estimatedAgeInYearsLabelText', 'Estimated age in years')}
                 invalid={!!(yearsEstimateMeta.touched && yearsEstimateMeta.error)}
@@ -127,7 +126,6 @@ export const DobField: React.FC = () => {
                 id="monthsEstimated"
                 type="number"
                 name={monthsEstimated.name}
-                light
                 onChange={onEstimatedMonthsChange}
                 labelText={t('estimatedAgeInMonthsLabelText', 'Estimated age in months')}
                 invalid={!!(monthsEstimateMeta.touched && monthsEstimateMeta.error)}
