@@ -1,10 +1,9 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import PatientSearchLaunch from './patient-search-icon.component';
-import { isDesktop, useOnClickOutside } from '@openmrs/esm-framework';
+import { isDesktop } from '@openmrs/esm-framework';
 
 const isDesktopMock = isDesktop as jest.Mock;
-// const mockUseOnClickOutside = useOnClickOutside as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
