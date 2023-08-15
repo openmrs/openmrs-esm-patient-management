@@ -11,7 +11,7 @@ import {
   IdentifierSource,
   PatientIdentifierType,
   PatientIdentifierValue,
-} from '../../patient-registration-types';
+} from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
 
