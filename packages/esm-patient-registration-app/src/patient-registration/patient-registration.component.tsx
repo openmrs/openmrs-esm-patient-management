@@ -36,7 +36,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
-  const [activeLink, setActiveLink] = useState<string>('');
   const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
@@ -162,9 +161,8 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   {sections.map((section) => (
                     <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
                       <Link
-                        className={`${styles.linkName} ${activeLink === section.id && styles.activeLink}`}
+                        className={styles.linkName}
                         onClick={() => {
-                          setActiveLink(section.id);
                           scrollIntoView(section.id);
                         }}>
                         <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
