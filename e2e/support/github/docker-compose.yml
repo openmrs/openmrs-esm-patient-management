@@ -21,4 +21,4 @@ services:
       - db
 
   db:
-    image: piumal1999/openmrs-reference-application-3-db:nightly-with-data #TODO: replace with OMRS docker image
+    image: openmrs/openmrs-reference-application-3-db:nightly-with-data
