@@ -3,15 +3,18 @@ import { render, screen } from '@testing-library/react';
 import ContactDetails from './contact-details.component';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { mockAddress } from '../../../../__mocks__/address.mock';
 
 const mockUseRelationships = useRelationships as jest.Mock;
 const mockUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;
 
-const mockContactAttributes = [{ attributeType: { display: 'Email' }, value: 'test@example.com', uuid: 'email-uuid' }];
+const mockContactAttributes = [
+  { attributeType: { display: 'Email' }, value: 'test@example.com', uuid: '24252571-dd5a-11e6-9d9c-0242ac152222' },
+];
 
 const mockRelationships = [
   {
-    uuid: 'relation-uuid',
+    uuid: '24252571-dd5a-11e6-9d9c-0242ac150002',
     display: 'John Doe',
     relationshipType: 'Family',
     relativeAge: 30,
@@ -38,14 +41,6 @@ describe('ContactDetails', () => {
     mockUseRelationships.mockReturnValue({ isLoading: false, data: mockRelationships });
   });
   it('renders address', () => {
-    const mockAddress = {
-      postalCode: '12345',
-      address1: '123 Main St',
-      cityVillage: 'City',
-      stateProvince: 'State',
-      country: 'Country',
-      preferred: true,
-    };
     render(<ContactDetails address={[mockAddress]} patientId="123" isDeceased={false} />);
 
     expect(screen.getByText('Address')).toBeInTheDocument();
