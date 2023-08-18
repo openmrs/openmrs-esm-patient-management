@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CheckInAppointmentModal from './check-in-modal.component';
 import { showActionableNotification, showNotification } from '@openmrs/esm-framework';
-import { handleUndoAction } from '../common';
 import { updateAppointmentStatus } from '../appointments-table.resource';
 
 const mockUpdateAppointmentStatus = updateAppointmentStatus as jest.Mock;
