@@ -18,7 +18,8 @@ describe('RecentPatientSearch', () => {
       },
     });
   });
-  it('should render loading skeleton when isLoading is true', () => {
+
+    it('should render loading skeleton when isLoading is true', () => {
     render(<RecentPatientSearch isLoading={true} loadingNewData={true} hasMore={true} />);
 
     const resultText = screen.queryByText(/recent search result/i);
