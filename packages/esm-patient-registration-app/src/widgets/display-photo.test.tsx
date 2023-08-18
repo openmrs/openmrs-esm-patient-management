@@ -9,7 +9,7 @@ jest.mock('../patient-registration/patient-registration.resource', () => ({
 
 jest.mock('geopattern', () => ({
   generate: jest.fn().mockReturnValue({
-    toDataUri: jest.fn().mockReturnValue('test-pattern-url'),
+    toDataUri: jest.fn().mockReturnValue('https://example.com'),
   }),
 }));
 
