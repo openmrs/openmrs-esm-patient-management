@@ -1,6 +1,9 @@
 /**
  * @returns {Promise<import('jest').Config>}
  */
+
+const path = require('path');
+
 module.exports = {
   transform: {
     '^.+\\.(j|t)sx?$': '@swc/jest',
@@ -9,16 +12,17 @@ module.exports = {
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
-    '^lodash-es/(.*)$': 'lodash/$1',
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
     '^dexie$': require.resolve('dexie'),
+    '^lodash-es/(.*)$': 'lodash/$1',
+    '^react-i18next$': path.resolve(__dirname, 'react-i18next.js'),
+    '^uuid$': path.resolve(__dirname, 'node_modules', 'uuid', 'dist', 'index.js'),
   },
   collectCoverageFrom: [
     '**/src/**/*.component.tsx',
     '!**/node_modules/**',
     '!**/vendor/**',
     '!**/src/**/*.test.*',
-    '!**/src/declarations.d.tsx',
+    '!**/src/declarations.d.ts',
     '!**/e2e/**',
   ],
   coverageThreshold: {
@@ -29,8 +33,8 @@ module.exports = {
       lines: 80,
     },
   },
-  setupFilesAfterEnv: ['<rootDir>/tools/setupTests.ts'],
-  testPathIgnorePatterns: ['<rootDir>/packages/esm-form-entry-app', '<rootDir>/e2e'],
+  setupFilesAfterEnv: [path.resolve(__dirname, 'tools', 'setupTests.ts')],
+  testPathIgnorePatterns: [path.resolve(__dirname, 'e2e')],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost/',

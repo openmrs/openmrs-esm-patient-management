@@ -7,7 +7,7 @@ import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
 import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
-import { PatientIdentifierValue } from '../../../patient-registration-types';
+import { PatientIdentifierValue } from '../../../patient-registration.types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { Input } from '../../basic-input/input/input.component';
 import styles from '../../input.scss';

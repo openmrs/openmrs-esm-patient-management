@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { usePagination } from '@openmrs/esm-framework';
 import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
 import { renderWithSwr } from '../../../../tools/test-helpers';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-import { usePagination } from '@openmrs/esm-framework';
 
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
@@ -97,6 +97,7 @@ describe('QueuePatientBaseTable: ', () => {
     expect(screen.queryByText(/john wilson/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/eric test ric/i)).not.toBeInTheDocument();
   });
+
   it('renders an empty state view if data is unavailable', async () => {
     mockUsePagination.mockReturnValue({
       results: [],

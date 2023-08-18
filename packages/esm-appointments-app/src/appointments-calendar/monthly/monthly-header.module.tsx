@@ -37,8 +37,8 @@ function MonthlyHeader({
         </Button>
       </div>
       <div className={styles.workLoadCard}>
-        {daysInWeek?.map((dayy) => (
-          <DaysOfWeekCard dayOfWeek={dayy} />
+        {daysInWeek?.map((day, i) => (
+          <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
         ))}
       </div>
     </>

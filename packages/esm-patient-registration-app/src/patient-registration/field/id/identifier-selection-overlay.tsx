@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useEffect, useState, useContext } from 're
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration-types';
+import { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
 import Overlay from '../../ui-components/overlay';
 import { ResourcesContext } from '../../../offline.resources';
 import { PatientRegistrationContext } from '../../patient-registration-context';

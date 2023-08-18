@@ -1,14 +1,15 @@
-import { AppointmentSummary, QueueServiceInfo } from '../types';
-import { getGlobalStore } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
-import { boolean } from 'yup';
+import { getGlobalStore } from '@openmrs/esm-framework';
+import type { AppointmentSummary } from '../types';
 
 export const getServiceCountByAppointmentType = (
   appointmentSummary: Array<AppointmentSummary>,
   appointmentType: string,
 ) => {
   return appointmentSummary
-    .map((el) => Object.entries(el.appointmentCountMap).flatMap((el) => el[1][appointmentType]))
+    .map((appointment) =>
+      Object.entries(appointment.appointmentCountMap).flatMap((appointment) => appointment[1][appointmentType]),
+    )
     .flat(1)
     .reduce((count, val) => count + val, 0);
 };
@@ -93,11 +94,12 @@ export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQue
 };
 
 export const useSelectedServiceName = () => {
-  const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName);
+  const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName ?? '');
 
   useEffect(() => {
     getSelectedServiceName().subscribe(({ serviceName }) => setCurrentServiceName(serviceName));
   }, []);
+
   return currentServiceName;
 };
 
