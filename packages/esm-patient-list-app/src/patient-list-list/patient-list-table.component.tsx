@@ -109,6 +109,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
       {loading ? (
         <DataTableSkeleton
           style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
+          data-testid="loading-skeleton"
           showToolbar={false}
           showHeader={false}
           rowCount={pageSize}
