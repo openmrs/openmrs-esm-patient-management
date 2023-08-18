@@ -14,7 +14,7 @@ const AppointmentsCalendarView: React.FC = () => {
   const { calendarEvents } = useAppointmentsCalendar(currentDate.toISOString(), calendarView);
 
   return (
-    <div>
+    <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('appointments', 'Appointments')} />
       <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
       <CalendarView
