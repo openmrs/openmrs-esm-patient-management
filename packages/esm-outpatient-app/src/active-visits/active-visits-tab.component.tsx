@@ -18,7 +18,7 @@ function ActiveVisitsTabs() {
   const [overlayHeader, setOverlayTitle] = useState('');
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid="active-visits-tabs">
       <div className={styles.headerBtnContainer}>
         <ExtensionSlot
           name="patient-search-button-slot"
