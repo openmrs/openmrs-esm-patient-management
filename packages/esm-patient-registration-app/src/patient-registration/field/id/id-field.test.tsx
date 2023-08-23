@@ -4,7 +4,6 @@ import { Identifiers } from './id-field.component';
 import { Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { useConfig } from '@openmrs/esm-framework';
 import { openmrsID } from '../__mocks__/identifiers.mock';
 import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
 
@@ -35,7 +34,7 @@ describe('Identifiers', () => {
             <PatientRegistrationContext.Provider
               value={{
                 setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { openmrsID } },
+                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
                 setInitialFormValues: jest.fn(),
                 values: {
                   identifiers: { openmrsID },
@@ -58,7 +57,7 @@ describe('Identifiers', () => {
             <PatientRegistrationContext.Provider
               value={{
                 setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { openmrsID } },
+                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
                 setInitialFormValues: jest.fn(),
                 values: {
                   identifiers: { openmrsID },
@@ -85,7 +84,7 @@ describe('Identifiers', () => {
             <PatientRegistrationContext.Provider
               value={{
                 setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { openmrsID } },
+                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
                 setInitialFormValues: jest.fn(),
                 values: {
                   identifiers: { openmrsID },

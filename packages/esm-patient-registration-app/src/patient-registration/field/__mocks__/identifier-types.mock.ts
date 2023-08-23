@@ -9,6 +9,21 @@ export const mockedIdentifierTypes = [
         description: 'Generator for OpenMRS ID',
         baseCharacterSet: '0123456789ACDEFGHJKLMNPRTUVWXY',
         prefix: '',
+        autoGenerationOption: {
+          manualEntryEnabled: false,
+          automaticGenerationEnabled: true,
+        },
+      },
+      {
+        uuid: '01af8526-cea4-4175-aa90-340acb411771',
+        name: 'Generator 2 for OpenMRS ID',
+        description: 'Generator 2 for OpenMRS ID',
+        baseCharacterSet: '0123456789ACDEFGHJKLMNPRTUVWXY',
+        prefix: '',
+        autoGenerationOption: {
+          manualEntryEnabled: true,
+          automaticGenerationEnabled: true,
+        },
       },
     ],
     isPrimary: true,
@@ -16,6 +31,7 @@ export const mockedIdentifierTypes = [
     required: true,
     uniquenessBehavior: 'UNIQUE',
     uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+    autoGenerationSource: null,
   },
   {
     fieldName: 'idCard',
