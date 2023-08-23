@@ -15,7 +15,7 @@ describe('PatientSearch', () => {
     isLoading: false,
     data: [
       {
-        uuid: 'patient-1',
+        uuid: '6baa7963-68ea-497e-b258-6fb82382bd07',
         person: {
           personName: {
             givenName: 'John',
@@ -28,7 +28,7 @@ describe('PatientSearch', () => {
         identifiers: [
           {
             identifierType: {
-              uuid: 'identifier-type-1',
+              uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
               display: 'National ID',
             },
             identifier: '123456',
