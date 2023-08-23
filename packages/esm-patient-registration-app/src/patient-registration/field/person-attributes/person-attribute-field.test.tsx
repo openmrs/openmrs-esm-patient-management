@@ -21,7 +21,7 @@ let fieldDefinition: FieldDefinition;
 describe('PersonAttributeField', () => {
   let mockPersonAttributeType = {
     format: 'java.lang.String',
-    display: 'Reffered by',
+    display: 'Referred by',
     uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
   };
 
@@ -59,7 +59,7 @@ describe('PersonAttributeField', () => {
       </Formik>,
     );
 
-    const input = screen.getByLabelText(/Reffered by/i) as HTMLInputElement;
+    const input = screen.getByLabelText(/Referred by/i) as HTMLInputElement;
     expect(screen.getByRole('heading')).toBeInTheDocument();
     expect(input).toBeInTheDocument();
     expect(input.type).toBe('text');
@@ -91,7 +91,7 @@ describe('PersonAttributeField', () => {
     fieldDefinition = {
       id: 'referredby',
       ...fieldDefinition,
-      label: 'Reffered by',
+      label: 'Referred by',
     };
 
     mockedUseConceptAnswers.mockReturnValueOnce({
@@ -110,9 +110,11 @@ describe('PersonAttributeField', () => {
       </Formik>,
     );
 
-    const input = screen.getByLabelText(/Reffered by/i) as HTMLInputElement;
+    const input = screen.getByLabelText(/Referred by/i) as HTMLInputElement;
     expect(input).toBeInTheDocument();
     expect(input.type).toBe('select-one');
+    expect(screen.getByText('Option 1')).toBeInTheDocument();
+    expect(screen.getByText('Option 2')).toBeInTheDocument();
   });
 
   it('renders an error notification if attribute type has unknown format', () => {
