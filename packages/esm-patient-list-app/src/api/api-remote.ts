@@ -1,4 +1,4 @@
-import { type LoggedInUser, openmrsFetch, setSessionLocation } from '@openmrs/esm-framework';
+import { type LoggedInUser, openmrsFetch, refetchCurrentUser } from '@openmrs/esm-framework';
 import {
   AddPatientData,
   CohortResponse,
@@ -10,7 +10,6 @@ import {
   PatientListFilter,
   PatientListMember,
   PatientListType,
-  PatientListUpdate,
 } from './types';
 
 export const cohortUrl = '/ws/rest/v1/cohortm';
@@ -84,33 +83,17 @@ export async function getAllPatientLists(
   }));
 }
 
-export function starPatientList(
-  user: LoggedInUser['userProperties'],
-  cohortUuid: string,
-  starPatientList: boolean,
-  sessionLocationUuid: string,
-  onSuccess: () => void,
-) {
-  let starredPatientLists: Array<string> = user?.userProperties?.starredPatientLists?.split(',') ?? [];
-  if (starPatientList) {
-    starredPatientLists.push(cohortUuid);
-  } else {
-    starredPatientLists = starredPatientLists.filter((uuid) => uuid !== cohortUuid);
-  }
-  return openmrsFetch(`/ws/rest/v1/user/${user.uuid}`, {
+export function starPatientList(userUuid: string, userProperties: LoggedInUser['userProperties']) {
+  return openmrsFetch(`/ws/rest/v1/user/${userUuid}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
     body: {
-      userProperties: {
-        ...(user.userProperties ?? {}),
-        starredPatientLists: starredPatientLists.join(','),
-      },
+      userProperties,
     },
   }).then(() => {
-    setSessionLocation(sessionLocationUuid, new AbortController());
-    onSuccess();
+    refetchCurrentUser();
   });
 }
 

@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DataTable,
   DataTableCustomRenderProps,
@@ -15,7 +15,6 @@ import {
   Pagination,
   Button,
   InlineLoading,
-  SkeletonIcon,
   Search,
 } from '@carbon/react';
 import orderBy from 'lodash-es/orderBy';
@@ -28,6 +27,7 @@ import {
   ErrorState,
   usePagination,
   useConfig,
+  showToast,
 } from '@openmrs/esm-framework';
 import { ConfigSchema } from '../config-schema';
 import styles from './patient-list-list.scss';
@@ -85,6 +85,51 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
     setSearchTerm(str);
     goTo(1);
   };
+
+  // Handles marking patient starred
+  const [starredLists, setStarredLists] = useState([]);
+  const [starhandleTimeout, setStarHandleTimeout] = useState(null);
+  const { user: currentUser, mutateUser } = useCurrentUser();
+  const setInitialStarredLists = useCallback(() => {
+    const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
+    setStarredLists(starredPatientLists.split(','));
+  }, [currentUser?.userProperties?.starredPatientLists, setStarredLists]);
+  const updateUserProperties = () => {
+    const starredPatientLists = starredLists.join(',');
+    const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
+    starPatientList(currentUser?.uuid, userProperties)
+      .then(() => mutateUser())
+      .catch(() => {
+        setInitialStarredLists();
+        showToast({
+          description: 'Marking patient lists starred/ unstarred failed',
+          kind: 'error',
+          title: 'Failed to update patient lists',
+        });
+      });
+  };
+  /**
+   * Handles toggling the starred list
+   * It uses a timeout to store all the changes made by the user
+   * and pass the changes in a single request
+   * @param cohortUuid
+   * @param starPatientList
+   */
+  const toggleStarredList = (cohortUuid, starPatientList) => {
+    setStarredLists((prev) => (starPatientList ? [...prev, cohortUuid] : prev.filter((uuid) => uuid !== cohortUuid)));
+    if (starhandleTimeout) {
+      clearTimeout(starhandleTimeout);
+    }
+    const timeout = setTimeout(updateUserProperties, 1000);
+    setStarHandleTimeout(timeout);
+  };
+
+  useEffect(() => {
+    if (currentUser?.userProperties?.starredPatientLists) {
+      setInitialStarredLists();
+    }
+  }, [currentUser?.userProperties?.starredPatientLists, setInitialStarredLists]);
+  // END: Handling starring patient
 
   return (
     <div>
@@ -162,7 +207,13 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
                               );
 
                             case 'isStarred':
-                              return <PatientListStarIcon cohortUuid={row.id} />;
+                              return (
+                                <PatientListStarIcon
+                                  cohortUuid={row.id}
+                                  isStarred={starredLists.includes(row.id)}
+                                  toggleStarredList={toggleStarredList}
+                                />
+                              );
 
                             case 'type':
                               return <TableCell key={cell.id}>{cell.value}</TableCell>;
@@ -209,43 +260,22 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
 
 interface PatientListStarIconProps {
   cohortUuid: string;
+  isStarred: boolean;
+  toggleStarredList: (cohortUuid: string, starList) => void;
 }
 
-const PatientListStarIcon = ({ cohortUuid }) => {
-  const [userActionInProgress, setUserActionInProgress] = useState(false);
-  const { sessionLocation } = useSession();
-  const { user, mutateUser } = useCurrentUser();
-  const isPatientListStarred = useMemo(
-    () => !!user?.userProperties?.starredPatientLists?.includes(cohortUuid),
-    [user?.userProperties?.starredPatientLists, cohortUuid],
-  );
+const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, isStarred, toggleStarredList }) => {
   const isTablet = useLayoutType() === 'tablet';
 
-  const onSucess = () => {
-    mutateUser().then(() => setUserActionInProgress(false));
-  };
-
-  const handleToggleStarred = () => {
-    setUserActionInProgress(true);
-
-    starPatientList(user, cohortUuid, !isPatientListStarred, sessionLocation.uuid, onSucess);
-  };
   return (
     <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
-      {userActionInProgress ? (
-        <Button size={isTablet ? 'lg' : 'sm'} kind="ghost" hasIconOnly>
-          <SkeletonIcon />
-        </Button>
-      ) : (
-        <Button
-          size={isTablet ? 'lg' : 'sm'}
-          kind="ghost"
-          hasIconOnly
-          renderIcon={isPatientListStarred ? StarFilled : Star}
-          iconDescription={''}
-          onClick={handleToggleStarred}
-        />
-      )}
+      <Button
+        size={isTablet ? 'lg' : 'sm'}
+        kind="ghost"
+        hasIconOnly
+        renderIcon={isStarred ? StarFilled : Star}
+        onClick={() => toggleStarredList(cohortUuid, !isStarred)}
+      />
     </TableCell>
   );
 };
