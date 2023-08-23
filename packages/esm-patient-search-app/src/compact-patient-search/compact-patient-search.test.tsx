@@ -71,25 +71,4 @@ describe('CompactPatientSearchComponent', () => {
       expect(searchResultsContainer).toBeInTheDocument();
     });
   });
-
-  // Example test for patient selection
-  it.skip('calls selectPatientAction on patient selection', async () => {
-    const selectPatientActionMock = jest.fn();
-    render(
-      <CompactPatientSearchComponent
-        selectPatientAction={selectPatientActionMock}
-        initialSearchTerm=""
-        isSearchPage={true}
-      />,
-    );
-
-    const searchInput = screen.getByRole('searchbox');
-
-    fireEvent.change(searchInput, { target: { value: 'John' } });
-
-    // const patientBanner = screen.getByTestId('patient-banner'); // Assuming a test ID on patient banner element
-    // fireEvent.click(patientBanner);
-
-    // expect(selectPatientActionMock).toHaveBeenCalled();
-  });
 });
