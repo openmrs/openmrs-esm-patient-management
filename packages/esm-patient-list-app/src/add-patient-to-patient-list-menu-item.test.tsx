@@ -7,9 +7,11 @@ const mockedShowModal = showModal as jest.Mock;
 
 jest.mock('@openmrs/esm-framework');
 
+const patientUuid = '6baa7963-68ea-497e-b258-6fb82382bd07';
+
 describe('AddPatientToPatientListMenuItem', () => {
   it('renders the button with the correct title', () => {
-    render(<AddPatientToPatientListMenuItem patientUuid="someUuid" />);
+    render(<AddPatientToPatientListMenuItem patientUuid={patientUuid} />);
     const button = screen.getByRole('menuitem');
 
     expect(button).toBeInTheDocument();
@@ -18,7 +20,7 @@ describe('AddPatientToPatientListMenuItem', () => {
   });
 
   it('should open the modal on button click', async () => {
-    render(<AddPatientToPatientListMenuItem patientUuid="someUuid" />);
+    render(<AddPatientToPatientListMenuItem patientUuid={patientUuid} />);
     const button = screen.getByRole('menuitem');
 
     fireEvent.click(button);
