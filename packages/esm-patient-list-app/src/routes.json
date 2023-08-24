@@ -3,12 +3,6 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "pages": [
-    {
-      "component": "root",
-      "route": "patient-lists"
-    }
-  ],
   "extensions": [
     {
       "name": "patient-lists-dashboard-link",
@@ -21,8 +15,8 @@
       }
     },
     {
-      "name": "patient-lists-dashboard",
       "component": "root",
+      "name": "patient-lists-dashboard", 
       "slot": "patient-lists-dashboard-slot"
     },
     {

@@ -12,6 +12,8 @@ const options = {
   moduleName,
 };
 
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
+
 export const appointmentsList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/scheduled-appointments-table.component'),
   options,

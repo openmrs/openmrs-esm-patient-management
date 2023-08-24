@@ -16,7 +16,7 @@ const AppointmentsCalendarView: React.FC = () => {
 
   return (
     <div data-testid="appointments-calendar">
-      <AppointmentsHeader title={t('appointments', 'Appointments')} />
+      <AppointmentsHeader title={t('calendar', 'Calendar')} />
       <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
       <CalendarView
         calendarView={calendarView}

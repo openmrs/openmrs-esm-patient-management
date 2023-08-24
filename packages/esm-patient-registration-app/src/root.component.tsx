@@ -43,7 +43,7 @@ export default function Root() {
             identifierTypes,
             currentSession,
           }}>
-          <BrowserRouter basename={`${window['getOpenmrsSpaBase']()}`}>
+          <BrowserRouter basename={window.getOpenmrsSpaBase()}>
             <Routes>
               <Route
                 path="patient-registration"
