@@ -71,6 +71,50 @@ Please read our [contributing](http://o3-dev.docs.openmrs.org/#/getting_started/
 
 ## Running tests
 
+To run tests for all packages, run:
+
+```bash
+yarn turbo test
+```
+
+To run tests in `watch` mode, run:
+
+```bash
+yarn turbo test:watch
+```
+
+To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
+
+```bash
+yarn turbo test --filter="esm-patient-conditions-app"
+```
+
+To run a specific test file, run:
+
+```bash
+yarn turbo test -- basic-search
+```
+
+The above command will only run tests in the file or files that match the provided string.
+
+You can also run the matching tests from above in watch mode by running:
+
+```bash
+yarn turbo test:watch --basic-search
+```
+
+To generate a `coverage` report, run:
+
+```bash
+yarn turbo coverage
+```
+
+By default, `turbo` will cache test runs. This means that re-running tests wihout changing any of the related files will return the cached logs from the last run. To bypass the cache, run tests with the `force` flag, as follows:
+
+```bash
+yarn turbo test --force
+```
+
 ### Unit tests
 To run unit tests, use:
 
