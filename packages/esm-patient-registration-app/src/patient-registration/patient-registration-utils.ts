@@ -6,7 +6,7 @@ import {
   PatientUuidMapType,
   PatientIdentifierValue,
   Encounter,
-} from './patient-registration-types';
+} from './patient-registration.types';
 import { parseDate } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
 import capitalize from 'lodash-es/capitalize';

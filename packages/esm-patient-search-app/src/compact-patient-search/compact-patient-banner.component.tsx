@@ -135,7 +135,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
 export const SearchResultSkeleton = () => {
   return (
-    <div className={styles.patientSearchResult}>
+    <div className={styles.patientSearchResult} data-testid="search-skeleton">
       <div className={styles.patientAvatar} role="img">
         <SkeletonIcon
           style={{

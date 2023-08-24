@@ -1,4 +1,4 @@
-import { FetchedPatientIdentifierType, PatientIdentifierType } from '../../../patient-registration-types';
+import { FetchedPatientIdentifierType, PatientIdentifierType } from '../../../patient-registration.types';
 
 export function shouldBlockPatientIdentifierInOfflineMode(identifierType: PatientIdentifierType) {
   // Patient Identifiers which are unique and can be manually entered are prohibited while offline because

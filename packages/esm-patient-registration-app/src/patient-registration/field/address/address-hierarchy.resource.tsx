@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useField } from 'formik';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
@@ -10,7 +10,7 @@ interface AddressFields {
 
 export function useOrderedAddressHierarchyLevels() {
   const url = '/module/addresshierarchy/ajax/getOrderedAddressHierarchyLevels.form';
-  const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<AddressFields>>>(url, openmrsFetch);
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<Array<AddressFields>>, Error>(url, openmrsFetch);
 
   const results = useMemo(
     () => ({
@@ -56,7 +56,7 @@ export function useAddressEntries(fetchResults, searchString) {
  * This also returns the function to reset the lower ordered fields if the value of a field is changed.
  */
 export function useAddressEntryFetchConfig(addressField: string) {
-  const { orderedFields, isLoadingFieldOrder, errorFetchingFieldOrder } = useOrderedAddressHierarchyLevels();
+  const { orderedFields, isLoadingFieldOrder } = useOrderedAddressHierarchyLevels();
   const { setFieldValue } = useContext(PatientRegistrationContext);
   const [, { value: addressValues }] = useField('address');
 
@@ -97,6 +97,60 @@ export function useAddressEntryFetchConfig(addressField: string) {
       updateChildElements,
     }),
     [addressFieldSearchConfig, updateChildElements],
+  );
+
+  return results;
+}
+
+export function useAddressHierarchy(searchString: string, separator: string) {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<
+      Array<{
+        address: string;
+      }>
+    >,
+    Error
+  >(
+    searchString
+      ? `/module/addresshierarchy/ajax/getPossibleFullAddresses.form?separator=${separator}&searchString=${searchString}`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      addresses: data?.data?.map((address) => address.address) ?? [],
+      error,
+      isLoading,
+    }),
+    [data?.data, error, isLoading],
+  );
+  return results;
+}
+
+export function useAddressHierarchyWithParentSearch(addressField: string, parentid: string, query: string) {
+  const { data, error, isLoading } = useSWRImmutable<
+    FetchResponse<
+      Array<{
+        uuid: string;
+        name: string;
+      }>
+    >,
+    Error
+  >(
+    query
+      ? `/module/addresshierarchy/ajax/getPossibleAddressHierarchyEntriesWithParents.form?addressField=${addressField}&limit=20&searchString=${query}&parentUuid=${parentid}`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      error: error,
+      isLoading,
+      addresses: data?.data ?? [],
+    }),
+    [data?.data, error, isLoading],
   );
 
   return results;
