@@ -9,8 +9,8 @@ jest.mock('../../patient-registration.resource', () => ({
   fetchPerson: jest.fn().mockResolvedValue({
     data: {
       results: [
-        { uuid: 'uuid1', display: 'Person 1' },
-        { uuid: 'uuid2', display: 'Person 2' },
+        { uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd24', display: 'Person 1' },
+        { uuid: '691eed12-c0f1-11e2-94be-8c13b969e334', display: 'Person 2' },
       ],
     },
   }),
@@ -21,7 +21,7 @@ let mockResourcesContextValue = {
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
-    currentProvider: { uuid: 'provider-uuid', identifier: 'PRO-123' },
+    currentProvider: { uuid: '45ce6c2e-dd5a-11e6-9d9c-0242ac150002', identifier: 'PRO-123' },
   },
   identifierTypes: [],
   relationshipTypes: null,
@@ -47,8 +47,8 @@ describe('RelationshipsSection', () => {
   it('renders relationships when relationshipTypes are available', () => {
     const relationshipTypes = {
       results: [
-        { aIsToB: 'Mother', bIsToA: 'Child', uuid: 'uuid1' },
-        { aIsToB: 'Father', bIsToA: 'Child', uuid: 'uuid2' },
+        { aIsToB: 'Mother', bIsToA: 'Child', uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd34' },
+        { aIsToB: 'Father', bIsToA: 'Child', uuid: '52ae5ce0-d64b-11ea-9064-5adc43bbdd24' },
       ],
     };
     mockResourcesContextValue = {
