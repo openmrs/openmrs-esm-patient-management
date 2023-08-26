@@ -17,6 +17,7 @@ jest.mock('./active-visits.resource', () => ({
     error: null,
   })),
 }));
+
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(() => ({ activeVisits: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
