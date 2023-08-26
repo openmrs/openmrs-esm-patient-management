@@ -13,10 +13,6 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn(() => ({
-    page: 1,
-  })),
-  useLocation: jest.fn(),
   useSearchParams: jest.fn(() => [
     {
       get: jest.fn(() => 'John'),
@@ -31,6 +27,7 @@ describe('PatientSearchLaunch', () => {
 
   it('renders without errors', () => {
     render(<PatientSearchLaunch />);
+    expect(screen.getByRole('button', { name: 'Search Patient' })).toBeInTheDocument();
   });
 
   it('toggles search input when search button is clicked', () => {
