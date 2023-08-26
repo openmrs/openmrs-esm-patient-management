@@ -112,6 +112,7 @@ describe('ActiveVisitsTable', () => {
       expect(screen.queryByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
   });
+
   it('should display the pagination when pagination is true', () => {
     mockActiveVisits.mockImplementationOnce(() => ({
       activeVisits: [
