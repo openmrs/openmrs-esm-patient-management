@@ -37,7 +37,7 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
   return (
     <>
       <MetricsHeader />
-      <div className={styles.cardContainer}>
+      <div className={styles.cardContainer} data-testid="clinic-metrics">
         <MetricsCard
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}

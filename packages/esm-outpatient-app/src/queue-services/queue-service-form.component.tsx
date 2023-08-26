@@ -111,7 +111,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
 
           <Layer className={styles.input}>
             <Select
-              labelText={t('selectServiceType', 'Select a servicee type')}
+              labelText={t('selectServiceType', 'Select a service type')}
               id="queueConcept"
               invalidText="Required"
               value={queueConcept}
