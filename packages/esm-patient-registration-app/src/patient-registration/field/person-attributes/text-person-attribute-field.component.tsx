@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './../field.scss';
-import { Input } from '../../input/basic-input/input/input.component';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
+import { Input } from '../../input/basic-input/input/input.component';
+import styles from './../field.scss';
 import { PersonAttributeTypeResponse } from '../../patient-registration.types';
 
 export interface TextPersonAttributeFieldProps {

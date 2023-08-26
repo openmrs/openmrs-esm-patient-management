@@ -28,7 +28,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
 
   return (
     <>
-      <div className={styles.header}>
+      <div className={styles.header} data-testid="patient-queue-header">
         <div className={styles['left-justified-items']}>
           <PatientQueueIllustration />
           <div className={styles['page-labels']}>
