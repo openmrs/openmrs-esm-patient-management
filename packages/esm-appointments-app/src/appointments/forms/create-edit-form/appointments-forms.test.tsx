@@ -42,7 +42,7 @@ let mockOpenmrsConfig = {
   hiddenFormFields: [],
 };
 
-xdescribe('AppointmentForm', () => {
+describe('AppointmentForm', () => {
   const patient = mockPatient;
   beforeEach(() => {
     mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
