@@ -1,0 +1,8 @@
+@import '../patient-registration/patient-registration.scss';
+
+.verificationWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 0.5fr;
+  column-gap: 0.25rem;
+  align-items: flex-end;
+}

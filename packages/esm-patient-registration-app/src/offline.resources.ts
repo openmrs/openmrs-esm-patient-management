@@ -68,14 +68,7 @@ async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdenti
 
     const primaryIdentifierTypeUuid = primaryIdentifierTypeResponse?.data?.results?.[0]?.metadataUuid;
 
-    let identifierTypes = primaryIdentifierTypeResponse?.ok
-      ? [
-          mapPatientIdentifierType(
-            patientIdentifierTypes?.find((type) => type.uuid === primaryIdentifierTypeUuid),
-            true,
-          ),
-        ]
-      : [];
+    let identifierTypes = [];
 
     patientIdentifierTypes.forEach((type) => {
       if (type.uuid !== primaryIdentifierTypeUuid) {
