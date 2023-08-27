@@ -82,8 +82,6 @@ describe('PatientListDetailComponent', () => {
     });
   });
 
-  // TODO:  this test is not running. need to fix
-
   it('opens edit overlay when "Edit Name/ Description" is clicked', () => {
     render(<PatientListDetailComponent />);
 
