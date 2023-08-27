@@ -82,14 +82,14 @@ describe('PatientListDetailComponent', () => {
     });
   });
 
-  // this test is not running. need to fix
+  // TODO:  this test is not running. need to fix
 
-  xit('opens edit overlay when "Edit Name/ Description" is clicked', () => {
+  it('opens edit overlay when "Edit Name/ Description" is clicked', () => {
     render(<PatientListDetailComponent />);
 
-    fireEvent.click(screen.getByText('Actions'));
+    userEvent.click(screen.getByText('Actions'));
     const editBtn = screen.getByText('Edit Name/ Description');
-    fireEvent.click(editBtn);
+    userEvent.click(editBtn);
   });
 
   it('deletes patient list and navigates on successful delete', async () => {
