@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { Button, Link, InlineLoading } from '@carbon/react';
-import { XAxis } from '@carbon/react/icons';
+import { XAxis, ShareKnowledge } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, type FormikHelpers } from 'formik';
@@ -25,6 +25,8 @@ import { builtInSections, type RegistrationConfig, type SectionDefinition } from
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
+import PatientVerification from '../patient-verification/patient-verification.component';
+import { handleSavePatientToClientRegistry } from '../patient-verification/patient-verification-hook';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -148,7 +150,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
   return (
     <Formik
-      enableReinitialize
+      enableReinitialize={true}
       initialValues={initialFormValues}
       validationSchema={validationSchema}
       onSubmit={onFormSubmit}>
@@ -172,6 +174,17 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                     </Link>
                   </div>
                 ))}
+                <Button
+                  renderIcon={ShareKnowledge}
+                  disabled={!currentSession || !identifierTypes}
+                  onClick={() => {
+                    props.isValid
+                      ? handleSavePatientToClientRegistry(props.values, props.setValues)
+                      : props.validateForm().then((errors) => displayErrors(errors));
+                  }}
+                  className={styles.submitButton}>
+                  {t('postToRegistry', 'Post to registry')}
+                </Button>
                 <Button
                   className={styles.submitButton}
                   type="submit"
@@ -212,6 +225,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   initialFormValues: props.initialValues,
                   setInitialFormValues,
                 }}>
+                <PatientVerification props={props} />
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}
