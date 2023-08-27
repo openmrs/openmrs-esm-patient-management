@@ -95,7 +95,7 @@ describe('PatientListTableContainer', () => {
       expect(screen.getByText('My lists')).toBeInTheDocument();
     });
 
-    // to Enquire why the data is not coming and add assertion to check the data
+    // TODO: Enquire why the patient list data is not coming and add assertion to check the data
   });
 
   it('should render the pagination component when paginated is true', () => {
