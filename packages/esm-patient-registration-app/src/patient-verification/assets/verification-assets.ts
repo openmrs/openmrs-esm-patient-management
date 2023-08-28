@@ -5,7 +5,7 @@ export const countries = [
 ];
 
 export const verificationIdentifierTypes = [
-  { name: 'National ID', value: 'national-id' },
+  { name: 'Patient Unique Identifier', value: 'patientUniqueIdentifier' },
   { name: 'Passport', value: 'passport' },
   { name: 'Birth certificate number', value: 'birth-certificate-number' },
 ];

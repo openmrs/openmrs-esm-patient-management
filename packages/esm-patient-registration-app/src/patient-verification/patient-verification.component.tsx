@@ -11,9 +11,10 @@ import { FormValues } from '../patient-registration/patient-registration.types';
 
 interface PatientVerificationProps {
   props: FormikProps<FormValues>;
+  setPostToRegistry: any;
 }
 
-const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
+const PatientVerification: React.FC<PatientVerificationProps> = ({ props, setPostToRegistry }) => {
   const { t } = useTranslation();
   const { data, isLoading, error } = useGlobalProperties();
   const [verificationCriteria, setVerificationCriteria] = useState({
@@ -31,6 +32,7 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
         props.values.token,
       );
       setIsLoadingSearch(false);
+      setPostToRegistry(clientRegistryResponse?.total === 0 ? false : true);
       handleClientRegistryResponse(clientRegistryResponse, props, verificationCriteria.searchTerm);
     } catch (error) {
       showToast({
@@ -69,7 +71,7 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
               itemToString={(item) => item?.name ?? ''}
               label="Combo box menu options"
               titleText={t('selectCountry', 'Select country')}
-              initialSelectedItem={countries[0]}
+              initialSelectedItem={countries[1]}
             />
           </Layer>
           <Layer>

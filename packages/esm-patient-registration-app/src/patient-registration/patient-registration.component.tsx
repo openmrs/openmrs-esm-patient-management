@@ -57,9 +57,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
-  const [enableClientRegistry, setEnableClientRegistry] = useState(
-    inEditMode ? initialFormValues.identifiers['nationalUniquePatientIdentifier']?.identifierValue : false,
-  );
+  const [enableClientRegistry, setEnableClientRegistry] = useState(false);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -176,7 +174,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 ))}
                 <Button
                   renderIcon={ShareKnowledge}
-                  disabled={!currentSession || !identifierTypes}
+                  disabled={enableClientRegistry}
                   onClick={() => {
                     setEnableClientRegistry(true);
                     props.isValid
@@ -193,7 +191,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   // Current session and identifiers are required for patient registration.
                   // If currentSession or identifierTypes are not available, then the
                   // user should be blocked to register the patient.
-                  disabled={!enableClientRegistry}>
+                >
                   {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
@@ -216,7 +214,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   initialFormValues: props.initialValues,
                   setInitialFormValues,
                 }}>
-                <PatientVerification props={props} />
+                <PatientVerification props={props} setPostToRegistry={setEnableClientRegistry} />
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}

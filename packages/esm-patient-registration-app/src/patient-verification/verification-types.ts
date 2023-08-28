@@ -1,3 +1,5 @@
+import { FHIRResource } from '@openmrs/esm-framework';
+
 export interface ClientIdentification {
   identificationType: string;
   identificationNumber: string;

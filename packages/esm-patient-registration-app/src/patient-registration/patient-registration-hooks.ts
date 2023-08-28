@@ -28,7 +28,6 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 import dayjs from 'dayjs';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const { martialStatus, education, occupation, educationLoad, loadingStatus } = useConcepts();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
@@ -146,17 +145,6 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
       setInitialFormValues((initialFormValues) => ({ ...initialFormValues, obs: obs, observation: observations }));
     }
   }, [isLoadingObs]);
-
-  // Set Initial encounter
-
-  useEffect(() => {
-    if (!educationLoad || !loadingStatus) {
-      setInitialFormValues((initialFormValues) => ({
-        ...initialFormValues,
-        concepts: [...occupation, ...martialStatus, ...education],
-      }));
-    }
-  }, [educationLoad, loadingStatus]);
 
   return [initialFormValues, setInitialFormValues];
 }

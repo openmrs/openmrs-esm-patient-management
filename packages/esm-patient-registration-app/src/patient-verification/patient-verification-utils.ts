@@ -1,123 +1,34 @@
-import { showModal } from '@openmrs/esm-framework';
+import { FHIRResource, showModal } from '@openmrs/esm-framework';
 import { FormikProps } from 'formik';
 import { ClientRegistryPatient, RegistryPatient } from './verification-types';
 import counties from './assets/counties.json';
 import { FormValues } from '../patient-registration/patient-registration.types';
 
-export function handleClientRegistryResponse(
-  clientResponse: ClientRegistryPatient,
-  props: FormikProps<FormValues>,
-  searchTerm: string,
-) {
-  if (clientResponse?.clientExists === false) {
-    const nupiIdentifiers = {
-      ['nationalId']: {
-        initialValue: searchTerm,
-        identifierUuid: undefined,
-        selectedSource: { uuid: '', name: '' },
-        preferred: false,
-        required: false,
-        identifierTypeUuid: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
-        identifierName: 'National ID',
-        identifierValue: searchTerm,
-      },
-    };
-    const dispose = showModal('empty-client-registry-modal', {
-      onConfirm: () => {
-        props.setValues({ ...props.values, identifiers: { ...props.values.identifiers, ...nupiIdentifiers } });
-        dispose();
-      },
-      close: () => dispose(),
-    });
-  }
-
-  if (clientResponse?.clientExists) {
-    const {
-      client: {
-        middleName,
-        lastName,
-        firstName,
-        contact,
-        country,
-        countyOfBirth,
-        residence,
-        identifications,
-        gender,
-        dateOfBirth,
-        isAlive,
-        clientNumber,
-        educationLevel,
-        occupation,
-        maritalStatus,
-      },
-    } = clientResponse;
-
-    const nupiIdentifiers = {
-      ['nationalId']: {
-        initialValue: identifications !== undefined && identifications[0]?.identificationNumber,
-        identifierUuid: undefined,
-        selectedSource: { uuid: '', name: '' },
-        preferred: false,
-        required: false,
-        identifierTypeUuid: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
-        identifierName: 'National ID',
-        identifierValue: identifications !== undefined && identifications[0]?.identificationNumber,
-      },
-
-      ['nationalUniquePatientIdentifier']: {
-        identifierTypeUuid: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
-        identifierName: 'National Unique patient identifier',
-        identifierValue: clientNumber,
-        initialValue: clientNumber,
-        identifierUuid: undefined,
-        selectedSource: { uuid: '', name: '' },
-        preferred: false,
-        required: false,
-      },
-    };
-
+export function handleClientRegistryResponse(clientResponse: any, props: FormikProps<FormValues>, searchTerm: string) {
+  if (clientResponse?.total > 0) {
+    const patientObject = clientResponse.entry[0].resource as fhir.Patient;
     const dispose = showModal('confirm-client-registry-modal', {
       onConfirm: () => {
         props.setValues({
           ...props.values,
-          familyName: lastName,
-          middleName: middleName,
-          givenName: firstName,
-          gender: gender === 'male' ? 'Male' : 'Female',
-          birthdate: new Date(dateOfBirth),
-          isDead: !isAlive,
-          attributes: {
-            'b2c38640-2603-4629-aebd-3b54f33f1e3a': contact?.primaryPhone,
-            '94614350-84c8-41e0-ac29-86bc107069be': contact?.secondaryPhone,
-            'b8d0b331-1d2d-4a9a-b741-1816f498bdb6': contact?.emailAddress ?? '',
-          },
+          familyName: patientObject.name[0].family,
+          middleName: patientObject.name[0].given[1],
+          givenName: patientObject.name[0].given[0],
+          gender: patientObject.gender === 'male' ? 'Male' : 'Female',
+          birthdate: new Date(patientObject.birthDate).toLocaleDateString(),
+          isDead: !patientObject.deceasedBoolean,
+          attributes: {},
           address: {
-            address1: residence?.address,
-            address2: '',
-            address4: residence?.ward,
-            cityVillage: residence?.village,
-            stateProvince: residence?.subCounty,
-            countyDistrict: counties.find((county) => county.code === parseInt(residence?.county))?.name,
-            country: 'Kenya',
-            postalCode: residence?.address,
+            address1: patientObject.address[0].city,
+            country: patientObject.address[0].country,
           },
-          identifiers: { ...props.values.identifiers, ...nupiIdentifiers },
-          obs: {
-            '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-              props.values.concepts.find((concept) => concept.display?.toLowerCase() === maritalStatus?.toLowerCase())
-                ?.uuid ?? '',
-            '1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-              props.values.concepts.find((concept) => concept.display?.toLowerCase() === educationLevel?.toLowerCase())
-                ?.uuid ?? '',
-            '1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-              props.values.concepts.find((concept) => concept.display?.toLowerCase() === occupation?.toLowerCase())
-                ?.uuid ?? '',
-          },
+          identifiers: { ...props.values.identifiers },
+          obs: {},
         });
         dispose();
       },
       close: () => dispose(),
-      patient: clientResponse.client,
+      patient: patientObject,
     });
   }
 }

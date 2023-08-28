@@ -4,9 +4,11 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { ConceptAnswers, ConceptResponse, FormValues } from '../patient-registration/patient-registration.types';
 
+const clientRegistryUrl = 'http://165.232.114.52:8080/fhir/Patient?_pretty=true&address-country=Uganda&identifier=';
+
 export function searchClientRegistry(identifierType: string, searchTerm: string, token: string) {
-  const url = `https://afyakenyaapi.health.go.ke/partners/registry/search/KE/${identifierType}/${searchTerm}`;
-  return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
+  const url = `${clientRegistryUrl}${searchTerm}`;
+  return fetch(url).then((r) => r.json());
 }
 
 export function savePatientToClientRegistry(formValues: FormValues) {
@@ -33,10 +35,7 @@ export async function handleSavePatientToClientRegistry(
           formValues.token,
         );
 
-        // if client does not exists post client to registry
-        if (searchResponse?.clientExists === false) {
-          postToRegistry(formValues, setValues);
-        }
+        console.log('searchResponse', searchResponse);
       } catch (error) {
         showToast({
           title: 'Client registry error',
