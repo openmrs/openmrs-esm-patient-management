@@ -15,8 +15,8 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
   const { totalProviders, isLoading: allAppointmentsLoading } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(serviceUuid);
 
-  const startDate = useAppointmentDate();
-  const formattedStartDate = formatDate(parseDate(startDate), { mode: 'standard', time: false });
+  const { currentAppointmentDate } = useAppointmentDate();
+  const formattedStartDate = formatDate(parseDate(currentAppointmentDate), { mode: 'standard', time: false });
 
   const { appointmentList: arrivedAppointments } = useAppointmentList('Honoured');
   const { appointmentList: pendingAppointments } = useAppointmentList('Pending');
@@ -43,7 +43,7 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
-          appointmentDate={startDate}
+          appointmentDate={currentAppointmentDate}
         />
         <MetricsCard
           label={

@@ -25,18 +25,25 @@ type scheduleType = 'CameEarly' | 'Rescheduled' | 'Honoured' | 'Pending' | 'Sche
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
   const { t } = useTranslation();
   const { patientIdentifierType } = useConfig<ConfigObject>();
-  const appointmentDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
   const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
-  const { appointmentList, isLoading } = useAppointmentList(scheduleType, appointmentDate, patientIdentifierType);
-  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList(appointmentDate, patientIdentifierType);
-  const { completedAppointments } = useCompletedAppointmentList(appointmentDate, patientIdentifierType);
-  const isDateInPast = dayjs(appointmentDate).isBefore(dayjs(), 'date');
-  const isDateInFuture = dayjs(appointmentDate).isAfter(dayjs(), 'date');
-  const isToday = dayjs(appointmentDate).isSame(dayjs(), 'date');
+  const { appointmentList, isLoading } = useAppointmentList(
+    scheduleType,
+    currentAppointmentDate,
+    patientIdentifierType,
+  );
+  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList(
+    currentAppointmentDate,
+    patientIdentifierType,
+  );
+  const { completedAppointments } = useCompletedAppointmentList(currentAppointmentDate, patientIdentifierType);
+  const isDateInPast = dayjs(currentAppointmentDate).isBefore(dayjs(), 'date');
+  const isDateInFuture = dayjs(currentAppointmentDate).isAfter(dayjs(), 'date');
+  const isToday = dayjs(currentAppointmentDate).isSame(dayjs(), 'date');
 
   useEffect(() => {
     setScheduleType('Scheduled');
-  }, [appointmentDate]);
+  }, [currentAppointmentDate]);
 
   const filteredAppointments = appointmentServiceType
     ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
