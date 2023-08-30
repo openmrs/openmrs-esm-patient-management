@@ -144,12 +144,6 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
               onClick={() => setSelectedTabIndex(2)}>
               {t('medications', 'Medications')}
             </Tab>
-            <Tab
-              className={`${styles.tab} ${selectedTabIndex === 3 && styles.selectedTab}`}
-              id="encounters-tab"
-              onClick={() => setSelectedTabIndex(3)}>
-              {t('encounters', 'Encounters')}
-            </Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
