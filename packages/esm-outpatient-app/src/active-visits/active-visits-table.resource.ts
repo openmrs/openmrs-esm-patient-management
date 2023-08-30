@@ -71,6 +71,9 @@ export interface VisitQueueEntry {
   uuid: string;
   visit: Visit;
   sortWeight: number;
+  locationComingFrom: {
+    name: string;
+  };
 }
 
 export interface MappedVisitQueueEntry {
@@ -99,6 +102,7 @@ export interface MappedVisitQueueEntry {
   sortWeight: number;
   visitQueueNumber: string;
   identifiers: Array<Identifer>;
+  locationComingFrom: string;
 }
 
 interface UseVisitQueueEntries {
@@ -244,6 +248,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
       (e) => e.attributeType.uuid === visitQueueNumberAttributeUuid,
     )?.value,
     identifiers: visitQueueEntry.queueEntry.patient?.identifiers,
+    locationComingFrom: visitQueueEntry.queueEntry?.locationComingFrom?.name,
   });
 
   let mappedVisitQueueEntries;
@@ -310,6 +315,7 @@ export async function updateQueueEntry(
         },
         startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
         sortWeight: sortWeight,
+        locationComingFrom: previousQueueUuid,
       },
     },
   });

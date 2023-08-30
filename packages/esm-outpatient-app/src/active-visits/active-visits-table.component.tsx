@@ -161,11 +161,16 @@ function ActiveVisitsTable() {
       },
       {
         id: 3,
+        header: t('locationComingFrom', 'Coming from'),
+        key: 'locationComingFrom',
+      },
+      {
+        id: 4,
         header: t('status', 'Status'),
         key: 'status',
       },
       {
-        id: 4,
+        id: 5,
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
@@ -212,6 +217,9 @@ function ActiveVisitsTable() {
             )}
           </>
         ),
+      },
+      locationComingFrom: {
+        content: <span className={styles.statusContainer}>{entry?.locationComingFrom}</span>,
       },
       status: {
         content: (
