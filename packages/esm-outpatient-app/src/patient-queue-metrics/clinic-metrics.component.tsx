@@ -29,7 +29,7 @@ function ClinicMetrics() {
   const { allServices } = useServices(currentQueueLocation ?? queueLocations?.[0]?.id);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
-  const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
+  const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation ?? queueLocations?.[0]?.id);
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
     if (currentServiceName && currentServiceUuid) {
       return false;

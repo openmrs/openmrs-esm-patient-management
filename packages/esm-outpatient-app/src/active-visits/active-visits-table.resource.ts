@@ -254,11 +254,11 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   let mappedVisitQueueEntries;
 
   if (!currServiceName || currServiceName == t('all', 'All')) {
+    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  } else {
     mappedVisitQueueEntries = data?.data?.results
       ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => dayjs(data.visitStartDateTime).isToday());
-  } else {
-    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+      .filter((data) => data.service == currServiceName);
   }
 
   return {
