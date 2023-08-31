@@ -37,5 +37,5 @@ export const useAppointmentDate = () => {
     getStartDate().subscribe(({ appointmentDate }) => setCurrentAppointmentDate(appointmentDate.toString()));
   }, []);
 
-  return currentAppointmentDate;
+  return { currentAppointmentDate, setCurrentAppointmentDate };
 };

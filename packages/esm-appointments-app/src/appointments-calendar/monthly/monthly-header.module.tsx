@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import styles from './monthly-header.module.scss';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +24,7 @@ function MonthlyHeader({
   setCurrentDate: (date: Dayjs) => void;
 }) {
   const { t } = useTranslation();
+
   return (
     <>
       <div className={styles.container}>

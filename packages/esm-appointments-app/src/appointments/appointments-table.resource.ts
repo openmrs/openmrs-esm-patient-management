@@ -6,8 +6,8 @@ import { getAppointment, useAppointmentDate } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
 
 export function useAppointments(status?: string, forDate?: string) {
-  const appointmentDate = useAppointmentDate();
-  const startDate = forDate ? forDate : appointmentDate;
+  const { currentAppointmentDate } = useAppointmentDate();
+  const startDate = forDate ? forDate : currentAppointmentDate;
   const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
 
