@@ -86,8 +86,6 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 </p>
               </div>
             </Tile>
-          </div>
-          <div className={styles.row}>
             <Tile className={styles.tile}>
               <p>{t('sp02', 'Sp02')}</p>
               <div className={styles.vitalValuesWrapper}>
@@ -97,6 +95,8 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 <p className={styles.unit}>{conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}</p>
               </div>
             </Tile>
+          </div>
+          <div className={styles.row}>
             <Tile className={styles.tile}>
               <p>{t('rRate', 'R. Rate')}</p>
               <div className={styles.vitalValuesWrapper}>
@@ -106,13 +106,18 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 <p className={styles.unit}>{conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}</p>
               </div>
             </Tile>
-          </div>
-          <div className={styles.row}>
             <Tile className={styles.tile}>
               <p>{t('height', 'Height')}</p>
               <div className={styles.vitalValuesWrapper}>
                 <p className={styles.vitalValues}>{vitalsToDisplay.height ? vitalsToDisplay.height : '--'}</p>
                 <p className={styles.unit}>{conceptUnits.get(config.concepts.heightUuid) ?? ''}</p>
+              </div>
+            </Tile>
+            <Tile className={styles.tile}>
+              <p>{t('weight', 'Weight')}</p>
+              <div className={styles.vitalValuesWrapper}>
+                <p className={styles.vitalValues}>{vitalsToDisplay.weight ? vitalsToDisplay.weight : '--'} </p>
+                <p className={styles.unit}>{conceptUnits.get(config.concepts.weightUuid) ?? ''}</p>
               </div>
             </Tile>
             <Tile className={styles.tile}>
@@ -123,13 +128,6 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                   {calculateBMI(Number(vitalsToDisplay.weight), Number(vitalsToDisplay.height))}
                 </p>
                 <p className={styles.unit}>{config.biometrics['bmiUnit']}</p>
-              </div>
-            </Tile>
-            <Tile className={styles.tile}>
-              <p>{t('weight', 'Weight')}</p>
-              <div className={styles.vitalValuesWrapper}>
-                <p className={styles.vitalValues}>{vitalsToDisplay.weight ? vitalsToDisplay.weight : '--'} </p>
-                <p className={styles.unit}>{conceptUnits.get(config.concepts.weightUuid) ?? ''}</p>
               </div>
             </Tile>
           </div>
