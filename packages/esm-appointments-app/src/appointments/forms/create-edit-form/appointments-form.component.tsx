@@ -36,7 +36,6 @@ import {
 } from '@openmrs/esm-framework';
 
 import first from 'lodash-es/first';
-import isEmpty from 'lodash-es/isEmpty';
 import styles from './appointments-form.scss';
 import { mutate } from 'swr';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
@@ -53,6 +52,7 @@ import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitia
 import { useCalendarDistribution } from '../workload-helper';
 import WorkloadCard from '../workload.component';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
+import LocationSelectOption from '../../common-components/location-select-option.component';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -177,18 +177,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         value={selectedLocation}
         defaultSelected={selectedLocation}
         onChange={(event) => setSelectedLocation(event.target.value)}>
-        {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
-        {!isEmpty(defaultFacility) ? (
-          <SelectItem key={defaultFacility?.uuid} text={defaultFacility?.display} value={defaultFacility?.uuid}>
-            {defaultFacility?.display}
-          </SelectItem>
-        ) : locations?.length > 0 ? (
-          locations.map((location) => (
-            <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-              {location.display}
-            </SelectItem>
-          ))
-        ) : null}
+        <LocationSelectOption
+          selectedLocation={selectedLocation}
+          defaultFacility={defaultFacility}
+          locations={locations}
+        />
       </Select>
 
       <Select
