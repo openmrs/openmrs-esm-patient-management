@@ -332,9 +332,10 @@ function ActiveVisitsTable() {
           rows={tableRows}
           size="xs"
           useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getToolbarProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar
+                {...getToolbarProps()}
                 style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
                 <TableToolbarContent className={styles.toolbarContent}>
                   <div className={styles.filterContainer}>
