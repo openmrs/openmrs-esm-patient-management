@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { age, ExtensionSlot, formatDate } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
+import { useFacilityName } from '../patient-verification-hook';
 
 const PatientInfo: React.FC<{ label: string; value: string }> = ({ label, value }) => {
   return (
@@ -21,6 +22,8 @@ interface ConfirmPromptProps {
 
 const ConfirmPrompt: React.FC<ConfirmPromptProps> = ({ close, onConfirm, patient }) => {
   const { t } = useTranslation();
+  const { facilityName, isLoading } = useFacilityName(patient?.originFacilityKmflCode);
+
   return (
     <>
       <div className="cds--modal-header">
@@ -54,6 +57,14 @@ const ConfirmPrompt: React.FC<ConfirmPromptProps> = ({ close, onConfirm, patient
             <PatientInfo label={t('dateOfBirth', 'Date of birth')} value={formatDate(new Date(patient?.dateOfBirth))} />
             <PatientInfo label={t('gender', 'Gender')} value={capitalize(patient?.gender)} />
             <PatientInfo label={t('nascopNumber', 'Nascop facility no')} value={capitalize(patient?.nascopCCCNumber)} />
+            <PatientInfo
+              label={t('originFacilityCode', 'Origin facility code')}
+              value={patient?.originFacilityKmflCode}
+            />
+            <PatientInfo
+              label={t('originFacilityName', 'Origin facility name')}
+              value={isLoading ? '--' : facilityName?.name}
+            />
           </div>
         </div>
       </div>
