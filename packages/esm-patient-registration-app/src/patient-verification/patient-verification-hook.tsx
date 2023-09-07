@@ -154,3 +154,14 @@ async function postToRegistry(
     showNotification({ kind: 'error', title: 'NUPI Post failed', description: JSON.stringify(error) });
   }
 }
+
+export const useFacilityName = (facilityCode) => {
+  const apiUrl = `/ws/rest/v1/kenyaemr/facilityName?facilityCode=${facilityCode}`;
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+
+  return {
+    facilityName: data ? data?.data : null,
+    isLoading: isLoading,
+    isError: error,
+  };
+};
