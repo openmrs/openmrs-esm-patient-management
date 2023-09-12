@@ -4,6 +4,8 @@
   "extends": ["ts-react-important-stuff", "plugin:prettier/recommended"],
   "rules": {
     "curly": ["error", "all"],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
     "no-restricted-imports": [
       "error",
       {

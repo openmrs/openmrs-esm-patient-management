@@ -13,6 +13,7 @@
     "verify": "turbo lint && turbo typescript && turbo test --color --concurrency=5",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "test-e2e": "playwright test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "postinstall": "husky install",
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
