@@ -1,4 +1,11 @@
-import { FetchResponse, getSynchronizationItems, openmrsFetch, useConfig, usePatient } from '@openmrs/esm-framework';
+import {
+  FetchResponse,
+  OpenmrsResource,
+  getSynchronizationItems,
+  openmrsFetch,
+  useConfig,
+  usePatient,
+} from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
 import { Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -239,14 +246,16 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) {
   const { registrationObs } = useConfig() as RegistrationConfig;
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Encounter> }>>(
-    patientToEdit
-      ? `/ws/rest/v1/encounter?patient=${patientUuid}&v=full&encounterType=${registrationObs.encounterTypeUuid}`
+    patientToEdit && registrationObs.encounterTypeUuid
+      ? `/ws/rest/v1/encounter?patient=${patientUuid}&v=custom:(encounterDatetime,obs:(concept:ref,value:ref))&encounterType=${registrationObs.encounterTypeUuid}`
       : null,
     openmrsFetch,
   );
   const obs = data?.data.results.sort(latestFirstEncounter)?.at(0)?.obs;
   const encounters = obs
-    ?.map(({ concept, value }) => ({ [concept['uuid']]: value['uuid'] }))
+    ?.map(({ concept, value }) => ({
+      [(concept as OpenmrsResource).uuid]: typeof value === 'object' ? value?.uuid : value,
+    }))
     .reduce((accu, curr) => Object.assign(accu, curr), {});
 
   return { data: encounters, isLoading, error };

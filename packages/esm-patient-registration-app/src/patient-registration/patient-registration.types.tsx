@@ -1,4 +1,4 @@
-import { Session } from '@openmrs/esm-framework';
+import { OpenmrsResource, Session } from '@openmrs/esm-framework';
 import { RegistrationConfig } from '../config-schema';
 import { SavePatientTransactionManager } from './form-manager';
 
@@ -128,8 +128,8 @@ export interface Encounter {
   }>;
   form: string;
   obs: Array<{
-    concept: string;
-    value: string | number;
+    concept: string | OpenmrsResource;
+    value: string | number | OpenmrsResource;
   }>;
 }
 
