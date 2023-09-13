@@ -108,8 +108,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                   /> */}
                 </div>
                 <p className={styles.demographics}>
-                  {getGender(patient.gender)}
-                  <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
+                  {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
                   <span className={styles.middot}>&middot;</span>
                   {config.defaultIdentifierTypes.length ? (
                     <>
