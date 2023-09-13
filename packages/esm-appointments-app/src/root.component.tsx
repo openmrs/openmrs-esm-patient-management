@@ -9,13 +9,15 @@ const swrConfiguration = {
 };
 
 const RootComponent: React.FC = () => {
+  const appointmentsBasename = window.getOpenmrsSpaBase() + 'home/appointments';
+
   return (
     <main>
       <SWRConfig value={swrConfiguration}>
-        <BrowserRouter basename={window.getOpenmrsSpaBase()}>
+        <BrowserRouter basename={appointmentsBasename}>
           <Routes>
-            <Route path="home/appointments" element={<ClinicalAppointments />} />
-            <Route path="home/appointments/calendar" element={<AppointmentsCalendarView />} />
+            <Route path="/" element={<ClinicalAppointments />} />
+            <Route path="/calendar" element={<AppointmentsCalendarView />} />
           </Routes>
         </BrowserRouter>
       </SWRConfig>

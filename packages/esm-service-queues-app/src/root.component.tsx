@@ -7,19 +7,22 @@ import ServicesTable from './queue-patient-linelists/queue-services-table.compon
 import QueueScreen from './queue-screen/queue-screen.component';
 
 const swrConfiguration = {
+  // Maximum number of retries when the backend returns an error
   errorRetryCount: 3,
 };
 
 const Root: React.FC = () => {
+  const serviceQueuesBasename = window.getOpenmrsSpaBase() + 'home/service-queues';
+
   return (
     <main>
       <SWRConfig value={swrConfiguration}>
-        <BrowserRouter basename={window.getOpenmrsSpaBase()}>
+        <BrowserRouter basename={serviceQueuesBasename}>
           <Routes>
-            <Route path="home/service-queues" element={<Home />} />
-            <Route path="home/service-queues/screen" element={<QueueScreen />} />
-            <Route path="home/service-queues/appointments-list/:value/" element={<AppointmentsTable />} />
-            <Route path="home/service-queues/queue-list/:value/" element={<ServicesTable />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/screen" element={<QueueScreen />} />
+            <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
+            <Route path="/queue-list/:value/" element={<ServicesTable />} />
           </Routes>
         </BrowserRouter>
       </SWRConfig>

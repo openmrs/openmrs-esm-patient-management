@@ -67,6 +67,8 @@
 }
 
 .demographics {
+  display: flex;
+  align-items: center;
   margin-top: spacing.$spacing-02;
   @include type.type-style('body-compact-01');
   color: $text-02;
@@ -87,7 +89,7 @@
 }
 
 .middot {
-  margin: 0 spacing.$spacing-03;
+  margin: 0 0.25rem;
 }
 
 .configuredTag {

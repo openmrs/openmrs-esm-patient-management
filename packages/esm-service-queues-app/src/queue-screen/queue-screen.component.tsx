@@ -28,7 +28,7 @@ const QueueScreen: React.FC<QueueScreenProps> = () => {
 
   return (
     <div>
-      <PatientQueueHeader />
+      <PatientQueueHeader title={t('queueScreen', 'Queue screen')} />
       <div className={styles.gridFlow}>
         {rowData.map((row) => (
           <div className={styles.card} key={row.id}>

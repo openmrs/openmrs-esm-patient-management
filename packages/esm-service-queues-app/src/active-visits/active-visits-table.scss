@@ -130,6 +130,7 @@
   @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: 0.5rem;
+  align-self: center;
 }
 
 .helper {
@@ -181,6 +182,7 @@
 .tileContent {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
