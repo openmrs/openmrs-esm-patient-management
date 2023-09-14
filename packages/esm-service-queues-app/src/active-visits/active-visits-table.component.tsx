@@ -161,8 +161,8 @@ function ActiveVisitsTable() {
       },
       {
         id: 3,
-        header: t('locationComingFrom', 'Coming from'),
-        key: 'locationComingFrom',
+        header: t('queueComingFrom', 'Coming from'),
+        key: 'queueComingFrom',
       },
       {
         id: 4,
@@ -218,8 +218,8 @@ function ActiveVisitsTable() {
           </>
         ),
       },
-      locationComingFrom: {
-        content: <span className={styles.statusContainer}>{entry?.locationComingFrom}</span>,
+      queueComingFrom: {
+        content: <span className={styles.statusContainer}>{entry?.queueComingFrom}</span>,
       },
       status: {
         content: (
