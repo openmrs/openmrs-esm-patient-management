@@ -11,12 +11,12 @@ export const configSchema = {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
-      _default: '9e123c90-76ac-4eaa-8d40-35577781eb46',
+      _default: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
     },
     emergencyPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
-      _default: '5c2d5f8c-5efb-46d0-8e28-9e707ab7523c',
+      _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
     },
     serviceConceptSetUuid: {
       _type: Type.ConceptUuid,
@@ -29,12 +29,12 @@ export const configSchema = {
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default status for the queues eg Waiting.',
-      _default: '136203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      _default: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
     },
     defaultTransitionStatus: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
-      _default: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
     visitQueueNumberAttributeUuid: {
       _type: Type.ConceptUuid,
