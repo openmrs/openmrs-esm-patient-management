@@ -19,7 +19,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
   const session = useSession();
   const [selectedLocation, setSelectedLocation] = useState(appointment.location);
   const [reason, setReason] = useState('');
-  const startDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         description: t('appointmentNowVisible', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
-      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Scheduled`);
-      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=Cancelled`);
+      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
+      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Cancelled`);
       closeOverlay();
     } else {
       showNotification({

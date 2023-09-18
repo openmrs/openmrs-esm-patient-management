@@ -25,82 +25,6 @@ interface RelationshipType {
   direction: string;
 }
 
-export const RelationshipsSection = () => {
-  const { relationshipTypes } = useContext(ResourcesContext);
-  const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (relationshipTypes) {
-      const tmp: RelationshipType[] = [];
-      relationshipTypes.results.forEach((type) => {
-        const aIsToB = {
-          display: type.displayAIsToB,
-          uuid: type.uuid,
-          direction: 'aIsToB',
-        };
-        const bIsToA = {
-          display: type.displayBIsToA,
-          uuid: type.uuid,
-          direction: 'bIsToA',
-        };
-        aIsToB.display === bIsToA.display ? tmp.push(aIsToB) : tmp.push(aIsToB, bIsToA);
-      });
-      setDisplayRelationshipTypes(tmp);
-    }
-  }, [relationshipTypes]);
-
-  if (!relationshipTypes) {
-    return (
-      <section aria-label="Relationships Section">
-        <SkeletonText />
-      </section>
-    );
-  }
-
-  return (
-    <section aria-label="Relationships Section">
-      <FieldArray name="relationships">
-        {({
-          push,
-          remove,
-          form: {
-            values: { relationships },
-          },
-        }) => (
-          <div>
-            {relationships && relationships.length > 0
-              ? relationships.map((relationship: RelationshipValue, index) => (
-                  <div key={index} className={sectionStyles.formSection}>
-                    <RelationshipView
-                      relationship={relationship}
-                      index={index}
-                      displayRelationshipTypes={displayRelationshipTypes}
-                      key={index}
-                      remove={remove}
-                    />
-                  </div>
-                ))
-              : null}
-            <div className={styles.actions}>
-              <Button
-                kind="ghost"
-                onClick={() =>
-                  push({
-                    relatedPersonUuid: '',
-                    action: 'ADD',
-                  })
-                }>
-                {t('addRelationshipButtonText', 'Add Relationship')}
-              </Button>
-            </div>
-          </div>
-        )}
-      </FieldArray>
-    </section>
-  );
-};
-
 interface RelationshipViewProps {
   relationship: RelationshipValue;
   index: number;
@@ -205,8 +129,12 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
               value="placeholder-item"
               text={t('relationshipToPatient', 'Relationship to patient')}
             />
-            {displayRelationshipTypes.map((type) => (
-              <SelectItem text={type.display} value={`${type.uuid}/${type.direction}`} key={type.display} />
+            {displayRelationshipTypes.map((relationshipType, index) => (
+              <SelectItem
+                text={relationshipType.display}
+                value={`${relationshipType.uuid}/${relationshipType.direction}`}
+                key={`relationship-${relationshipType.uuid}-${index}`}
+              />
             ))}
           </Select>
         </Layer>
@@ -222,5 +150,81 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
         </NotificationActionButton>
       }
     />
+  );
+};
+
+export const RelationshipsSection = () => {
+  const { relationshipTypes } = useContext(ResourcesContext);
+  const [displayRelationshipTypes, setDisplayRelationshipTypes] = useState<RelationshipType[]>([]);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (relationshipTypes) {
+      const tmp: RelationshipType[] = [];
+      relationshipTypes.results.forEach((type) => {
+        const aIsToB = {
+          display: type.aIsToB,
+          uuid: type.uuid,
+          direction: 'aIsToB',
+        };
+        const bIsToA = {
+          display: type.bIsToA,
+          uuid: type.uuid,
+          direction: 'bIsToA',
+        };
+        aIsToB.display === bIsToA.display ? tmp.push(aIsToB) : tmp.push(aIsToB, bIsToA);
+      });
+      setDisplayRelationshipTypes(tmp);
+    }
+  }, [relationshipTypes]);
+
+  if (!relationshipTypes) {
+    return (
+      <section aria-label="Loading relationships section">
+        <SkeletonText role="progressbar" />
+      </section>
+    );
+  }
+
+  return (
+    <section aria-label="Relationships section">
+      <FieldArray name="relationships">
+        {({
+          push,
+          remove,
+          form: {
+            values: { relationships },
+          },
+        }) => (
+          <div>
+            {relationships && relationships.length > 0
+              ? relationships.map((relationship: RelationshipValue, index) => (
+                  <div key={index} className={sectionStyles.formSection}>
+                    <RelationshipView
+                      relationship={relationship}
+                      index={index}
+                      displayRelationshipTypes={displayRelationshipTypes}
+                      key={index}
+                      remove={remove}
+                    />
+                  </div>
+                ))
+              : null}
+            <div className={styles.actions}>
+              <Button
+                kind="ghost"
+                onClick={() =>
+                  push({
+                    relatedPersonUuid: '',
+                    action: 'ADD',
+                  })
+                }>
+                {t('addRelationshipButtonText', 'Add Relationship')}
+              </Button>
+            </div>
+          </div>
+        )}
+      </FieldArray>
+    </section>
   );
 };

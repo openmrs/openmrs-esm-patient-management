@@ -29,7 +29,7 @@ function ClinicMetrics() {
   const { allServices } = useServices(currentQueueLocation ?? queueLocations?.[0]?.id);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
-  const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation);
+  const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation ?? queueLocations?.[0]?.id);
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
     if (currentServiceName && currentServiceUuid) {
       return false;
@@ -56,7 +56,7 @@ function ClinicMetrics() {
   return (
     <>
       <MetricsHeader />
-      <div className={styles.cardContainer}>
+      <div className={styles.cardContainer} data-testid="clinic-metrics">
         <MetricsCard
           label={t('patients', 'Patients')}
           value={loading ? '--' : activeVisitsCount}

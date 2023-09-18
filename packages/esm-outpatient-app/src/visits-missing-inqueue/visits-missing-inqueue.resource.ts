@@ -39,11 +39,12 @@ export function useMissingQueueEntries() {
     isValidating: visitsIsValidating,
   } = useSWR<{ data: { results: Array<Visit> } }, Error>(sessionLocation ? url : null, openmrsFetch);
 
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+  const apiUrl = `/ws/rest/v1/visit-queue-entry`;
   const {
     data: queueData,
     error: queueError,
     isValidating: queueIsValidating,
+    mutate: mutateQueueEntries,
   } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(apiUrl, openmrsFetch);
 
   const byId = {};
@@ -82,6 +83,7 @@ export function useMissingQueueEntries() {
     isLoading: !data && !visitsError && !queueError,
     isError: !visitsError && !queueError,
     visitsIsValidating,
+    mutateQueueEntries,
   };
 }
 

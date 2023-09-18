@@ -67,7 +67,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
     () =>
       patients.map((patient, index) => {
         const row = {
-          id: index,
+          id: String(index),
         };
         columns.forEach((column) => {
           const value = column.getValue?.(patient) || patient[column.key];
@@ -88,7 +88,15 @@ const PatientTable: React.FC<PatientTableProps> = ({
   const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
   if (isLoading) {
-    return <DataTableSkeleton className={styles.dataTableSkeleton} rowCount={5} columnCount={5} zebra />;
+    return (
+      <DataTableSkeleton
+        data-testid="data-table-skeleton"
+        className={styles.dataTableSkeleton}
+        rowCount={5}
+        columnCount={5}
+        zebra
+      />
+    );
   }
 
   return (
@@ -154,8 +162,8 @@ const PatientTable: React.FC<PatientTableProps> = ({
           className={styles.paginationOverride}
           pagesUnknown={pagination?.pagesUnknown}
           isLastPage={pagination.lastPage}
-          backwardText=""
-          forwardText=""
+          backwardText="Next Page"
+          forwardText="Previous Page"
         />
       )}
     </div>

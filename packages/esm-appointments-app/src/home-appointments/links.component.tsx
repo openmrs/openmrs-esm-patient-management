@@ -23,7 +23,7 @@ const SeeAllAppointmentsLink = () => {
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   ) : (
-    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}` })}>
+    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}/appointments` })}>
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   );
@@ -41,7 +41,7 @@ const AddAppointmentLink = () => {
           target="_blank"
           kind="ghost"
           href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/new`}
-          renderIcon={(props) => <Add size={16} {...props} className="cds--btn__icon" />}>
+          renderIcon={(props) => <Add size={16} {...props} />}>
           {t('add', 'Add')}
         </Button>
       ) : (
@@ -66,19 +66,18 @@ const ViewCalendarLink = () => {
 
   return useBahmniUI ? (
     <Button
+      className={styles.viewCalendarButton}
       kind="ghost"
       size="md"
       target="_blank"
-      className="cds--btn cds--btn--ghost"
-      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar`}
-      renderIcon={(props) => <Calendar size={16} {...props} className="cds--btn__icon" />}>
+      href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar`}>
       {t('viewCalendar', 'View Calendar')}
     </Button>
   ) : (
     <Button
-      className={styles.calendarButton}
+      className={styles.viewCalendarButton}
       kind="ghost"
-      onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
+      onClick={() => navigate({ to: `${spaBasePath}/appointments/calendar` })}
       renderIcon={(props) => <Calendar size={16} {...props} />}
       data-floating-menu-primary-focus
       iconDescription={t('viewCalendar', 'View Calendar')}>

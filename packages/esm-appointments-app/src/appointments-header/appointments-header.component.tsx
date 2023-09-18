@@ -6,7 +6,7 @@ import AppointmentsIllustration from './appointments-illustration.component';
 import styles from './appointments-header.scss';
 import { DatePicker, DatePickerInput, Dropdown, Layer } from '@carbon/react';
 import dayjs from 'dayjs';
-import { changeStartDate } from '../helpers';
+import { changeStartDate, useAppointmentDate } from '../helpers';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 
 interface AppointmentHeaderProps {
@@ -18,11 +18,11 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
   const { t } = useTranslation();
   const session = useSession();
   const datePickerRef = useRef(null);
-  const [appointmentDate, setDateTime] = useState(new Date());
+  const { currentAppointmentDate } = useAppointmentDate();
   const location = session?.sessionLocation?.display;
   const { serviceTypes } = useAppointmentServices();
   return (
-    <div className={styles.header}>
+    <div className={styles.header} data-testid="appointments-header">
       <div className={styles['left-justified-items']}>
         <AppointmentsIllustration />
         <div className={styles['page-labels']}>
@@ -46,7 +46,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
               placeholder="DD-MMM-YYYY"
               labelText=""
               type="text"
-              value={dayjs(appointmentDate).format('DD MMM YYYY')}
+              value={dayjs(currentAppointmentDate).format('DD MMM YYYY')}
             />
           </DatePicker>
         </div>

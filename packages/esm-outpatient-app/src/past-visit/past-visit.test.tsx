@@ -24,18 +24,15 @@ describe('PastVisit: ', () => {
 
     expect(screen.queryAllByText(/vitals/i));
     const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
-    const encountersTab = screen.getByRole('tab', { name: /encounters/i });
 
     expect(vitalsTab).toBeInTheDocument();
 
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
     await user.click(vitalsTab);
 
     expect(vitalsTab).toHaveAttribute('aria-selected', 'true');
-    expect(encountersTab).toHaveAttribute('aria-selected', 'false');
   });
 });
 

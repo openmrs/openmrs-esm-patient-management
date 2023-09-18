@@ -9,11 +9,11 @@ import { omrsDateFormat } from '../constants';
 
 export function useTodaysAppointments() {
   const { t } = useTranslation();
-  const startDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
 
-  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
+  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${currentAppointmentDate}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
-    startDate ? apiUrl : null,
+    currentAppointmentDate ? apiUrl : null,
     openmrsFetch,
   );
 

@@ -21,7 +21,7 @@ import {
   useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
-import { ActiveVisit } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
+import { ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface AddVisitToQueueDialogProps {
@@ -48,6 +48,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const config = useConfig() as ConfigObject;
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
   const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
+  const { mutateQueueEntries } = useMissingQueueEntries();
 
   const addVisitToQueue = useCallback(() => {
     if (!queueUuid) {
@@ -86,6 +87,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
           });
           closeModal();
           mutate();
+          mutateQueueEntries();
         }
       },
       (error) => {

@@ -161,11 +161,16 @@ function ActiveVisitsTable() {
       },
       {
         id: 3,
+        header: t('locationComingFrom', 'Coming from'),
+        key: 'locationComingFrom',
+      },
+      {
+        id: 4,
         header: t('status', 'Status'),
         key: 'status',
       },
       {
-        id: 4,
+        id: 5,
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
@@ -212,6 +217,9 @@ function ActiveVisitsTable() {
             )}
           </>
         ),
+      },
+      locationComingFrom: {
+        content: <span className={styles.statusContainer}>{entry?.locationComingFrom}</span>,
       },
       status: {
         content: (
@@ -324,9 +332,10 @@ function ActiveVisitsTable() {
           rows={tableRows}
           size="xs"
           useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, onInputChange }) => (
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getToolbarProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar
+                {...getToolbarProps()}
                 style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
                 <TableToolbarContent className={styles.toolbarContent}>
                   <div className={styles.filterContainer}>
