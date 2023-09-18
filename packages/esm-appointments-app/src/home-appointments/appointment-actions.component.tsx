@@ -1,16 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { navigate, useConfig } from '@openmrs/esm-framework';
-import { MappedAppointment } from '../types';
-import PatientSearch from '../patient-search/patient-search.component';
+import { isDesktop, navigate, useConfig } from '@openmrs/esm-framework';
+import type { MappedAppointment } from '../types';
 import { launchOverlay } from '../hooks/useOverlay';
-import styles from './appointments-list.scss';
 import { spaBasePath } from '../constants';
 import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } from './common';
-import { useSWRConfig } from 'swr';
-import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
 import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
+import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
+import PatientSearch from '../patient-search/patient-search.component';
+import styles from './appointments-list.scss';
 
 interface ActionMenuProps {
   appointment: MappedAppointment;
@@ -95,7 +95,11 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
 
   return (
     <Layer>
-      <OverflowMenu ariaLabel="Edit appointment" selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+      <OverflowMenu
+        ariaLabel="Edit appointment"
+        selectorPrimaryFocus={'#editPatientDetails'}
+        size={isDesktop ? 'sm' : 'lg'}
+        flipped>
         <EditOverflowItem />
         <OverflowMenuItem
           className={styles.menuItem}
