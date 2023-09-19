@@ -36,11 +36,6 @@ export const configSchema = {
       _description: 'The UUID of the default status for attending a service in the queues eg In Service.',
       _default: 'ca7494ae-437f-4fd0-8aae-b88b9a2ba47d',
     },
-    visitQueueNumberAttributeUuid: {
-      _type: Type.ConceptUuid,
-      _description: 'The UUID of the visit attribute that contains the visit queue number.',
-      _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
       _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -92,6 +87,11 @@ export const configSchema = {
     _description:
       'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
     _default: [],
+  },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.UUID,
+    _description: 'The UUID of the visit attribute that contains the visit queue number.',
+    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
