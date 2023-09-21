@@ -3743,21 +3743,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-outpatient-app@workspace:packages/esm-outpatient-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-outpatient-app@workspace:packages/esm-outpatient-app"
-  dependencies:
-    "@carbon/react": ^1.12.0
-    lodash-es: ^4.17.15
-    webpack: ^5.74.0
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    react: ^18.1.0
-    react-i18next: 11.x
-    react-router-dom: 6.x
-  languageName: unknown
-  linkType: soft
-
 "@openmrs/esm-patient-list-app@workspace:packages/esm-patient-list-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-list-app@workspace:packages/esm-patient-list-app"
@@ -3893,6 +3878,21 @@ __metadata:
   checksum: 5031672d9d4431f873ac3cf19709ee5fca2a195e3c1581ccae58927ff5d6649a852b568ca408b777d631b5868b3d54f630a785c952d0298451ddef7f78032f5a
   languageName: node
   linkType: hard
+
+"@openmrs/esm-service-queues-app@workspace:packages/esm-service-queues-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-service-queues-app@workspace:packages/esm-service-queues-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
 
 "@openmrs/esm-state@npm:^5.1.1-pre.922":
   version: 5.1.1-pre.922

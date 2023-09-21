@@ -9,7 +9,7 @@ The `Service Queues` app is a frontend module that enables users to track a pati
 The key component of the service queue app is the `Active Visits` table. It displays a tabular overview of the active visits ongoing in a facility and the wait time of patients. Users can add patients to the service queue by starting visits for them. They can also view information from the current active visits as well as the previous visit on each queue entry by clicking the table extension slot. Users can also change the priority and status of an entry in the queue from the UI, effectively moving a patient from one point in the queue to another. In order to indicate that a patient is currently attending service, click on the bell icon. In order to edit an entry, click the pencil icon. 
 
 Amend the following concepts in the configuration schema to get started using the module:
-- `priorityConceptSetUuid` - concept UUID for `prioritity`.
+- `priorityConceptSetUuid` - concept UUID for `priority`.
 - `defaultPriorityConceptUuid` - concept UUID for `not urgent`.
 - `serviceConceptSetUuid` - concept UUID for `service`.
 - `statusConceptSetUuid` - concept UUID for `status`.
