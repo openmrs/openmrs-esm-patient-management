@@ -131,7 +131,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     <OverflowMenuVertical className={styles.menu} size={16} />
                   </>
                 }
-                dropDownMenu={showDropdown}>
+                dropdownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
                   name="patient-search-actions-slot"
