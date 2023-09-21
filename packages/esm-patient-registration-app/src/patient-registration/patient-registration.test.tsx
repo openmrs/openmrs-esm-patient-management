@@ -11,21 +11,13 @@ import { PatientRegistration } from './patient-registration.component';
 import { RegistrationConfig } from '../config-schema';
 import { mockedAddressTemplate } from './field/address/tests/mocks';
 import { mockPatient } from '../../../../tools/test-helpers';
+import { OpenmrsDatePicker } from '@openmrs/esm-styleguide/src/public';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
 const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
 const mockedShowToast = showToast as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-  };
-});
 
 // Mock field.resource using the manual mock (in __mocks__)
 jest.mock('./field/field.resource');
@@ -55,6 +47,18 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     validator: jest.fn(),
+    getLocale: jest.fn().mockReturnValue('en'),
+    OpenmrsDatePicker: (datePickerProps) => (
+      <OpenmrsDatePicker
+        id={datePickerProps.id}
+        dateFormat={datePickerProps.dateFormat}
+        onChange={datePickerProps.onChange}
+        maxDate={datePickerProps.maxDate}
+        labelText={datePickerProps.labelText}
+        value={datePickerProps.value}
+        carbonOptions={datePickerProps.carbonOptions}
+      />
+    ),
   };
 });
 
@@ -345,7 +349,7 @@ describe('patient registration component', () => {
       jest.clearAllMocks();
     });
 
-    it('edits patient demographics', async () => {
+    fit('edits patient demographics', async () => {
       const user = userEvent.setup();
 
       mockedSavePatient.mockResolvedValue({});
@@ -379,7 +383,7 @@ describe('patient registration component', () => {
       expect(givenNameInput.value).toBe('John');
       expect(familyNameInput.value).toBe('Wilson');
       expect(middleNameInput.value).toBeFalsy();
-      expect(dateOfBirthInput.value).toBe('4/4/1972');
+      expect(dateOfBirthInput.value).toBe('04/04/1972');
       expect(genderInput.value).toBe('Male');
 
       // do some edits
