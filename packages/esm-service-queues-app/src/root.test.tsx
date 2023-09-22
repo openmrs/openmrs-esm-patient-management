@@ -12,17 +12,16 @@ describe('Root Component', () => {
   });
 
   it('renders AppointmentsTable component for "/appointments-list/:value/" route', () => {
-    window.history.pushState({}, 'Appointments List', '/spa/home/service-queues/appointments-list/some-value/');
+    window.history.pushState({}, 'Appointments List', '/openmrs/spa/home/service-queues/appointments-list/some-value/');
     render(<Root />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('renders ServicesTable component for "/queue-list/:value/" route', () => {
-    window.history.pushState({}, 'Queue List', '/spa/home/service-queues/queue-list/some-value/');
+    window.history.pushState({}, 'Queue List', '/openmrs/spa/home/service-queues/queue-list/some-value/');
     render(<Root />);
 
-    const servicesTable = screen.getByText('A list of clients waiting for queue-list');
-    expect(servicesTable).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 });

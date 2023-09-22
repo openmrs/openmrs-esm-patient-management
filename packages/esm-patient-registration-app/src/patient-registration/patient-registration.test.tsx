@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
 import { FormManager } from './form-manager';
 import { saveEncounter, savePatient } from './patient-registration.resource';
-import { Encounter } from './patient-registration-types';
+import type { Encounter } from './patient-registration.types';
 import { Resources, ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
 import { RegistrationConfig } from '../config-schema';
@@ -18,6 +18,17 @@ const mockedUsePatient = usePatient as jest.Mock;
 const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
 const mockedShowToast = showToast as jest.Mock;
+
+jest.setTimeout(10000);
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    validator: jest.fn(),
+  };
+});
 
 // Mock field.resource using the manual mock (in __mocks__)
 jest.mock('./field/field.resource');

@@ -507,25 +507,27 @@ function ActiveVisitsTable() {
       ) : null}
       <div className={styles.tileContainer}>
         <Tile className={styles.tile}>
-          <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-          <ExtensionSlot
-            name="patient-search-button-slot"
-            state={{
-              buttonText: t('addPatientToQueue', 'Add patient to queue'),
-              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-              buttonProps: {
-                kind: 'ghost',
-                renderIcon: (props) => <Add size={16} {...props} />,
-                size: 'sm',
-              },
-              selectPatientAction: (selectedPatientUuid) => {
-                setShowOverlay(true);
-                setView(SearchTypes.SCHEDULED_VISITS);
-                setViewState({ selectedPatientUuid });
-                setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
-              },
-            }}
-          />
+          <div className={styles.tileContent}>
+            <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+            <ExtensionSlot
+              name="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'ghost',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: 'sm',
+                },
+                selectPatientAction: (selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setView(SearchTypes.SCHEDULED_VISITS);
+                  setViewState({ selectedPatientUuid });
+                  setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
+                },
+              }}
+            />
+          </div>
         </Tile>
       </div>
       {showOverlay && (

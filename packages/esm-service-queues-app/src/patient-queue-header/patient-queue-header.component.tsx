@@ -15,9 +15,9 @@ import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
+  const { queueLocations } = useQueueLocations();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
-  const { queueLocations } = useQueueLocations();
   const currentQueueLocationName = useSelectedQueueLocationName();
 
   const handleQueueLocationChange = ({ selectedItem }) => {
