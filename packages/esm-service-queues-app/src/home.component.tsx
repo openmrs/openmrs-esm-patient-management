@@ -1,21 +1,19 @@
 import React from 'react';
+import { ConfigObject, useConfig } from '@openmrs/esm-framework';
 import ActiveVisitsTable from './active-visits/active-visits-table.component';
 import ActiveVisitsTabs from './active-visits/active-visits-tab.component';
 import ClinicMetrics from './patient-queue-metrics/clinic-metrics.component';
-import { ConfigObject, useConfig } from '@openmrs/esm-framework';
 import PatientQueueHeader from './patient-queue-header/patient-queue-header.component';
 
-interface HomeProps {}
-
-const Home: React.FC<HomeProps> = (props) => {
-  const config = useConfig() as ConfigObject;
-  const useQueueTableTabs = config.showQueueTableTab;
+const Home: React.FC = () => {
+  const config = useConfig<ConfigObject>();
+  const useQueueTableTabs: boolean = config.showQueueTableTab;
 
   return (
     <>
       <PatientQueueHeader />
       <ClinicMetrics />
-      {useQueueTableTabs === true ? <ActiveVisitsTabs /> : <ActiveVisitsTable />}
+      {useQueueTableTabs ? <ActiveVisitsTabs /> : <ActiveVisitsTable />}
     </>
   );
 };
