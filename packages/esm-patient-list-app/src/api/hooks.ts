@@ -26,7 +26,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     ['v', custom],
     ['totalCount', 'true'],
   ];
-  const config = useConfig() as ConfigSchema;
+  const config: ConfigSchema = useConfig();
 
   if (name) {
     query.push(['q', name]);
@@ -53,6 +53,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
 
     return url;
   };
+
   const {
     data,
     error,

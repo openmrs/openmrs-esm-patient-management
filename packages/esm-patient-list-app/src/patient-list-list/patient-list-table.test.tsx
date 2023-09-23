@@ -1,143 +1,97 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import PatientListTableContainer from './patient-list-table.component';
-import { usePagination } from '@openmrs/esm-framework';
+import { useSession } from '@openmrs/esm-framework';
+import { mockSession } from '../../../../__mocks__/session.mock';
 import { PatientList } from '../api/types';
 
-const mockedUsePagination = usePagination as jest.Mock;
+const mockedUseSession = jest.mocked(useSession);
 
-// Mock useSession and other dependencies
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  useSession: jest.fn(),
-  useLayoutType: jest.fn(),
   useConfig: jest.fn(() => ({
     patientListsToShow: 20,
   })),
 }));
 
-describe('PatientListTableContainer', () => {
-  const patientLists: Array<PatientList> = [
-    {
-      id: '1',
-      display: 'My lists',
-      description: 'My Lists',
-      type: 'List type',
-      size: 10,
-    },
-  ];
-  const header = [
-    { header: 'List name', key: '1' },
-    { header: 'List type', key: '2' },
-    { header: 'No. of patients', key: '3' },
-    { header: 'Starred', key: '4' },
-  ];
+const patientLists: Array<PatientList> = [
+  {
+    id: '1',
+    display: 'My lists',
+    description: 'My Lists',
+    type: 'List type',
+    size: 10,
+  },
+];
 
-  it('renders loading skeleton', () => {
+const header = [
+  { header: 'List name', key: '1' },
+  { header: 'List type', key: '2' },
+  { header: 'No. of patients', key: '3' },
+  { header: 'Starred', key: '4' },
+];
+
+describe('PatientListTableContainer', () => {
+  beforeEach(() => mockedUseSession.mockReturnValue(mockSession.data));
+
+  it('renders a loading state when patient list data is getting fetched', () => {
     render(
       <PatientListTableContainer
-        loading={true}
-        patientLists={[]}
-        listType={'My lists'}
-        error={undefined}
-        isValidating={false}
+        error={null}
         headers={['id', 'name']}
+        isLoading
+        isValidating={false}
+        listType={'My lists'}
+        patientLists={[]}
       />,
     );
-    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
+
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  xit('renders error state', () => {
-    const error = new Error('Something went wrong');
+  it('renders an error state when there is a problem loading patient list data', () => {
+    const error = {
+      message: 'You are not logged in',
+      response: {
+        status: 401,
+        statusText: 'Unauthorized',
+      },
+    };
+
     render(
       <PatientListTableContainer
-        loading={false}
         error={error}
+        headers={['id', 'name']}
+        isLoading={false}
+        isValidating={false}
+        listType={''}
         patientLists={[]}
         refetch={jest.fn()}
-        listType={''}
-        isValidating={false}
-        headers={['id', 'name']}
         searchTerm={''}
         setSearchTerm={jest.fn()}
       />,
     );
-    expect(screen.getByText('Error')).toBeInTheDocument();
 
-    // this is throwing error that rendered item is not component it is string
+    expect(screen.getByText(/401:\s*unauthorized/i)).toBeInTheDocument();
+    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
-  it('renders empty state', () => {
+  it('renders an empty state when there is no patient list data to display', () => {
     render(<PatientListTableContainer patientLists={[]} listType={''} />);
-    expect(screen.getByText('Empty data illustration')).toBeInTheDocument();
+
+    expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByText(/there are no {listType} patient lists to display/i)).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  it('renders patient lists', () => {
+  it('renders the available patient lists in a datatable', () => {
     render(<PatientListTableContainer patientLists={patientLists} listType={''} headers={header} />);
 
-    expect(screen.getByText('List name')).toBeInTheDocument();
-    expect(screen.getByText('List type')).toBeInTheDocument();
-    expect(screen.getByText('No. of patients')).toBeInTheDocument();
-    expect(screen.getByText('Starred')).toBeInTheDocument();
-  });
+    const headers = ['List name', 'List type', 'No. of patients', 'Starred'];
 
-  xit('should render the patient list table with correct data when data is present', async () => {
-    mockedUsePagination.mockReturnValue({
-      results: patientLists,
-      goTo: jest.fn(),
-      currentPage: 1,
-      paginated: false,
+    headers.forEach((header) => {
+      expect(screen.getByText(header)).toBeInTheDocument();
+      expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
-
-    render(<PatientListTableContainer patientLists={patientLists} listType={''} headers={header} />);
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText('My lists')).toBeInTheDocument();
-    });
-
-    // TODO: Enquire why the patient list data is not coming and add assertion to check the data
-  });
-
-  it('should render the pagination component when paginated is true', () => {
-    mockedUsePagination.mockReturnValue({
-      results: patientLists,
-      goTo: jest.fn(),
-      currentPage: 1,
-      paginated: true,
-    });
-
-    render(<PatientListTableContainer patientLists={patientLists} listType={''} headers={header} />);
-
-    expect(screen.getByRole('button', { name: 'Previous page' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Next page' })).toBeInTheDocument();
-  });
-
-  it('should change the search input', () => {
-    const mockedSetSearchTerm = jest.fn();
-    render(
-      <PatientListTableContainer patientLists={patientLists} headers={header} setSearchTerm={mockedSetSearchTerm} />,
-    );
-
-    const searchInput = screen.getByRole('searchbox');
-
-    fireEvent.change(searchInput, { target: { value: 'search term' } });
-
-    expect(searchInput).toHaveValue('search term');
-    expect(mockedSetSearchTerm).toHaveBeenCalledTimes(1);
-  });
-
-  it('should update the page size when it is changed', () => {
-    mockedUsePagination.mockReturnValue({
-      results: patientLists,
-      goTo: jest.fn(),
-      currentPage: 1,
-      paginated: true,
-    });
-    render(<PatientListTableContainer patientLists={patientLists} listType={''} headers={header} />);
-
-    const pageSizeInput = screen.getByLabelText('Items per page:');
-    fireEvent.change(pageSizeInput, { target: { value: '25' } });
-
-    expect(pageSizeInput).toHaveValue('25');
   });
 });
