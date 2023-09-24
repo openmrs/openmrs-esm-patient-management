@@ -15,9 +15,9 @@ import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
+  const { queueLocations } = useQueueLocations();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
-  const { queueLocations } = useQueueLocations();
   const currentQueueLocationName = useSelectedQueueLocationName();
 
   const handleQueueLocationChange = ({ selectedItem }) => {
@@ -32,7 +32,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
         <div className={styles['left-justified-items']}>
           <PatientQueueIllustration />
           <div className={styles['page-labels']}>
-            <p>{t('serviceQueue', 'Service queue')}</p>
+            <p>{t('serviceQueues', 'Service queues')}</p>
             <p className={styles['page-name']}>{title ?? t('home', 'Home')}</p>
           </div>
         </div>

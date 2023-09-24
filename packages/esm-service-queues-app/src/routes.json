@@ -3,20 +3,6 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "pages": [
-    {
-      "component": "appointmentsList",
-      "routeRegex": "^appointments-list",
-      "online": true,
-      "offline": true
-    }, 
-    {
-      "component": "queueList",
-      "routeRegex": "^queue-list",
-      "online": true,
-      "offline": true
-    }
-  ],
   "extensions": [
     {
       "name": "outpatient-side-nav-ext",
@@ -38,11 +24,9 @@
       "offline": true
     }, 
     {
-      "name": "home-dashboard",
-      "component": "homeDashboard",
-      "slot": "service-queues-dashboard-slot",
-      "online": true,
-      "offline": true
+      "component": "root",
+      "name": "service-queues-dashboard",
+      "slot": "service-queues-dashboard-slot"
     }, 
     {
       "name": "edit-queue-entry-status-modal",

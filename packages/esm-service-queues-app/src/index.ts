@@ -5,12 +5,14 @@ import { dashboardMeta } from './dashboard.meta';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const moduleName = '@openmrs/esm-outpatient-app';
+const moduleName = '@openmrs/esm-service-queues-app';
 
 const options = {
   featureName: 'outpatient',
   moduleName,
 };
+
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
 
 export const appointmentsList = getAsyncLifecycle(
   () => import('./queue-patient-linelists/scheduled-appointments-table.component'),

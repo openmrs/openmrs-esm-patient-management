@@ -119,7 +119,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
           compact={isDesktop(layout)}
         />
       ) : error ? (
-        <ErrorState error={error} headerTitle={t('patientLists', 'Patient Lists')} />
+        <ErrorState error={error} headerTitle={t('patientLists', 'Patient lists')} />
       ) : !patientLists?.length ? (
         <PatientListEmptyState launchForm={handleCreate} listType={listType} />
       ) : (

@@ -21,6 +21,11 @@
       }
     },
     {
+      "component": "root",
+      "name": "clinical-appointments-dashboard",
+      "slot": "clinical-appointments-dashboard-slot"
+    },
+    {
       "name": "appointments-calendar-dashboard-link",
       "slot": "calendar-dashboard-slot",
       "component": "appointmentsCalendarDashboardLink"
@@ -31,15 +36,9 @@
       "component": "checkInModal"
     },
     {
-      "name": "clinical-appointments-dashboard",
-      "slot": "clinical-appointments-dashboard-slot",
-      "component": "appointmentsDashboard"
-    },
-    {
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
       "component": "homeAppointments"
     }
-  ],
-  "pages": []
+  ]
 }

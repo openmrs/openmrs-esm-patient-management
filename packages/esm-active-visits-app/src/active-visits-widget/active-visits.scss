@@ -89,7 +89,6 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
 
   h4 {
     @include type.type-style('heading-compact-02');
