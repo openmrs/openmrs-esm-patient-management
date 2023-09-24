@@ -40,10 +40,6 @@
   display: none;
 }
 
-.addButtonContainer {
-  margin-left: 1.25rem;
-}
-
 .tableContainer {
   a {
     text-decoration: none;
@@ -249,6 +245,10 @@
   }
 }
 
+.actionLink {
+  margin: -1rem;
+}
+
 .actionLinks {
   display: flex;
   align-items: center;
@@ -293,7 +293,7 @@
   width: 1px;
   height: layout.$spacing-05;
   color: colors.$gray-20;
-  margin-left: layout.$spacing-05;
+  margin: 0 layout.$spacing-05;
 }
 
 .overflowMenu {
