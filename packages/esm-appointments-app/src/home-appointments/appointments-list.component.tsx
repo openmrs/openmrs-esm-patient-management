@@ -210,9 +210,11 @@ const AppointmentsBaseTable = () => {
     return (
       <Layer className={styles.container}>
         <Tile className={styles.tile}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+          <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
             <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
-            <AddAppointmentLink />
+            <div className={styles.actionLink}>
+              <AddAppointmentLink />
+            </div>
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>
