@@ -101,11 +101,11 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                   <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
                     patient.name?.[0]?.family
                   }`}</h2>
-                  <ExtensionSlot
+                  {/* <ExtensionSlot
                     name="patient-banner-tags-slot"
                     state={{ patient, patientUuid: patient.id }}
                     className={styles.flexRow}
-                  />
+                  /> */}
                 </div>
                 <p className={styles.demographics}>
                   {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
@@ -135,7 +135,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
 export const SearchResultSkeleton = () => {
   return (
-    <div className={styles.patientSearchResult}>
+    <div className={styles.patientSearchResult} data-testid="search-skeleton">
       <div className={styles.patientAvatar} role="img">
         <SkeletonIcon
           style={{

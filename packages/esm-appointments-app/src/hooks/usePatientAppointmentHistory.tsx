@@ -7,7 +7,7 @@ import { useAppointmentDate } from '../helpers';
 export function usePatientAppointmentHistory(patientUuid: string) {
   const abortController = new AbortController();
   const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
-  const startDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
@@ -17,7 +17,7 @@ export function usePatientAppointmentHistory(patientUuid: string) {
       },
       body: {
         patientUuid: patientUuid,
-        startDate: startDate,
+        startDate: currentAppointmentDate,
       },
     });
 

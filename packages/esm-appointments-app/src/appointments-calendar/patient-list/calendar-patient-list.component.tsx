@@ -63,7 +63,7 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
   if (isLoading) {
     return (
       <>
-        <DataTableSkeleton />
+        <DataTableSkeleton data-testid="calendar-patient-list" />
       </>
     );
   }

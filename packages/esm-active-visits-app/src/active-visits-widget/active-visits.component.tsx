@@ -247,15 +247,21 @@ const ActiveVisitsTable = () => {
                   {rows.map((row, index) => {
                     const visit = activeVisits.find((visit) => visit.id === row.id);
 
+                    if (!visit) {
+                      return null;
+                    }
+
+                    const patientLink = `$\{openmrsSpaBase}/patient/${visit.patientUuid}/chart/Patient%20Summary`;
+
                     return (
                       <React.Fragment key={index}>
-                        <TableExpandRow {...getRowProps({ row })} data-testid={`activeVisitRow${visit.patientUuid}`}>
+                        <TableExpandRow
+                          {...getRowProps({ row })}
+                          data-testid={`activeVisitRow${visit.patientUuid || 'unknown'}`}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id} data-testid={cell.id}>
-                              {cell.info.header === 'name' ? (
-                                <PatientNameLink
-                                  from={fromPage}
-                                  to={`\${openmrsSpaBase}/patient/${visit.patientUuid}/chart/Patient%20Summary`}>
+                              {cell.info.header === 'name' && visit.patientUuid ? (
+                                <PatientNameLink from={fromPage} to={patientLink}>
                                   {cell.value}
                                 </PatientNameLink>
                               ) : (

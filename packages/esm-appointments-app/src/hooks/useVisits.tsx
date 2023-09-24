@@ -8,11 +8,11 @@ import { useAppointmentDate } from '../helpers';
  * @returns An object containing the visits, isLoading flag, and error message.
  */
 export const useVisits = () => {
-  const startDateTime = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
   const session = useSession();
 
   const visitsUrl = `/ws/rest/v1/visit?includeInactive=true&v=custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime)&fromStartDate=${dayjs(
-    startDateTime,
+    currentAppointmentDate,
   ).format('YYYY-MM-DD')}&location=${session?.sessionLocation?.uuid}`;
 
   const { data, error, isLoading, mutate } = useSWR<{ data: { results: Visit[] } }>(visitsUrl, openmrsFetch);

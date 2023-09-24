@@ -13,8 +13,8 @@ export interface Response {
 }
 
 export function useUnscheduledAppointments() {
-  const fromData = useAppointmentDate();
-  const url = `/ws/rest/v1/appointment/unScheduledAppointment?forDate=${fromData}`;
+  const { currentAppointmentDate } = useAppointmentDate();
+  const url = `/ws/rest/v1/appointment/unScheduledAppointment?forDate=${currentAppointmentDate}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch, { errorRetryCount: 2 });
   return { isLoading, data: data?.data ?? [], error };
 }
