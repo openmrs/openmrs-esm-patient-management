@@ -2,21 +2,25 @@
 @use '@carbon/styles/scss/type';
 @import '../style.scss';
 
-.flex {
+.container {
   display: flex;
-}
-
-.patientListDetailsPage {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ededed;
 }
 
 .cohortHeader {
   display: flex;
   justify-content: space-between;
+  border-bottom: 1px solid $ui-03;
+  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-04;
+  background-color: $ui-01;
+}
+
+.overflowMenu {
+  display: flex;
   align-items: flex-start;
-  border: 1px solid $ui-03;
-  padding: spacing.$spacing-05 0 spacing.$spacing-05 spacing.$spacing-05;
+  margin-top: spacing.$spacing-04;
 }
 
 .marginTop {
@@ -30,4 +34,5 @@
 
 .tableContainer {
   padding: 0 spacing.$spacing-05 spacing.$spacing-05;
+  height: calc(100vh - 11rem);
 }

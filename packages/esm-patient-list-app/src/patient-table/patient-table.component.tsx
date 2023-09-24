@@ -85,6 +85,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
   );
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
+
   const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
   if (isLoading) {
@@ -101,7 +102,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
 
   return (
     <div className={styles.tableOverride}>
-      <div id="table-tool-bar" className={styles.searchContainer}>
+      <div className={styles.searchContainer}>
         <div>{isFetching && <InlineLoading />}</div>
         <div>
           <Layer>
@@ -118,7 +119,12 @@ const PatientTable: React.FC<PatientTableProps> = ({
           </Layer>
         </div>
       </div>
-      <DataTable rows={rows} headers={columns} isSortable={true} useZebraStyles={true}>
+      <DataTable
+        rows={rows}
+        headers={columns}
+        isSortable={true}
+        size={isDesktop(layout) ? 'sm' : 'lg'}
+        useZebraStyles={true}>
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <TableContainer>
             <Table {...getTableProps()} data-testid="patientsTable">
