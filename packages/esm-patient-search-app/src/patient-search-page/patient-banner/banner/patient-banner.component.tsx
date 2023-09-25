@@ -40,7 +40,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { currentVisit } = useVisit(patientUuid);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const config = useConfig();
-  const searchActionsItems = useConnectedExtensions('patient-search-actions-slot');
+  const patientSearchActions = useConnectedExtensions('patient-search-actions-slot');
 
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, selectPatientAction, onTransition, launchPatientChart: true }),
@@ -68,8 +68,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   }, []);
 
   const showActionsMenu = useMemo(
-    () => !hideActionsOverflow && searchActionsItems.length > 0,
-    [searchActionsItems.length, hideActionsOverflow],
+    () => !hideActionsOverflow && patientSearchActions.length > 0,
+    [patientSearchActions.length, hideActionsOverflow],
   );
 
   const getGender = (gender) => {
