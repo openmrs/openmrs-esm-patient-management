@@ -13,11 +13,13 @@ interface AppointmentPatientList {
     name: string;
     uuid: string;
     age: number;
+    identifier: string;
     identifiers: Array<{ identifierName: string; identifier: string }>;
   };
   providers: Array<Provider>;
   service: AppointmentService;
   startDateTime: string;
+  status: string;
 }
 
 export const useAppointmentList = (appointmentStatus: string, startDate?: string, identifierType?: string) => {
@@ -33,6 +35,21 @@ export const useAppointmentList = (appointmentStatus: string, startDate?: string
 
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
   return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
+};
+
+export const useScheduledAppointments = (startDate?: string, identifierType?: string) => {
+  const { currentAppointmentDate } = useAppointmentDate();
+  const forDate = startDate ? startDate : currentAppointmentDate;
+  const url = `/ws/rest/v1/appointments?forDate=${forDate}`;
+
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
+    errorRetryCount: 2,
+  });
+
+  const appointments = data?.data
+    ?.filter(({ status }) => status === 'Scheduled')
+    .map((appointment) => toAppointmentObject(appointment, identifierType));
+  return { scheduledAppointments: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
 export const useEarlyAppointmentList = (startDate?: string, identifierType?: string) => {
@@ -60,13 +77,13 @@ export const useCompletedAppointmentList = (startDate?: string, identifierType?:
 };
 
 function toAppointmentObject(appointment: AppointmentPatientList, identifierType: string) {
-  const patientIdentifier = appointment.patient.identifiers.find(
-    (identifier) => identifier.identifierName === identifierType,
-  );
+  const identifier = appointment.patient.identifiers
+    ? appointment.patient.identifiers.find((identifier) => identifier.identifierName === identifierType).identifier
+    : appointment.patient.identifier;
   return {
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,
-    identifier: patientIdentifier?.identifier ?? '',
+    identifier: identifier,
     dateTime: appointment.startDateTime,
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',

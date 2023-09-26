@@ -5,6 +5,7 @@ import {
   useAppointmentList,
   useCompletedAppointmentList,
   useEarlyAppointmentList,
+  useScheduledAppointments,
 } from '../../hooks/useAppointmentList';
 import { useAppointmentDate } from '../../helpers';
 import dayjs from 'dayjs';
@@ -37,6 +38,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     patientIdentifierType,
   );
   const { completedAppointments } = useCompletedAppointmentList(currentAppointmentDate, patientIdentifierType);
+  const { scheduledAppointments } = useScheduledAppointments(currentAppointmentDate, patientIdentifierType);
   const isDateInPast = dayjs(currentAppointmentDate).isBefore(dayjs(), 'date');
   const isDateInFuture = dayjs(currentAppointmentDate).isAfter(dayjs(), 'date');
   const isToday = dayjs(currentAppointmentDate).isSame(dayjs(), 'date');
@@ -45,9 +47,6 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     setScheduleType('Scheduled');
   }, [currentAppointmentDate]);
 
-  const filteredAppointments = appointmentServiceType
-    ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
-    : appointmentList;
   const rowData = appointmentList.map((appointment, index) => {
     return {
       id: `${index}`,
@@ -58,9 +57,20 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     ? rowData.filter((app) => app.serviceTypeUuid === appointmentServiceType)
     : rowData;
 
+  const filteredScheduledAppointmentsRow = (
+    appointmentServiceType
+      ? scheduledAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
+      : scheduledAppointments
+  ).map((appointment, index) => {
+    return {
+      id: `${index}`,
+      ...appointment,
+    };
+  });
+
   const appointmentsBaseTableConfig = {
     Scheduled: {
-      appointments: filteredAppointments,
+      appointments: filteredScheduledAppointmentsRow,
       isLoading,
       tableHeading: t('scheduled', 'Scheduled'),
       visits,
