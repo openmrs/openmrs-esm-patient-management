@@ -60,19 +60,24 @@ export const mockSession = {
       address13: null,
       address14: null,
       address15: null,
+      links: [],
     },
     user: {
       uuid: '45ce6c2e-dd5a-11e6-9d9c-0242ac150002',
       display: 'admin',
       username: '',
       systemId: 'admin',
+      locale: 'en',
+      allowedLocales: ['en', 'en-GB', 'es', 'fr', 'he', 'km'],
       userProperties: {
         loginAttempts: '0',
       },
       person: {
         uuid: '0775e6b7-f439-40e5-87a3-2bd11f3b9ee5',
         display: 'Test User',
+        links: [],
       },
+      links: [],
       privileges: [
         {
           uuid: '62431c71-5244-11ea-a771-0242ac160002',
@@ -91,17 +96,21 @@ export const mockSession = {
         {
           uuid: '8d94f852-c2cc-11de-8d13-0010c6dffd0f',
           display: 'System Developer',
+          links: [],
         },
         {
           uuid: '62c195c5-5244-11ea-a771-0242ac160002',
           display: 'Bahmni Role',
+          links: [],
         },
         {
           uuid: '8d94f280-c2cc-11de-8d13-0010c6dffd0f',
           display: 'Provider',
+          links: [],
         },
       ],
       retired: false,
     },
+    sessionId: '39570a50-abb2-4f44-b146-a288ec35064b',
   },
 };

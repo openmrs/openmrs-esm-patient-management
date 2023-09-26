@@ -103,7 +103,7 @@ export const Identifiers: React.FC = () => {
 
   if (isLoading && !isOffline) {
     return (
-      <div className={styles.halfWidthInDesktopView}>
+      <div data-testid="loading-skeleton" className={styles.halfWidthInDesktopView}>
         <div className={styles.identifierLabelText}>
           <h4 className={styles.productiveHeading02Light}>{t('idFieldLabelText', 'Identifiers')}</h4>
         </div>

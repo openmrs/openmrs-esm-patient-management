@@ -35,7 +35,7 @@ const AddAppointmentLink = () => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.addButtonContainer}>
+    <div>
       {useBahmniUI ? (
         <Button
           target="_blank"

@@ -1,16 +1,16 @@
-import { Button } from '@carbon/react';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Button } from '@carbon/react';
 import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
-  dropDownMenu: boolean;
+  dropdownMenu: boolean;
   children?: React.ReactNode;
   isDeceased?: boolean;
 }
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
-  dropDownMenu,
+  dropdownMenu,
   menuTitle,
   children,
   isDeceased,
@@ -19,12 +19,12 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   const wrapperRef = useRef(null);
 
   useEffect(() => {
-    if (!dropDownMenu) {
+    if (!dropdownMenu) {
       setShowMenu((state) => state);
     }
 
     setShowMenu(() => false);
-  }, [dropDownMenu]);
+  }, [dropdownMenu]);
   const toggleShowMenu = useCallback(() => setShowMenu((state) => !state), []);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
           isDeceased ? styles.deceased : ''
         } ${styles.overflowMenuButton}`}
-        aria-haspopup="true"
+        aria-haspopup
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
         aria-controls="custom-actions-overflow-menu"
