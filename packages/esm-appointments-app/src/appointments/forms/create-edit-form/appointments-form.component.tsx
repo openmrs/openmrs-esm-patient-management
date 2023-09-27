@@ -171,7 +171,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       </div>
 
       <Select
-        labelText={t('selectLocation', 'Select a location')}
+        labelText={t('selectALocation', 'Select a location')}
         id="location"
         invalidText="Required"
         value={selectedLocation}
@@ -289,7 +289,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
               onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
               className={styles.tabs}>
               <TabList style={{ paddingLeft: '1rem' }}>
-                <Tab>{t('weekly', 'WeeKly')}</Tab>
+                <Tab>{t('weekly', 'Weekly')}</Tab>
                 <Tab>{t('monthly', 'Monthly')}</Tab>
               </TabList>
               <TabPanels>

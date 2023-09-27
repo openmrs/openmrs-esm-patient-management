@@ -36,7 +36,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
             <ConfigurableLink
               to={`\${openmrsSpaBase}/patient/${patient.id}/edit`}
               className={styles.patientEditBtn}
-              title={t('editPatientDetails', 'Edit Patient Details')}>
+              title={t('editPatientDetails', 'Edit patient details')}>
               <Edit size={16} />
             </ConfigurableLink>
           </div>

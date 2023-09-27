@@ -41,7 +41,7 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry, closeModal }) => 
           hasDivider
           isDelete
           itemText={t('endVisit', 'End visit')}>
-          {t('endVisit', 'End Visit')}
+          {t('endVisit', 'End visit')}
         </OverflowMenuItem>
       </OverflowMenu>
     </Layer>

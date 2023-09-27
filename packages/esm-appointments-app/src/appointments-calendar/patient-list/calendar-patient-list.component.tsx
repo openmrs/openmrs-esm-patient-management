@@ -35,11 +35,11 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
 
   const headers = [
     {
-      header: t('name', 'Patient name'),
+      header: t('patientName', 'Patient name'),
       key: 'name',
     },
     {
-      header: t('dateTime', 'Date & Time'),
+      header: t('date&Time', 'Date & time'),
       key: 'dateTime',
     },
     {

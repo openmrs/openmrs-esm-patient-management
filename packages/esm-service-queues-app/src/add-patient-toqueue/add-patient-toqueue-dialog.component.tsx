@@ -165,7 +165,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
                 style={{ margin: '0', minWidth: '100%' }}
                 kind="error"
                 lowContrast={true}
-                title={t('missingService', 'Please select a service')}
+                title={t('pleaseSelectService', 'Please select a service')}
               />
             </section>
           )}

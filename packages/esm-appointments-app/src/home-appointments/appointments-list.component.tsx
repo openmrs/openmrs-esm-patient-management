@@ -120,7 +120,7 @@ const AppointmentsBaseTable = () => {
     () => [
       {
         id: 0,
-        header: t('dateTime', 'Date and time'),
+        header: t('dateAndTime', 'Date and time'),
         key: 'dateTime',
       },
       {
