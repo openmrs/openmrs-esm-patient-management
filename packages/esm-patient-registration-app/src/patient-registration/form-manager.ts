@@ -192,10 +192,9 @@ export class FormManager {
             },
           ],
           form: config.registrationObs.registrationFormUuid,
-          obs: Object.keys(obss).map((conceptUuid) => ({
-            concept: conceptUuid,
-            value: obss[conceptUuid],
-          })),
+          obs: Object.entries(obss)
+            .filter(([, value]) => value !== '')
+            .map(([conceptUuid, value]) => ({ concept: conceptUuid, value })),
         };
         return saveEncounter(encounterToSave);
       }
