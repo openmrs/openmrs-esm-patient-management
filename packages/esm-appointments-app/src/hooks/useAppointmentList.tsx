@@ -47,18 +47,6 @@ export const useEarlyAppointmentList = (startDate?: string, identifierType?: str
   return { earlyAppointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-export const useCompletedAppointmentList = (startDate?: string, identifierType?: string) => {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const forDate = startDate ? startDate : currentAppointmentDate;
-  const url = `/ws/rest/v1/appointment/completedAppointment?forDate=${forDate}`;
-
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
-    errorRetryCount: 2,
-  });
-  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
-  return { completedAppointments: (appointments as Array<any>) ?? [], isLoading, error };
-};
-
 function toAppointmentObject(appointment: AppointmentPatientList, identifierType: string) {
   const patientIdentifier = appointment.patient.identifiers.find(
     (identifier) => identifier.identifierName === identifierType,
