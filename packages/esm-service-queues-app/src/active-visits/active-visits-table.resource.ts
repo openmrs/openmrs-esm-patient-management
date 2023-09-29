@@ -190,9 +190,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
   const config = useConfig();
-  const {
-    concepts: { visitQueueNumberAttributeUuid },
-  } = config;
+  const { visitQueueNumberAttributeUuid } = config;
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();

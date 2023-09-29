@@ -74,7 +74,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisitQueueEntries('', '');
-  const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+  const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [selectedLocation, setSelectedLocation] = useState('');
   const [visitType, setVisitType] = useState('');
 
