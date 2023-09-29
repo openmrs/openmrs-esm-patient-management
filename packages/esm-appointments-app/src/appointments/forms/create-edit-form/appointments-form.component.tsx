@@ -92,9 +92,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   }, [locations, sessionUser, loadingDefaultFacility]);
 
   const handleSubmit = async () => {
-    const [hours, minutes] = convertTime12to24(patientAppointment.startDateTime, patientAppointment.timeFormat);
-    const startDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
-    const endDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
+    const [startHour, startMinutes] = convertTime12to24(
+      patientAppointment.startDateTime,
+      patientAppointment.timeFormat,
+    );
+    const [endHour, endMinutes] = convertTime12to24(patientAppointment.endDateTime, patientAppointment.timeFormat);
+    const startDatetime = toAppointmentDateTime(patientAppointment.visitDate, startHour, startMinutes);
+    const endDatetime = toAppointmentDateTime(patientAppointment.visitDate, endHour, endMinutes);
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: patientAppointment.appointmentKind,
       status: patientAppointment.status,
@@ -232,15 +236,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       {!patientAppointment.isFullDay ? (
         <div className={styles.row}>
           <TimePicker
-            disabled={!appointmentService}
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
             onChange={(event) => setPatientAppointment({ ...patientAppointment, startDateTime: event.target.value })}
-            value={patientAppointment.endDateTime}
+            value={patientAppointment.startDateTime}
             labelText={t('startTime', 'Start Time')}
             id="start-time-picker">
             <TimePickerSelect
-              disabled={!appointmentService}
               id="start-time-picker"
               onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
               value={patientAppointment.timeFormat}
@@ -252,7 +254,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           </TimePicker>
 
           <TimePicker
-            disabled={!appointmentService}
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
             onChange={(event) => setPatientAppointment({ ...patientAppointment, endDateTime: event.target.value })}
@@ -260,7 +261,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             labelText={t('endTime', 'End Time')}
             id="end-time-picker">
             <TimePickerSelect
-              disabled={!appointmentService}
               id="end-time-picker"
               onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
               value={patientAppointment.timeFormat}
