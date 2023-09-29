@@ -392,7 +392,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           ))}
       </Select>
 
-      <div className={styles.inputContainer} id="radio-group">
+      {/*      <div className={styles.inputContainer} id="radio-group">
         <label className="cds--label">
           {t('getAppointmentReminder', 'Would you like to get a reminder about this appointment?')}
         </label>
@@ -404,7 +404,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
           <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
         </RadioButtonGroup>
-      </div>
+      </div>*/}
 
       <Layer style={{ margin: '0.25rem 0' }}>
         <TextArea
