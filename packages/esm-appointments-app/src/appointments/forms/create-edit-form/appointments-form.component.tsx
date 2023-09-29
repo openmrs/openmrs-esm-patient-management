@@ -158,7 +158,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       )}
 
-      <div className={styles.inputContainer} id="appointment-place">
+      {/*   <div className={styles.inputContainer} id="appointment-place">
         <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
         <ContentSwitcher className={styles.inputContainer} data-testid="appointment-place">
           <Switch value="facility" id="facility" text={t('facility', 'Facility')}>
@@ -168,7 +168,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             {t('community', 'Community')}
           </Switch>
         </ContentSwitcher>
-      </div>
+      </div>*/}
 
       <Select
         labelText={t('selectLocation', 'Select a location')}
