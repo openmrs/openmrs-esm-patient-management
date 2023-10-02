@@ -82,6 +82,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
+  const today = dayjs().startOf('day').toDate();
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
@@ -221,7 +222,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           dateFormat="d/m/Y"
           datePickerType="single"
           id="visitDate"
-          minDate={patientAppointment.visitDate}
+          minDate={today}
           className={styles.datePickerInput}
           onChange={([date]) => setPatientAppointment({ ...patientAppointment, visitDate: date })}
           value={patientAppointment.visitDate}>
