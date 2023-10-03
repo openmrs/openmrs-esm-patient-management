@@ -34,6 +34,7 @@ export interface PatientListOption {
 }
 
 export interface PatientListMember {
+  endDate: string | number | Date;
   id: string;
 }
 

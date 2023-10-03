@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { navigate, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem, Modal } from '@carbon/react';
@@ -27,7 +27,7 @@ const PatientListDetailComponent = () => {
   const [currentPageSize, setCurrentPageSize] = useState(10);
   const [searchString, setSearchString] = useState('');
   const { data: patientListDetails, mutate: mutatePatientListDetails } = usePatientListDetails(patientListUuid);
-  const { data: patientListMembers } = usePatientListMembers(
+  const { data: patientListMembers, mutate: mutatePatientListMembers } = usePatientListMembers(
     patientListUuid,
     searchString,
     (currentPage - 1) * currentPageSize,
@@ -46,6 +46,7 @@ const PatientListDetailComponent = () => {
               sex: member?.patient?.person?.gender,
               startDate: formatDate(parseDate(member?.startDate)),
               uuid: `${member?.patient?.uuid}`,
+              membershipUuid: member?.uuid,
             }))
           : []
         : [],
@@ -108,15 +109,22 @@ const PatientListDetailComponent = () => {
   }, [patientListUuid, patientListDetails, t]);
 
   return (
-    <main className={styles.container}>
-      <section className={styles.cohortHeader}>
-        <div data-testid="patientListHeader">
-          <h1 className={styles.productiveHeading03}>{patientListDetails?.name ?? '--'}</h1>
-          <h4 className={`${styles.bodyShort02} ${styles.marginTop}`}>{patientListDetails?.description ?? '--'}</h4>
-          <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
-            {patientListDetails?.size} {t('patients', 'patients')} &middot;{' '}
-            <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
-            {patientListDetails?.startDate ? formatDate(parseDate(patientListDetails.startDate)) : null}
+    <main className={`omrs-main-content ${styles.patientListDetailsPage}`}>
+      <section>
+        <ExtensionSlot name="breadcrumbs-slot" />
+        <div className={styles.cohortHeader} data-testid="patientListHeader">
+          <div>
+            {patientListDetails && (
+              <>
+                <h1 className={styles.productiveHeading03}>{patientListDetails?.name}</h1>
+                <h4 className={`${styles.bodyShort02} ${styles.marginTop}`}>{patientListDetails?.description}</h4>
+                <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
+                  {patientListDetails?.size} {t('patients', 'patients')} &middot;{' '}
+                  <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
+                  {patientListDetails?.startDate ? formatDate(parseDate(patientListDetails.startDate)) : null}
+                </div>
+              </>
+            )}
           </div>
         </div>
         <div className={styles.overflowMenu}>
@@ -148,6 +156,8 @@ const PatientListDetailComponent = () => {
             columns={headers}
             isLoading={!patientListMembers && !patients}
             isFetching={!patientListMembers}
+            cohortName={patientListDetails?.name}
+            mutatePatientListMembers={mutatePatientListMembers}
             search={{
               onSearch: handleSearch,
               placeHolder: 'Search',

@@ -16,7 +16,8 @@ import {
   TableRow,
 } from '@carbon/react';
 import debounce from 'lodash-es/debounce';
-import { ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType, isDesktop, OpenmrsResource } from '@openmrs/esm-framework';
+import PatientListOverflowMenuComponent from './overflow-menu.component';
 import styles from './patient-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -113,12 +114,14 @@ interface SearchProps extends InputPropsBase {
 }
 
 interface PatientTableProps {
-  patients: Array<Object>;
+  patients: Array<OpenmrsResource>;
   columns: Array<PatientTableColumn>;
   style?: CSSProperties;
   autoFocus?: boolean;
   isLoading: boolean;
   isFetching?: boolean;
+  cohortName: string;
+  mutatePatientListMembers: () => void;
   search: {
     onSearch(searchTerm: string): any;
     placeHolder: string;
@@ -153,13 +156,15 @@ const PatientTable: React.FC<PatientTableProps> = ({
   isLoading,
   autoFocus,
   isFetching,
+  cohortName,
+  mutatePatientListMembers,
 }) => {
   const layout = useLayoutType();
   const rows: Array<any> = useMemo(
     () =>
       patients.map((patient, index) => {
         const row = {
-          id: String(index),
+          id: patient.membershipUuid,
         };
         columns.forEach((column) => {
           const value = column.getValue?.(patient) || patient[column.key];
@@ -243,6 +248,13 @@ const PatientTable: React.FC<PatientTableProps> = ({
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
+                    <TableCell className="cds--table-column-menu">
+                      <PatientListOverflowMenuComponent
+                        cohortMembershipUuid={row.id}
+                        cohortName={cohortName}
+                        mutatePatientListMembers={mutatePatientListMembers}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
