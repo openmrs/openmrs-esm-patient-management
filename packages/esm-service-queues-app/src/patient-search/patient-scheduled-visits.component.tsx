@@ -83,7 +83,7 @@ const ScheduledVisits: React.FC<{
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
   const config = useConfig() as ConfigObject;
-  const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+  const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { queueLocations } = useQueueLocations();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
 

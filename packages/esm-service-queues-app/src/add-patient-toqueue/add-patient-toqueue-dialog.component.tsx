@@ -65,7 +65,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
     const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
     const status = config.concepts.defaultStatusConceptUuid;
-    const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
+    const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
     addQueueEntry(
       visitUuid,
@@ -104,7 +104,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     priority,
     config.concepts.emergencyPriorityConceptUuid,
     config.concepts.defaultStatusConceptUuid,
-    config.concepts.visitQueueNumberAttributeUuid,
+    config.visitQueueNumberAttributeUuid,
     visitUuid,
     patientUuid,
     selectedQueueLocation,

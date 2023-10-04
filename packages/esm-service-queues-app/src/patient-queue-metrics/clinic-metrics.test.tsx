@@ -60,9 +60,7 @@ jest.mock('../active-visits/active-visits-table.resource.ts', () => {
 describe('Clinic metrics', () => {
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     mockedUseConfig.mockReturnValue({
-      concepts: {
-        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-      },
+      visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
     });
 
     mockedOpenmrsFetch.mockReturnValue({ data: mockMetrics });

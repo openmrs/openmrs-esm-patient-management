@@ -4,12 +4,12 @@ import {
   navigate,
   setupDynamicOfflineDataHandler,
   setupOfflineSync,
-  subscribePrecacheStaticDependencies,
   SyncProcessOptions,
 } from '@openmrs/esm-framework';
 import { patientRegistration, personRelationshipRepresentation } from './constants';
 import {
   fetchAddressTemplate,
+  fetchAllFieldDefinitionTypes,
   fetchAllRelationshipTypes,
   fetchCurrentSession,
   fetchPatientIdentifierTypesWithSources,
@@ -24,7 +24,7 @@ export function setupOffline() {
     },
   });
 
-  subscribePrecacheStaticDependencies(precacheStaticAssets);
+  precacheStaticAssets();
 
   setupDynamicOfflineDataHandler({
     id: 'esm-patient-registration-app:patient',
@@ -66,6 +66,7 @@ async function precacheStaticAssets() {
     fetchCurrentSession(),
     fetchAddressTemplate(),
     fetchAllRelationshipTypes(),
+    fetchAllFieldDefinitionTypes(),
     fetchPatientIdentifierTypesWithSources(),
   ]);
 }
