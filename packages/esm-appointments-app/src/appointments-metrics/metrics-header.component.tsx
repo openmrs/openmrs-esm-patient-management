@@ -5,7 +5,7 @@ dayjs.extend(isToday);
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, navigate, useConfig } from '@openmrs/esm-framework';
 import styles from './metrics-header.scss';
 import { spaBasePath } from '../constants';
 import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
@@ -13,6 +13,7 @@ import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { showCreateAppointmentButtons } = useConfig();
 
   const launchCreateAppointmentForm = (patientUuid) => {
     closeOverlay();
@@ -32,19 +33,21 @@ const MetricsHeader: React.FC = () => {
           onClick={() => navigate({ to: `${spaBasePath}/appointments/calendar` })}>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
-        <ExtensionSlot
-          name="patient-search-button-slot"
-          state={{
-            selectPatientAction: launchCreateAppointmentForm,
-            buttonText: t('createNewAppointment', 'Create new appointment'),
-            overlayHeader: t('createNewAppointment', 'Create new appointment'),
-            buttonProps: {
-              kind: 'primary',
-              renderIcon: (props) => <Hospital size={32} {...props} />,
-              size: 'lg',
-            },
-          }}
-        />
+        {showCreateAppointmentButtons && (
+          <ExtensionSlot
+            name="patient-search-button-slot"
+            state={{
+              selectPatientAction: launchCreateAppointmentForm,
+              buttonText: t('createNewAppointment', 'Create new appointment'),
+              overlayHeader: t('createNewAppointment', 'Create new appointment'),
+              buttonProps: {
+                kind: 'primary',
+                renderIcon: (props) => <Hospital size={32} {...props} />,
+                size: 'lg',
+              },
+            }}
+          />
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { Layer, Button, Tile } from '@carbon/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import styles from './empty-state.scss';
 import { Add } from '@carbon/react/icons';
 
@@ -16,6 +16,7 @@ export interface EmptyStateProps {
 export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText, launchForm, scheduleType }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const { showCreateAppointmentButtons } = useConfig();
 
   return (
     <Layer>
@@ -29,7 +30,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText
             There are no {displayText} to display
           </Trans>
         </p>
-        {scheduleType === 'Scheduled' ? (
+        {scheduleType === 'Scheduled' && showCreateAppointmentButtons ? (
           <p className={styles.action}>
             {launchForm && (
               <span>

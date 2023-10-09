@@ -71,6 +71,11 @@ export const configSchema = {
     _description: 'The name of the patient identifier type to be used for the patient identifier field',
     _default: 'OpenMRS ID',
   },
+  showCreateAppointmentButtons: {
+    _type: Type.Boolean,
+    _description: 'Whether to show the create appointment button`',
+    _default: true,
+  },
 };
 
 export interface ConfigObject {
@@ -88,4 +93,5 @@ export interface ConfigObject {
   showServiceQueueFields: boolean;
   defaultFacilityUrl: string;
   patientIdentifierType: string;
+  showCreateAppointmentButtons: boolean;
 }
