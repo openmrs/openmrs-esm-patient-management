@@ -71,7 +71,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     Honoured: {
       appointments: filteredRow,
       isLoading,
-      tableHeading: t('honored', 'Honored'),
+      tableHeading: t('checkedIn', 'Checked in'),
       visits,
       scheduleType,
     },
@@ -98,7 +98,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {isToday && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
           <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+          <Switch name={'Honoured'} text={t('checkedIn', 'Checked in')} />
           <Switch name={'Pending'} text={t('notArrived', 'Not arrived')} />
           <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
         </ContentSwitcher>
@@ -106,7 +106,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {isDateInPast && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
           <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
+          <Switch name={'Honoured'} text={t('checkedIn', 'Checked in')} />
           <Switch name={'Pending'} text={t('missed', 'Missed')} />
         </ContentSwitcher>
       )}
