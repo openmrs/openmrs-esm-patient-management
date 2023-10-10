@@ -11,7 +11,7 @@ export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueu
   while (curReq < queueEntries.length) {
     const end = queueEntries.length < curReq + batchSize ? queueEntries.length : curReq + batchSize;
     const concurrentReq = new Array(batchSize);
-    const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
+    const endedAt = new Date();
     for (let index = curReq; index < end; index++) {
       await Promise.all([
         endPatientStatus(queueEntries[index]?.queueUuid, queueEntries[index]?.queueEntryUuid, endedAt),

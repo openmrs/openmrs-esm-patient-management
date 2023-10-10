@@ -53,7 +53,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   const { mutate } = useVisitQueueEntries('', '');
 
   const launchEditPriorityModal = useCallback(() => {
-    const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
+    const endedAt = new Date();
     updateQueueEntry(
       queueEntry?.visitUuid,
       queueEntry?.queueUuid,
