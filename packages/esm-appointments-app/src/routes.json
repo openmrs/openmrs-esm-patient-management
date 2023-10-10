@@ -39,6 +39,66 @@
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
       "component": "homeAppointments"
+    },
+    {
+      "name": "expected-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus",
+      "meta": {
+        "title": "expected",
+        "status": "Scheduled",
+        "showForPastDate": false,
+        "showForToday": true,
+        "showForFutureDate": true
+      }
+    },
+    {
+      "name": "checked-in-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus",
+      "meta": {
+        "title": "checkedIn",
+        "status": "CheckedIn",
+        "showForPastDate": false,
+        "showForToday": true,
+        "showForFutureDate": false
+      }
+    },
+    {
+      "name": "completed-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus",
+      "meta": {
+        "title": "completed",
+        "status": "Completed",
+        "showForPastDate": true,
+        "showForToday": true,
+        "showForFutureDate": false
+      }
+    },
+    {
+      "name": "missed-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus",
+      "meta": {
+        "title": "missed",
+        "status": "Missed",
+        "showForPastDate": true,
+        "showForToday": false,
+        "showForFutureDate": false
+      }
+    },
+    {
+      "name": "cancelled-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus",
+      "meta": {
+        "title": "cancelled",
+        "status": "Cancelled",
+        "showForPastDate": true,
+        "showForToday": true,
+        "showForFutureDate": true
+      }
     }
   ]
 }

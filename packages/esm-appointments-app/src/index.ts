@@ -48,3 +48,13 @@ export const checkInModal = getAsyncLifecycle(
 );
 
 export const homeAppointments = getAsyncLifecycle(() => import('./home-appointments'), options);
+
+export const appointmentsByStatus = getAsyncLifecycle(
+  () => import('./appointments/scheduled/appointments-by-status.component'),
+  options,
+);
+
+export const earlyAppointments = getAsyncLifecycle(
+  () => import('./appointments/scheduled/early-appointments.component'),
+  options,
+);

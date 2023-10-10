@@ -1,124 +1,120 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useAppointmentList, useEarlyAppointmentList } from '../../hooks/useAppointmentList';
 import { useAppointmentDate } from '../../helpers';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import styles from './scheduled-appointments.scss';
-import AppointmentsTable from '../common-components/appointments-table.component';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../config-schema';
+import { ExtensionSlot, Extension, useConnectedExtensions } from '@openmrs/esm-framework';
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
   isLoading: boolean;
   appointmentServiceType?: string;
 }
-type scheduleType = 'CameEarly' | 'Rescheduled' | 'Honoured' | 'Pending' | 'Scheduled';
+
+type DateType = 'pastDate' | 'today' | 'futureDate';
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
+  const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
+
   const { t } = useTranslation();
-  const { patientIdentifierType } = useConfig<ConfigObject>();
-  const { currentAppointmentDate } = useAppointmentDate();
-  const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
-  const { appointmentList, isLoading } = useAppointmentList(
-    scheduleType,
-    currentAppointmentDate,
-    patientIdentifierType,
-  );
-  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList(
-    currentAppointmentDate,
-    patientIdentifierType,
-  );
-  const isDateInPast = dayjs(currentAppointmentDate).isBefore(dayjs(), 'date');
-  const isDateInFuture = dayjs(currentAppointmentDate).isAfter(dayjs(), 'date');
-  const isToday = dayjs(currentAppointmentDate).isSame(dayjs(), 'date');
+  const { currentAppointmentDate: date } = useAppointmentDate();
+
+  const [currentTab, setCurrentTab] = useState<string>(null);
+  const [dateType, setDateType] = useState<DateType>('today');
+  const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);
+
+  const isDateInPast = dayjs(date).isBefore(dayjs(), 'date');
+  const isDateInFuture = dayjs(date).isAfter(dayjs(), 'date');
+  const isToday = dayjs(date).isSame(dayjs(), 'date');
 
   useEffect(() => {
-    setScheduleType('Scheduled');
-  }, [currentAppointmentDate]);
+    if (dayjs(date).isBefore(dayjs(), 'date')) {
+      setDateType('pastDate');
+    } else if (dayjs(date).isAfter(dayjs(), 'date')) {
+      setDateType('futureDate');
+    } else {
+      setDateType('today');
+    }
+  }, [date]);
 
-  const filteredAppointments = appointmentServiceType
-    ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
-    : appointmentList;
-  const rowData = appointmentList.map((appointment, index) => {
-    return {
-      id: `${index}`,
-      ...appointment,
-    };
-  });
-  const filteredRow = appointmentServiceType
-    ? rowData.filter((app) => app.serviceTypeUuid === appointmentServiceType)
-    : rowData;
+  // set the default tab on first render
+  useEffect(() => {
+    if (!currentTab) {
+      setCurrentTab(getDefaultTab(scheduledAppointmentPanels));
+    }
+  }, [scheduledAppointmentPanels]);
 
-  const appointmentsBaseTableConfig = {
-    Scheduled: {
-      appointments: filteredAppointments,
-      isLoading,
-      tableHeading: t('scheduled', 'Scheduled'),
-      visits,
-      scheduleType,
-    },
-    CameEarly: {
-      appointments: earlyAppointmentList,
-      isLoading: loading,
-      tableHeading: t('cameEarly', 'Came early'),
-      visits,
-      scheduleType,
-    },
-    Honoured: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: t('honored', 'Honored'),
-      visits,
-      scheduleType,
-    },
-    Rescheduled: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: t('rescheduled', 'Rescheduled'),
-      visits,
-      scheduleType,
-    },
-    Pending: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: isDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived'),
-      visits,
-      scheduleType,
-    },
+  // set the default tab whenever the date type changes
+  useEffect(() => {
+    setCurrentTab(getDefaultTab(scheduledAppointmentPanels));
+  }, [dateType]);
+
+  const getDefaultTab = (panels) => {
+    return panels?.find(
+      (panel) =>
+        (isDateInPast && panel.meta.showForPastDate) ||
+        (isToday && panel.meta.showForToday) ||
+        (isDateInFuture && panel.meta.showForFutureDate),
+    )?.meta.title;
   };
-
-  const currentConfig = appointmentsBaseTableConfig[scheduleType];
 
   return (
     <>
-      {isToday && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
-          <Switch name={'Pending'} text={t('notArrived', 'Not arrived')} />
-          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
+      {dateType === 'today' && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
+          {scheduledAppointmentPanels.map((panel) => {
+            return panel.meta.showForToday ? (
+              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
+            ) : (
+              <></>
+            );
+          })}
         </ContentSwitcher>
       )}
-      {isDateInPast && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('honored', 'Honored')} />
-          <Switch name={'Pending'} text={t('missed', 'Missed')} />
+
+      {dateType === 'pastDate' && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
+          {scheduledAppointmentPanels.map((panel) => {
+            return panel.meta.showForPastDate ? (
+              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
+            ) : (
+              <></>
+            );
+          })}
         </ContentSwitcher>
       )}
-      {isDateInFuture && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
+
+      {dateType === 'futureDate' && (
+        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
+          {scheduledAppointmentPanels.map((panel) => {
+            return panel.meta.showForFutureDate ? (
+              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
+            ) : (
+              <></>
+            );
+          })}
         </ContentSwitcher>
       )}
-      <div className={styles.container}>
-        <AppointmentsTable {...currentConfig} />
-      </div>
+
+      <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
+        {(extension) =>
+          extension.meta.title === currentTab && (
+            <div className={styles.container}>
+              <Extension
+                state={{
+                  date,
+                  appointmentServiceType,
+                  status: extension.meta.status,
+                  statusText: extension.meta.title,
+                }}
+              />
+            </div>
+          )
+        }
+      </ExtensionSlot>
     </>
   );
 };

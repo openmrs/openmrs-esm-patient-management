@@ -18,8 +18,9 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
   const { currentAppointmentDate } = useAppointmentDate();
   const formattedStartDate = formatDate(parseDate(currentAppointmentDate), { mode: 'standard', time: false });
 
-  const { appointmentList: arrivedAppointments } = useAppointmentList('Honoured');
-  const { appointmentList: pendingAppointments } = useAppointmentList('Pending');
+  // TODO we will need rework these after we discuss the logic we want to use
+  const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
+  const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
   const filteredArrivedAppointments = serviceUuid
     ? arrivedAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
