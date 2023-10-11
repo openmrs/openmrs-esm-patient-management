@@ -71,7 +71,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
   }, [data, pageNumber, setSize]);
 
   const patientListsData: Array<OpenmrsCohort> = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
-  const { user } = useCurrentUser();
+  const { user } = useSession();
 
   return {
     patientLists: isStarred
@@ -143,18 +143,18 @@ export function useCohortTypes() {
   return { ...swrResult, data: swrResult?.data?.data?.results };
 }
 
-export function useCurrentUser() {
-  const {
-    user: { uuid },
-  } = useSession();
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<LoggedInUser>>(
-    uuid ? `ws/rest/v1/user/${uuid}` : null,
-    openmrsFetch,
-  );
-  return {
-    user: data?.data,
-    isLoading,
-    errorFetchingUser: error,
-    mutateUser: mutate,
-  };
-}
+// export function useCurrentUser() {
+//   const {
+//     user: { uuid },
+//   } = useSession();
+//   const { data, error, isLoading, mutate } = useSWR<FetchResponse<LoggedInUser>>(
+//     uuid ? `ws/rest/v1/user/${uuid}` : null,
+//     openmrsFetch,
+//   );
+//   return {
+//     user: data?.data,
+//     isLoading,
+//     errorFetchingUser: error,
+//     mutateUser: mutate,
+//   };
+// }

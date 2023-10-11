@@ -93,6 +93,7 @@ export function starPatientList(userUuid: string, userProperties: LoggedInUser['
       userProperties,
     },
   }).then(() => {
+    console.log('refetching', userProperties);
     refetchCurrentUser();
   });
 }

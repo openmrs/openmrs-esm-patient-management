@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -22,7 +22,9 @@ import orderBy from 'lodash-es/orderBy';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
+  getSessionStore,
   isDesktop,
+  showToast,
   useConfig,
   useLayoutType,
   usePagination,
@@ -33,6 +35,7 @@ import type { PatientList } from '../api/types';
 import { ErrorState } from './error-state/error-state.component';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
 import styles from './patient-list-list.scss';
+import { starPatientList } from '../api/api-remote';
 
 interface PatientListTableContainerProps {
   style?: CSSProperties;
@@ -71,6 +74,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
 
   const { key, order } = sortParams;
   const sortedData = order === 'DESC' ? orderBy(patientLists, [key], ['desc']) : orderBy(patientLists, [key], ['asc']);
+  const { toggleStarredList, starredLists } = usePatientListStar();
 
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
@@ -164,17 +168,11 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
 
                           case 'isStarred':
                             return (
-                              <TableCell
-                                key={cell.id}
-                                style={{ cursor: 'pointer' }}
-                                // onClick={() => handleToggleStarred(row.id, !cell.value)}
-                              >
-                                {cell.value ? (
-                                  <StarFilled size={16} className={styles.interactiveText01} />
-                                ) : (
-                                  <Star size={16} className={styles.interactiveText01} />
-                                )}
-                              </TableCell>
+                              <PatientListStarIcon
+                                cohortUuid={row.id}
+                                isStarred={starredLists.includes(row.id)}
+                                toggleStarredList={toggleStarredList}
+                              />
                             );
 
                           case 'type':
@@ -242,5 +240,63 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
     </TableCell>
   );
 };
+
+function usePatientListStar() {
+  const { t } = useTranslation();
+  const [starredLists, setStarredLists] = useState([]);
+  console.log(starredLists, starredLists.join(','));
+  const [starhandleTimeout, setStarHandleTimeout] = useState(null);
+  const { user: currentUser } = useSession();
+
+  const setInitialStarredLists = useCallback(() => {
+    const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
+    setStarredLists(starredPatientLists.split(','));
+  }, [currentUser?.userProperties?.starredPatientLists, setStarredLists]);
+
+  const updateUserProperties = (newStarredLists: Array<string>) => {
+    const starredPatientLists = newStarredLists.join(',');
+    const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
+    console.log('checking', starredPatientLists);
+
+    starPatientList(currentUser?.uuid, userProperties)
+      // .then(() => mutateUser())
+      .catch(() => {
+        setInitialStarredLists();
+        showToast({
+          description: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
+          kind: 'error',
+          title: 'Failed to update patient lists',
+        });
+      });
+  };
+  /**
+   * Handles toggling the starred list
+   * It uses a timeout to store all the changes made by the user
+   * and pass the changes in a single request
+   * @param cohortUuid
+   * @param starPatientList
+   */
+  const toggleStarredList = (cohortUuid, starPatientList) => {
+    console.log('check');
+    const newStarredLists = starPatientList
+      ? [...starredLists, cohortUuid]
+      : starredLists.filter((uuid) => uuid !== cohortUuid);
+    setStarredLists(newStarredLists);
+    if (starhandleTimeout) {
+      clearTimeout(starhandleTimeout);
+    }
+    const timeout = setTimeout(() => updateUserProperties(newStarredLists), 1500);
+    setStarHandleTimeout(timeout);
+  };
+
+  useEffect(() => {
+    if (currentUser?.userProperties?.starredPatientLists) {
+      setInitialStarredLists();
+    }
+  }, [currentUser?.userProperties?.starredPatientLists, setInitialStarredLists]);
+  // END: Handling starring patient
+
+  return { toggleStarredList, starredLists };
+}
 
 export default PatientListTableContainer;
