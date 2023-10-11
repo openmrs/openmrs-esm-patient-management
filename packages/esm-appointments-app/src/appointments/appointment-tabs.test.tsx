@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
@@ -21,17 +21,14 @@ describe('AppointmentTabs', () => {
     await waitForLoadingToFinish();
 
     const scheduledAppointmentsTab = screen.getByRole('tab', { name: /^scheduled$/i });
-    const completedAppointmentsTab = screen.getByRole('tab', { name: /completed/i });
     const unsheduledAppointment = screen.getByRole('tab', { name: /^unscheduled$/i });
     const pendingAppointments = screen.getByRole('tab', { name: /^unscheduled$/i });
 
     expect(scheduledAppointmentsTab).toBeInTheDocument();
-    expect(completedAppointmentsTab).toBeInTheDocument();
     expect(unsheduledAppointment).toBeInTheDocument();
     expect(pendingAppointments).toBeInTheDocument();
 
     expect(scheduledAppointmentsTab).toHaveAttribute('aria-selected', 'true');
-    expect(completedAppointmentsTab).toHaveAttribute('aria-selected', 'false');
     expect(unsheduledAppointment).toHaveAttribute('aria-selected', 'false');
     expect(pendingAppointments).toHaveAttribute('aria-selected', 'false');
 
@@ -52,11 +49,6 @@ describe('AppointmentTabs', () => {
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
-
-    await waitFor(() => user.click(completedAppointmentsTab));
-
-    expect(scheduledAppointmentsTab).toHaveAttribute('aria-selected', 'false');
-    expect(completedAppointmentsTab).toHaveAttribute('aria-selected', 'true');
   });
 });
 

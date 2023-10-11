@@ -98,10 +98,12 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
 
       const payload: NewVisitPayload = {
         patient: patientUuid,
-        startDatetime: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
-          ),
+        startDatetime: new Date(
+          dayjs(visitDate).year(),
+          dayjs(visitDate).month(),
+          dayjs(visitDate).date(),
+          hours,
+          minutes,
         ),
         visitType: visitType,
         location: selectedLocation,

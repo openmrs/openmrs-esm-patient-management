@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
+import { Button, IconButton } from '@carbon/react';
 import { Events } from '@carbon/react/icons';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import styles from './patient-list-action-button.scss';
@@ -21,18 +21,15 @@ const PatientListActionButton: React.FC = () => {
   }
 
   return (
-    <Button
+    <IconButton
+      align="left"
       className={styles.container}
-      onClick={navigateToPatientList}
-      kind="ghost"
-      renderIcon={(props) => <Events size={20} {...props} />}
-      hasIconOnly
-      iconDescription={t('patientLists', 'Patient lists')}
       enterDelayMs={1000}
-      tooltipAlignment="center"
-      tooltipPosition="left"
-      size="sm"
-    />
+      kind="ghost"
+      label={t('patientLists', 'Patient lists')}
+      onClick={navigateToPatientList}>
+      <Events size={20} />
+    </IconButton>
   );
 };
 

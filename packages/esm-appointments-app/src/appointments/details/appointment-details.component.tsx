@@ -63,7 +63,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
               <span className={styles.historyGridCount}>{appointmentsCount.cancelledAppointments}</span>
             </div>
             <div>
-              <p className={styles.historyGridLabel}>{t('upcomming', 'Upcoming')}</p>
+              <p className={styles.historyGridLabel}>{t('upcoming', 'Upcoming')}</p>
               <span className={styles.historyGridCount}>{appointmentsCount.upcomingAppointments}</span>
             </div>
           </div>

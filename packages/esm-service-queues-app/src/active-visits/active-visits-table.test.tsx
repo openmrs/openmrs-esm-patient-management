@@ -73,8 +73,8 @@ describe('ActiveVisitsTable: ', () => {
         concepts: {
           priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
           serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-          visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
         },
+        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
         showQueueTableTab: false,
       } as ConfigObject);
   });

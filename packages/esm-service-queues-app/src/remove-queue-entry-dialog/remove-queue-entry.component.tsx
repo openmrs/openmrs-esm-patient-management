@@ -36,7 +36,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
       stopDatetime: new Date(),
     };
 
-    const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
+    const endedAt = new Date();
 
     voidQueueEntry(
       queueEntry.queueUuid,

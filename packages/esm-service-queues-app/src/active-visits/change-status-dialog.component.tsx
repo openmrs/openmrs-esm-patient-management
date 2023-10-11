@@ -62,7 +62,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       const queuePriority = priority === '' ? defaultPriority : priority;
       const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
       const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
-      const endDate = toDateObjectStrict(toOmrsIsoString(new Date()));
+      const endDate = new Date();
       updateQueueEntry(
         queueEntry?.visitUuid,
         queueEntry?.queueUuid,
