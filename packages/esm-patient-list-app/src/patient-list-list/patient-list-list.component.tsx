@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, Tabs, TabList } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
+import { Add, Calendar } from '@carbon/react/icons';
+import { formatDate, navigate } from '@openmrs/esm-framework';
 import { useAllPatientLists } from '../api/hooks';
 import { PatientListFilter, PatientListType } from '../api/types';
 import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
@@ -109,7 +109,6 @@ const PatientListList: React.FC = () => {
   return (
     <main className={`omrs-main-content ${styles.patientListListPage}`}>
       <section className={styles.patientListList}>
-        <ExtensionSlot name="breadcrumbs-slot" className={styles.breadcrumbsSlot} />
         <div className={styles.patientListHeader}>
           <div className={styles.leftJustifiedItems}>
             <Illustration />
@@ -119,7 +118,12 @@ const PatientListList: React.FC = () => {
             </div>
           </div>
           <div className={styles.rightJustifiedItems}>
+            <div className={styles.date}>
+              <Calendar size={16} />
+              <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
+            </div>
             <Button
+              size="sm"
               className={styles.newListButton}
               kind="ghost"
               renderIcon={(props) => <Add {...props} size={16} />}
@@ -144,7 +148,7 @@ const PatientListList: React.FC = () => {
         <div className={styles.patientListTableContainer}>
           <PatientListTableContainer
             listType={patientListFilter.label}
-            loading={isLoading}
+            isLoading={isLoading}
             isValidating={isValidating}
             headers={tableHeaders}
             patientLists={patientListRows}

@@ -1,5 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
-import { getPatientListName } from './api/api-remote';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta } from './dashboard.meta';
@@ -15,27 +14,8 @@ const options = {
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
-  const patientListsBasePath = `${window.spaBase}/home/patient-lists`;
-
-  async function getListName(patientListUuid: string): Promise<string> {
-    return (await getPatientListName(patientListUuid)) ?? '--';
-  }
-
   setupOffline();
   defineConfigSchema(moduleName, configSchema);
-
-  registerBreadcrumbs([
-    {
-      title: 'Patient Lists',
-      path: patientListsBasePath,
-      parent: `${window.spaBase}/home`,
-    },
-    {
-      title: ([patientListUuid]) => getListName(patientListUuid),
-      path: `${patientListsBasePath}/:patientListUuid?`,
-      parent: patientListsBasePath,
-    },
-  ]);
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);

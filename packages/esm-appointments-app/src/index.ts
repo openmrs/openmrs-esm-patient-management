@@ -31,6 +31,8 @@ export function startupApp() {
   ]);
 }
 
+export const root = getAsyncLifecycle(() => import('./root.component'), options);
+
 export const appointmentsDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
 export const appointmentsCalendarDashboardLink = getSyncLifecycle(

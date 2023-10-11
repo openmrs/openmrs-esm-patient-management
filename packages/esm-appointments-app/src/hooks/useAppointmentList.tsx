@@ -21,8 +21,8 @@ interface AppointmentPatientList {
 }
 
 export const useAppointmentList = (appointmentStatus: string, startDate?: string, identifierType?: string) => {
-  const appointmentDate = useAppointmentDate();
-  const forDate = startDate ? startDate : appointmentDate;
+  const { currentAppointmentDate } = useAppointmentDate();
+  const forDate = startDate ? startDate : currentAppointmentDate;
   const url = `/ws/rest/v1/appointment/appointmentStatus?status=${appointmentStatus}&forDate=${forDate}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(
@@ -36,8 +36,8 @@ export const useAppointmentList = (appointmentStatus: string, startDate?: string
 };
 
 export const useEarlyAppointmentList = (startDate?: string, identifierType?: string) => {
-  const appointmentDate = useAppointmentDate();
-  const forDate = startDate ? startDate : appointmentDate;
+  const { currentAppointmentDate } = useAppointmentDate();
+  const forDate = startDate ? startDate : currentAppointmentDate;
   const url = `/ws/rest/v1/appointment/earlyAppointment?forDate=${forDate}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
@@ -45,18 +45,6 @@ export const useEarlyAppointmentList = (startDate?: string, identifierType?: str
   });
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
   return { earlyAppointmentList: (appointments as Array<any>) ?? [], isLoading, error };
-};
-
-export const useCompletedAppointmentList = (startDate?: string, identifierType?: string) => {
-  const appointmentDate = useAppointmentDate();
-  const forDate = startDate ? startDate : appointmentDate;
-  const url = `/ws/rest/v1/appointment/completedAppointment?forDate=${forDate}`;
-
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
-    errorRetryCount: 2,
-  });
-  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
-  return { completedAppointments: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
 function toAppointmentObject(appointment: AppointmentPatientList, identifierType: string) {

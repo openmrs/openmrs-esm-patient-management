@@ -1,0 +1,52 @@
+{
+  "name": "@openmrs/esm-service-queues-app",
+  "version": "5.1.0",
+  "description": "Outpatient front-end module for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-service-queues-app.js",
+  "main": "src/index.ts",
+  "source": true,
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-management#readme",
+  "scripts": {
+    "start": "openmrs develop",
+    "serve": "webpack serve --mode=development",
+    "debug": "npm run serve",
+    "build": "webpack --mode production",
+    "analyze": "webpack --mode=production --env.analyze=true",
+    "lint": "cross-env TIMING=1 eslint src --ext ts,tsx",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
+    "coverage": "yarn test --coverage",
+    "typescript": "tsc",
+    "extract-translations": "i18next 'src/**/*.component.tsx'"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "keywords": [
+    "openmrs"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-management.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openmrs/openmrs-esm-patient-management/issues"
+  },
+  "dependencies": {
+    "@carbon/react": "^1.12.0",
+    "lodash-es": "^4.17.15"
+  },
+  "peerDependencies": {
+    "@openmrs/esm-framework": "5.x",
+    "react": "^18.1.0",
+    "react-i18next": "11.x",
+    "react-router-dom": "6.x"
+  },
+  "devDependencies": {
+    "webpack": "^5.74.0"
+  }
+}

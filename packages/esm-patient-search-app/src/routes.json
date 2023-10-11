@@ -3,24 +3,30 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
-  "pages": [{
-    "component": "root",
-    "route": "search"
-  }],
-  "extensions": [{
-    "name": "patient-search-icon",
-    "component": "patientSearchIcon",
-    "slot": "top-nav-actions-slot",
-    "order": 0
-  }, {
-    "name": "patient-search-button",
-    "component": "patientSearchButton",
-    "slot": "patient-search-button-slot",
-    "offline": true
-  }, {
-    "name": "patient-search-bar",
-    "component": "patientSearchBar",
-    "slot": "patient-search-bar-slot",
-    "offline": true
-  }]
+  "pages": [
+    {
+      "component": "root",
+      "route": "search"
+    }
+  ],
+  "extensions": [
+    {
+      "name": "patient-search-icon",
+      "component": "patientSearchIcon",
+      "slot": "top-nav-actions-slot",
+      "order": 0
+    },
+    {
+      "name": "patient-search-button",
+      "component": "patientSearchButton",
+      "slot": "patient-search-button-slot",
+      "offline": true
+    },
+    {
+      "name": "patient-search-bar",
+      "component": "patientSearchBar",
+      "slot": "patient-search-bar-slot",
+      "offline": true
+    }
+  ]
 }

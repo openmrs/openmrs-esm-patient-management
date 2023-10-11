@@ -8,7 +8,7 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
-- [Outpatient app](packages/esm-outpatient-app/README.md)
+- [Service queues](packages/esm-service-queues-app/README.md)
 - [Patient search](packages/esm-patient-search-app)
 - [Patient registration](packages/esm-patient-registration-app)
 - [Patient list](packages/esm-patient-list-app)

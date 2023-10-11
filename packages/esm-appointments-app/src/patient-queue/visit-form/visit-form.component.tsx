@@ -53,7 +53,7 @@ interface VisitFormProps {
 
 const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
-  const startDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
   const locations = useLocations();
@@ -66,7 +66,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
-  const { mutate } = useAppointments(startDate);
+  const { mutate } = useAppointments(currentAppointmentDate);
   const { mutateVisit } = useVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
@@ -98,10 +98,12 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
 
       const payload: NewVisitPayload = {
         patient: patientUuid,
-        startDatetime: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
-          ),
+        startDatetime: new Date(
+          dayjs(visitDate).year(),
+          dayjs(visitDate).month(),
+          dayjs(visitDate).date(),
+          hours,
+          minutes,
         ),
         visitType: visitType,
         location: selectedLocation,
@@ -171,7 +173,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           },
         );
     },
-    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutate, startDate],
+    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutate, currentAppointmentDate],
   );
 
   return (

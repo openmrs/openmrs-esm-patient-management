@@ -3,44 +3,53 @@
   "backendDependencies": {
     "webservices.rest": "^2.24.0"
   },
-  "pages": [{
-    "component": "root",
-    "route": "patient-registration",
-    "online": true,
-    "offline": true
-  }, {
-    "component": "editPatient",
-    "routeRegex": "patient\\/([a-zA-Z0-9\\-]+)\\/edit",
-    "online": true,
-    "offline": true
-  }],
-  "extensions": [{
-    "component": "addPatientLink",
-    "name": "add-patient-action",
-    "slot": "top-nav-actions-slot",
-    "online": true,
-    "offline": true
-  }, {
-    "component": "cancelPatientEditModal",
-    "name": "cancel-patient-edit-modal",
-    "online": true,
-    "offline": true
-  }, {
-    "component": "patientPhoto",
-    "name": "patient-photo-widget",
-    "slot": "patient-photo-slot",
-    "online": true,
-    "offline": true
-  }, {
-    "component": "editPatientDetailsButton",
-    "name": "edit-patient-details-button",
-    "slot": "patient-actions-slot",
-    "online": true,
-    "offline": true
-  }, {
-    "component": "deleteIdentifierConfirmationModal",
-    "name": "delete-identifier-confirmation-modal",
-    "online": true,
-    "offline": true
-  }]
+  "pages": [
+    {
+      "component": "root",
+      "route": "patient-registration",
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "editPatient",
+      "routeRegex": "patient\\/([a-zA-Z0-9\\-]+)\\/edit",
+      "online": true,
+      "offline": true
+    }
+  ],
+  "extensions": [
+    {
+      "component": "addPatientLink",
+      "name": "add-patient-action",
+      "slot": "top-nav-actions-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "cancelPatientEditModal",
+      "name": "cancel-patient-edit-modal",
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "patientPhoto",
+      "name": "patient-photo-widget",
+      "slot": "patient-photo-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "editPatientDetailsButton",
+      "name": "edit-patient-details-button",
+      "slot": "patient-actions-slot",
+      "online": true,
+      "offline": true
+    },
+    {
+      "component": "deleteIdentifierConfirmationModal",
+      "name": "delete-identifier-confirmation-modal",
+      "online": true,
+      "offline": true
+    }
+  ]
 }

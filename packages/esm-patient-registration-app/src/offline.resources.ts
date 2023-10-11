@@ -2,13 +2,13 @@ import React from 'react';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
+import { getConfig, messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
 import type {
   PatientIdentifierType,
   FetchedPatientIdentifierType,
   AddressTemplate,
 } from './patient-registration/patient-registration.types';
-import { cacheForOfflineHeaders } from './constants';
+import { cacheForOfflineHeaders, moduleName } from './constants';
 
 export interface Resources {
   addressTemplate: AddressTemplate;
@@ -31,6 +31,41 @@ export async function fetchAddressTemplate() {
 
 export async function fetchAllRelationshipTypes() {
   const { data } = await cacheAndFetch('/ws/rest/v1/relationshiptype?v=default');
+  return data;
+}
+
+export async function fetchAllFieldDefinitionTypes() {
+  const config = await getConfig(moduleName);
+
+  if (!config.fieldDefinitions) {
+    return;
+  }
+
+  const fieldDefinitionPromises = config.fieldDefinitions.map((def) => fetchFieldDefinitionType(def));
+
+  const fieldDefinitionResults = await Promise.all(fieldDefinitionPromises);
+
+  const mergedData = fieldDefinitionResults.reduce((merged, result) => {
+    if (result) {
+      merged.push(result);
+    }
+    return merged;
+  }, []);
+
+  return mergedData;
+}
+
+async function fetchFieldDefinitionType(fieldDefinition) {
+  let apiUrl = '';
+
+  if (fieldDefinition.type === 'person attribute') {
+    apiUrl = `/ws/rest/v1/personattributetype/${fieldDefinition.uuid}`;
+  }
+
+  if (fieldDefinition.answerConceptSetUuid) {
+    await cacheAndFetch(`/ws/rest/v1/concept/${fieldDefinition.answerConceptSetUuid}`);
+  }
+  const { data } = await cacheAndFetch(apiUrl);
   return data;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -32,6 +32,7 @@ import {
   showNotification,
   showToast,
   ConfigObject,
+  useSession,
 } from '@openmrs/esm-framework';
 
 import first from 'lodash-es/first';
@@ -50,6 +51,8 @@ import {
 import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
 import { useCalendarDistribution } from '../workload-helper';
 import WorkloadCard from '../workload.component';
+import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
+import LocationSelectOption from '../../common-components/location-select-option.component';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -63,6 +66,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const [patientAppointment, setPatientAppointment] = useState<PatientAppointment>(initialAppointmentFormValues);
   const { patient, isLoading } = usePatient(patientUuid ?? patientAppointment.patientUuid);
   const locations = useLocations();
+  const sessionUser = useSession();
   const { providers } = useProviders();
   const { services } = useServices();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,15 +75,31 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const calendarWorkload = useCalendarDistribution(
     patientAppointment.serviceUuid,
     selectedTab === 0 ? 'week' : 'month',
+    patientAppointment.visitDate,
   );
-  const appointmentStartDate = useAppointmentDate();
+  const { currentAppointmentDate } = useAppointmentDate();
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
+  const today = dayjs().startOf('day').toDate();
+
+  useEffect(() => {
+    if (locations?.length && sessionUser) {
+      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+    } else if (!loadingDefaultFacility && defaultFacility) {
+      setSelectedLocation(defaultFacility?.uuid);
+    }
+  }, [locations, sessionUser, loadingDefaultFacility]);
 
   const handleSubmit = async () => {
-    const [hours, minutes] = convertTime12to24(patientAppointment.startDateTime, patientAppointment.timeFormat);
-    const startDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
-    const endDatetime = toAppointmentDateTime(patientAppointment.visitDate, hours, minutes);
+    const [startHour, startMinutes] = convertTime12to24(
+      patientAppointment.startDateTime,
+      patientAppointment.timeFormat,
+    );
+    const [endHour, endMinutes] = convertTime12to24(patientAppointment.endDateTime, patientAppointment.timeFormat);
+    const startDatetime = toAppointmentDateTime(patientAppointment.visitDate, startHour, startMinutes);
+    const endDatetime = toAppointmentDateTime(patientAppointment.visitDate, endHour, endMinutes);
     const appointmentPayload: AppointmentPayload = {
       appointmentKind: patientAppointment.appointmentKind,
       status: patientAppointment.status,
@@ -107,11 +127,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=Scheduled`);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${appointmentStartDate}&status=CheckedIn`);
-          mutate(`/ws/rest/v1/appointment/all?forDate=${appointmentStartDate}`);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Scheduled&forDate=${appointmentStartDate}`);
-          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Pending&forDate=${appointmentStartDate}`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=CheckedIn`);
+          mutate(`/ws/rest/v1/appointment/all?forDate=${currentAppointmentDate}`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Scheduled&forDate=${currentAppointmentDate}`);
+          mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Pending&forDate=${currentAppointmentDate}`);
           closeOverlay();
         }
       },
@@ -159,15 +179,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         labelText={t('selectLocation', 'Select a location')}
         id="location"
         invalidText="Required"
-        value={patientAppointment.locationUuid}
-        className={styles.inputContainer}
-        onChange={(event) => setPatientAppointment({ ...patientAppointment, locationUuid: event.target.value })}>
-        {locations?.length > 0 &&
-          locations.map((location) => (
-            <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-              {location.display}
-            </SelectItem>
-          ))}
+        value={selectedLocation}
+        defaultSelected={selectedLocation}
+        onChange={(event) => setSelectedLocation(event.target.value)}>
+        <LocationSelectOption
+          selectedLocation={selectedLocation}
+          defaultFacility={defaultFacility}
+          locations={locations}
+        />
       </Select>
 
       <Select
@@ -203,7 +222,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           dateFormat="d/m/Y"
           datePickerType="single"
           id="visitDate"
-          minDate={patientAppointment.visitDate}
+          minDate={today}
           className={styles.datePickerInput}
           onChange={([date]) => setPatientAppointment({ ...patientAppointment, visitDate: date })}
           value={patientAppointment.visitDate}>
@@ -218,15 +237,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       {!patientAppointment.isFullDay ? (
         <div className={styles.row}>
           <TimePicker
-            disabled={!appointmentService}
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
             onChange={(event) => setPatientAppointment({ ...patientAppointment, startDateTime: event.target.value })}
-            value={patientAppointment.endDateTime}
+            value={patientAppointment.startDateTime}
             labelText={t('startTime', 'Start Time')}
             id="start-time-picker">
             <TimePickerSelect
-              disabled={!appointmentService}
               id="start-time-picker"
               onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
               value={patientAppointment.timeFormat}
@@ -238,7 +255,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           </TimePicker>
 
           <TimePicker
-            disabled={!appointmentService}
             className={styles.timePickerInput}
             pattern="([\d]+:[\d]{2})"
             onChange={(event) => setPatientAppointment({ ...patientAppointment, endDateTime: event.target.value })}
@@ -246,7 +262,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             labelText={t('endTime', 'End Time')}
             id="end-time-picker">
             <TimePickerSelect
-              disabled={!appointmentService}
               id="end-time-picker"
               onChange={(event) => setPatientAppointment({ ...patientAppointment, timeFormat: event.target.value })}
               value={patientAppointment.timeFormat}

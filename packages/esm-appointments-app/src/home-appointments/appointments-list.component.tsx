@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
+import type { KeyedMutator } from 'swr';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   DataTable,
@@ -30,7 +30,7 @@ import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
-import { MappedHomeAppointment } from '../types';
+import { Appointment, MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
 
@@ -42,7 +42,16 @@ interface PaginationData {
 
 const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
-const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
+type RenderStatusProps = {
+  status: string;
+  t: (key: string, fallback: string) => string;
+  appointmentUuid: string;
+  mutate: KeyedMutator<{
+    data: Array<Appointment>;
+  }>;
+};
+
+const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps) => {
   switch (status) {
     case 'Completed':
       return (
@@ -74,6 +83,7 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }) => {
     default:
       return (
         <Button
+          size="sm"
           kind="ghost"
           className={styles.actionButton}
           disabled={status === 'CheckedIn'}
@@ -88,9 +98,8 @@ const AppointmentsBaseTable = () => {
   const layout = useLayoutType();
   const { user } = useSession();
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
   const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
-  const { appointments, isLoading, isValidating } = useTodaysAppointments();
+  const { appointments, isLoading, mutate } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
 
@@ -201,9 +210,11 @@ const AppointmentsBaseTable = () => {
     return (
       <Layer className={styles.container}>
         <Tile className={styles.tile}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+          <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
             <h4>{t('todaysAppointments', "Today's Appointments")}</h4>
-            <AddAppointmentLink />
+            <div className={styles.actionLink}>
+              <AddAppointmentLink />
+            </div>
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>
@@ -227,6 +238,7 @@ const AppointmentsBaseTable = () => {
           </div>
           <div className={styles.actionLinks}>
             <ViewCalendarLink />
+            <span className={styles.divider}>|</span>
             <AddAppointmentLink />
           </div>
         </div>
@@ -258,7 +270,7 @@ const AppointmentsBaseTable = () => {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           {fullView && (
-                            <TableCell className="cds--table-column-menu">
+                            <TableCell className={`cds--table-column-menu ${styles.overflowMenu}`}>
                               <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
                             </TableCell>
                           )}

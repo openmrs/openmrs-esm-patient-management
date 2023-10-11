@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { useAppointmentSummary } from './forms.resource';
-import { useAppointmentDate } from '../../helpers';
 interface AppointmentCount {
   date: string;
   count: number;
@@ -20,9 +19,12 @@ export const getMonthlyCalendarDistribution = (startDate: Date, appointmentCount
   return Array.from(distributionHashTable).flatMap(([date, value]) => ({ date: date, count: value }));
 };
 
-export const useCalendarDistribution = (servieUuid: string, distributionType: 'month' | 'week') => {
-  const appointmentStartDate = useAppointmentDate();
-  const appointmentSummary = useAppointmentSummary(new Date(appointmentStartDate), servieUuid);
-  const monthlyData = getMonthlyCalendarDistribution(new Date(appointmentStartDate), appointmentSummary) ?? [];
+export const useCalendarDistribution = (
+  servieUuid: string,
+  distributionType: 'month' | 'week',
+  appointmentDate: Date,
+) => {
+  const appointmentSummary = useAppointmentSummary(new Date(appointmentDate), servieUuid);
+  const monthlyData = getMonthlyCalendarDistribution(new Date(appointmentDate), appointmentSummary) ?? [];
   return distributionType === 'month' ? monthlyData : monthlyData.slice(0, 7);
 };

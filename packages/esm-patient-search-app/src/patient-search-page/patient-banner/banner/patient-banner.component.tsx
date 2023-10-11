@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react';
+import React, { MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -11,6 +11,7 @@ import {
   interpolateString,
   useConfig,
   ConfigurableLink,
+  useConnectedExtensions,
 } from '@openmrs/esm-framework';
 import { SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
@@ -39,6 +40,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const { currentVisit } = useVisit(patientUuid);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const config = useConfig();
+  const patientSearchActions = useConnectedExtensions('patient-search-actions-slot');
 
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, selectPatientAction, onTransition, launchPatientChart: true }),
@@ -64,6 +66,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     event.stopPropagation();
     setShowDropdown((value) => !value);
   }, []);
+
+  const showActionsMenu = useMemo(
+    () => !hideActionsOverflow && patientSearchActions.length > 0,
+    [patientSearchActions.length, hideActionsOverflow],
+  );
 
   const getGender = (gender) => {
     switch (gender) {
@@ -121,7 +128,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
         </ConfigurableLink>
         <div className={styles.buttonCol}>
-          {!hideActionsOverflow && (
+          {showActionsMenu && (
             <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
               <CustomOverflowMenuComponent
                 isDeceased={isDeceased}
@@ -131,7 +138,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     <OverflowMenuVertical className={styles.menu} size={16} />
                   </>
                 }
-                dropDownMenu={showDropdown}>
+                dropdownMenu={showDropdown}>
                 <ExtensionSlot
                   onClick={closeDropdownMenu}
                   name="patient-search-actions-slot"
