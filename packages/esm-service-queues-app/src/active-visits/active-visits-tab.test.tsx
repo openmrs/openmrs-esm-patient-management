@@ -5,9 +5,7 @@ import ActiveVisitsTabs from './active-visits-tab.component';
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(() => ({
-    concepts: {
-      visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
+    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
   })),
 }));
 

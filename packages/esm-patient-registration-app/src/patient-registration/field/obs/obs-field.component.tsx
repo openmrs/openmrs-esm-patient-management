@@ -36,16 +36,24 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           validationRegex={fieldDefinition.validation.matches}
           label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
         />
       );
     case 'Numeric':
-      return <NumericObsField concept={concept} label={fieldDefinition.label} />;
+      return (
+        <NumericObsField
+          concept={concept}
+          label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
+        />
+      );
     case 'Coded':
       return (
         <CodedObsField
           concept={concept}
           answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
           label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
         />
       );
     default:
@@ -61,9 +69,10 @@ interface TextObsFieldProps {
   concept: ConceptResponse;
   validationRegex: string;
   label: string;
+  required?: boolean;
 }
 
-function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
+function TextObsField({ concept, validationRegex, label, required }: TextObsFieldProps) {
   const { t } = useTranslation();
 
   const validateInput = (value: string) => {
@@ -87,6 +96,7 @@ function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
             <Input
               id={fieldName}
               labelText={label ?? concept.display}
+              required={required}
               invalid={errors[fieldName] && touched[fieldName]}
               {...field}
             />
@@ -100,9 +110,10 @@ function TextObsField({ concept, validationRegex, label }: TextObsFieldProps) {
 interface NumericObsFieldProps {
   concept: ConceptResponse;
   label: string;
+  required?: boolean;
 }
 
-function NumericObsField({ concept, label }: NumericObsFieldProps) {
+function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
   const { t } = useTranslation();
 
   const fieldName = `obs.${concept.uuid}`;
@@ -115,6 +126,7 @@ function NumericObsField({ concept, label }: NumericObsFieldProps) {
             <Input
               id={fieldName}
               labelText={label ?? concept.display}
+              required={required}
               invalid={errors[fieldName] && touched[fieldName]}
               type="number"
               {...field}
@@ -130,9 +142,10 @@ interface CodedObsFieldProps {
   concept: ConceptResponse;
   answerConceptSetUuid?: string;
   label?: string;
+  required?: boolean;
 }
 
-function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldProps) {
+function CodedObsField({ concept, answerConceptSetUuid, label, required }: CodedObsFieldProps) {
   const config = useConfig() as RegistrationConfig;
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
     answerConceptSetUuid ?? concept.uuid,
@@ -152,6 +165,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldPr
                   <Select
                     id={fieldName}
                     name={fieldName}
+                    required={required}
                     labelText={label ?? concept?.display}
                     invalid={errors[fieldName] && touched[fieldName]}
                     {...field}>
@@ -169,6 +183,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label }: CodedObsFieldPr
                   id={fieldName}
                   name={fieldName}
                   labelText={label ?? concept?.display}
+                  required={required}
                   invalid={errors[fieldName] && touched[fieldName]}
                   {...field}>
                   <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />

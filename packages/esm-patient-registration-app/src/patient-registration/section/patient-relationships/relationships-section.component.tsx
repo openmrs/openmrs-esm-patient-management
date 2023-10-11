@@ -83,9 +83,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
     <div className={styles.relationship}>
       <div className={styles.searchBox}>
         <div className={styles.relationshipHeader}>
-          <h4 className={styles.productiveHeading}>
-            {relationship?.relation ?? t('relationshipPlaceholder', 'Relationship')}
-          </h4>
+          <h4 className={styles.productiveHeading}>{t('relationshipPlaceholder', 'Relationship')}</h4>
           <Button
             kind="ghost"
             iconDescription={t('deleteRelationshipTooltipText', 'Delete')}
@@ -163,12 +161,12 @@ export const RelationshipsSection = () => {
       const tmp: RelationshipType[] = [];
       relationshipTypes.results.forEach((type) => {
         const aIsToB = {
-          display: type.aIsToB,
+          display: type.displayAIsToB ? type.displayAIsToB : type.aIsToB,
           uuid: type.uuid,
           direction: 'aIsToB',
         };
         const bIsToA = {
-          display: type.bIsToA,
+          display: type.displayBIsToA ? type.displayBIsToA : type.bIsToA,
           uuid: type.uuid,
           direction: 'bIsToA',
         };
