@@ -9,9 +9,9 @@ export interface DashboardLinkConfig {
 }
 
 function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: DashboardLinkConfig }) {
-  // t('Patient lists', 'Patient lists')
+  //
   const { t } = useTranslation();
-  const { name, title } = dashboardLinkConfig;
+  const { name } = dashboardLinkConfig;
   const location = useLocation();
   const spaBasePath = `${window.spaBase}/home`;
 
@@ -25,7 +25,7 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
     <ConfigurableLink
       to={`${spaBasePath}/${name}`}
       className={`cds--side-nav__link ${navLink.match(name) && 'active-left-nav-link'}`}>
-      {t(title)}
+      {t('patientLists', 'Patient lists')}
     </ConfigurableLink>
   );
 }

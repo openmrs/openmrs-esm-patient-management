@@ -9,7 +9,6 @@ export interface DashboardLinkConfig {
 }
 
 function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: DashboardLinkConfig }) {
-  // t('Service queues','Service queues')
   const { t } = useTranslation();
   const { name, title } = dashboardLinkConfig;
   const location = useLocation();
@@ -25,7 +24,7 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
     <ConfigurableLink
       to={`${spaBasePath}/${name}`}
       className={`cds--side-nav__link ${navLink.match(name) && 'active-left-nav-link'}`}>
-      {t(title)}
+      {t('serviceQueues', 'Service queues')}
     </ConfigurableLink>
   );
 }
