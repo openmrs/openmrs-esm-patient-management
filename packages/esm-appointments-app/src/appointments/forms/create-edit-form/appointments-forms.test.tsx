@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen, within, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within } from '@testing-library/react';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { mockPatient, mockServices, mockProviders } from '../../../../../../__mocks__/appointments.mock';
 import { mockLocations } from '../../../../../../__mocks__/locations.mock';
@@ -84,8 +83,6 @@ describe('AppointmentForm', () => {
       'service',
       'appointmentType',
       'providers',
-      'facility',
-      'community',
     ]);
   });
 
