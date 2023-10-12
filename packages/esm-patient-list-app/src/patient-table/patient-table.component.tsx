@@ -1,10 +1,13 @@
-import React, { useMemo, CSSProperties, HTMLAttributes } from 'react';
-
+import React, { HTMLAttributes, useMemo, useState, useCallback, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
+  Button,
   DataTable,
+  DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   Layer,
+  Modal,
   Pagination,
   Search,
   Table,
@@ -15,9 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+import { TrashCan } from '@carbon/react/icons';
 import debounce from 'lodash-es/debounce';
-import { ConfigurableLink, useLayoutType, isDesktop, OpenmrsResource } from '@openmrs/esm-framework';
-import PatientListOverflowMenuComponent from './overflow-menu.component';
+import { ConfigurableLink, useLayoutType, isDesktop, OpenmrsResource, showToast } from '@openmrs/esm-framework';
+import { removePatientFromList } from '../api/api-remote';
 import styles from './patient-table.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -154,13 +158,18 @@ const PatientTable: React.FC<PatientTableProps> = ({
   search,
   pagination,
   isLoading,
-  autoFocus,
   isFetching,
   cohortName,
   mutatePatientListMembers,
 }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
-  const rows: Array<any> = useMemo(
+
+  const [membershipUuid, setMembershipUuid] = useState('');
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const rows: Array<typeof DataTableRow> = useMemo(
     () =>
       patients.map((patient, index) => {
         const row = {
@@ -183,6 +192,27 @@ const PatientTable: React.FC<PatientTableProps> = ({
 
   const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
 
+  const confirmRemovePatientFromList = useCallback(async () => {
+    setIsDeleting(true);
+    try {
+      await removePatientFromList(membershipUuid);
+      mutatePatientListMembers();
+      showToast({
+        title: t('removed', 'Removed'),
+        description: `${t('successRemovePatientFromList', 'Successfully removed patient from list')}: ${cohortName}`,
+      });
+    } catch (error) {
+      showToast({
+        title: t('error', 'Error'),
+        kind: 'error',
+        description: `${t('errorRemovePatientFromList', 'Failed to remove patient from list')}: ${cohortName}`,
+      });
+    }
+
+    setIsDeleting(false);
+    setShowConfirmationModal(false);
+  }, [membershipUuid, cohortName, mutatePatientListMembers, t]);
+
   const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
   if (isLoading) {
@@ -198,85 +228,110 @@ const PatientTable: React.FC<PatientTableProps> = ({
   }
 
   return (
-    <div className={styles.tableOverride}>
-      <div className={styles.searchContainer}>
-        <div>{isFetching && <InlineLoading />}</div>
-        <div>
-          <Layer>
-            <Search
-              id="patient-list-search"
-              placeholder={search.placeHolder}
-              labelText=""
-              size={isDesktop(layout) ? 'sm' : 'lg'}
-              className={styles.searchOverrides}
-              onChange={(evnt) => handleSearch(evnt.target.value)}
-              defaultValue={search.currentSearchTerm}
-              {...otherSearchProps}
-            />
-          </Layer>
+    <>
+      <div className={styles.tableOverride}>
+        <div className={styles.searchContainer}>
+          <div>{isFetching && <InlineLoading />}</div>
+          <div>
+            <Layer>
+              <Search
+                id="patient-list-search"
+                placeholder={search.placeHolder}
+                labelText=""
+                size={isDesktop(layout) ? 'sm' : 'lg'}
+                className={styles.searchOverrides}
+                onChange={(evnt) => handleSearch(evnt.target.value)}
+                defaultValue={search.currentSearchTerm}
+                {...otherSearchProps}
+              />
+            </Layer>
+          </div>
         </div>
-      </div>
-      <DataTable
-        rows={rows}
-        headers={columns}
-        isSortable={true}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        useZebraStyles={true}>
-        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} data-testid="patientsTable">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}
-                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    {...getRowProps({ row })}
-                    className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
-                    key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+        <DataTable
+          rows={rows}
+          headers={columns}
+          isSortable
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+          overflowMenuOnHover={isDesktop}
+          useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+            <TableContainer>
+              <Table className={styles.table} {...getTableProps()} data-testid="patientsTable">
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                        className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
                     ))}
-                    <TableCell className="cds--table-column-menu">
-                      <PatientListOverflowMenuComponent
-                        cohortMembershipUuid={row.id}
-                        cohortName={cohortName}
-                        mutatePatientListMembers={mutatePatientListMembers}
-                      />
-                    </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow
+                      {...getRowProps({ row })}
+                      className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
+                      key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      ))}
+                      <TableCell className="cds--table-column-menu">
+                        <Button
+                          size={isDesktop(layout) ? 'sm' : 'lg'}
+                          kind="danger--ghost"
+                          hasIconOnly
+                          renderIcon={TrashCan}
+                          iconDescription={t('removeFromList', 'Remove from list')}
+                          onClick={() => {
+                            setMembershipUuid(row.id);
+                            setShowConfirmationModal(true);
+                          }}
+                          tooltipPosition="left"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        {pagination.usePagination && (
+          <Pagination
+            page={pagination.currentPage}
+            pageSize={pagination.pageSize}
+            pageSizes={[10, 20, 30, 40, 50]}
+            totalItems={pagination.totalItems}
+            onChange={pagination.onChange}
+            className={styles.paginationOverride}
+            pagesUnknown={pagination?.pagesUnknown}
+            isLastPage={pagination.lastPage}
+            backwardText="Next Page"
+            forwardText="Previous Page"
+          />
         )}
-      </DataTable>
-      {pagination.usePagination && (
-        <Pagination
-          page={pagination.currentPage}
-          pageSize={pagination.pageSize}
-          pageSizes={[10, 20, 30, 40, 50]}
-          totalItems={pagination.totalItems}
-          onChange={pagination.onChange}
-          className={styles.paginationOverride}
-          pagesUnknown={pagination?.pagesUnknown}
-          isLastPage={pagination.lastPage}
-          backwardText="Next Page"
-          forwardText="Previous Page"
+      </div>
+      {showConfirmationModal && (
+        <Modal
+          open
+          danger
+          modalHeading={t('confirmRemovePatient', 'Are you sure you want to remove this patient from {cohortName}?', {
+            cohortName: cohortName,
+          })}
+          modalLabel={t('removePatientFromList', 'Remove patient from list')}
+          primaryButtonText="Remove patient"
+          secondaryButtonText="Cancel"
+          onRequestClose={() => setShowConfirmationModal(false)}
+          onRequestSubmit={confirmRemovePatientFromList}
+          primaryButtonDisabled={isDeleting}
         />
       )}
-    </div>
+    </>
   );
 };
 

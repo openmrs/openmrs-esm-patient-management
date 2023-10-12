@@ -33,6 +33,10 @@ div#table-tool-bar {
   margin-top: spacing.$spacing-09;
 }
 
+.table {
+  background-color: $ui-03;
+}
+
 .desktopRow,
 .desktopHeader {
   height: spacing.$spacing-07 !important;

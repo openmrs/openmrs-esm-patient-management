@@ -146,7 +146,8 @@ export async function addPatientToList(data: AddPatientData, ac = new AbortContr
   return postData(`${cohortUrl}/cohortmember`, data, ac);
 }
 
-export async function removePatientFromList(cohortMembershipUuid: string, ac = new AbortController()) {
+export async function removePatientFromList(cohortMembershipUuid: string) {
+  const ac = new AbortController();
   return postData(
     `${cohortUrl}/cohortmember/${cohortMembershipUuid}`,
     {
