@@ -104,6 +104,7 @@
   "queueAddedSuccessfully": "",
   "queueEntryError": "שגיאה בהוספת המטופל לתור",
   "reasonForChanges": "סיבת השינויים",
+  "rescheduled": "Rescheduled",
   "revertingAppointmentStatus": "Reverting appointment status",
   "save": "שמירה",
   "scheduled": "מתוזמן",

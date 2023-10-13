@@ -104,6 +104,7 @@
   "queueAddedSuccessfully": "",
   "queueEntryError": "Error adding patient to the queue",
   "reasonForChanges": "Reason For Changes",
+  "rescheduled": "Rescheduled",
   "revertingAppointmentStatus": "Reverting appointment status",
   "save": "Save",
   "scheduled": "Scheduled",
