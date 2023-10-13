@@ -38,7 +38,7 @@ describe('VisitDetailComponent', () => {
     render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
 
     expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
-    expect(screen.getByText(formatDate(visitDate))).toBeInTheDocument();
+    expect(screen.getByText(formatDate(visitDate), { collapseWhitespace: false })).toBeInTheDocument();
 
     expect(screen.getByText('All Encounters')).toBeInTheDocument();
     expect(screen.getByText('Visit Summary')).toBeInTheDocument();
