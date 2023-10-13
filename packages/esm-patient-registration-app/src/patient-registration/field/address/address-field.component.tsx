@@ -18,10 +18,12 @@ function parseString(xmlDockAsString: string) {
 export const AddressComponent: React.FC = () => {
   const [selected, setSelected] = useState('');
   const { addressTemplate } = useContext(ResourcesContext);
+  const allRequiredFields = addressTemplate?.requiredElements?.reduce((acc, curr) => ({ ...acc, [curr]: curr }), {});
   const addressLayout = useMemo(() => {
     if (!addressTemplate?.lines) {
       return [];
     }
+
     const allFields = addressTemplate?.lines?.flat();
     const fields = allFields?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
 
@@ -29,6 +31,7 @@ export const AddressComponent: React.FC = () => {
       id: codeName,
       name: codeName,
       label: displayText,
+      required: Boolean(allRequiredFields[codeName]),
     }));
   }, [addressTemplate]);
 
@@ -83,6 +86,7 @@ export const AddressComponent: React.FC = () => {
             labelText={t(attributes.label)}
             id={attributes.name}
             selected={selected}
+            required={attributes.required}
           />
         ))}
       </AddressComponentContainer>
@@ -123,6 +127,7 @@ export const AddressComponent: React.FC = () => {
             labelText={t(attributes.label)}
             id={attributes.name}
             selected={selected}
+            required={attributes.required}
           />
         ))
       )}

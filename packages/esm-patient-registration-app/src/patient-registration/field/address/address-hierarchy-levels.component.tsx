@@ -28,6 +28,7 @@ interface AddressComboBoxProps {
     name: string;
     value: string;
     label: string;
+    required?: boolean;
   };
 }
 
