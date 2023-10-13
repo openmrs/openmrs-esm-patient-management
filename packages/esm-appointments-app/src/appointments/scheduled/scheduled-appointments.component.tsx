@@ -67,7 +67,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
           {scheduledAppointmentPanels.map((panel) => {
             return panel.meta.showForToday ? (
-              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
+              <Switch name={panel.meta.title} text={t(panel.meta.title} />
             ) : (
               <></>
             );
