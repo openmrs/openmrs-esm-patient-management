@@ -6,15 +6,10 @@ import { filterByServiceType } from '../utils';
 interface AppointmentsByStatusProps {
   appointmentServiceType?: string;
   status: string;
-  statusText: string;
+  title: string;
   date: string;
 }
-const AppointmentsByStatus: React.FC<AppointmentsByStatusProps> = ({
-  appointmentServiceType,
-  status,
-  statusText,
-  date,
-}) => {
+const AppointmentsByStatus: React.FC<AppointmentsByStatusProps> = ({ appointmentServiceType, status, title, date }) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
   const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment, index) => {
@@ -24,7 +19,7 @@ const AppointmentsByStatus: React.FC<AppointmentsByStatusProps> = ({
     };
   });
 
-  return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={statusText} />;
+  return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={title} />;
 };
 
 export default AppointmentsByStatus;

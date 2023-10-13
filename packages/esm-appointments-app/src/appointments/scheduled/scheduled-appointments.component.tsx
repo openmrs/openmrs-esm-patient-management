@@ -65,37 +65,31 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     <>
       {dateType === 'today' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
-          {scheduledAppointmentPanels.map((panel) => {
-            return panel.meta.showForToday ? (
-              <Switch name={panel.meta.title} text={t(panel.meta.title} />
-            ) : (
-              <></>
-            );
-          })}
+          {scheduledAppointmentPanels
+            .filter((panel) => panel.meta.showForToday)
+            .map((panel, i) => {
+              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+            })}
         </ContentSwitcher>
       )}
 
       {dateType === 'pastDate' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
-          {scheduledAppointmentPanels.map((panel) => {
-            return panel.meta.showForPastDate ? (
-              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
-            ) : (
-              <></>
-            );
-          })}
+          {scheduledAppointmentPanels
+            .filter((panel) => panel.meta.showForPastDate)
+            .map((panel, i) => {
+              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+            })}
         </ContentSwitcher>
       )}
 
       {dateType === 'futureDate' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
-          {scheduledAppointmentPanels.map((panel) => {
-            return panel.meta.showForFutureDate ? (
-              <Switch name={panel.meta.title} text={t(panel.meta.title, panel.meta.title)} />
-            ) : (
-              <></>
-            );
-          })}
+          {scheduledAppointmentPanels
+            .filter((panel) => panel.meta.showForFutureDate)
+            .map((panel, i) => {
+              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+            })}
         </ContentSwitcher>
       )}
 
@@ -108,7 +102,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
                   date,
                   appointmentServiceType,
                   status: extension.meta.status,
-                  statusText: extension.meta.title,
+                  title: extension.meta.title,
                 }}
               />
             </div>
