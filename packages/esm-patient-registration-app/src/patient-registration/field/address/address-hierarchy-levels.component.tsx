@@ -37,6 +37,7 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
   const [field, meta, { setValue }] = useField(`address.${attribute.name}`);
   const { fetchEntriesForField, searchString, updateChildElements } = useAddressEntryFetchConfig(attribute.name);
   const { entries } = useAddressEntries(fetchEntriesForField, searchString);
+  const label = t(attribute.label) + (attribute?.required ? '' : ` (${t('optional', 'optional')})`);
 
   const handleInputChange = useCallback(
     (newValue) => {
@@ -63,7 +64,8 @@ const AddressComboBox: React.FC<AddressComboBoxProps> = ({ attribute }) => {
       fieldProps={{
         ...field,
         id: attribute.name,
-        labelText: `${t(attribute.label)} (${t('optional', 'optional')})`,
+        labelText: label,
+        required: attribute?.required,
       }}
       handleInputChange={handleInputChange}
     />
