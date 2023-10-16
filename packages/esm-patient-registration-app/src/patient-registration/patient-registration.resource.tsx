@@ -182,11 +182,20 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
 }
 
 export async function fetchPerson(query: string) {
-  const abortController = new AbortController();
+  const BASE_API = '/ws/rest/v1';
+  const ctrl = new AbortController();
+  const { signal } = ctrl;
 
-  return openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
-    signal: abortController.signal,
-  });
+  try {
+    const endpoint = (await openmrsFetch(`${BASE_API}/person?q=${query}`, { signal })).data.results.length
+      ? `${BASE_API}/person?q=${query}`
+      : `${BASE_API}/patient?q=${query}`;
+
+    return openmrsFetch(endpoint, { signal });
+  } catch (error) {
+    console.error('Error fetching person:', error);
+    throw error;
+  }
 }
 
 export async function addPatientIdentifier(patientUuid: string, patientIdentifier: PatientIdentifier) {
