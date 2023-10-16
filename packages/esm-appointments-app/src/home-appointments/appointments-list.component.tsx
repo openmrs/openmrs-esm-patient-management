@@ -122,31 +122,37 @@ const AppointmentsBaseTable = () => {
         id: 0,
         header: t('dateTime', 'Date and time'),
         key: 'dateTime',
+        isSortable: true,
       },
       {
         id: 1,
         header: t('name', 'Patient Name'),
         key: 'name',
+        isSortable: true,
       },
       {
         id: 2,
         header: t('identifier', 'Identifier'),
         key: 'identifier',
+        isSortable: true,
       },
       {
         id: 3,
         header: t('location', 'Location'),
         key: 'location',
+        isSortable: true,
       },
       {
         id: 4,
         header: t('service', 'Service'),
         key: 'service',
+        isSortable: true,
       },
       {
         id: 5,
         header: t('actions', 'Actions'),
         key: 'actionButton',
+        isSortable: false,
       },
     ],
     [t],
@@ -161,6 +167,7 @@ const AppointmentsBaseTable = () => {
           {appointment.duration}
         </span>
       ),
+      sortKey: appointment.dateTime,
     },
     name: {
       content: (
@@ -170,6 +177,7 @@ const AppointmentsBaseTable = () => {
           </ConfigurableLink>
         </div>
       ),
+      sortKey: appointment.name,
     },
     identifier: {
       content: (
@@ -177,9 +185,11 @@ const AppointmentsBaseTable = () => {
           <span className={styles.identifier}>{appointment.identifier}</span>
         </div>
       ),
+      sortKey: appointment.identifier,
     },
     location: {
       content: <span className={styles.statusContainer}>{appointment.location}</span>,
+      sortKey: appointment.location,
     },
     service: {
       content: (
@@ -188,6 +198,7 @@ const AppointmentsBaseTable = () => {
           {appointment.serviceType}
         </span>
       ),
+      sortKey: appointment.serviceType,
     },
     actionButton: {
       content: (
@@ -197,6 +208,30 @@ const AppointmentsBaseTable = () => {
       ),
     },
   }));
+
+  const handleSorting = (
+    cellA: { content: JSX.Element; sortKey: string },
+    cellB: { content: JSX.Element; sortKey: string },
+    {
+      sortDirection,
+      sortStates,
+    }: {
+      sortDirection: 'ASC' | 'DESC' | 'NONE';
+      sortStates: { ASC: 'ASC'; DESC: 'DESC'; NONE: 'NONE' };
+    },
+  ) => {
+    if (sortDirection === sortStates.NONE) {
+      return 0;
+    }
+
+    if (sortDirection === sortStates.ASC) {
+      return cellA?.sortKey?.localeCompare(cellB?.sortKey) ?? 0;
+    }
+
+    if (sortDirection === sortStates.DESC) {
+      return cellB?.sortKey?.localeCompare(cellA?.sortKey) ?? 0;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -245,74 +280,77 @@ const AppointmentsBaseTable = () => {
         <DataTable
           data-floating-menu-container
           headers={tableHeaders}
+          sortRow={handleSorting}
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
-          size={isDesktop(layout) ? 'xs' : 'md'}
+          size={isDesktop(layout) ? 'md' : 'lg'}
           useZebraStyles={true}>
-          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-            <TableContainer className={styles.tableContainer}>
-              <Table {...getTableProps()} className={styles.appointmentsTable}>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })} key={header.id}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, index) => {
-                    return (
-                      <React.Fragment key={row.id}>
-                        <TableRow {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                          ))}
-                          {fullView && (
-                            <TableCell className={`cds--table-column-menu ${styles.overflowMenu}`}>
-                              <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              {rows.length === 0 ? (
-                <div className={styles.tileContainer}>
-                  <Layer>
-                    <Tile className={styles.tile}>
-                      <div className={styles.tileContent}>
-                        <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                        <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                      </div>
-                      <p className={styles.separator}>{t('or', 'or')}</p>
-                      <AddAppointmentLink />
-                    </Tile>
-                  </Layer>
-                </div>
-              ) : null}
-              <Pagination
-                forwardText="Next page"
-                backwardText="Previous page"
-                page={currentPage}
-                pageSize={currentPageSize}
-                pageSizes={pageSizes}
-                totalItems={filteredAppointments.length}
-                className={styles.pagination}
-                onChange={({ pageSize, page }) => {
-                  if (pageSize !== currentPageSize) {
-                    setPageSize(pageSize);
-                  }
-                  if (page !== currentPage) {
-                    goTo(page);
-                  }
-                }}
-              />
-            </TableContainer>
-          )}
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => {
+            return (
+              <TableContainer className={styles.tableContainer}>
+                <Table {...getTableProps()} className={styles.appointmentsTable}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader {...getHeaderProps({ header, isSortable: header.isSortable })} key={header.id}>
+                          {header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, index) => {
+                      return (
+                        <React.Fragment key={row.id}>
+                          <TableRow {...getRowProps({ row })}>
+                            {row.cells.map((cell) => (
+                              <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                            ))}
+                            {fullView && (
+                              <TableCell className={`cds--table-column-menu ${styles.overflowMenu}`}>
+                                <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        </React.Fragment>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                {rows.length === 0 ? (
+                  <div className={styles.tileContainer}>
+                    <Layer>
+                      <Tile className={styles.tile}>
+                        <div className={styles.tileContent}>
+                          <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                          <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                        </div>
+                        <p className={styles.separator}>{t('or', 'or')}</p>
+                        <AddAppointmentLink />
+                      </Tile>
+                    </Layer>
+                  </div>
+                ) : null}
+                <Pagination
+                  forwardText="Next page"
+                  backwardText="Previous page"
+                  page={currentPage}
+                  pageSize={currentPageSize}
+                  pageSizes={pageSizes}
+                  totalItems={filteredAppointments.length}
+                  className={styles.pagination}
+                  onChange={({ pageSize, page }) => {
+                    if (pageSize !== currentPageSize) {
+                      setPageSize(pageSize);
+                    }
+                    if (page !== currentPage) {
+                      goTo(page);
+                    }
+                  }}
+                />
+              </TableContainer>
+            );
+          }}
         </DataTable>
       </div>
       <SeeAllAppointmentsLink />
