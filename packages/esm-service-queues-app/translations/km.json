@@ -180,7 +180,7 @@
   "queueScreen": "Queue screen",
   "queueService": "សេវាកម្មជួរ",
   "queueStatus": "ស្ថានភាពជួរ",
-  "recentScheduledVisits_other": "{count} visit(s) scheduled for +/- 7 days",
+  "recentScheduledVisits_other": "{count} visits scheduled for +/- 7 days",
   "recommended": "អនុសាសន៏",
   "refills": "ការបំពេញបន្ថែម",
   "removeFromQueueAndEndVisit": "ដកអ្នកជំងឺចេញពីជួរ ហើយបញ្ចប់ការមកពិនិត្យសកម្ម",
