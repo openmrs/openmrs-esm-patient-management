@@ -71,7 +71,6 @@
   "errorCancellingAppointment": "Error cancelling the appointment",
   "errorCheckingAppoitment": "Error checking in the appointment",
   "errorCreatingAppointmentService": "Error creating appointment service",
-  "facility": "Facility",
   "filter": "Filter",
   "gender": "Gender",
   "highestServiceVolume": "High volume service: {time}",
