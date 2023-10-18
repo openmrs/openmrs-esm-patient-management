@@ -22,8 +22,8 @@
   "phoneNumber": "Phone number",
   "postcode": "Postcode",
   "previousPage": "Previous page",
-  "recentSearchResultsCount": "{count} recent search result{plural}",
-  "recentSearchResultsCount_plural": "{count} recent search result{plural}",
+  "recentSearchResultsCount_one": "{count} recent search result",
+  "recentSearchResultsCount_other": "{count} recent search results",
   "refineSearch": "Refine search",
   "refineSearchHeaderText": "Add additional search criteria",
   "refineSearchTabletBannerText": "Can't find who you're looking for?",
@@ -34,13 +34,11 @@
   "searchingText": "Searching...",
   "searchPatient": "Search Patient",
   "searchResults": "Search Results",
-  "searchResultsCount": "{count} search result{plural}",
-  "searchResultsCount_plural": "{count} search result{plural}",
+  "searchResultsCount_one": "{count} search result",
+  "searchResultsCount_other": "{count} search results",
   "sex": "Sex",
   "showDetails": "Show details",
   "trySearchWithPatientUniqueID": "Try to search again using the patient's unique ID number",
   "unknown": "Unknown",
-  "yearOfBirth": "Year of Birth",
-  "searchResultsCount_one": "{count} search result{plural}",
-  "searchResultsCount_other": "{count} search result{plural}"
+  "yearOfBirth": "Year of Birth"
 }

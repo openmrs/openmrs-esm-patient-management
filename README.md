@@ -136,7 +136,11 @@ Then, in a separate terminal, run:
 yarn test-e2e --headed
 ```
 
-Please read [our e2e docs](e2e/README.md) for more information about E2E testing.
+Please read [our e2e test guide](https://o3-docs.openmrs.org/docs/frontend-modules/testing#end-to-end-testing-with-playwright) for more information about E2E testing.
+
+### Updating Playwright Version
+
+To upgrade your Playwright version, ensure that you update both the package.json file and the [e2e/support/bamboo/playwright.Dockerfile](e2e/support/bamboo/playwright.Dockerfile).
 
 ## Design Patterns
 
