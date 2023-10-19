@@ -66,7 +66,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
         <Layer>
           <Tile className={styles.tile}>
             <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('visitType', 'Visit type')}</h4>
+              <h4>{t('visitType', 'Visit Type')}</h4>
             </div>
             <EmptyDataIllustration />
             <p className={styles.content}>

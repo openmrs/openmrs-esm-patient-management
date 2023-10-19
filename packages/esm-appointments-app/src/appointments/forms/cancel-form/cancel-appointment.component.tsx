@@ -35,7 +35,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
       showToast({
         critical: true,
         kind: 'success',
-        description: t('appointmentNowVisible', 'It has been cancelled successfully'),
+        description: t('cancelledSuccessfully', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
@@ -46,7 +46,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         title: t('appointmentCancelError', 'Error cancelling appointment'),
         kind: 'error',
         critical: true,
-        description: t('errorMessage', 'Error cancelling the appointment'),
+        description: t('errorCancellingAppointment', 'Error cancelling the appointment'),
       });
       setIsSubmitting(false);
     }

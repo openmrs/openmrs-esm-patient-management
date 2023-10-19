@@ -148,7 +148,7 @@ const ScheduledVisits: React.FC<{
                     if (status === 201) {
                       showToast({
                         kind: 'success',
-                        title: t('startVisit', 'Start a visit'),
+                        title: t('startAVisit', 'Start a visit'),
                         description: t(
                           'startVisitQueueSuccessfully',
                           'Patient has been added to active visits list and queue.',
@@ -321,7 +321,7 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
         closePanel={closePanel}
       />
 
-      <div className={styles['text-divider']}>{t('or', 'Or')}</div>
+      <div className={styles['text-divider']}>{t('orInProperFormat', 'Or')}</div>
 
       <div className={styles.buttonContainer}>
         <Button

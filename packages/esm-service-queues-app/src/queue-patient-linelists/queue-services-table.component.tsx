@@ -40,7 +40,7 @@ const ServicesTable: React.FC = () => {
       },
       {
         id: 5,
-        header: t('phoneNumber', 'Phone Number'),
+        header: t('phoneNumber', 'Phone number'),
         key: 'phoneNumber',
       },
     ],
