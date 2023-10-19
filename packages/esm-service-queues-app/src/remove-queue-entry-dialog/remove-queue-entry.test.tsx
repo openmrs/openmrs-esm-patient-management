@@ -28,7 +28,7 @@ describe('RemoveQueueEntryDialog', () => {
     expect(screen.getByText(/Ending this visit will remove this patient/)).toBeInTheDocument();
 
     expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('End Visit')).toBeInTheDocument();
+    expect(screen.getByText('End visit')).toBeInTheDocument();
   });
 
   it('calls closeModal when Cancel button is clicked', () => {

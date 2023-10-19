@@ -39,7 +39,7 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
       },
       (error) => {
         showNotification({
-          title: t('errorMessage', 'Error creating appointment service'),
+          title: t('errorCreatingAppointmentService', 'Error creating appointment service'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -120,7 +120,7 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
             <Layer>
               <TextInput
                 id="durationMins"
-                invalidText={t(props.errors.durationMins)}
+                invalidText={props.errors.durationMins}
                 labelText={t('durationMins', 'Duration min')}
                 placeholder={t('durationMins', 'Duration min')}
                 invalid={!!(props.touched && props.errors.durationMins)}
