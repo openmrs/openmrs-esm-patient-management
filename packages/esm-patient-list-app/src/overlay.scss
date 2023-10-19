@@ -3,15 +3,19 @@
 @import './style.scss';
 
 .desktopOverlay {
-  position: sticky;
+  position: fixed;
+  right: 0;
+  width: 37rem;
   top: spacing.$spacing-09;
   height: calc(100vh - 3rem);
   min-width: 27rem;
-  background-color: $ui-02;
+  background-color: $ui-01;
   border-left: 1px solid $text-03;
-  overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 99999;
 }
 
 .tabletOverlay {

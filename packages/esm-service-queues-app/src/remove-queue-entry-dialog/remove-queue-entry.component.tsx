@@ -36,7 +36,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
       stopDatetime: new Date(),
     };
 
-    const endedAt = toDateObjectStrict(toOmrsIsoString(new Date()));
+    const endedAt = new Date();
 
     voidQueueEntry(
       queueEntry.queueUuid,
@@ -85,7 +85,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={removeQueueEntry}>
-          {t('endVisit', 'End Visit')}
+          {t('endVisit', 'End visit')}
         </Button>
       </ModalFooter>
     </div>

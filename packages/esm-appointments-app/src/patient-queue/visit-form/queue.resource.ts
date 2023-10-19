@@ -36,7 +36,7 @@ export async function saveQueueEntry(
         patient: {
           uuid: patientUuid,
         },
-        startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        startedAt: new Date(),
         sortWeight: sortWeight,
       },
     },

@@ -124,7 +124,7 @@ const AppointmentsTable: React.FC = () => {
       },
       {
         id: 6,
-        header: t('phoneNumber', 'Phone Number'),
+        header: t('phoneNumber', 'Phone number'),
         key: 'phoneNumber',
       },
     ],

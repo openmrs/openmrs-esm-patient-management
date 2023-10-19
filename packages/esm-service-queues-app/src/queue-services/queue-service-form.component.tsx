@@ -161,7 +161,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
                   kind="error"
                   lowContrast={true}
                   title={t('missingLocation', 'Missing location')}
-                  subtitle={t('selectLocation', 'Please select a location')}
+                  subtitle={t('pleaseSelectLocation', 'Please select a location')}
                 />
               </section>
             )}
