@@ -85,7 +85,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={removeQueueEntry}>
-          {t('endVisit', 'End Visit')}
+          {t('endVisit', 'End visit')}
         </Button>
       </ModalFooter>
     </div>
