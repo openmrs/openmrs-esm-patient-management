@@ -15,7 +15,7 @@
   "editList": "កែសម្រួលបញ្ជី",
   "editNameDescription": "កែសម្រួលឈ្មោះ/ការពិពណ៌នា",
   "editPatientListHeader": "កែសម្រួលបញ្ជីអ្នកជំងឺ",
-  "emptyStateText": "There are no {listType} patient lists to display",
+  "emptyStateText": "មិនមានបញ្ជីអ្នកជំងឺ {ប្រភេទបញ្ជី} ដែលត្រូវបង្ហាញទេ",
   "error": "កំហុស/ ការភាន់ច្រឡំ",
   "errorAddPatientToList": "អ្នកជំងឺមិនត្រូវបានបញ្ចូលទៅក្នុងបញ្ជីទេ",
   "errorCreatePatientListDescription": "មិនអាចបង្កើតបញ្ជីអ្នកជំងឺបានទេ",
