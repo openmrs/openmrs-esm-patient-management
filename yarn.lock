@@ -3762,6 +3762,7 @@ __metadata:
     react: ^18.1.0
     react-dom: ^18.1.0
     react-i18next: 11.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
@@ -3827,6 +3828,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
@@ -3970,6 +3972,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
@@ -4053,6 +4056,7 @@ __metadata:
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
@@ -4068,6 +4072,7 @@ __metadata:
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
@@ -4105,6 +4110,7 @@ __metadata:
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
+    swr: 2.x
   languageName: unknown
   linkType: soft
 
