@@ -4,14 +4,10 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  ContentSwitcher,
   DatePicker,
   DatePickerInput,
-  RadioButton,
-  RadioButtonGroup,
   Select,
   SelectItem,
-  Switch,
   TimePicker,
   TimePickerSelect,
   Toggle,
@@ -163,17 +159,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       )}
 
-      {/*   <div className={styles.inputContainer} id="appointment-place">
-        <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
-        <ContentSwitcher className={styles.inputContainer} data-testid="appointment-place">
-          <Switch value="facility" id="facility" text={t('facility', 'Facility')}>
-            {t('facility', 'Facility')}
-          </Switch>
-          <Switch value="community" id="community" text={t('community', 'Community')}>
-            {t('community', 'Community')}
-          </Switch>
-        </ContentSwitcher>
-      </div>*/}
+      <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
 
       <Select
         labelText={t('selectLocation', 'Select a location')}
