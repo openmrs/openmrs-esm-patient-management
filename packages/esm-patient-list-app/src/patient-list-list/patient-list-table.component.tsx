@@ -38,7 +38,7 @@ interface PatientListTableContainerProps {
   style?: CSSProperties;
   patientLists: Array<PatientList>;
   isLoading?: boolean;
-  headers?: Array<DataTableHeader<keyof PatientList>>;
+  headers?: Array<DataTableHeader>;
   refetch?(): void;
   listType: string;
   handleCreate?: () => void;
