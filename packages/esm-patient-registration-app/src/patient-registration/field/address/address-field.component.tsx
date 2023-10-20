@@ -86,7 +86,7 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            selected={selected}
+            value={selected}
             required={attributes.required}
           />
         ))}
@@ -127,7 +127,7 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            selected={selected}
+            value={selected}
             required={attributes.required}
           />
         ))
