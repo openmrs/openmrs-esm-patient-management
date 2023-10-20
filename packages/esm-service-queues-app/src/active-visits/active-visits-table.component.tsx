@@ -72,6 +72,14 @@ import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
 
+/**
+ * FIXME Temporarily moved here
+ */
+interface DataTableHeader {
+  key: string;
+  header: React.ReactNode;
+}
+
 type FilterProps = {
   rowIds: Array<string>;
   headers: Array<DataTableHeader>;
