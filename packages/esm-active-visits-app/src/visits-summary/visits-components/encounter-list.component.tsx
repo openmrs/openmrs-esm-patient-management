@@ -63,12 +63,12 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  return encounters.length !== 0 ? (
-    <DataTable rows={encounters} headers={headerData} size={!isDesktop(layout) ? 'md' : 'sm'}>
+  return encounters.length > 0 ? (
+    <DataTable rows={encounters} headers={headerData}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer data-testid="encountersTable">
-            <Table className={styles.customTable} {...getTableProps()}>
+            <Table className={styles.customTable} {...getTableProps()} size={isDesktop(layout) ? 'sm' : 'md'}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
