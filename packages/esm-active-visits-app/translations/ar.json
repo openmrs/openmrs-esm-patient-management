@@ -18,6 +18,7 @@
   "noNotesFound": "لم يتم العثور على ملاحظات",
   "noObservationsFound": "لم يتم العثور على ملاحظات",
   "notes": "الملاحظات",
+  "noVisitsFound": "No visits found",
   "noVisitsToDisplay": "لا زيارات للعرض",
   "orderDurationAndUnit": "لمدة {duration} {durationUnit}",
   "orderIndefiniteDuration": "مدة غير محددة",
