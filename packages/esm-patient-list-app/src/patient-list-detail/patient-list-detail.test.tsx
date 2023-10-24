@@ -82,11 +82,11 @@ describe('PatientListDetailComponent', () => {
     });
   });
 
-  it('opens edit overlay when "Edit Name/ Description" is clicked', () => {
+  it('opens edit overlay when "Edit Name or Description" is clicked', () => {
     render(<PatientListDetailComponent />);
 
     userEvent.click(screen.getByText('Actions'));
-    const editBtn = screen.getByText('Edit Name/ Description');
+    const editBtn = screen.getByText('Edit Name or Description');
     userEvent.click(editBtn);
   });
 
@@ -94,7 +94,19 @@ describe('PatientListDetailComponent', () => {
     render(<PatientListDetailComponent />);
 
     await waitFor(() => {
-      userEvent.click(screen.getByText('Delete'));
+      userEvent.click(screen.getByText('Actions'));
+      userEvent.click(screen.getByText('Delete patient List'));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Are you sure you want to delete the patient list')).toBeInTheDocument();
+      expect(screen.getByText(`This list has ${mockedPatientListDetails.size} patients.`)).toBeInTheDocument();
+      expect(screen.getByText('Delete')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+
+      expect(screen.getByText('Delete').closest('button')).not.toHaveAttribute('disabled');
+
+      userEvent.click(screen.getByText('Cancel'));
     });
 
     await waitFor(() => {

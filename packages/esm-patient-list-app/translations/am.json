@@ -13,7 +13,7 @@
   "deleted": "Deleted",
   "deletedPatientList": "Deleted patient list",
   "editList": "Edit list",
-  "editNameDescription": "Edit Name/ Description",
+  "editNameDescription": "Edit Name or Description",
   "editPatientListHeader": "Edit patient list",
   "emptyStateText": "There are no {listType} patient lists to display",
   "error": "Error",

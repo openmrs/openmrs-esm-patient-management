@@ -2,6 +2,10 @@
 @use '@carbon/styles/scss/type';
 @import '../style.scss';
 
+.menuItem {
+  max-width: none;
+}
+
 .container {
   display: flex;
   flex-direction: column;
