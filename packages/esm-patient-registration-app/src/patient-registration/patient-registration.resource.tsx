@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration.types';
+import { setIdentifierSource } from './field/id/id-field.component';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
@@ -19,6 +20,19 @@ function dataURItoFile(dataURI: string) {
 
   const blob = new Blob([buffer], { type: mimeString });
   return new File([blob], 'patient-photo.png');
+}
+
+//Function to get all identifier sources
+
+export function getAllIdentifierSources() {
+  const abortController = new AbortController();
+  return openmrsFetch('/ws/rest/v1/idgen/identifierSource', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'GET',
+    signal: abortController.signal,
+  });
 }
 
 export function savePatient(patient: Patient | null, updatePatientUuid?: string) {
@@ -47,17 +61,25 @@ export function saveEncounter(encounter: Encounter) {
   });
 }
 
-export function generateIdentifier(source: string) {
-  const abortController = new AbortController();
+export async function generateIdentifier(source: string) {
+  const allIdentifierSources = await getAllIdentifierSources();
+  const specificSource = allIdentifierSources.data(
+    (identifierSource: { name: string }) => identifierSource.name === source,
+  );
 
-  return openmrsFetch(`/ws/rest/v1/idgen/identifiersource/${source}/identifier`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: {},
-    signal: abortController.signal,
-  });
+  if (specificSource) {
+    const abortController = new AbortController();
+    return openmrsFetch(`/ws/rest/v1/idgen/identifiersource/${source}/identifier`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: {},
+      signal: abortController.signal,
+    });
+  } else {
+    throw new Error('identifier source not found');
+  }
 }
 
 export function deletePersonName(nameUuid: string, personUuid: string) {
