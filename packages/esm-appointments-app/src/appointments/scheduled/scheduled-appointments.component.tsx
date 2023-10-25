@@ -55,10 +55,10 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   const getDefaultTab = (panels) => {
     return panels?.find(
       (panel) =>
-        (isDateInPast && panel.meta.showForPastDate) ||
-        (isToday && panel.meta.showForToday) ||
-        (isDateInFuture && panel.meta.showForFutureDate),
-    )?.meta.title;
+        (isDateInPast && panel.config.showForPastDate) ||
+        (isToday && panel.config.showForToday) ||
+        (isDateInFuture && panel.config.showForFutureDate),
+    )?.config.title;
   };
 
   return (
@@ -66,9 +66,9 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {dateType === 'today' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
           {scheduledAppointmentPanels
-            .filter((panel) => panel.meta.showForToday)
+            .filter((panel) => panel.config.showForToday)
             .map((panel, i) => {
-              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+              return <Switch key={i} name={panel.config.title} text={t(panel.config.title)} />;
             })}
         </ContentSwitcher>
       )}
@@ -76,9 +76,9 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {dateType === 'pastDate' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
           {scheduledAppointmentPanels
-            .filter((panel) => panel.meta.showForPastDate)
+            .filter((panel) => panel.config.showForPastDate)
             .map((panel, i) => {
-              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+              return <Switch key={i} name={panel.config.title} text={t(panel.config.title)} />;
             })}
         </ContentSwitcher>
       )}
@@ -86,23 +86,23 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
       {dateType === 'futureDate' && (
         <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
           {scheduledAppointmentPanels
-            .filter((panel) => panel.meta.showForFutureDate)
+            .filter((panel) => panel.config.showForFutureDate)
             .map((panel, i) => {
-              return <Switch key={i} name={panel.meta.title} text={t(panel.meta.title)} />;
+              return <Switch key={i} name={panel.config.title} text={t(panel.config.title)} />;
             })}
         </ContentSwitcher>
       )}
 
       <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
         {(extension) =>
-          extension.meta.title === currentTab && (
+          extension.config.title === currentTab && (
             <div className={styles.container}>
               <Extension
                 state={{
                   date,
                   appointmentServiceType,
-                  status: extension.meta.status,
-                  title: extension.meta.title,
+                  status: extension.config.status,
+                  title: extension.config.title,
                 }}
               />
             </div>
