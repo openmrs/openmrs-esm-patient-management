@@ -198,7 +198,6 @@ export async function fetchPerson(query: string) {
     const patientEndpoint = `${BASE_API}/patient?q=${query}`;
     return openmrsFetch(patientEndpoint, { signal });
   } catch (error) {
-    console.error('Error fetching person:', error);
     throw error;
   }
 }
