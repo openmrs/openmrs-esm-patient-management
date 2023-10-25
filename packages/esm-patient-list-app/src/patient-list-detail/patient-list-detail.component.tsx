@@ -128,12 +128,13 @@ const PatientListDetailComponent = () => {
               </>
             }>
             <OverflowMenuItem
+              className={styles.menuItem}
               itemText={t('editNameDescription', 'Edit Name or Description')}
               onClick={() => setEditPatientListDetailOverlay(true)}
             />
             <OverflowMenuItem
               className={styles.menuItem}
-              itemText={t('deletePatientList', 'Delete patient List')}
+              itemText={t('deletePatientList', 'Delete patient list')}
               onClick={handleDelete}
               isDelete
             />
@@ -180,7 +181,7 @@ const PatientListDetailComponent = () => {
             danger
             modalHeading={t(
               'confirmDeletePatientList',
-              'Are you sure you want to delete the patient list: {patientListName}?',
+              'Are you sure you want to delete {patientListName} patient list?',
               {
                 patientListName: patientListDetails?.name,
               },

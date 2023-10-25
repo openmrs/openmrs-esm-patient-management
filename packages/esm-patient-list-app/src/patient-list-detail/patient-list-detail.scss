@@ -2,10 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '../style.scss';
 
-.menuItem {
-  max-width: none;
-}
-
 .container {
   display: flex;
   flex-direction: column;
@@ -29,6 +25,10 @@
 
 .marginTop {
   margin-top: spacing.$spacing-03;
+}
+
+.menuItem {
+  max-width: none;
 }
 
 .actionsButtonText {
