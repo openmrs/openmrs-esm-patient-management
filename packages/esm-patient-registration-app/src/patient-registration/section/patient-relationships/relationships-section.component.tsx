@@ -65,8 +65,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 
   const searchPerson = async (query: string) => {
     const abortController = new AbortController();
-    const searchResults = await fetchPerson(query);
-    return searchResults.data.results;
+    return await fetchPerson(query, abortController);
   };
 
   const deleteRelationship = useCallback(() => {
