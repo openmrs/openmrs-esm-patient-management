@@ -6,19 +6,19 @@ import {
   ButtonSet,
   DatePicker,
   DatePickerInput,
+  Layer,
   Select,
   SelectItem,
-  TimePicker,
-  TimePickerSelect,
-  Toggle,
   SkeletonText,
   Tab,
   TabList,
-  Tabs,
   TabPanel,
   TabPanels,
+  Tabs,
   TextArea,
-  Layer,
+  TimePicker,
+  TimePickerSelect,
+  Toggle,
 } from '@carbon/react';
 import {
   useLocations,
@@ -30,9 +30,7 @@ import {
   ConfigObject,
   useSession,
 } from '@openmrs/esm-framework';
-
 import first from 'lodash-es/first';
-import styles from './appointments-form.scss';
 import { mutate } from 'swr';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
@@ -46,9 +44,10 @@ import {
 } from '../forms.resource';
 import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
 import { useCalendarDistribution } from '../workload-helper';
-import WorkloadCard from '../workload.component';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
 import LocationSelectOption from '../../common-components/location-select-option.component';
+import WorkloadCard from '../workload.component';
+import styles from './appointments-form.scss';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -78,7 +77,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
-  const today = dayjs().startOf('day').toDate();
+  const today = dayjs().startOf('day').format();
 
   useEffect(() => {
     if (locations?.length && sessionUser) {

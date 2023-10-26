@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
-import styles from './metrics-header.scss';
 import { spaBasePath } from '../constants';
-import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
+import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
+import styles from './metrics-header.scss';
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
