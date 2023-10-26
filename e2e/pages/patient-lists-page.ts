@@ -33,6 +33,6 @@ export class PatientListsPage {
 
   async deletePatientList() {
     await this.page.getByRole('button', { name: 'Actions' }).click();
-    await this.page.getByRole('menuitem', { name: 'Delete' }).click();
+    await this.page.getByRole('menuitem', { name: 'Delete patient list' }).click();
   }
 }

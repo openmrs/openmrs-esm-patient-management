@@ -11,6 +11,7 @@
   "createPatientList": "Create patient list",
   "delete": "Delete",
   "deleted": "Deleted",
+  "deletePatientList": "Delete patient list",
   "deletedPatientList": "Deleted patient list",
   "editList": "Edit list",
   "editNameDescription": "Edit Name or Description",

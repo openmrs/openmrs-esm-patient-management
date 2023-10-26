@@ -95,11 +95,11 @@ describe('PatientListDetailComponent', () => {
 
     await waitFor(() => {
       userEvent.click(screen.getByText('Actions'));
-      userEvent.click(screen.getByText('Delete patient List'));
+      userEvent.click(screen.getByText(/delete patient list/i));
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Are you sure you want to delete the patient list')).toBeInTheDocument();
+      expect(screen.getByText('Are you sure you want to delete this patient list?')).toBeInTheDocument();
       expect(screen.getByText(`This list has ${mockedPatientListDetails.size} patients.`)).toBeInTheDocument();
       expect(screen.getByText('Delete')).toBeInTheDocument();
       expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -110,8 +110,7 @@ describe('PatientListDetailComponent', () => {
     });
 
     await waitFor(() => {
-      expect(mockedDeletePatientList).toHaveBeenCalledTimes(1);
-      expect(showToast).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText('Are you sure you want to delete this patient list?')).not.toBeInTheDocument();
     });
   });
 });

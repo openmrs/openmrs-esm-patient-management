@@ -179,13 +179,7 @@ const PatientListDetailComponent = () => {
           <Modal
             open
             danger
-            modalHeading={t(
-              'confirmDeletePatientList',
-              'Are you sure you want to delete {patientListName} patient list?',
-              {
-                patientListName: patientListDetails?.name,
-              },
-            )}
+            modalHeading={t('confirmDeletePatientList', 'Are you sure you want to delete this patient list?')}
             primaryButtonText="Delete"
             secondaryButtonText="Cancel"
             onRequestClose={() => setShowDeleteConfirmationModal(false)}
