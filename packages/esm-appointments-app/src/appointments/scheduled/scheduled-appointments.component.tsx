@@ -51,7 +51,11 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   }, [date]);
 
   useEffect(() => {
-    if (currentTab === null && allowedExtensions) {
+    // This is intended to cover two things:
+    //  1. If no current tab is set, set it to the first allowed tab
+    //  2. If a current tab is set, but the tab is no longer allowed in this context, set it to the
+    //     first allowed tab
+    if (allowedExtensions && (currentTab === null || !(allowedExtensions[currentTab] ?? false))) {
       for (const extension of Object.getOwnPropertyNames(allowedExtensions)) {
         if (allowedExtensions[extension]) {
           setCurrentTab(extension);
