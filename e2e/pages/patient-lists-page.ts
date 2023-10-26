@@ -21,7 +21,7 @@ export class PatientListsPage {
 
   async editPatientList(listName: string, description: string) {
     await this.page.getByRole('button', { name: 'Actions' }).click();
-    await this.page.getByRole('menuitem', { name: 'Edit Name/ Description' }).click();
+    await this.page.getByRole('menuitem', { name: 'Edit Name or Description' }).click();
     await this.page.getByLabel('List name').fill(listName);
     await this.page.getByLabel('Describe the purpose of this list in a few words').fill(description);
     await this.page.getByRole('button', { name: 'Edit list' }).click();
@@ -33,6 +33,6 @@ export class PatientListsPage {
 
   async deletePatientList() {
     await this.page.getByRole('button', { name: 'Actions' }).click();
-    await this.page.getByRole('menuitem', { name: 'Delete' }).click();
+    await this.page.getByRole('menuitem', { name: 'Delete patient list' }).click();
   }
 }

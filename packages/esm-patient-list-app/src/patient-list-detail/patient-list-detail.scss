@@ -27,6 +27,10 @@
   margin-top: spacing.$spacing-03;
 }
 
+.menuItem {
+  max-width: none;
+}
+
 .actionsButtonText {
   @include type.type-style('body-compact-01');
   color: $interactive-01;

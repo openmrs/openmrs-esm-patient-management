@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { navigate, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { OverflowMenuItem } from '@carbon/react';
+import { OverflowMenuItem, Modal } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
 import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
@@ -34,6 +34,7 @@ const PatientListDetailComponent = () => {
     currentPageSize,
   );
   const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
+  const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
   const patients: PatientListMemberRow[] = useMemo(
     () =>
@@ -83,6 +84,10 @@ const PatientListDetailComponent = () => {
   }, []);
 
   const handleDelete = useCallback(() => {
+    setShowDeleteConfirmationModal(true);
+  }, []);
+
+  const confirmDeletePatientList = useCallback(() => {
     deletePatientList(patientListUuid)
       .then(() =>
         showToast({
@@ -98,7 +103,8 @@ const PatientListDetailComponent = () => {
           description: t('errorDeleteList', "Couldn't delete patient list"),
           kind: 'error',
         }),
-      );
+      )
+      .finally(() => setShowDeleteConfirmationModal(false));
   }, [patientListUuid, patientListDetails, t]);
 
   return (
@@ -122,10 +128,16 @@ const PatientListDetailComponent = () => {
               </>
             }>
             <OverflowMenuItem
-              itemText={t('editNameDescription', 'Edit Name/ Description')}
+              className={styles.menuItem}
+              itemText={t('editNameDescription', 'Edit Name or Description')}
               onClick={() => setEditPatientListDetailOverlay(true)}
             />
-            <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={handleDelete} isDelete />
+            <OverflowMenuItem
+              className={styles.menuItem}
+              itemText={t('deletePatientList', 'Delete patient list')}
+              onClick={handleDelete}
+              isDelete
+            />
           </CustomOverflowMenuComponent>
         </div>
       </section>
@@ -162,6 +174,23 @@ const PatientListDetailComponent = () => {
             patientListDetails={patientListDetails}
             onSuccess={mutatePatientListDetails}
           />
+        )}
+        {showDeleteConfirmationModal && (
+          <Modal
+            open
+            danger
+            modalHeading={t('confirmDeletePatientList', 'Are you sure you want to delete this patient list?')}
+            primaryButtonText="Delete"
+            secondaryButtonText="Cancel"
+            onRequestClose={() => setShowDeleteConfirmationModal(false)}
+            onRequestSubmit={confirmDeletePatientList}
+            primaryButtonDisabled={false}>
+            {patientListDetails?.size > 0 ? (
+              <p>{`This list has ${patientListDetails.size} patients.`}</p>
+            ) : (
+              <p>This list has no patients.</p>
+            )}
+          </Modal>
         )}
       </section>
     </main>
