@@ -352,7 +352,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
             danger
             modalHeading={t(
               'removePatientFromListConfirmation',
-              'Are you sure you want to remove {patientName} from this list?',
+              'Are you sure you want to remove {{patientName}} from this list?',
               {
                 patientName: patientName,
               },

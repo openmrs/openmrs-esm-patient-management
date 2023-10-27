@@ -190,7 +190,7 @@ const PatientListDetailComponent = () => {
             primaryButtonDisabled={false}>
             {listDetails?.size > 0 ? (
               <p>
-                {t('patientListMemberCount', 'This list has {count} patients', {
+                {t('patientListMemberCount', 'This list has {{count}} patients', {
                   count: listDetails.size,
                 })}
                 .
