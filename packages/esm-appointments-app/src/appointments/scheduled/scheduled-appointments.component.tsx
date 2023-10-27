@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -55,7 +55,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     //  1. If no current tab is set, set it to the first allowed tab
     //  2. If a current tab is set, but the tab is no longer allowed in this context, set it to the
     //     first allowed tab
-    if (allowedExtensions && (currentTab === null || !(allowedExtensions[currentTab] ?? false))) {
+    if (allowedExtensions && (currentTab === null || !allowedExtensions[currentTab])) {
       for (const extension of Object.getOwnPropertyNames(allowedExtensions)) {
         if (allowedExtensions[extension]) {
           setCurrentTab(extension);
@@ -69,7 +69,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     <>
       <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
         {scheduledAppointmentPanels.filter(shouldShowPanel).map((panel) => {
-          return <Switch key={`panel-${panel.name}`} name={panel.config.title} text={t(panel.config.title)} />;
+          return <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />;
         })}
       </ContentSwitcher>
 
@@ -93,19 +93,27 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
 };
 
 function useAllowedExtensions() {
-  const [allowedExtensions, setAllowedExtensions] = useState<Readonly<Record<string, boolean>>>({});
+  const [allowedExtensions, dispatch] = useReducer(
+    (state: Record<string, boolean>, action: { type: 'show_extension' | 'hide_extension'; extension: string }) => {
+      let addedState = {} as Record<string, boolean>;
+      switch (action.type) {
+        case 'show_extension':
+          addedState[action.extension] = true;
+          break;
+        case 'hide_extension':
+          addedState[action.extension] = false;
+          break;
+      }
 
-  const set = useCallback(
-    (value: boolean, key: string) => {
-      setAllowedExtensions({ ...allowedExtensions, [key]: value });
+      return { ...state, ...addedState };
     },
-    [allowedExtensions, setAllowedExtensions],
+    {},
   );
 
   return {
-    allowedExtensions,
-    showExtension: set.bind(null, true) as (extension: string) => void,
-    hideExtension: set.bind(null, false) as (extension: string) => void,
+    allowedExtensions: allowedExtensions as Readonly<Record<string, boolean>>,
+    showExtension: (extension: string) => dispatch({ type: 'show_extension', extension }),
+    hideExtension: (extension: string) => dispatch({ type: 'hide_extension', extension }),
   };
 }
 
