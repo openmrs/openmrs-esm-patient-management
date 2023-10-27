@@ -8,7 +8,11 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 
-const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid }) => {
+interface AppointmentMetricsProps {
+  serviceUuid: string;
+}
+
+const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid }) => {
   const { t } = useTranslation();
 
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
