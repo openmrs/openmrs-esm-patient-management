@@ -1,10 +1,14 @@
-import React, { useMemo, CSSProperties, HTMLAttributes } from 'react';
-
+import React, { HTMLAttributes, useMemo, useState, useCallback, type CSSProperties } from 'react';
+import debounce from 'lodash-es/debounce';
+import { useTranslation } from 'react-i18next';
 import {
+  Button,
   DataTable,
+  DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   Layer,
+  Modal,
   Pagination,
   Search,
   Table,
@@ -14,13 +18,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
-import debounce from 'lodash-es/debounce';
-import { ConfigurableLink, useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import { ArrowLeft, TrashCan } from '@carbon/react/icons';
+import { ConfigurableLink, useLayoutType, isDesktop, showToast } from '@openmrs/esm-framework';
+import { removePatientFromList } from '../api/api-remote';
+import { EmptyDataIllustration } from '../patient-list-list/empty-state/empty-data-illustration.component';
 import styles from './patient-table.scss';
 
 // FIXME Temporarily included types from Carbon
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
+
 interface SearchProps extends InputPropsBase {
   /**
    * Specify an optional value for the `autocomplete` property on the underlying
@@ -113,12 +121,14 @@ interface SearchProps extends InputPropsBase {
 }
 
 interface PatientTableProps {
-  patients: Array<Object>;
+  patients;
   columns: Array<PatientTableColumn>;
   style?: CSSProperties;
   autoFocus?: boolean;
   isLoading: boolean;
   isFetching?: boolean;
+  mutateListDetails: () => void;
+  mutateListMembers: () => void;
   search: {
     onSearch(searchTerm: string): any;
     placeHolder: string;
@@ -151,120 +161,225 @@ const PatientTable: React.FC<PatientTableProps> = ({
   search,
   pagination,
   isLoading,
-  autoFocus,
   isFetching,
+  mutateListMembers,
+  mutateListDetails,
 }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
-  const rows: Array<any> = useMemo(
+  const patientListsPath = window.getOpenmrsSpaBase() + 'home/patient-lists';
+
+  const [patientName, setPatientName] = useState('');
+  const [membershipUuid, setMembershipUuid] = useState('');
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const rows: Array<typeof DataTableRow> = useMemo(
     () =>
-      patients.map((patient, index) => {
-        const row = {
-          id: String(index),
-        };
-        columns.forEach((column) => {
-          const value = column.getValue?.(patient) || patient[column.key];
-          row[column.key] = column.link ? (
-            <ConfigurableLink className={styles.link} to={column.link.getUrl(patient)}>
-              {value}
-            </ConfigurableLink>
-          ) : (
-            value
-          );
-        });
-        return row;
-      }),
-    [patients, columns],
+      patients.map((patient) => ({
+        id: patient.identifier,
+        identifier: patient.identifier,
+        membershipUuid: patient.membershipUuid,
+        name: columns.find((column) => column.key === 'name')?.link ? (
+          <ConfigurableLink
+            className={styles.link}
+            to={columns.find((column) => column.key === 'name')?.link?.getUrl(patient)}>
+            {patient.name}
+          </ConfigurableLink>
+        ) : (
+          patient.name
+        ),
+        sex: patient.sex,
+        startDate: patient.startDate,
+      })),
+    [columns, patients],
   );
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), [search]);
+
+  const handleRemovePatientFromList = useCallback(async () => {
+    setIsDeleting(true);
+
+    try {
+      await removePatientFromList(membershipUuid);
+      mutateListMembers();
+      mutateListDetails();
+
+      showToast({
+        critical: true,
+        kind: 'success',
+        description: t('listUpToDate', 'The list is now up to date'),
+        title: t('patientRemovedFromList', 'Patient removed from list'),
+      });
+    } catch (error) {
+      showToast({
+        critical: true,
+        kind: 'error',
+        description: error?.message,
+        title: t('errorRemovingPatientFromList', 'Failed to remove patient from list'),
+      });
+    }
+
+    setIsDeleting(false);
+    setShowConfirmationModal(false);
+  }, [membershipUuid, mutateListDetails, mutateListMembers, t]);
 
   const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
+  const BackButton = () => (
+    <div className={styles.backButton}>
+      <ConfigurableLink to={patientListsPath}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          iconDescription="Return to lists page"
+          size="sm"
+          onClick={() => {}}>
+          <span>{t('backToListsPage', 'Back to lists page')}</span>
+        </Button>
+      </ConfigurableLink>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <DataTableSkeleton
-        data-testid="data-table-skeleton"
-        className={styles.dataTableSkeleton}
-        rowCount={5}
-        columnCount={5}
-        zebra
-      />
+      <div className={styles.skeletonContainer}>
+        <DataTableSkeleton
+          data-testid="data-table-skeleton"
+          className={styles.dataTableSkeleton}
+          rowCount={5}
+          columnCount={5}
+          zebra
+        />
+      </div>
+    );
+  }
+
+  if (patients.length > 0) {
+    return (
+      <>
+        <BackButton />
+        <div className={styles.tableOverride}>
+          <div className={styles.searchContainer}>
+            <div>{isFetching && <InlineLoading />}</div>
+            <div>
+              <Layer>
+                <Search
+                  id="patient-list-search"
+                  placeholder={search.placeHolder}
+                  labelText=""
+                  size={isDesktop(layout) ? 'sm' : 'lg'}
+                  className={styles.searchOverrides}
+                  onChange={(event) => handleSearch(event.target.value)}
+                  defaultValue={search.currentSearchTerm}
+                  {...otherSearchProps}
+                />
+              </Layer>
+            </div>
+          </div>
+          <DataTable rows={rows} headers={columns} isSortable size={isDesktop(layout) ? 'sm' : 'lg'} useZebraStyles>
+            {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
+              <TableContainer>
+                <Table className={styles.table} {...getTableProps()} data-testid="patientsTable">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}
+                          className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
+                          {header.header?.content ?? header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => {
+                      const name = patients.find((patient) => patient.identifier === row.id)?.name;
+
+                      return (
+                        <TableRow
+                          {...getRowProps({ row })}
+                          className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
+                          key={row.id}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                          ))}
+                          <TableCell className="cds--table-column-menu">
+                            <Button
+                              className={styles.removeButton}
+                              kind="ghost"
+                              hasIconOnly
+                              renderIcon={TrashCan}
+                              iconDescription={t('removeFromList', 'Remove from list')}
+                              size={isDesktop(layout) ? 'sm' : 'lg'}
+                              tooltipPosition="left"
+                              onClick={() => {
+                                setMembershipUuid(row.id);
+                                setPatientName(name);
+                                setShowConfirmationModal(true);
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+          {pagination.usePagination && (
+            <Pagination
+              page={pagination.currentPage}
+              pageSize={pagination.pageSize}
+              pageSizes={[10, 20, 30, 40, 50]}
+              totalItems={pagination.totalItems}
+              onChange={pagination.onChange}
+              className={styles.paginationOverride}
+              pagesUnknown={pagination?.pagesUnknown}
+              isLastPage={pagination.lastPage}
+              backwardText="Next Page"
+              forwardText="Previous Page"
+            />
+          )}
+        </div>
+        {showConfirmationModal && (
+          <Modal
+            open
+            danger
+            modalHeading={t(
+              'removePatientFromListConfirmation',
+              'Are you sure you want to remove {{patientName}} from this list?',
+              {
+                patientName: patientName,
+              },
+            )}
+            primaryButtonText={t('removeFromList', 'Remove from list')}
+            secondaryButtonText={t('cancel', 'Cancel')}
+            onRequestClose={() => setShowConfirmationModal(false)}
+            onRequestSubmit={handleRemovePatientFromList}
+            primaryButtonDisabled={isDeleting}
+          />
+        )}
+      </>
     );
   }
 
   return (
-    <div className={styles.tableOverride}>
-      <div className={styles.searchContainer}>
-        <div>{isFetching && <InlineLoading />}</div>
-        <div>
-          <Layer>
-            <Search
-              id="patient-list-search"
-              placeholder={search.placeHolder}
-              labelText=""
-              size={isDesktop(layout) ? 'sm' : 'lg'}
-              className={styles.searchOverrides}
-              onChange={(evnt) => handleSearch(evnt.target.value)}
-              defaultValue={search.currentSearchTerm}
-              {...otherSearchProps}
-            />
-          </Layer>
-        </div>
-      </div>
-      <DataTable
-        rows={rows}
-        headers={columns}
-        isSortable={true}
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-        useZebraStyles={true}>
-        {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} data-testid="patientsTable">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}
-                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    {...getRowProps({ row })}
-                    className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
-                    key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
-      {pagination.usePagination && (
-        <Pagination
-          page={pagination.currentPage}
-          pageSize={pagination.pageSize}
-          pageSizes={[10, 20, 30, 40, 50]}
-          totalItems={pagination.totalItems}
-          onChange={pagination.onChange}
-          className={styles.paginationOverride}
-          pagesUnknown={pagination?.pagesUnknown}
-          isLastPage={pagination.lastPage}
-          backwardText="Next Page"
-          forwardText="Previous Page"
-        />
-      )}
-    </div>
+    <>
+      <BackButton />
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={styles.illo}>
+            <EmptyDataIllustration />
+          </div>
+          <p className={styles.content}>{t('noPatientsInList', 'There are no patients in this list')}</p>
+        </Tile>
+      </Layer>
+    </>
   );
 };
 

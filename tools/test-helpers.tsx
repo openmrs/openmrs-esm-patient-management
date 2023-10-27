@@ -22,6 +22,19 @@ export function waitForLoadingToFinish() {
   });
 }
 
+// Custom matcher that queries elements split up by multiple HTML elements by text
+export function getByTextWithMarkup(text: RegExp | string) {
+  try {
+    return screen.getByText((content, node) => {
+      const hasText = (node: Element) => node.textContent === text || node.textContent.match(text);
+      const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child as HTMLElement));
+      return hasText(node) && childrenDontHaveText;
+    });
+  } catch (error) {
+    throw new Error(`Text '${text}' not found. ${error}`);
+  }
+}
+
 export const mockPatient = {
   resourceType: 'Patient',
   id: '8673ee4f-e2ab-4077-ba55-4980f408773e',
