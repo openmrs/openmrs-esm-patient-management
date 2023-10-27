@@ -9,6 +9,13 @@ import {
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
 import { dashboardMeta, appointmentCalendarDashboardMeta } from './dashboard.meta';
+import {
+  cancelledAppointmentsPanelConfigSchema,
+  checkedInAppointmentsPanelConfigSchema,
+  completedAppointmentsPanelConfigSchema,
+  expectedAppointmentsPanelConfigSchema,
+  missedAppointmentsPanelConfigSchema,
+} from './scheduled-appointments-config-schema';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -19,41 +26,16 @@ const options = {
   moduleName,
 };
 
-const expectedAppointmentsPanelConfigSchema = {
-  title: {
-    _type: Type.Boolean,
-    _description: 'The title to display, may be a translation key or plain text',
-    _default: 'expected',
-  },
-  status: {
-    _type: Type.String,
-    _description:
-      'The status to filter on, must be one of the valid appointment statues: Requested, Scheduled, CheckedIn, Completed, Cancelled, Missed',
-    _default: 'Scheduled',
-  },
-  showForPastDate: {
-    _type: Type.Boolean,
-    _description: 'Whether to display this panel when viewing scheduled appointments for a past date',
-    _default: false,
-  },
-  showForToday: {
-    _type: Type.Boolean,
-    _description: 'Whether to display this panel when viewing scheduled appointments for today',
-    _default: true,
-  },
-  showForFutureDate: {
-    _type: Type.Boolean,
-    _description: 'Whether to display this panel when viewing scheduled appointments for a future date',
-    _default: true,
-  },
-};
-
 export function startupApp() {
   const appointmentsBasePath = `${window.spaBase}/home/appointments`;
 
   defineConfigSchema(moduleName, configSchema);
 
   defineExtensionConfigSchema('expected-appointments-panel', expectedAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('checked-in-appointments-panel', checkedInAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('completed-appointments-panel', completedAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('missed-appointments-panel', missedAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('cancelled-appointments-panel', cancelledAppointmentsPanelConfigSchema);
 
   registerBreadcrumbs([
     {
