@@ -80,7 +80,7 @@ describe('PatientListTableContainer', () => {
     render(<PatientListTableContainer patientLists={[]} listType={''} />);
 
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
-    expect(screen.getByText(/there are no {listType} patient lists to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/there are no {{listType}} patient lists to display/i)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 

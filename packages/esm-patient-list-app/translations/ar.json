@@ -16,7 +16,7 @@
   "editList": "تعديل القائمة",
   "editNameDescription": "تعديل الاسم/ الوصف",
   "editPatientListHeader": "تعديل قائمة المرضى",
-  "emptyStateText": "لا توجد قوائم مرضى من نوع {listType} لعرضها",
+  "emptyStateText": "لا توجد قوائم مرضى من نوع {{listType}} لعرضها",
   "error": "خطأ",
   "errorAddPatientToList": "لم يتم إضافة المريض إلى القائمة",
   "errorCreatePatientListDescription": "تعذر إنشاء قائمة المرضى",

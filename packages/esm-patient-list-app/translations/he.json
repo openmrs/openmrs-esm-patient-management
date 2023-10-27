@@ -16,7 +16,7 @@
   "editList": "ערוך רשימה",
   "editNameDescription": "ערוך שם/ תיאור",
   "editPatientListHeader": "ערוך רשימת מטופלים",
-  "emptyStateText": "There are no {listType} patient lists to display",
+  "emptyStateText": "There are no {{listType}} patient lists to display",
   "error": "שגיאה",
   "errorAddPatientToList": "המטופל לא נוסף לרשימה",
   "errorCreatePatientListDescription": "לא ניתן ליצור רשימת מטופלים",

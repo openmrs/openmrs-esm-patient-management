@@ -95,7 +95,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
           }`}>
           {isLoading ? t('searchingText', 'Searching...') : null}
           {!isLoading
-            ? t('searchResultsCount', '{count} search result', {
+            ? t('searchResultsCount', '{{count}} search result', {
                 count: totalResults,
               })
             : null}

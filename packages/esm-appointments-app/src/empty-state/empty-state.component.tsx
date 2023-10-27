@@ -25,9 +25,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText
         </div>
         <EmptyDataIllustration />
         <p className={styles.content}>
-          <Trans i18nKey="emptyStateText" values={{ displayText: displayText }}>
-            There are no {displayText} to display
-          </Trans>
+          {t('emptyStateText', 'There are no {{displayText}} to display', { displayText })}
         </p>
         {scheduleType === 'Scheduled' ? (
           <p className={styles.action}>

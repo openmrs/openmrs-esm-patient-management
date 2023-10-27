@@ -16,7 +16,7 @@
   "editList": "Edit list",
   "editNameDescription": "Edit Name or Description",
   "editPatientListHeader": "Edit patient list",
-  "emptyStateText": "There are no {listType} patient lists to display",
+  "emptyStateText": "There are no {{listType}} patient lists to display",
   "error": "Error",
   "errorAddPatientToList": "Patient not added to list",
   "errorCreatePatientListDescription": "Couldn't create patient list",

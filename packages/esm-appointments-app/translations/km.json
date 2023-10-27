@@ -64,7 +64,7 @@
   "durationMins": "រយៈពេលអប្បបរមា",
   "editAppointment": "កែសម្រួលការណាត់ជួប",
   "editAppointments": "Edit Appointment",
-  "emptyStateText": "There are no {displayText} to display",
+  "emptyStateText": "There are no {{displayText}} to display",
   "encounters": "ការជួប",
   "encounterType": "ប្រភេទជួប",
   "endTime": "ពេលវេលាបញ្ចប់",
