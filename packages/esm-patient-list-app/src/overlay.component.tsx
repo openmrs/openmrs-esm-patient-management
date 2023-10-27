@@ -18,14 +18,15 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
     <div className={isDesktop(layout) ? styles.desktopOverlay : styles.tabletOverlay}>
       {isDesktop(layout) ? (
         <div className={styles.desktopHeader}>
-          <div className={styles.headerContent}>{header}</div>
+          <span className={styles.headerContent}>{header}</span>
           <Button
             className={styles.closeButton}
-            onClick={close}
-            kind="ghost"
             hasIconOnly
-            renderIcon={(props) => <Close size={16} {...props} />}
             iconDescription="Close overlay"
+            kind="ghost"
+            onClick={close}
+            renderIcon={(props) => <Close size={16} {...props} />}
+            size="lg"
           />
         </div>
       ) : (

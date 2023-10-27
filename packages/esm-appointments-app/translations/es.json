@@ -36,6 +36,7 @@
   "cancel": "Cancelar",
   "cancelAppointment": "Cancelar cita",
   "cancelled": "Cancelada",
+  "cancelledSuccessfully": "It has been cancelled successfully",
   "checkedIn": "Checked in",
   "checkedOut": "Completada",
   "checkFilters": "Compruebe los filtros anteriores",

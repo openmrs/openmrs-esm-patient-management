@@ -1,9 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layer, Button, Tile } from '@carbon/react';
-import { Trans, useTranslation } from 'react-i18next';
+import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import styles from './empty-state.scss';
-import { Add } from '@carbon/react/icons';
 
 export interface EmptyStateProps {
   listType: string;

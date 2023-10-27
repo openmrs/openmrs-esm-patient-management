@@ -75,6 +75,7 @@ export interface OpenmrsCohortMember {
   name: string;
   uuid: string;
   patient: OpenmrsResource;
+  voided: boolean;
 }
 
 export interface CohortResponse<T> {
