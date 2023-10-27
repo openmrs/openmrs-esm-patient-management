@@ -54,12 +54,12 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid })
             highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
           }
           value={highestServiceLoad?.count ?? '--'}
-          headerLabel={t('highestServiceVolume', 'High volume service: {time}', { time: formattedStartDate })}
+          headerLabel={t('highestServiceVolume', 'High volume service: {{time}}', { time: formattedStartDate })}
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
-          headerLabel={t('providersAvailableToday', 'Providers available: {time}', { time: formattedStartDate })}
+          headerLabel={t('providersAvailableToday', 'Providers available: {{time}}', { time: formattedStartDate })}
         />
       </div>
     </>

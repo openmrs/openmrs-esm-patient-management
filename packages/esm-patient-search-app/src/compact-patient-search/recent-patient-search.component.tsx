@@ -75,7 +75,7 @@ const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearch
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>
-              {t('recentSearchResultsCount', '{count} recent search result', {
+              {t('recentSearchResultsCount', '{{count}} recent search result', {
                 count: searchResults.length,
               })}
             </p>

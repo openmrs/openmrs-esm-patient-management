@@ -20,7 +20,7 @@ export const PatientListEmptyState: React.FC<EmptyStateProps> = ({ listType, lau
           <EmptyDataIllustration />
         </div>
         <p className={styles.content}>
-          {t('emptyStateText', 'There are no {listType} patient lists to display', {
+          {t('emptyStateText', 'There are no {{listType}} patient lists to display', {
             listType: listType.toLowerCase(),
           })}
         </p>
