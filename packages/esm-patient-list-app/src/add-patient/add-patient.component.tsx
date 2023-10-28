@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
 import useSWR from 'swr';
 import {
   getDynamicOfflineDataEntries,
@@ -11,11 +12,10 @@ import {
   navigate,
   useConfig,
 } from '@openmrs/esm-framework';
-import { Button, Checkbox, Pagination, Search, SkeletonText, CheckboxSkeleton } from '@carbon/react';
+import { Button, Checkbox, Pagination, Search, CheckboxSkeleton } from '@carbon/react';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
-import { TFunction } from 'i18next';
-import styles from './add-patient.scss';
 import { ConfigSchema } from '../config-schema';
+import styles from './add-patient.scss';
 
 interface AddPatientProps {
   closeModal: () => void;

@@ -40,6 +40,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         onClick={toggleShowMenu}
         style={{
           boxShadow: showMenu ? '0 2px 6px 0 rgb(0 0 0 / 30%)' : 'none',
+          height: '2.5rem',
         }}>
         {menuTitle}
       </button>
@@ -52,6 +53,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         id="custom-actions-overflow-menu"
         style={{
           display: showMenu ? 'block' : 'none',
+          marginTop: '-0.475rem',
         }}>
         <ul className="cds--overflow-menu-options__content">{children}</ul>
         <span />

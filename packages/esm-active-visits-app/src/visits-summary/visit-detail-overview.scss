@@ -26,7 +26,6 @@
 .visitsDetailHeaderContainer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
   background-color: $ui-background;
 }
@@ -39,16 +38,26 @@
   border-bottom: 0.375rem solid $brand-teal-01;
 }
 
-.contentSwitcher :global(.cds--content-switcher-btn) {
-  width: 10rem;
+.customTable {
+  th {
+    padding: 0 !important;
+  }
+
+  tr[data-parent-row]:nth-child(odd) td {
+    background-color: $ui-02;
+  }
+
+  tbody tr[data-parent-row]:nth-child(even) td {
+    background-color: $ui-01;
+  }
 }
 
-.customTable tr[data-parent-row]:nth-child(odd) td {
-  background-color: $ui-02;
-}
-
-.customTable tbody tr[data-parent-row]:nth-child(even) td {
-  background-color: $ui-01;
+.visitEmptyState {
+  text-align: center;
+  background-color: white;
+  padding: 2rem;
+  border: 1px solid $ui-03;
+  width: 100%;
 }
 
 .encounterEmptyState {
@@ -112,6 +121,7 @@
 .tab {
   outline: 0;
   outline-offset: 0;
+  min-height: spacing.$spacing-07;
 
   &:active,
   &:focus {
@@ -172,6 +182,21 @@
 .testSummaryExtension p {
   @include type.type-style('body-01');
   color: #525252;
+}
+
+.actions {
+  margin: 0 1rem;
+}
+
+.contentSwitcher {
+  // TODO: Remove once override gets added to styleguide
+  :global(.cds--content-switcher-btn) {
+    min-width: fit-content;
+  }
+
+  :global(.cds--content-switcher__label) {
+    height: spacing.$spacing-05;
+  }
 }
 
 // Overriding styles for RTL support

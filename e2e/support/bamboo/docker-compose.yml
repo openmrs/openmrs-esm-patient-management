@@ -3,14 +3,19 @@ version: "3.7"
 
 services:
   playwright:
-    image: mcr.microsoft.com/playwright:v1.34.0-jammy # should match with the playwright version in the package.json file
-    container_name: my-playwright-tests-container
+    build:
+      context: .
+      dockerfile: playwright.Dockerfile
+      args:
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+    container_name: playwright-tests-container
     working_dir: /app
     command: sh /app/e2e/support/bamboo/e2e-test-runner.sh
     volumes:
       - ../../../:/app
-    depends_on:
-      - gateway
+    networks:
+      - test
 
   gateway:
     image: openmrs/openmrs-reference-application-3-gateway:${TAG:-nightly}
@@ -19,6 +24,8 @@ services:
       - backend
     ports:
       - "80:80"
+    networks:
+      - test
 
   frontend:
     image: openmrs/openmrs-reference-application-3-frontend:${TAG:-nightly}
@@ -27,43 +34,23 @@ services:
       API_URL: /openmrs
       SPA_CONFIG_URLS:
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: [ "CMD", "curl", "-f", "http://localhost/" ]
       timeout: 5s
     depends_on:
       - backend
+    networks:
+      - test
 
   backend:
-    image: openmrs/openmrs-reference-application-3-backend:${TAG:-nightly}
+    image: openmrs/openmrs-reference-application-3-backend:nightly-with-data
     depends_on:
       - db
-    environment:
-      OMRS_CONFIG_MODULE_WEB_ADMIN: "true"
-      OMRS_CONFIG_AUTO_UPDATE_DATABASE: "true"
-      OMRS_CONFIG_CREATE_TABLES: "true"
-      OMRS_CONFIG_CONNECTION_SERVER: db
-      OMRS_CONFIG_CONNECTION_DATABASE: openmrs
-      OMRS_CONFIG_CONNECTION_USERNAME: ${OPENMRS_DB_USER:-openmrs}
-      OMRS_CONFIG_CONNECTION_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/openmrs"]
-      timeout: 5s
-    volumes:
-      - openmrs-data:/openmrs/data
-    ports:
-      - 9000:8080
-
-  # MariaDB
+    networks:
+      - test
   db:
-    image: mariadb:10.8.2
-    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
-    environment:
-      MYSQL_DATABASE: openmrs
-      MYSQL_USER: ${OPENMRS_DB_USER:-openmrs}
-      MYSQL_PASSWORD: ${OPENMRS_DB_PASSWORD:-openmrs}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-openmrs}
-    volumes:
-      - db-data:/var/lib/mysql
+    image: openmrs/openmrs-reference-application-3-db:nightly-with-data
+    networks:
+      - test
 
-volumes:
-  openmrs-data: ~
-  db-data: ~
+networks:
+  test:

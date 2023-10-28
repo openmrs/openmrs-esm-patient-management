@@ -45,7 +45,7 @@ const StartVisitQueueFields: React.FC = () => {
   return (
     <div className={styles.container}>
       <section className={styles.section}>
-        <div className={styles.sectionTitle}>{t('queueLocation', 'Queue Location')}</div>
+        <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper isTablet={isTablet}>
           <Select
             labelText={t('selectQueueLocation', 'Select a queue location')}
@@ -55,7 +55,7 @@ const StartVisitQueueFields: React.FC = () => {
             value={selectedQueueLocation}
             onChange={(event) => setSelectedQueueLocation(event.target.value)}>
             {!selectedQueueLocation ? (
-              <SelectItem text={t('selectLocation', 'Select a queue location')} value="" />
+              <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
             ) : null}
             {queueLocations?.length > 0 &&
               queueLocations.map((location) => (
@@ -85,7 +85,7 @@ const StartVisitQueueFields: React.FC = () => {
             invalidText="Required"
             value={service}
             onChange={(event) => setSelectedService(event.target.value)}>
-            {!service ? <SelectItem text={t('selectService', 'Select a queue service')} value="" /> : null}
+            {!service ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
             {allServices?.length > 0 &&
               allServices.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.uuid}>

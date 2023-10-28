@@ -8,7 +8,11 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 
-const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid }) => {
+interface AppointmentMetricsProps {
+  serviceUuid: string;
+}
+
+const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid }) => {
   const { t } = useTranslation();
 
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
@@ -50,12 +54,12 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
             highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
           }
           value={highestServiceLoad?.count ?? '--'}
-          headerLabel={t('highestServiceVolume', 'High volume service: {time}', { time: formattedStartDate })}
+          headerLabel={t('highestServiceVolume', 'High volume service: {{time}}', { time: formattedStartDate })}
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
-          headerLabel={t('providersAvailableToday', 'Providers available: {time}', { time: formattedStartDate })}
+          headerLabel={t('providersAvailableToday', 'Providers available: {{time}}', { time: formattedStartDate })}
         />
       </div>
     </>

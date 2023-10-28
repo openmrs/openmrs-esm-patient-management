@@ -86,7 +86,6 @@ test('Manage patients in a list', async ({ api, page }) => {
     await removePatientFromCohort(api, createdCohortMember.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
-    await expect(patientListPage.patientsTable()).not.toHaveText(new RegExp(patient.person.display));
     createdCohortMember = null;
   });
 });

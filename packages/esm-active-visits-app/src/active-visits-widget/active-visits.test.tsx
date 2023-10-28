@@ -8,6 +8,7 @@ const mockedUsePagination = usePagination as jest.Mock;
 const mockActiveVisits = useActiveVisits as jest.Mock;
 
 const mockActiveVisitsData = [{ id: '1', name: 'John Doe', visitType: 'Checkup', patientUuid: 'uuid1' }];
+
 jest.mock('./active-visits.resource', () => ({
   ...jest.requireActual('./active-visits.resource'),
   useActiveVisits: jest.fn(() => ({
@@ -20,6 +21,12 @@ jest.mock('./active-visits.resource', () => ({
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
+  ErrorState: jest.fn(() => (
+    <div>
+      Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site
+      administrator and quote the error code above.
+    </div>
+  )),
   useConfig: jest.fn(() => ({ activeVisits: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
   usePagination: jest.fn().mockImplementation((data) => ({
     currentPage: 1,
@@ -30,10 +37,6 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('ActiveVisitsTable', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders data table with active visits', () => {
     render(<ActiveVisitsTable />);
 
@@ -97,7 +100,7 @@ describe('ActiveVisitsTable', () => {
     });
   });
 
-  it('should display the Error when there is error', () => {
+  it('should display the error state when there is error', () => {
     mockActiveVisits.mockImplementationOnce(() => ({
       activeVisits: undefined,
       isLoading: false,
@@ -107,10 +110,8 @@ describe('ActiveVisitsTable', () => {
 
     render(<ActiveVisitsTable />);
 
-    const expectedColumnHeaders = [/Visit Time/, /ID Number/, /Name/, /Gender/, /Age/, /Visit Type/];
-    expectedColumnHeaders.forEach((header) => {
-      expect(screen.queryByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
-    });
+    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   it('should display the pagination when pagination is true', () => {

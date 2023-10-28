@@ -34,7 +34,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ encounters }) => {
         <StructuredListWrapper>
           <StructuredListHead>
             <StructuredListRow head>
-              <StructuredListCell head>{t('dateTime', 'Date & time')}</StructuredListCell>
+              <StructuredListCell head>{t('date&Time', 'Date & time')}</StructuredListCell>
               <StructuredListCell head>{t('encounterType', 'Encounter type')}</StructuredListCell>
               <StructuredListCell head>{t('provider', 'Provider')}</StructuredListCell>
             </StructuredListRow>

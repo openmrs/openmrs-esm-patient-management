@@ -1,9 +1,8 @@
 import React, { CSSProperties, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
-  DataTableCustomRenderProps,
-  DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
   Layer,
@@ -17,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import orderBy from 'lodash-es/orderBy';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
@@ -34,11 +32,19 @@ import { ErrorState } from './error-state/error-state.component';
 import { PatientListEmptyState } from './empty-state/empty-state.component';
 import styles from './patient-list-list.scss';
 
+/**
+ * FIXME Temporarily moved here
+ */
+interface DataTableHeader {
+  key: string;
+  header: React.ReactNode;
+}
+
 interface PatientListTableContainerProps {
   style?: CSSProperties;
   patientLists: Array<PatientList>;
   isLoading?: boolean;
-  headers?: Array<DataTableHeader<keyof PatientList>>;
+  headers?: Array<DataTableHeader>;
   refetch?(): void;
   listType: string;
   handleCreate?: () => void;
@@ -127,14 +133,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
           </Layer>
         </div>
         <DataTable rows={results} headers={headers} size={isDesktop(layout) ? 'sm' : 'lg'} sortRow={customSortRow}>
-          {({
-            rows,
-            headers,
-            getHeaderProps,
-            getRowProps,
-            getTableProps,
-            getTableContainerProps,
-          }: DataTableCustomRenderProps) => (
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
             <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
               <Table {...getTableProps()} data-testid="patientListsTable" isSortable useZebraStyles>
                 <TableHead>

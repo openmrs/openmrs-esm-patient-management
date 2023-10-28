@@ -1,10 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import AppointmentsBaseTable from './appointments-list.component';
 import { mockSession } from '../../../../__mocks__/session.mock';
 import { useTodaysAppointments } from './appointments-table.resource';
 import { usePagination } from '@openmrs/esm-framework';
-import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
 
 const useTodaysAppointmentsMock = useTodaysAppointments as jest.Mock;
 const usePaginationMock = usePagination as jest.Mock;
@@ -51,7 +50,7 @@ describe('AppointmentsBaseTable', () => {
     useTodaysAppointmentsMock.mockImplementationOnce(() => ({
       appointments: [
         {
-          id: 1,
+          id: '1',
           dateTime: '2023-08-18 10:00 AM',
           name: 'John Doe',
           identifier: 'JD123',
@@ -69,7 +68,7 @@ describe('AppointmentsBaseTable', () => {
       currentPage: 1,
       results: [
         {
-          id: 1,
+          id: '2',
           dateTime: '2023-08-18 10:00 AM',
           name: 'John Doe',
           identifier: 'JD123',

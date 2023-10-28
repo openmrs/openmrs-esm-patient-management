@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
-import { showToast } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import PatientListDetailComponent from './patient-list-detail.component';
 
 const mockedUsePatientListDetails = usePatientListDetails as jest.Mock;
@@ -27,7 +27,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 const mockedPatientListDetails = {
   name: 'Test Patient List',
   description: 'This is a test patient list',
-  size: 5,
+  size: 1,
   startDate: '2023-08-14',
 };
 
@@ -46,60 +46,67 @@ const mockedPatientListMembers = [
       uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
     },
     startDate: '2023-08-10',
+    uuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
   },
 ];
 
 describe('PatientListDetailComponent', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
     mockedUsePatientListDetails.mockReturnValue({
-      data: mockedPatientListDetails,
+      listDetails: mockedPatientListDetails,
     });
 
     mockedUsePatientListMembers.mockReturnValue({
-      data: mockedPatientListMembers,
+      listMembers: mockedPatientListMembers,
     });
 
     mockedDeletePatientList.mockResolvedValue({});
   });
 
-  it('renders patient list details', async () => {
+  it('renders patient list details page', async () => {
     render(<PatientListDetailComponent />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Test Patient List')).toBeInTheDocument();
-      expect(screen.getByText('This is a test patient list')).toBeInTheDocument();
-    });
+    expect(screen.getByRole('heading', { name: /^test patient list$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /this is a test patient list/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /actions/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back to lists page/i })).toBeInTheDocument();
+    expect(screen.getByText(/1 patient/)).toBeInTheDocument();
+    expect(getByTextWithMarkup('Created on: 14-Aug-2023')).toBeInTheDocument();
+    expect(screen.getByText(/edit name or description/i)).toBeInTheDocument();
+    expect(screen.getByText(/delete patient list/i)).toBeInTheDocument();
   });
 
-  it('displays patient list members', async () => {
+  it('renders an empty state view if a list has no patients', async () => {
+    mockedUsePatientListMembers.mockReturnValue({
+      listMembers: [],
+    });
+
     render(<PatientListDetailComponent />);
 
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.getByText('Male')).toBeInTheDocument();
-      expect(screen.getByText('100GEJ')).toBeInTheDocument();
-    });
+    expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
-  it('opens edit overlay when "Edit Name/ Description" is clicked', () => {
+  it('opens overlay with a form when the "Edit name or description" button is clicked', () => {
     render(<PatientListDetailComponent />);
 
     userEvent.click(screen.getByText('Actions'));
-    const editBtn = screen.getByText('Edit Name/ Description');
+    const editBtn = screen.getByText('Edit name or description');
     userEvent.click(editBtn);
   });
 
-  it('deletes patient list and navigates on successful delete', async () => {
+  it('deletes patient list and navigates back to the list page', async () => {
     render(<PatientListDetailComponent />);
 
-    await waitFor(() => {
-      userEvent.click(screen.getByText('Delete'));
-    });
+    await userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText(/delete patient list/i));
 
-    await waitFor(() => {
-      expect(mockedDeletePatientList).toHaveBeenCalledTimes(1);
-      expect(showToast).toHaveBeenCalledTimes(1);
-    });
+    expect(screen.getByText(/Are you sure you want to delete this patient list/i)).toBeInTheDocument();
+    expect(screen.getByText('Delete')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+
+    expect(screen.getByText('Delete').closest('button')).not.toHaveAttribute('disabled');
+
+    await userEvent.click(screen.getByText('Cancel'));
   });
 });

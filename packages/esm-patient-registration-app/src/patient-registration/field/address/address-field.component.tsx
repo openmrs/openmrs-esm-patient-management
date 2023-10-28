@@ -22,14 +22,18 @@ export const AddressComponent: React.FC = () => {
     if (!addressTemplate?.lines) {
       return [];
     }
+
     const allFields = addressTemplate?.lines?.flat();
     const fields = allFields?.filter(({ isToken }) => isToken === 'IS_ADDR_TOKEN');
-
-    return fields.map(({ displayText, codeName }) => ({
-      id: codeName,
-      name: codeName,
-      label: displayText,
-    }));
+    const allRequiredFields = Object.fromEntries(addressTemplate?.requiredElements?.map((curr) => [curr, curr]) || []);
+    return fields.map(({ displayText, codeName }) => {
+      return {
+        id: codeName,
+        name: codeName,
+        label: displayText,
+        required: Boolean(allRequiredFields[codeName]),
+      };
+    });
   }, [addressTemplate]);
 
   const { t } = useTranslation();
@@ -82,7 +86,8 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            selected={selected}
+            value={selected}
+            required={attributes.required}
           />
         ))}
       </AddressComponentContainer>
@@ -122,7 +127,8 @@ export const AddressComponent: React.FC = () => {
             name={`address.${attributes.name}`}
             labelText={t(attributes.label)}
             id={attributes.name}
-            selected={selected}
+            value={selected}
+            required={attributes.required}
           />
         ))
       )}

@@ -37,21 +37,21 @@ describe('ActionsMenu', () => {
       status: 'Scheduled',
     };
 
-    const { getByText } = render(<ActionsMenu appointment={mockAppointment} useBahmniUI="true" />);
+    renderActionsMenu({ appointment: mockAppointment, useBahmniUI: 'true' });
 
-    fireEvent.click(getByText('Edit Appointment'));
-    fireEvent.click(getByText('Check In'));
-    fireEvent.click(getByText('Complete'));
-    fireEvent.click(getByText('Missed'));
-    fireEvent.click(getByText('Cancel'));
-    fireEvent.click(getByText('Add new appointment'));
+    fireEvent.click(screen.getByText(/Edit Appointment/i));
+    fireEvent.click(screen.getByText(/Check In/i));
+    fireEvent.click(screen.getByText(/Complete/i));
+    fireEvent.click(screen.getByText(/Missed/i));
+    fireEvent.click(screen.getByText(/Cancel/i));
+    fireEvent.click(screen.getByText(/Add new appointment/i));
 
-    expect(screen.getByText('Edit Appointment')).toBeInTheDocument();
-    expect(screen.getByText('Check In')).toBeInTheDocument();
-    expect(screen.getByText('Complete')).toBeInTheDocument();
-    expect(screen.getByText('Missed')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Add new appointment')).toBeInTheDocument();
+    expect(screen.getByText(/Edit Appointment/i)).toBeInTheDocument();
+    expect(screen.getByText(/Check In/i)).toBeInTheDocument();
+    expect(screen.getByText(/Complete/i)).toBeInTheDocument();
+    expect(screen.getByText(/Missed/i)).toBeInTheDocument();
+    expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
+    expect(screen.getByText(/Add new appointment/i)).toBeInTheDocument();
   });
 
   it('renders the actions menu with correct options and handlers in non-BahmniUI mode', () => {
@@ -61,14 +61,14 @@ describe('ActionsMenu', () => {
       status: 'CheckedIn',
     };
 
-    const { getByText } = render(<ActionsMenu appointment={mockAppointment} useBahmniUI={undefined} />);
+    renderActionsMenu({ appointment: mockAppointment, useBahmniUI: undefined });
 
-    fireEvent.click(getByText('Edit Appointment'));
-    fireEvent.click(getByText('Check In'));
-    fireEvent.click(getByText('Complete'));
-    fireEvent.click(getByText('Missed'));
-    fireEvent.click(getByText('Cancel'));
-    fireEvent.click(getByText('Add new appointment'));
+    fireEvent.click(screen.getByText(/Edit Appointment/i));
+    fireEvent.click(screen.getByText(/Check In/i));
+    fireEvent.click(screen.getByText(/Complete/i));
+    fireEvent.click(screen.getByText(/Missed/i));
+    fireEvent.click(screen.getByText(/Cancel/i));
+    fireEvent.click(screen.getByText(/Add new appointment/i));
 
     expect(screen.getByText('Edit Appointment')).toBeInTheDocument();
     expect(screen.getByText('Check In')).toBeInTheDocument();
@@ -78,3 +78,7 @@ describe('ActionsMenu', () => {
     expect(screen.getByText('Add new appointment')).toBeInTheDocument();
   });
 });
+
+function renderActionsMenu({ appointment, useBahmniUI }) {
+  return render(<ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />);
+}

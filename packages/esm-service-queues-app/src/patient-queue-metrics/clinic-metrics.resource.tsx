@@ -21,12 +21,19 @@ export function useActiveVisits() {
     openmrsFetch,
   );
 
-  const activeVisitsCount = data?.data?.results.length
-    ? data.data.results.filter((visit) => dayjs(visit.startDatetime).isToday())?.length
-    : 0;
+  // Create a Set to store unique patient UUIDs
+  const uniquePatientUUIDs = new Set();
+
+  data?.data?.results.forEach((visit) => {
+    const patientUUID = visit.patient?.uuid;
+    const isToday = dayjs(visit.startDatetime).isToday();
+    if (patientUUID && isToday) {
+      uniquePatientUUIDs.add(patientUUID);
+    }
+  });
 
   return {
-    activeVisitsCount: activeVisitsCount,
+    activeVisitsCount: uniquePatientUUIDs.size,
     isLoading,
     isError: error,
     isValidating,

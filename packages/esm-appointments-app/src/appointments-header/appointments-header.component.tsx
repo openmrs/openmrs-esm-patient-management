@@ -63,7 +63,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
                 titleText={t('view', 'View')}
                 type="inline"
                 size="sm"
-                direction="left"
+                direction="bottom"
                 onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
               />
             </Layer>

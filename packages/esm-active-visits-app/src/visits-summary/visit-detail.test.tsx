@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import VisitDetailComponent from './visit-detail.component';
 import { useVisit } from './visit.resource';
+import { formatDate } from '@openmrs/esm-framework';
 
 jest.mock('./visit.resource');
 
@@ -23,11 +24,12 @@ describe('VisitDetailComponent', () => {
   });
 
   it('should render visit details and switches when data is available', () => {
+    let visitDate = new Date();
     mockedUseVisit.mockReturnValueOnce({
       visit: {
         uuid: visitUuid,
         visitType: { display: 'Some Visit Type' },
-        startDatetime: '2023-07-29T12:34:56Z',
+        startDatetime: visitDate,
         encounters: [],
       },
       isLoading: false,
@@ -36,7 +38,7 @@ describe('VisitDetailComponent', () => {
     render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
 
     expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
-    expect(screen.getByText(/29-Jul-2023, 12:34 PM/)).toBeInTheDocument();
+    expect(screen.getByText(formatDate(visitDate), { collapseWhitespace: false })).toBeInTheDocument();
 
     expect(screen.getByText('All Encounters')).toBeInTheDocument();
     expect(screen.getByText('Visit Summary')).toBeInTheDocument();
