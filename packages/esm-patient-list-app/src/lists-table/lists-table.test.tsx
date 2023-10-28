@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import PatientListTableContainer from './patient-list-table.component';
 import { useSession } from '@openmrs/esm-framework';
 import { mockSession } from '../../../../__mocks__/session.mock';
-import { PatientList } from '../api/types';
+import type { PatientList } from '../api/types';
+import ListsTable from './lists-table.component';
 
 const mockedUseSession = jest.mocked(useSession);
 
@@ -24,27 +24,18 @@ const patientLists: Array<PatientList> = [
   },
 ];
 
-const header = [
+const tableHeaders = [
   { header: 'List name', key: '1' },
   { header: 'List type', key: '2' },
   { header: 'No. of patients', key: '3' },
   { header: 'Starred', key: '4' },
 ];
 
-describe('PatientListTableContainer', () => {
+describe('ListsTable', () => {
   beforeEach(() => mockedUseSession.mockReturnValue(mockSession.data));
 
   it('renders a loading state when patient list data is getting fetched', () => {
-    render(
-      <PatientListTableContainer
-        error={null}
-        headers={['id', 'name']}
-        isLoading
-        isValidating={false}
-        listType={'My lists'}
-        patientLists={[]}
-      />,
-    );
+    render(<ListsTable error={null} headers={tableHeaders} isLoading listType={'My lists'} patientLists={[]} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
@@ -59,16 +50,13 @@ describe('PatientListTableContainer', () => {
     };
 
     render(
-      <PatientListTableContainer
+      <ListsTable
         error={error}
-        headers={['id', 'name']}
+        headers={tableHeaders}
         isLoading={false}
-        isValidating={false}
         listType={''}
         patientLists={[]}
         refetch={jest.fn()}
-        searchTerm={''}
-        setSearchTerm={jest.fn()}
       />,
     );
 
@@ -77,7 +65,7 @@ describe('PatientListTableContainer', () => {
   });
 
   it('renders an empty state when there is no patient list data to display', () => {
-    render(<PatientListTableContainer patientLists={[]} listType={''} />);
+    render(<ListsTable patientLists={[]} listType={''} />);
 
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patient lists to display/i)).toBeInTheDocument();
@@ -85,7 +73,7 @@ describe('PatientListTableContainer', () => {
   });
 
   it('renders the available patient lists in a datatable', () => {
-    render(<PatientListTableContainer patientLists={patientLists} listType={''} headers={header} />);
+    render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} />);
 
     const headers = ['List name', 'List type', 'No. of patients', 'Starred'];
 

@@ -1,13 +1,12 @@
-import React, { CSSProperties, useState } from 'react';
+import React, { type CSSProperties, useCallback, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import fuzzy from 'fuzzy';
 import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
   DataTableSkeleton,
-  InlineLoading,
   Layer,
   Pagination,
-  Search,
   Table,
   TableBody,
   TableCell,
@@ -15,22 +14,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
+  Tile,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   isDesktop,
   useConfig,
+  useDebounce,
   useLayoutType,
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
+import { updatePatientList } from '../api/api-remote';
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
-import { updatePatientList } from '../api/api-remote';
-import { ErrorState } from './error-state/error-state.component';
-import { PatientListEmptyState } from './empty-state/empty-state.component';
-import styles from './patient-list-list.scss';
+import EmptyState from '../empty-state/empty-state.component';
+import ErrorState from '../error-state/error-state.component';
+import styles from './lists-table.scss';
 
 /**
  * FIXME Temporarily moved here
@@ -40,7 +44,7 @@ interface DataTableHeader {
   header: React.ReactNode;
 }
 
-interface PatientListTableContainerProps {
+interface PatientListTableProps {
   style?: CSSProperties;
   patientLists: Array<PatientList>;
   isLoading?: boolean;
@@ -49,12 +53,9 @@ interface PatientListTableContainerProps {
   listType: string;
   handleCreate?: () => void;
   error?: any;
-  isValidating?: boolean;
-  searchTerm?: string;
-  setSearchTerm?: (searchString: string) => void;
 }
 
-const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
+const ListsTable: React.FC<PatientListTableProps> = ({
   style,
   patientLists = [],
   isLoading = false,
@@ -63,9 +64,6 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   listType,
   handleCreate,
   error,
-  isValidating,
-  searchTerm,
-  setSearchTerm,
 }) => {
   const { t } = useTranslation();
   const userId = useSession()?.user?.uuid;
@@ -74,6 +72,9 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   const pageSizes = [10, 20, 25, 50];
   const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
+  const debouncedSearchTerm = useDebounce(searchTerm);
 
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
@@ -89,12 +90,33 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
     const { key } = props;
     setSortParams({ key, order: sortDirection });
   }
+
   const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
-  const handleSearch = (str) => {
-    setSearchTerm(str);
-    goTo(1);
-  };
+  const filteredLists = useMemo(() => {
+    if (!debouncedSearchTerm) {
+      return results;
+    }
+
+    return debouncedSearchTerm
+      ? fuzzy
+          .filter(debouncedSearchTerm, results, { extract: (list) => `${list.display} ${list.type}` })
+          .sort((r1, r2) => r1.score - r2.score)
+          .map((result) => result.original)
+      : results;
+  }, [results, debouncedSearchTerm]);
+
+  const tableRows = useMemo(
+    () =>
+      filteredLists?.map((list) => ({
+        id: list.id,
+        display: list.display,
+        description: list.description,
+        type: list.type,
+        size: list.size,
+      })) ?? [],
+    [filteredLists],
+  );
 
   if (isLoading) {
     return (
@@ -118,24 +140,26 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
   if (patientLists.length) {
     return (
       <>
-        <div id="tableToolBar" className={styles.searchContainer}>
-          <div>{isValidating && <InlineLoading />}</div>
-          <Layer>
-            <Search
-              className={styles.search}
-              id="patient-list-search"
-              labelText=""
-              onChange={(evnt) => handleSearch(evnt.target.value)}
-              placeholder={t('searchThisList', 'Search this list')}
-              size={isDesktop(layout) ? 'sm' : 'lg'}
-              value={searchTerm}
-            />
-          </Layer>
-        </div>
-        <DataTable rows={results} headers={headers} size={isDesktop(layout) ? 'sm' : 'lg'} sortRow={customSortRow}>
+        <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-            <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
-              <Table {...getTableProps()} data-testid="patientListsTable" isSortable useZebraStyles>
+            <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
+              <div className={styles.toolbarWrapper}>
+                <TableToolbar className={styles.tableToolbar} size={responsiveSize}>
+                  <TableToolbarContent className={styles.headerContainer}>
+                    <TableToolbarSearch
+                      className={styles.searchbox}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                      placeholder={t('searchThisList', 'Search this list')}
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
+              </div>
+              <Table
+                className={styles.table}
+                {...getTableProps()}
+                data-testid="patientListsTable"
+                isSortable
+                useZebraStyles>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -196,6 +220,16 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
             </TableContainer>
           )}
         </DataTable>
+        {filteredLists?.length === 0 && (
+          <div className={styles.filterEmptyState}>
+            <Layer level={0}>
+              <Tile className={styles.filterEmptyStateTile}>
+                <p className={styles.filterEmptyStateContent}>{t('noMatchingLists', 'No matching lists to display')}</p>
+                <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+              </Tile>
+            </Layer>
+          </div>
+        )}
         {paginated && (
           <Layer>
             <Pagination
@@ -223,7 +257,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
     );
   }
 
-  return <PatientListEmptyState launchForm={handleCreate} listType={listType} />;
+  return <EmptyState launchForm={handleCreate} listType={listType} />;
 };
 
-export default PatientListTableContainer;
+export default ListsTable;

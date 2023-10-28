@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import PatientListList from './patient-list-list/patient-list-list.component';
-import PatientListDetailComponent from './patient-list-detail/patient-list-detail.component';
+import ListsDashboard from './lists-dashboard/lists-dashboard.component';
+import ListDetails from './list-details/list-details.component';
 
 const RootComponent: React.FC = () => {
   const patientListsBasename = window.getOpenmrsSpaBase() + 'home/patient-lists';
@@ -9,8 +9,8 @@ const RootComponent: React.FC = () => {
   return (
     <BrowserRouter basename={patientListsBasename}>
       <Routes>
-        <Route path="/" element={<PatientListList />} />
-        <Route path="/:patientListUuid" element={<PatientListDetailComponent />} />
+        <Route path="/" element={<ListsDashboard />} />
+        <Route path="/:patientListUuid" element={<ListDetails />} />
       </Routes>
     </BrowserRouter>
   );

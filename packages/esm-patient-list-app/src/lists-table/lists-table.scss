@@ -1,0 +1,126 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../style.scss';
+
+.tableContainer {
+  padding: 0;
+
+  :global(.cds--data-table-content) {
+    border: 1px solid colors.$gray-20;
+    border-bottom: none;
+    overflow: visible;
+  }
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+    height: 2rem;
+    min-height: 0rem;
+    overflow: visible;
+    top: 0;
+  }
+
+  &:global(.cds--data-table-container) {
+    padding-top: 0rem;
+  }
+}
+
+.toolbarWrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .toolbarWrapper {
+    height: spacing.$spacing-09;
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .toolbarWrapper {
+    height: spacing.$spacing-07;
+  }
+}
+
+.tableToolbar {
+  width: 20%;
+  min-width: 12.5rem;
+}
+
+.headerContainer {
+  background-color: colors.$gray-10;
+}
+
+.searchbox {
+  input {
+    outline: 2px solid colors.$orange-40 !important;
+  }
+}
+
+.table {
+  tr {
+    &:last-of-type {
+      td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.desktopRow,
+.desktopHeader {
+  height: spacing.$spacing-07 !important;
+}
+
+.tabletRow,
+.tabletHeader {
+  height: spacing.$spacing-09 !important;
+}
+
+.tableBody {
+  background-color: $ui-01;
+}
+
+.tableCell,
+.interactiveText01 {
+  color: $interactive-01;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-07;
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

@@ -9,10 +9,10 @@ import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
-import PatientTable from '../patient-table/patient-table.component';
-import styles from './patient-list-detail.scss';
+import ListDetailsTable from '../list-details-table/list-details-table.component';
+import styles from './list-details.scss';
 
-interface PatientListMemberRow {
+interface ListDetails {
   name: string;
   identifier: string;
   sex: string;
@@ -20,7 +20,7 @@ interface PatientListMemberRow {
   uuid: string;
 }
 
-const PatientListDetailComponent = () => {
+const ListDetails = () => {
   const { t } = useTranslation();
   const params = useParams();
   const patientListUuid = params.patientListUuid;
@@ -38,7 +38,7 @@ const PatientListDetailComponent = () => {
   const [showEditPatientListDetailOverlay, setEditPatientListDetailOverlay] = useState(false);
   const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
-  const patients: PatientListMemberRow[] = useMemo(
+  const patients: Array<ListDetails> = useMemo(
     () =>
       listMembers
         ? listMembers?.length
@@ -81,11 +81,6 @@ const PatientListDetailComponent = () => {
     [t],
   );
 
-  const handleSearch = useCallback((str) => {
-    setPageCount(1);
-    setSearchString(str);
-  }, []);
-
   const handleDelete = useCallback(() => {
     setShowDeleteConfirmationModal(true);
   }, []);
@@ -102,7 +97,7 @@ const PatientListDetailComponent = () => {
       .then(() => navigate({ to: `${window.spaBase}/home/patient-lists/` }))
       .catch((e) =>
         showToast({
-          title: t('errorDeleteList', 'Error deleting patient list'),
+          title: t('errorDeletingList', 'Error deleting patient list'),
           description: e?.message,
           kind: 'error',
         }),
@@ -146,17 +141,13 @@ const PatientListDetailComponent = () => {
       </section>
       <section>
         <div className={styles.tableContainer}>
-          <PatientTable
+          <ListDetailsTable
             patients={patients}
             columns={headers}
             isLoading={isLoadingListMembers}
             isFetching={!listMembers}
             mutateListMembers={mutateListMembers}
             mutateListDetails={mutateListDetails}
-            search={{
-              onSearch: handleSearch,
-              placeHolder: 'Search',
-            }}
             pagination={{
               usePagination: listDetails?.size > currentPageSize,
               currentPage,
@@ -206,4 +197,4 @@ const PatientListDetailComponent = () => {
   );
 };
 
-export default PatientListDetailComponent;
+export default ListDetails;

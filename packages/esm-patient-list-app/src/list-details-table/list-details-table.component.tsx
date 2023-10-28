@@ -1,5 +1,5 @@
 import React, { HTMLAttributes, useMemo, useState, useCallback, type CSSProperties } from 'react';
-import debounce from 'lodash-es/debounce';
+import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -21,10 +21,10 @@ import {
   Tile,
 } from '@carbon/react';
 import { ArrowLeft, TrashCan } from '@carbon/react/icons';
-import { ConfigurableLink, useLayoutType, isDesktop, showToast } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType, isDesktop, showToast, useDebounce } from '@openmrs/esm-framework';
 import { removePatientFromList } from '../api/api-remote';
-import { EmptyDataIllustration } from '../patient-list-list/empty-state/empty-data-illustration.component';
-import styles from './patient-table.scss';
+import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
+import styles from './list-details-table.scss';
 
 // FIXME Temporarily included types from Carbon
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
@@ -120,7 +120,7 @@ interface SearchProps extends InputPropsBase {
   value?: string | number;
 }
 
-interface PatientTableProps {
+interface ListDetailsTableProps {
   patients;
   columns: Array<PatientTableColumn>;
   style?: CSSProperties;
@@ -129,12 +129,6 @@ interface PatientTableProps {
   isFetching?: boolean;
   mutateListDetails: () => void;
   mutateListMembers: () => void;
-  search: {
-    onSearch(searchTerm: string): any;
-    placeHolder: string;
-    currentSearchTerm?: string;
-    otherSearchProps?: SearchProps;
-  };
   pagination: {
     usePagination: boolean;
     currentPage: number;
@@ -155,10 +149,9 @@ interface PatientTableColumn {
   };
 }
 
-const PatientTable: React.FC<PatientTableProps> = ({
+const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
   patients,
   columns,
-  search,
   pagination,
   isLoading,
   isFetching,
@@ -167,16 +160,34 @@ const PatientTable: React.FC<PatientTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const patientListsPath = window.getOpenmrsSpaBase() + 'home/patient-lists';
 
-  const [patientName, setPatientName] = useState('');
-  const [membershipUuid, setMembershipUuid] = useState('');
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [membershipUuid, setMembershipUuid] = useState('');
+  const [patientName, setPatientName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm);
 
-  const rows: Array<typeof DataTableRow> = useMemo(
+  const filteredPatients = useMemo(() => {
+    if (!debouncedSearchTerm) {
+      return patients;
+    }
+
+    return debouncedSearchTerm
+      ? fuzzy
+          .filter(debouncedSearchTerm, patients, {
+            extract: (patient: any) => `${patient.name} ${patient.identifier} ${patient.sex}`,
+          })
+          .sort((r1, r2) => r1.score - r2.score)
+          .map((result) => result.original)
+      : patients;
+  }, [debouncedSearchTerm, patients]);
+
+  const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
-      patients.map((patient) => ({
+      filteredPatients?.map((patient) => ({
         id: patient.identifier,
         identifier: patient.identifier,
         membershipUuid: patient.membershipUuid,
@@ -191,11 +202,9 @@ const PatientTable: React.FC<PatientTableProps> = ({
         ),
         sex: patient.sex,
         startDate: patient.startDate,
-      })),
-    [columns, patients],
+      })) ?? [],
+    [columns, filteredPatients],
   );
-
-  const handleSearch = useMemo(() => debounce((searchTerm) => search.onSearch(searchTerm), 300), [search]);
 
   const handleRemovePatientFromList = useCallback(async () => {
     setIsDeleting(true);
@@ -223,8 +232,6 @@ const PatientTable: React.FC<PatientTableProps> = ({
     setIsDeleting(false);
     setShowConfirmationModal(false);
   }, [membershipUuid, mutateListDetails, mutateListMembers, t]);
-
-  const otherSearchProps = useMemo(() => search.otherSearchProps || {}, [search]);
 
   const BackButton = () => (
     <div className={styles.backButton}>
@@ -265,19 +272,17 @@ const PatientTable: React.FC<PatientTableProps> = ({
             <div>
               <Layer>
                 <Search
-                  id="patient-list-search"
-                  placeholder={search.placeHolder}
-                  labelText=""
-                  size={isDesktop(layout) ? 'sm' : 'lg'}
                   className={styles.searchOverrides}
-                  onChange={(event) => handleSearch(event.target.value)}
-                  defaultValue={search.currentSearchTerm}
-                  {...otherSearchProps}
+                  id="patient-list-search"
+                  labelText=""
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                  placeholder={t('searchThisList', 'Search this list')}
+                  size={responsiveSize}
                 />
               </Layer>
             </div>
           </div>
-          <DataTable rows={rows} headers={columns} isSortable size={isDesktop(layout) ? 'sm' : 'lg'} useZebraStyles>
+          <DataTable rows={tableRows} headers={columns} isSortable size={responsiveSize} useZebraStyles>
             {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
               <TableContainer>
                 <Table className={styles.table} {...getTableProps()} data-testid="patientsTable">
@@ -314,7 +319,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
                               hasIconOnly
                               renderIcon={TrashCan}
                               iconDescription={t('removeFromList', 'Remove from list')}
-                              size={isDesktop(layout) ? 'sm' : 'lg'}
+                              size={responsiveSize}
                               tooltipPosition="left"
                               onClick={() => {
                                 setMembershipUuid(currentPatient.membershipUuid);
@@ -331,6 +336,18 @@ const PatientTable: React.FC<PatientTableProps> = ({
               </TableContainer>
             )}
           </DataTable>
+          {filteredPatients?.length === 0 && (
+            <div className={styles.filterEmptyState}>
+              <Layer level={0}>
+                <Tile className={styles.filterEmptyStateTile}>
+                  <p className={styles.filterEmptyStateContent}>
+                    {t('noMatchingPatients', 'No matching patients to display')}
+                  </p>
+                  <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+                </Tile>
+              </Layer>
+            </div>
+          )}
           {pagination.usePagination && (
             <Pagination
               page={pagination.currentPage}
@@ -383,4 +400,4 @@ const PatientTable: React.FC<PatientTableProps> = ({
   );
 };
 
-export default PatientTable;
+export default ListDetailsTable;

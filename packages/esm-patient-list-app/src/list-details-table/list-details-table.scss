@@ -26,7 +26,6 @@ div.tableOverride {
 
 div.tableOverride > div {
   white-space: nowrap;
-  padding: 0px !important;
 }
 
 div#table-tool-bar {
@@ -116,4 +115,33 @@ div#table-tool-bar {
       order: 2;
     }
   }
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-07 !important;
+  text-align: center;
+  border: 1px solid $ui-03;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }

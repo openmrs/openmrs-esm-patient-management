@@ -50,10 +50,8 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
       })
         .then(() =>
           showToast({
-            title: t('successCreatedPatientList', 'Created patient list'),
-            description: `${t('successCreatedPatientListDescription', 'Successfully created patient list')} : ${
-              cohortDetails?.name
-            }`,
+            title: t('created', 'Created'),
+            description: `${t('listCreated', 'List created successfully')}`,
             kind: 'success',
           }),
         )
@@ -62,12 +60,10 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           setSubmitting(false);
         })
         .then(close)
-        .catch(() => {
+        .catch((e) => {
           showToast({
-            title: t('error', 'Error'),
-            description: `${t('errorCreatePatientListDescription', "Couldn't create patient list")} : ${
-              cohortDetails?.name
-            }`,
+            title: t('error', 'Error creating list'),
+            description: e?.message,
             kind: 'error',
           });
           setSubmitting(false);
@@ -76,8 +72,8 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
       editPatientList(patientListDetails.uuid, cohortDetails)
         .then(() =>
           showToast({
-            title: t('successUpdatePatientList', 'Updated patient list'),
-            description: t('successUpdatePatientListDescription', 'Successfully updated patient list'),
+            title: t('updated', 'Updated'),
+            description: t('listUpdated', 'List updated successfully'),
             kind: 'success',
           }),
         )
@@ -86,12 +82,10 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           setSubmitting(false);
         })
         .then(close)
-        .catch(() => {
+        .catch((e) => {
           showToast({
-            title: t('error', 'Error'),
-            description: `${t('errorUpdatePatientListDescription', "Couldn't update patient list")} : ${
-              cohortDetails?.name
-            }`,
+            title: t('errorUpdatingList', 'Error updating list'),
+            description: e?.message,
             kind: 'error',
           });
           setSubmitting(false);

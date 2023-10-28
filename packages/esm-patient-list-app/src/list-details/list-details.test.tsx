@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import PatientListDetailComponent from './patient-list-detail.component';
+import ListDetails from './list-details.component';
 
 const mockedUsePatientListDetails = usePatientListDetails as jest.Mock;
 const mockedUsePatientListMembers = usePatientListMembers as jest.Mock;
@@ -50,7 +50,7 @@ const mockedPatientListMembers = [
   },
 ];
 
-describe('PatientListDetailComponent', () => {
+describe('ListDetails', () => {
   beforeEach(() => {
     mockedUsePatientListDetails.mockReturnValue({
       listDetails: mockedPatientListDetails,
@@ -64,7 +64,7 @@ describe('PatientListDetailComponent', () => {
   });
 
   it('renders patient list details page', async () => {
-    render(<PatientListDetailComponent />);
+    render(<ListDetails />);
 
     expect(screen.getByRole('heading', { name: /^test patient list$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /this is a test patient list/i })).toBeInTheDocument();
@@ -81,14 +81,14 @@ describe('PatientListDetailComponent', () => {
       listMembers: [],
     });
 
-    render(<PatientListDetailComponent />);
+    render(<ListDetails />);
 
     expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
   it('opens overlay with a form when the "Edit name or description" button is clicked', () => {
-    render(<PatientListDetailComponent />);
+    render(<ListDetails />);
 
     userEvent.click(screen.getByText('Actions'));
     const editBtn = screen.getByText('Edit name or description');
@@ -96,7 +96,7 @@ describe('PatientListDetailComponent', () => {
   });
 
   it('deletes patient list and navigates back to the list page', async () => {
-    render(<PatientListDetailComponent />);
+    render(<ListDetails />);
 
     await userEvent.click(screen.getByText('Actions'));
     await userEvent.click(screen.getByText(/delete patient list/i));
