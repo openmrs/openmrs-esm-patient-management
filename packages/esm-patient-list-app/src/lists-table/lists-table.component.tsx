@@ -16,9 +16,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
   Tile,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
@@ -34,8 +31,8 @@ import {
 import { updatePatientList } from '../api/api-remote';
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
+import { ErrorState } from '../error-state/error-state.component';
 import EmptyState from '../empty-state/empty-state.component';
-import ErrorState from '../error-state/error-state.component';
 import styles from './lists-table.scss';
 
 /**

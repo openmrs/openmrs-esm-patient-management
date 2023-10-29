@@ -73,7 +73,7 @@ const ListsDashboard: React.FC = () => {
   ];
 
   if (showCohortType) {
-    tableHeaders.push({ id: 2, key: 'type', header: t('listType', 'List type') });
+    tableHeaders.splice(1, 0, { id: 2, key: 'type', header: t('listType', 'List type') });
   }
 
   return (
