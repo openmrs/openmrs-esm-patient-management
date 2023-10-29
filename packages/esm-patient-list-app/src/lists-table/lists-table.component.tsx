@@ -1,12 +1,14 @@
-import React, { type CSSProperties, useCallback, useState, useMemo } from 'react';
+import React, { type CSSProperties, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import fuzzy from 'fuzzy';
 import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
   Layer,
   Pagination,
+  Search,
   Table,
   TableBody,
   TableCell,
@@ -48,6 +50,7 @@ interface PatientListTableProps {
   style?: CSSProperties;
   patientLists: Array<PatientList>;
   isLoading?: boolean;
+  isValidating?: boolean;
   headers?: Array<DataTableHeader>;
   refetch?(): void;
   listType: string;
@@ -59,6 +62,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   style,
   patientLists = [],
   isLoading = false,
+  isValidating,
   headers,
   refetch,
   listType,
@@ -140,20 +144,23 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   if (patientLists.length) {
     return (
       <>
+        <div id="tableToolBar" className={styles.searchContainer}>
+          <div>{isValidating && <InlineLoading />}</div>
+          <Layer>
+            <Search
+              className={styles.searchbox}
+              id="patient-list-search"
+              labelText=""
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={responsiveSize}
+              value={searchTerm}
+            />
+          </Layer>
+        </div>
         <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-            <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
-              <div className={styles.toolbarWrapper}>
-                <TableToolbar className={styles.tableToolbar} size={responsiveSize}>
-                  <TableToolbarContent className={styles.headerContainer}>
-                    <TableToolbarSearch
-                      className={styles.searchbox}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                      placeholder={t('searchThisList', 'Search this list')}
-                    />
-                  </TableToolbarContent>
-                </TableToolbar>
-              </div>
+            <TableContainer {...getTableContainerProps()}>
               <Table
                 className={styles.table}
                 {...getTableProps()}

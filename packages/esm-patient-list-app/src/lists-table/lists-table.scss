@@ -3,61 +3,6 @@
 @use '@carbon/styles/scss/type';
 @import '../style.scss';
 
-.tableContainer {
-  padding: 0;
-
-  :global(.cds--data-table-content) {
-    border: 1px solid colors.$gray-20;
-    border-bottom: none;
-    overflow: visible;
-  }
-
-  :global(.cds--table-toolbar) {
-    position: relative;
-    height: 2rem;
-    min-height: 0rem;
-    overflow: visible;
-    top: 0;
-  }
-
-  &:global(.cds--data-table-container) {
-    padding-top: 0rem;
-  }
-}
-
-.toolbarWrapper {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-}
-
-:global(.omrs-breakpoint-lt-desktop) {
-  .toolbarWrapper {
-    height: spacing.$spacing-09;
-  }
-}
-
-:global(.omrs-breakpoint-gt-tablet) {
-  .toolbarWrapper {
-    height: spacing.$spacing-07;
-  }
-}
-
-.tableToolbar {
-  width: 20%;
-  min-width: 12.5rem;
-}
-
-.headerContainer {
-  background-color: colors.$gray-10;
-}
-
-.searchbox {
-  input {
-    outline: 2px solid colors.$orange-40 !important;
-  }
-}
-
 .table {
   tr {
     &:last-of-type {
@@ -105,9 +50,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: spacing.$spacing-07;
+  padding: spacing.$spacing-09;
   text-align: center;
   border: 1px solid $ui-03;
+  background-color: white;
 }
 
 .filterEmptyStateTile {
@@ -123,4 +69,23 @@
 .filterEmptyStateHelper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+// Patient List Table
+.searchContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.searchContainer > div {
+  align-self: center;
+  justify-self: flex-end;
+}
+
+.searchbox {
+  width: 100%;
+  max-width: 16rem;
+  background-color: $ui-02;
+  border-bottom-color: $ui-03;
 }

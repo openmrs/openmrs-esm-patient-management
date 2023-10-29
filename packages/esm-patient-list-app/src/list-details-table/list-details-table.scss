@@ -126,9 +126,10 @@ div#table-tool-bar {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: spacing.$spacing-07 !important;
+  padding: spacing.$spacing-09 !important;
   text-align: center;
   border: 1px solid $ui-03;
+  background-color: white;
 }
 
 .filterEmptyStateTile {
