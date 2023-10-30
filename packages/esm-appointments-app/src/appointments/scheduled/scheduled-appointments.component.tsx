@@ -29,6 +29,10 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   const { t } = useTranslation();
   const { currentAppointmentDate: date } = useAppointmentDate();
 
+  // added to prevent auto-removal of translations for dynamic keys
+  // t('checkedIn', 'Checked In');
+  // t('expected', 'Expected');
+
   const [currentTab, setCurrentTab] = useState<string>(null);
   const [dateType, setDateType] = useState<DateType>('today');
   const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);

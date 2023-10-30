@@ -17,10 +17,6 @@ import {
   missedAppointmentsPanelConfigSchema,
 } from './scheduled-appointments-config-schema';
 
-// added to prevent auto-removal of translations for dynamic keys
-// t('checkedIn', 'Checked In')
-// t('expected', 'Expected')
-
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-appointments-app';
