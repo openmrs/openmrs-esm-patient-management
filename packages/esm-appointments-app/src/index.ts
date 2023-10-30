@@ -4,7 +4,6 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
-  Type,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink';
