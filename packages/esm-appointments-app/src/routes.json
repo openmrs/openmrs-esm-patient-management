@@ -64,6 +64,10 @@
       "name": "cancelled-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
       "component": "appointmentsByStatus"
+    },
+    {
+      "name": "early-appointments-panel",
+      "component": "earlyAppointments"
     }
   ]
 }

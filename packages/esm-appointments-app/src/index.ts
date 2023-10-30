@@ -12,6 +12,7 @@ import {
   cancelledAppointmentsPanelConfigSchema,
   checkedInAppointmentsPanelConfigSchema,
   completedAppointmentsPanelConfigSchema,
+  earlyAppointmentsPanelConfigSchema,
   expectedAppointmentsPanelConfigSchema,
   missedAppointmentsPanelConfigSchema,
 } from './scheduled-appointments-config-schema';
@@ -35,6 +36,7 @@ export function startupApp() {
   defineExtensionConfigSchema('completed-appointments-panel', completedAppointmentsPanelConfigSchema);
   defineExtensionConfigSchema('missed-appointments-panel', missedAppointmentsPanelConfigSchema);
   defineExtensionConfigSchema('cancelled-appointments-panel', cancelledAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('early-appointments-panel', earlyAppointmentsPanelConfigSchema);
 
   registerBreadcrumbs([
     {

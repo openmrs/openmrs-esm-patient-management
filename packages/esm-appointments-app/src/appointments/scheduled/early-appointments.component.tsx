@@ -9,6 +9,10 @@ interface EarlyAppointmentsProps {
   date: string;
 }
 
+/**
+ * Component to display early appointments
+ * Note that although we define this extension in routes.jsx, we currently don't wire it into the scheduled-appointments-panels-slot by default because it requests a custom endpoint (see useEarlyAppointments) not provided by the standard Bahmni Appointments module
+ */
 const EarlyAppointments: React.FC<EarlyAppointmentsProps> = ({ appointmentServiceType, date }) => {
   const { t } = useTranslation();
   const { earlyAppointmentList, isLoading } = useEarlyAppointmentList(date);

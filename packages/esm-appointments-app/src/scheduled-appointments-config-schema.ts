@@ -144,3 +144,26 @@ export const cancelledAppointmentsPanelConfigSchema = {
     _default: true,
   },
 };
+
+export const earlyAppointmentsPanelConfigSchema = {
+  title: {
+    _type: Type.Boolean,
+    _description: 'The title to display, may be a translation key or plain text',
+    _default: 'cameEarly',
+  },
+  showForPastDate: {
+    _type: Type.Boolean,
+    _description: 'Whether to display this panel when viewing scheduled appointments for a past date',
+    _default: true,
+  },
+  showForToday: {
+    _type: Type.Boolean,
+    _description: 'Whether to display this panel when viewing scheduled appointments for today',
+    _default: true,
+  },
+  showForFutureDate: {
+    _type: Type.Boolean,
+    _description: 'Whether to display this panel when viewing scheduled appointments for a future date',
+    _default: false,
+  },
+};
