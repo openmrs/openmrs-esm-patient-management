@@ -139,14 +139,8 @@ export function usePatientListMembers(
     openmrsFetch,
   );
 
-  // FIXME: This is a workaround for removing a patient from a list
-  const filterList = (listMembers: Array<OpenmrsCohortMember>) =>
-    listMembers.filter((member) => !member.endDate && !member.voided);
-
-  const filteredListMembers = filterList(data?.data?.results ?? []);
-
   return {
-    listMembers: filteredListMembers,
+    listMembers: data?.data?.results ?? [],
     isLoadingListMembers: isLoading,
     error: error,
     mutateListMembers: mutate,

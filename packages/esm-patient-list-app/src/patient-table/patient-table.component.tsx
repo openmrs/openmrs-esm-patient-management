@@ -297,7 +297,7 @@ const PatientTable: React.FC<PatientTableProps> = ({
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => {
-                      const name = patients.find((patient) => patient.identifier === row.id)?.name;
+                      const currentPatient = patients.find((patient) => patient.identifier === row.id);
 
                       return (
                         <TableRow
@@ -317,8 +317,8 @@ const PatientTable: React.FC<PatientTableProps> = ({
                               size={isDesktop(layout) ? 'sm' : 'lg'}
                               tooltipPosition="left"
                               onClick={() => {
-                                setMembershipUuid(row.id);
-                                setPatientName(name);
+                                setMembershipUuid(currentPatient.membershipUuid);
+                                setPatientName(currentPatient.name);
                                 setShowConfirmationModal(true);
                               }}
                             />
