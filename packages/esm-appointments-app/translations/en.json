@@ -68,6 +68,8 @@
   "encounters": "Encounters",
   "encounterType": "Encounter type",
   "endTime": "End Time",
+  "expected": "Expected",
+  "facility": "Facility",
   "errorCancellingAppointment": "Error cancelling the appointment",
   "errorCheckingAppoitment": "Error checking in the appointment",
   "errorCreatingAppointmentService": "Error creating appointment service",
