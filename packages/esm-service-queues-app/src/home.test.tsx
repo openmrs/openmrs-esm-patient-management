@@ -15,6 +15,11 @@ jest.mock('@openmrs/esm-framework', () => ({
   })),
 }));
 
+jest.mock('./helpers/helpers.ts', () => ({
+  ...jest.requireActual('./helpers/helpers.ts'),
+  useSelectedQueueLocationName: jest.fn(() => 'Test Location'),
+}));
+
 describe('Home Component', () => {
   it('renders PatientQueueHeader, ClinicMetrics, and ActiveVisitsTabs when activeTicketScreen is not "screen"', () => {
     // Mock window.location.pathname

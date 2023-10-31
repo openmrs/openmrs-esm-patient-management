@@ -42,7 +42,13 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
       default:
         return (
           <InlineNotification kind="error" title="Error">
-            Patient attribute type has unknown format "{personAttributeType.format}"
+            {t(
+              'unknownPatientAttributeType',
+              'Patient attribute type has unknown format {{personAttributeTypeFormat}}',
+              {
+                personAttributeTypeFormat: personAttributeType.format,
+              },
+            )}
           </InlineNotification>
         );
     }
@@ -62,7 +68,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
       <div>
         {fieldDefinition.showHeading && <h4 className={styles.productiveHeading02Light}>{fieldDefinition?.label}</h4>}
         <InlineNotification kind="error" title={t('error', 'Error')}>
-          {t('unableToFetch', 'Unable to fetch person attribute type - {personattributetype}', {
+          {t('unableToFetch', 'Unable to fetch person attribute type - {{personattributetype}}', {
             personattributetype: fieldDefinition?.label ?? fieldDefinition?.id,
           })}
         </InlineNotification>

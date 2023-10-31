@@ -1,9 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layer, Button, Tile } from '@carbon/react';
-import { Trans, useTranslation } from 'react-i18next';
+import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import styles from './empty-state.scss';
-import { Add } from '@carbon/react/icons';
 
 export interface EmptyStateProps {
   listType: string;
@@ -20,7 +20,7 @@ export const PatientListEmptyState: React.FC<EmptyStateProps> = ({ listType, lau
           <EmptyDataIllustration />
         </div>
         <p className={styles.content}>
-          {t('emptyStateText', 'There are no {listType} patient lists to display', {
+          {t('emptyStateText', 'There are no {{listType}} patient lists to display', {
             listType: listType.toLowerCase(),
           })}
         </p>

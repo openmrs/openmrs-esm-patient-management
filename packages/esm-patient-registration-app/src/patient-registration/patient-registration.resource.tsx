@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { Patient, Relationship, PatientIdentifier, Encounter } from './patient-registration.types';
 
 export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
@@ -181,12 +179,25 @@ export function usePatientPhoto(patientUuid: string): UsePatientPhotoResult {
   };
 }
 
-export async function fetchPerson(query: string) {
-  const abortController = new AbortController();
+export async function fetchPerson(query: string, abortController: AbortController) {
+  const [patientsRes, personsRes] = await Promise.all([
+    openmrsFetch(`/ws/rest/v1/patient?q=${query}`, {
+      signal: abortController.signal,
+    }),
+    openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
+      signal: abortController.signal,
+    }),
+  ]);
 
-  return openmrsFetch(`/ws/rest/v1/person?q=${query}`, {
-    signal: abortController.signal,
+  const results = [...patientsRes.data.results];
+
+  personsRes.data.results.forEach((person) => {
+    if (!results.some((patient) => patient.uuid === person.uuid)) {
+      results.push(person);
+    }
   });
+
+  return results;
 }
 
 export async function addPatientIdentifier(patientUuid: string, patientIdentifier: PatientIdentifier) {

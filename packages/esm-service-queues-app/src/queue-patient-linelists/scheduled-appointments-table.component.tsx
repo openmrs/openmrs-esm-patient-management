@@ -37,6 +37,14 @@ import { updateSelectedAppointmentStatus, useSelectedAppointmentStatus } from '.
 import { useAppointments } from './queue-linelist.resource';
 import { getGender } from '../helpers/functions';
 
+/**
+ * FIXME Temporarily moved here
+ */
+interface DataTableHeader {
+  key: string;
+  header: React.ReactNode;
+}
+
 type FilterProps = {
   rowIds: Array<string>;
   headers: Array<DataTableHeader>;
@@ -124,7 +132,7 @@ const AppointmentsTable: React.FC = () => {
       },
       {
         id: 6,
-        header: t('phoneNumber', 'Phone Number'),
+        header: t('phoneNumber', 'Phone number'),
         key: 'phoneNumber',
       },
     ],

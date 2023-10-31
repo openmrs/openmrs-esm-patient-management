@@ -30,6 +30,8 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
+  const defaultVisitType = results?.length === 1 ? results[0].uuid : '';
+
   return (
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
       {results.length ? (
@@ -52,7 +54,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
           <RadioButtonGroup
             className={styles.radioButtonGroup}
-            defaultSelected={results?.length === 1 && results[0].uuid}
+            defaultSelected={defaultVisitType}
             orientation="vertical"
             onChange={onChange}
             name="radio-button-group"
@@ -66,7 +68,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
         <Layer>
           <Tile className={styles.tile}>
             <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('visitType', 'Visit type')}</h4>
+              <h4>{t('visitType', 'Visit Type')}</h4>
             </div>
             <EmptyDataIllustration />
             <p className={styles.content}>

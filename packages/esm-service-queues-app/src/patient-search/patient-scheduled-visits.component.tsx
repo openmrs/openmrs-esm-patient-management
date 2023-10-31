@@ -148,7 +148,7 @@ const ScheduledVisits: React.FC<{
                     if (status === 201) {
                       showToast({
                         kind: 'success',
-                        title: t('startVisit', 'Start a visit'),
+                        title: t('startAVisit', 'Start a visit'),
                         description: t(
                           'startVisitQueueSuccessfully',
                           'Patient has been added to active visits list and queue.',
@@ -305,7 +305,7 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={appointments?.recentVisits}
-        scheduledVisitHeader={t('recentScheduledVisits', '{count} visit(s) scheduled for +/- 7 days', {
+        scheduledVisitHeader={t('recentScheduledVisits', '{{count}} visit(s) scheduled for +/- 7 days', {
           count: appointments?.recentVisits?.length,
         })}
         patientUuid={patientUuid}
@@ -314,14 +314,14 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
       <ScheduledVisits
         visitType={visitType.FUTURE}
         visits={appointments?.futureVisits}
-        scheduledVisitHeader={t('futureScheduledVisits', '{count} visit(s) scheduled for dates in the future', {
+        scheduledVisitHeader={t('futureScheduledVisits', '{{count}} visit(s) scheduled for dates in the future', {
           count: appointments?.futureVisits?.length,
         })}
         patientUuid={patientUuid}
         closePanel={closePanel}
       />
 
-      <div className={styles['text-divider']}>{t('or', 'Or')}</div>
+      <div className={styles['text-divider']}>{t('orInProperFormat', 'Or')}</div>
 
       <div className={styles.buttonContainer}>
         <Button

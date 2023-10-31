@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Grid, Layer, Row, Tile } from '@carbon/react';
+import { Button, Tile } from '@carbon/react';
 import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
@@ -144,7 +144,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
                 {t('vitalsNotRecordedForVisit', 'Vitals has not been recorded for this patient for this visit')}
               </p>
               <Button
-                size="small"
+                size="sm"
                 kind="ghost"
                 renderIcon={(props) => <ArrowRight size={16} {...props} />}
                 onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}

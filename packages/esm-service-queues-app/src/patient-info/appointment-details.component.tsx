@@ -67,7 +67,7 @@ const UpcomingAppointmentDetails: React.FC<UpcomingAppointmentDetailsProps> = ({
     return (
       <div className={styles.widgetCard}>
         <React.Fragment>
-          <p className={styles.title}>{t('returnDate', 'Return date')}</p>
+          <p className={styles.title}>{t('returnDate', 'Return Date')}</p>
           <p className={styles.subtitle}>
             {formatDatetime(parseDate(upcomingAppointment?.startDateTime))} ·{' '}
             {upcomingAppointment?.service ? upcomingAppointment?.service?.name : '--'} ·{' '}

@@ -311,7 +311,7 @@ export async function updateQueueEntry(
         patient: {
           uuid: patientUuid,
         },
-        startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        startedAt: new Date(),
         sortWeight: sortWeight,
         queueComingFrom: previousQueueUuid,
       },
@@ -396,7 +396,7 @@ export async function addQueueEntry(
         patient: {
           uuid: patientUuid,
         },
-        startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+        startedAt: new Date(),
         sortWeight: sortWeight,
       },
     },

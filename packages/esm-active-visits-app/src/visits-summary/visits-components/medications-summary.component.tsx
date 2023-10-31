@@ -29,7 +29,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                   &mdash; {medication.order.frequency?.display} &mdash;{' '}
                   {!medication.order.duration
                     ? t('orderIndefiniteDuration', 'Indefinite duration')
-                    : t('orderDurationAndUnit', 'for {duration} {durationUnit}', {
+                    : t('orderDurationAndUnit', 'for {{duration}} {{durationUnit}}', {
                         duration: medication.order.duration,
                         durationUnit: medication.order.durationUnits?.display,
                       })}

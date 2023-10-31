@@ -46,6 +46,13 @@
       "offline": true
     },
     {
+      "component": "editPatientDetailsButton",
+      "name": "edit-patient-details-button",
+      "slot": "patient-search-actions-slot",
+      "online": true,
+      "offline": true
+    },
+    {
       "component": "deleteIdentifierConfirmationModal",
       "name": "delete-identifier-confirmation-modal",
       "online": true,

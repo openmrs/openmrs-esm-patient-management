@@ -110,7 +110,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       <DataTable rows={rowData} headers={headerData} isSortable useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
           <TableContainer
-            title={`${startCase(tableHeading)} ${t('appointments', 'appointment')}`}
+            title={`${startCase(tableHeading)} ${t('appointment', 'appointment')}`}
             description={`${t(`Total ${appointments.length ?? 0}`)}`}
             {...getTableContainerProps()}>
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">

@@ -18,6 +18,7 @@ import {
   TableExpandedRow,
   Tile,
 } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import {
   useLayoutType,
   isDesktop,
@@ -28,7 +29,6 @@ import {
   navigate,
   ErrorState,
 } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useActiveVisits, getOriginFromPathName } from './active-visits.resource';
 import styles from './active-visits.scss';

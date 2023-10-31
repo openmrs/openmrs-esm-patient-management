@@ -3,15 +3,19 @@
 @import './style.scss';
 
 .desktopOverlay {
-  position: sticky;
+  position: fixed;
+  right: 0;
+  width: 37rem;
   top: spacing.$spacing-09;
   height: calc(100vh - 3rem);
   min-width: 27rem;
-  background-color: $ui-02;
+  background-color: $ui-01;
   border-left: 1px solid $text-03;
-  overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 99999;
 }
 
 .tabletOverlay {
@@ -43,6 +47,7 @@
   align-items: center;
   background-color: $ui-03;
   border-bottom: 1px solid $text-03;
+  height: 2.5rem;
 }
 
 .headerContent {
@@ -52,12 +57,26 @@
 }
 
 .closeButton {
+  border: none;
+  border-bottom: 1px solid $text-03;
   background-color: $ui-02;
+  padding-block-start: 0.75rem;
+  // FIXME: Why are carbon's default button styles not working?
+  height: 2.5rem;
+  width: 2.5rem;
 }
 
 .overlayContent {
   padding: spacing.$spacing-05;
   overflow-y: auto;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .overlayContent {
+  background-color: #ededed;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .overlayContent {
+  background-color: white;
 }
 
 .buttonsGroup {

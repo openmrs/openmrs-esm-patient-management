@@ -39,7 +39,7 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
         title: t('appointmentCheckInError', 'Error checking in appointment'),
         kind: 'error',
         critical: true,
-        description: t('errorMessage', 'Error checking in the appointment'),
+        description: t('errorCheckingAppoitment', 'Error checking in the appointment'),
       });
       setIsSubmitting(false);
     }

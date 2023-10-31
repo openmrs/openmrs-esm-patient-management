@@ -58,7 +58,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
             showToast({
               title: t('addQueueRoom', 'Add queue room'),
               kind: 'success',
-              description: t('queueRoomAddedSuccessfully', 'Queue room addeded successfully'),
+              description: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
             closePanel();
             mutate(`/ws/rest/v1/queueroom`);

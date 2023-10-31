@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tag, Button } from '@carbon/react';
+import { Button, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
@@ -37,7 +37,7 @@ const TriageNote: React.FC<TriageNoteProps> = ({ notes, patientUuid, diagnoses }
         <div>
           <p className={styles.emptyText}>{t('tirageNotYetCompleted', 'Triage has not yet been completed')}</p>
           <Button
-            size="small"
+            size="sm"
             kind="ghost"
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
             onClick={() => navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` })}

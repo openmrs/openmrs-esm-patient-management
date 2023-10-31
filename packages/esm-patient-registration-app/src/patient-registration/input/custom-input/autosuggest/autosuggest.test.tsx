@@ -38,7 +38,7 @@ describe('autosuggest', () => {
       <BrowserRouter>
         <Autosuggest
           labelText=""
-          name="person"
+          id="person"
           placeholder="Find Person"
           onSuggestionSelected={handleSuggestionSelected}
           getSearchResults={mockGetSearchResults}

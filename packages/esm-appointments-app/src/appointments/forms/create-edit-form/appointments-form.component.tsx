@@ -4,25 +4,21 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  ContentSwitcher,
   DatePicker,
   DatePickerInput,
-  RadioButton,
-  RadioButtonGroup,
+  Layer,
   Select,
   SelectItem,
-  Switch,
-  TimePicker,
-  TimePickerSelect,
-  Toggle,
   SkeletonText,
   Tab,
   TabList,
-  Tabs,
   TabPanel,
   TabPanels,
+  Tabs,
   TextArea,
-  Layer,
+  TimePicker,
+  TimePickerSelect,
+  Toggle,
 } from '@carbon/react';
 import {
   useLocations,
@@ -34,9 +30,7 @@ import {
   ConfigObject,
   useSession,
 } from '@openmrs/esm-framework';
-
 import first from 'lodash-es/first';
-import styles from './appointments-form.scss';
 import { mutate } from 'swr';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
@@ -50,9 +44,10 @@ import {
 } from '../forms.resource';
 import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
 import { useCalendarDistribution } from '../workload-helper';
-import WorkloadCard from '../workload.component';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
 import LocationSelectOption from '../../common-components/location-select-option.component';
+import WorkloadCard from '../workload.component';
+import styles from './appointments-form.scss';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -82,7 +77,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
-  const today = dayjs().startOf('day').toDate();
+  const today = dayjs().startOf('day').format();
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
@@ -163,20 +158,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         </div>
       )}
 
-      <div className={styles.inputContainer} id="appointment-place">
-        <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
-        <ContentSwitcher className={styles.inputContainer} data-testid="appointment-place">
-          <Switch value="facility" id="facility" text={t('facility', 'Facility')}>
-            {t('facility', 'Facility')}
-          </Switch>
-          <Switch value="community" id="community" text={t('community', 'Community')}>
-            {t('community', 'Community')}
-          </Switch>
-        </ContentSwitcher>
-      </div>
+      <p>{t('selectAppointmentLocation', 'Select where the appointment will take place')}</p>
 
       <Select
-        labelText={t('selectLocation', 'Select a location')}
+        labelText={t('selectALocation', 'Select a location')}
         id="location"
         invalidText="Required"
         value={selectedLocation}
@@ -290,7 +275,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
               onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
               className={styles.tabs}>
               <TabList style={{ paddingLeft: '1rem' }}>
-                <Tab>{t('weekly', 'WeeKly')}</Tab>
+                <Tab>{t('weekly', 'Weekly')}</Tab>
                 <Tab>{t('monthly', 'Monthly')}</Tab>
               </TabList>
               <TabPanels>
@@ -393,7 +378,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           ))}
       </Select>
 
-      <div className={styles.inputContainer} id="radio-group">
+      {/*      <div className={styles.inputContainer} id="radio-group">
         <label className="cds--label">
           {t('getAppointmentReminder', 'Would you like to get a reminder about this appointment?')}
         </label>
@@ -405,7 +390,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           <RadioButton className={styles.radioButton} id="Yes" labelText="Yes" value="Yes" />
           <RadioButton className={styles.radioButton} id="No" labelText="No" value="No" />
         </RadioButtonGroup>
-      </div>
+      </div>*/}
 
       <Layer style={{ margin: '0.25rem 0' }}>
         <TextArea

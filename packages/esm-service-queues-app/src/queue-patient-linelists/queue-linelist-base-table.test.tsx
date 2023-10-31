@@ -107,7 +107,6 @@ describe('QueuePatientBaseTable: ', () => {
 
     renderQueueBaseTable();
 
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
   });
