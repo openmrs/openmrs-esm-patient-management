@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { FormValues, PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
-import Overlay from '../../ui-components/overlay';
+import Overlay from '../../ui-components/overlay/overlay.component';
 import { ResourcesContext } from '../../../offline.resources';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import {
@@ -42,29 +42,32 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
 
   const filteredIdentifiers = useMemo(
     () => identifierTypes?.filter((identifier) => identifier?.name?.toLowerCase().includes(searchString.toLowerCase())),
-    [unsavedIdentifierTypes, searchString],
+    [searchString, identifierTypes],
   );
 
-  const handleCheckingIdentifier = (identifierType: PatientIdentifierType, checked: boolean) =>
-    setUnsavedIdentifierTypes((unsavedIdentifierTypes) => {
-      if (checked) {
-        return {
-          ...unsavedIdentifierTypes,
-          [identifierType.fieldName]: initializeIdentifier(
-            identifierType,
-            values.identifiers[identifierType.fieldName] ??
-              initialFormValues.identifiers[identifierType.fieldName] ??
-              {},
-          ),
-        };
-      }
-      if (unsavedIdentifierTypes[identifierType.fieldName]) {
-        return Object.fromEntries(
-          Object.entries(unsavedIdentifierTypes).filter(([fieldName]) => fieldName !== identifierType.fieldName),
-        );
-      }
-      return unsavedIdentifierTypes;
-    });
+  const handleCheckingIdentifier = useCallback(
+    (identifierType: PatientIdentifierType, checked: boolean) =>
+      setUnsavedIdentifierTypes((unsavedIdentifierTypes) => {
+        if (checked) {
+          return {
+            ...unsavedIdentifierTypes,
+            [identifierType.fieldName]: initializeIdentifier(
+              identifierType,
+              values.identifiers[identifierType.fieldName] ??
+                initialFormValues.identifiers[identifierType.fieldName] ??
+                {},
+            ),
+          };
+        }
+        if (unsavedIdentifierTypes[identifierType.fieldName]) {
+          return Object.fromEntries(
+            Object.entries(unsavedIdentifierTypes).filter(([fieldName]) => fieldName !== identifierType.fieldName),
+          );
+        }
+        return unsavedIdentifierTypes;
+      }),
+    [initialFormValues.identifiers, values.identifiers],
+  );
 
   const handleSelectingIdentifierSource = (identifierType: PatientIdentifierType, sourceUuid) =>
     setUnsavedIdentifierTypes((unsavedIdentifierTypes) => ({
@@ -149,13 +152,14 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
       values.identifiers,
       isOffline,
       handleCheckingIdentifier,
+      t,
     ],
   );
 
   const handleConfiguringIdentifiers = useCallback(() => {
     setFieldValue('identifiers', unsavedIdentifierTypes);
     closeOverlay();
-  }, [unsavedIdentifierTypes, setFieldValue]);
+  }, [unsavedIdentifierTypes, setFieldValue, closeOverlay]);
 
   return (
     <Overlay

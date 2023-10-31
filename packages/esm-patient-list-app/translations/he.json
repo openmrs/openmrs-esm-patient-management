@@ -49,6 +49,7 @@
   "pageNumber": "Page number",
   "patientListMemberCount_one": "This list has {{count}} patient",
   "patientListMemberCount_two": "This list has {{count}} patients",
+  "patientListMemberCount_many": "This list has {{count}} patients",
   "patientListMemberCount_other": "This list has {{count}} patients",
   "patientLists": "רשימות מטופלים",
   "patientRemovedFromList": "Patient removed from list",
