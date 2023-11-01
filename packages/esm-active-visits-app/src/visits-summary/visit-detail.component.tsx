@@ -43,7 +43,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
             <br />
             <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(parseDate(visit?.startDatetime))}</p>
           </h4>
-          <div style={{ margin: '0 1rem' }}>
+          <div className={styles.actions}>
             <ContentSwitcher
               className={styles.contentSwitcher}
               selectedIndex={contentSwitcherIndex}
@@ -60,7 +60,14 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
       </div>
     );
   } else {
-    return null;
+    return (
+      <div className={styles.visitEmptyState}>
+        <h4 className={styles.productiveHeading02}>{t('noVisitsFound', 'No visits found')}</h4>
+        <p className={`${styles.bodyLong01} ${styles.text02}`}>
+          {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
+        </p>
+      </div>
+    );
   }
 };
 

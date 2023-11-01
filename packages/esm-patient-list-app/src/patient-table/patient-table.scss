@@ -33,6 +33,10 @@ div#table-tool-bar {
   margin-top: spacing.$spacing-09;
 }
 
+.table {
+  background-color: $ui-03;
+}
+
 .desktopRow,
 .desktopHeader {
   height: spacing.$spacing-07 !important;
@@ -63,4 +67,53 @@ div#table-tool-bar {
 .dataTableSkeleton {
   background-color: transparent;
   padding: 0rem;
+}
+
+.skeletonContainer {
+  margin: spacing.$spacing-05;
+}
+
+.removeButton {
+  padding-block-start: 0.5rem;
+  padding-inline-end: 0;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  margin: spacing.$spacing-05 0;
+}
+
+.illo {
+  margin-top: spacing.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.backButton {
+  padding: spacing.$spacing-03 0;
+  max-width: fit-content;
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    display: flex;
+    padding-left: 0 !important;
+
+    svg {
+      order: 1;
+      margin: 0 spacing.$spacing-03;
+    }
+
+    span {
+      order: 2;
+    }
+  }
 }

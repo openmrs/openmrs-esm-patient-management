@@ -112,6 +112,7 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
     throw error;
   }
 
+  const currentDate = new Date();
   const searchQuery = results.map((p) => p.patient.uuid).join(',');
   const result = await openmrsFetch(`/ws/fhir2/R4/Patient/_search?_id=${searchQuery}`, {
     method: 'POST',
@@ -119,7 +120,16 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   });
 
   const patients: Array<PatientListMember> = result.data.entry.map((e) => e.resource);
-  return patients;
+  const validPatients = patients.filter((patient) => {
+    if (!patient.endDate) {
+      return true;
+    }
+
+    const endDate = new Date(patient.endDate);
+    return endDate >= currentDate;
+  });
+
+  return validPatients;
 }
 
 export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
@@ -141,6 +151,17 @@ export async function getPatientListIdsForPatient(patientUuid: string, ac = new 
 
 export async function addPatientToList(data: AddPatientData, ac = new AbortController()) {
   return postData(`${cohortUrl}/cohortmember`, data, ac);
+}
+
+export async function removePatientFromList(cohortMembershipUuid: string) {
+  const ac = new AbortController();
+  return postData(
+    `${cohortUrl}/cohortmember/${cohortMembershipUuid}`,
+    {
+      endDate: new Date(),
+    },
+    ac,
+  );
 }
 
 export async function createPatientList(cohort: NewCohortDataPayload, ac = new AbortController()) {

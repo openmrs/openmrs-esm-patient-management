@@ -62,7 +62,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           </div>
           {!isEmpty(count) && (
             <div className={styles.countGrid}>
-              <span>{t('honored', 'Honored')}</span>
+              <span>{t('checkedIn', 'Checked in')}</span>
               <span>{isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}</span>
               <p style={{ color: '#319227' }}>{count.arrivedAppointments?.length}</p>
               <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>

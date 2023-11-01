@@ -8,7 +8,11 @@ import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
 
-const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid }) => {
+interface AppointmentMetricsProps {
+  serviceUuid: string;
+}
+
+const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid }) => {
   const { t } = useTranslation();
 
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
@@ -18,8 +22,9 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
   const { currentAppointmentDate } = useAppointmentDate();
   const formattedStartDate = formatDate(parseDate(currentAppointmentDate), { mode: 'standard', time: false });
 
-  const { appointmentList: arrivedAppointments } = useAppointmentList('Honoured');
-  const { appointmentList: pendingAppointments } = useAppointmentList('Pending');
+  // TODO we will need rework these after we discuss the logic we want to use
+  const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
+  const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
   const filteredArrivedAppointments = serviceUuid
     ? arrivedAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
@@ -50,12 +55,12 @@ const AppointmentsMetrics: React.FC<{ serviceUuid: string }> = ({ serviceUuid })
             highestServiceLoad?.count !== 0 ? t(highestServiceLoad?.serviceName) : t('serviceName', 'Service name')
           }
           value={highestServiceLoad?.count ?? '--'}
-          headerLabel={t('highestServiceVolume', 'High volume service: {time}', { time: formattedStartDate })}
+          headerLabel={t('highestServiceVolume', 'High volume service: {{time}}', { time: formattedStartDate })}
         />
         <MetricsCard
           label={t('providers', 'Providers')}
           value={totalProviders}
-          headerLabel={t('providersAvailableToday', 'Providers available: {time}', { time: formattedStartDate })}
+          headerLabel={t('providersAvailableToday', 'Providers available: {{time}}', { time: formattedStartDate })}
         />
       </div>
     </>

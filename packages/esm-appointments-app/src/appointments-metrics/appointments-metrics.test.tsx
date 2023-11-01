@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '../../../../__mocks__/appointments.mock';
 import AppointmentsMetrics from './appointments-metrics.component';
@@ -31,19 +31,21 @@ jest.mock('../hooks/useClinicalMetrics', () => {
 });
 
 describe('Appointment metrics', () => {
-  it('renders metrics from appointment list', async () => {
+  it('renders metrics from the appointments list', async () => {
     mockedOpenmrsFetch.mockResolvedValue({ data: [] });
 
     renderAppointmentMetrics();
 
-    await waitFor(() => expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument());
-    expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
-    expect(screen.getByText(/patients/i)).toBeInTheDocument();
-    expect(screen.getByText(/16/i)).toBeInTheDocument();
-    expect(screen.getByText(/4/i)).toBeInTheDocument();
+    await act(() => {
+      expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
+      expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
+      expect(screen.getByText(/patients/i)).toBeInTheDocument();
+      expect(screen.getByText(/16/i)).toBeInTheDocument();
+      expect(screen.getByText(/4/i)).toBeInTheDocument();
+    });
   });
 });
 
 function renderAppointmentMetrics() {
-  render(<AppointmentsMetrics serviceUuid="uuid" />);
+  render(<AppointmentsMetrics serviceUuid="consultation-service-uuid" />);
 }

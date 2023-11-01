@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { AdvancedPatientSearchState } from '../types';
-import styles from './advanced-patient-search.scss';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch from './refine-search.component';
+import styles from './advanced-patient-search.scss';
 
 interface AdvancedPatientSearchProps {
   query: string;

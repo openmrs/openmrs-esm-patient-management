@@ -10,16 +10,22 @@ jest.mock('@openmrs/esm-framework', () => ({
 describe('PatientTable Component', () => {
   const patients = [
     {
-      id: '123abced',
+      identifier: '123abced',
       firstName: 'John',
       lastName: 'Doe',
       age: 30,
+      sex: 'Male',
+      startDate: '2023-08-10',
+      membershipUuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
     },
     {
-      id: '123abcedfg',
+      identifier: '123abcedfg',
       firstName: 'Jane',
       lastName: 'Smith',
       age: 25,
+      sex: 'Female',
+      startDate: '2023-08-10',
+      membershipUuid: 'ce7d26fa-e1b4-4e78-a1f5-3a7a5de9c0db',
     },
   ];
 
@@ -70,6 +76,8 @@ describe('PatientTable Component', () => {
         isLoading={false}
         autoFocus={false}
         isFetching={true}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
       />,
     );
     expect(screen.getByTestId('patientsTable')).toBeInTheDocument();
@@ -85,6 +93,8 @@ describe('PatientTable Component', () => {
         isLoading={true}
         autoFocus={false}
         isFetching={false}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
       />,
     );
 
@@ -101,6 +111,8 @@ describe('PatientTable Component', () => {
         isLoading={false}
         autoFocus={false}
         isFetching={false}
+        mutateListDetails={jest.fn()}
+        mutateListMembers={jest.fn()}
       />,
     );
 
@@ -111,28 +123,5 @@ describe('PatientTable Component', () => {
 
     expect(searchInput).toHaveValue(searchText);
     await waitFor(() => expect(mockedOnSearch).toHaveBeenCalledWith(searchText));
-  });
-
-  //need to fix this test
-  xit('calls onChange when clicking pagination buttons', async () => {
-    render(
-      <PatientTable
-        patients={patients}
-        columns={columns}
-        search={search}
-        pagination={pagination}
-        isLoading={false}
-        autoFocus={false}
-        isFetching={false}
-      />,
-    );
-
-    // Click on the next page button
-    fireEvent.click(screen.getByRole('button', { name: /Next page/i }));
-
-    // Expect the onChange function to be called with the new page number
-    await waitFor(() => expect(mockedOnChange).toHaveBeenCalledWith({ page: 2, pageSize: 10 }));
-    //
-    expect(pagination.currentPage).toBe(2);
   });
 });

@@ -18,7 +18,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx'"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts'"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -50,7 +50,8 @@
     "dayjs": "1.x",
     "react": "18.x",
     "react-i18next": "11.x",
-    "react-router-dom": "6.x"
+    "react-router-dom": "6.x",
+    "swr": "2.x"
   },
   "devDependencies": {
     "webpack": "^5.74.0"

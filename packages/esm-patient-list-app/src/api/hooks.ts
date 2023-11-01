@@ -1,3 +1,9 @@
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
+import { openmrsFetch, FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
+import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
+import { ConfigSchema } from '../config-schema';
 import {
   CohortResponse,
   CohortType,
@@ -6,12 +12,6 @@ import {
   PatientListFilter,
   PatientListType,
 } from './types';
-import { openmrsFetch, FetchResponse, useConfig, useSession, LoggedInUser } from '@openmrs/esm-framework';
-import useSWR from 'swr';
-import useSWRInfinite from 'swr/infinite';
-import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
-import { ConfigSchema } from '../config-schema';
-import { useEffect, useState } from 'react';
 
 interface PatientListResponse {
   results: Array<OpenmrsCohort>;
@@ -117,10 +117,10 @@ export function usePatientListDetails(patientListUuid: string) {
   );
 
   return {
-    data: data?.data,
+    listDetails: data?.data,
     error,
     isLoading,
-    mutate,
+    mutateListDetails: mutate,
   };
 }
 
@@ -131,11 +131,17 @@ export function usePatientListMembers(
   pageSize: number = 10,
   v: string = 'full',
 ) {
-  const swrResult = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<CohortResponse<OpenmrsCohortMember>>, Error>(
     `${cohortUrl}/cohortmember?cohort=${patientListUuid}&startIndex=${startIndex}&limit=${pageSize}&v=${v}&q=${searchQuery}`,
     openmrsFetch,
   );
-  return { ...swrResult, data: swrResult?.data?.data?.results };
+
+  return {
+    listMembers: data?.data?.results ?? [],
+    isLoadingListMembers: isLoading,
+    error: error,
+    mutateListMembers: mutate,
+  };
 }
 
 export function useCohortTypes() {

@@ -45,3 +45,9 @@ export function useSearchResults<T>(data: T[], searchString: string): T[] {
 
   return searchResults;
 }
+
+export function filterByServiceType(appointmentList: any[], appointmentServiceType: string) {
+  return appointmentServiceType
+    ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
+    : appointmentList;
+}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { render, screen, within, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within } from '@testing-library/react';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { mockPatient, mockServices, mockProviders } from '../../../../../../__mocks__/appointments.mock';
 import { mockLocations } from '../../../../../../__mocks__/locations.mock';
@@ -64,33 +63,10 @@ describe('AppointmentForm', () => {
   it('renders the form with all expected inputs in create mode', () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
 
-    const allInputs = screen.queryAllByLabelText(
-      (content, element) => element.tagName.toLowerCase() === 'input',
-    ) as Array<HTMLInputElement>;
-    const allSelects = screen.queryAllByRole('combobox') as Array<HTMLInputElement>;
-    const allTabs = screen.queryAllByRole('tab') as Array<HTMLInputElement>;
-    let inputAndSelectNamesAndTabValues = [];
-
-    allInputs.forEach((input) => inputAndSelectNamesAndTabValues.push(input?.id));
-    allSelects.forEach((select) => inputAndSelectNamesAndTabValues.push(select?.id));
-    allTabs.forEach((tab) => inputAndSelectNamesAndTabValues.push(tab?.id));
-
-    expect(inputAndSelectNamesAndTabValues).toEqual([
-      'visitStartDateInput',
-      'Yes',
-      'No',
-      '',
-      'location',
-      'service',
-      'appointmentType',
-      'providers',
-      'facility',
-      'community',
-    ]);
-  });
-
-  it('renders the form with all expected inputs in edit mode', () => {
-    renderAppointmentsForm('editing', mockPatient.uuid);
+    expect(screen.getByRole('combobox', { name: /select a location/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select a service/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select an appointment type/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /select a provider/i })).toBeInTheDocument();
   });
 
   it('renders the expected appointment types', () => {

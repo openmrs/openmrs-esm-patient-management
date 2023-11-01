@@ -29,7 +29,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid 
               <VisitForm patientUuid={patientUuid} appointment={appointment} />,
             )
           }>
-          {t('checkIn', 'CheckIn')}
+          {t('checkIn', 'Check In')}
         </Button>
       )}
     </>

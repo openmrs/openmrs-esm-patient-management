@@ -45,7 +45,8 @@
     "dayjs": "1.x",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-i18next": "11.x"
+    "react-i18next": "11.x",
+    "swr": "2.x"
   },
   "devDependencies": {
     "webpack": "^5.74.0"

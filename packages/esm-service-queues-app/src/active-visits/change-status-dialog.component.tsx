@@ -89,7 +89,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
         },
         (error) => {
           showNotification({
-            title: t('queueEntryUpdateFailed', 'Error updating queue entry status'),
+            title: t('queueEntryStatusUpdateFailed', 'Error updating queue entry status'),
             kind: 'error',
             critical: true,
             description: error?.message,
