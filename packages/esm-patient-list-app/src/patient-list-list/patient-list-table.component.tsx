@@ -244,9 +244,10 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
 function usePatientListStar() {
   const { t } = useTranslation();
   const [starredLists, setStarredLists] = useState([]);
-  console.log(starredLists, starredLists.join(','));
+  console.log(starredLists);
   const [starhandleTimeout, setStarHandleTimeout] = useState(null);
   const { user: currentUser } = useSession();
+  console.log("user starred lists", currentUser?.userProperties?.starredPatientLists);
 
   const setInitialStarredLists = useCallback(() => {
     const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
@@ -256,7 +257,6 @@ function usePatientListStar() {
   const updateUserProperties = (newStarredLists: Array<string>) => {
     const starredPatientLists = newStarredLists.join(',');
     const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
-    console.log('checking', starredPatientLists);
 
     starPatientList(currentUser?.uuid, userProperties)
       // .then(() => mutateUser())
@@ -277,7 +277,6 @@ function usePatientListStar() {
    * @param starPatientList
    */
   const toggleStarredList = (cohortUuid, starPatientList) => {
-    console.log('check');
     const newStarredLists = starPatientList
       ? [...starredLists, cohortUuid]
       : starredLists.filter((uuid) => uuid !== cohortUuid);
@@ -294,7 +293,6 @@ function usePatientListStar() {
       setInitialStarredLists();
     }
   }, [currentUser?.userProperties?.starredPatientLists, setInitialStarredLists]);
-  // END: Handling starring patient
 
   return { toggleStarredList, starredLists };
 }
