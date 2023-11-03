@@ -7,8 +7,8 @@ import { OverflowMenuVertical } from '@carbon/react/icons';
 import { navigate, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
+import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
-import EditPatientListDetailsOverlay from '../create-edit-patient-list/create-edit-list.component';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
 
@@ -87,14 +87,15 @@ const ListDetails = () => {
 
   const confirmDeletePatientList = useCallback(() => {
     deletePatientList(patientListUuid)
-      .then(() =>
+      .then(() => {
         showToast({
           title: t('deleted', 'Deleted'),
           description: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
           kind: 'success',
-        }),
-      )
-      .then(() => navigate({ to: `${window.spaBase}/home/patient-lists/` }))
+        });
+
+        navigate({ to: window.getOpenmrsSpaBase() + 'home/patient-lists' });
+      })
       .catch((e) =>
         showToast({
           title: t('errorDeletingList', 'Error deleting patient list'),
@@ -163,9 +164,9 @@ const ListDetails = () => {
           />
         </div>
         {showEditPatientListDetailOverlay && (
-          <EditPatientListDetailsOverlay
+          <CreateEditPatientList
             close={() => setEditPatientListDetailOverlay(false)}
-            edit
+            isEditing
             patientListDetails={listDetails}
             onSuccess={mutateListDetails}
           />

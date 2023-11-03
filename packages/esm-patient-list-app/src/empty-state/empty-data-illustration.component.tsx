@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const EmptyDataIllustration = ({ width = '64', height = '64' }) => {
+  const { t } = useTranslation();
+
   return (
     <svg width={width} height={height} viewBox="0 0 64 64">
-      <title>Empty data illustration</title>
+      <title>{t('emptyDataIllustration', 'Empty data illustration')}</title>
       <g fill="none" fillRule="evenodd">
         <path
           d="M38.133 13.186H21.947c-.768.001-1.39.623-1.39 1.391V50.55l-.186.057-3.97 1.216a.743.743 0 01-.927-.493L3.664 12.751a.742.742 0 01.492-.926l6.118-1.874 17.738-5.43 6.119-1.873a.741.741 0 01.926.492L38.076 13l.057.186z"

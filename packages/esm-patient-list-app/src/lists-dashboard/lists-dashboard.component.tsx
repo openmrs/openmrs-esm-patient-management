@@ -5,7 +5,7 @@ import { Tab, Tabs, TabList } from '@carbon/react';
 import { navigate } from '@openmrs/esm-framework';
 import { PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
-import CreateNewList from '../create-edit-patient-list/create-edit-list.component';
+import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import Header from '../header/header.component';
 import ListsTable from '../lists-table/lists-table.component';
 import styles from './lists-dashboard.scss';
@@ -50,7 +50,7 @@ const ListsDashboard: React.FC = () => {
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
 
-  const isCreatingNewList =
+  const isCreatingPatientList =
     Object.fromEntries(
       search
         .slice(1)
@@ -62,7 +62,7 @@ const ListsDashboard: React.FC = () => {
 
   const handleHideNewListOverlay = () => {
     navigate({
-      to: '${openmrsSpaBase}/home/patient-lists',
+      to: window.getOpenmrsSpaBase() + 'home/patient-lists',
     });
   };
 
@@ -82,11 +82,11 @@ const ListsDashboard: React.FC = () => {
         <Header />
         <Tabs
           className={styles.tabs}
-          tabContentClassName={styles.hiddenTabsContent}
-          selectedIndex={selectedTab}
           onChange={({ selectedIndex }) => {
             setSelectedTab(selectedIndex);
-          }}>
+          }}
+          selectedIndex={selectedTab}
+          tabContentClassName={styles.hiddenTabsContent}>
           <TabList className={styles.tablist} aria-label="List tabs" contained>
             <Tab className={styles.tab}>{t('starredLists', 'Starred lists')}</Tab>
             <Tab className={styles.tab}>{t('systemLists', 'System lists')}</Tab>
@@ -96,18 +96,18 @@ const ListsDashboard: React.FC = () => {
         </Tabs>
         <div className={styles.listsTableContainer}>
           <ListsTable
+            error={error}
+            headers={tableHeaders}
+            isLoading={isLoading}
             key={patientListFilter.label}
             listType={patientListFilter.label}
-            isLoading={isLoading}
-            headers={tableHeaders}
             patientLists={patientLists}
             refetch={mutate}
-            error={error}
           />
         </div>
       </section>
       <section>
-        {isCreatingNewList && <CreateNewList close={handleHideNewListOverlay} onSuccess={() => mutate()} />}
+        {isCreatingPatientList && <CreateEditPatientList close={handleHideNewListOverlay} onSuccess={() => mutate()} />}
       </section>
     </main>
   );

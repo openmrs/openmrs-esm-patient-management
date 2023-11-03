@@ -1,7 +1,7 @@
-import React, { type CSSProperties, useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { type CSSProperties, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import orderBy from 'lodash-es/orderBy';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -44,29 +44,30 @@ interface DataTableHeader {
 }
 
 interface PatientListTableProps {
-  style?: CSSProperties;
-  patientLists: Array<PatientList>;
+  error?: any;
+  handleCreate?: () => void;
+  headers?: Array<DataTableHeader>;
   isLoading?: boolean;
   isValidating?: boolean;
-  headers?: Array<DataTableHeader>;
-  refetch?(): void;
   listType: string;
-  handleCreate?: () => void;
-  error?: any;
+  patientLists: Array<PatientList>;
+  refetch?(): void;
+  style?: CSSProperties;
 }
 
 const ListsTable: React.FC<PatientListTableProps> = ({
-  style,
-  patientLists = [],
+  error,
+  handleCreate,
+  headers,
   isLoading = false,
   isValidating,
-  headers,
-  refetch,
   listType,
-  handleCreate,
-  error,
+  patientLists = [],
+  refetch,
+  style,
 }) => {
   const { t } = useTranslation();
+  const id = useId();
   const userId = useSession()?.user?.uuid;
   const layout = useLayoutType();
   const config: ConfigSchema = useConfig();
@@ -122,14 +123,14 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   if (isLoading) {
     return (
       <DataTableSkeleton
-        role="progressbar"
-        style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
-        showToolbar={false}
-        showHeader={false}
-        rowCount={pageSize}
         columnCount={headers.length}
-        zebra
         compact={isDesktop(layout)}
+        role="progressbar"
+        rowCount={pageSize}
+        showHeader={false}
+        showToolbar={false}
+        style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
+        zebra
       />
     );
   }
@@ -146,7 +147,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
           <Layer>
             <Search
               className={styles.searchbox}
-              id="patient-list-search"
+              id={`${id}-search`}
               labelText=""
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               placeholder={t('searchThisList', 'Search this list')}
@@ -159,8 +160,8 @@ const ListsTable: React.FC<PatientListTableProps> = ({
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
             <TableContainer {...getTableContainerProps()}>
               <Table
-                className={styles.table}
                 {...getTableProps()}
+                className={styles.table}
                 data-testid="patientListsTable"
                 isSortable
                 useZebraStyles>
@@ -190,7 +191,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
                               <TableCell className={styles.tableCell} key={cell.id}>
                                 <ConfigurableLink
                                   className={styles.link}
-                                  to={`\${openmrsSpaBase}/home/patient-lists/${patientLists[index]?.id}`}>
+                                  to={window.getOpenmrsSpaBase() + `home/patient-lists/${patientLists[index]?.id}`}>
                                   {cell.value}
                                 </ConfigurableLink>
                               </TableCell>
@@ -237,15 +238,9 @@ const ListsTable: React.FC<PatientListTableProps> = ({
         {paginated && (
           <Layer>
             <Pagination
-              size={isDesktop(layout) ? 'sm' : 'lg'}
               backwardText={t('previousPage', 'Previous page')}
               forwardText={t('nextPage', 'Next page')}
               itemsPerPageText={t('itemsPerPage', 'Items per page:')}
-              page={currentPage}
-              pageNumberText={t('pageNumber', 'Page number')}
-              pageSize={pageSize}
-              pageSizes={pageSizes}
-              totalItems={patientLists?.length}
               onChange={({ page: newPage, pageSize: newPageSize }) => {
                 if (newPageSize !== pageSize) {
                   setPageSize(newPageSize);
@@ -254,6 +249,12 @@ const ListsTable: React.FC<PatientListTableProps> = ({
                   goTo(newPage);
                 }
               }}
+              page={currentPage}
+              pageNumberText={t('pageNumber', 'Page number')}
+              pageSize={pageSize}
+              pageSizes={pageSizes}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              totalItems={patientLists?.length}
             />
           </Layer>
         )}

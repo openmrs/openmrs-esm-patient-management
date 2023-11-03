@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Illustration: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <svg width="92" height="94" viewBox="0 0 92 94" xmlns="http://www.w3.org/2000/svg">
-      <title>Empty state illustration</title>
+      <title>{t('emptyDataIllustration', 'Empty state illustration')}</title>
       <g fill="none" fillRule="evenodd">
         <path fill="#FFF" d="M0 0h92v94H0z" />
         <path

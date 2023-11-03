@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useMemo, useState, useCallback, type CSSProperties } from 'react';
+import React, { type CSSProperties, HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
@@ -121,12 +121,10 @@ interface SearchProps extends InputPropsBase {
 }
 
 interface ListDetailsTableProps {
-  patients;
-  columns: Array<PatientTableColumn>;
-  style?: CSSProperties;
   autoFocus?: boolean;
-  isLoading: boolean;
+  columns: Array<PatientTableColumn>;
   isFetching?: boolean;
+  isLoading: boolean;
   mutateListDetails: () => void;
   mutateListMembers: () => void;
   pagination: {
@@ -138,6 +136,8 @@ interface ListDetailsTableProps {
     pagesUnknown?: boolean;
     lastPage?: boolean;
   };
+  patients;
+  style?: CSSProperties;
 }
 
 interface PatientTableColumn {
@@ -150,15 +150,16 @@ interface PatientTableColumn {
 }
 
 const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
-  patients,
   columns,
-  pagination,
-  isLoading,
   isFetching,
-  mutateListMembers,
+  isLoading,
   mutateListDetails,
+  mutateListMembers,
+  pagination,
+  patients,
 }) => {
   const { t } = useTranslation();
+  const id = useId();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const patientListsPath = window.getOpenmrsSpaBase() + 'home/patient-lists';
@@ -273,7 +274,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
               <Layer>
                 <Search
                   className={styles.searchOverrides}
-                  id="patient-list-search"
+                  id={`${id}-search`}
                   labelText=""
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   placeholder={t('searchThisList', 'Search this list')}
@@ -350,16 +351,16 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
           )}
           {pagination.usePagination && (
             <Pagination
+              backwardText={t('nextPage', 'Next page')}
+              className={styles.paginationOverride}
+              forwardText={t('previousPage', 'Previous page')}
+              isLastPage={pagination.lastPage}
+              onChange={pagination.onChange}
               page={pagination.currentPage}
               pageSize={pagination.pageSize}
               pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={pagination.totalItems}
-              onChange={pagination.onChange}
-              className={styles.paginationOverride}
               pagesUnknown={pagination?.pagesUnknown}
-              isLastPage={pagination.lastPage}
-              backwardText="Next Page"
-              forwardText="Previous Page"
+              totalItems={pagination.totalItems}
             />
           )}
         </div>

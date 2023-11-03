@@ -5,13 +5,13 @@ import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
 import styles from './overlay.scss';
 
 interface OverlayProps {
-  close: () => void;
-  header: string;
   buttonsGroup?: React.ReactElement;
   children?: React.ReactNode;
+  close: () => void;
+  header: string;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup }) => {
+const Overlay: React.FC<OverlayProps> = ({ buttonsGroup, children, close, header }) => {
   const layout = useLayoutType();
 
   return (

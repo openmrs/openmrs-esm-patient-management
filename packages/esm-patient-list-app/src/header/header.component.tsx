@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Add, Calendar } from '@carbon/react/icons';
 import { formatDate, navigate } from '@openmrs/esm-framework';
-import Illustration from '../illo';
+import Illustration from '../illo.component';
 import styles from './header.scss';
 
 const Header: React.FC = () => {
