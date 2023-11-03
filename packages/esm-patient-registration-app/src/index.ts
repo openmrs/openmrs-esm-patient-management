@@ -1,7 +1,11 @@
-import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { esmPatientRegistrationSchema } from './config-schema';
 import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
+import rootComponent from './root.component';
+import addPatientLinkComponent from './add-patient-link';
+import patientPhotoComponent from './widgets/display-photo.component';
+import editPatientDetailsButtonComponent from './widgets/edit-patient-details-button.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -37,29 +41,26 @@ export function startupApp() {
   setupOffline();
 }
 
-export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const root = getSyncLifecycle(rootComponent, options);
 
-export const editPatient = getAsyncLifecycle(() => import('./root.component'), {
+export const editPatient = getSyncLifecycle(rootComponent, {
   featureName: 'edit-patient-details-form',
   moduleName,
 });
 
-export const addPatientLink = getAsyncLifecycle(() => import('./add-patient-link'), options);
+export const addPatientLink = getSyncLifecycle(addPatientLinkComponent, options);
 
 export const cancelPatientEditModal = getAsyncLifecycle(
   () => import('./widgets/cancel-patient-edit.component'),
   options,
 );
 
-export const patientPhoto = getAsyncLifecycle(() => import('./widgets/display-photo.component'), options);
+export const patientPhoto = getSyncLifecycle(patientPhotoComponent, options);
 
-export const editPatientDetailsButton = getAsyncLifecycle(
-  () => import('./widgets/edit-patient-details-button.component'),
-  {
-    featureName: 'edit-patient-details',
-    moduleName,
-  },
-);
+export const editPatientDetailsButton = getSyncLifecycle(editPatientDetailsButtonComponent, {
+  featureName: 'edit-patient-details',
+  moduleName,
+});
 
 export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
   () => import('./widgets/delete-identifier-confirmation-modal'),
