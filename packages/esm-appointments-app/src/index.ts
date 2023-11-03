@@ -16,6 +16,11 @@ import {
   expectedAppointmentsPanelConfigSchema,
   missedAppointmentsPanelConfigSchema,
 } from './scheduled-appointments-config-schema';
+import rootComponent from './root.component';
+import appointmentsDashboardComponent from './appointments.component';
+import homeAppointmentsComponent from './home-appointments';
+import appointmentStatusComponent from './appointments/scheduled/appointments-by-status.component';
+import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -52,7 +57,7 @@ export function startupApp() {
   ]);
 }
 
-export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const root = getSyncLifecycle(rootComponent, options);
 
 export const appointmentsDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
@@ -61,21 +66,15 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const appointmentsDashboard = getAsyncLifecycle(() => import('./appointments.component'), options);
+export const appointmentsDashboard = getSyncLifecycle(appointmentsDashboardComponent, options);
 
 export const checkInModal = getAsyncLifecycle(
   () => import('./home-appointments/check-in-modal/check-in-modal.component'),
   options,
 );
 
-export const homeAppointments = getAsyncLifecycle(() => import('./home-appointments'), options);
+export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
 
-export const appointmentsByStatus = getAsyncLifecycle(
-  () => import('./appointments/scheduled/appointments-by-status.component'),
-  options,
-);
+export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
 
-export const earlyAppointments = getAsyncLifecycle(
-  () => import('./appointments/scheduled/early-appointments.component'),
-  options,
-);
+export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);

@@ -3,6 +3,10 @@ import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
+import rootComponent from './root.component';
+import patientListActionButtonComponent from './patient-list-action-button.component';
+import patientTableComponent from './patient-table/patient-table.component';
+import addPatientToPatientListMenuItemComponent from './add-patient-to-patient-list-menu-item.component';
 
 const moduleName = '@openmrs/esm-patient-list-app';
 
@@ -18,29 +22,26 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const root = getSyncLifecycle(rootComponent, options);
 
 export const addPatientToListModal = getAsyncLifecycle(() => import('./add-patient/add-patient.component'), {
   featureName: 'patient-actions-modal',
   moduleName,
 });
 
-export const addPatientToPatientListMenuItem = getAsyncLifecycle(
-  () => import('./add-patient-to-patient-list-menu-item.component'),
-  {
-    featureName: 'patient-actions-slot',
-    moduleName,
-  },
-);
+export const addPatientToPatientListMenuItem = getSyncLifecycle(addPatientToPatientListMenuItemComponent, {
+  featureName: 'patient-actions-slot',
+  moduleName,
+});
 
-export const patientListActionButton = getAsyncLifecycle(() => import('./patient-list-action-button.component'), {
+export const patientListActionButton = getSyncLifecycle(patientListActionButtonComponent, {
   featureName: 'patient-list-action-menu-item',
   moduleName,
 });
 
 export const patientListDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const patientTable = getAsyncLifecycle(() => import('./patient-table/patient-table.component'), {
+export const patientTable = getSyncLifecycle(patientTableComponent, {
   featureName: 'patient-table',
   moduleName,
 });
