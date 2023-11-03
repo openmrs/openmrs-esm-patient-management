@@ -2,7 +2,7 @@ import { Type } from '@openmrs/esm-framework';
 
 export const expectedAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'expected',
   },
@@ -31,7 +31,7 @@ export const expectedAppointmentsPanelConfigSchema = {
 
 export const checkedInAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'checkedIn',
   },
@@ -60,7 +60,7 @@ export const checkedInAppointmentsPanelConfigSchema = {
 
 export const completedAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'completed',
   },
@@ -89,7 +89,7 @@ export const completedAppointmentsPanelConfigSchema = {
 
 export const missedAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'missed',
   },
@@ -118,7 +118,7 @@ export const missedAppointmentsPanelConfigSchema = {
 
 export const cancelledAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'cancelled',
   },
@@ -147,7 +147,7 @@ export const cancelledAppointmentsPanelConfigSchema = {
 
 export const earlyAppointmentsPanelConfigSchema = {
   title: {
-    _type: Type.Boolean,
+    _type: Type.String,
     _description: 'The title to display, may be a translation key or plain text',
     _default: 'cameEarly',
   },
