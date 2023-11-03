@@ -17,7 +17,7 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+This monorepo uses [yarn](https://yarnpkg.com).
 
 To install the dependancies, run:
 ```bash
@@ -175,5 +175,5 @@ The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
 should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
 
-> Don't run `npm publish`, `yarn publish`, or `lerna publish`. Use the above process.
+> Don't run `npm publish` or `yarn publish`. Use the above process.
 
