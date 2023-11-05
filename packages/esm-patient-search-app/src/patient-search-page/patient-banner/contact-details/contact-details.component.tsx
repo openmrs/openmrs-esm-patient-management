@@ -1,9 +1,10 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import { Address as AddressType } from '../../../types';
+import type { Address as AddressType } from '../../../types';
 import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
@@ -91,7 +92,10 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, patientId, isD
   const currentAddress = address ? address.find((a) => a.preferred) : undefined;
 
   return (
-    <div className={`${styles.contactDetails} ${isDeceased ? styles.deceased : ''}`}>
+    <div
+      className={classNames(styles.contactDetails, {
+        [styles.deceased]: isDeceased,
+      })}>
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />

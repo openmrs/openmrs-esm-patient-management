@@ -3104,6 +3104,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^4.15.1"
     "@typescript-eslint/parser": "npm:^4.15.1"
     babel-preset-minify: "npm:^0.5.1"
+    classnames: "npm:^2.3.2"
     concurrently: "npm:^5.3.0"
     cross-env: "npm:^7.0.3"
     css-loader: "npm:^6.8.1"
@@ -6901,7 +6902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:2.3.2":
+"classnames@npm:2.3.2, classnames@npm:^2.3.2":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: ba3151c12e8b6a84c64b340ab4259ad0408947652009314462d828e94631505989c6a7d7e796bec1d309be9295d3111b498ad18a9d533fe3e6f859e51e574cbb

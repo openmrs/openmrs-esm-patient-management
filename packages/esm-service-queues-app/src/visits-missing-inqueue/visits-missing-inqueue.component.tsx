@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import classNames from 'classnames';
 import {
   DataTable,
   DataTableSkeleton,
@@ -252,7 +253,7 @@ const MissingQueueEntries = () => {
                     height: isDesktop(layout) ? '2rem' : '3rem',
                     margin: '1rem 1.5rem',
                   }}
-                  className={`${styles.emptyRow} ${styles.bodyLong01}`}>
+                  className={classNames(styles.emptyRow, styles.bodyLong01)}>
                   {t('noVisitsNotInQueueFound', 'No visits currently not in queue found')}
                 </p>
               )}

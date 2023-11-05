@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 import useSWR from 'swr';
 import {
   getDynamicOfflineDataEntries,
@@ -154,7 +155,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       </div>
       {paginated && (
         <div className={styles.paginationContainer}>
-          <span className={`${styles.itemsCountDisplay} ${styles.bodyLong01}`}>
+          <span className={classNames(styles.itemsCountDisplay, styles.bodyLong01)}>
             {results.length * currentPage} / {searchResults.length} {t('items', 'items')}
           </span>
           <Pagination

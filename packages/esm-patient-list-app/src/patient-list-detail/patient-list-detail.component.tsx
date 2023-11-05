@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem, Modal } from '@carbon/react';
@@ -114,8 +115,8 @@ const PatientListDetailComponent = () => {
       <section className={styles.cohortHeader}>
         <div data-testid="patientListHeader">
           <h1 className={styles.productiveHeading03}>{listDetails?.name ?? '--'}</h1>
-          <h4 className={`${styles.bodyShort02} ${styles.marginTop}`}>{listDetails?.description ?? '--'}</h4>
-          <div className={` ${styles.text02} ${styles.bodyShort01} ${styles.marginTop}`}>
+          <h4 className={classNames(styles.bodyShort02, styles.marginTop)}>{listDetails?.description ?? '--'}</h4>
+          <div className={classNames(styles.text02, styles.bodyShort01, styles.marginTop)}>
             {listDetails?.size} {t('patients', 'patients')} &middot;{' '}
             <span className={styles.label01}>{t('createdOn', 'Created on')}:</span>{' '}
             {listDetails?.startDate ? formatDate(parseDate(listDetails.startDate)) : null}

@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Layer, Select, SelectItem } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
@@ -35,7 +36,7 @@ const PersonAttributeField: React.FC<PersonAttributeFieldProps> = ({ personAttri
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(conceptUuid);
 
   return !isLoading ? (
-    <div className={`${styles.attributeField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.attributeField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Layer>
           <Select

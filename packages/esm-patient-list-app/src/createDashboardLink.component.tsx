@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +24,10 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
 
   return (
     <ConfigurableLink
-      to={`${spaBasePath}/${name}`}
-      className={`cds--side-nav__link ${navLink.match(name) && 'active-left-nav-link'}`}>
+      className={classNames('cds--side-nav__link', {
+        'active-left-nav-link': navLink.match(name),
+      })}
+      to={`${spaBasePath}/${name}`}>
       {t('patientLists', 'Patient lists')}
     </ConfigurableLink>
   );

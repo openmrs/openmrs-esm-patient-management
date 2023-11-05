@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -116,7 +117,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   ) : (
     <div className={styles.encounterEmptyState}>
       <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
-      <p className={`${styles.bodyLong01} ${styles.text02}`}>
+      <p className={classNames(styles.bodyLong01, styles.text02)}>
         {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
       </p>
     </div>

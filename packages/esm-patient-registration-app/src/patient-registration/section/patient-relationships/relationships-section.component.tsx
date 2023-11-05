@@ -117,7 +117,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
           )}
         </div>
       </div>
-      <div className={`${styles.selectRelationshipType}`} style={{ marginBottom: '1rem' }}>
+      <div className={styles.selectRelationshipType} style={{ marginBottom: '1rem' }}>
         <Layer>
           <Select
             id="select"

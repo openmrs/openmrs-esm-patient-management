@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
@@ -29,7 +30,10 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
     window.getOpenmrsSpaBase() + `home/service-queues/queue-list/${service}/${serviceUuid}/${locationUuid}`;
 
   return (
-    <Layer className={`${children && styles.cardWithChildren} ${styles.container}`}>
+    <Layer
+      className={classNames(styles.container, {
+        [styles.cardWithChildren]: children,
+      })}>
       <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
