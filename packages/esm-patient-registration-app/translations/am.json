@@ -80,5 +80,8 @@
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
   "yearsEstimateRequired": "",
-  "yes": "Yes"
+  "yes": "Yes",
+  "dashboardLink.appointments": "Appointments",
+  "dashboardLink.patientLists": "Patient Lists",
+  "dashboardLink.patientQueues": "Patient Queues"
 }

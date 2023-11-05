@@ -80,5 +80,8 @@
   "updationSuccessToastDescription": "פרטי המטופל עודכנו בהצלחה",
   "updationSuccessToastTitle": "פרטי המטופל עודכנו",
   "yearsEstimateRequired": "נדרש חיזוי שנים",
-  "yes": "כן"
+  "yes": "כן",
+  "dashboardLink.appointments": "תורים של חולים",
+  "dashboardLink.patientLists": "רשימות חולים",
+  "dashboardLink.patientQueues": "תורים של חולים"
 }

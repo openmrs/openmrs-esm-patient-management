@@ -80,5 +80,9 @@
   "updationSuccessToastDescription": "Les informations du patient ont été mises à jour avec succès",
   "updationSuccessToastTitle": "Les informations du patients ont été mises à jour",
   "yearsEstimateRequired": "Estimation du nombre d'années requise",
-  "yes": "Oui"
+  "yes": "Oui", 
+  "dashboardLink.appointments": "Rendez-vous",
+  "dashboardLink.patientLists": "Listes de patients",
+  "dashboardLink.patientQueues": "Files d'attente des patients"
+
 }

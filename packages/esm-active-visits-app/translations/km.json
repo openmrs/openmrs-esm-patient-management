@@ -29,5 +29,8 @@
   "time": "ម៉ោងពេល",
   "visitStartTime": "ម៉ោងពេលពិនិត្យជំងឺ",
   "visitSummary": "សេចក្តីសង្ខេបពីការពិនិត្យជំងឺ",
-  "visitType": "ប្រភេទនៃជំងឺពិនិត្យ"
+  "visitType": "ប្រភេទនៃជំងឺពិនិត្យ",
+  "dashboardLink.appointments": "ប្រភេទនៃជំងឺពិនិត្យ",
+  "dashboardLink.patientLists": "បញ្ជីអ្នកជំងឺ",
+  "dashboardLink.patientQueues": "ជួរអ្នកជំងឺ"
 }

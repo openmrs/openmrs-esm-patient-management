@@ -148,5 +148,8 @@
   "visitType": "Visit Type",
   "vitals": "Vitals",
   "weekly": "WeeKly",
-  "yes": "Yes"
+  "yes": "Yes",
+  "dashboardLink.appointments": "Rendez-vous",
+  "dashboardLink.patientLists": "Listes de patients",
+  "dashboardLink.patientQueues": "Files d'attente des patients"
 }

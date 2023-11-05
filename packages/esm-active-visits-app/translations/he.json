@@ -29,5 +29,8 @@
   "time": "זמן",
   "visitStartTime": "שעת התחלת הביקור",
   "visitSummary": "סיכום הביקור",
-  "visitType": "סוג הביקור"
+  "visitType": "סוג הביקור",
+  "dashboardLink.appointments": "תורים של חולים",
+  "dashboardLink.patientLists": "רשימות חולים",
+  "dashboardLink.patientQueues": "תורים של חולים"
 }

@@ -29,5 +29,8 @@
   "time": "Tiempo",
   "visitStartTime": "Tiempo de Visita",
   "visitSummary": "Resumen de Visita",
-  "visitType": "Tipo de Visita"
+  "visitType": "Tipo de Visita",
+  "dashboardLink.appointments": "Equipo",
+  "dashboardLink.patientLists": "Listas de pacientes",
+  "dashboardLink.patientQueues": "Colas de pacientes"
 }

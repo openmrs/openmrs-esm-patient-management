@@ -80,5 +80,8 @@
   "updationSuccessToastDescription": "تم تحديث معلومات المريض بنجاح",
   "updationSuccessToastTitle": "تم تحديث تفاصيل المريض",
   "yearsEstimateRequired": "",
-  "yes": "نعم"
+  "yes": "نعم",
+  "dashboardLink.appointments": "تعيينات",
+  "dashboardLink.patientLists": "قوائم المرضى",
+  "dashboardLink.patientQueues": "ذيول المريض"
 }

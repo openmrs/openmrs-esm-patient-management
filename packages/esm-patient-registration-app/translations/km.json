@@ -80,5 +80,8 @@
   "updationSuccessToastDescription": "ព័ត៌មានរបស់អ្នកជំងឺត្រូវបានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ",
   "updationSuccessToastTitle": "ព័ត៌មានលម្អិតអំពីអ្នកជំងឺត្រូវបានធ្វើបច្ចុប្បន្នភាព",
   "yearsEstimateRequired": "តម្រូវ​ឱ្យ​មាន​ការ​ប៉ាន់ស្មាន​ឆ្នាំ",
-  "yes": "បាទ/ចាស"
+  "yes": "បាទ/ចាស",
+  "dashboardLink.appointments": "ប្រភេទនៃជំងឺពិនិត្យ",
+  "dashboardLink.patientLists": "បញ្ជីអ្នកជំងឺ",
+  "dashboardLink.patientQueues": "ជួរអ្នកជំងឺ"
 }

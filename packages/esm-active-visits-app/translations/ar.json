@@ -29,5 +29,8 @@
   "time": "الوقت",
   "visitStartTime": "وقت الزيارة",
   "visitSummary": "ملخص الزيارة",
-  "visitType": "نوع الزيارة"
+  "visitType": "نوع الزيارة",
+  "dashboardLink.appointments": "تعيينات",
+  "dashboardLink.patientLists": "قوائم المرضى",
+  "dashboardLink.patientQueues": "ذيول المريض"
 }

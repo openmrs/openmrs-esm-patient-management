@@ -29,5 +29,8 @@
   "time": "Heure",
   "visitStartTime": "Heure de la consultation",
   "visitSummary": "Compte rendu de la consultation",
-  "visitType": "Type de consultation"
+  "visitType": "Type de consultation",
+  "dashboardLink.appointments": "Rendez-vous",
+  "dashboardLink.patientLists": "Listes de patients",
+  "dashboardLink.patientQueues": "Files d'attente des patients"
 }

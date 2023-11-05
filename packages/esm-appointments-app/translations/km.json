@@ -148,5 +148,8 @@
   "visitType": "ប្រភេទនៃការមកពិនិត្យជំងឺ",
   "vitals": "សញ្ញាជីវិត",
   "weekly": "ប្រចាំសប្តាហ៍",
-  "yes": "Yes"
+  "yes": "Yes",
+  "dashboardLink.appointments": "ការណាត់ជួប",
+  "dashboardLink.patientLists": "បញ្ជីអ្នកជំងឺ",
+  "dashboardLink.patientQueues": "ជួរអ្នកជំងឺ"
 }

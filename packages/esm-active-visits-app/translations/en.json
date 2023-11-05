@@ -29,5 +29,8 @@
   "time": "Time",
   "visitStartTime": "Visit Time",
   "visitSummary": "Visit Summary",
-  "visitType": "Visit Type"
+  "visitType": "Visit Type",
+  "dashboardLink.appointments": "Appointments",
+  "dashboardLink.patientLists": "Patient Lists",
+  "dashboardLink.patientQueues": "Patient Queues"
 }

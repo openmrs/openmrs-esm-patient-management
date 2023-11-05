@@ -148,5 +148,8 @@
   "visitType": "نوع الزيارة",
   "vitals": "العلامات الحيوية",
   "weekly": "أسبوعي",
-  "yes": "نعم"
+  "yes": "نعم",
+  "dashboardLink.appointments": "تعيينات",
+  "dashboardLink.patientLists": "قوائم المرضى",
+  "dashboardLink.patientQueues": "طوابير المرضى"
 }

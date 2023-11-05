@@ -148,5 +148,8 @@
   "visitType": "Tipo de visita",
   "vitals": "Signos vitales",
   "weekly": "Semanal",
-  "yes": "Sí"
+  "yes": "Sí",
+  "dashboardLink.appointments": "Equipo",
+  "dashboardLink.patientLists": "Listas de pacientes",
+  "dashboardLink.patientQueues": "Colas de pacientes"
 }

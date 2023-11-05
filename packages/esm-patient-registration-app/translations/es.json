@@ -80,5 +80,8 @@
   "updationSuccessToastDescription": "La información del paciente se ha actualizado correctamente",
   "updationSuccessToastTitle": "Datos del paciente actualizados",
   "yearsEstimateRequired": "Estimación de años obligatoria",
-  "yes": "Sí"
+  "yes": "Sí",
+  "dashboardLink.appointments": "Equipo",
+  "dashboardLink.patientLists": "Listas de pacientes",
+  "dashboardLink.patientQueues": "Colas de pacientes"
 }

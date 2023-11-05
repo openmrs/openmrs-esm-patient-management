@@ -148,5 +148,8 @@
   "visitType": "סוג הביקור",
   "vitals": "מדדים",
   "weekly": "שבועי",
-  "yes": "Yes"
+  "yes": "Yes",
+  "dashboardLink.appointments": "פגישות",
+  "dashboardLink.patientLists": "רשימות חולים",
+  "dashboardLink.patientQueues": "תורים של חולים"
 }
