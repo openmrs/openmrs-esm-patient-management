@@ -107,7 +107,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                     className={styles.flexRow}
                   /> */}
                 </div>
-                <p className={styles.demographics}>
+                <div className={styles.demographics}>
                   {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
                   <span className={styles.middot}>&middot;</span>
                   {config.defaultIdentifierTypes.length ? (
@@ -123,7 +123,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                       <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
                     </>
                   )}
-                </p>
+                </div>
               </div>
             </ConfigurableLink>
           );

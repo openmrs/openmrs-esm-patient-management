@@ -83,8 +83,8 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
         <div className={styles.searchResultsContainer}>
           <div className={styles.searchResults}>
             <p className={styles.resultsText}>
-              {t('searchResultsCount', '{count} search result', {
-                count: searchResults.length,
+              {t('searchResultsCount', '{{count}} search result', {
+                count: totalResults,
               })}
             </p>
             <PatientSearchResults patients={searchResults} selectPatientAction={selectPatientAction} ref={ref} />

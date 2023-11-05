@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentService, Provider } from '../types';
 import { useAppointmentDate } from '../helpers';
+import dayjs from 'dayjs';
 
 interface AppointmentPatientList {
   uuid: string;
@@ -13,29 +14,45 @@ interface AppointmentPatientList {
     name: string;
     uuid: string;
     age: number;
-    identifiers: Array<{ identifierName: string; identifier: string }>;
+    identifier: string;
   };
   providers: Array<Provider>;
   service: AppointmentService;
   startDateTime: string;
 }
 
-export const useAppointmentList = (appointmentStatus: string, startDate?: string, identifierType?: string) => {
+export const useAppointmentList = (appointmentStatus: string, date?: string) => {
   const { currentAppointmentDate } = useAppointmentDate();
-  const forDate = startDate ? startDate : currentAppointmentDate;
-  const url = `/ws/rest/v1/appointment/appointmentStatus?status=${appointmentStatus}&forDate=${forDate}`;
+  const startDate = date ? date : currentAppointmentDate;
+  const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
+  const searchUrl = `/ws/rest/v1/appointments/search`;
+  const abortController = new AbortController();
+
+  const fetcher = ([url, startDate, endDate, status]) =>
+    openmrsFetch(url, {
+      method: 'POST',
+      signal: abortController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        startDate: startDate,
+        endDate: endDate,
+        status: status,
+      },
+    });
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(
-    appointmentStatus ? url : null,
-    openmrsFetch,
+    [searchUrl, startDate, endDate, appointmentStatus],
+    fetcher,
     { errorRetryCount: 2 },
   );
 
-  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
+  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));
   return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-export const useEarlyAppointmentList = (startDate?: string, identifierType?: string) => {
+export const useEarlyAppointmentList = (startDate?: string) => {
   const { currentAppointmentDate } = useAppointmentDate();
   const forDate = startDate ? startDate : currentAppointmentDate;
   const url = `/ws/rest/v1/appointment/earlyAppointment?forDate=${forDate}`;
@@ -43,18 +60,15 @@ export const useEarlyAppointmentList = (startDate?: string, identifierType?: str
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
-  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment, identifierType));
+  const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));
   return { earlyAppointmentList: (appointments as Array<any>) ?? [], isLoading, error };
 };
 
-function toAppointmentObject(appointment: AppointmentPatientList, identifierType: string) {
-  const patientIdentifier = appointment.patient.identifiers.find(
-    (identifier) => identifier.identifierName === identifierType,
-  );
+function toAppointmentObject(appointment: AppointmentPatientList) {
   return {
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,
-    identifier: patientIdentifier?.identifier ?? '',
+    identifier: appointment.patient.identifier,
     dateTime: appointment.startDateTime,
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',

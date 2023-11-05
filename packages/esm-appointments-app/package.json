@@ -14,6 +14,9 @@
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests --color",
+    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
+    "coverage": "yarn test --coverage",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx'"
   },

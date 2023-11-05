@@ -27,6 +27,10 @@
   margin-top: spacing.$spacing-03;
 }
 
+.menuItem {
+  max-width: none;
+}
+
 .actionsButtonText {
   @include type.type-style('body-compact-01');
   color: $interactive-01;
@@ -35,4 +39,8 @@
 .tableContainer {
   padding: 0 spacing.$spacing-05 spacing.$spacing-05;
   height: calc(100vh - 11rem);
+}
+
+.menuItem {
+  max-width: none;
 }

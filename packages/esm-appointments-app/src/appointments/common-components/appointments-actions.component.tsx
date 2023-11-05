@@ -30,8 +30,8 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
   const visitDate = dayjs(appointment.dateTime);
   const isFutureAppointment = visitDate.isAfter(dayjs());
   const isTodayAppointment = visitDate.isToday();
-  const hasActiveVisit = visits.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
-  const hasCheckedOut = visits.some(
+  const hasActiveVisit = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
+  const hasCheckedOut = visits?.some(
     (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
   );
 

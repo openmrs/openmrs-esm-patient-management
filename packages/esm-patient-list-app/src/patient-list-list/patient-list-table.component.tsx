@@ -1,5 +1,6 @@
 import React, { CSSProperties, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import orderBy from 'lodash-es/orderBy';
 import {
   DataTable,
   DataTableSkeleton,
@@ -15,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import orderBy from 'lodash-es/orderBy';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,

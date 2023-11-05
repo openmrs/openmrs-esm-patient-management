@@ -34,6 +34,7 @@ export interface PatientListOption {
 }
 
 export interface PatientListMember {
+  endDate: string | number | Date;
   id: string;
 }
 
@@ -74,6 +75,7 @@ export interface OpenmrsCohortMember {
   name: string;
   uuid: string;
   patient: OpenmrsResource;
+  voided: boolean;
 }
 
 export interface CohortResponse<T> {

@@ -39,6 +39,35 @@
       "name": "todays-appointments-dashboard",
       "slot": "todays-appointment-slot",
       "component": "homeAppointments"
+    },
+    {
+      "name": "expected-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus"
+    },
+    {
+      "name": "checked-in-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus"
+    },
+    {
+      "name": "completed-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus"
+    },
+    {
+      "name": "missed-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus"
+    },
+    {
+      "name": "cancelled-appointments-panel",
+      "slot": "scheduled-appointments-panels-slot",
+      "component": "appointmentsByStatus"
+    },
+    {
+      "name": "early-appointments-panel",
+      "component": "earlyAppointments"
     }
   ]
 }

@@ -20,7 +20,7 @@
   "notes": "الملاحظات",
   "noVisitsFound": "No visits found",
   "noVisitsToDisplay": "لا زيارات للعرض",
-  "orderDurationAndUnit": "لمدة {duration} {durationUnit}",
+  "orderDurationAndUnit": "لمدة {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "مدة غير محددة",
   "provider": "مقدم الخدمة",
   "refills": "إعادة التعبئة",
