@@ -122,7 +122,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       </div>
       <div className={styles.patientListList}>
         <fieldset className="cds--fieldset">
-          <p className="cds--label">{t('patientLists', 'Patient Lists')}</p>
+          <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
           {!isLoading && results ? (
             results.length > 0 ? (
               results.map((patientList) => (

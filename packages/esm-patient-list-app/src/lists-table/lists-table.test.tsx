@@ -67,7 +67,7 @@ describe('ListsTable', () => {
   it('renders an empty state when there is no patient list data to display', () => {
     render(<ListsTable patientLists={[]} listType={''} />);
 
-    expect(screen.getByTitle(/empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByTitle(/empty state illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/there are no patient lists to display/i)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });

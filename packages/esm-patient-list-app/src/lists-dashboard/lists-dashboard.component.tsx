@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import classnames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
@@ -77,7 +78,7 @@ const ListsDashboard: React.FC = () => {
   }
 
   return (
-    <main className={`omrs-main-content ${styles.dashboardContainer}`}>
+    <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
         <Header />
         <Tabs
