@@ -5,7 +5,7 @@ import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
 import rootComponent from './root.component';
 import patientListActionButtonComponent from './patient-list-action-button.component';
-import patientTableComponent from './patient-table/patient-table.component';
+import listDetailsTableComponent from './list-details-table/list-details-table.component';
 import addPatientToPatientListMenuItemComponent from './add-patient-to-patient-list-menu-item.component';
 
 const moduleName = '@openmrs/esm-patient-list-app';
@@ -41,7 +41,7 @@ export const patientListActionButton = getSyncLifecycle(patientListActionButtonC
 
 export const patientListDashboardLink = getSyncLifecycle(createDashboardLink(dashboardMeta), options);
 
-export const patientTable = getSyncLifecycle(patientTableComponent, {
+export const listDetailsTable = getSyncLifecycle(listDetailsTableComponent, {
   featureName: 'patient-table',
   moduleName,
 });

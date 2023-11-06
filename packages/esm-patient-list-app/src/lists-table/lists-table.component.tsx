@@ -1,6 +1,7 @@
-import React, { CSSProperties, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { type CSSProperties, useId, useMemo, useState } from 'react';
+import fuzzy from 'fuzzy';
 import orderBy from 'lodash-es/orderBy';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -15,22 +16,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   isDesktop,
   useConfig,
+  useDebounce,
   useLayoutType,
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
+import { updatePatientList } from '../api/api-remote';
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
-import { updatePatientList } from '../api/api-remote';
-import { ErrorState } from './error-state/error-state.component';
-import { PatientListEmptyState } from './empty-state/empty-state.component';
-import styles from './patient-list-list.scss';
+import { ErrorState } from '../error-state/error-state.component';
+import EmptyState from '../empty-state/empty-state.component';
+import styles from './lists-table.scss';
 
 /**
  * FIXME Temporarily moved here
@@ -40,40 +43,40 @@ interface DataTableHeader {
   header: React.ReactNode;
 }
 
-interface PatientListTableContainerProps {
-  style?: CSSProperties;
-  patientLists: Array<PatientList>;
-  isLoading?: boolean;
-  headers?: Array<DataTableHeader>;
-  refetch?(): void;
-  listType: string;
-  handleCreate?: () => void;
+interface PatientListTableProps {
   error?: any;
+  handleCreate?: () => void;
+  headers?: Array<DataTableHeader>;
+  isLoading?: boolean;
   isValidating?: boolean;
-  searchTerm?: string;
-  setSearchTerm?: (searchString: string) => void;
+  listType: string;
+  patientLists: Array<PatientList>;
+  refetch?(): void;
+  style?: CSSProperties;
 }
 
-const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
-  style,
-  patientLists = [],
-  isLoading = false,
-  headers,
-  refetch,
-  listType,
-  handleCreate,
+const ListsTable: React.FC<PatientListTableProps> = ({
   error,
+  handleCreate,
+  headers,
+  isLoading = false,
   isValidating,
-  searchTerm,
-  setSearchTerm,
+  listType,
+  patientLists = [],
+  refetch,
+  style,
 }) => {
   const { t } = useTranslation();
+  const id = useId();
   const userId = useSession()?.user?.uuid;
   const layout = useLayoutType();
   const config: ConfigSchema = useConfig();
   const pageSizes = [10, 20, 25, 50];
   const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
+  const debouncedSearchTerm = useDebounce(searchTerm);
 
   const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
     if (userId) {
@@ -89,24 +92,45 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
     const { key } = props;
     setSortParams({ key, order: sortDirection });
   }
+
   const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
-  const handleSearch = (str) => {
-    setSearchTerm(str);
-    goTo(1);
-  };
+  const filteredLists = useMemo(() => {
+    if (!debouncedSearchTerm) {
+      return results;
+    }
+
+    return debouncedSearchTerm
+      ? fuzzy
+          .filter(debouncedSearchTerm, results, { extract: (list) => `${list.display} ${list.type}` })
+          .sort((r1, r2) => r1.score - r2.score)
+          .map((result) => result.original)
+      : results;
+  }, [results, debouncedSearchTerm]);
+
+  const tableRows = useMemo(
+    () =>
+      filteredLists?.map((list) => ({
+        id: list.id,
+        display: list.display,
+        description: list.description,
+        type: list.type,
+        size: list.size,
+      })) ?? [],
+    [filteredLists],
+  );
 
   if (isLoading) {
     return (
       <DataTableSkeleton
-        role="progressbar"
-        style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
-        showToolbar={false}
-        showHeader={false}
-        rowCount={pageSize}
         columnCount={headers.length}
-        zebra
         compact={isDesktop(layout)}
+        role="progressbar"
+        rowCount={pageSize}
+        showHeader={false}
+        showToolbar={false}
+        style={{ ...style, backgroundColor: 'transparent', padding: '0rem' }}
+        zebra
       />
     );
   }
@@ -122,20 +146,25 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
           <div>{isValidating && <InlineLoading />}</div>
           <Layer>
             <Search
-              className={styles.search}
-              id="patient-list-search"
+              className={styles.searchbox}
+              id={`${id}-search`}
               labelText=""
-              onChange={(evnt) => handleSearch(evnt.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               placeholder={t('searchThisList', 'Search this list')}
-              size={isDesktop(layout) ? 'sm' : 'lg'}
+              size={responsiveSize}
               value={searchTerm}
             />
           </Layer>
         </div>
-        <DataTable rows={results} headers={headers} size={isDesktop(layout) ? 'sm' : 'lg'} sortRow={customSortRow}>
+        <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-            <TableContainer style={{ ...style, backgroundColor: 'transparent' }} {...getTableContainerProps()}>
-              <Table {...getTableProps()} data-testid="patientListsTable" isSortable useZebraStyles>
+            <TableContainer {...getTableContainerProps()}>
+              <Table
+                {...getTableProps()}
+                className={styles.table}
+                data-testid="patientListsTable"
+                isSortable
+                useZebraStyles>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -162,7 +191,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
                               <TableCell className={styles.tableCell} key={cell.id}>
                                 <ConfigurableLink
                                   className={styles.link}
-                                  to={`\${openmrsSpaBase}/home/patient-lists/${patientLists[index]?.id}`}>
+                                  to={window.getOpenmrsSpaBase() + `home/patient-lists/${patientLists[index]?.id}`}>
                                   {cell.value}
                                 </ConfigurableLink>
                               </TableCell>
@@ -196,18 +225,22 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
             </TableContainer>
           )}
         </DataTable>
+        {filteredLists?.length === 0 && (
+          <div className={styles.filterEmptyState}>
+            <Layer level={0}>
+              <Tile className={styles.filterEmptyStateTile}>
+                <p className={styles.filterEmptyStateContent}>{t('noMatchingLists', 'No matching lists to display')}</p>
+                <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+              </Tile>
+            </Layer>
+          </div>
+        )}
         {paginated && (
           <Layer>
             <Pagination
-              size={isDesktop(layout) ? 'sm' : 'lg'}
               backwardText={t('previousPage', 'Previous page')}
               forwardText={t('nextPage', 'Next page')}
               itemsPerPageText={t('itemsPerPage', 'Items per page:')}
-              page={currentPage}
-              pageNumberText={t('pageNumber', 'Page number')}
-              pageSize={pageSize}
-              pageSizes={pageSizes}
-              totalItems={patientLists?.length}
               onChange={({ page: newPage, pageSize: newPageSize }) => {
                 if (newPageSize !== pageSize) {
                   setPageSize(newPageSize);
@@ -216,6 +249,12 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
                   goTo(newPage);
                 }
               }}
+              page={currentPage}
+              pageNumberText={t('pageNumber', 'Page number')}
+              pageSize={pageSize}
+              pageSizes={pageSizes}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              totalItems={patientLists?.length}
             />
           </Layer>
         )}
@@ -223,7 +262,7 @@ const PatientListTableContainer: React.FC<PatientListTableContainerProps> = ({
     );
   }
 
-  return <PatientListEmptyState launchForm={handleCreate} listType={listType} />;
+  return <EmptyState launchForm={handleCreate} listType={listType} />;
 };
 
-export default PatientListTableContainer;
+export default ListsTable;

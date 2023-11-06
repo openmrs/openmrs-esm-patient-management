@@ -1,3 +1,4 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '../style.scss';
@@ -6,69 +7,16 @@
   margin: 1rem 0;
 }
 
-.link {
-  text-decoration: none;
-}
-
-.patientListListPage {
+.dashboardContainer {
   display: flex;
   background-color: $ui-02;
 }
 
-.patientListList {
+.dashboard {
   height: 100%;
   width: 100%;
   background-color: $ui-02;
   height: calc(100vh - 3rem);
-}
-
-.patientListHeader {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  height: spacing.$spacing-12;
-  display: flex;
-  justify-content: space-between;
-}
-
-.leftJustifiedItems {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.rightJustifiedItems {
-  @include type.type-style('body-compact-02');
-  display: flex;
-  flex-direction: column;
-  color: $text-02;
-  padding: 1rem 0;
-  justify-content: space-between;
-}
-
-.date {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: 1rem;
-
-  svg {
-    margin-right: 0.5rem;
-  }
-}
-
-.pageName {
-  @include type.type-style('heading-04');
-}
-
-.pageLabels {
-  p:first-of-type {
-    margin-bottom: 0.25rem;
-  }
-}
-
-.newListButton {
-  align-self: flex-end;
-  width: fit-content;
 }
 
 .tabs {
@@ -97,29 +45,10 @@
   display: none;
 }
 
-.patientListTableContainer {
+.listsTableContainer {
   padding: spacing.$spacing-05;
   background-color: $ui-01;
   height: calc(100vh - 12rem);
-}
-
-// Patient List Table
-.searchContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-}
-
-.searchContainer > div {
-  align-self: center;
-  justify-self: flex-end;
-}
-
-.search {
-  width: 100%;
-  max-width: 16rem;
-  background-color: $ui-02;
-  border-bottom-color: $ui-03;
 }
 
 .tableBody {
@@ -142,7 +71,6 @@
 }
 
 // Search Overlay
-
 .searchOverlay {
   z-index: 1;
   grid-row: 2 / 4;

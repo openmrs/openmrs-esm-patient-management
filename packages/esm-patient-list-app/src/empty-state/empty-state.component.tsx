@@ -10,7 +10,7 @@ export interface EmptyStateProps {
   launchForm?(): void;
 }
 
-export const PatientListEmptyState: React.FC<EmptyStateProps> = ({ listType, launchForm }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ listType, launchForm }) => {
   const { t } = useTranslation();
 
   return (
@@ -37,3 +37,5 @@ export const PatientListEmptyState: React.FC<EmptyStateProps> = ({ listType, lau
     </Layer>
   );
 };
+
+export default EmptyState;

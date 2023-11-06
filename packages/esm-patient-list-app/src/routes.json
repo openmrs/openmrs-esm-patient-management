@@ -16,12 +16,12 @@
     },
     {
       "component": "root",
-      "name": "patient-lists-dashboard", 
+      "name": "patient-lists-dashboard",
       "slot": "patient-lists-dashboard-slot"
     },
     {
-      "name": "patient-table",
-      "component": "patientTable"
+      "name": "list-details-table",
+      "component": "listDetailsTable"
     },
     {
       "name": "add-patient-to-patient-list-modal",
