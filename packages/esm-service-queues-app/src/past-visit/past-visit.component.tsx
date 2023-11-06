@@ -31,7 +31,7 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
       </div>
     );
   }
-  return <p className={`${styles.bodyLong01}`}>{t('noPreviousVisitFound', 'No previous visit found')}</p>;
+  return <p className={styles.bodyLong01}>{t('noPreviousVisitFound', 'No previous visit found')}</p>;
 };
 
 export default PastVisit;

@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
+import classNames from 'classnames';
 import { Button, Link } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
-import { Router, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, FormikHelpers } from 'formik';
 import { createErrorHandler, showToast, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps, PatientIdentifierValue } from './patient-registration.types';
+import { FormValues, CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import {
-  cancelRegistration,
-  filterUndefinedPatientIdenfier,
-  parseAddressTemplateXml,
-  scrollIntoView,
-} from './patient-registration-utils';
+import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
@@ -158,7 +154,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
                 {sections.map((section) => (
-                  <div className={`${styles.space05} ${styles.touchTarget}`} key={section.name}>
+                  <div className={classNames(styles.space05, styles.touchTarget)} key={section.name}>
                     <Link className={styles.linkName} onClick={() => scrollIntoView(section.id)}>
                       <XAxis size={16} /> {t(`${section.id}Section`, section.name)}
                     </Link>

@@ -1,4 +1,5 @@
 import React, { useCallback, useReducer, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Layer, NumberInput, Switch, TextInput } from '@carbon/react';
 import { ChevronUp, ChevronDown } from '@carbon/react/icons';
@@ -125,7 +126,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
             </p>
           ) : (
             <div className={styles.refineSearchBannerFilterInfo}>
-              <span className={`${styles.filtersAppliedCount} ${styles.bodyShort01}`}>{filtersApplied}</span>{' '}
+              <span className={classNames(styles.filtersAppliedCount, styles.bodyShort01)}>{filtersApplied}</span>{' '}
               <p className={styles.bodyShort01}>{t('filtersAppliedText', 'search queries added')}</p>
               <Button kind="ghost" onClick={handleResetFields} className={styles.refineSearchDialogOpener} size="sm">
                 {t('clear', 'Clear')}
@@ -156,10 +157,13 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                 </Button>
               </div>
               <form onSubmit={handleSubmit}>
-                <div className={`${styles.padded} ${isTablet && styles.refineSearchDialogGenderSexRow}`}>
+                <div
+                  className={classNames(styles.padded, {
+                    [styles.refineSearchDialogGenderSexRow]: isTablet,
+                  })}>
                   <div className={styles.fieldTabletOrOverlay}>
                     <div className={styles.labelText}>
-                      <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">
+                      <label className={classNames(styles.sexLabelText, styles.label01)} htmlFor="#gender">
                         {t('sex', 'Sex')}
                       </label>
                     </div>
@@ -181,7 +185,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                       <Switch name="unknown" text={t('unknown', 'Unknown')} />
                     </ContentSwitcher>
                   </div>
-                  <div className={`${styles.fieldTabletOrOverlay} ${styles.dobFields}`}>
+                  <div className={classNames(styles.fieldTabletOrOverlay, styles.dobFields)}>
                     <NumberInput
                       id="dateOfBirth"
                       placeholder="DD"
@@ -226,7 +230,10 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                     />
                   </div>
                 </div>
-                <div className={`${styles.padded} ${isTablet && styles.phoneLastVisitRow}`}>
+                <div
+                  className={classNames(styles.padded, {
+                    [styles.phoneLastVisitRow]: isTablet,
+                  })}>
                   <div className={styles.phonePostcode}>
                     <div className={styles.fieldTabletOrOverlay}>
                       <NumberInput
@@ -264,7 +271,10 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
                     />
                   </div>
                 </div>
-                <div className={`${isTablet && styles.paddedButtons} ${styles.buttonSet}`}>
+                <div
+                  className={classNames(styles.buttonSet, {
+                    [styles.paddedButtons]: isTablet,
+                  })}>
                   <Button kind="secondary" size="xl" onClick={handleResetFields} className={styles.button}>
                     {t('resetFields', 'Reset fields')}
                   </Button>
@@ -286,7 +296,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
       <h2 className={styles.productiveHeading02}>{t('refineSearch', 'Refine search')}</h2>
       <div className={styles.field}>
         <div className={styles.labelText}>
-          <label className={`${styles.sexLabelText} ${styles.label01}`} htmlFor="#gender">
+          <label className={classNames(styles.sexLabelText, styles.label01)} htmlFor="#gender">
             {t('sex', 'Sex')}
           </label>
         </div>
@@ -306,7 +316,7 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           <Switch name="unknown" text={t('unknown', 'Unknown')} />
         </ContentSwitcher>
       </div>
-      <div className={`${styles.field} ${styles.dobFields}`}>
+      <div className={classNames(styles.field, styles.dobFields)}>
         <Layer>
           <NumberInput
             id="dateOfBirth"
@@ -393,12 +403,16 @@ const RefineSearch: React.FC<RefineSearchProps> = ({ setFilters, inTabletOrOverl
           />
         </Layer>
       </div>
-      <hr className={`${styles.field} ${styles.horizontalDivider}`} />
-      <Button type="submit" kind="primary" size="md" className={`${styles.field} ${styles.button}`}>
+      <hr className={classNames(styles.field, styles.horizontalDivider)} />
+      <Button type="submit" kind="primary" size="md" className={classNames(styles.field, styles.button)}>
         {t('apply', 'Apply')}{' '}
         {filtersApplied ? `(${filtersApplied} ${t('countOfFiltersApplied', 'filters applied')})` : null}
       </Button>
-      <Button kind="secondary" size="md" onClick={handleResetFields} className={`${styles.field} ${styles.button}`}>
+      <Button
+        kind="secondary"
+        size="md"
+        onClick={handleResetFields}
+        className={classNames(styles.field, styles.button)}>
         {t('resetFields', 'Reset fields')}
       </Button>
     </form>

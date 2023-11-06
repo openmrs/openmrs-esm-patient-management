@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import { Tile } from '@carbon/react';
@@ -86,7 +87,9 @@ const Medications: React.FC<MedicationProps> = ({ medications }) => {
             ),
         )
       ) : (
-        <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noMedicationsFound', 'No medications found')}</p>
+        <p className={classNames(styles.bodyLong01, styles.text02)}>
+          {t('noMedicationsFound', 'No medications found')}
+        </p>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { Encounter } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
@@ -12,7 +13,7 @@ const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encoun
   }, [encounters]);
 
   return (
-    <div className={`${styles.bodyLong01} ${styles.testSummaryExtension}`}>
+    <div className={classNames(styles.bodyLong01, styles.testSummaryExtension)}>
       <ExtensionSlot name="test-results-filtered-overview" state={{ filter, patientUuid }} />
     </div>
   );

@@ -21,6 +21,7 @@
   "emptyStateText": "لا توجد قوائم مرضى من نوع {{listType}} لعرضها",
   "error": "خطأ",
   "errorAddPatientToList": "لم يتم إضافة المريض إلى القائمة",
+  "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "errorCreatePatientListDescription": "تعذر إنشاء قائمة المرضى",
   "errorDeleteList": "تعذر حذف قائمة المرضى",
   "errorRemovingPatientFromList": "Failed to remove patient from list",

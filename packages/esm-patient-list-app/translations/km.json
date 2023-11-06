@@ -21,6 +21,7 @@
   "emptyStateText": "មិនមានបញ្ជីអ្នកជំងឺ {ប្រភេទបញ្ជី} ដែលត្រូវបង្ហាញទេ",
   "error": "កំហុស/ ការភាន់ច្រឡំ",
   "errorAddPatientToList": "អ្នកជំងឺមិនត្រូវបានបញ្ចូលទៅក្នុងបញ្ជីទេ",
+  "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "errorCreatePatientListDescription": "មិនអាចបង្កើតបញ្ជីអ្នកជំងឺបានទេ",
   "errorDeleteList": "មិនអាចលុបបញ្ជីអ្នកជំងឺបានទេ",
   "errorRemovingPatientFromList": "Failed to remove patient from list",

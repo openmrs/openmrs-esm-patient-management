@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { CaretLeft, CaretRight } from '@carbon/react/icons';
 import styles from './pagination.scss';
-import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   hasMore: boolean;
@@ -26,10 +27,12 @@ const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, setCur
     const totalButtons = right - left + 1;
     return [...Array(totalButtons).keys()].map((index) => (
       <Button
+        className={classNames(styles.paginationButton, {
+          [styles.activeButton]: index + left === currentPage,
+        })}
         key={index}
         kind="ghost"
         onClick={() => setCurrentPage(index + left)}
-        className={`${styles.paginationButton} ${index + left === currentPage && styles.activeButton}`}
         type="button">
         {index + left}
       </Button>

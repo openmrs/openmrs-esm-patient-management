@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { interpolateString, navigate, useConfig, usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
@@ -9,7 +10,7 @@ import {
   PatientSearchResults,
   SearchResultsEmptyState,
 } from './patient-search-views.component';
-import { SearchedPatient } from '../types';
+import type { SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 
 interface PatientSearchComponentProps {
@@ -87,12 +88,16 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   }, [query, isLoading, inTabletOrOverlay, results, handlePatientSelection, fetchError]);
 
   return (
-    <div className={`${!inTabletOrOverlay ? styles.searchResultsDesktop : styles.searchResultsTabletOrOverlay}`}>
-      <div className={`${stickyPagination && styles.broadBottomMargin}`}>
+    <div
+      className={classNames({
+        [styles.searchResultsDesktop]: !inTabletOrOverlay,
+        [styles.searchResultsTabletOrOverlay]: inTabletOrOverlay,
+      })}>
+      <div className={classNames(stickyPagination, styles.broadBottomMargin)}>
         <h2
-          className={`${styles.resultsHeader} ${styles.productiveHeading02} ${
-            inTabletOrOverlay && styles.leftPaddedResultHeader
-          }`}>
+          className={classNames(styles.resultsHeader, styles.productiveHeading02, {
+            [styles.leftPaddedResultHeader]: inTabletOrOverlay,
+          })}>
           {isLoading ? t('searchingText', 'Searching...') : null}
           {!isLoading
             ? t('searchResultsCount', '{{count}} search result', {
@@ -103,7 +108,10 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         {searchResultsView}
       </div>
       {paginated && (
-        <div className={`${styles.pagination} ${stickyPagination && styles.stickyPagination}`}>
+        <div
+          className={classNames(styles.pagination, {
+            [styles.stickyPagination]: stickyPagination,
+          })}>
           <Pagination
             setCurrentPage={goTo}
             currentPage={currentPage}

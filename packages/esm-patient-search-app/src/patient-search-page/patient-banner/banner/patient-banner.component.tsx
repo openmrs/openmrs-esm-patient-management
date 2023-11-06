@@ -1,4 +1,5 @@
 import React, { MouseEvent, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -98,18 +99,21 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   return (
     <>
       <div
-        className={`${styles.container} ${
-          isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer
-        }`}
+        className={classNames(styles.container, {
+          [styles.deceasedPatientContainer]: isDeceased,
+          [styles.activePatientContainer]: !isDeceased,
+        })}
         role="banner">
         <ConfigurableLink
+          className={classNames(styles.patientBanner, {
+            [styles.patientAvatarButton]: selectPatientAction,
+          })}
+          onClick={(evt) => selectPatientAction(evt, patientUuid)}
           to={`${interpolateString(config.search.patientResultUrl, {
             patientUuid: patientUuid,
-          })}`}
-          onClick={(evt) => selectPatientAction(evt, patientUuid)}
-          className={`${styles.patientBanner} ${selectPatientAction && styles.patientAvatarButton}`}>
+          })}`}>
           {patientAvatar}
-          <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
+          <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
@@ -191,7 +195,7 @@ export const PatientBannerSkeleton = () => {
     <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
         <SkeletonIcon className={styles.patientAvatar} />
-        <div className={`${styles.patientNameRow} ${styles.patientInfo}`}>
+        <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
           <div className={styles.flexRow}>
             <SkeletonText />
           </div>

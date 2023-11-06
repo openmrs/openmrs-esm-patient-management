@@ -1,4 +1,5 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
+import classNames from 'classnames';
 import styles from './daily-workload-module.scss';
 import React from 'react';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
@@ -41,17 +42,17 @@ const DailyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, currentD
               <div className={styles.currentData}>
                 {currentData?.service.map(({ serviceName, count, i }) => (
                   <div
+                    className={classNames(styles.serviceArea, styles[colorCoding[serviceName]])}
+                    key={serviceName}
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` })}
-                    key={serviceName}
-                    className={`${styles.serviceArea} ${styles[colorCoding[serviceName]]}`}>
+                    onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` })}>
                     <span>{serviceName}</span>
                     <span>{count}</span>
                   </div>
                 ))}
                 <div
-                  className={`${styles.serviceArea} ${styles.green}`}
+                  className={classNames(styles.serviceArea, styles.green)}
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/Total` })}>

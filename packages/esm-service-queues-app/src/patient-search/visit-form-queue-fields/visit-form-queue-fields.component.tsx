@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { InlineNotification, Layer, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
@@ -96,7 +97,7 @@ const StartVisitQueueFields: React.FC = () => {
         )}
       </section>
 
-      <section className={`${styles.section} ${styles.sectionHidden}`}>
+      <section className={classNames(styles.section, styles.sectionHidden)}>
         <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
         <Select
           labelText={t('selectStatus', 'Select a status')}
@@ -140,7 +141,7 @@ const StartVisitQueueFields: React.FC = () => {
         )}
       </section>
 
-      <section className={`${styles.section} ${styles.sectionHidden}`}>
+      <section className={classNames(styles.section, styles.sectionHidden)}>
         <TextInput
           type="number"
           id="sortWeight"

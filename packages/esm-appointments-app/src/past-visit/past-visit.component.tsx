@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton, Tab, Tabs } from '@carbon/react';
 import { formatDate, OpenmrsResource, parseDate, useLayoutType } from '@openmrs/esm-framework';
@@ -35,6 +36,16 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
   if (pastVisits?.length) {
     const encounters = mapEncounters(pastVisits[0]);
 
+    const tabsClasses = classNames(styles.verticalTabs, {
+      [styles.tabletTabs]: isTablet,
+      [styles.desktopTabs]: !isTablet,
+    });
+
+    const tabClass = (index) =>
+      classNames(styles.tab, styles.bodyLong01, {
+        [styles.selectedTab]: selectedTabIndex === index,
+      });
+
     return (
       <div className={styles.wrapper}>
         <div className={styles.visitType}>
@@ -44,27 +55,27 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
           </p>
         </div>
         <div className={styles.visitContainer}>
-          <Tabs className={`${styles.verticalTabs} ${isTablet ? styles.tabletTabs : styles.desktopTabs}`}>
+          <Tabs className={tabsClasses}>
             <Tab
-              className={`${styles.tab} ${styles.bodyLong01} ${selectedTabIndex === 0 && styles.selectedTab}`}
+              className={tabClass[0]}
               id="vitals-tab"
               onClick={() => setSelectedTabIndex(0)}
               label={t('vitals', 'Vitals')}></Tab>
 
             <Tab
-              className={`${styles.tab} ${selectedTabIndex === 1 && styles.selectedTab}`}
+              className={tabClass[1]}
               id="notes-tab"
               onClick={() => setSelectedTabIndex(1)}
               label={t('notes', 'Notes')}></Tab>
 
             <Tab
-              className={`${styles.tab} ${selectedTabIndex === 2 && styles.selectedTab}`}
+              className={tabClass[2]}
               id="medications-tab"
               onClick={() => setSelectedTabIndex(2)}
               label={t('medications', 'Medications')}></Tab>
 
             <Tab
-              className={`${styles.tab} ${selectedTabIndex === 3 && styles.selectedTab}`}
+              className={tabClass[3]}
               id="encounters-tab"
               onClick={() => setSelectedTabIndex(3)}
               label={t('encounters', 'Encounters')}>
@@ -75,10 +86,8 @@ const PastVisit: React.FC<PastVisitProps> = ({ patientUuid }) => {
       </div>
     );
   }
-  return <p className={`${styles.bodyLong01}`}>{t('noPreviousVisitFound', 'No previous visit found')}</p>;
+  return <p className={styles.bodyLong01}>{t('noPreviousVisitFound', 'No previous visit found')}</p>;
 };
-
-export default PastVisit;
 
 export function mapEncounters(visit) {
   return visit?.encounters?.map((encounter) => ({
@@ -93,3 +102,5 @@ export function mapEncounters(visit) {
     visitType: visit?.visitType?.name,
   }));
 }
+
+export default PastVisit;

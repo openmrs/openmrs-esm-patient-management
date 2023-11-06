@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Tab, Tabs, TabList } from '@carbon/react';
@@ -95,7 +96,7 @@ const PatientListList: React.FC = () => {
   };
 
   return (
-    <main className={`omrs-main-content ${styles.patientListListPage}`}>
+    <main className={classNames('omrs-main-content', styles.patientListListPage)}>
       <section className={styles.patientListList}>
         <div className={styles.patientListHeader}>
           <div className={styles.leftJustifiedItems}>
