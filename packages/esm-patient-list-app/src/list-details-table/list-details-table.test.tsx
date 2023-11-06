@@ -1,13 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import PatientTable from './patient-table.component';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import ListDetailsTable from './list-details-table.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   isDesktop: jest.fn(() => true),
 }));
 
-describe('PatientTable Component', () => {
+describe('ListDetailsTable Component', () => {
   const patients = [
     {
       identifier: '123abced',
@@ -48,13 +49,6 @@ describe('PatientTable Component', () => {
     },
   ];
 
-  const mockedOnSearch = jest.fn();
-
-  const search = {
-    onSearch: mockedOnSearch,
-    placeHolder: 'Search Patients',
-  };
-
   const mockedOnChange = jest.fn();
 
   let pagination = {
@@ -68,10 +62,9 @@ describe('PatientTable Component', () => {
 
   it('renders table with patient data', () => {
     render(
-      <PatientTable
+      <ListDetailsTable
         patients={patients}
         columns={columns}
-        search={search}
         pagination={pagination}
         isLoading={false}
         autoFocus={false}
@@ -85,10 +78,9 @@ describe('PatientTable Component', () => {
 
   it('renders loading skeleton when loading', () => {
     render(
-      <PatientTable
+      <ListDetailsTable
         patients={patients}
         columns={columns}
-        search={search}
         pagination={pagination}
         isLoading={true}
         autoFocus={false}
@@ -99,29 +91,5 @@ describe('PatientTable Component', () => {
     );
 
     expect(screen.getByTestId('data-table-skeleton')).toBeInTheDocument();
-  });
-
-  it('performs search when typing in the search input', async () => {
-    render(
-      <PatientTable
-        patients={patients}
-        columns={columns}
-        search={search}
-        pagination={pagination}
-        isLoading={false}
-        autoFocus={false}
-        isFetching={false}
-        mutateListDetails={jest.fn()}
-        mutateListMembers={jest.fn()}
-      />,
-    );
-
-    const searchInput = screen.getByPlaceholderText('Search Patients');
-    const searchText = 'John Doe';
-
-    fireEvent.change(searchInput, { target: { value: searchText } });
-
-    expect(searchInput).toHaveValue(searchText);
-    await waitFor(() => expect(mockedOnSearch).toHaveBeenCalledWith(searchText));
   });
 });

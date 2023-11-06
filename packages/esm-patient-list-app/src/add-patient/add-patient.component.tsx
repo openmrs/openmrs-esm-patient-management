@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import useSWR from 'swr';
+import { Button, Checkbox, Pagination, Search, CheckboxSkeleton } from '@carbon/react';
 import {
   getDynamicOfflineDataEntries,
   putDynamicOfflineData,
@@ -13,7 +14,6 @@ import {
   navigate,
   useConfig,
 } from '@openmrs/esm-framework';
-import { Button, Checkbox, Pagination, Search, CheckboxSkeleton } from '@carbon/react';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
 import { ConfigSchema } from '../config-schema';
 import styles from './add-patient.scss';
@@ -21,6 +21,13 @@ import styles from './add-patient.scss';
 interface AddPatientProps {
   closeModal: () => void;
   patientUuid: string;
+}
+
+interface AddablePatientListViewModel {
+  addPatient(): Promise<void>;
+  displayName: string;
+  checked?: boolean;
+  id: string;
 }
 
 const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
@@ -31,8 +38,9 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 
   const handleCreateNewList = () => {
     navigate({
-      to: '${openmrsSpaBase}/home/patient-lists?new_cohort=true',
+      to: window.getOpenmrsSpaBase() + 'home/patient-lists?new_cohort=true',
     });
+
     closeModal();
   };
 
@@ -114,7 +122,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       </div>
       <div className={styles.patientListList}>
         <fieldset className="cds--fieldset">
-          <p className="cds--label">Patient Lists</p>
+          <p className="cds--label">{t('patientLists', 'Patient lists')}</p>
           {!isLoading && results ? (
             results.length > 0 ? (
               results.map((patientList) => (
@@ -195,13 +203,6 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
 // This is why the following abstracts away the differences between the real and the fake patient lists.
 // The component doesn't really care about which is which - the only thing that matters is that the
 // data can be fetched and that there is an "add patient" function.
-
-interface AddablePatientListViewModel {
-  id: string;
-  displayName: string;
-  checked?: boolean;
-  addPatient(): Promise<void>;
-}
 
 export function useAddablePatientLists(patientUuid: string) {
   const { t } = useTranslation();

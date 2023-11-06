@@ -13,7 +13,8 @@
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid $ui-03;
-  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-04;
+  padding: spacing.$spacing-04 spacing.$spacing-05;
+  padding-right: 0;
   background-color: $ui-01;
 }
 

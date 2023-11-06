@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { useLocation } from 'react-router-dom';
 import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '../../../../__mocks__/session.mock';
-import PatientListList from './patient-list-list.component';
 import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import ListsDashboard from './lists-dashboard.component';
 
 const mockedUseLocation = jest.mocked(useLocation);
 const mockedUseSession = jest.mocked(useSession);
@@ -21,7 +21,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   navigate: jest.fn(),
 }));
 
-describe('PatientListList', () => {
+describe('ListsDashboard', () => {
   beforeEach(() => {
     mockedUseLocation.mockReturnValue({
       pathname: '/',
@@ -96,7 +96,7 @@ describe('PatientListList', () => {
   });
 
   it('renders the patient list page UI correctly', async () => {
-    render(<PatientListList />);
+    render(<ListsDashboard />);
 
     await waitForLoadingToFinish();
 
@@ -116,14 +116,16 @@ describe('PatientListList', () => {
     columnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('tab', { name: /starred lists/i })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('clicking a tab switches the page content to the selected tab', async () => {
     const user = userEvent.setup();
 
-    render(<PatientListList />);
+    render(<ListsDashboard />);
 
-    const systemListsTab = screen.getByRole('tab', { name: 'System lists' });
+    const systemListsTab = screen.getByRole('tab', { name: /system lists/i });
     expect(systemListsTab).toHaveAttribute('aria-selected', 'false');
 
     await user.click(systemListsTab);
