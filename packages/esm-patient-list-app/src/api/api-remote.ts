@@ -15,11 +15,9 @@ import {
 
 export const cohortUrl = '/ws/rest/v1/cohortm';
 
-async function postData(url: string, data = {}) {
-  const abortController = new AbortController();
-
+async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
-    signal: abortController.signal,
+    signal: ac.signal,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,11 +28,9 @@ async function postData(url: string, data = {}) {
   return response.data;
 }
 
-async function deleteData(url: string, data = {}) {
-  const abortController = new AbortController();
-
+async function deleteData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
-    signal: abortController.signal,
+    signal: ac.signal,
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -49,8 +45,8 @@ export async function getAllPatientLists(
   filter: PatientListFilter = {},
   myListCohortTypeUUID,
   systemListCohortTypeUUID,
+  ac = new AbortController(),
 ) {
-  const abortController = new AbortController();
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [['v', custom]];
 
@@ -73,7 +69,7 @@ export async function getAllPatientLists(
   const {
     data: { results, error },
   } = await openmrsFetch<CohortResponse<OpenmrsCohort>>(`${cohortUrl}/cohort?${params}`, {
-    signal: abortController.signal,
+    signal: ac.signal,
   });
 
   if (error) {
@@ -97,15 +93,13 @@ export function updatePatientList(id: string, update: PatientListUpdate) {
   return Promise.resolve();
 }
 
-export async function getPatientListMembers(cohortUuid: string) {
-  const abortController = new AbortController();
-
+export async function getPatientListMembers(cohortUuid: string, ac = new AbortController()) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortResponse<OpenmrsCohortMember>>(
     `${cohortUrl}/cohortmember?cohort=${cohortUuid}&v=default`,
     {
-      signal: abortController.signal,
+      signal: ac.signal,
     },
   );
 
@@ -118,7 +112,7 @@ export async function getPatientListMembers(cohortUuid: string) {
 
   const result = await openmrsFetch(`/ws/fhir2/R4/Patient/_search?_id=${searchQuery}`, {
     method: 'POST',
-    signal: abortController.signal,
+    signal: ac.signal,
   });
 
   const patients: Array<PatientListMember> = result.data.entry.map((e) => e.resource);
@@ -134,14 +128,13 @@ export async function getPatientListMembers(cohortUuid: string) {
   return validPatients;
 }
 
-export async function getPatientListIdsForPatient(patientUuid: string) {
-  const abortController = new AbortController();
+export async function getPatientListIdsForPatient(patientUuid: string, ac = new AbortController()) {
   const {
     data: { results, error },
   } = await openmrsFetch<CohortResponse<OpenmrsCohortRef>>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     {
-      signal: abortController.signal,
+      signal: ac.signal,
     },
   );
 
@@ -162,23 +155,31 @@ export async function removePatientFromList(cohortMembershipUuid: string) {
   });
 }
 
-export async function createPatientList(cohort: NewCohortDataPayload) {
-  return postData(`${cohortUrl}/cohort/`, {
-    ...cohort,
-    startDate: new Date(),
-    groupCohort: false,
-    definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
-  });
+export async function createPatientList(cohort: NewCohortDataPayload, ac = new AbortController()) {
+  return postData(
+    `${cohortUrl}/cohort/`,
+    {
+      ...cohort,
+      startDate: new Date(),
+      groupCohort: false,
+      definitionHandlerClassname: 'org.openmrs.module.cohort.definition.handler.DefaultCohortDefinitionHandler',
+    },
+    ac,
+  );
 }
 
-export async function editPatientList(cohortUuid: string, cohort: NewCohortData) {
-  return postData(`${cohortUrl}/cohort/${cohortUuid}`, cohort);
+export async function editPatientList(cohortUuid: string, cohort: NewCohortData, ac = new AbortController()) {
+  return postData(`${cohortUrl}/cohort/${cohortUuid}`, cohort, ac);
 }
 
-export async function deletePatientList(cohortUuid: string) {
-  return deleteData(`${cohortUrl}/cohort/${cohortUuid}`, {
-    voidReason: '',
-  });
+export async function deletePatientList(cohortUuid: string, ac = new AbortController()) {
+  return deleteData(
+    `${cohortUrl}/cohort/${cohortUuid}`,
+    {
+      voidReason: '',
+    },
+    ac,
+  );
 }
 
 export async function getPatientListName(patientListUuid: string) {
