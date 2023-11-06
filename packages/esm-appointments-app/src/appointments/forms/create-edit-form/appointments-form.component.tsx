@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -359,10 +360,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
       )}
 
       <Select
+        className={classNames(styles.inputContainer, {
+          [styles.hide]: hiddenFormFields.includes('providers'),
+        })}
         id="providers"
         invalidText="Required"
         labelText={t('selectProvider', 'Select a provider')}
-        className={`${styles.inputContainer} ${hiddenFormFields.includes('providers') && styles.hide}`}
         onChange={(event) => {
           setPatientAppointment({ ...patientAppointment, providerUuid: event.target.value });
         }}

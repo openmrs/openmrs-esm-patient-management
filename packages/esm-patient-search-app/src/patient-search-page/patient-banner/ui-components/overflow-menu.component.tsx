@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { Button } from '@carbon/react';
 import styles from './overflow-menu.scss';
 
@@ -46,26 +47,29 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   }, [wrapperRef]);
 
   return (
-    <div data-overflow-menu className={`cds--overflow-menu ${styles.container}`} ref={wrapperRef}>
+    <div data-overflow-menu className={classNames('cds--overflow-menu', styles.container)} ref={wrapperRef}>
       <Button
-        kind="ghost"
-        className={`cds--overflow-menu__trigger ${showMenu && 'cds--overflow-menu--open'} ${
-          isDeceased ? styles.deceased : ''
-        } ${styles.overflowMenuButton}`}
-        aria-haspopup
-        aria-expanded={showMenu}
-        id="custom-actions-overflow-menu-trigger"
+        className={classNames('cds--overflow-menu__trigger', styles.overflowMenuButton, {
+          'cds--overflow-menu--open': showMenu,
+          [styles.deceased]: isDeceased,
+        })}
         aria-controls="custom-actions-overflow-menu"
+        aria-expanded={showMenu}
+        aria-haspopup
+        id="custom-actions-overflow-menu-trigger"
+        kind="ghost"
         onClick={toggleShowMenu}>
         {menuTitle}
       </Button>
       <div
-        className={`cds--overflow-menu-options cds--overflow-menu--flip ${styles.menu} ${showMenu && styles.show}`}
-        tabIndex={0}
-        data-floating-menu-direction="bottom"
-        role="menu"
         aria-labelledby="custom-actions-overflow-menu-trigger"
-        id="custom-actions-overflow-menu">
+        className={classNames('cds--overflow-menu-options', 'cds--overflow-menu--flip', styles.menu, {
+          [styles.show]: showMenu,
+        })}
+        data-floating-menu-direction="bottom"
+        id="custom-actions-overflow-menu"
+        role="menu"
+        tabIndex={0}>
         <ul className="cds--overflow-menu-options__content">{children}</ul>
         <span />
       </div>

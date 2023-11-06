@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import {
   StructuredListHead,
   StructuredListCell,
@@ -45,7 +46,9 @@ const EncounterList: React.FC<EncounterListProps> = ({ encounters }) => {
     );
   }
 
-  return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncountersFound', 'No encounters found')}</p>;
+  return (
+    <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
+  );
 };
 
 export default EncounterList;

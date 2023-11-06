@@ -18,6 +18,7 @@
     "extract-translations": "turbo extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
   "dependencies": {
+    "classnames": "^2.3.2",
     "swr": "^2.0.1",
     "xlsx": "^0.18.5"
   },

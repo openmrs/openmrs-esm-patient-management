@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import styles from './overflow-menu.scss';
 
 interface CustomOverflowMenuComponentProps {
@@ -30,9 +31,11 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
   }, [wrapperRef]);
 
   return (
-    <div data-overflow-menu className={`cds--overflow-menu ${styles.overflowMenu}`} ref={wrapperRef}>
+    <div data-overflow-menu className={classNames('cds--overflow-menu', styles.overflowMenu)} ref={wrapperRef}>
       <button
-        className={`cds--overflow-menu__trigger ${styles.overflowMenuButton} ${showMenu && 'cds--overflow-menu--open'}`}
+        className={classNames('cds--overflow-menu__trigger', styles.overflowMenuButton, {
+          'cds--overflow-menu--open': showMenu,
+        })}
         aria-haspopup="true"
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
@@ -45,7 +48,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         {menuTitle}
       </button>
       <div
-        className="cds--overflow-menu-options cds--overflow-menu--flip"
+        className={classNames('cds--overflow-menu-options', 'cds--overflow-menu--flip')}
         tabIndex={0}
         data-floating-menu-direction="bottom"
         role="menu"

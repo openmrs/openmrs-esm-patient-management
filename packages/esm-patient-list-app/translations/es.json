@@ -21,6 +21,7 @@
   "emptyStateText": "No hay listas de pacientes {{listType}} para mostrar",
   "error": "Error",
   "errorAddPatientToList": "Paciente no agregado a la lista",
+  "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "errorCreatePatientListDescription": "No se pudo crear la lista de pacientes",
   "errorDeleteList": "No se pudo eliminar la lista de pacientes",
   "errorRemovingPatientFromList": "Failed to remove patient from list",

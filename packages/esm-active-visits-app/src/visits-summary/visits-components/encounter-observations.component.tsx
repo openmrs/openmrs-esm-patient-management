@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { Observation } from '../visit.resource';
@@ -27,7 +28,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
         {observationsList.map((obs, ind) => (
           <React.Fragment key={ind}>
             <span className={styles.caption01}>{obs.question}: </span>
-            <span className={`${styles.bodyShort02} ${styles.text01}`}>{obs.answer}</span>
+            <span className={classNames(styles.bodyShort02, styles.text01)}>{obs.answer}</span>
           </React.Fragment>
         ))}
       </div>

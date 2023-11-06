@@ -21,6 +21,7 @@
   "emptyStateText": "There are no {{listType}} patient lists to display",
   "error": "שגיאה",
   "errorAddPatientToList": "המטופל לא נוסף לרשימה",
+  "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "errorCreatePatientListDescription": "לא ניתן ליצור רשימת מטופלים",
   "errorDeleteList": "לא ניתן למחוק רשימת מטופלים",
   "errorRemovingPatientFromList": "Failed to remove patient from list",

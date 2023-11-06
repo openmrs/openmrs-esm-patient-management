@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { ArrowRight, CircleFilled } from '@carbon/react/icons';
@@ -153,7 +154,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               </Button>
             </div>
           ) : (
-            <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noVitalsFound', 'No vitals found')}</p>
+            <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noVitalsFound', 'No vitals found')}</p>
           )}
         </div>
       )}

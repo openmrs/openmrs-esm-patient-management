@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
@@ -89,7 +90,7 @@ function TextObsField({ concept, validationRegex, label, required }: TextObsFiel
 
   const fieldName = `obs.${concept.uuid}`;
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
@@ -119,7 +120,7 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
   const fieldName = `obs.${concept.uuid}`;
 
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
@@ -155,7 +156,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required }: Coded
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'obs' && def.uuid === concept.uuid)[0];
 
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Field name={fieldName}>
           {({ field, form: { touched, errors }, meta }) => {

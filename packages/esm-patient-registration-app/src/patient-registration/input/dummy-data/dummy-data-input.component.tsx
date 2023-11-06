@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { v4 } from 'uuid';
 import { FormValues } from '../../patient-registration.types';
 import styles from './../input.scss';
@@ -41,8 +42,8 @@ export const DummyDataInput: React.FC<DummyDataInputProps> = ({ setValues }) => 
   return (
     <main>
       <button
+        className={classNames('omrs-btn omrs-filled-neutral', styles.dummyData)}
         onClick={() => setValues(dummyFormValues)}
-        className={`omrs-btn omrs-filled-neutral ${styles.dummyData}`}
         type="button"
         aria-label="Dummy Data Input">
         Input Dummy Data
