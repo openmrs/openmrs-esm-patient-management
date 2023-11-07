@@ -81,7 +81,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
           return (
             <ConfigurableLink
-              className={classNames(styles.container, {
+              className={classNames(styles.patientSearchResult, {
                 [styles.deceased]: isDeceased,
               })}
               key={patient.id}
