@@ -34,7 +34,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-let mockOpenmrsConfig = {
+const mockedConfig = {
   daysOfTheWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   appointmentTypes: ['Scheduled', 'WalkIn', 'Virtual'],
   appointmentStatuses: ['Requested', 'Scheduled', 'CheckedIn', 'Completed', 'Cancelled', 'Missed'],
@@ -44,7 +44,7 @@ let mockOpenmrsConfig = {
 describe('AppointmentForm', () => {
   const patient = mockPatient;
   beforeEach(() => {
-    mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
+    mockedUseConfig.mockReturnValue(mockedConfig);
     mockedUsePatient.mockReturnValue({
       patient,
       isLoading: false,
@@ -53,11 +53,10 @@ describe('AppointmentForm', () => {
     });
   });
 
-  it('renders the patient banner with the right patient', () => {
+  it('renders details of the correct patient in the patient banner', () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
 
-    expect(screen.getByText(/Appointments Date and Time/i)).toBeInTheDocument();
-    // Need to test the banner extension
+    expect(screen.getByText(/Date and time/i)).toBeInTheDocument();
   });
 
   it('renders the form with all expected inputs in create mode', () => {
@@ -77,7 +76,5 @@ describe('AppointmentForm', () => {
     expect(within(appointmentTypeSelect).getAllByRole('option')[2]).toHaveValue('Virtual');
     expect(within(appointmentTypeSelect).getAllByRole('option')[1]).toHaveValue('WalkIn');
     expect(within(appointmentTypeSelect).getAllByRole('option')[0]).toHaveValue('Scheduled');
-
-    // TODO handle onselect an option
   });
 });
