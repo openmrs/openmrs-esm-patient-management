@@ -2,8 +2,45 @@
 @use '@carbon/styles/scss/type';
 @import '../../../root.scss';
 
-.formContainer {
-  margin: 0 spacing.$spacing-05;
+.container {
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05;
+}
+
+.loaderContainer {
+  height: 100vh;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .form {
+  margin-top: 3rem;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .form {
+  background-color: #ededed;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .form {
+  background-color: $ui-02;
+}
+
+.columnLabel {
+  display: block;
+  margin: spacing.$spacing-03 0;
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
 }
 
 .stickyFormHeader {
@@ -14,16 +51,22 @@
 
 .row {
   display: flex;
-  margin: spacing.$spacing-03;
+  flex-direction: column;
+  margin: spacing.$spacing-03 0;
+}
+
+.flexRow {
+  @extend .row;
+  flex-direction: row;
+}
+
+.flex1 {
+  flex: 1;
 }
 
 .select {
   width: 90%;
   margin-right: 60%;
-}
-
-.inputContainer {
-  margin: spacing.$spacing-05 0;
 }
 
 .button {
@@ -40,7 +83,6 @@
 
 .datePickerInput {
   padding-bottom: 1rem;
-  margin-left: 12.5rem;
 }
 
 .workLoadCard {
@@ -48,11 +90,13 @@
   margin: 0 1rem;
   color: #525252;
 }
+
 .monthlyWorkLoadCard {
   color: #525252;
   display: flex;
   flex-wrap: wrap;
 }
+
 .workLoadContainer {
   display: flex;
   flex-direction: column;
@@ -67,6 +111,7 @@
   @include type.type-style('legal-01');
   font-weight: 400;
 }
+
 .input {
   width: 13.5rem;
 }
