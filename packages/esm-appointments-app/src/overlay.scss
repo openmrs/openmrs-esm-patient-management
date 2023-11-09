@@ -56,6 +56,7 @@
 .desktopHeader {
   display: flex;
   justify-content: space-between;
+  height: 3rem;
   align-items: center;
   background-color: $ui-03;
   border-bottom: 1px solid $text-03;
@@ -72,10 +73,12 @@
   color: $ui-05;
 }
 
-.closeButton {
-  background-color: $ui-background;
-  color: $ui-05;
-  fill: $ui-05;
+.closePanelButton {
+  background-color: $ui-02;
+  padding-block-start: 0.75rem;
+  // FIXME: Why are carbon's default button styles not working?
+  height: 3rem;
+  width: 3rem;
 }
 
 /* Desktop */
