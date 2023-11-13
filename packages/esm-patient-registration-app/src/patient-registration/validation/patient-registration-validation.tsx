@@ -45,8 +45,8 @@ export const validationSchema = Yup.object({
   ),
   relationships: Yup.array().of(
     Yup.object().shape({
-      relatedPersonUuid: Yup.string().required(),
-      relationshipType: Yup.string().required(),
+      relatedPersonUuid: Yup.string().required('relationshipPersonRequired'),
+      relationshipType: Yup.string().required('relationshipTypeRequired'),
     }),
   ),
 });

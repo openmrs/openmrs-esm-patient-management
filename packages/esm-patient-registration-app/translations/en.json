@@ -67,10 +67,11 @@
   "registrationSuccessToastDescription": "The patient can now be found by searching for them using their name or ID number",
   "registrationSuccessToastTitle": "New Patient Created",
   "relationship": "Relationship",
+  "relationshipFullNameValid": "Full name must be valid",
   "relationshipPlaceholder": "Relationship",
   "relationshipRemovedText": "Relationship removed",
   "relationshipsSection": "Relationships",
-  "relationshipToPatient": "Relationship to patient",
+  "relationshipToPatient": "Relationship is required",
   "relativeFullNameLabelText": "Full name",
   "relativeNamePlaceholder": "Firstname Familyname",
   "resetIdentifierTooltip": "Reset",
@@ -89,6 +90,6 @@
   "updationSuccessToastTitle": "Patient Details Updated",
   "yearsEstimateRequired": "Years estimate required",
   "yes": "Yes",
-  "relationshipFullNameValid": "Full name must be valid",
-  "relationshipToPatient": "Relationship is required"
+  "relationshipPersonRequired": "Relationships - Full name is required",
+  "relationshipTypeRequired": "Relationships - Relationship is required"
 }
