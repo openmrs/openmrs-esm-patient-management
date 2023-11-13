@@ -172,7 +172,6 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           {...searchProps}
         />
       </Layer>
-      {invalid ? <label className={styles.invalidMsg}>{invalidText}</label> : <></>}
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>
           {suggestions.map((suggestion, index) => (
@@ -184,6 +183,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           ))}
         </ul>
       )}
+      {invalid ? <label className={styles.invalidMsg}>{invalidText}</label> : <></>}
     </div>
   );
 };

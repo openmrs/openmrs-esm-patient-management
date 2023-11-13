@@ -67,6 +67,7 @@
   "registrationSuccessToastDescription": "Ahora se puede encontrar al paciente buscándolo por su nombre o número de identificación",
   "registrationSuccessToastTitle": "Nuevo paciente creado",
   "relationship": "Relación",
+  "relationshipFullNameValid": "Full name must be valid",
   "relationshipPlaceholder": "Relación",
   "relationshipRemovedText": "Relación eliminada",
   "relationshipsSection": "Relaciones",

@@ -67,6 +67,7 @@
   "registrationSuccessToastDescription": "يمكن الآن العثور على المريض عن طريق البحث عنه باستخدام اسمه أو رقم هويته",
   "registrationSuccessToastTitle": "تم إنشاء مريض جديد",
   "relationship": "العلاقة",
+  "relationshipFullNameValid": "Full name must be valid",
   "relationshipPlaceholder": "العلاقة",
   "relationshipRemovedText": "تمت إزالة العلاقة",
   "relationshipsSection": "العلاقات",
