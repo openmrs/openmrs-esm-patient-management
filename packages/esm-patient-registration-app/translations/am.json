@@ -89,7 +89,5 @@
   "updationSuccessToastDescription": "The patient's information has been successfully updated",
   "updationSuccessToastTitle": "Patient Details Updated",
   "yearsEstimateRequired": "",
-  "yes": "Yes",
-  "relationshipPersonRequired": "Relationships - Related person is required",
-  "relationshipTypeRequired": "Relationships - Relationship is required"
+  "yes": "Yes"
 }
