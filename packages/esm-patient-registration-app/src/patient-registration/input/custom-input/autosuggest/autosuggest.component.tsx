@@ -135,7 +135,6 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.warn('handleChange');
     const query = e.target.value;
     onSuggestionSelected(name, undefined);
     if (query) {
