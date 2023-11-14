@@ -57,7 +57,7 @@ export function useInfinitePatientSearch(
   return results;
 }
 
-export function useRecentlyViewedPatients() {
+export function useUserProperties() {
   const { t } = useTranslation();
   const { user } = useSession();
   const userUuid = user?.uuid;
@@ -80,6 +80,7 @@ export function useRecentlyViewedPatients() {
     () => ({
       isLoadingPatients: !data && !error,
       recentlyViewedPatients: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
+      userProperties: data?.data?.userProperties,
       mutateUserProperties: mutate,
     }),
     [data, error, mutate],
@@ -138,10 +139,10 @@ export function useRESTPatients(
   return results;
 }
 
-export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedInUser) {
+export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedInUser, userProperties) {
   const recentlyViewedPatients: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
   const restPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
-  const newPatientsVisited = [patientUuid, ...restPatients].join(',');
+  const newUserProperties = (userProperties.patientsVisited = [patientUuid, ...restPatients].join(','));
 
   return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
     method: 'POST',
@@ -149,9 +150,7 @@ export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedIn
       'content-type': 'application/json',
     },
     body: {
-      userProperties: {
-        patientsVisited: newPatientsVisited,
-      },
+      userProperties: newUserProperties,
     },
   });
 }

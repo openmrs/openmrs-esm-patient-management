@@ -10,7 +10,7 @@ import {
   updateRecentlyViewedPatients,
   useInfinitePatientSearch,
   useRESTPatients,
-  useRecentlyViewedPatients,
+  useUserProperties,
 } from '../patient-search.resource';
 import styles from './compact-patient-search.scss';
 
@@ -36,7 +36,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const config = useConfig();
   const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
   const { data: searchedPatients } = patientSearchResponse;
-  const { recentlyViewedPatients, mutateUserProperties } = useRecentlyViewedPatients();
+  const { recentlyViewedPatients, userProperties, mutateUserProperties } = useUserProperties();
   const recentPatientSearchResponse = useRESTPatients(recentlyViewedPatients, !showSearchResults);
   const { data: recentPatients } = recentPatientSearchResponse;
   const {
@@ -67,7 +67,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
               patientUuid: patients[index].uuid,
             })}`,
           });
-          updateRecentlyViewedPatients(patients[index].uuid, user).then(() => {
+          updateRecentlyViewedPatients(patients[index].uuid, user, userProperties).then(() => {
             setSessionLocation(currentLocation, new AbortController());
             mutateUserProperties();
           });
@@ -82,6 +82,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
       user,
       currentLocation,
       mutateUserProperties,
+      userProperties,
     ],
   );
   const focussedResult = useArrowNavigation(
