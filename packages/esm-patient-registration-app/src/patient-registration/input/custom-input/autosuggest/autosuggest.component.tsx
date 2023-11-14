@@ -1,6 +1,4 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Layer, Search, SearchProps } from '@carbon/react';
 import styles from './autosuggest.scss';
 
@@ -115,7 +113,6 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   invalidText,
   ...searchProps
 }) => {
-  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
