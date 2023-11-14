@@ -1,5 +1,6 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
 import { Layer, Search, SearchProps } from '@carbon/react';
+import classNames from 'classnames';
 import styles from './autosuggest.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -159,7 +160,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
-      <Layer className={invalid ? styles.invalid : {}}>
+      <Layer className={invalid ? classNames(styles.invalid) : {}}>
         <Search
           id="autosuggest"
           onChange={handleChange}
@@ -180,7 +181,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           ))}
         </ul>
       )}
-      {invalid ? <label className={styles.invalidMsg}>{invalidText}</label> : <></>}
+      {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}
     </div>
   );
 };
