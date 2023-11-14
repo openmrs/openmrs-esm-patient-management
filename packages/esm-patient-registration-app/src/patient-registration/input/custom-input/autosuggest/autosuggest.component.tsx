@@ -1,4 +1,5 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { Layer, Search, SearchProps } from '@carbon/react';
 import styles from './autosuggest.scss';
 import { useTranslation } from 'react-i18next';
@@ -161,7 +162,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
-      <Layer className={invalid ? styles.invalid : {}}>
+      <Layer className={invalid ? classNames(styles.invalid) : {}}>
         <Search
           id="autosuggest"
           onChange={handleChange}

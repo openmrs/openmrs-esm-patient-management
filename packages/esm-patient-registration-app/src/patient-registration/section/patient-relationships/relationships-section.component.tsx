@@ -107,7 +107,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
               defaultValue={relationship.relatedPersonName}
               onSuggestionSelected={handleSuggestionSelected}
               invalid={isInvalid}
-              invalidText={t('relationshipFullNameValid', 'Full name must be valid')}
+              invalidText={t('relationshipPersonMustExist', 'Related person must be an existing person')}
               getSearchResults={searchPerson}
               getDisplayValue={(item) => item.display}
               getFieldValue={(item) => item.uuid}
