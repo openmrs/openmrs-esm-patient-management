@@ -1,7 +1,8 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layer, Search, SearchProps } from '@carbon/react';
 import styles from './autosuggest.scss';
-import { useTranslation } from 'react-i18next';
+
 
 // FIXME Temporarily included types from Carbon
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
