@@ -1,8 +1,8 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import { Layer, Search, SearchProps } from '@carbon/react';
 import styles from './autosuggest.scss';
-import { useTranslation } from 'react-i18next';
 
 // FIXME Temporarily included types from Carbon
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
@@ -162,7 +162,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
-      <Layer className={invalid ? classNames(styles.invalid) : {}}>
+      <Layer className={invalid ? styles.invalid : {}}>
         <Search
           id="autosuggest"
           onChange={handleChange}
