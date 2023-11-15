@@ -75,6 +75,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
 
   const rowData = results?.map((appointment, index) => ({
     id: `${index}`,
+    uuid: appointment.uuid,
     patientName: (
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}

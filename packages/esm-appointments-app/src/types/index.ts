@@ -109,6 +109,7 @@ export interface MappedAppointment {
   dateTime: string;
   serviceType: string;
   serviceUuid: string;
+  serviceTypeUuid?: string;
   appointmentKind: string;
   provider: string;
   location: string;
