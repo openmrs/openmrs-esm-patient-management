@@ -42,14 +42,14 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
       },
     });
 
-  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentPatientList> }>(
+  const { data, error, isLoading, mutate } = useSWR<{ data: Array<AppointmentPatientList> }>(
     [searchUrl, startDate, endDate, appointmentStatus],
     fetcher,
     { errorRetryCount: 2 },
   );
 
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));
-  return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error };
+  return { appointmentList: (appointments as Array<any>) ?? [], isLoading, error, mutate };
 };
 
 export const useEarlyAppointmentList = (startDate?: string) => {
