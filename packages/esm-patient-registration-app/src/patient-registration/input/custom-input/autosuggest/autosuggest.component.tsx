@@ -160,7 +160,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
-      <Layer className={classNames({[styles.invalid]: invalid})}>
+      <Layer className={classNames({ [styles.invalid]: invalid })}>
         <Search
           id="autosuggest"
           onChange={handleChange}
