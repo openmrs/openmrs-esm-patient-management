@@ -67,6 +67,7 @@
   "registrationSuccessToastDescription": "អ្នកជំងឺអាចត្រូវបានស្រាវជ្រាវរកពួកគេតាមរយ ប្រើប្រាស់ឈ្មោះឬអត្តលេខរបស់ពួកគេ",
   "registrationSuccessToastTitle": "បង្កើតការចុះឈ្មោះអ្នកជំងឺថ្មី",
   "relationship": "ទំនាក់ទំនង",
+  "relationshipPersonMustExist": "Related person must be an existing person",
   "relationshipPlaceholder": "ទំនាក់ទំនង",
   "relationshipRemovedText": "ការទំនាក់ទំនងត្រូវបានដកចេញ",
   "relationshipsSection": "ទំនាក់ទំនង",

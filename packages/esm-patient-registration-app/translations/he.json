@@ -67,6 +67,7 @@
   "registrationSuccessToastDescription": "המטופל נרשם בהצלחה וניתן למצוא אותו באמצעות חיפוש לפי שם או מספר תעודת זהות",
   "registrationSuccessToastTitle": "נרשם מטופל חדש",
   "relationship": "קשר",
+  "relationshipPersonMustExist": "Related person must be an existing person",
   "relationshipPlaceholder": "קשר",
   "relationshipRemovedText": "קשר הוסר",
   "relationshipsSection": "Relationships",
