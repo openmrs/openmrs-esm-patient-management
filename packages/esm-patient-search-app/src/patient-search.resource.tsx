@@ -57,7 +57,7 @@ export function useInfinitePatientSearch(
   return results;
 }
 
-export function useUserProperties() {
+export function useRecentlyViewedPatients() {
   const { t } = useTranslation();
   const { user } = useSession();
   const userUuid = user?.uuid;
@@ -76,11 +76,31 @@ export function useUserProperties() {
     }
   }, [error, t]);
 
+  const addViewedPatient = useCallback(
+    (patientUuid: string) => {
+      const userProperties: Record<string, string> = data?.data?.userProperties ?? {};
+      const recentlyViewedPatients: Array<string> = userProperties.patientsVisited?.split(',') ?? [];
+      const remainingPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
+      const newUserProperties = { ...userProperties, patientsVisited: [patientUuid, ...remainingPatients].join(',') };
+
+      return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: {
+          userProperties: newUserProperties,
+        },
+      });
+    },
+    [data?.data?.userProperties, user],
+  );
+
   const result = useMemo(
     () => ({
       isLoadingPatients: !data && !error,
       recentlyViewedPatients: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
-      userProperties: data?.data?.userProperties,
+      addViewedPatient,
       mutateUserProperties: mutate,
     }),
     [data, error, mutate],
@@ -137,20 +157,4 @@ export function useRESTPatients(
   );
 
   return results;
-}
-
-export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedInUser, userProperties) {
-  const recentlyViewedPatients: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
-  const restPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
-  const newUserProperties = (userProperties.patientsVisited = [patientUuid, ...restPatients].join(','));
-
-  return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: {
-      userProperties: newUserProperties,
-    },
-  });
 }
