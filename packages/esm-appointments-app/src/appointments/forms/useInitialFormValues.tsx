@@ -39,7 +39,7 @@ export const useInitialAppointmentFormValue = (
   const patientAppointment: PatientAppointment = {
     appointmentKind: appointment?.appointmentKind ?? 'Scheduled',
     status: appointment?.status ?? 'Scheduled',
-    serviceUuid: appointment?.serviceUuid ?? '',
+    serviceUuid: appointment?.serviceTypeUuid ?? '',
     startDateTime: dayjs(new Date()).format('hh:mm'),
     endDateTime: dayjs(new Date()).format('hh:mm'),
     providers: appointment?.providers ?? [],
@@ -47,7 +47,7 @@ export const useInitialAppointmentFormValue = (
     comments: appointment?.comments ?? '',
     locationUuid: appointment?.location ?? session?.sessionLocation?.uuid,
     frequency: '',
-    uuid: appointment?.id ?? '',
+    uuid: appointment?.uuid ?? '',
     appointmentNumber: appointment?.appointmentNumber ?? '',
     patientUuid: appointment?.patientUuid ?? patientUuid,
     visitDate: appointment?.dateTime ? new Date(appointment.dateTime) : new Date(),

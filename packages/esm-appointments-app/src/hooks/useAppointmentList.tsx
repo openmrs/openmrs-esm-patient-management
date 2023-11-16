@@ -76,5 +76,6 @@ function toAppointmentObject(appointment: AppointmentPatientList) {
     gender: appointment.patient?.gender,
     phoneNumber: appointment.patient?.phoneNumber,
     age: appointment.patient?.age,
+    uuid: appointment.uuid,
   };
 }
