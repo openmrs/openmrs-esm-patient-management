@@ -54,6 +54,7 @@ import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
 import LocationSelectOption from '../../common-components/location-select-option.component';
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
+import { useAppointmentList } from '../../../hooks/useAppointmentList';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -76,6 +77,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const [patientAppointment, setPatientAppointment] = useState<PatientAppointment>(initialAppointmentFormValues);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedTab, setSelectedTab] = useState(0);
+  const { mutate: mutateAppointmentSearch } = useAppointmentList(patientAppointment.status);
 
   const { patient, isLoading } = usePatient(patientUuid ?? patientAppointment.patientUuid);
   const appointmentSummary = useAppointmentSummary(patientAppointment.visitDate, patientAppointment.serviceUuid);
@@ -136,6 +138,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
           mutate(`/ws/rest/v1/appointment/all?forDate=${currentAppointmentDate}`);
           mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Scheduled&forDate=${currentAppointmentDate}`);
           mutate(`/ws/rest/v1/appointment/appointmentStatus?status=Pending&forDate=${currentAppointmentDate}`);
+          mutateAppointmentSearch();
           closeOverlay();
         }
       },
