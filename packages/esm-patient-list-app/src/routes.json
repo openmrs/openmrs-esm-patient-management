@@ -28,11 +28,6 @@
       "component": "addPatientToListModal"
     },
     {
-      "name": "patient-list-action-menu",
-      "component": "patientListActionButton",
-      "slot": "action-menu-non-chart-items-slot"
-    },
-    {
       "name": "add-patient-to-patient-list-button",
       "slot": "patient-actions-slot",
       "component": "addPatientToPatientListMenuItem"
