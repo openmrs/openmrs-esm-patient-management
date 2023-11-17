@@ -8,7 +8,7 @@ import { cacheForOfflineHeaders } from './constants';
 
 export function setupOffline() {
   setupDynamicOfflineDataHandler({
-    id: 'esm-patient-list-app:patient',
+    id: 'esm-patient-list-management-app:patient',
     type: 'patient',
     displayName: 'Patient list',
     async isSynced(patientUuid) {

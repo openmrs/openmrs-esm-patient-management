@@ -89,7 +89,7 @@ export async function getAllPatientLists(
 export function updatePatientList(id: string, update: PatientListUpdate) {
   // TODO: Support updating a full patient list, i.e. including the `isStarred` value.
   // Basically implement the (missing) functionality which was previously declared as "TODO" here:
-  // https://github.com/openmrs/openmrs-esm-patient-management/blob/25ec687afd37c383a0dbd4d8be8b8e09c8c53129/packages/esm-patient-list-app/src/api/api.ts#L89
+  // https://github.com/openmrs/openmrs-esm-patient-management/blob/25ec687afd37c383a0dbd4d8be8b8e09c8c53129/packages/esm-patient-list-management-app/src/api/api.ts#L89
   return Promise.resolve();
 }
 

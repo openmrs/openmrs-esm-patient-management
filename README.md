@@ -11,7 +11,7 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 - [Service queues](packages/esm-service-queues-app/README.md)
 - [Patient search](packages/esm-patient-search-app)
 - [Patient registration](packages/esm-patient-registration-app)
-- [Patient list](packages/esm-patient-list-app)
+- [Patient list management](packages/esm-patient-list-management-app)
 
 ## Setup
 
@@ -27,11 +27,14 @@ yarn install
 To set up environment variables for the project, follow these steps:
 
 1. Create a copy of the .env.example file by running the following command:
-  ```bash
-  cp example.env .env
-  ```
+
+    ```bash
+    cp example.env .env
+    ```
+
 2. Open the newly created .env file in the root of the project.
-3. Add the environment variables you need. 
+
+3. Add the environment variables you need.
 
 Note: These variables are currently only used for end-to-end tests.
 
