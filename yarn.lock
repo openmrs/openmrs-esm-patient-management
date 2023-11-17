@@ -3062,9 +3062,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-patient-list-app@workspace:packages/esm-patient-list-app":
+"@openmrs/esm-patient-list-management-app@workspace:packages/esm-patient-list-management-app":
   version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-list-app@workspace:packages/esm-patient-list-app"
+  resolution: "@openmrs/esm-patient-list-management-app@workspace:packages/esm-patient-list-management-app"
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     dexie: "npm:^3.0.3"
