@@ -4,7 +4,6 @@ import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
 import { setupOffline } from './offline';
 import rootComponent from './root.component';
-import patientListActionButtonComponent from './patient-list-action-button.component';
 import listDetailsTableComponent from './list-details-table/list-details-table.component';
 import addPatientToPatientListMenuItemComponent from './add-patient-to-patient-list-menu-item.component';
 
@@ -31,11 +30,6 @@ export const addPatientToListModal = getAsyncLifecycle(() => import('./add-patie
 
 export const addPatientToPatientListMenuItem = getSyncLifecycle(addPatientToPatientListMenuItemComponent, {
   featureName: 'patient-actions-slot',
-  moduleName,
-});
-
-export const patientListActionButton = getSyncLifecycle(patientListActionButtonComponent, {
-  featureName: 'patient-list-action-menu-item',
   moduleName,
 });
 
