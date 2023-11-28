@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { validationSchema } from './appointment-services-validation';
 import { useAppointmentServices } from './appointment-services-hook';
-import { showNotification, showSnackbar, useLocations } from '@openmrs/esm-framework';
+import { showSnackbar, useLocations } from '@openmrs/esm-framework';
 import type { AppointmentService } from '../../types';
 import { closeOverlay } from '../../hooks/useOverlay';
 import styles from './appointment-services.scss';
