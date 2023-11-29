@@ -163,11 +163,11 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             }
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              isLowContrast: false,
+              subtitle: error?.message,
             });
           },
         );
