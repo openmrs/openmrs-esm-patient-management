@@ -30,8 +30,7 @@ import {
 import {
   ConfigObject,
   ExtensionSlot,
-  showNotification,
-  showToast,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useLocations,
@@ -126,10 +125,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
     saveAppointment(appointmentPayload).then(
       ({ status }) => {
         if (status === 200) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
-            description: t('appointmentNowVisible', 'It is now visible on the appointments page'),
+            subtitle: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
@@ -143,11 +142,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
         setIsSubmitting(false);
       },
