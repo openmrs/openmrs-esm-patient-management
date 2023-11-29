@@ -29,8 +29,7 @@ import {
   saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   usePatient,
   useConfig,
   useLocations,
@@ -137,10 +136,10 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                   ({ status }) => {
                     if (status === 201) {
                       mutate();
-                      showToast({
+                      showSnackbar({
                         kind: 'success',
                         title: t('visitStarted', 'Visit started'),
-                        description: t(
+                        subtitle: t(
                           'queueAddedSuccessfully',
                           `Patient has been added to the queue successfully.`,
                           `${hours} : ${minutes}`,
@@ -149,11 +148,11 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                     }
                   },
                   (error) => {
-                    showNotification({
+                   showSnackbar ({
                       title: t('queueEntryError', 'Error adding patient to the queue'),
                       kind: 'error',
-                      critical: true,
-                      description: error?.message,
+                      isLowContrast: true,
+                      subtitle: error?.message,
                     });
                   },
                 );
