@@ -138,6 +138,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                       mutate();
                       showSnackbar({
                         kind: 'success',
+                        isLowContrast: true,
                         title: t('visitStarted', 'Visit started'),
                         subtitle: t(
                           'queueAddedSuccessfully',
