@@ -92,6 +92,7 @@ const ListDetails = () => {
           title: t('deleted', 'Deleted'),
           subtitle: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
           kind: 'success',
+          isLowContrast: true,
         });
 
         navigate({ to: window.getOpenmrsSpaBase() + 'home/patient-lists' });
@@ -101,6 +102,7 @@ const ListDetails = () => {
           title: t('errorDeletingList', 'Error deleting patient list'),
           subtitle: e?.message,
           kind: 'error',
+          isLowContrast: false,
         }),
       )
       .finally(() => setShowDeleteConfirmationModal(false));
