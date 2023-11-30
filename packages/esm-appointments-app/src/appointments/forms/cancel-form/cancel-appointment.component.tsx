@@ -33,7 +33,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
     const { status } = await cancelAppointment('Cancelled', appointment.id);
     if (status === 200) {
      showSnackbar({
-        isLowContrast: false,
+        isLowContrast: true,
         kind: 'success',
         subtitle: t('cancelledSuccessfully', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
