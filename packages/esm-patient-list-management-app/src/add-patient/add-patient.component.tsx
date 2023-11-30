@@ -65,6 +65,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           showSnackbar({
             title: t('successfullyAdded', 'Successfully added'),
             kind: 'success',
+            isLowContrast: true,
             subtitle: `${t('successAddPatientToList', 'Patient added to list')}: ${patientList.displayName}`,
           }),
         )
@@ -72,6 +73,7 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
           showSnackbar({
             title: t('error', 'Error'),
             kind: 'error',
+            isLowContrast: false,
             subtitle: `${t('errorAddPatientToList', 'Patient not added to list')}: ${patientList.displayName}`,
           }),
         );
