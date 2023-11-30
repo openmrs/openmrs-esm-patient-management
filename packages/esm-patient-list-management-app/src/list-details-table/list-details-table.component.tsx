@@ -216,7 +216,7 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       mutateListDetails();
 
       showSnackbar({
-        isLowContrast: false,
+        isLowContrast: true,
         kind: 'success',
         subtitle: t('listUpToDate', 'The list is now up to date'),
         title: t('patientRemovedFromList', 'Patient removed from list'),
