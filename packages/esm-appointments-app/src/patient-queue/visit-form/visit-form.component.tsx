@@ -151,7 +151,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                    showSnackbar ({
                       title: t('queueEntryError', 'Error adding patient to the queue'),
                       kind: 'error',
-                      isLowContrast: true,
+                      isLowContrast: false,
                       subtitle: error?.message,
                     });
                   },
