@@ -51,6 +51,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             title: t('updated', 'Updated'),
             subtitle: t('listUpdated', 'List updated successfully'),
             kind: 'success',
+            isLowContrast: true,
           });
 
           onSuccess();
@@ -63,6 +64,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             title: t('errorUpdatingList', 'Error updating list'),
             subtitle: t('problemUpdatingList', 'There was a problem updating the list'),
             kind: 'error',
+            isLowContrast: false,
           });
           setIsSubmitting(false);
         });
@@ -79,6 +81,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             title: t('created', 'Created'),
             subtitle: `${t('listCreated', 'List created successfully')}`,
             kind: 'success',
+            isLowContrast: true,
           });
           onSuccess();
           setIsSubmitting(false);
@@ -90,6 +93,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             title: t('errorCreatingList', 'Error creating list'),
             subtitle: t('problemCreatingList', 'There was a problem creating the list'),
             kind: 'error',
+            isLowContrast: false,
           });
           setIsSubmitting(false);
         });
