@@ -29,7 +29,7 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
       ({ status }) => {
         if (status === 200) {
          showSnackbar({
-            isLowContrast: false,
+            isLowContrast: true,
             kind: 'success',
             subtitle: t('appointmentServiceCreate', 'Appointment service created successfully'),
             title: t('appointmentService', 'Appointment service'),
