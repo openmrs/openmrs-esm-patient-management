@@ -1,4 +1,4 @@
-import React, { useCallback, SyntheticEvent, useEffect, useId, useState } from 'react';
+ import React, { useCallback, SyntheticEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Layer, TextArea, TextInput } from '@carbon/react';
 import { useLayoutType, showSnackbar, useSession, useConfig } from '@openmrs/esm-framework';
