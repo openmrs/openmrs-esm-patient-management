@@ -26,6 +26,7 @@ import {
   usePagination,
   useSession,
   userHasAccess,
+  ConfigObject,
 } from '@openmrs/esm-framework';
 import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
@@ -104,6 +105,9 @@ const AppointmentsBaseTable = () => {
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
 
+  const config: ConfigObject = useConfig();
+  const { patientChartUrl } = config;
+
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
     : appointments;
@@ -173,7 +177,7 @@ const AppointmentsBaseTable = () => {
     name: {
       content: (
         <div className={styles.nameContainer}>
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+          <ConfigurableLink to={patientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
             {appointment.name}
           </ConfigurableLink>
         </div>

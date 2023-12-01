@@ -19,6 +19,9 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
+    useConfig: jest.fn(() => ({
+      patientChartUrl: 'someUrl',
+    })),
   };
 });
 

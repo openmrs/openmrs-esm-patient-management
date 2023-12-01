@@ -18,7 +18,7 @@ import {
   Button,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
-import { ConfigurableLink, usePagination } from '@openmrs/esm-framework';
+import { ConfigObject, ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import { EmptyState } from '../../empty-state/empty-state.component';
@@ -31,6 +31,10 @@ const UnscheduledAppointments: React.FC = () => {
   const [searchString, setSearchString] = useState('');
   const { data: unscheduledAppointments, isLoading, error } = useUnscheduledAppointments();
   const searchResults = useSearchResults(unscheduledAppointments, searchString);
+
+  const config: ConfigObject = useConfig();
+  const { patientChartUrl } = config;
+
   const headerData = [
     {
       header: 'Patient Name',
@@ -55,7 +59,7 @@ const UnscheduledAppointments: React.FC = () => {
   const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
     name: (
-      <ConfigurableLink style={{ textDecoration: 'none' }} to={`\${openmrsSpaBase}/patient/${visit.uuid}/chart`}>
+      <ConfigurableLink style={{ textDecoration: 'none' }} to={patientChartUrl}>
         {visit.name}
       </ConfigurableLink>
     ),

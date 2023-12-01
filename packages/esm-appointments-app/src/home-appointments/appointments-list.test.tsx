@@ -17,6 +17,7 @@ jest.mock('@openmrs/esm-framework', () => ({
     useBahmniAppointmentsUI: false,
     useFullViewPrivilege: false,
     fullViewPrivilege: 'somePrivilege',
+    patientChartUrl: 'someUrl',
   })),
   userHasAccess: jest.fn(() => true),
 }));
