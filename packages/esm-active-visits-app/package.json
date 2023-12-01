@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-active-visits-app",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "Active visits widget microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-active-visits-app.js",
   "main": "src/index.ts",
