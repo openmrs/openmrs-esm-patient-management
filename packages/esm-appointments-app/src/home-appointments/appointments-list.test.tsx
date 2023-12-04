@@ -17,7 +17,7 @@ jest.mock('@openmrs/esm-framework', () => ({
     useBahmniAppointmentsUI: false,
     useFullViewPrivilege: false,
     fullViewPrivilege: 'somePrivilege',
-    patientChartUrl: 'someUrl',
+    customPatientChartUrl: 'someUrl',
   })),
   userHasAccess: jest.fn(() => true),
 }));
@@ -59,6 +59,7 @@ describe('AppointmentsBaseTable', () => {
           serviceColor: 'blue',
           serviceType: 'Checkup',
           status: 'Scheduled',
+          patientUuid: 'some-uuid',
         },
       ],
       isLoading: false,
@@ -77,6 +78,7 @@ describe('AppointmentsBaseTable', () => {
           serviceColor: 'blue',
           serviceType: 'Checkup',
           status: 'Scheduled',
+          patientUuid: 'some-uuid',
         },
       ],
     }));
@@ -84,7 +86,9 @@ describe('AppointmentsBaseTable', () => {
 
     // Assert that appointment data is displayed
     expect(screen.getByText('2023-08-18 10:00 AM')).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    const patient = screen.getByText('John Doe');
+    expect(patient).toBeInTheDocument();
+    expect(patient).toHaveAttribute('href', 'someUrl');
     expect(screen.getByText('JD123')).toBeInTheDocument();
     expect(screen.getByText('Clinic A')).toBeInTheDocument();
     expect(screen.getByText('Checkup')).toBeInTheDocument();

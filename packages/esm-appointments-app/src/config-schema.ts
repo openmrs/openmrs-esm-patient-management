@@ -66,9 +66,10 @@ export const configSchema = {
     _default: '/ws/rest/v1/kenyaemr/default-facility',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
-  patientChartUrl: {
+  customPatientChartUrl: {
     _type: Type.String,
-    _description: 'Custom URL to the patient chart',
+    _description:
+      'Template URL that will be used when clicking on the patient name in the appointment list. Available argument: patientUuid',
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
   },
   patientIdentifierType: {
@@ -92,6 +93,6 @@ export interface ConfigObject {
   hiddenFormFields: Array<string>;
   showServiceQueueFields: boolean;
   defaultFacilityUrl: string;
-  patientChartUrl: string;
+  customPatientChartUrl: string;
   patientIdentifierType: string;
 }

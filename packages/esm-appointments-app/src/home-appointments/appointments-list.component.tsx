@@ -26,7 +26,6 @@ import {
   usePagination,
   useSession,
   userHasAccess,
-  ConfigObject,
 } from '@openmrs/esm-framework';
 import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
@@ -35,6 +34,7 @@ import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './
 import { Appointment, MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
+import { ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -104,9 +104,7 @@ const AppointmentsBaseTable = () => {
   const { appointments, isLoading, mutate } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
-
-  const config: ConfigObject = useConfig();
-  const { patientChartUrl } = config;
+  const { customPatientChartUrl } = useConfig<ConfigObject>();
 
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
@@ -177,7 +175,7 @@ const AppointmentsBaseTable = () => {
     name: {
       content: (
         <div className={styles.nameContainer}>
-          <ConfigurableLink to={patientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
             {appointment.name}
           </ConfigurableLink>
         </div>

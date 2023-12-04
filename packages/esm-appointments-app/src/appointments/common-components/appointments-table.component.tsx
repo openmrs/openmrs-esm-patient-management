@@ -54,9 +54,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const [searchString, setSearchString] = useState('');
   const searchResults = useSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
-  const config: ConfigObject = useConfig();
-
-  const { patientChartUrl } = config;
+  const { customPatientChartUrl } = useConfig<ConfigObject>();
 
   const headerData = [
     {
@@ -83,7 +81,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     patientName: (
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={patientChartUrl}
+        to={customPatientChartUrl}
         templateParams={{ patientUuid: appointment.patientUuid }}>
         {appointment.name}
       </ConfigurableLink>

@@ -20,7 +20,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => ({
-      patientChartUrl: 'someUrl',
+      customPatientChartUrl: 'someUrl',
     })),
   };
 });
@@ -65,6 +65,7 @@ describe('UnscheduledAppointments component', () => {
 
     const patientName = await screen.findByText('Test Patient');
     expect(patientName).toBeInTheDocument();
+    expect(patientName).toHaveAttribute('href', 'someUrl');
 
     const identifier = screen.getByText('1234-56-78');
     expect(identifier).toBeInTheDocument();
