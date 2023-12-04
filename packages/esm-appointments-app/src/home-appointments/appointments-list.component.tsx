@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
 import type { KeyedMutator } from 'swr';
 import { useTranslation } from 'react-i18next';
 import {
@@ -307,7 +308,7 @@ const AppointmentsBaseTable = () => {
                               <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                             ))}
                             {fullView && (
-                              <TableCell className={`cds--table-column-menu ${styles.overflowMenu}`}>
+                              <TableCell className={classNames('cds--table-column-menu', styles.overflowMenu)}>
                                 <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
                               </TableCell>
                             )}

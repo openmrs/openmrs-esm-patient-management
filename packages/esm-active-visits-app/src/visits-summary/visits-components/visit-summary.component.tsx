@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
@@ -81,14 +82,14 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             </Tag>
           ))
         ) : (
-          <p className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
+          <p className={classNames(styles.bodyLong01, styles.text02)} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
           </p>
         )}
       </div>
       <Tabs className={styles.verticalTabs}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={`${styles.tab} ${styles.bodyLong01}`} onClick={() => setSelectedTab(0)} id="notes-tab">
+          <Tab className={classNames(styles.tab, styles.bodyLong01)} onClick={() => setSelectedTab(0)} id="notes-tab">
             {t('notes', 'Notes')}
           </Tab>
           <Tab className={styles.tab} onClick={() => setSelectedTab(1)} id="tests-tab">

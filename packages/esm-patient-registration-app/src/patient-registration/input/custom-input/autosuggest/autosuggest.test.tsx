@@ -79,7 +79,7 @@ describe('autosuggest', () => {
     fireEvent.change(searchbox, { target: { value: 'john' } });
     const listitems = await waitFor(() => screen.getAllByRole('listitem'));
     fireEvent.click(listitems[0]);
-    expect(handleSuggestionSelected).toHaveBeenNthCalledWith(1, 'person', 'randomuuid1');
+    expect(handleSuggestionSelected).toHaveBeenNthCalledWith(4, 'person', 'randomuuid1');
   });
 
   it('should clear the suggestions when a suggestion is selected', async () => {

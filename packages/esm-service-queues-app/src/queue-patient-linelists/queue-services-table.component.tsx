@@ -7,8 +7,8 @@ const ServicesTable: React.FC = () => {
   const { t } = useTranslation();
 
   const currentPathName: string = window.location.pathname.replace('%20', ' ');
-  let service = currentPathName.split('/')[4];
-  let locationUuid = currentPathName.split('/')[6];
+  let service = currentPathName.split('/')[6];
+  let locationUuid = currentPathName.split('/')[8];
   const { serviceQueueEntries, isLoading } = useServiceQueueEntries(service, locationUuid);
 
   const tableHeaders = useMemo(

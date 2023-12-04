@@ -50,7 +50,7 @@ function WeeklyHeader({
         {weekDays(currentDate).map((dateTime, i) => (
           <React.Fragment key={`weekDay-${i}`}>
             {i !== 0 && (
-              <div tabIndex={0} role="button" className={`${styles.tileContainer} `}>
+              <div tabIndex={0} role="button" className={styles.tileContainer}>
                 <span>
                   {dateTime.format('dddd')} {dateTime.format('DD')}
                 </span>

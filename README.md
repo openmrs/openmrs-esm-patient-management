@@ -11,13 +11,13 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 - [Service queues](packages/esm-service-queues-app/README.md)
 - [Patient search](packages/esm-patient-search-app)
 - [Patient registration](packages/esm-patient-registration-app)
-- [Patient list](packages/esm-patient-list-app)
+- [Patient list management](packages/esm-patient-list-management-app)
 
 ## Setup
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+This monorepo uses [yarn](https://yarnpkg.com).
 
 To install the dependancies, run:
 ```bash
@@ -27,11 +27,14 @@ yarn install
 To set up environment variables for the project, follow these steps:
 
 1. Create a copy of the .env.example file by running the following command:
-  ```bash
-  cp example.env .env
-  ```
+
+    ```bash
+    cp example.env .env
+    ```
+
 2. Open the newly created .env file in the root of the project.
-3. Add the environment variables you need. 
+
+3. Add the environment variables you need.
 
 Note: These variables are currently only used for end-to-end tests.
 
@@ -175,5 +178,5 @@ The tag should be prefixed with `v` (e.g., `v3.2.1`), while the release title
 should just be the version number (e.g., `3.2.1`). The creation of the GitHub release
 will cause GitHub Actions to publish the packages, completing the release process.
 
-> Don't run `npm publish`, `yarn publish`, or `lerna publish`. Use the above process.
+> Don't run `npm publish` or `yarn publish`. Use the above process.
 

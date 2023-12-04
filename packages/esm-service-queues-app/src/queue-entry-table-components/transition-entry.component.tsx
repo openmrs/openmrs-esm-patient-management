@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
-import { Notification } from '@carbon/react/icons';
-import { MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
-import { showModal, showNotification } from '@openmrs/esm-framework';
-import { Button } from '@carbon/react';
-import styles from './transition-entry.scss';
+import classNames from 'classnames';
 import { mutate } from 'swr';
+import { Button } from '@carbon/react';
+import { Notification } from '@carbon/react/icons';
+import { showModal, showNotification } from '@openmrs/esm-framework';
+import { MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
+import styles from './transition-entry.scss';
 interface TransitionMenuProps {
   queueEntry: MappedVisitQueueEntry;
   closeModal: () => void;
@@ -38,9 +39,10 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry, closeModal 
   return (
     <Button
       renderIcon={(props) => <Notification size={16} {...props} />}
-      className={`${styles.callBtn} ${
-        queueEntry?.priorityComment === 'Requeued' ? styles.requeueIcon : styles.normalIcon
-      }`}
+      className={classNames(styles.callBtn, {
+        [styles.requeueIcon]: queueEntry?.priorityComment === 'Requeued',
+        [styles.normalIcon]: queueEntry?.priorityComment !== 'Requeued',
+      })}
       onClick={launchTransitionPriorityModal}
       iconDescription={t('call', 'Call')}
       hasIconOnly

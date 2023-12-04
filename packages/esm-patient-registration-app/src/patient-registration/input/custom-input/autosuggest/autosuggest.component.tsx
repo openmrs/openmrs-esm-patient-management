@@ -1,5 +1,6 @@
 import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
 import { Layer, Search, SearchProps } from '@carbon/react';
+import classNames from 'classnames';
 import styles from './autosuggest.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -100,6 +101,8 @@ interface AutosuggestProps extends SearchProps {
   getFieldValue: Function;
   getSearchResults: (query: string) => Promise<any>;
   onSuggestionSelected: (field: string, value: string) => void;
+  invalid?: boolean | undefined;
+  invalidText?: string | undefined;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
@@ -107,6 +110,8 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   getFieldValue,
   getSearchResults,
   onSuggestionSelected,
+  invalid,
+  invalidText,
   ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -130,6 +135,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
+    onSuggestionSelected(name, undefined);
     if (query) {
       getSearchResults(query).then((suggestions) => {
         setSuggestions(suggestions);
@@ -137,6 +143,10 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     } else {
       setSuggestions([]);
     }
+  };
+
+  const handleClear = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSuggestionSelected(name, undefined);
   };
 
   const handleClick = (index: number) => {
@@ -150,10 +160,11 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
-      <Layer>
+      <Layer className={classNames({ [styles.invalid]: invalid })}>
         <Search
           id="autosuggest"
           onChange={handleChange}
+          onClear={handleClear}
           ref={searchBox}
           className={styles.autocompleteSearch}
           {...searchProps}
@@ -170,6 +181,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           ))}
         </ul>
       )}
+      {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}
     </div>
   );
 };

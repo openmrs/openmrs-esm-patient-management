@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { DiagnosisItem, Note } from '../../types/index';
@@ -31,7 +32,7 @@ const Notes: React.FC<NotesProps> = ({ notes, diagnoses }) => {
           </div>
         ))
       ) : (
-        <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noNotesFound', 'No notes found')}</p>
+        <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noNotesFound', 'No notes found')}</p>
       )}
     </div>
   );

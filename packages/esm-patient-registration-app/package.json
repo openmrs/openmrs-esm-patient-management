@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-registration-app",
-  "version": "5.1.0",
+  "version": "5.2.1",
   "description": "Patient registration microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-registration-app.js",
   "main": "src/index.ts",
@@ -18,7 +18,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx'"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts'"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
