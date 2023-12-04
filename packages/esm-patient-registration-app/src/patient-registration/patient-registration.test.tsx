@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showToast, useConfig, usePatient } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
 import { FormManager } from './form-manager';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import type { Encounter } from './patient-registration.types';
@@ -16,7 +16,7 @@ const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
 const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
-const mockedShowToast = showToast as jest.Mock;
+const mockedShowSnackbar = showSnackbar as jest.Mock;
 
 jest.setTimeout(10000);
 
@@ -180,7 +180,7 @@ describe('patient registration component', () => {
       mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
       mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
       mockedSaveEncounter.mockClear();
-      mockedShowToast.mockClear();
+      mockedShowSnackbar.mockClear();
       jest.clearAllMocks();
     });
 
@@ -327,7 +327,7 @@ describe('patient registration component', () => {
       await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(1));
       await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(1));
       await waitFor(() =>
-        expect(mockedShowToast).toHaveBeenCalledWith(expect.objectContaining({ description: 'an error message' })),
+        expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' })),
       );
 
       mockedSaveEncounter.mockResolvedValue({});
@@ -335,7 +335,9 @@ describe('patient registration component', () => {
       await user.click(screen.getByText('Register Patient'));
       await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(2));
       await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(2));
-      await waitFor(() => expect(mockedShowToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })));
+      await waitFor(() =>
+        expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' })),
+      );
     });
   });
 
@@ -344,7 +346,7 @@ describe('patient registration component', () => {
       mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
       mockedSavePatient.mockReturnValue({ data: { uuid: 'new-pt-uuid' }, ok: true });
       mockedSaveEncounter.mockClear();
-      mockedShowToast.mockClear();
+      mockedShowSnackbar.mockClear();
       jest.clearAllMocks();
     });
 

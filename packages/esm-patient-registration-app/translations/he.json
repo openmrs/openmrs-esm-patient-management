@@ -66,6 +66,9 @@
   "registerPatient": "רשום מטופל",
   "registrationSuccessToastDescription": "המטופל נרשם בהצלחה וניתן למצוא אותו באמצעות חיפוש לפי שם או מספר תעודת זהות",
   "registrationSuccessToastTitle": "נרשם מטופל חדש",
+  "registerPatientSuccessSnackbarDescription": "The patient can now be found by searching for them using their name or ID number",
+  "registerPatientSuccessSnackbarTitle": "New Patient Created",
+  "registrationErrorSnackbarTitle": "Patient Registration Failed",
   "relationship": "קשר",
   "relationshipPersonMustExist": "האדם הקשור חייב להיות אדם קיים",
   "relationshipPlaceholder": "קשר",
@@ -86,8 +89,9 @@
   "unknown": "לא ידוע",
   "unknownPatientAttributeType": "סוג המאפיין של המטופל לא ידוע {{personAttributeTypeFormat}}",
   "updatePatient": "עדכון פרטי מטופל",
-  "updationSuccessToastDescription": "פרטי המטופל עודכנו בהצלחה",
-  "updationSuccessToastTitle": "פרטי המטופל עודכנו",
+  "updatePatientErrorSnackbarTitle": "Patient Details Update Failed",
+  "updatePatientSuccessSnackbarDescription": "The patient's information has been successfully updated",
+  "updatePatientSuccessSnackbarTitle": "Patient Details Updated",
   "yearsEstimateRequired": "נדרש חיזוי שנים",
   "yes": "כן"
 }
