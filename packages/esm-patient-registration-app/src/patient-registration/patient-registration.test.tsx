@@ -81,6 +81,14 @@ let mockOpenmrsConfig: RegistrationConfig = {
   ],
   fieldDefinitions: [],
   fieldConfigurations: {
+    dateOfBirth: {
+      allowEstimatedDateOfBirth: true,
+      useEstimatedDateOfBirth: {
+        enabled: true,
+        dayOfMonth: new Date().getDay(),
+        month: new Date().getMonth(),
+      },
+    },
     name: {
       displayMiddleName: true,
       allowUnidentifiedPatients: true,
