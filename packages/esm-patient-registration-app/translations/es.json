@@ -63,7 +63,7 @@
   "patientNameKnown": "¿Se sabe el nombre del paciente?",
   "patientRegistrationBreadcrumb": "Patient Registration",
   "registerPatient": "Registrar paciente",
-  "registerPatientSuccessSnackbarDescription": "The patient can now be found by searching for them using their name or ID number",
+  "registerPatientSuccessSnackbarSubtitle": "The patient can now be found by searching for them using their name or ID number",
   "registerPatientSuccessSnackbarTitle": "New Patient Created",
   "registrationErrorSnackbarTitle": "Patient Registration Failed",
   "relationship": "Relación",
@@ -87,7 +87,7 @@
   "unknownPatientAttributeType": "Patient attribute type has unknown format {{personAttributeTypeFormat}}",
   "updatePatient": "Paciente Actualizado",
   "updatePatientErrorSnackbarTitle": "Patient Details Update Failed",
-  "updatePatientSuccessSnackbarDescription": "The patient's information has been successfully updated",
+  "updatePatientSuccessSnackbarSubtitle": "The patient's information has been successfully updated",
   "updatePatientSuccessSnackbarTitle": "Patient Details Updated",
   "yearsEstimateRequired": "Estimación de años obligatoria",
   "yes": "Sí"

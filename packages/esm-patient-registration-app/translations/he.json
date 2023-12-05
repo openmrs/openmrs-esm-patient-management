@@ -63,7 +63,7 @@
   "patientNameKnown": "שם המטופל ידוע?",
   "patientRegistrationBreadcrumb": "רישום מטופל",
   "registerPatient": "רשום מטופל",
-  "registerPatientSuccessSnackbarDescription": "The patient can now be found by searching for them using their name or ID number",
+  "registerPatientSuccessSnackbarSubtitle": "The patient can now be found by searching for them using their name or ID number",
   "registerPatientSuccessSnackbarTitle": "New Patient Created",
   "registrationErrorSnackbarTitle": "Patient Registration Failed",
   "relationship": "קשר",
@@ -87,7 +87,7 @@
   "unknownPatientAttributeType": "סוג המאפיין של המטופל לא ידוע {{personAttributeTypeFormat}}",
   "updatePatient": "עדכון פרטי מטופל",
   "updatePatientErrorSnackbarTitle": "Patient Details Update Failed",
-  "updatePatientSuccessSnackbarDescription": "The patient's information has been successfully updated",
+  "updatePatientSuccessSnackbarSubtitle": "The patient's information has been successfully updated",
   "updatePatientSuccessSnackbarTitle": "Patient Details Updated",
   "yearsEstimateRequired": "נדרש חיזוי שנים",
   "yes": "כן"

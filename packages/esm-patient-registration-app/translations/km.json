@@ -63,7 +63,7 @@
   "patientNameKnown": "ស្គាល់ឈ្មោះអ្នកជំងឺឬទេ?",
   "patientRegistrationBreadcrumb": "ការចុះឈ្មោះអ្នកជំងឺ",
   "registerPatient": "ចុះឈ្មោះអ្នកជំងឺ",
-  "registerPatientSuccessSnackbarDescription": "The patient can now be found by searching for them using their name or ID number",
+  "registerPatientSuccessSnackbarSubtitle": "The patient can now be found by searching for them using their name or ID number",
   "registerPatientSuccessSnackbarTitle": "New Patient Created",
   "registrationErrorSnackbarTitle": "Patient Registration Failed",
   "relationship": "ទំនាក់ទំនង",
@@ -87,7 +87,7 @@
   "unknownPatientAttributeType": "ប្រភេទនៃគុណលក្ខណៈរបស់អ្នកជំងឺគឺមិនស្គាល់។ {{personAttributeTypeFormat}}",
   "updatePatient": "ធ្វើបច្ចុប្បន្នភាពអ្នកជំងឺ",
   "updatePatientErrorSnackbarTitle": "Patient Details Update Failed",
-  "updatePatientSuccessSnackbarDescription": "The patient's information has been successfully updated",
+  "updatePatientSuccessSnackbarSubtitle": "The patient's information has been successfully updated",
   "updatePatientSuccessSnackbarTitle": "Patient Details Updated",
   "yearsEstimateRequired": "តម្រូវឱ្យមានការប៉ាន់ស្មានឆ្នាំ",
   "yes": "បាទ/ចាស"
