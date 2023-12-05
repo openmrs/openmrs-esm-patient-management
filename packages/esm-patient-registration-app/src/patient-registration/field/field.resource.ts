@@ -13,7 +13,6 @@ export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoad
       title: error.name,
       subtitle: error.message,
       kind: 'error',
-      isLowContrast: true,
     });
   }
   return { data: data?.data, isLoading };
@@ -30,7 +29,6 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
       title: error.name,
       subtitle: error.message,
       kind: 'error',
-      isLowContrast: true,
     });
   }
   return { data: data?.data?.answers, isLoading };

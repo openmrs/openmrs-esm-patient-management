@@ -83,9 +83,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       showSnackbar({
         subtitle: inEditMode
-          ? t('updatePatientSuccessSnackbarDescription', "The patient's information has been successfully updated")
+          ? t('updatePatientSuccessSnackbarSubtitle', "The patient's information has been successfully updated")
           : t(
-              'registerPatientSuccessSnackbarDescription',
+              'registerPatientSuccessSnackbarSubtitle',
               'The patient can now be found by searching for them using their name or ID number',
             ),
         title: inEditMode
@@ -108,7 +108,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
               : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
             subtitle: error.message,
             kind: 'error',
-            isLowContrast: true,
           });
         });
       } else if (error.responseBody?.error?.message) {
@@ -118,7 +117,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
           subtitle: error.responseBody.error.message,
           kind: 'error',
-          isLowContrast: true,
         });
       } else {
         createErrorHandler()(error);
