@@ -12,7 +12,7 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import styles from './queue-room.scss';
 import { SearchTypes } from '../types';
 import { mutate } from 'swr';
@@ -55,21 +55,21 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
       saveQueueRoom(queueRoomName, queueRoomName, queueRoomService).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
+            showSnackbar({
               title: t('addQueueRoom', 'Add queue room'),
               kind: 'success',
-              description: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+              subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
             closePanel();
             mutate(`/ws/rest/v1/queueroom`);
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('errorAddingQueueRoom', 'Error adding queue room'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
         },
       );

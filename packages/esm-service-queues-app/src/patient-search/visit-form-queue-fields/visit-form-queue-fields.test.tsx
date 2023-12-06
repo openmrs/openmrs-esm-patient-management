@@ -5,8 +5,7 @@ import StartVisitQueueFields from './visit-form-queue-fields.component';
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useLayoutType: () => 'desktop',
-  showNotification: jest.fn(),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
   useConfig: jest.fn(() => ({
     concepts: {
       defaultStatusConceptUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',

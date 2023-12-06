@@ -10,7 +10,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   useQueueLocations: jest.fn(() => ({
     queueLocations: { uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' },
   })),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 jest.mock('./queue-room.resource', () => ({
