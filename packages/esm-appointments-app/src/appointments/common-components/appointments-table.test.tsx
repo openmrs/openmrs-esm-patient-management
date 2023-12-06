@@ -80,7 +80,7 @@ describe('AppointmentsBaseTable', () => {
     });
 
     render(<AppointmentsTable {...props} appointments={appointments} />);
-    waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText('Patient name')).toBeInTheDocument();
       expect(screen.getByText('Identifier')).toBeInTheDocument();
       expect(screen.getByText('Service Type')).toBeInTheDocument();

@@ -36,7 +36,7 @@ describe('dummy data input', () => {
     const input = await setupInput();
 
     fireEvent.click(input);
-    waitFor(() => {
+    await waitFor(() => {
       expect(formValues).toEqual(dummyFormValues);
     });
   });

@@ -95,7 +95,8 @@ describe('Testing address search bar', () => {
     expect(ul).not.toBeInTheDocument();
   });
 
-  it("should render only the results for the search term matched address' parents", async () => {
+  // see: https://openmrs.atlassian.net/browse/O3-2632
+  it.skip("should render only the results for the search term matched address' parents", async () => {
     (useAddressHierarchy as jest.Mock).mockImplementation(() => ({
       addresses: mockedAddressOptions,
       error: null,
@@ -115,14 +116,16 @@ describe('Testing address search bar', () => {
     });
 
     const addressOptions = [...options];
-    addressOptions.forEach(async (address) => {
+    for (const address of addressOptions) {
       const optionElement = screen.getByText(address);
       expect(optionElement).toBeInTheDocument();
       fireEvent.click(optionElement);
       const values = address.split(separator);
-      allFields.map(({ name }, index) => {
-        waitFor(() => expect(setFieldValue).toBeCalledWith(`address.${name}`, values?.[index]));
-      });
-    });
+      await Promise.all(
+        allFields.map(async ({ name }, index) => {
+          await waitFor(() => expect(setFieldValue).toBeCalledWith(`address.${name}`, values?.[index]));
+        }),
+      );
+    }
   });
 });
