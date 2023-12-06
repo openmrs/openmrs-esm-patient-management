@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 import {
   DataTable,
   TableContainer,
@@ -18,11 +17,12 @@ import {
   Button,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
-import { ConfigurableLink, usePagination } from '@openmrs/esm-framework';
+import { ConfigurableLink, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { getPageSizes, useSearchResults } from '../utils';
+import { ConfigObject } from '../../config-schema';
 
 const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();
@@ -31,6 +31,8 @@ const UnscheduledAppointments: React.FC = () => {
   const [searchString, setSearchString] = useState('');
   const { data: unscheduledAppointments, isLoading, error } = useUnscheduledAppointments();
   const searchResults = useSearchResults(unscheduledAppointments, searchString);
+  const { customPatientChartUrl } = useConfig<ConfigObject>();
+
   const headerData = [
     {
       header: 'Patient Name',
@@ -55,7 +57,10 @@ const UnscheduledAppointments: React.FC = () => {
   const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
     name: (
-      <ConfigurableLink style={{ textDecoration: 'none' }} to={`\${openmrsSpaBase}/patient/${visit.uuid}/chart`}>
+      <ConfigurableLink
+        style={{ textDecoration: 'none' }}
+        to={customPatientChartUrl}
+        templateParams={{ patientUuid: visit.uuid }}>
         {visit.name}
       </ConfigurableLink>
     ),
