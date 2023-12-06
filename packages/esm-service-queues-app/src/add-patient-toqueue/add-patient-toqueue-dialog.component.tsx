@@ -12,7 +12,7 @@ import {
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
-import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   addQueueEntry,
   usePriority,
@@ -79,11 +79,11 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     ).then(
       ({ status }) => {
         if (status === 201) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             title: t('addEntry', 'Add entry'),
             kind: 'success',
-            description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
+            subtitle: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
           mutate();
@@ -91,11 +91,11 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('queueEntryAddFailed', 'Error adding queue entry status'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );
