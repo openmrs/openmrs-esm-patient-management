@@ -77,6 +77,12 @@ export const configSchema = {
     _description: 'The name of the patient identifier type to be used for the patient identifier field',
     _default: 'OpenMRS ID',
   },
+  showUnscheduledAppointmentsTab: {
+    _type: Type.Boolean,
+    _description:
+      'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
+    _default: false,
+  },
 };
 
 export interface ConfigObject {
@@ -95,4 +101,5 @@ export interface ConfigObject {
   defaultFacilityUrl: string;
   customPatientChartUrl: string;
   patientIdentifierType: string;
+  showUnscheduledAppointmentsTab: boolean;
 }
