@@ -1,11 +1,12 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .cardContainer {
   background-color: $ui-02;
   display: flex;
-  height: spacing.$spacing-12;
+  height: layout.$spacing-12;
 }
 
 .tileContainer {
@@ -30,7 +31,7 @@
 .tileHeader {
   display: flex;
   justify-content: space-between;
-  padding-bottom: spacing.$spacing-05;
+  padding-bottom: layout.$spacing-05;
 }
 
 .headerLabel {
@@ -51,7 +52,7 @@
 .headerLabelContainer {
   display: flex;
   align-items: center;
-  height: $spacing-07;
+  height: layout.$spacing-07;
 }
 
 .link {

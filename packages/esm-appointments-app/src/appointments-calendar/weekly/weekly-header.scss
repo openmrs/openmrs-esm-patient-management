@@ -1,6 +1,6 @@
 @use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
 @use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -24,7 +24,7 @@
   border: 1px solid colors.$gray-20;
 
   & > span {
-    font-size: spacing.$spacing-05;
+    font-size: layout.$spacing-05;
     color: colors.$gray-70;
   }
 }
@@ -35,7 +35,7 @@
 .tileHeader {
   display: flex;
   justify-content: space-between;
-  padding-bottom: spacing.$spacing-05;
+  padding-bottom: layout.$spacing-05;
 }
 
 .headerLabel {
