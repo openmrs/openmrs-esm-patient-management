@@ -7,6 +7,7 @@ import { spaBasePath } from '../../constants';
 import { CalendarType } from '../../types';
 
 jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
   navigate: jest.fn(),
   useLayoutType: jest.fn(),
 }));
