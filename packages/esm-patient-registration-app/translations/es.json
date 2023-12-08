@@ -82,6 +82,7 @@
   "sexFieldLabelText": "Sexo",
   "source": "Source",
   "stroke": "Ictus",
+  "submitting": "Submiting...",
   "unableToFetch": "No se puede obtener el tipo de atributo de persona {{personattributetype}}",
   "unknown": "Desconocido",
   "unknownPatientAttributeType": "Patient attribute type has unknown format {{personAttributeTypeFormat}}",

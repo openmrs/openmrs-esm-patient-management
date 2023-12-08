@@ -82,6 +82,7 @@
   "sexFieldLabelText": "מין",
   "source": "מקור",
   "stroke": "שבץ",
+  "submitting": "Submiting...",
   "unableToFetch": "אין אפשרות לאחזר סוג מאפיין אדם - {{personattributetype}}",
   "unknown": "לא ידוע",
   "unknownPatientAttributeType": "סוג המאפיין של המטופל לא ידוע {{personAttributeTypeFormat}}",

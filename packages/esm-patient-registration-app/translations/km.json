@@ -82,6 +82,7 @@
   "sexFieldLabelText": "ភេទ",
   "source": "ប្រភព",
   "stroke": "ជំងឺស្ទះសរសៃឈាមខួរក្បាល",
+  "submitting": "Submiting...",
   "unableToFetch": "មិនអាចទាញយកប្រភេទគុណលក្ខណៈតាមអ្នកជំងឺបានទេ - {{personattributetype}}",
   "unknown": "មិនដឹង",
   "unknownPatientAttributeType": "ប្រភេទនៃគុណលក្ខណៈរបស់អ្នកជំងឺគឺមិនស្គាល់។ {{personAttributeTypeFormat}}",
