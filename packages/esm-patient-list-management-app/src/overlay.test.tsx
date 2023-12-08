@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import Overlay from './overlay.component';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import Overlay from './overlay.component';
 
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockIsDesktop = isDesktop as jest.Mock;
@@ -40,8 +41,10 @@ describe('Overlay', () => {
     expect(backButton).toBeInTheDocument();
   });
 
-  it('calls the close function when close button is clicked', () => {
+  it('calls the close function when close button is clicked', async () => {
+    const user = userEvent.setup();
     const mockClose = jest.fn();
+
     mockUseLayoutType.mockImplementation(() => 'desktop');
     render(
       <Overlay close={mockClose} header="Test Header">
@@ -50,7 +53,7 @@ describe('Overlay', () => {
     );
 
     const closeButton = screen.getByRole('button', { name: 'Close overlay' });
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
 
     expect(mockClose).toHaveBeenCalled();
   });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
 import { of } from 'rxjs';
 import { renderWithSwr } from '../../../../tools/test-helpers';
@@ -103,7 +103,7 @@ describe('ActiveVisitsTable: ', () => {
 
     renderActiveVisitsTable();
 
-    await waitFor(() => screen.getByRole('table'));
+    await screen.findByRole('table');
 
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();

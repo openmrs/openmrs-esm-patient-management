@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import QueueLinelist from './queue-linelist.component';
 
 describe('QueueLinelist', () => {
@@ -10,11 +11,13 @@ describe('QueueLinelist', () => {
     expect(filterContent).toBeInTheDocument();
   });
 
-  it('toggles between filter content and null', () => {
+  it('toggles between filter content and null', async () => {
+    const user = userEvent.setup();
+
     render(<QueueLinelist closePanel={jest.fn()} />);
 
     const closeButton = screen.getByText('Close overlay');
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
 
     const filterContent = screen.queryByTestId('filter-content');
     expect(filterContent).not.toBeInTheDocument();
