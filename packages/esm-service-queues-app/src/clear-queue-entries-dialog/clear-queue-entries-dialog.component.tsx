@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './clear-queue-entries-dialog.scss';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
 import { MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 
@@ -21,20 +21,20 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
     batchClearQueueEntries(visitQueueEntries).then(
       (response) => {
         closeModal();
-        showToast({
-          critical: true,
+        showSnackbar({
+          isLowContrast: true,
           title: t('clearQueue', 'Clear queue'),
           kind: 'success',
-          description: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
+          subtitle: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
         mutate();
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('errorClearingQueues', 'Error clearing queues'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );

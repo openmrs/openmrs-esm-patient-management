@@ -1,15 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddProviderQueueRoom from './add-provider-queue-room.component';
-import { showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useCurrentProvider: jest.fn(() => ({
     currentProvider: { uuid: 'provider-uuid-1' },
   })),
-  showToast: jest.fn(),
-  showNotification: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 jest.mock('./add-provider-queue-room.resource', () => ({
   useProvidersQueueRoom: jest.fn(() => ({
@@ -92,7 +91,7 @@ describe('AddProviderQueueRoom', () => {
 
     await waitFor(() => {
       expect(mockCloseModal).toHaveBeenCalled();
-      expect(showToast).toHaveBeenCalled();
+      expect(showSnackbar).toHaveBeenCalled();
     });
   });
 });

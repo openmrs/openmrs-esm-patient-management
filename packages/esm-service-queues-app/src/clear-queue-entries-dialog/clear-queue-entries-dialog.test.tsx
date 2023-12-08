@@ -7,7 +7,7 @@ const mockBatchClearQueueEntries = batchClearQueueEntries as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 jest.mock('./clear-queue-entries-dialog.resource');
