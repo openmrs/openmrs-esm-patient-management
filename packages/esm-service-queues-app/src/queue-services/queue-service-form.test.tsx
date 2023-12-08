@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import QueueServiceForm from './queue-service-form.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -28,25 +29,29 @@ jest.mock('../patient-search/hooks/useQueueLocations', () => ({
 
 describe('QueueServiceForm', () => {
   it('should display required error messages when form is submitted with missing fields', async () => {
+    const user = userEvent.setup();
+
     render(<QueueServiceForm toggleSearchType={() => {}} closePanel={() => {}} />);
 
     const submitButton = screen.getByText('Save');
 
-    fireEvent.click(submitButton);
+    await user.click(submitButton);
 
     expect(screen.getByText('Missing queue name')).toBeInTheDocument();
   });
 
   it('should submit the form when all fields are filled', async () => {
+    const user = userEvent.setup();
+
     render(<QueueServiceForm toggleSearchType={() => {}} closePanel={() => {}} />);
 
     const queueNameInput = screen.getByLabelText('Queue name');
     const serviceSelect = screen.getByLabelText('Select a service type');
     const locationSelect = screen.getByLabelText('Select a location');
 
-    fireEvent.change(queueNameInput, { target: { value: 'Test Queue' } });
-    fireEvent.change(serviceSelect, { target: { value: '6f017eb0-b035-4acd-b284-da45f5067502' } });
-    fireEvent.change(locationSelect, { target: { value: '34567eb0-b035-4acd-b284-da45f5067502' } });
+    await user.type(queueNameInput, 'Test Queue');
+    await user.selectOptions(serviceSelect, '6f017eb0-b035-4acd-b284-da45f5067502');
+    await user.selectOptions(locationSelect, '34567eb0-b035-4acd-b284-da45f5067502');
 
     expect(queueNameInput).toHaveValue('Test Queue');
     expect(serviceSelect).toHaveValue('6f017eb0-b035-4acd-b284-da45f5067502');

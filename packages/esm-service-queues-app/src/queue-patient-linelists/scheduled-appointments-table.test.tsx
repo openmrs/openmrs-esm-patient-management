@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import AppointmentsTable from './scheduled-appointments-table.component';
 import { mockAppointmentsData } from '../../__mocks__/appointments-data.mock';
 
@@ -30,11 +31,14 @@ describe('AppointmentsTable', () => {
     expect(appointmentName).toBeInTheDocument();
   });
 
-  it('filters appointments based on status selection', () => {
+  it('filters appointments based on status selection', async () => {
+    const user = userEvent.setup();
+
     render(<AppointmentsTable />);
 
     const statusDropdown = screen.getAllByLabelText('Status:');
-    fireEvent.change(statusDropdown[0], { target: { value: 'Completed' } });
+
+    await user.type(statusDropdown[0], 'Completed');
 
     const filteredAppointmentName = screen.getByText('Hungai Kevin');
     expect(filteredAppointmentName).toBeInTheDocument();

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import CompactPatientSearchComponent from './compact-patient-search.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -25,50 +26,46 @@ describe('CompactPatientSearchComponent', () => {
   });
 
   it('updates search term on input change', async () => {
+    const user = userEvent.setup();
     render(<CompactPatientSearchComponent isSearchPage={true} initialSearchTerm="" />);
     const searchInput: HTMLInputElement = screen.getByRole('searchbox');
 
-    fireEvent.change(searchInput, { target: { value: 'John' } });
+    await user.type(searchInput, 'John');
 
-    await waitFor(() => {
-      expect(searchInput.value).toBe('John');
-    });
+    expect(searchInput.value).toBe('John');
   });
 
   it('clears search term on clear button click', async () => {
+    const user = userEvent.setup();
     render(<CompactPatientSearchComponent isSearchPage={true} initialSearchTerm="" />);
     const searchInput: HTMLInputElement = screen.getByRole('searchbox');
     const clearButton = screen.getByRole('button', { name: 'Clear' });
 
-    fireEvent.change(searchInput, { target: { value: 'John' } });
-    fireEvent.click(clearButton);
+    await user.type(searchInput, 'John');
+    await user.click(clearButton);
 
-    await waitFor(() => {
-      expect(searchInput.value).toBe('');
-    });
+    expect(searchInput.value).toBe('');
   });
 
   it('renders search results when search term is not empty', async () => {
+    const user = userEvent.setup();
     render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
     const searchInput = screen.getByRole('searchbox');
 
-    fireEvent.change(searchInput, { target: { value: 'John' } });
+    await user.type(searchInput, 'John');
 
-    await waitFor(() => {
-      const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
-      expect(searchResultsContainer).toBeInTheDocument();
-    });
+    const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
+    expect(searchResultsContainer).toBeInTheDocument();
   });
 
-  it('renders recent patient search when search term is empty', async () => {
+  it('renders a list of recently searched patients when a search term is not provided', async () => {
+    const user = userEvent.setup();
     render(<CompactPatientSearchComponent isSearchPage={false} initialSearchTerm="" />);
     const searchInput = screen.getByRole('searchbox');
 
-    fireEvent.change(searchInput, { target: { value: '' } });
+    await user.clear(searchInput);
 
-    await waitFor(() => {
-      const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
-      expect(searchResultsContainer).toBeInTheDocument();
-    });
+    const searchResultsContainer = screen.getByTestId('floatingSearchResultsContainer');
+    expect(searchResultsContainer).toBeInTheDocument();
   });
 });
