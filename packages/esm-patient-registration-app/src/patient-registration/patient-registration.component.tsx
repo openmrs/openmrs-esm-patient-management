@@ -173,9 +173,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   disabled={!currentSession || !identifierTypes || props.isSubmitting}>
                   {props.isSubmitting ? (
                     <InlineLoading
-                      status="active"
+                      className={styles.spinner}
+                      description={`${t('submitting', 'Submitting')} ...`}
                       iconDescription="submitting"
-                      description={t('submitting', 'Submiting...')}
+                      status="active"
                     />
                   ) : inEditMode ? (
                     t('updatePatient', 'Update Patient')

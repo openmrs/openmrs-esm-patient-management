@@ -82,7 +82,7 @@
   "sexFieldLabelText": "الجنس",
   "source": "Source",
   "stroke": "جلطة",
-  "submitting": "Submiting...",
+  "submitting": "Submitting",
   "unableToFetch": "تعذر الجلب نوع السمة الشخصية - {{personattributetype}}",
   "unknown": "غير معروف",
   "unknownPatientAttributeType": "Patient attribute type has unknown format {{personAttributeTypeFormat}}",
