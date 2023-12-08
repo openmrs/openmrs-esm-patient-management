@@ -44,6 +44,9 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
+    useConfig: jest.fn(() => ({
+      customPatientChartUrl: 'someUrl',
+    })),
   };
 });
 
@@ -85,7 +88,9 @@ describe('AppointmentsBaseTable', () => {
       expect(screen.getByText('Identifier')).toBeInTheDocument();
       expect(screen.getByText('Service Type')).toBeInTheDocument();
       expect(screen.getByText('Actions')).toBeInTheDocument();
-      expect(screen.getByText('John Smith')).toBeInTheDocument();
+      const patient = screen.getByText('John Smith');
+      expect(patient).toBeInTheDocument();
+      expect(patient).toHaveAttribute('href', 'someUrl');
       expect(screen.getByText('12345')).toBeInTheDocument();
       expect(screen.getByText('Service')).toBeInTheDocument();
     });

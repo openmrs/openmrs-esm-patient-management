@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { PersonAttributeTypeResponse } from '../../patient-registration.types';
 

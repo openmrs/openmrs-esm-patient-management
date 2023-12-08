@@ -4,8 +4,7 @@ import QueueServiceForm from './queue-service-form.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
   useLayoutType: () => 'desktop',
-  showNotification: jest.fn(),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 jest.mock('./queue-service.resource', () => ({

@@ -12,7 +12,7 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import styles from './queue-service.scss';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { SearchTypes } from '../types';
@@ -60,10 +60,10 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
       saveQueue(queueName, queueConcept, queueName, userLocation).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
+            showSnackbar({
               title: t('addQueue', 'Add queue'),
               kind: 'success',
-              description: t('queueAddedSuccessfully', 'Queue addeded successfully'),
+              subtitle: t('queueAddedSuccessfully', 'Queue addeded successfully'),
             });
             closePanel();
             mutate(`/ws/rest/v1/queue?${userLocation}`);
@@ -71,11 +71,11 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('errorAddingQueue', 'Error adding queue'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
         },
       );

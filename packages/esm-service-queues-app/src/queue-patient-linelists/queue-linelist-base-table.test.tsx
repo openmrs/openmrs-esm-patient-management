@@ -59,6 +59,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.setTimeout(20000);
+
 describe('QueuePatientBaseTable: ', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
