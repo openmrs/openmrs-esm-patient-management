@@ -2,8 +2,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 .tileContainer {
   height: layout.$spacing-10;
@@ -30,6 +28,6 @@
 }
 
 .headerLabel {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
 }
