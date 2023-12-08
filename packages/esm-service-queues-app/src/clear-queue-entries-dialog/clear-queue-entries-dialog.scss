@@ -1,10 +1,9 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '~carbon-components/src/globals/scss/mixins';
 
 #subHeading {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $ui-05;
 }
 

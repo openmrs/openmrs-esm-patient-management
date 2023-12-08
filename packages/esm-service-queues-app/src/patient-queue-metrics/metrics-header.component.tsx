@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MessageQueue, ArrowRight } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import styles from './metrics-header.scss';
 import { navigate, UserHasAccess } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 import { SearchTypes } from '../types';
 import PatientSearch from '../patient-search/patient-search.component';
+import styles from './metrics-header.scss';
 
 const MetricsHeader = () => {
   const { t } = useTranslation();

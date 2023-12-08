@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import classNames from 'classnames';
-import { Button, Link } from '@carbon/react';
+import { Button, Link, InlineLoading } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -170,8 +170,19 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   // Current session and identifiers are required for patient registration.
                   // If currentSession or identifierTypes are not available, then the
                   // user should be blocked to register the patient.
-                  disabled={!currentSession || !identifierTypes}>
-                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                  disabled={!currentSession || !identifierTypes || props.isSubmitting}>
+                  {props.isSubmitting ? (
+                    <InlineLoading
+                      className={styles.spinner}
+                      description={`${t('submitting', 'Submitting')} ...`}
+                      iconDescription="submitting"
+                      status="active"
+                    />
+                  ) : inEditMode ? (
+                    t('updatePatient', 'Update Patient')
+                  ) : (
+                    t('registerPatient', 'Register Patient')
+                  )}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
