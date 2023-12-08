@@ -338,7 +338,7 @@ function ActiveVisitsTable() {
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop(layout) ? true : false}
           rows={tableRows}
-          size="xs"
+          size="sm"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getToolbarProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
@@ -358,14 +358,12 @@ function ActiveVisitsTable() {
                       size="sm"
                     />
                   </div>
-                  <Layer>
-                    <TableToolbarSearch
-                      className={styles.search}
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
-                      size="sm"
-                    />
-                  </Layer>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={onInputChange}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
                   <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
                 </TableToolbarContent>
               </TableToolbar>
