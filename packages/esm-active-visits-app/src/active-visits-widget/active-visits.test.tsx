@@ -53,7 +53,7 @@ describe('ActiveVisitsTable', () => {
     expect(patientNameLink.tagName).toBe('A');
   });
 
-  it.skip('filters active visits based on search input', async () => {
+  it('filters active visits based on search input', async () => {
     const user = userEvent.setup();
 
     mockActiveVisits.mockImplementationOnce(() => ({
@@ -65,6 +65,7 @@ describe('ActiveVisitsTable', () => {
       isValidating: false,
       error: null,
     }));
+
     render(<ActiveVisitsTable />);
 
     const searchInput = screen.getByPlaceholderText('Filter table');
