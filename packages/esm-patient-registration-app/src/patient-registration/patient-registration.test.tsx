@@ -340,7 +340,7 @@ describe('patient registration component', () => {
 
       mockedSaveEncounter.mockResolvedValue({});
 
-      await user.click(screen.getByText('Register Patient'));
+      await waitFor(() => user.click(screen.getByText('Register Patient')));
       await waitFor(() => expect(mockedSavePatient).toHaveBeenCalledTimes(2));
       await waitFor(() => expect(mockedSaveEncounter).toHaveBeenCalledTimes(2));
       await waitFor(() =>
