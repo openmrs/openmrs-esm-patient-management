@@ -2,8 +2,6 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/jest-dom';
 import { DobField } from './dob.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';

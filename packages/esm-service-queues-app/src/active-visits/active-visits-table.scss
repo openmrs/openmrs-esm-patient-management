@@ -61,10 +61,10 @@
 
 .search {
   max-width: 16rem;
+  display: inline;
 
   input {
     background-color: $ui-02 !important;
-    // height: 2rem !important;
   }
 }
 
@@ -86,6 +86,8 @@
   }
 
   .toolbarContent {
+    display: flex;
+    align-items: baseline;
     height: spacing.$spacing-07;
     margin-bottom: spacing.$spacing-02;
   }

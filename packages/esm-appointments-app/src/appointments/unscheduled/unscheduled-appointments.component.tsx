@@ -53,7 +53,6 @@ const UnscheduledAppointments: React.FC = () => {
   ];
 
   const { results, currentPage, goTo } = usePagination(searchResults, pageSize);
-
   const rowData = results?.map((visit) => ({
     id: `${visit.uuid}`,
     name: (
@@ -64,9 +63,9 @@ const UnscheduledAppointments: React.FC = () => {
         {visit.name}
       </ConfigurableLink>
     ),
-    identifier: visit.identifier,
     gender: visit.gender === 'F' ? 'Female' : 'Male',
     phoneNumber: visit.phoneNumber === '' ? '--' : visit.phoneNumber,
+    identifier: visit?.identifier,
   }));
 
   if (isLoading) {

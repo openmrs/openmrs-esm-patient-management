@@ -82,6 +82,7 @@
   "sexFieldLabelText": "Sex",
   "source": "Source",
   "stroke": "Stroke",
+  "submitting": "Submitting",
   "unableToFetch": "Unable to fetch person attribute type - {{personattributetype}}",
   "unknown": "Unknown",
   "unknownPatientAttributeType": "Patient attribute type has unknown format {{personAttributeTypeFormat}}",

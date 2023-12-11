@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import Overlay from './overlay.component';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
+import Overlay from './overlay.component';
 
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockIsDesktop = isDesktop as jest.Mock;
@@ -11,7 +12,8 @@ jest.mock('@openmrs/esm-framework');
 const headerText = 'Test Header';
 
 describe('Overlay Component', () => {
-  it('renders desktop layout with close button', () => {
+  it('renders desktop layout with close button', async () => {
+    const user = userEvent.setup();
     const closePanelMock = jest.fn();
 
     mockIsDesktop.mockImplementation(() => true);
@@ -24,7 +26,7 @@ describe('Overlay Component', () => {
     expect(headerContent).toBeInTheDocument();
     expect(closeButton).toBeInTheDocument();
 
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
     expect(closePanelMock).toHaveBeenCalled();
   });
 

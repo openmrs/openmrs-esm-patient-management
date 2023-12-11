@@ -1,8 +1,9 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import ActiveVisitsTable from './active-visits.component';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { usePagination } from '@openmrs/esm-framework';
 import { useActiveVisits } from './active-visits.resource';
+import ActiveVisitsTable from './active-visits.component';
 
 const mockedUsePagination = usePagination as jest.Mock;
 const mockActiveVisits = useActiveVisits as jest.Mock;
@@ -52,7 +53,9 @@ describe('ActiveVisitsTable', () => {
     expect(patientNameLink.tagName).toBe('A');
   });
 
-  it.skip('filters active visits based on search input', () => {
+  it('filters active visits based on search input', async () => {
+    const user = userEvent.setup();
+
     mockActiveVisits.mockImplementationOnce(() => ({
       activeVisits: [
         { id: '1', name: 'John Doe', visitType: 'Checkup', patientUuid: 'uuid1' },
@@ -62,10 +65,11 @@ describe('ActiveVisitsTable', () => {
       isValidating: false,
       error: null,
     }));
+
     render(<ActiveVisitsTable />);
 
     const searchInput = screen.getByPlaceholderText('Filter table');
-    fireEvent.change(searchInput, { target: { value: 'John' } });
+    await user.type(searchInput, 'John');
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.queryByText('Some One')).toBeNull();

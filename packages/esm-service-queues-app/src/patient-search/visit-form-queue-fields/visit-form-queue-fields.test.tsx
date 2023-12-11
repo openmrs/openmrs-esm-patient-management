@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
 import StartVisitQueueFields from './visit-form-queue-fields.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -46,20 +47,22 @@ describe('StartVisitQueueFields', () => {
     expect(getByLabelText('Sort weight')).toBeInTheDocument();
   });
 
-  it('updates the selected queue location', () => {
+  it('updates the selected queue location', async () => {
+    const user = userEvent.setup();
     const { getByLabelText } = render(<StartVisitQueueFields />);
 
     const selectQueueLocation = getByLabelText('Select a queue location') as HTMLInputElement;
-    fireEvent.change(selectQueueLocation, { target: { value: '1' } });
+    await user.type(selectQueueLocation, '1');
 
     expect(selectQueueLocation.value).toBe('1');
   });
 
-  it('updates the selected service', () => {
+  it('updates the selected service', async () => {
+    const user = userEvent.setup();
     const { getByLabelText } = render(<StartVisitQueueFields />);
 
     const selectService = getByLabelText('Select a service') as HTMLInputElement;
-    fireEvent.change(selectService, { target: { value: 'service-1' } });
+    await user.type(selectService, 'service-1');
 
     expect(selectService.value).toBe('e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
   });

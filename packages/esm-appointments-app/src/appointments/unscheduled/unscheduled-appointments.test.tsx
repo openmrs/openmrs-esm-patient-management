@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import { usePagination } from '@openmrs/esm-framework';
@@ -78,6 +79,8 @@ describe('UnscheduledAppointments component', () => {
   });
 
   it('allows the user to search for appointments', async () => {
+    const user = userEvent.setup();
+
     mockUseUnscheduledAppointments.mockReturnValue({
       isLoading: false,
       data: mockUnscheduledAppointments,
@@ -92,7 +95,7 @@ describe('UnscheduledAppointments component', () => {
     render(<UnscheduledAppointments />);
 
     const searchInput = await screen.findByRole('searchbox');
-    fireEvent.change(searchInput, { target: { value: 'Another' } });
+    await user.type(searchInput, 'Another');
 
     const patientName = screen.getByText('Another Patient');
     expect(patientName).toBeInTheDocument();
@@ -108,6 +111,8 @@ describe('UnscheduledAppointments component', () => {
   });
 
   it('allows the user to download a list of unscheduled appointments', async () => {
+    const user = userEvent.setup();
+
     mockUseUnscheduledAppointments.mockReturnValue({
       isLoading: false,
       data: mockUnscheduledAppointments,
@@ -124,7 +129,7 @@ describe('UnscheduledAppointments component', () => {
     const downloadButton = await screen.findByText('Download');
     expect(downloadButton).toBeInTheDocument();
 
-    fireEvent.click(downloadButton);
+    await user.click(downloadButton);
 
     expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(mockUnscheduledAppointments);
   });
