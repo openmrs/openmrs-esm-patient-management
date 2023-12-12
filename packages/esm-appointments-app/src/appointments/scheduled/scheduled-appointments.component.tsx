@@ -69,10 +69,17 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     }
   }, [allowedExtensions, currentTab]);
 
+  const panelsToShow = scheduledAppointmentPanels.filter(shouldShowPanel);
+
   return (
     <>
-      <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setCurrentTab(name)}>
-        {scheduledAppointmentPanels.filter(shouldShowPanel).map((panel) => {
+      <ContentSwitcher
+        className={styles.switcher}
+        size="sm"
+        onChange={({ name }) => setCurrentTab(name)}
+        selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
+        selectionMode="manual">
+        {panelsToShow.map((panel) => {
           return <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />;
         })}
       </ContentSwitcher>
