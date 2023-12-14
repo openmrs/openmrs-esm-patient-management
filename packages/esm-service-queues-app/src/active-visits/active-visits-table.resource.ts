@@ -17,6 +17,7 @@ import {
 import { Identifer, MappedServiceQueueEntry, QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
+import { configSchema } from '../config-schema';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -193,11 +194,24 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   const { visitQueueNumberAttributeUuid } = config;
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
+  const billingUrl = configSchema.customBillinguRL;
+
   const { t } = useTranslation();
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const {
+    data: queueData,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(apiUrl, openmrsFetch);
+
+  const {
+    data: billsData,
+    error: billsError,
+    isLoading: billsIsLoading,
+  } = useSWR<{ data: { results: Array<any> } }>(billingUrl, openmrsFetch, {
+    errorRetryCount: 2,
+  });
 
   const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
     diagnoses: encounter.diagnoses,
@@ -251,10 +265,18 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
 
   let mappedVisitQueueEntries;
 
-  if (!currServiceName || currServiceName == t('all', 'All')) {
-    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  if ((config.hideEntriesWithUnpaidBills && !currServiceName) || currServiceName == t('all', 'All')) {
+    const filteredArray = queueData?.data?.results.filter((patientUuid) => {
+      const matchingEntry = billsData?.data?.results?.find((entry) => {
+        entry.patient?.uuid === patientUuid;
+      });
+      return matchingEntry && matchingEntry.status === 'PAID';
+    });
+    mappedVisitQueueEntries = filteredArray?.map(mapVisitQueueEntryProperties);
+  } else if (!currServiceName || currServiceName == t('all', 'All')) {
+    mappedVisitQueueEntries = queueData?.data?.results?.map(mapVisitQueueEntryProperties);
   } else {
-    mappedVisitQueueEntries = data?.data?.results
+    mappedVisitQueueEntries = queueData?.data?.results
       ?.map(mapVisitQueueEntryProperties)
       .filter((data) => data.service == currServiceName);
   }
@@ -438,4 +460,27 @@ export function serveQueueEntry(servicePointName: string, ticketNumber: string, 
       status,
     },
   });
+}
+
+export function useHasUnpaidBill(patientUuid: string) {
+  const url = configSchema.customBillinguRL;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<any> } }>(
+    url,
+    openmrsFetch,
+    {
+      errorRetryCount: 2,
+    },
+  );
+
+  const hasUnpaidBill = () => {
+    const filteredResults = data?.data?.results?.filter((res) => res?.patient?.uuid === patientUuid);
+    return filteredResults?.some((res) => res?.status === 'PAID');
+  };
+
+  return {
+    hasUnpaidBill: hasUnpaidBill(),
+    isLoading,
+    isError: error,
+  };
 }

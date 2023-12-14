@@ -138,6 +138,16 @@ export const configSchema = {
     _default: '',
     _description: 'Custom label for patient chart button',
   },
+  hideEntriesWithUnpaidBills: {
+    _type: Type.Boolean,
+    _description: 'Whether to use the billing module to only show patients with paid bills in the queue table`',
+    _default: true,
+  },
+  customBillinguRL: {
+    _type: Type.String,
+    _default: '/ws/rest/v1/cashier/bill?v=full',
+    _description: 'Custom URL to fetch bills',
+  },
 };
 
 export interface ConfigObject {
@@ -170,6 +180,7 @@ export interface ConfigObject {
   customPatientIdUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
+  hideEntriesWithUnpaidBills: boolean;
 }
 
 export interface OutpatientConfig {
