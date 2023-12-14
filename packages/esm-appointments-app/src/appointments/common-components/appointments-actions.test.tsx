@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import AppointmentActions from './appointments-actions.component';
-import { MappedAppointment } from '../../types';
+import { type MappedAppointment } from '../../types';
 
 describe('AppointmentActions', () => {
   const defaultProps = {

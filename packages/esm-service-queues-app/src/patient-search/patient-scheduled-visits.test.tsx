@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import { renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockPatientsVisits, mockLocations, mockSession, mockPatient } from '__mocks__';
-import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 
 const mockedUseConfig = useConfig as jest.Mock;

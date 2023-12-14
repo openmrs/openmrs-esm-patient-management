@@ -1,7 +1,7 @@
 import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
-import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
+import { type ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
 import { mockServices, mockVisitQueueEntries, mockMappedQueueEntries, mockSession } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useVisitQueueEntries } from './active-visits-table.resource';

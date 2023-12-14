@@ -34,7 +34,7 @@ module.exports = {
       lines: 80,
     },
   },
-  setupFilesAfterEnv: [path.resolve(__dirname, 'tools', 'setupTests.ts')],
+  setupFilesAfterEnv: [path.resolve(__dirname, 'tools', 'setup-tests.ts')],
   testPathIgnorePatterns: [path.resolve(__dirname, 'e2e')],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {

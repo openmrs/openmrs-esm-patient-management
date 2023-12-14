@@ -2,7 +2,7 @@ import React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { AddressComponent } from '../address-field.component';
 import { Formik, Form } from 'formik';
-import { Resources, ResourcesContext } from '../../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';

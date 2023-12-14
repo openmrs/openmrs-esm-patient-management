@@ -5,7 +5,6 @@
   "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "react-hooks"],
-  "ignorePatterns": ["**/*.test.tsx"],
   "rules": {
     // Disabling these rules for now just to keep the diff small. I'll enable them one by one as we go.
     "@typescript-eslint/ban-ts-comment": "off",

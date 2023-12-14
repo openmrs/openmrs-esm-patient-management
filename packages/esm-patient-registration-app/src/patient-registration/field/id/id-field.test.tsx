@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { Identifiers } from './id-field.component';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { openmrsID, mockedIdentifierTypes } from '__mocks__';

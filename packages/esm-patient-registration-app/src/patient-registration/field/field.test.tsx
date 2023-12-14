@@ -3,9 +3,9 @@ import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Field } from './field.component';
-import { FormValues } from '../patient-registration.types';
+import type { AddressTemplate, FormValues } from '../patient-registration.types';
+import { type Resources, ResourcesContext } from '../../offline.resources';
 import { PatientRegistrationContext } from '../patient-registration-context';
-import { Resources, ResourcesContext } from '../../offline.resources';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -38,7 +38,7 @@ const mockedIdentifierTypes = [
     isPrimary: true,
     name: 'OpenMRS ID',
     required: true,
-    uniquenessBehavior: 'UNIQUE' as 'UNIQUE',
+    uniquenessBehavior: 'UNIQUE' as const,
     uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
   },
   {
@@ -48,7 +48,7 @@ const mockedIdentifierTypes = [
     isPrimary: false,
     name: 'ID Card',
     required: false,
-    uniquenessBehavior: 'UNIQUE' as 'UNIQUE',
+    uniquenessBehavior: 'UNIQUE' as const,
     uuid: 'b4143563-16cd-4439-b288-f83d61670fc8',
   },
   {
@@ -84,7 +84,7 @@ const mockedIdentifierTypes = [
 ];
 
 const mockResourcesContextValue: Resources = {
-  addressTemplate: predefinedAddressTemplate,
+  addressTemplate: predefinedAddressTemplate as unknown as AddressTemplate,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',

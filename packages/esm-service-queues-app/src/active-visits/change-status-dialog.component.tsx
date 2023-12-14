@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
-import { MappedQueueEntry } from '../types';
+import { type MappedQueueEntry } from '../types';
 import {
   updateQueueEntry,
   usePriority,

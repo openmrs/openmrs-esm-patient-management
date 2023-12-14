@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { mockLocations, mockSession, mockPatient, mockServices, mockProviders } from '__mocks__';
-import { MappedAppointment } from '../../../types';
+import { type MappedAppointment } from '../../../types';
 import AppointmentForm from './appointments-form.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
