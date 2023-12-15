@@ -28,7 +28,6 @@ import {
   Toggle,
 } from '@carbon/react';
 import {
-  ConfigObject,
   ExtensionSlot,
   showNotification,
   showToast,
@@ -55,6 +54,7 @@ import LocationSelectOption from '../../common-components/location-select-option
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
 import { useAppointmentList } from '../../../hooks/useAppointmentList';
+import { ConfigObject } from '../../../config-schema';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -71,7 +71,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const sessionUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const initialAppointmentFormValues = useInitialAppointmentFormValue(appointment, patientUuid);
-  const { appointmentTypes, appointmentStatuses, hiddenFormFields } = useConfig<ConfigObject>();
+  const { appointmentTypes, appointmentStatuses, hiddenFormFields, allowAllDayAppointments } =
+    useConfig<ConfigObject>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [patientAppointment, setPatientAppointment] = useState<PatientAppointment>(initialAppointmentFormValues);
@@ -225,15 +226,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             </Column>
             <Column>
               <section className={styles.flexRow}>
-                <Toggle
-                  className={styles.flex1}
-                  defaultToggled={patientAppointment.isFullDay}
-                  id="allDay"
-                  labelA={t('off', 'Off')}
-                  labelB={t('on', 'On')}
-                  labelText={t('allDay', 'All Day')}
-                  onToggle={(value) => setPatientAppointment({ ...patientAppointment, isFullDay: value })}
-                />
+                {allowAllDayAppointments && (
+                  <Toggle
+                    className={styles.flex1}
+                    defaultToggled={patientAppointment.isFullDay}
+                    id="allDay"
+                    labelA={t('off', 'Off')}
+                    labelB={t('on', 'On')}
+                    labelText={t('allDay', 'All Day')}
+                    onToggle={(value) => setPatientAppointment({ ...patientAppointment, isFullDay: value })}
+                  />
+                )}
                 <DatePicker
                   dateFormat="d/m/Y"
                   datePickerType="single"
