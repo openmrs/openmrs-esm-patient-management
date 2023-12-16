@@ -119,7 +119,7 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     <Overlay
       buttonsGroup={
         <ButtonSet className={styles.buttonsGroup}>
-          <Button onClick={close} kind="secondary" size="xl">
+          <Button className={styles.button} onClick={close} kind="secondary" size="xl">
             {t('cancel', 'Cancel')}
           </Button>
           <Button onClick={handleSubmit} size="xl" disabled={isSubmitting}>
