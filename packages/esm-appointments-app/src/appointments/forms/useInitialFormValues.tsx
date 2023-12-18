@@ -1,7 +1,8 @@
-import { OpenmrsResource, useSession } from '@openmrs/esm-framework';
+import { OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { amPm } from '../../helpers';
 import { MappedAppointment } from '../../types';
+import { ConfigObject } from '../../config-schema';
 
 export interface PatientAppointment {
   appointmentKind: string;
@@ -34,6 +35,7 @@ export const useInitialAppointmentFormValue = (
   patientUuid: string,
 ): PatientAppointment => {
   const session = useSession();
+  const { allowAllDayAppointments } = useConfig<ConfigObject>();
 
   // Build the initial form value for the appointment.
   const patientAppointment: PatientAppointment = {
@@ -52,7 +54,7 @@ export const useInitialAppointmentFormValue = (
     patientUuid: appointment?.patientUuid ?? patientUuid,
     visitDate: appointment?.dateTime ? new Date(appointment.dateTime) : new Date(),
     timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
-    isFullDay: true,
+    isFullDay: allowAllDayAppointments,
     day: appointment?.dateTime,
   };
 
