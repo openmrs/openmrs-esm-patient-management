@@ -18,8 +18,7 @@ import {
   ErrorState,
   toOmrsIsoString,
   toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   useSession,
   useLocations,
   NewVisitPayload,
@@ -119,11 +118,11 @@ const ScheduledVisits: React.FC<{
 
       const abortController = new AbortController();
       if (currentVisit) {
-        showNotification({
+        showSnackbar({
           title: t('startVisitError', 'Error starting visit'),
           kind: 'error',
-          critical: true,
-          description: t('patientHasActiveVisit', 'The patient already has an active visit'),
+          isLowContrast: false,
+          subtitle: t('patientHasActiveVisit', 'The patient already has an active visit'),
         });
         setIsSubmitting(false);
       } else {
@@ -146,10 +145,10 @@ const ScheduledVisits: React.FC<{
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
-                      showToast({
+                      showSnackbar({
                         kind: 'success',
                         title: t('startAVisit', 'Start a visit'),
-                        description: t(
+                        subtitle: t(
                           'startVisitQueueSuccessfully',
                           'Patient has been added to active visits list and queue.',
                           `${hours} : ${minutes}`,
@@ -161,11 +160,11 @@ const ScheduledVisits: React.FC<{
                     }
                   },
                   (error) => {
-                    showNotification({
+                    showSnackbar({
                       title: t('queueEntryError', 'Error adding patient to the queue'),
                       kind: 'error',
-                      critical: true,
-                      description: error?.message,
+                      isLowContrast: false,
+                      subtitle: error?.message,
                     });
                     setIsSubmitting(false);
                   },
@@ -173,11 +172,11 @@ const ScheduledVisits: React.FC<{
               }
             },
             (error) => {
-              showNotification({
+              showSnackbar({
                 title: t('startVisitError', 'Error starting visit'),
                 kind: 'error',
-                critical: true,
-                description: error?.message,
+                isLowContrast: false,
+                subtitle: error?.message,
               });
               setIsSubmitting(false);
             },

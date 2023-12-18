@@ -1,8 +1,9 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentService, Provider } from '../types';
+import { AppointmentService, Identifier, Provider } from '../types';
 import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
+import { configSchema } from '../config-schema';
 
 interface AppointmentPatientList {
   uuid: string;
@@ -14,11 +15,12 @@ interface AppointmentPatientList {
     name: string;
     uuid: string;
     age: number;
-    identifier: string;
+    identifiers?: Array<Identifier>;
   };
   providers: Array<Provider>;
   service: AppointmentService;
   startDateTime: string;
+  identifier: string;
 }
 
 export const useAppointmentList = (appointmentStatus: string, date?: string) => {
@@ -68,7 +70,9 @@ function toAppointmentObject(appointment: AppointmentPatientList) {
   return {
     name: appointment.patient.name,
     patientUuid: appointment.patient.uuid,
-    identifier: appointment.patient.identifier,
+    identifier: appointment?.patient?.identifiers?.find(
+      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
+    ).identifier,
     dateTime: appointment.startDateTime,
     serviceType: appointment.service?.name,
     provider: appointment?.providers[0]?.['name'] ?? '',

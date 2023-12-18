@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { Identifiers } from './id-field.component';
 import { Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
@@ -76,7 +77,9 @@ describe('Identifiers', () => {
     expect(configureButton).toBeEnabled();
   });
 
-  it('should open identifier selection overlay when "Configure" button is clicked', () => {
+  it('should open identifier selection overlay when "Configure" button is clicked', async () => {
+    const user = userEvent.setup();
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
@@ -98,7 +101,7 @@ describe('Identifiers', () => {
     );
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });
-    fireEvent.click(configureButton);
+    await user.click(configureButton);
 
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
   });

@@ -12,13 +12,13 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
-import styles from './queue-room.scss';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { useServices } from '../active-visits/active-visits-table.resource';
 import { saveQueueRoom } from './queue-room.resource';
+import styles from './queue-room-form.scss';
 
 interface QueueRoomFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -55,21 +55,21 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
       saveQueueRoom(queueRoomName, queueRoomName, queueRoomService).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
+            showSnackbar({
               title: t('addQueueRoom', 'Add queue room'),
               kind: 'success',
-              description: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+              subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
             closePanel();
             mutate(`/ws/rest/v1/queueroom`);
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('errorAddingQueueRoom', 'Error adding queue room'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
         },
       );
@@ -81,7 +81,6 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
     <Form onSubmit={createQueueRoom} className={styles.form}>
       <Stack gap={4} className={styles.grid}>
         <Column>
-          <h3 className={styles.heading}>{t('addNewQueueRoom', 'Add new queue room')}</h3>
           <Layer className={styles.input}>
             <TextInput
               id="queueRoomName"
@@ -102,55 +101,63 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
               </section>
             )}
           </Layer>
+        </Column>
 
-          <section className={styles.section}>
-            <Select
-              labelText={t('selectQueueLocation', 'Select a queue location')}
-              id="location"
-              invalidText="Required"
-              value={selectedQueueLocation}
-              onChange={(event) => {
-                setSelectedQueueLocation(event.target.value);
-              }}>
-              {!selectedQueueLocation ? (
-                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-              ) : null}
-              {queueLocations?.length > 0 &&
-                queueLocations.map((location) => (
-                  <SelectItem key={location.id} text={location.name} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-            </Select>
-          </section>
-
-          <section className={styles.section}>
-            <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
-              invalidText="Required"
-              value={queueRoomService}
-              onChange={(event) => setQueueRoomService(event.target.value)}>
-              {!queueRoomService ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
-              {services?.length > 0 &&
-                services.map((service) => (
-                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                    {service.display}
-                  </SelectItem>
-                ))}
-            </Select>
-          </section>
-          {isMissingQueueRoomService && (
-            <section>
-              <InlineNotification
-                style={{ margin: '0', minWidth: '100%' }}
-                kind="error"
-                lowContrast={true}
-                title={t('missingQueueRoomService', 'Missing queue room service')}
-                subtitle={t('addQueueRoomService', 'Please add a queue room service')}
-              />
+        <Column>
+          <Layer className={styles.input}>
+            <section className={styles.section}>
+              <Select
+                labelText={t('selectQueueLocation', 'Select a queue location')}
+                id="location"
+                invalidText="Required"
+                value={selectedQueueLocation}
+                onChange={(event) => {
+                  setSelectedQueueLocation(event.target.value);
+                }}>
+                {!selectedQueueLocation ? (
+                  <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                ) : null}
+                {queueLocations?.length > 0 &&
+                  queueLocations.map((location) => (
+                    <SelectItem key={location.id} text={location.name} value={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+              </Select>
             </section>
-          )}
+          </Layer>
+        </Column>
+
+        <Column>
+          <Layer className={styles.input}>
+            <section className={styles.section}>
+              <Select
+                labelText={t('selectService', 'Select a service')}
+                id="service"
+                invalidText="Required"
+                value={queueRoomService}
+                onChange={(event) => setQueueRoomService(event.target.value)}>
+                {!queueRoomService ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
+                {services?.length > 0 &&
+                  services.map((service) => (
+                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                      {service.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            </section>
+            {isMissingQueueRoomService && (
+              <section>
+                <InlineNotification
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingQueueRoomService', 'Missing queue room service')}
+                  subtitle={t('addQueueRoomService', 'Please add a queue room service')}
+                />
+              </section>
+            )}
+          </Layer>
         </Column>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

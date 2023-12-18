@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import BaseVisitType from './base-visit-type.component';
+import { render, screen } from '@testing-library/react';
 import { mockVisitTypes } from '../../../__mocks__/visits.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -21,21 +22,25 @@ describe('BaseVisitType', () => {
     });
   });
 
-  it('handles search input correctly', () => {
+  it('handles search input correctly', async () => {
+    const user = userEvent.setup();
+
     render(<BaseVisitType onChange={() => {}} visitTypes={mockVisitTypes} />);
 
     const searchInput: HTMLInputElement = screen.getByRole('searchbox');
-    fireEvent.change(searchInput, { target: { value: 'Visit Type 1' } });
+    await user.type(searchInput, 'Visit Type 1');
 
     expect(searchInput.value).toBe('Visit Type 1');
   });
 
-  it('calls onChange when a visit type is selected', () => {
+  it('calls onChange when a visit type is selected', async () => {
+    const user = userEvent.setup();
+
     const mockOnChange = jest.fn();
     render(<BaseVisitType onChange={mockOnChange} visitTypes={mockVisitTypes} />);
 
     const radioButton: HTMLInputElement = screen.getByLabelText(mockVisitTypes[0].display);
-    fireEvent.click(radioButton);
+    await user.click(radioButton);
     expect(radioButton.checked).toBe(true);
   });
 });

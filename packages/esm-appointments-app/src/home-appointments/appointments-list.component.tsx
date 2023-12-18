@@ -34,6 +34,7 @@ import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './
 import { Appointment, MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
+import { ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -103,6 +104,7 @@ const AppointmentsBaseTable = () => {
   const { appointments, isLoading, mutate } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
+  const { customPatientChartUrl } = useConfig<ConfigObject>();
 
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
@@ -173,7 +175,7 @@ const AppointmentsBaseTable = () => {
     name: {
       content: (
         <div className={styles.nameContainer}>
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
             {appointment.name}
           </ConfigurableLink>
         </div>

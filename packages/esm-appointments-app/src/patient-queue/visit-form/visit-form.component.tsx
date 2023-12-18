@@ -34,16 +34,16 @@ import {
   useConfig,
   useLocations,
 } from '@openmrs/esm-framework';
+import isEmpty from 'lodash-es/isEmpty';
 import BaseVisitType from './base-visit-type.component';
 import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { MappedAppointment } from '../../types';
-import styles from './visit-form.scss';
 import { useAppointments } from '../../appointments/appointments-table.resource';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
-import isEmpty from 'lodash-es/isEmpty';
+import styles from './visit-form.scss';
 
 interface VisitFormProps {
   patientUuid: string;

@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { ConceptAnswers, ConceptResponse } from '../patient-registration.types';
 
@@ -9,9 +9,9 @@ export function useConcept(conceptUuid: string): { data: ConceptResponse; isLoad
     openmrsFetch,
   );
   if (error) {
-    showToast({
+    showSnackbar({
       title: error.name,
-      description: error.message,
+      subtitle: error.message,
       kind: 'error',
     });
   }
@@ -25,9 +25,9 @@ export function useConceptAnswers(conceptUuid: string): { data: Array<ConceptAns
     openmrsFetch,
   );
   if (error) {
-    showToast({
+    showSnackbar({
       title: error.name,
-      description: error.message,
+      subtitle: error.message,
       kind: 'error',
     });
   }

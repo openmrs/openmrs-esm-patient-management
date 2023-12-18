@@ -1,15 +1,15 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { showSnackbar } from '@openmrs/esm-framework';
 import AddProviderQueueRoom from './add-provider-queue-room.component';
-import { showToast } from '@openmrs/esm-framework';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useCurrentProvider: jest.fn(() => ({
     currentProvider: { uuid: 'provider-uuid-1' },
   })),
-  showToast: jest.fn(),
-  showNotification: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 jest.mock('./add-provider-queue-room.resource', () => ({
   useProvidersQueueRoom: jest.fn(() => ({
@@ -62,37 +62,39 @@ describe('AddProviderQueueRoom', () => {
     expect(screen.getByText('Save')).toBeInTheDocument();
   });
 
-  it('updates queue room selection', () => {
+  it('updates the queue room selection', async () => {
+    const user = userEvent.setup();
     render(<AddProviderQueueRoom providerUuid={providerUuid} closeModal={jest.fn()} />);
 
     const selectQueueRoom: HTMLInputElement = screen.getByRole('combobox');
-    fireEvent.change(selectQueueRoom, { target: { value: 'room-uuid-1' } });
+    await user.selectOptions(selectQueueRoom, 'Room 1');
 
     expect(selectQueueRoom.value).toBe('6b3e233d-2b44-40ca-b0c8-c5a57a8c51b6');
   });
 
-  it('should update the retain location checkbox', () => {
+  it('should update the retain location checkbox', async () => {
+    const user = userEvent.setup();
     render(<AddProviderQueueRoom providerUuid={providerUuid} closeModal={jest.fn()} />);
 
     const retainLocationCheckbox: HTMLInputElement = screen.getByRole('checkbox');
-    fireEvent.click(retainLocationCheckbox);
+    await user.click(retainLocationCheckbox);
 
     expect(retainLocationCheckbox.checked).toBe(true);
   });
 
   it('should submit the form and add provider to queue room when all fields are filled', async () => {
+    const user = userEvent.setup();
     const mockCloseModal = jest.fn();
+
     render(<AddProviderQueueRoom providerUuid={providerUuid} closeModal={mockCloseModal} />);
 
     const queueRoomSelect = screen.getByRole('combobox');
     const submitButton = screen.getByText('Save');
 
-    fireEvent.change(queueRoomSelect, { target: { value: '6b3e233d-2b44-40ca-b0c8-c5a57a8c51b6' } });
-    fireEvent.click(submitButton);
+    await user.selectOptions(queueRoomSelect, '6b3e233d-2b44-40ca-b0c8-c5a57a8c51b6');
+    await user.click(submitButton);
 
-    await waitFor(() => {
-      expect(mockCloseModal).toHaveBeenCalled();
-      expect(showToast).toHaveBeenCalled();
-    });
+    expect(mockCloseModal).toHaveBeenCalled();
+    expect(showSnackbar).toHaveBeenCalled();
   });
 });

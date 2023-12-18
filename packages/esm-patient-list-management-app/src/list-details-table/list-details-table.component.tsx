@@ -315,7 +315,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Button
-                              className={styles.removeButton}
                               kind="ghost"
                               hasIconOnly
                               renderIcon={TrashCan}
