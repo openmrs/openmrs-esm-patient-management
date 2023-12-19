@@ -141,7 +141,7 @@ export const configSchema = {
   hideEntriesWithUnpaidBills: {
     _type: Type.Boolean,
     _description: 'Whether to use the billing module to only show patients with paid bills in the queue table`',
-    _default: true,
+    _default: false,
   },
   customBillinguRL: {
     _type: Type.String,
