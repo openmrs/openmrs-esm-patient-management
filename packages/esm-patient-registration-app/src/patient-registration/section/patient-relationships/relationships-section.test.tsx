@@ -17,7 +17,7 @@ jest.mock('../../patient-registration.resource', () => ({
 }));
 
 let mockResourcesContextValue = {
-  addressTemplate: [],
+  addressTemplate: null,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
@@ -40,7 +40,7 @@ describe('RelationshipsSection', () => {
     );
 
     expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
-    expect(screen.getByRole(/progressbar/i)).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/add relationship/i)).not.toBeInTheDocument();
   });
 

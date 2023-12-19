@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { mockServices } from '../../__mocks__/active-visits.mock';
+import { mockServices } from '__mocks__';
 import QueueRoomForm from './queue-room-form.component';
 
 jest.mock('@openmrs/esm-framework', () => ({

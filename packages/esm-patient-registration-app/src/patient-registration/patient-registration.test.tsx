@@ -6,11 +6,13 @@ import type { Encounter } from './patient-registration.types';
 import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
 import { FormManager } from './form-manager';
 import { saveEncounter, savePatient } from './patient-registration.resource';
-import { Resources, ResourcesContext } from '../offline.resources';
+import { ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
 import { RegistrationConfig } from '../config-schema';
-import { mockedAddressTemplate } from './field/address/tests/mocks';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { mockedAddressTemplate } from '__mocks__';
+import { mockPatient } from 'tools';
+
+jest.setTimeout(10000);
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
@@ -18,7 +20,62 @@ const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
 const mockedShowSnackbar = showSnackbar as jest.Mock;
 
-jest.setTimeout(10000);
+jest.mock('./field/field.resource', () => ({
+  useConcept: jest.fn().mockImplementation((uuid: string) => {
+    let data;
+    if (uuid == 'weight-uuid') {
+      data = {
+        uuid: 'weight-uuid',
+        display: 'Weight (kg)',
+        datatype: { display: 'Numeric', uuid: 'num' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'chief-complaint-uuid') {
+      data = {
+        uuid: 'chief-complaint-uuid',
+        display: 'Chief Complaint',
+        datatype: { display: 'Text', uuid: 'txt' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'nationality-uuid') {
+      data = {
+        uuid: 'nationality-uuid',
+        display: 'Nationality',
+        datatype: { display: 'Coded', uuid: 'cdd' },
+        answers: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        setMembers: [],
+      };
+    }
+    return {
+      data: data ?? null,
+      isLoading: !data,
+    };
+  }),
+  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
+    if (uuid == 'nationality-uuid') {
+      return {
+        data: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        isLoading: false,
+      };
+    } else if (uuid == 'other-countries-uuid') {
+      return {
+        data: [
+          { display: 'Kenya', uuid: 'ke' },
+          { display: 'Uganda', uuid: 'ug' },
+        ],
+        isLoading: false,
+      };
+    }
+  }),
+}));
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -28,9 +85,6 @@ jest.mock('@openmrs/esm-framework', () => {
     validator: jest.fn(),
   };
 });
-
-// Mock field.resource using the manual mock (in __mocks__)
-jest.mock('./field/field.resource');
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
@@ -70,7 +124,7 @@ const mockResourcesContextValue = {
   },
   relationshipTypes: [],
   identifierTypes: [],
-} as Resources;
+};
 
 let mockOpenmrsConfig: RegistrationConfig = {
   sections: ['demographics', 'contact'],

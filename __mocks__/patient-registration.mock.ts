@@ -1,4 +1,47 @@
-import { AddressTemplate } from '../../../patient-registration.types';
+type AddressProperties =
+  | 'cityVillage'
+  | 'stateProvince'
+  | 'countyDistrict'
+  | 'postalCode'
+  | 'country'
+  | 'address1'
+  | 'address2'
+  | 'address3'
+  | 'address4'
+  | 'address5'
+  | 'address6'
+  | 'address7'
+  | 'address8'
+  | 'address9'
+  | 'address10'
+  | 'address11'
+  | 'address12'
+  | 'address13'
+  | 'address14'
+  | 'address15';
+
+type ExtensibleAddressProperties = { [p in AddressProperties]?: string } | null;
+
+export interface AddressTemplate {
+  displayName: string | null;
+  codeName: string | null;
+  country: string | null;
+  lines: Array<
+    Array<{
+      isToken: 'IS_NOT_ADDR_TOKEN' | 'IS_ADDR_TOKEN';
+      displayText: string;
+      codeName?: AddressProperties;
+      displaySize?: string;
+    }>
+  > | null;
+  lineByLineFormat: Array<string> | null;
+  nameMappings: ExtensibleAddressProperties;
+  sizeMappings: ExtensibleAddressProperties;
+  elementDefaults: ExtensibleAddressProperties;
+  elementRegex: ExtensibleAddressProperties;
+  elementRegexFormats: ExtensibleAddressProperties;
+  requiredElements: Array<AddressProperties> | null;
+}
 
 export const mockedAddressTemplate: AddressTemplate = {
   displayName: null,

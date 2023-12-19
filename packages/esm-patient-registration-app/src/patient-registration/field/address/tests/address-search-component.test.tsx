@@ -6,7 +6,7 @@ import { Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from './mocks';
+import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
 import AddressSearchComponent from '../address-search.component';
 
 useAddressHierarchy;
@@ -128,7 +128,7 @@ describe('Testing address search bar', () => {
       await user.click(optionElement);
       const values = address.split(separator);
       allFields.map(({ name }, index) => {
-        expect(setFieldValue).toBeCalledWith(`address.${name}`, values?.[index]);
+        expect(setFieldValue).toHaveBeenCalledWith(`address.${name}`, values?.[index]);
       });
     });
   });

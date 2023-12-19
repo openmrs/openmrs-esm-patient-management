@@ -185,7 +185,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
                 id="location"
                 invalidText="Required"
                 value={selectedLocation}
-                defaultSelected={selectedLocation}
+                defaultValue={selectedLocation}
                 onChange={(event) => setSelectedLocation(event.target.value)}>
                 <LocationSelectOption
                   selectedLocation={selectedLocation}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useVisit } from './current-visit.resource';
-import { mockPastVisit } from '../../__mocks__/visits.mock';
+import { mockPastVisit } from '__mocks__';
 import CurrentVisit from './current-visit-summary.component';
 
 const useVisitMock = useVisit as jest.Mock;

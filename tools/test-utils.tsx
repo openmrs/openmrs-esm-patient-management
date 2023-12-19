@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { SWRConfig } from 'swr';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 const swrWrapper = ({ children }) => {
   return (
@@ -14,16 +14,17 @@ const swrWrapper = ({ children }) => {
   );
 };
 
-export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
+const renderWithSwr = (ui: ReactElement, options?: Omit<RenderOptions, 'queries'>) =>
+  render(ui, { wrapper: swrWrapper, ...options });
 
-export function waitForLoadingToFinish() {
-  return waitForElementToBeRemoved(() => [...screen.queryAllByRole(/progressbar/i)], {
+function waitForLoadingToFinish() {
+  return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
     timeout: 4000,
   });
 }
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
-export function getByTextWithMarkup(text: RegExp | string) {
+function getByTextWithMarkup(text: RegExp | string) {
   try {
     return screen.getByText((content, node) => {
       const hasText = (node: Element) => node.textContent === text || node.textContent.match(text);
@@ -35,7 +36,7 @@ export function getByTextWithMarkup(text: RegExp | string) {
   }
 }
 
-export const mockPatient = {
+const mockPatient = {
   resourceType: 'Patient',
   id: '8673ee4f-e2ab-4077-ba55-4980f408773e',
   extension: [
@@ -77,7 +78,7 @@ export const mockPatient = {
   address: [],
 };
 
-export const mockPatientWithLongName = {
+const mockPatientWithLongName = {
   ...mockPatient,
   name: [
     {
@@ -88,3 +89,5 @@ export const mockPatientWithLongName = {
     },
   ],
 };
+
+export { renderWithSwr, waitForLoadingToFinish, getByTextWithMarkup, mockPatient, mockPatientWithLongName };

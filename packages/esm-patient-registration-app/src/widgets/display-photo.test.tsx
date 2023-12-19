@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { mockPatient } from '__mocks__';
 import DisplayPatientPhoto from './display-photo.component';
-import { mockPatient } from '../../../../__mocks__/appointments.mock';
 
 jest.mock('../patient-registration/patient-registration.resource', () => ({
   usePatientPhoto: jest.fn().mockReturnValue({ data: { imageSrc: 'test-image-src' } }),

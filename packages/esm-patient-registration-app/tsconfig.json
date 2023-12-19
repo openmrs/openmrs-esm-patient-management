@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.tsx", "src/**/*.outdated.tsx"]
+  "include": ["src/**/*", "../../__mocks__/field.resource.ts"],
+  "exclude": ["src/**/*.test.tsx"]
 }
