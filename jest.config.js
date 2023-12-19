@@ -10,7 +10,6 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!@openmrs)'],
   moduleDirectories: ['node_modules', '__mocks__', '__tools__', __dirname],
-  // path.resolve(__dirname, '__mocks__'), path.resolve(__dirname, 'tools')],
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
