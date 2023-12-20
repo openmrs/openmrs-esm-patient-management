@@ -4,7 +4,7 @@ import { ResourcesContext } from '../../../offline.resources';
 import { SkeletonText, InlineNotification } from '@carbon/react';
 import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
-import { useConfig } from '@openmrs/esm-framework';
+import { useConfig, useConnectivity } from '@openmrs/esm-framework';
 import AddressSearchComponent from './address-search.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
@@ -38,6 +38,7 @@ export const AddressComponent: React.FC = () => {
 
   const { t } = useTranslation();
   const config = useConfig();
+  const isOnline = useConnectivity();
   const {
     fieldConfigurations: {
       address: {
@@ -77,7 +78,7 @@ export const AddressComponent: React.FC = () => {
     );
   }
 
-  if (!addressHierarchyEnabled) {
+  if (!addressHierarchyEnabled || !isOnline) {
     return (
       <AddressComponentContainer>
         {addressLayout.map((attributes, index) => (
