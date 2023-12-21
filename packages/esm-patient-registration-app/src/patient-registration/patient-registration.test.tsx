@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Encounter } from './patient-registration.types';
+import type { AddressTemplate, Encounter } from './patient-registration.types';
 import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
 import { FormManager } from './form-manager';
 import { saveEncounter, savePatient } from './patient-registration.resource';
@@ -116,7 +116,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 const mockResourcesContextValue = {
-  addressTemplate: mockedAddressTemplate,
+  addressTemplate: mockedAddressTemplate as AddressTemplate,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
@@ -237,6 +237,14 @@ const fillRequiredFields = async () => {
   user.click(genderInput);
 };
 
+function Wrapper({ children }) {
+  return (
+    <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <Router>{children}</Router>
+    </ResourcesContext.Provider>
+  );
+}
+
 describe('Registering a new patient', () => {
   beforeEach(() => {
     mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
@@ -247,24 +255,11 @@ describe('Registering a new patient', () => {
   });
 
   it('renders without crashing', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
-        </Router>
-        ,
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
   });
 
   it('has the expected sections', async () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
     expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull();
     expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
@@ -273,13 +268,9 @@ describe('Registering a new patient', () => {
   it('saves the patient without extra info', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     await user.click(await screen.findByText('Register Patient'));
@@ -306,13 +297,7 @@ describe('Registering a new patient', () => {
     const user = userEvent.setup();
 
     const mockedSavePatientForm = jest.fn();
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />, { wrapper: Wrapper });
 
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
@@ -328,13 +313,9 @@ describe('Registering a new patient', () => {
     mockedSaveEncounter.mockResolvedValue({});
     mockedUseConfig.mockReturnValue(configWithObs);
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
@@ -367,13 +348,9 @@ describe('Registering a new patient', () => {
 
     mockedUseConfig.mockReturnValue(configWithObs);
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
@@ -425,13 +402,7 @@ describe('Updating an existing patient record', () => {
       error: null,
     });
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={mockedSavePatient} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatient} />, { wrapper: Wrapper });
 
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
     const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);

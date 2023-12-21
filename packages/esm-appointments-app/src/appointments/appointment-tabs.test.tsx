@@ -53,6 +53,5 @@ describe('AppointmentTabs', () => {
 });
 
 function renderAppointmentTabs() {
-  ('');
   renderWithSwr(<AppointmentTabs appointmentServiceType="" />);
 }

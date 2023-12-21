@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { useConfig } from '@openmrs/esm-framework';
 import { useVisits } from '../hooks/useVisits';
 import ScheduledAppointments from './scheduled/scheduled-appointments.component';
