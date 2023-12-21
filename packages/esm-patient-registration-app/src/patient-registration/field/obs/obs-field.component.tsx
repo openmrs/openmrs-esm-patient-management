@@ -16,6 +16,7 @@ export interface ObsFieldProps {
 
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
+
   const config = useConfig() as RegistrationConfig;
 
   if (!config.registrationObs.encounterTypeUuid) {
@@ -30,6 +31,7 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
   if (isLoading) {
     return null;
   }
+
   switch (concept.datatype.display) {
     case 'Text':
       return (

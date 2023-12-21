@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { mockMappedAppointmentsData } from '../../../../../../__mocks__/appointments.mock';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
+import { mockMappedAppointmentsData } from '__mocks__';
 import CancelAppointment from './cancel-appointment.component';
 
 const testProps = {

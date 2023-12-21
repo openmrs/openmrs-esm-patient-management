@@ -50,6 +50,6 @@ describe('Compact Patient Search Results', () => {
   //   render(<PatientSearchResults patients={patients} selectPatientAction={selectPatientActionMock} />);
 
   //   user.click(screen.getByText('John Doe Smith'));
-  //   expect(selectPatientActionMock).toBeCalledWith(patients[0]);
+  //   expect(selectPatientActionMock).toHaveBeenCalledWith(patients[0]);
   // });
 });

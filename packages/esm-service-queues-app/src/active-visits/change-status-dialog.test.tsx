@@ -1,12 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { mockServices } from '../../__mocks__/active-visits.mock';
-import { mockPriorities, mockStatus } from '../../../../__mocks__/metrics.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
+import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockQueueEntry } from '__mocks__';
 import { ConfigObject, showToast, useConfig, showNotification } from '@openmrs/esm-framework';
-import { mockQueueEntry } from '../../../../__mocks__/queue-entry.mock';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
 

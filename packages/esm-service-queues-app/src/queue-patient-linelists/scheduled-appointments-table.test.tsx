@@ -1,8 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { mockAppointmentsData } from '__mocks__';
 import AppointmentsTable from './scheduled-appointments-table.component';
-import { mockAppointmentsData } from '../../__mocks__/appointments-data.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -27,7 +27,7 @@ describe('AppointmentsTable', () => {
   it('renders appointments when loading is complete', () => {
     render(<AppointmentsTable />);
 
-    const appointmentName = screen.getByText('Hungai Kevin');
+    const appointmentName = screen.getByText(/charles babbage/i);
     expect(appointmentName).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe('AppointmentsTable', () => {
 
     await user.type(statusDropdown[0], 'Completed');
 
-    const filteredAppointmentName = screen.getByText('Hungai Kevin');
+    const filteredAppointmentName = screen.getByText(/charles babbage/i);
     expect(filteredAppointmentName).toBeInTheDocument();
   });
 });

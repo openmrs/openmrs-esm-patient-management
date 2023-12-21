@@ -307,3 +307,12 @@ export interface AddressTemplate {
   elementRegexFormats: ExtensibleAddressProperties;
   requiredElements: Array<AddressProperties> | null;
 }
+
+// https://rest.openmrs.org/#address-template
+export interface RestAddressTemplate {
+  uuid: string;
+  description: string;
+  property: string;
+  display: string;
+  value: string;
+}

@@ -1,10 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { mockMetrics, mockServiceTypes, mockLocations, mockSession } from '__mocks__';
 import ClinicMetrics from './clinic-metrics.component';
-import { mockMetrics, mockServiceTypes } from '../../../../__mocks__/metrics.mock';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
