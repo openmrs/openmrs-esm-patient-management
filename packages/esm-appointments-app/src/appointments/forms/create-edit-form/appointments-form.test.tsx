@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { mockLocations, mockSession, mockPatient, mockServices, mockProviders } from '__mocks__';
-import { MappedAppointment } from '../../../types';
+import { type MappedAppointment } from '../../../types';
 import AppointmentForm from './appointments-form.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
@@ -12,8 +12,8 @@ function renderAppointmentsForm(context: string, patientUuid?: string, appointme
   render(<AppointmentForm patientUuid={patientUuid} context={context} appointment={appointment} />);
 }
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,

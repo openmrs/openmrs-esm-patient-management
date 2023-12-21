@@ -1,8 +1,8 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './daily-calendar.scss';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
 import { dailyHours } from '../../helpers';
 import DailyHeader from './daily-header.component';
 import DailyWorkloadView from './daily-view-workload.component';

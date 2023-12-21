@@ -23,8 +23,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
     view === 'queue_service_form'
       ? SearchTypes.QUEUE_SERVICE_FORM
       : view === 'queue_room_form'
-      ? SearchTypes.QUEUE_ROOM_FORM
-      : SearchTypes.SCHEDULED_VISITS,
+        ? SearchTypes.QUEUE_ROOM_FORM
+        : SearchTypes.SCHEDULED_VISITS,
   );
   const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
 

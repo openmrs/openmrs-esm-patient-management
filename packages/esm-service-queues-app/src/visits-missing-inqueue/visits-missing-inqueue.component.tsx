@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, type MouseEvent, type AnchorHTMLAttributes } from 'react';
 import classNames from 'classnames';
 import {
   DataTable,
@@ -37,7 +37,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from './visits-missing-inqueue.scss';
 import { getOriginFromPathName } from '../active-visits/active-visits-table.resource';
-import { ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
+import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
 
 interface PaginationData {

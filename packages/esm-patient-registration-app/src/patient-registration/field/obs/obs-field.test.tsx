@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig } from '@openmrs/esm-framework';
-import { FieldDefinition } from '../../../config-schema';
+import { type FieldDefinition } from '../../../config-schema';
 import { ObsField } from './obs-field.component';
 
 const mockUseConfig = useConfig as jest.Mock;

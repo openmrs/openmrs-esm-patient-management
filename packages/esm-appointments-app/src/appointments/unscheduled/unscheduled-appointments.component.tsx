@@ -22,7 +22,7 @@ import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointmen
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { getPageSizes, useSearchResults } from '../utils';
-import { ConfigObject } from '../../config-schema';
+import { type ConfigObject } from '../../config-schema';
 
 const UnscheduledAppointments: React.FC = () => {
   const { t } = useTranslation();

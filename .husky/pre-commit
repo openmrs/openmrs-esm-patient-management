@@ -3,5 +3,6 @@
 
 set -e  # die on error
 
-npx pretty-quick --staged
 yarn run extract-translations
+yarn prettier && npx lint-staged
+

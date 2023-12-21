@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MappedAppointment } from '../../types/index';
+import { type MappedAppointment } from '../../types/index';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
 import { formatDate } from '@openmrs/esm-framework';

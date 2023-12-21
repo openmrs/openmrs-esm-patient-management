@@ -12,7 +12,7 @@ import {
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
-import { ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   addQueueEntry,
   usePriority,
@@ -21,7 +21,7 @@ import {
   useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
-import { ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
+import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface AddVisitToQueueDialogProps {

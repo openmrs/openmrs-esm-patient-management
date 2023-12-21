@@ -14,8 +14,8 @@ const mockShowToast = showToast as jest.Mock;
 const mockCancelAppointment = cancelAppointment as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,

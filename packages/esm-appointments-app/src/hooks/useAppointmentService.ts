@@ -1,6 +1,6 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { AppointmentService } from '../types';
+import { type AppointmentService } from '../types';
 
 export function useAppointmentServices() {
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }>(

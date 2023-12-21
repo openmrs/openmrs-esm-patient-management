@@ -1,4 +1,4 @@
-import React, { useCallback, SyntheticEvent, useEffect, useId, useState } from 'react';
+import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Layer, TextArea, TextInput } from '@carbon/react';
 import { useLayoutType, showToast, useSession, useConfig } from '@openmrs/esm-framework';
@@ -126,8 +126,8 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
             {isSubmitting
               ? t('submitting', 'Submitting')
               : isEditing
-              ? t('editList', 'Edit list')
-              : t('createList', 'Create list')}
+                ? t('editList', 'Edit list')
+                : t('createList', 'Create list')}
           </Button>
         </ButtonSet>
       }

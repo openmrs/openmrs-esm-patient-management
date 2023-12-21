@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { RelationshipsSection } from './relationships-section.component';
 
 jest.mock('../../patient-registration.resource', () => ({

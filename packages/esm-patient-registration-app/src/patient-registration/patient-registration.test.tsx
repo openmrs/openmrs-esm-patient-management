@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { AddressTemplate, Encounter } from './patient-registration.types';
 import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
+import type { AddressTemplate, Encounter } from './patient-registration.types';
+import { type RegistrationConfig } from '../config-schema';
 import { FormManager } from './form-manager';
-import { saveEncounter, savePatient } from './patient-registration.resource';
 import { ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
-import { RegistrationConfig } from '../config-schema';
+import { saveEncounter, savePatient } from './patient-registration.resource';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 

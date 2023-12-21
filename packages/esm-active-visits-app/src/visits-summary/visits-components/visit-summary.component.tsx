@@ -2,11 +2,11 @@ import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
 import NotesSummary from './notes-summary.component';
 import MedicationSummary from './medications-summary.component';
 import TestsSummary from './tests-summary.component';
-import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
+import { type Order, type Encounter, type Note, type Observation, type OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
 interface DiagnosisItem {

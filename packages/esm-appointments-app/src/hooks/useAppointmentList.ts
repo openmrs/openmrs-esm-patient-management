@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentService, Identifier, Provider } from '../types';
+import { type AppointmentService, type Identifier, type Provider } from '../types';
 import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
 import { configSchema } from '../config-schema';

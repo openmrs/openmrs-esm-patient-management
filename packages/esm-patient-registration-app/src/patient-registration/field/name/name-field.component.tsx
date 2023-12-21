@@ -6,7 +6,7 @@ import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { Input } from '../../input/basic-input/input/input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import styles from '../field.scss';
-import { RegistrationConfig } from '../../../config-schema';
+import { type RegistrationConfig } from '../../../config-schema';
 
 export const unidentifiedPatientAttributeTypeUuid = '8b56eac7-5c76-4b9c-8c6f-1deab8d3fc47';
 const containsNoNumbers = /^([^0-9]*)$/;

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { DeathInfoSection } from './death-info-section.component';
-import { FormValues } from '../../patient-registration.types';
+import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
 jest.mock('@openmrs/esm-framework', () => {

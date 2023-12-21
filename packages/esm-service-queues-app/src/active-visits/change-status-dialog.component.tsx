@@ -14,8 +14,8 @@ import {
   RadioButtonGroup,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { ConfigObject, navigate, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
-import { MappedQueueEntry } from '../types';
+import { type ConfigObject, navigate, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { type MappedQueueEntry } from '../types';
 import {
   updateQueueEntry,
   usePriority,

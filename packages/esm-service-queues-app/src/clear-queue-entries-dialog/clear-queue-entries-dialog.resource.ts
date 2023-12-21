@@ -1,5 +1,5 @@
-import { openmrsFetch, parseDate, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
-import { endPatientStatus, MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { openmrsFetch, parseDate } from '@openmrs/esm-framework';
+import { endPatientStatus, type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
 export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueueEntry>) {
   const abortController = new AbortController();

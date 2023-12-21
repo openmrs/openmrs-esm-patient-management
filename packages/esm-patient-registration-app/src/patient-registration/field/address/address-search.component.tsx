@@ -72,9 +72,7 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
         /* Since the input has a marginBottom of 1rem */
         <ul className={styles.suggestions}>
           {addressOptions.map((address, index) => (
-            <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
-              key={index}
-              onClick={(e) => handleChange(address)}>
+            <li key={index} onClick={(e) => handleChange(address)}>
               {address}
             </li>
           ))}

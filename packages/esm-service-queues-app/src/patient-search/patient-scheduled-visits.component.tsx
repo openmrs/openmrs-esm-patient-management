@@ -21,14 +21,14 @@ import {
   showSnackbar,
   useSession,
   useLocations,
-  NewVisitPayload,
+  type NewVisitPayload,
   saveVisit,
   useVisitTypes,
   useVisit,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
 } from '@openmrs/esm-framework';
-import { Appointment, SearchTypes } from '../types';
+import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
@@ -40,7 +40,7 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
-import { convertTime12to24, amPm } from '../helpers/time-helpers';
+import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';

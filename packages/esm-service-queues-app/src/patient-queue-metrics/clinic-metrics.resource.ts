@@ -1,7 +1,7 @@
-import { useSession, Visit, openmrsFetch } from '@openmrs/esm-framework';
+import { useSession, type Visit, openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { WaitTime } from '../types';
+import { type WaitTime } from '../types';
 
 export function useActiveVisits() {
   const currentUserSession = useSession();

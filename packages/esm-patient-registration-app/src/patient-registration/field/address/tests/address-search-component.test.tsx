@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form, useFormikContext } from 'formik';
-import { Resources, ResourcesContext } from '../../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';

@@ -7,7 +7,7 @@ import AppointmentsMetrics from './appointments-metrics.component';
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('../hooks/useClinicalMetrics', () => {
-  const originalModule = jest.requireActual('../hooks/useClinicalMetrics.tsx');
+  const originalModule = jest.requireActual('../hooks/useClinicalMetrics');
 
   return {
     ...originalModule,

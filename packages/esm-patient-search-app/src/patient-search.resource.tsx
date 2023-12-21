@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, showNotification, useSession, FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
+import { openmrsFetch, showNotification, useSession, type FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
 const v =

@@ -1,9 +1,9 @@
 import { Button } from '@carbon/react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { type CalendarType } from '../../types';
 import styles from './daily-header.scss';
-import { CalendarType } from '../../types';
 
 const Format = {
   monthly: 'month',

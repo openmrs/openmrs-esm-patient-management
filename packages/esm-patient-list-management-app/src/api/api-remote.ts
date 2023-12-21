@@ -1,16 +1,16 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import {
-  AddPatientData,
-  CohortResponse,
-  NewCohortData,
-  NewCohortDataPayload,
-  OpenmrsCohort,
-  OpenmrsCohortMember,
-  OpenmrsCohortRef,
-  PatientListFilter,
-  PatientListMember,
+  type AddPatientData,
+  type CohortResponse,
+  type NewCohortData,
+  type NewCohortDataPayload,
+  type OpenmrsCohort,
+  type OpenmrsCohortMember,
+  type OpenmrsCohortRef,
+  type PatientListFilter,
+  type PatientListMember,
   PatientListType,
-  PatientListUpdate,
+  type PatientListUpdate,
 } from './types';
 
 export const cohortUrl = '/ws/rest/v1/cohortm';

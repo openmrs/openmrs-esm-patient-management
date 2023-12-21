@@ -4,7 +4,7 @@ import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useField } from 'formik';
-import { RegistrationConfig } from '../../../config-schema';
+import { type RegistrationConfig } from '../../../config-schema';
 import { useConfig } from '@openmrs/esm-framework';
 
 export const GenderField: React.FC = () => {

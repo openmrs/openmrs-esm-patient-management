@@ -1,15 +1,15 @@
-import { FetchResponse, openmrsFetch, queueSynchronizationItem, Session } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, queueSynchronizationItem, type Session } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
-  FormValues,
-  AttributeValue,
-  PatientUuidMapType,
-  Patient,
-  CapturePhotoProps,
-  PatientIdentifier,
-  PatientRegistration,
-  RelationshipValue,
-  Encounter,
+  type FormValues,
+  type AttributeValue,
+  type PatientUuidMapType,
+  type Patient,
+  type CapturePhotoProps,
+  type PatientIdentifier,
+  type PatientRegistration,
+  type RelationshipValue,
+  type Encounter,
 } from './patient-registration.types';
 import {
   addPatientIdentifier,
@@ -24,7 +24,7 @@ import {
   updatePatientIdentifier,
   saveEncounter,
 } from './patient-registration.resource';
-import { RegistrationConfig } from '../config-schema';
+import { type RegistrationConfig } from '../config-schema';
 
 export type SavePatientForm = (
   isNewPatient: boolean,
