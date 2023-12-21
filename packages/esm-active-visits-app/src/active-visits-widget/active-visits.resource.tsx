@@ -5,9 +5,9 @@ import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
 import {
   openmrsFetch,
-  Visit,
+  type Visit,
   useSession,
-  FetchResponse,
+  type FetchResponse,
   formatDatetime,
   parseDate,
   useConfig,

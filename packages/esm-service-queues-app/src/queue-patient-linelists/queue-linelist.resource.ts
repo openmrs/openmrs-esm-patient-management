@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { Appointment, AppointmentsFetchResponse } from '../types/index';
-import { Provider } from '../types';
+import { type Appointment, type AppointmentsFetchResponse } from '../types/index';
+import { type Provider } from '../types';
 import { startOfDay } from '../constants';
 import dayjs from 'dayjs';
 

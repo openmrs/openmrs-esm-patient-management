@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectionDefinition } from '../../config-schema';
+import { type SectionDefinition } from '../../config-schema';
 import { GenericSection } from './generic-section.component';
 import { DeathInfoSection } from './death-info/death-info-section.component';
 import { DemographicsSection } from './demographics/demographics-section.component';

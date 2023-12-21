@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { parseDate, showSnackbar, toDateObjectStrict, toOmrsIsoString, useVisit } from '@openmrs/esm-framework';
-import { MappedQueueEntry } from '../types';
+import { parseDate, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { type MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
 import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';

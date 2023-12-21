@@ -1,11 +1,11 @@
 import * as Yup from 'yup';
 import {
-  AddressValidationSchemaType,
-  FormValues,
-  PatientIdentifier,
-  PatientUuidMapType,
-  PatientIdentifierValue,
-  Encounter,
+  type AddressValidationSchemaType,
+  type FormValues,
+  type PatientIdentifier,
+  type PatientUuidMapType,
+  type PatientIdentifierValue,
+  type Encounter,
 } from './patient-registration.types';
 import { parseDate } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';

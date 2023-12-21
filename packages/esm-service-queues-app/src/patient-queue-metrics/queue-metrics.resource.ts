@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { Appointment, QueueServiceInfo } from '../types';
+import { type Appointment, type QueueServiceInfo } from '../types';
 import { startOfDay } from '../constants';
 
 export function useServices(location: string) {

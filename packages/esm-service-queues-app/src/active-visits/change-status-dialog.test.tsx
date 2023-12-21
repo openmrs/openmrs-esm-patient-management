@@ -11,8 +11,8 @@ const mockShowToast = showToast as jest.Mock;
 const mockUpdateQueueEntry = updateQueueEntry as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('./active-visits-table.resource.ts', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource.ts');
+jest.mock('./active-visits-table.resource', () => {
+  const originalModule = jest.requireActual('./active-visits-table.resource');
 
   return {
     ...originalModule,

@@ -12,8 +12,8 @@ function renderAppointmentsForm(context: string, patientUuid?: string, appointme
   render(<AppointmentForm patientUuid={patientUuid} context={context} appointment={appointment} />);
 }
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,

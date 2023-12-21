@@ -6,7 +6,7 @@ import { cancelAppointment } from '../forms.resource';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
-import { MappedAppointment } from '../../../types';
+import { type MappedAppointment } from '../../../types';
 import styles from './cancel-appointment.scss';
 
 interface CancelAppointmentProps {

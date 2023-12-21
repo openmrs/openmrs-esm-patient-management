@@ -28,6 +28,7 @@ import {
   Toggle,
 } from '@carbon/react';
 import {
+  type ConfigObject,
   ExtensionSlot,
   showNotification,
   showToast,
@@ -39,7 +40,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
-import { MappedAppointment, AppointmentPayload } from '../../../types';
+import { type MappedAppointment, type AppointmentPayload } from '../../../types';
 import {
   saveAppointment,
   toAppointmentDateTime,
@@ -47,14 +48,13 @@ import {
   useProviders,
   useServices,
 } from '../forms.resource';
-import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
+import { useAppointmentList } from '../../../hooks/useAppointmentList';
 import { useCalendarDistribution } from '../workload-helper';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
+import { useInitialAppointmentFormValue, type PatientAppointment } from '../useInitialFormValues';
 import LocationSelectOption from '../../common-components/location-select-option.component';
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
-import { useAppointmentList } from '../../../hooks/useAppointmentList';
-import { ConfigObject } from '../../../config-schema';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;

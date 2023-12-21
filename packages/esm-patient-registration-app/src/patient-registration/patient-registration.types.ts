@@ -1,6 +1,6 @@
-import { OpenmrsResource, Session } from '@openmrs/esm-framework';
-import { RegistrationConfig } from '../config-schema';
-import { SavePatientTransactionManager } from './form-manager';
+import { type OpenmrsResource, type Session } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../config-schema';
+import { type SavePatientTransactionManager } from './form-manager';
 
 interface NameValue {
   uuid: string;

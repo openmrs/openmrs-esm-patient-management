@@ -1,7 +1,7 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
 import { monthDays } from '../../helpers/functions';
 import MonthlyViewWorkload from './monthly-view-workload.component';
 import MonthlyHeader from './monthly-header.module';
