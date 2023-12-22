@@ -1,10 +1,10 @@
-import React, { type CSSProperties, HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
+import React, { type CSSProperties, type HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableRow,
+  type DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   Layer,
@@ -315,7 +315,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Button
-                              className={styles.removeButton}
                               kind="ghost"
                               hasIconOnly
                               renderIcon={TrashCan}

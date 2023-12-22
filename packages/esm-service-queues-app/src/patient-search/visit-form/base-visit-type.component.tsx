@@ -4,7 +4,7 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { useTranslation } from 'react-i18next';
 import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
-import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, type VisitType } from '@openmrs/esm-framework';
 import EmptyDataIllustration from '../empty-data-illustration.component';
 import styles from './base-visit-type.scss';
 

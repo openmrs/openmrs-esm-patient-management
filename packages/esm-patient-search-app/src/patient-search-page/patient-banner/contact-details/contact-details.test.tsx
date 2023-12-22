@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ContactDetails from './contact-details.component';
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import { mockAddress } from '../../../../__mocks__/address.mock';
+import { mockAddress } from '__mocks__';
+import ContactDetails from './contact-details.component';
 
 const mockUseRelationships = useRelationships as jest.Mock;
 const mockUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;

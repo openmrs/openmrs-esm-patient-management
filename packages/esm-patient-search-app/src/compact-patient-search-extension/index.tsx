@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import PatientSearch from '../compact-patient-search/patient-search.component';
-import { SearchedPatient } from '../types';
+import { type SearchedPatient } from '../types';
 import { Search, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './compact-patient-search.scss';
@@ -60,7 +60,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFocusToInput = useCallback(() => {
-    var len = inputRef.current.value?.length ?? 0;
+    let len = inputRef.current.value?.length ?? 0;
     inputRef.current.setSelectionRange(len, len);
     inputRef.current.focus();
   }, [inputRef]);

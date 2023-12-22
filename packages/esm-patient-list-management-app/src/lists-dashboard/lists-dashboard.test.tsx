@@ -3,8 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useLocation } from 'react-router-dom';
 import { openmrsFetch, useSession } from '@openmrs/esm-framework';
-import { mockSession } from '../../../../__mocks__/session.mock';
-import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
 const mockedUseLocation = jest.mocked(useLocation);
@@ -98,10 +97,8 @@ describe('ListsDashboard', () => {
   it('renders the patient list page UI correctly', async () => {
     render(<ListsDashboard />);
 
-    await waitForLoadingToFinish();
-
+    await screen.findByRole('searchbox');
     expect(screen.getByRole('button', { name: /new list/i })).toBeInTheDocument();
-    expect(screen.getByRole('searchbox')).toBeInTheDocument();
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('tablist', { name: /list tabs/i })).toBeInTheDocument();
 

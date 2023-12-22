@@ -2,8 +2,8 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import PastVisitSummary from './past-visit-details/past-visit-summary.component';
 import userEvent from '@testing-library/user-event';
-import { mockPastVisit } from '../../__mocks__/visits.mock';
-import { mockPatient, renderWithSwr } from '../../../../tools/test-helpers';
+import { mockPastVisit } from '__mocks__';
+import { mockPatient, renderWithSwr } from 'tools';
 import { usePastVisits } from './past-visit.resource';
 
 const mockUsePastVisits = usePastVisits as jest.Mock;

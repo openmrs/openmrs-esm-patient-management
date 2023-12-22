@@ -6,8 +6,8 @@ import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
-import { ConfigObject } from '../../config-schema';
-import { PatientVitals } from '../../types/index';
+import { type ConfigObject } from '../../config-schema';
+import { type PatientVitals } from '../../types/index';
 import styles from './triage-note.scss';
 
 interface VitalsComponentProps {

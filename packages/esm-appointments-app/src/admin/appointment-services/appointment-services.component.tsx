@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ButtonSet, Dropdown, Layer, SelectItem, TextInput, TimePicker, TimePickerSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { validationSchema } from './appointment-services-validation';
 import { useAppointmentServices } from './appointment-services-hook';
 import { showNotification, showToast, useLocations } from '@openmrs/esm-framework';

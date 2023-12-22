@@ -15,7 +15,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { addPatientToList, getAllPatientLists, getPatientListIdsForPatient } from '../api/api-remote';
-import { ConfigSchema } from '../config-schema';
+import { type ConfigSchema } from '../config-schema';
 import styles from './add-patient.scss';
 
 interface AddPatientProps {

@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import classNames from 'classnames';
-import { Button, Link } from '@carbon/react';
+import { Button, Link, InlineLoading } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Formik, Form, FormikHelpers } from 'formik';
+import { Formik, Form, type FormikHelpers } from 'formik';
 import { createErrorHandler, showSnackbar, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
 import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration.types';
+import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
-import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
+import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
@@ -170,8 +170,19 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   // Current session and identifiers are required for patient registration.
                   // If currentSession or identifierTypes are not available, then the
                   // user should be blocked to register the patient.
-                  disabled={!currentSession || !identifierTypes}>
-                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                  disabled={!currentSession || !identifierTypes || props.isSubmitting}>
+                  {props.isSubmitting ? (
+                    <InlineLoading
+                      className={styles.spinner}
+                      description={`${t('submitting', 'Submitting')} ...`}
+                      iconDescription="submitting"
+                      status="active"
+                    />
+                  ) : inEditMode ? (
+                    t('updatePatient', 'Update Patient')
+                  ) : (
+                    t('registerPatient', 'Register Patient')
+                  )}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}

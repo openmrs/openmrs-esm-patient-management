@@ -22,16 +22,16 @@ import {
 import { ConfigurableLink, formatDatetime, usePagination, formatDate, useConfig } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
 import { Download } from '@carbon/react/icons';
-import AppointmentDetails from '../details/appointment-details.component';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import { launchOverlay } from '../../hooks/useOverlay';
-import PatientSearch from '../../patient-search/patient-search.component';
-import { MappedAppointment } from '../../types';
+import { type MappedAppointment } from '../../types';
 import { getPageSizes, useSearchResults } from '../utils';
+import { type ConfigObject } from '../../config-schema';
+import AppointmentDetails from '../details/appointment-details.component';
 import AppointmentActions from './appointments-actions.component';
+import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
-import { ConfigObject } from '../../config-schema';
 
 interface AppointmentsTableProps {
   appointments: Array<MappedAppointment>;

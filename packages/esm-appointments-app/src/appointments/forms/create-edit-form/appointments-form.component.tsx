@@ -28,7 +28,7 @@ import {
   Toggle,
 } from '@carbon/react';
 import {
-  ConfigObject,
+  type ConfigObject,
   ExtensionSlot,
   showNotification,
   showToast,
@@ -40,7 +40,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
-import { MappedAppointment, AppointmentPayload } from '../../../types';
+import { type MappedAppointment, type AppointmentPayload } from '../../../types';
 import {
   saveAppointment,
   toAppointmentDateTime,
@@ -48,13 +48,13 @@ import {
   useProviders,
   useServices,
 } from '../forms.resource';
-import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
+import { useAppointmentList } from '../../../hooks/useAppointmentList';
 import { useCalendarDistribution } from '../workload-helper';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
+import { useInitialAppointmentFormValue, type PatientAppointment } from '../useInitialFormValues';
 import LocationSelectOption from '../../common-components/location-select-option.component';
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
-import { useAppointmentList } from '../../../hooks/useAppointmentList';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -71,7 +71,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const sessionUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const initialAppointmentFormValues = useInitialAppointmentFormValue(appointment, patientUuid);
-  const { appointmentTypes, appointmentStatuses, hiddenFormFields } = useConfig<ConfigObject>();
+  const { appointmentTypes, appointmentStatuses, hiddenFormFields, allowAllDayAppointments } =
+    useConfig<ConfigObject>();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [patientAppointment, setPatientAppointment] = useState<PatientAppointment>(initialAppointmentFormValues);
@@ -184,7 +185,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
                 id="location"
                 invalidText="Required"
                 value={selectedLocation}
-                defaultSelected={selectedLocation}
+                defaultValue={selectedLocation}
                 onChange={(event) => setSelectedLocation(event.target.value)}>
                 <LocationSelectOption
                   selectedLocation={selectedLocation}
@@ -225,15 +226,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
             </Column>
             <Column>
               <section className={styles.flexRow}>
-                <Toggle
-                  className={styles.flex1}
-                  defaultToggled={patientAppointment.isFullDay}
-                  id="allDay"
-                  labelA={t('off', 'Off')}
-                  labelB={t('on', 'On')}
-                  labelText={t('allDay', 'All Day')}
-                  onToggle={(value) => setPatientAppointment({ ...patientAppointment, isFullDay: value })}
-                />
+                {allowAllDayAppointments && (
+                  <Toggle
+                    className={styles.flex1}
+                    defaultToggled={patientAppointment.isFullDay}
+                    id="allDay"
+                    labelA={t('off', 'Off')}
+                    labelB={t('on', 'On')}
+                    labelText={t('allDay', 'All Day')}
+                    onToggle={(value) => setPatientAppointment({ ...patientAppointment, isFullDay: value })}
+                  />
+                )}
                 <DatePicker
                   dateFormat="d/m/Y"
                   datePickerType="single"

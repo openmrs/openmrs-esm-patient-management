@@ -66,26 +66,13 @@ const AddressSearchComponent: React.FC<AddressSearchComponentProps> = ({ address
         labelText={t('searchAddress', 'Search address')}
         placeholder={t('searchAddress', 'Search address')}
         ref={searchBox}
-        helperText={
-          searchString
-            ? isLoading
-              ? t('loadingResults', 'Loading results')
-              : error
-              ? error.message
-              : addresses?.length === 0
-              ? t('noResultsFound', 'No results found')
-              : null
-            : null
-        }
         value={searchString}
       />
       {addressOptions.length > 0 && (
         /* Since the input has a marginBottom of 1rem */
         <ul className={styles.suggestions}>
           {addressOptions.map((address, index) => (
-            <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
-              key={index}
-              onClick={(e) => handleChange(address)}>
+            <li key={index} onClick={(e) => handleChange(address)}>
               {address}
             </li>
           ))}
