@@ -2,7 +2,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
-import { Appointment, DurationPeriod } from '../types';
+import { type Appointment, DurationPeriod } from '../types';
 
 interface AppointmentsReturnType {
   isLoading: boolean;

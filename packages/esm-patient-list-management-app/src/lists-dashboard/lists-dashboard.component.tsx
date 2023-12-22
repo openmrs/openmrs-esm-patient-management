@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { navigate } from '@openmrs/esm-framework';
-import { PatientListFilter, PatientListType } from '../api/types';
+import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
 import Header from '../header/header.component';

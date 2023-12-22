@@ -9,7 +9,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { FormattedEncounter } from './past-visit.component';
+import { type FormattedEncounter } from './past-visit.component';
 import styles from './past-visit.scss';
 
 interface EncounterListProps {

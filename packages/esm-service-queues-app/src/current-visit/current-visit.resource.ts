@@ -1,7 +1,7 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
-import { ConceptMetadata } from './hooks/useVitalsConceptMetadata';
-import { ObsMetaInfo } from '../types/index';
+import { openmrsFetch, type Visit } from '@openmrs/esm-framework';
+import { type ConceptMetadata } from './hooks/useVitalsConceptMetadata';
+import { type ObsMetaInfo } from '../types/index';
 
 export function useVisit(visitUuid: string) {
   const customRepresentation =

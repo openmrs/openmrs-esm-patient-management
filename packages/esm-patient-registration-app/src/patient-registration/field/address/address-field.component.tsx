@@ -2,13 +2,13 @@ import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResourcesContext } from '../../../offline.resources';
 import { SkeletonText, InlineNotification } from '@carbon/react';
-import styles from '../field.scss';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConfig } from '@openmrs/esm-framework';
-import AddressSearchComponent from './address-search.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useOrderedAddressHierarchyLevels } from './address-hierarchy.resource';
 import AddressHierarchyLevels from './address-hierarchy-levels.component';
+import AddressSearchComponent from './address-search.component';
+import styles from '../field.scss';
 
 function parseString(xmlDockAsString: string) {
   const parser = new DOMParser();

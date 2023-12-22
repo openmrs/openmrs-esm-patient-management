@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { mockMappedAppointmentsData } from '../../../../../../__mocks__/appointments.mock';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
+import { mockMappedAppointmentsData } from '__mocks__';
 import CancelAppointment from './cancel-appointment.component';
 
 const testProps = {
@@ -14,8 +14,8 @@ const mockShowToast = showToast as jest.Mock;
 const mockCancelAppointment = cancelAppointment as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,

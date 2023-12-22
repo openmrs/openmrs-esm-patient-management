@@ -2,11 +2,11 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { formatDatetime, parseDate, Visit } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, type Visit } from '@openmrs/esm-framework';
 import { useAppointments } from './appointments.resource';
 import styles from './appointment-details.scss';
 import { usePastVisits } from '../past-visit/past-visit.resource';
-import { Appointment } from '../types';
+import { type Appointment } from '../types';
 
 interface AppointmentDetailsProps {
   patientUuid: string;

@@ -1,9 +1,9 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import styles from './monthly-header.module.scss';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
 import DaysOfWeekCard from '../daily/days-of-week.component';
 
 const Format = {
@@ -38,9 +38,7 @@ function MonthlyHeader({
         </Button>
       </div>
       <div className={styles.workLoadCard}>
-        {daysInWeek?.map((day, i) => (
-          <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />
-        ))}
+        {daysInWeek?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import { openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
+import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';

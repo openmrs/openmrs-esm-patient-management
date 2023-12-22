@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import uniqBy from 'lodash-es/uniqBy';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { Appointment, AppointmentSummary } from '../types';
+import { type Appointment, type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';
 import {
   getHighestAppointmentServiceLoad,

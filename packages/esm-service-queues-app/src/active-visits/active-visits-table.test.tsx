@@ -1,13 +1,11 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
-import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
 import { of } from 'rxjs';
-import { renderWithSwr } from '../../../../tools/test-helpers';
-import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
-import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
+import { screen } from '@testing-library/react';
+import { type ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
+import { mockServices, mockVisitQueueEntries, mockMappedQueueEntries, mockSession } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import { useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { mockSession } from '../../../../__mocks__/session.mock';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActiveVisitsTable from './active-visits-table.component';
 

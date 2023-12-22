@@ -9,7 +9,7 @@ import {
   StructuredListWrapper,
 } from '@carbon/react';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { FormattedEncounter } from '../../types/index';
+import { type FormattedEncounter } from '../../types/index';
 import styles from '../past-visit.scss';
 
 interface EncounterListProps {

@@ -1,6 +1,4 @@
-import { AddressTemplate } from '../../../patient-registration.types';
-
-export const mockedAddressTemplate: AddressTemplate = {
+export const mockedAddressTemplate = {
   displayName: null,
   codeName: 'default',
   country: null,
@@ -86,6 +84,7 @@ export const mockedAddressTemplate: AddressTemplate = {
 };
 
 export const mockedOrderedFields = ['country', 'stateProvince', 'cityVillage', 'postalCode', 'address1', 'address2'];
+
 export const mockedAddressOptions = [
   'Cambodia > Banteay Meanchey > Mongkol Borei > Banteay Neang > Ou Thum',
   'Cambodia > Battambang > Banan > Ta Kream > Andoung Neang',

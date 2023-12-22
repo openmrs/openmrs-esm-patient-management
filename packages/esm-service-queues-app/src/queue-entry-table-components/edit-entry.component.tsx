@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { useTranslation } from 'react-i18next';
 import { showModal } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';

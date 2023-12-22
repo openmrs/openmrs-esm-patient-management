@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { InlineNotification, TextInputSkeleton, SkeletonText } from '@carbon/react';
-import { FieldDefinition } from '../../../config-schema';
+import { type FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';

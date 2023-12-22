@@ -4,7 +4,7 @@ import { usePersonAttributeType } from './person-attributes.resource';
 import { PersonAttributeField } from './person-attribute-field.component';
 import { useConceptAnswers } from '../field.resource';
 import { Form, Formik } from 'formik';
-import { FieldDefinition } from '../../../config-schema';
+import { type FieldDefinition } from '../../../config-schema';
 
 jest.mock('./person-attributes.resource'); // Mock the usePersonAttributeType hook
 jest.mock('../field.resource'); // Mock the useConceptAnswers hook

@@ -1,4 +1,4 @@
-export const mockServices = [
+export const mockServiceData = [
   { uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'Clinical consultation' },
   { uuid: 'd80ff12a-06a7-11ed-b939-0242ac120002', display: 'Triage' },
 ];

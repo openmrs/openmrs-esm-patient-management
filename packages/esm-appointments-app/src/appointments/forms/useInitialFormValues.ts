@@ -1,7 +1,7 @@
-import { OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
+import { type OpenmrsResource, useConfig, useSession } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { amPm } from '../../helpers';
-import { MappedAppointment } from '../../types';
+import { type amPm } from '../../helpers';
+import { type MappedAppointment } from '../../types';
 import { ConfigObject } from '../../config-schema';
 
 export interface PatientAppointment {
