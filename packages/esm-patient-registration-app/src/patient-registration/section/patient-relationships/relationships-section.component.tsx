@@ -15,7 +15,7 @@ import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.co
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
-import { RelationshipValue } from '../../patient-registration.types';
+import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 

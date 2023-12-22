@@ -1,7 +1,7 @@
 import { openmrsFetch, updateVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { endPatientStatus } from '../active-visits/active-visits-table.resource';
-import { AppointmentsFetchResponse, EndVisitPayload } from '../types';
+import { type AppointmentsFetchResponse, type EndVisitPayload } from '../types';
 import useSWR from 'swr';
 import { omrsDateFormat, timeZone } from '../constants';
 import { first } from 'rxjs/operators';

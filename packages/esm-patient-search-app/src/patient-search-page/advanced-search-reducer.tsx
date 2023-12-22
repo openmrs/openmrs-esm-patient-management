@@ -1,4 +1,8 @@
-import { AdvancedPatientSearchAction, AdvancedPatientSearchActionTypes, AdvancedPatientSearchState } from '../types';
+import {
+  type AdvancedPatientSearchAction,
+  AdvancedPatientSearchActionTypes,
+  type AdvancedPatientSearchState,
+} from '../types';
 
 export const initialState: AdvancedPatientSearchState = {
   gender: 'any',

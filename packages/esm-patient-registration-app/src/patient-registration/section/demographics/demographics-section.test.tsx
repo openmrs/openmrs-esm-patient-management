@@ -4,7 +4,7 @@ import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { FormValues } from '../../patient-registration.types';
+import { type FormValues } from '../../patient-registration.types';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');

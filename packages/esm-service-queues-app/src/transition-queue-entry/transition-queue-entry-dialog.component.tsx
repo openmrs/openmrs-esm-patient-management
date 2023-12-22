@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import {
-  ConfigObject,
+  type ConfigObject,
   ExtensionSlot,
   formatDatetime,
   navigate,
@@ -14,7 +14,7 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import {
-  MappedVisitQueueEntry,
+  type MappedVisitQueueEntry,
   serveQueueEntry,
   updateQueueEntry,
   useVisitQueueEntries,

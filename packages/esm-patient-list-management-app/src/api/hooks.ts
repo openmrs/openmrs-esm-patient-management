@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse, useConfig } from '@openmrs/esm-framework';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
-import { ConfigSchema } from '../config-schema';
+import { type ConfigSchema } from '../config-schema';
 import {
-  CohortResponse,
-  CohortType,
-  OpenmrsCohort,
-  OpenmrsCohortMember,
-  PatientListFilter,
+  type CohortResponse,
+  type CohortType,
+  type OpenmrsCohort,
+  type OpenmrsCohortMember,
+  type PatientListFilter,
   PatientListType,
 } from './types';
 

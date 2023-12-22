@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
-import { Observation } from '../visit.resource';
+import { type Observation } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {

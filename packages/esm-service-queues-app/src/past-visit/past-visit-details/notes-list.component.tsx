@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { DiagnosisItem, Note } from '../../types/index';
+import { type DiagnosisItem, type Note } from '../../types/index';
 import styles from './past-visit-summary.scss';
 
 interface NotesProps {

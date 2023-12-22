@@ -1,7 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { mapAppointmentProperties, useAppointmentDate } from '../helpers';
-import { Identifier } from '../types';
+import { useAppointmentDate } from '../helpers';
+import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
 
 export interface Response {

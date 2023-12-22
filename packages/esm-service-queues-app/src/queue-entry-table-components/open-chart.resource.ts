@@ -1,4 +1,4 @@
-import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 const usePatientId = (patientUuid: string) => {

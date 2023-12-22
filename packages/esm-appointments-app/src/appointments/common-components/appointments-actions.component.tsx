@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { launchOverlay } from '../../hooks/useOverlay';
 import AppointmentForm from '../forms/create-edit-form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
-import { MappedAppointment } from '../../types';
+import { type MappedAppointment } from '../../types';
 import { showModal } from '@openmrs/esm-framework';
 import { useVisits } from '../../hooks/useVisits';
 import DefaulterTracingForm from '../forms/defaulter-tracing-form/default-tracing-form.component';
@@ -70,7 +70,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case isTodayAppointment:
+      case isTodayAppointment: {
         const isAfterNoon = new Date().getHours() > 12;
 
         if (scheduleType === 'Pending' && isAfterNoon) {
@@ -82,6 +82,8 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
         }
 
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
+      }
+
       default:
         if (!isFutureAppointment) {
           return (

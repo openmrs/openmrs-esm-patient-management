@@ -31,10 +31,10 @@ import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
-import { Appointment, MappedHomeAppointment } from '../types';
+import { type Appointment, type MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;

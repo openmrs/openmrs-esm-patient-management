@@ -1,5 +1,5 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
-import { MappedQueuePriority } from '../active-visits/active-visits-table.resource';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type MappedQueuePriority } from '../active-visits/active-visits-table.resource';
 
 export const getTagType = (priority: string) => {
   switch (priority as MappedQueuePriority) {

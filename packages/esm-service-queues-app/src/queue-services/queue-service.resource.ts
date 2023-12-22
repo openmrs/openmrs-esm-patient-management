@@ -1,6 +1,5 @@
-import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 
 export function useServiceConcepts() {
   const config = useConfig();
@@ -9,7 +8,7 @@ export function useServiceConcepts() {
   } = config;
 
   const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
     queueConcepts: data ? data?.data?.setMembers : [],

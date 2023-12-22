@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
+import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.component';
 
 jest.mock('@openmrs/esm-framework', () => ({

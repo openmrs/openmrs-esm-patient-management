@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { AppointmentsFetchResponse } from '../../types';
+import { type AppointmentsFetchResponse } from '../../types';
 
 export function useScheduledVisits(patientUuid: string) {
   const abortController = new AbortController();

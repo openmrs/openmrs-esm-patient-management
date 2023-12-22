@@ -4,6 +4,9 @@ import { useActiveTickets } from './useActiveTickets';
 import QueueScreen from './queue-screen.component';
 
 jest.mock('./useActiveTickets');
+jest.mock('../helpers/helpers', () => ({
+  useSelectedQueueLocationName: jest.fn().mockReturnValue('Room A'),
+}));
 
 describe('QueueScreen component', () => {
   test('renders loading skeleton when data is loading', () => {

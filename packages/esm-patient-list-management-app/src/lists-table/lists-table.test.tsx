@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useSession } from '@openmrs/esm-framework';
-import { mockSession } from '../../../../__mocks__/session.mock';
+import { mockSession } from '__mocks__';
 import type { PatientList } from '../api/types';
 import ListsTable from './lists-table.component';
 

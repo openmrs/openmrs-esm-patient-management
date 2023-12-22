@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, useCallback, type MouseEvent, type AnchorHTMLAttributes } from 'react';
 import {
   DataTable,
   DataTableSkeleton,

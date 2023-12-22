@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { useSession, Visit, openmrsFetch } from '@openmrs/esm-framework';
+import { useSession, type Visit, openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { useAppointmentDate } from '../helpers';
 
