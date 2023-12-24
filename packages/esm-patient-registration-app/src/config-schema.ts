@@ -59,6 +59,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    phone: {
+      personAttributeUuid: string;
+    };
   };
   links: {
     submitButton: string;
@@ -310,6 +313,13 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
+      },
+    },
+    phone: {
+      personAttributeUuid: {
+        _type: Type.UUID,
+        _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        _description: 'The UUID of the phone number person attribute type',
       },
     },
   },

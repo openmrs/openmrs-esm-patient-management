@@ -1,11 +1,15 @@
 import React from 'react';
 import { PersonAttributeField } from '../person-attributes/person-attribute-field.component';
+import { useConfig } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../../config-schema';
 
 export function PhoneField() {
+  const config = useConfig<RegistrationConfig>();
+
   const fieldDefinition = {
     id: 'phone',
     type: 'person attribute',
-    uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+    uuid: config.fieldConfigurations.phone.personAttributeUuid,
     showHeading: false,
   };
   return <PersonAttributeField fieldDefinition={fieldDefinition} />;
