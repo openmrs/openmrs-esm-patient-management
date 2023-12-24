@@ -7,7 +7,6 @@ export interface PatientRegistrationContextProps {
   identifierTypes: Array<any>;
   values: FormValues;
   validationSchema: any;
-  setValidationSchema(value: any): void;
   inEditMode: boolean;
   setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   setCapturePhotoProps(value: SetStateAction<CapturePhotoProps>): void;

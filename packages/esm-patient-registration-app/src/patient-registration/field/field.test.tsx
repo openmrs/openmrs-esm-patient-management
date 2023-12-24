@@ -103,7 +103,6 @@ const initialContextValues = {
   setCapturePhotoProps: jest.fn(),
   setFieldValue: jest.fn(),
   setInitialFormValues: jest.fn(),
-  setValidationSchema: jest.fn(),
   validationSchema: null,
   values: {} as FormValues,
 };
@@ -255,7 +254,6 @@ describe('Field', () => {
       setCapturePhotoProps: jest.fn(),
       setFieldValue: jest.fn(),
       setInitialFormValues: jest.fn(),
-      setValidationSchema: jest.fn(),
       validationSchema: null,
       values: { identifiers: { openmrsID } } as unknown as FormValues,
     };

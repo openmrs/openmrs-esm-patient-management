@@ -1,4 +1,6 @@
-import { validationSchema } from './patient-registration-validation';
+import { getConfig } from '@openmrs/esm-framework';
+import { getValidationSchema } from './patient-registration-validation';
+import { type RegistrationConfig } from '../../config-schema';
 
 describe('Patient Registration Validation', () => {
   describe('validationSchema', () => {
@@ -25,6 +27,8 @@ describe('Patient Registration Validation', () => {
     };
 
     const validateFormValues = async (formValues) => {
+      const config = (await getConfig('@openmrs/esm-patient-registration-app')) as any as RegistrationConfig;
+      const validationSchema = getValidationSchema(config);
       try {
         await validationSchema.validate(formValues, { abortEarly: false });
       } catch (err) {

@@ -60,7 +60,6 @@ function renderDob() {
             identifierTypes: [],
             values: formValues,
             validationSchema: null,
-            setValidationSchema: (value) => {},
             inEditMode: false,
             setFieldValue: () => {},
             setCapturePhotoProps: (value) => {},
