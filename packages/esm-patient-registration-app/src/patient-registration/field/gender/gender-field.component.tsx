@@ -33,10 +33,10 @@ export const GenderField: React.FC = () => {
         <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
           {fieldConfigs.map((option) => (
             <RadioButton
-              key={option.label}
-              id={option.id}
+              key={option.label ?? option.value}
+              id={`gender-option-${option.value}`}
               value={option.value}
-              labelText={t(`${option.label}`, `${option.label}`)}
+              labelText={t(option.label ?? option.value, option.label ?? option.value)}
             />
           ))}
         </RadioButtonGroup>

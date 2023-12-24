@@ -383,21 +383,13 @@ export class FormManager {
     // provide a valid fhir.Patient object. The various patient chart modules should be able to handle
     // such missing props correctly (and should be updated if they don't).
 
-    // Gender in the original object only uses a single letter. fhir.Patient expects a full string.
-    const genderMap = {
-      M: 'male',
-      F: 'female',
-      O: 'other',
-      U: 'unknown',
-    };
-
     // Mapping inspired by:
     // https://github.com/openmrs/openmrs-module-fhir/blob/669b3c52220bb9abc622f815f4dc0d8523687a57/api/src/main/java/org/openmrs/module/fhir/api/util/FHIRPatientUtil.java#L36
     // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
     // Update as required.
     return {
       id: patient.uuid,
-      gender: genderMap[patient.person?.gender],
+      gender: patient.person?.gender,
       birthDate: patient.person?.birthdate,
       deceasedBoolean: patient.person.dead,
       deceasedDateTime: patient.person.deathDate,

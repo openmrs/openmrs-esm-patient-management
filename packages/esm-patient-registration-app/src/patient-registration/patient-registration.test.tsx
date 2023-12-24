@@ -153,9 +153,8 @@ let mockOpenmrsConfig: RegistrationConfig = {
     },
     gender: [
       {
-        value: 'Male',
+        value: 'male',
         label: 'Male',
-        id: 'male',
       },
     ],
     address: {
@@ -282,7 +281,7 @@ describe('Registering a new patient', () => {
           attributes: [],
           birthdate: '1993-8-2',
           birthdateEstimated: false,
-          gender: 'M',
+          gender: expect.stringMatching(/M/i),
           names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
           dead: false,
           uuid: expect.anything(),
@@ -415,7 +414,7 @@ describe('Updating an existing patient record', () => {
     expect(familyNameInput.value).toBe('Wilson');
     expect(middleNameInput.value).toBeFalsy();
     expect(dateOfBirthInput.value).toBe('4/4/1972');
-    expect(genderInput.value).toBe('Male');
+    expect(genderInput.value).toBe('male');
 
     // do some edits
     await user.clear(givenNameInput);
@@ -445,7 +444,7 @@ describe('Updating an existing patient record', () => {
         deathCause: '',
         deathDate: '',
         familyName: 'Smith',
-        gender: 'Male',
+        gender: expect.stringMatching(/male/i),
         givenName: 'Eric',
         identifiers: {},
         isDead: false,

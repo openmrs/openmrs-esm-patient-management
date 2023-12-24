@@ -27,7 +27,6 @@ export interface CustomConceptAnswer {
 export interface Gender {
   label?: string;
   value: string;
-  id: string;
 }
 
 export interface RegistrationConfig {
@@ -133,7 +132,7 @@ export const esmPatientRegistrationSchema = {
       type: {
         _type: Type.String,
         _description: "How this field's data will be stored—a person attribute or an obs.",
-        // _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -233,42 +232,33 @@ export const esmPatientRegistrationSchema = {
       _elements: {
         value: {
           _type: Type.String,
-          _description: 'The value for sex option',
+          _description:
+            'Value that will be sent to the server. Limited to FHIR-supported values for Administrative Gender',
+          _validators: [validators.oneOf(['male', 'female', 'other', 'unknown'])],
         },
         label: {
           _type: Type.String,
           _default: null,
-          _description: 'The label displayed for sex option.',
-        },
-        id: {
-          _type: Type.String,
-          _default: null,
-          _description: 'The id for sex option.',
+          _description:
+            'The label displayed for the sex option, if it should be different from the value (the value will be translated; the English "translation" is upper-case).',
         },
       },
       _default: [
         {
-          id: 'male',
-          value: 'Male',
-          label: 'Male',
+          value: 'male',
         },
         {
-          id: 'female',
-          value: 'Female',
-          label: 'Female',
+          value: 'female',
         },
         {
-          id: 'other',
-          value: 'Other',
-          label: 'Other',
+          value: 'other',
         },
         {
-          id: 'unknown',
-          value: 'Unknown',
-          label: 'Unknown',
+          value: 'unknown',
         },
       ],
-      _description: 'Provide ability to configure sex options.',
+      _description:
+        'The options for sex selection during patient registration. This is Administrative Gender as it is called by FHIR (Possible options are limited to those defined in FHIR Administrative Gender, see https://hl7.org/fhir/R4/valueset-administrative-gender.html).',
     },
     address: {
       useAddressHierarchy: {

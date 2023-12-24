@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 
 export type PatientRegistrationSex = 'male' | 'female' | 'other' | 'unknown';
 
@@ -25,7 +25,7 @@ export class RegistrationAndEditPage {
   readonly givenNameInput = () => this.page.locator('#givenName');
   readonly middleNameInput = () => this.page.locator('#middleName');
   readonly familyNameInput = () => this.page.locator('#familyName');
-  readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=${sex}]`);
+  readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
   readonly birthdateInput = () => this.page.locator('#birthdate');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');

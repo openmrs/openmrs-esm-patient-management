@@ -120,7 +120,7 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   result.additionalMiddleName = additionalPatientName?.given[1];
   result.additionalFamilyName = additionalPatientName?.family;
 
-  result.gender = capitalize(patient.gender);
+  result.gender = patient.gender;
   result.birthdate = patient.birthDate ? parseDate(patient.birthDate) : undefined;
   result.telephoneNumber = patient.telecom ? patient.telecom[0].value : '';
 

@@ -60,7 +60,6 @@ describe('demographics section', () => {
               initialFormValues: null,
               identifierTypes: [],
               validationSchema: {},
-              setValidationSchema: () => {},
               values: { ...initialFormValues, birthdateEstimated, addNameInLocalLanguage },
               inEditMode: false,
               setFieldValue: () => {},

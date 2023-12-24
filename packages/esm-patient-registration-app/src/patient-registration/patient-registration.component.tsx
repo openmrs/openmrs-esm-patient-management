@@ -6,7 +6,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, type FormikHelpers } from 'formik';
 import { createErrorHandler, showSnackbar, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
-import { validationSchema as initialSchema } from './validation/patient-registration-validation';
+import { getValidationSchema } from './validation/patient-registration-validation';
 import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
@@ -32,7 +32,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
-  const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
@@ -46,6 +45,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
+  const validationSchema = getValidationSchema(config);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -194,7 +194,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 value={{
                   identifierTypes: identifierTypes,
                   validationSchema,
-                  setValidationSchema,
                   values: props.values,
                   inEditMode,
                   setFieldValue: props.setFieldValue,
