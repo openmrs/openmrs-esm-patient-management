@@ -34,6 +34,46 @@ describe('CodedPersonAttributeField', () => {
     });
   });
 
+  it('shows error if there is no concept answer set provided', () => {
+    expect(() => {
+      render(
+        <Formik initialValues={{}} onSubmit={() => {}}>
+          <Form>
+            <CodedPersonAttributeField
+              id="attributeId"
+              personAttributeType={personAttributeType}
+              answerConceptSetUuid={null}
+              label={personAttributeType.display}
+              customConceptAnswers={[]}
+            />
+          </Form>
+        </Formik>,
+      );
+    }).toThrow(expect.stringMatching(/has been defined without an answer concept set UUID/i));
+  });
+
+  it('shows error if the concept answer set does not have any concept answers', () => {
+    mockedUseConceptAnswers.mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
+    expect(() => {
+      render(
+        <Formik initialValues={{}} onSubmit={() => {}}>
+          <Form>
+            <CodedPersonAttributeField
+              id="attributeId"
+              personAttributeType={personAttributeType}
+              answerConceptSetUuid={answerConceptSetUuid}
+              label={personAttributeType.display}
+              customConceptAnswers={[]}
+            />
+          </Form>
+        </Formik>,
+      );
+    }).toThrow(expect.stringMatching(/does not have any concept answers/i));
+  });
+
   it('renders the conceptAnswers as select options', () => {
     render(
       <Formik initialValues={{}} onSubmit={() => {}}>
