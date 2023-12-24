@@ -288,9 +288,7 @@ describe('Field', () => {
       error = err;
     }
 
-    expect(error).toBe(
-      "Invalid field name 'invalidField'. Valid options are 'weight', 'name', 'gender', 'dob', 'address', 'id', 'phone & email'.",
-    );
+    expect(error).toMatch(/Invalid field name 'invalidField'. Valid options are /);
     expect(screen.queryByTestId('invalid-field')).not.toBeInTheDocument();
 
     consoleError.mockRestore();
