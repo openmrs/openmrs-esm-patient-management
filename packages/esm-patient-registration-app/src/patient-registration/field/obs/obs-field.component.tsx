@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ export interface ObsFieldProps {
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
 
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
 
   if (!config.registrationObs.encounterTypeUuid) {
     console.error(
@@ -62,7 +62,7 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
     default:
       return (
         <InlineNotification kind="error" title="Error">
-          Concept has unknown datatype "{concept.datatype.display}"
+          Concept for obs field "{fieldDefinition.id}" has unknown datatype "{concept.datatype.display}"
         </InlineNotification>
       );
   }
@@ -149,37 +149,30 @@ interface CodedObsFieldProps {
 }
 
 function CodedObsField({ concept, answerConceptSetUuid, label, required }: CodedObsFieldProps) {
-  const config = useConfig() as RegistrationConfig;
-  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
-    answerConceptSetUuid ?? concept.uuid,
-  );
-
+  const { t } = useTranslation();
+  const config = useConfig<RegistrationConfig>();
   const fieldName = `obs.${concept.uuid}`;
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'obs' && def.uuid === concept.uuid)[0];
+
+  const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
+    fieldDefinition.customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
+  );
+
+  const answers = useMemo(
+    () =>
+      fieldDefinition.customConceptAnswers.length
+        ? fieldDefinition.customConceptAnswers
+        : isLoadingConceptAnswers
+          ? []
+          : conceptAnswers.map((answer) => ({ ...answer, label: answer.display })),
+    [fieldDefinition.customConceptAnswers, conceptAnswers, isLoadingConceptAnswers],
+  );
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Field name={fieldName}>
           {({ field, form: { touched, errors }, meta }) => {
-            if (fieldDefinition?.customConceptAnswers?.length) {
-              return (
-                <Layer>
-                  <Select
-                    id={fieldName}
-                    name={fieldName}
-                    required={required}
-                    labelText={label ?? concept?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
-                    {...field}>
-                    <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                    {fieldDefinition?.customConceptAnswers.map((answer) => (
-                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                    ))}
-                  </Select>
-                </Layer>
-              );
-            }
             return (
               <Layer>
                 <Select
@@ -189,9 +182,13 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required }: Coded
                   required={required}
                   invalid={errors[fieldName] && touched[fieldName]}
                   {...field}>
-                  <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                  {conceptAnswers.map((answer) => (
-                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+                  <SelectItem
+                    key={`no-answer-select-item-${fieldName}`}
+                    value={''}
+                    text={t('selectAnOption', 'Select an option')}
+                  />
+                  {answers.map((answer) => (
+                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
                   ))}
                 </Select>
               </Layer>
