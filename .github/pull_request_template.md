@@ -1,43 +1,18 @@
 ## Requirements
 
 - [ ] This PR has a title that briefly describes the work done including the ticket number. If there is a ticket, make sure your PR title includes a [conventional commit](https://o3-dev.docs.openmrs.org/#/getting_started/contributing?id=your-pr-title-should-indicate-the-type-of-change-it-is) label. See existing PR titles for inspiration.
-- [ ] My work conforms to the [**OpenMRS 3.0 Styleguide**](https://om.rs/styleguide) and [**design documentation**](https://zeroheight.com/23a080e38/p/880723-introduction).
-- [ ] I checked for feature overlap with [**existing widgets**](https://om.rs/directory).
-
+- [ ] My work conforms to the [OpenMRS 3.0 Styleguide](https://om.rs/styleguide) and [design documentation](https://zeroheight.com/23a080e38/p/880723-introduction).
+- [ ] My work includes tests or is validated by existing tests.
 
 ## Summary
-
-<!--
-Required.
-Please describe what problems your PR addresses.
--->
-
+<!-- Please describe what problems your PR addresses. -->
 
 ## Screenshots
-
-*None.*
-<!--
-Optional.
-If possible, please insert any screenshots/videos of your changes here.
-Don't forget to remove the *None.* above if you do fill this section.
--->
-
+<!-- Required if you are making UI changes. -->
 
 ## Related Issue
-
-*None.*
-<!--
-Required if applicable.
-If present, please link any related issue here, e.g. "https://issues.openmrs.org/browse/123").
-Don't forget to remove the *None.* above if you do fill this section.
--->
-
+<!-- Paste the link to the Jira ticket here if one exists. -->
+<!-- https://issues.openmrs.org/browse/O3- -->
 
 ## Other
-
-*None.*
-<!--
-Optional.
-Anything else that isn't covered by one of the sections above.
-Don't forget to remove the *None.* above if you do fill this section.
--->
+<!-- Anything not covered above -->
