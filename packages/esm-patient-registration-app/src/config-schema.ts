@@ -186,7 +186,7 @@ export const esmPatientRegistrationSchema = {
         },
         _default: [],
         _description:
-          'For coded questions only (obs or person attrbute). Provide ability to add custom concept answers.',
+          'For coded questions only (obs or person attrbute). A list of custom concept answers. Overrides answers that come from the obs concept or from `answerSetConceptUuid`.',
       },
     },
     // Do not add fields here. If you want to add a field in code, add it to built-in fields above.

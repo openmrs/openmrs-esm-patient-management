@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
@@ -28,32 +28,46 @@ export function CodedPersonAttributeField({
   );
   const { t } = useTranslation();
   const fieldName = `attributes.${personAttributeType.uuid}`;
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!answerConceptSetUuid) {
       reportError(
         `The person attribute field '${id}' is of type 'coded' but has been defined without an answer concept set UUID. The 'answerConceptSetUuid' key is required.`,
       );
+      setError(true);
     }
   }, [answerConceptSetUuid]);
 
   useEffect(() => {
-    if (!isLoadingConceptAnswers && conceptAnswers?.length == 0) {
-      reportError(
-        `The coded person attribute field '${id}' has been defined with an answer concept set UUID '${answerConceptSetUuid}' that does not have any concept answers.`,
-      );
+    if (!isLoadingConceptAnswers) {
+      if (!conceptAnswers) {
+        reportError(
+          `The coded person attribute field '${id}' has been defined with an invalid answer concept set UUID '${answerConceptSetUuid}'.`,
+        );
+        setError(true);
+      }
+      if (conceptAnswers?.length == 0) {
+        reportError(
+          `The coded person attribute field '${id}' has been defined with an answer concept set UUID '${answerConceptSetUuid}' that does not have any concept answers.`,
+        );
+        setError(true);
+      }
     }
   }, [isLoadingConceptAnswers, conceptAnswers]);
 
-  const answers = useMemo(
-    () =>
-      customConceptAnswers.length
-        ? customConceptAnswers
-        : isLoadingConceptAnswers
-          ? []
-          : conceptAnswers.map((answer) => ({ ...answer, label: answer.display })),
-    [customConceptAnswers, conceptAnswers, isLoadingConceptAnswers],
-  );
+  const answers = useMemo(() => {
+    if (customConceptAnswers.length) {
+      return customConceptAnswers;
+    }
+    return isLoadingConceptAnswers || !conceptAnswers
+      ? []
+      : conceptAnswers.map((answer) => ({ ...answer, label: answer.display }));
+  }, [customConceptAnswers, conceptAnswers, isLoadingConceptAnswers]);
+
+  if (error) {
+    return null;
+  }
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
