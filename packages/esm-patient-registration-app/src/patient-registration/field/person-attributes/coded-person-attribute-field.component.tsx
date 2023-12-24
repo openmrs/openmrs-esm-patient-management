@@ -13,7 +13,7 @@ export interface CodedPersonAttributeFieldProps {
   personAttributeType: PersonAttributeTypeResponse;
   answerConceptSetUuid: string;
   label?: string;
-  customConceptAnswers?: Array<{ uuid: string; label?: string }>;
+  customConceptAnswers: Array<{ uuid: string; label?: string }>;
 }
 
 export function CodedPersonAttributeField({

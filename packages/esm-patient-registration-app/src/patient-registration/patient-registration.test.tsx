@@ -189,6 +189,7 @@ configWithObs.fieldDefinitions = [
     placeholder: '',
     validation: { required: false, matches: null },
     answerConceptSetUuid: null,
+    customConceptAnswers: [],
   },
   {
     id: 'chief complaint',
@@ -198,6 +199,7 @@ configWithObs.fieldDefinitions = [
     placeholder: '',
     validation: { required: false, matches: null },
     answerConceptSetUuid: null,
+    customConceptAnswers: [],
   },
   {
     id: 'nationality',
@@ -207,6 +209,7 @@ configWithObs.fieldDefinitions = [
     placeholder: '',
     validation: { required: false, matches: null },
     answerConceptSetUuid: null,
+    customConceptAnswers: [],
   },
 ];
 

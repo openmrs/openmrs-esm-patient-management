@@ -57,6 +57,7 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
+          customConceptAnswers={fieldDefinition.customConceptAnswers}
         />
       );
     default:
@@ -117,8 +118,6 @@ interface NumericObsFieldProps {
 }
 
 function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
-  const { t } = useTranslation();
-
   const fieldName = `obs.${concept.uuid}`;
 
   return (
@@ -146,26 +145,25 @@ interface CodedObsFieldProps {
   answerConceptSetUuid?: string;
   label?: string;
   required?: boolean;
+  customConceptAnswers: Array<{ uuid: string; label?: string }>;
 }
 
-function CodedObsField({ concept, answerConceptSetUuid, label, required }: CodedObsFieldProps) {
+function CodedObsField({ concept, answerConceptSetUuid, label, required, customConceptAnswers }: CodedObsFieldProps) {
   const { t } = useTranslation();
-  const config = useConfig<RegistrationConfig>();
   const fieldName = `obs.${concept.uuid}`;
-  const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'obs' && def.uuid === concept.uuid)[0];
 
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
-    fieldDefinition.customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
+    customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
   );
 
   const answers = useMemo(
     () =>
-      fieldDefinition.customConceptAnswers.length
-        ? fieldDefinition.customConceptAnswers
+      customConceptAnswers.length
+        ? customConceptAnswers
         : isLoadingConceptAnswers
           ? []
           : conceptAnswers.map((answer) => ({ ...answer, label: answer.display })),
-    [fieldDefinition.customConceptAnswers, conceptAnswers, isLoadingConceptAnswers],
+    [customConceptAnswers, conceptAnswers, isLoadingConceptAnswers],
   );
 
   return (
