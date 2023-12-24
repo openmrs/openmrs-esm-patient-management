@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
+import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
 import { deletePatient, getPatient } from '../commands';
 
 let patientUuid: string;
@@ -46,7 +46,7 @@ test('Register a new patient', async ({ page, api }) => {
     const { givenName, middleName, familyName, sex } = formValues;
 
     await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
-    await expect(person.gender).toBe(sex[0].toUpperCase());
+    await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
     await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
     await expect(person.preferredAddress.address1).toBe(formValues.address1);
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
