@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
@@ -19,17 +19,13 @@ interface PatientListResponse {
   totalCount: number;
 }
 
-export function useAllPatientLists({ name, isStarred, type }: PatientListFilter) {
+export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
   ];
   const config: ConfigSchema = useConfig();
-
-  if (name) {
-    query.push(['q', name]);
-  }
 
   if (type === PatientListType.USER) {
     query.push(['cohortType', config.myListCohortTypeUUID]);
