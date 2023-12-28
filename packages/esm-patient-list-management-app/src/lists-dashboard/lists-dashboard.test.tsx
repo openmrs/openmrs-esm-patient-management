@@ -15,11 +15,6 @@ jest.mock('react-router-dom', () => ({
   useLocation: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  navigate: jest.fn(),
-}));
-
 describe('ListsDashboard', () => {
   beforeEach(() => {
     mockedUseLocation.mockReturnValue({
@@ -95,11 +90,10 @@ describe('ListsDashboard', () => {
   });
 
   it('renders the patient list page UI correctly', async () => {
+    const user = userEvent.setup();
     render(<ListsDashboard />);
 
-    await screen.findByRole('searchbox');
-    expect(screen.getByRole('button', { name: /new list/i })).toBeInTheDocument();
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    await screen.findByRole('button', { name: /new list/i });
     expect(screen.getByRole('tablist', { name: /list tabs/i })).toBeInTheDocument();
 
     const tabs = ['Starred lists', 'System lists', 'My lists', 'All lists'];
@@ -107,14 +101,17 @@ describe('ListsDashboard', () => {
     tabs.forEach((tab) => {
       expect(screen.getByRole('tab', { name: tab })).toBeInTheDocument();
     });
+    expect(screen.getByRole('tab', { name: /starred lists/i })).toHaveAttribute('aria-selected', 'true');
+
+    await user.click(screen.getByRole('tab', { name: 'All lists' }));
+    await screen.findByRole('searchbox');
+    expect(screen.getByRole('table')).toBeInTheDocument();
 
     const columnHeaders = ['List name', 'List type', 'No. of patients', ''];
 
     columnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
     });
-
-    expect(screen.getByRole('tab', { name: /starred lists/i })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('clicking a tab switches the page content to the selected tab', async () => {
