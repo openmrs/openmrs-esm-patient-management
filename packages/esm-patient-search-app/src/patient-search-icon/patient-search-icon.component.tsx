@@ -1,12 +1,13 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { HeaderGlobalAction } from '@carbon/react';
 import { Close, Search } from '@carbon/react/icons';
 import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/esm-framework';
-import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
+import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-icon.scss';
-import { useParams, useSearchParams } from 'react-router-dom';
 
 interface PatientSearchLaunchProps {}
 
@@ -76,11 +77,17 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
           <PatientSearchOverlay onClose={handleGlobalAction} query={initialSearchTerm} />
         ))}
 
-      <div className={`${showSearchInput && styles.closeButton}`}>
+      <div
+        className={classNames({
+          [styles.closeButton]: showSearchInput,
+        })}>
         <HeaderGlobalAction
           aria-label={t('searchPatient', 'Search Patient')}
           aria-labelledby="Search Patient"
-          className={`${showSearchInput ? styles.activeSearchIconButton : styles.searchIconButton}`}
+          className={classNames({
+            [styles.activeSearchIconButton]: showSearchInput,
+            [styles.searchIconButton]: !showSearchInput,
+          })}
           enterDelayMs={500}
           name="SearchPatientIcon"
           data-testid="searchPatientIcon"

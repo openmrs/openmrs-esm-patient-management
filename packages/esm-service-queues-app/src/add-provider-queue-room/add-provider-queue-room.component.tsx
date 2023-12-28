@@ -12,7 +12,7 @@ import {
   Checkbox,
   Dropdown,
 } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { useServices, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
@@ -95,11 +95,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
       updateProviderToQueueRoom(queueProviderMapUuid, queueRoomUuid, providerUuid).then(
         ({ status }) => {
           if (status === 200) {
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               title: t('updateRoom', 'Update room'),
               kind: 'success',
-              description: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
+              subtitle: t('queueRoomUpdatedSuccessfully', 'Queue room updated successfully'),
             });
             closeModal();
             localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
@@ -108,11 +108,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('queueRoomAddFailed', 'Error adding queue room'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
           closeModal();
         },
@@ -121,11 +121,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
       addProviderToQueueRoom(queueRoomUuid, providerUuid).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               title: t('addRoom', 'Add room'),
               kind: 'success',
-              description: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
+              subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
             closeModal();
             localStorage.setItem('lastUpdatedQueueRoomTimestamp', new Date().toString());
@@ -134,11 +134,11 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('queueRoomAddFailed', 'Error adding queue room'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
         },
       );

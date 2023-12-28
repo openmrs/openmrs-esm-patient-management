@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
+import React, { type ChangeEvent, useCallback, useContext } from 'react';
+import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
-import { RegistrationConfig } from '../../../config-schema';
+import { useConfig } from '@openmrs/esm-framework';
+import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
 const calcBirthdate = (yearDelta, monthDelta, dateOfBirth) => {
@@ -35,42 +35,54 @@ export const DobField: React.FC = () => {
   const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
   const today = new Date();
 
-  const onToggle = (e) => {
-    setFieldValue('birthdateEstimated', e.name === 'unknown');
-    setFieldValue('birthdate', '');
-    setFieldValue('yearsEstimated', 0);
-    setFieldValue('monthsEstimated', '');
-  };
+  const onToggle = useCallback(
+    (e: { name?: string | number }) => {
+      setFieldValue('birthdateEstimated', e.name === 'unknown');
+      setFieldValue('birthdate', '');
+      setFieldValue('yearsEstimated', 0);
+      setFieldValue('monthsEstimated', '');
+    },
+    [setFieldValue],
+  );
 
-  const onDateChange = (birthdate) => {
-    setFieldValue('birthdate', birthdate);
-  };
+  const onDateChange = useCallback(
+    (birthdate: Date[]) => {
+      setFieldValue('birthdate', birthdate[0]);
+    },
+    [setFieldValue],
+  );
 
-  const onEstimatedYearsChange = (ev) => {
-    const years = +ev.target.value;
+  const onEstimatedYearsChange = useCallback(
+    (ev: ChangeEvent<HTMLInputElement>) => {
+      const years = +ev.target.value;
 
-    if (!isNaN(years) && years < 140 && years >= 0) {
-      setFieldValue('yearsEstimated', years);
-      setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
-    }
-  };
+      if (!isNaN(years) && years < 140 && years >= 0) {
+        setFieldValue('yearsEstimated', years);
+        setFieldValue('birthdate', calcBirthdate(years, monthsEstimateMeta.value, dateOfBirth));
+      }
+    },
+    [setFieldValue, dateOfBirth, monthsEstimateMeta.value],
+  );
 
-  const onEstimatedMonthsChange = (e) => {
-    const months = +e.target.value;
+  const onEstimatedMonthsChange = useCallback(
+    (ev: ChangeEvent<HTMLInputElement>) => {
+      const months = +ev.target.value;
 
-    if (!isNaN(months)) {
-      setFieldValue('monthsEstimated', months);
-      setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
-    }
-  };
+      if (!isNaN(months)) {
+        setFieldValue('monthsEstimated', months);
+        setFieldValue('birthdate', calcBirthdate(yearsEstimateMeta.value, months, dateOfBirth));
+      }
+    },
+    [setFieldValue, dateOfBirth, yearsEstimateMeta.value],
+  );
 
-  const updateBirthdate = () => {
+  const updateBirthdate = useCallback(() => {
     const months = +monthsEstimateMeta.value % 12;
     const years = +yearsEstimateMeta.value + Math.floor(monthsEstimateMeta.value / 12);
     setFieldValue('yearsEstimated', years);
     setFieldValue('monthsEstimated', months > 0 ? months : '');
     setFieldValue('birthdate', calcBirthdate(years, months, dateOfBirth));
-  };
+  }, [setFieldValue, monthsEstimateMeta, yearsEstimateMeta, dateOfBirth]);
 
   return (
     <div className={styles.halfWidthInDesktopView}>
@@ -89,20 +101,17 @@ export const DobField: React.FC = () => {
       <Layer>
         {!dobUnknown ? (
           <div className={styles.dobField}>
-            <OpenmrsDatePicker
-              id="birthdate"
-              {...birthdate}
-              dateFormat={dateFormat}
-              onChange={onDateChange}
-              maxDate={format(today)}
-              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
-              value={format(birthdate.value)}
-              carbonOptions={{
-                placeholder: placeHolder,
-              }}
-            />
+            <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
+              <DatePickerInput
+                id="birthdate"
+                {...birthdate}
+                placeholder={placeHolder}
+                labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+                invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+                invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+                value={format(birthdate.value)}
+              />
+            </DatePicker>
           </div>
         ) : (
           <div className={styles.grid}>

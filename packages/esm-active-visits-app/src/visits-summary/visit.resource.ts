@@ -1,4 +1,4 @@
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export interface Encounter {

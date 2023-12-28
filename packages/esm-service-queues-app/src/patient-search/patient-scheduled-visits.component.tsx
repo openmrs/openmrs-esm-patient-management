@@ -18,18 +18,17 @@ import {
   ErrorState,
   toOmrsIsoString,
   toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   useSession,
   useLocations,
-  NewVisitPayload,
+  type NewVisitPayload,
   saveVisit,
   useVisitTypes,
   useVisit,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
 } from '@openmrs/esm-framework';
-import { Appointment, SearchTypes } from '../types';
+import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
@@ -41,7 +40,7 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
-import { convertTime12to24, amPm } from '../helpers/time-helpers';
+import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
@@ -119,11 +118,11 @@ const ScheduledVisits: React.FC<{
 
       const abortController = new AbortController();
       if (currentVisit) {
-        showNotification({
+        showSnackbar({
           title: t('startVisitError', 'Error starting visit'),
           kind: 'error',
-          critical: true,
-          description: t('patientHasActiveVisit', 'The patient already has an active visit'),
+          isLowContrast: false,
+          subtitle: t('patientHasActiveVisit', 'The patient already has an active visit'),
         });
         setIsSubmitting(false);
       } else {
@@ -146,10 +145,10 @@ const ScheduledVisits: React.FC<{
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
-                      showToast({
+                      showSnackbar({
                         kind: 'success',
                         title: t('startAVisit', 'Start a visit'),
-                        description: t(
+                        subtitle: t(
                           'startVisitQueueSuccessfully',
                           'Patient has been added to active visits list and queue.',
                           `${hours} : ${minutes}`,
@@ -161,11 +160,11 @@ const ScheduledVisits: React.FC<{
                     }
                   },
                   (error) => {
-                    showNotification({
+                    showSnackbar({
                       title: t('queueEntryError', 'Error adding patient to the queue'),
                       kind: 'error',
-                      critical: true,
-                      description: error?.message,
+                      isLowContrast: false,
+                      subtitle: error?.message,
                     });
                     setIsSubmitting(false);
                   },
@@ -173,11 +172,11 @@ const ScheduledVisits: React.FC<{
               }
             },
             (error) => {
-              showNotification({
+              showSnackbar({
                 title: t('startVisitError', 'Error starting visit'),
                 kind: 'error',
-                critical: true,
-                description: error?.message,
+                isLowContrast: false,
+                subtitle: error?.message,
               });
               setIsSubmitting(false);
             },

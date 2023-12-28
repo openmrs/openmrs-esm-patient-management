@@ -1,9 +1,9 @@
-import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, type MouseEvent, type AnchorHTMLAttributes, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   DataTableSkeleton,
   DefinitionTooltip,
   Dropdown,
@@ -39,7 +39,7 @@ import {
   ExtensionSlot,
   usePagination,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
   useSession,
   showModal,
 } from '@openmrs/esm-framework';
@@ -47,7 +47,7 @@ import {
   useVisitQueueEntries,
   useServices,
   getOriginFromPathName,
-  MappedVisitQueueEntry,
+  type MappedVisitQueueEntry,
 } from './active-visits-table.resource';
 import { SearchTypes } from '../types';
 import {
@@ -338,7 +338,7 @@ function ActiveVisitsTable() {
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop(layout) ? true : false}
           rows={tableRows}
-          size="xs"
+          size="sm"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getToolbarProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
@@ -358,14 +358,12 @@ function ActiveVisitsTable() {
                       size="sm"
                     />
                   </div>
-                  <Layer>
-                    <TableToolbarSearch
-                      className={styles.search}
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
-                      size="sm"
-                    />
-                  </Layer>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={onInputChange}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
                   <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
                 </TableToolbarContent>
               </TableToolbar>

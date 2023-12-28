@@ -1,13 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import ClearQueueEntriesDialog from './clear-queue-entries-dialog.component';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
+import ClearQueueEntriesDialog from './clear-queue-entries-dialog.component';
 
 const mockBatchClearQueueEntries = batchClearQueueEntries as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 jest.mock('./clear-queue-entries-dialog.resource');
@@ -31,11 +32,13 @@ describe('ClearQueueEntriesDialog Component', () => {
   });
 
   it('should close modal when clicked on cancel', async () => {
+    const user = userEvent.setup();
     const closeModalMock = jest.fn();
+
     mockBatchClearQueueEntries.mockImplementationOnce(() => Promise.resolve());
     render(<ClearQueueEntriesDialog visitQueueEntries={visitQueueEntriesMock} closeModal={closeModalMock} />);
 
-    fireEvent.click(screen.getByText('Cancel'));
+    await user.click(screen.getByText('Cancel'));
 
     expect(closeModalMock).toHaveBeenCalled();
   });

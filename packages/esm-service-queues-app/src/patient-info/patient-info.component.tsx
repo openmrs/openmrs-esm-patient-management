@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile } from '@carbon/react';
 import { ChevronDown, ChevronUp, Edit } from '@carbon/react/icons';
@@ -28,14 +29,18 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
 
   return (
     <ClickableTile className={styles.container} onClick={handlePatientInfoClick}>
-      <div className={`${showContactDetails ? styles.activePatientInfoContainer : styles.patientInfoContainer}`}>
+      <div
+        className={classNames({
+          [styles.activePatientInfoContainer]: showContactDetails,
+          [styles.patientInfoContainer]: !showContactDetails,
+        })}>
         <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
         <div className={styles.patientInfoContent}>
           <div className={styles.patientInfoRow}>
             <span className={styles.patientName}>{patientName}</span>
             <ConfigurableLink
-              to={`\${openmrsSpaBase}/patient/${patient.id}/edit`}
               className={styles.patientEditBtn}
+              to={`\${openmrsSpaBase}/patient/${patient.id}/edit`}
               title={t('editPatientDetails', 'Edit patient details')}>
               <Edit size={16} />
             </ConfigurableLink>

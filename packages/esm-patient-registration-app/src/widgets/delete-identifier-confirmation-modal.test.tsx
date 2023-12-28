@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation-modal';
 
 describe('DeleteIdentifierConfirmationModal component', () => {
@@ -11,7 +12,9 @@ describe('DeleteIdentifierConfirmationModal component', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the modal and triggers deleteIdentifier function', () => {
+  it('renders the modal and triggers deleteIdentifier function', async () => {
+    const user = userEvent.setup();
+
     render(
       <DeleteIdentifierConfirmationModal
         deleteIdentifier={mockDeleteIdentifier}
@@ -21,11 +24,11 @@ describe('DeleteIdentifierConfirmationModal component', () => {
     );
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    fireEvent.click(cancelButton);
+    await user.click(cancelButton);
     expect(mockDeleteIdentifier).toHaveBeenCalledWith(false);
 
     const removeButton = screen.getByRole('button', { name: /remove identifier/i });
-    fireEvent.click(removeButton);
+    await user.click(removeButton);
     expect(mockDeleteIdentifier).toHaveBeenCalledWith(true);
   });
 });

@@ -59,7 +59,7 @@
     }, 
     {
       "name": "previous-visit-summary-widget",
-      "component": "previousVisitSummaryWidget",
+      "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
     }, 
     {
@@ -68,7 +68,7 @@
     }, 
     {
       "name": "add-queue-entry-widget",
-      "component": "addQueueEntryWidget",
+      "component": "addQueueEntry",
       "slot": "add-queue-entry-slot"
     }
   ]

@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import {
   StructuredListHead,
   StructuredListCell,
@@ -8,7 +9,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { FormattedEncounter } from './past-visit.component';
+import { type FormattedEncounter } from './past-visit.component';
 import styles from './past-visit.scss';
 
 interface EncounterListProps {
@@ -45,7 +46,9 @@ const EncounterList: React.FC<EncounterListProps> = ({ encounters }) => {
     );
   }
 
-  return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncountersFound', 'No encounters found')}</p>;
+  return (
+    <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noEncountersFound', 'No encounters found')}</p>
+  );
 };
 
 export default EncounterList;

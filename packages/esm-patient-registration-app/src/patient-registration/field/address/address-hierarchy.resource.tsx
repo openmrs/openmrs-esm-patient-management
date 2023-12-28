@@ -1,7 +1,7 @@
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { useField } from 'formik';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useField } from 'formik';
 import useSWRImmutable from 'swr/immutable';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
 interface AddressFields {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import RemoveQueueEntryDialog from './remove-queue-entry.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -31,11 +32,13 @@ describe('RemoveQueueEntryDialog', () => {
     expect(screen.getByText('End visit')).toBeInTheDocument();
   });
 
-  it('calls closeModal when Cancel button is clicked', () => {
+  it('calls closeModal when Cancel button is clicked', async () => {
+    const user = userEvent.setup();
     const closeModal = jest.fn();
+
     render(<RemoveQueueEntryDialog queueEntry={queueEntry} closeModal={closeModal} />);
 
-    fireEvent.click(screen.getByText('Cancel'));
+    await user.click(screen.getByText('Cancel'));
 
     expect(closeModal).toHaveBeenCalledTimes(1);
   });

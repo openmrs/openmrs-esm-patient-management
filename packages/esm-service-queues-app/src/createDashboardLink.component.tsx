@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import classNames from 'classnames';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 export interface DashboardLinkConfig {
   name: string;
@@ -22,16 +23,17 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
 
   return (
     <ConfigurableLink
-      to={`${spaBasePath}/${name}`}
-      className={`cds--side-nav__link ${navLink.match(name) && 'active-left-nav-link'}`}>
+      className={classNames('cds--side-nav__link', {
+        'active-left-nav-link': navLink.match(name),
+      })}
+      to={`${spaBasePath}/${name}`}>
       {t('serviceQueues', 'Service queues')}
     </ConfigurableLink>
   );
 }
 
-export const createDashboardLink = (dashboardLinkConfig: DashboardLinkConfig) => () =>
-  (
-    <BrowserRouter>
-      <DashboardExtension dashboardLinkConfig={dashboardLinkConfig} />
-    </BrowserRouter>
-  );
+export const createDashboardLink = (dashboardLinkConfig: DashboardLinkConfig) => () => (
+  <BrowserRouter>
+    <DashboardExtension dashboardLinkConfig={dashboardLinkConfig} />
+  </BrowserRouter>
+);

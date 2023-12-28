@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import CurrentVisit from './current-visit-summary.component';
+import { render, screen } from '@testing-library/react';
 import { useVisit } from './current-visit.resource';
-import { mockPastVisit } from '../../__mocks__/visits.mock';
+import { mockPastVisit } from '__mocks__';
+import CurrentVisit from './current-visit-summary.component';
 
 const useVisitMock = useVisit as jest.Mock;
 
@@ -24,12 +24,10 @@ describe('CurrentVisit', () => {
   it('renders visit details correctly', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
-    await waitFor(() => {
-      expect(screen.queryByRole('progressbar')).toBeNull();
-      expect(screen.getByText('Visit Type')).toBeInTheDocument();
-      expect(screen.getByText('Scheduled for today')).toBeInTheDocument();
-      expect(screen.getByText('On time')).toBeInTheDocument();
-    });
+    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.getByText('Visit Type')).toBeInTheDocument();
+    expect(screen.getByText('Scheduled for today')).toBeInTheDocument();
+    expect(screen.getByText('On time')).toBeInTheDocument();
   });
   it('should render skeleton when loading', async () => {
     useVisitMock.mockImplementationOnce(() => ({
@@ -40,8 +38,6 @@ describe('CurrentVisit', () => {
 
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
-    await waitFor(() => {
-      expect(screen.getByRole('progressbar')).toBeInTheDocument();
-    });
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 });

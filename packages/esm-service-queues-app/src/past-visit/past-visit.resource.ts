@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 export function usePastVisits(patientUuid: string) {

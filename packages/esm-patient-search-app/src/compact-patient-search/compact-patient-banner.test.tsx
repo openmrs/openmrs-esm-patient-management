@@ -1,4 +1,5 @@
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import PatientSearchResults from './compact-patient-banner.component';
 import { useConfig } from '@openmrs/esm-framework';
@@ -43,11 +44,12 @@ describe('Compact Patient Search Results', () => {
   });
 
   // Fix this test later
-  // it('should call selectPatientAction when a patient is clicked', () => {
+  // const user = userEvent.setup();
+  // it('should call selectPatientAction when a patient is clicked', async () => {
   //   const selectPatientActionMock = jest.fn();
   //   render(<PatientSearchResults patients={patients} selectPatientAction={selectPatientActionMock} />);
 
-  //   fireEvent.click(screen.getByText('John Doe Smith'));
-  //   expect(selectPatientActionMock).toBeCalledWith(patients[0]);
+  //   user.click(screen.getByText('John Doe Smith'));
+  //   expect(selectPatientActionMock).toHaveBeenCalledWith(patients[0]);
   // });
 });

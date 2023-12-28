@@ -1,7 +1,7 @@
-import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
-import { RelationshipValue } from '../../patient-registration.types';
-import useSWR from 'swr';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type RelationshipValue } from '../../patient-registration.types';
 import { personRelationshipRepresentation } from '../../../constants';
 
 export function useInitialPatientRelationships(patientUuid: string): {

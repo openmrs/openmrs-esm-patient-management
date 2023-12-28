@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Layer,
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import { ConfigurableLink, ExtensionSlot, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
-import { FilterTypes } from '../types';
+import { type FilterTypes } from '../types';
 import QueueLinelist from './queue-linelist.component';
 import { getGender } from '../helpers/functions';
 

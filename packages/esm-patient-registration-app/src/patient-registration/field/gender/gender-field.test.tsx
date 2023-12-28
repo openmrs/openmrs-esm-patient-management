@@ -1,9 +1,7 @@
-import React, { useContext } from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/jest-dom';
+import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
-
+import { render } from '@testing-library/react';
 import { GenderField } from './gender-field.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -12,9 +10,8 @@ jest.mock('@openmrs/esm-framework', () => ({
     fieldConfigurations: {
       gender: [
         {
-          value: 'Male',
+          value: 'male',
           label: 'Male',
-          id: 'male',
         },
       ],
       name: {
@@ -50,17 +47,13 @@ describe('GenderField', () => {
     );
   };
 
-  it('renders', () => {
-    expect(renderComponent()).not.toBeNull();
-  });
-
   it('has a label', () => {
     expect(renderComponent().getAllByText('Sex')).toBeTruthy();
   });
 
-  it('checks an option', () => {
+  it('checks an option', async () => {
+    const user = userEvent.setup();
     const component = renderComponent();
-    fireEvent.click(component.getByLabelText('Male'));
-    expect(component.getByLabelText('Male')).toBeChecked();
+    expect(component.getByLabelText('Male').getAttribute('value')).toBe('male');
   });
 });

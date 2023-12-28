@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, type MouseEvent, type AnchorHTMLAttributes } from 'react';
+import classNames from 'classnames';
 import {
   DataTable,
   DataTableSkeleton,
@@ -36,7 +37,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from './visits-missing-inqueue.scss';
 import { getOriginFromPathName } from '../active-visits/active-visits-table.resource';
-import { ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
+import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
 
 interface PaginationData {
@@ -252,7 +253,7 @@ const MissingQueueEntries = () => {
                     height: isDesktop(layout) ? '2rem' : '3rem',
                     margin: '1rem 1.5rem',
                   }}
-                  className={`${styles.emptyRow} ${styles.bodyLong01}`}>
+                  className={classNames(styles.emptyRow, styles.bodyLong01)}>
                   {t('noVisitsNotInQueueFound', 'No visits currently not in queue found')}
                 </p>
               )}

@@ -1,7 +1,8 @@
 import React from 'react';
-import styles from '../visit-detail-overview.scss';
-import { Note } from '../visit.resource';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import type { Note } from '../visit.resource';
+import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {
   notes: Array<Note>;
@@ -15,7 +16,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
       {notes.length > 0 ? (
         notes.map((note, index) => (
           <React.Fragment key={index}>
-            <p className={`${styles.medicationBlock} ${styles.bodyLong01}`} data-testid={'note'}>
+            <p className={classNames(styles.medicationBlock, styles.bodyLong01)} data-testid={'note'}>
               {note.note}
             </p>
             <p className={styles.caption01} style={{ color: '#525252' }}>
@@ -24,7 +25,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
           </React.Fragment>
         ))
       ) : (
-        <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noNotesFound', 'No notes found')}</p>
+        <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noNotesFound', 'No notes found')}</p>
       )}
     </React.Fragment>
   );

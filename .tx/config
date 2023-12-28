@@ -32,8 +32,8 @@ source_file = packages/esm-active-visits-app/translations/en.json
 source_lang = en
 type = KEYVALUEJSON
 
-[openmrs-esm-patient-management.esm-patient-list-app]
-file_filter = packages/esm-patient-list-app/translations/<lang>.json
-source_file = packages/esm-patient-list-app/translations/en.json
+[openmrs-esm-patient-management.esm-patient-list-management-app]
+file_filter = packages/esm-patient-list-management-app/translations/<lang>.json
+source_file = packages/esm-patient-list-management-app/translations/en.json
 source_lang = en
 type = KEYVALUEJSON

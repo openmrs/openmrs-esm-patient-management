@@ -1,4 +1,4 @@
-import { FetchResponse, OpenmrsResource } from '@openmrs/esm-framework';
+import { type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
 export interface SearchedPatient {
   uuid: string;
   identifiers: Array<Identifier>;

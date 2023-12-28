@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../input/basic-input/input/input.component';
 import { SelectInput } from '../../input/basic-input/select/select-input.component';
@@ -11,7 +12,7 @@ export const DeathInfoSection = () => {
 
   return (
     <section className={styles.formSection} aria-label="Death Info Section">
-      <h5 className={`omrs-type-title-5 ${styles.formSectionTitle}`}>Death Info</h5>
+      <h5 className={classNames('omrs-type-title-5', styles.formSectionTitle)}>Death Info</h5>
       <section className={styles.fieldGroup}>
         <Input labelText={t('isDeadInputLabel', 'Is Dead')} name="isDead" id="isDead" />
         {values.isDead && (

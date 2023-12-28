@@ -15,8 +15,11 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  Button,
 } from '@carbon/react';
-import { ExtensionSlot, formatDatetime } from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDate, formatDatetime } from '@openmrs/esm-framework';
+import { downloadAppointmentsAsExcel } from '../../helpers/excel';
+import { Download } from '@carbon/react/icons';
 import styles from './calenar-patient-list.scss';
 import { useAppointments } from '../../appointments/appointments-table.resource';
 
@@ -37,6 +40,10 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
     {
       header: t('patientName', 'Patient name'),
       key: 'name',
+    },
+    {
+      header: t('identifier', 'Identifier'),
+      key: 'identifier',
     },
     {
       header: t('date&Time', 'Date & time'),
@@ -84,6 +91,20 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
                     tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                     onChange={onInputChange}
                   />
+                  <Button
+                    size="lg"
+                    kind="tertiary"
+                    renderIcon={Download}
+                    onClick={() =>
+                      downloadAppointmentsAsExcel(
+                        appointments,
+                        `${serviceName} ${formatDate(new Date(appointments[0]?.dateTime), {
+                          year: true,
+                        })}`,
+                      )
+                    }>
+                    {t('download', 'Download')}
+                  </Button>
                 </TableToolbarContent>
               </TableToolbar>
               <Table>

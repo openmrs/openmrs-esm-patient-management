@@ -1,5 +1,5 @@
 import { FormManager } from './form-manager';
-import { FormValues } from './patient-registration.types';
+import { type FormValues } from './patient-registration.types';
 
 jest.mock('./patient-registration.resource');
 

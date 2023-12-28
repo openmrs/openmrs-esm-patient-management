@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
@@ -80,12 +81,14 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
 
           return (
             <ConfigurableLink
+              className={classNames(styles.patientSearchResult, {
+                [styles.deceased]: isDeceased,
+              })}
+              key={patient.id}
               onClick={(event) => selectPatientAction(event, index, patients)}
               to={`${interpolateString(config.search.patientResultUrl, {
                 patientUuid: patient.id,
-              })}`}
-              key={patient.id}
-              className={`${styles.patientSearchResult} ${isDeceased ? styles.deceased : ''}`}>
+              })}`}>
               <div className={styles.patientAvatar} role="img">
                 <ExtensionSlot
                   name="patient-photo-slot"
@@ -98,9 +101,8 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
               </div>
               <div>
                 <div className={styles.flexRow}>
-                  <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${
-                    patient.name?.[0]?.family
-                  }`}</h2>
+                  <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]
+                    ?.family}`}</h2>
                   {/* <ExtensionSlot
                     name="patient-banner-tags-slot"
                     state={{ patient, patientUuid: patient.id }}

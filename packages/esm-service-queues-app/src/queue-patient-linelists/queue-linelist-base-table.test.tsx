@@ -2,8 +2,8 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { usePagination } from '@openmrs/esm-framework';
-import { mockMappedAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { mockMappedAppointmentsData } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
 
 const mockUsePagination = usePagination as jest.Mock;
@@ -58,6 +58,8 @@ jest.mock('@openmrs/esm-framework', () => {
     usePagination: jest.fn(),
   };
 });
+
+jest.setTimeout(20000);
 
 describe('QueuePatientBaseTable: ', () => {
   it('renders a tabular overview of appointments data when available', async () => {

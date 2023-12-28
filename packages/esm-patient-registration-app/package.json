@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-registration-app",
-  "version": "5.1.0",
+  "version": "5.2.1",
   "description": "Patient registration microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-registration-app.js",
   "main": "src/index.ts",
@@ -38,10 +38,11 @@
   },
   "dependencies": {
     "@carbon/react": "^1.12.0",
+    "core-js-pure": "^3.34.0",
     "formik": "^2.1.5",
     "geopattern": "^1.2.3",
     "lodash-es": "^4.17.15",
-    "react-avatar": "^4.0.0",
+    "react-avatar": "^5.0.3",
     "uuid": "^8.3.2",
     "yup": "^0.29.1"
   },

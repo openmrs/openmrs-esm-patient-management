@@ -15,7 +15,7 @@ import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.co
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
-import { RelationshipValue } from '../../patient-registration.types';
+import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 
@@ -40,7 +40,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { setFieldValue } = React.useContext(PatientRegistrationContext);
-
+  const [isInvalid, setIsInvalid] = useState<boolean>(false);
   const newRelationship = !relationship.uuid;
 
   const handleRelationshipTypeChange = useCallback(
@@ -58,6 +58,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
 
   const handleSuggestionSelected = useCallback(
     (field: string, selectedSuggestion: string) => {
+      setIsInvalid(!selectedSuggestion);
       setFieldValue(field, selectedSuggestion);
     },
     [setFieldValue],
@@ -105,6 +106,8 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
               placeholder={t('relativeNamePlaceholder', 'Firstname Familyname')}
               defaultValue={relationship.relatedPersonName}
               onSuggestionSelected={handleSuggestionSelected}
+              invalid={isInvalid}
+              invalidText={t('relationshipPersonMustExist', 'Related person must be an existing person')}
               getSearchResults={searchPerson}
               getDisplayValue={(item) => item.display}
               getFieldValue={(item) => item.uuid}
@@ -117,7 +120,7 @@ const RelationshipView: React.FC<RelationshipViewProps> = ({
           )}
         </div>
       </div>
-      <div className={`${styles.selectRelationshipType}`} style={{ marginBottom: '1rem' }}>
+      <div className={styles.selectRelationshipType} style={{ marginBottom: '1rem' }}>
         <Layer>
           <Select
             id="select"

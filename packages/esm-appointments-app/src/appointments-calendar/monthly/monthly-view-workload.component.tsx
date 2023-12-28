@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
@@ -22,9 +23,11 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
 
   return (
     <div
-      className={`${styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled']} ${
-        currentData?.service ? styles.greyBackground : ''
-      } ${layout === 'small-desktop' ? styles.smallDesktop : styles.largeDesktop}`}>
+      className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
+        [styles.greyBackground]: currentData?.service,
+        [styles.smallDesktop]: layout === 'small-desktop',
+        [styles.largeDesktop]: layout !== 'small-desktop',
+      })}>
       {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
         <p>
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
@@ -36,7 +39,7 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
                   role="button"
                   tabIndex={0}
                   onClick={() => serviceAreaOnClick(serviceName)}
-                  className={`${styles.serviceArea}`}>
+                  className={styles.serviceArea}>
                   <span>{serviceName}</span>
                   <span>{count}</span>
                 </div>
@@ -45,7 +48,7 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
                 role="button"
                 tabIndex={0}
                 onClick={() => serviceAreaOnClick('Total')}
-                className={`${styles.serviceArea} ${styles.green}`}>
+                className={classNames(styles.serviceArea, styles.green)}>
                 <span>{t('total', 'Total')}</span>
                 <span>{currentData?.service.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
               </div>

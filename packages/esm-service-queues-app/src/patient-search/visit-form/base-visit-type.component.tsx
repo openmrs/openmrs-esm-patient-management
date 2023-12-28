@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
+import { useTranslation } from 'react-i18next';
 import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
-import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, type VisitType } from '@openmrs/esm-framework';
 import EmptyDataIllustration from '../empty-data-illustration.component';
 import styles from './base-visit-type.scss';
 
@@ -33,7 +34,11 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
   const defaultVisitType = results?.length === 1 ? results[0].uuid : '';
 
   return (
-    <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
+    <div
+      className={classNames(styles.visitTypeOverviewWrapper, {
+        [styles.tablet]: isTablet,
+        [styles.desktop]: !isTablet,
+      })}>
       {results.length ? (
         <>
           {isTablet ? (

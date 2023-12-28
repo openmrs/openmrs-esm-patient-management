@@ -1,12 +1,13 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, Tile } from '@carbon/react';
 import { ArrowRight, CircleFilled } from '@carbon/react/icons';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { calculateBMI, assessValue, getReferenceRangesForConcept } from '../current-visit.resource';
 import { useVitalsConceptMetadata } from '../hooks/useVitalsConceptMetadata';
-import { ConfigObject } from '../../config-schema';
-import { PatientVitals } from '../../types/index';
+import { type ConfigObject } from '../../config-schema';
+import { type PatientVitals } from '../../types/index';
 import styles from './triage-note.scss';
 
 interface VitalsComponentProps {
@@ -153,7 +154,7 @@ const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType
               </Button>
             </div>
           ) : (
-            <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noVitalsFound', 'No vitals found')}</p>
+            <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noVitalsFound', 'No vitals found')}</p>
           )}
         </div>
       )}
