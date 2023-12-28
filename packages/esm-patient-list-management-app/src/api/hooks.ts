@@ -14,7 +14,7 @@ import {
 } from './types';
 
 interface PatientListResponse {
-  results: Array<OpenmrsCohort>;
+  results: CohortResponse<OpenmrsCohort>;
   links: Array<{ rel: 'prev' | 'next' }>;
   totalCount: number;
 }
@@ -69,12 +69,18 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData: Array<OpenmrsCohort> = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const patientListsData = (data ? [].concat(...data?.map((res) => res?.data?.results)) : []).map((cohort) => ({
+    id: cohort.uuid,
+    display: cohort.name,
+    description: cohort.description,
+    type: cohort.cohortType?.display,
+    size: cohort.size,
+  }));
   const { user } = useSession();
 
   return {
     patientLists: isStarred
-      ? patientListsData.filter(({ uuid }) => user?.userProperties?.starredPatientLists?.includes(uuid))
+      ? patientListsData.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
       : patientListsData,
     isLoading,
     isValidating,
