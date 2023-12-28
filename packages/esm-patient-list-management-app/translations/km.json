@@ -71,6 +71,7 @@
   "sex": "ភេទ",
   "starred": "បានដាក់សញ្ញាផ្កាយ",
   "starredLists": "បញ្ជីដាក់សញ្ញាផ្កាយ",
+  "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
   "startDate": "ថ្ងៃចាប់ផ្តើម",
   "submitting": "បញ្ជូន",
   "successAddPatientToList": "អ្នកជំងឺត្រូវបានបញ្ចូលទៅក្នុងបញ្ជី",

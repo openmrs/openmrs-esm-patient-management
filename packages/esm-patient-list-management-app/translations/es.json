@@ -72,6 +72,7 @@
   "sex": "Sexo",
   "starred": "marcado",
   "starredLists": "Listas marcadas",
+  "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
   "startDate": "Fecha de inicio",
   "submitting": "Enviando",
   "successAddPatientToList": "Paciente agregado a la lista",
