@@ -309,17 +309,20 @@ function usePatientListStar() {
    * @param cohortUuid
    * @param starPatientList
    */
-  const toggleStarredList = (cohortUuid, starPatientList) => {
-    const newStarredLists = starPatientList
-      ? [...starredLists, cohortUuid]
-      : starredLists.filter((uuid) => uuid !== cohortUuid);
-    setStarredLists(newStarredLists);
-    if (starhandleTimeout) {
-      clearTimeout(starhandleTimeout);
-    }
-    const timeout = setTimeout(() => updateUserProperties(newStarredLists), 1500);
-    setStarHandleTimeout(timeout);
-  };
+  const toggleStarredList = useCallback(
+    (cohortUuid, starPatientList) => {
+      const newStarredLists = starPatientList
+        ? [...starredLists, cohortUuid]
+        : starredLists.filter((uuid) => uuid !== cohortUuid);
+      setStarredLists(newStarredLists);
+      if (starhandleTimeout) {
+        clearTimeout(starhandleTimeout);
+      }
+      const timeout = setTimeout(() => updateUserProperties(newStarredLists), 1500);
+      setStarHandleTimeout(timeout);
+    },
+    [starredLists, starhandleTimeout, setStarredLists, setStarHandleTimeout, updateUserProperties],
+  );
 
   useEffect(() => {
     if (currentUser?.userProperties?.starredPatientLists) {
