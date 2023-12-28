@@ -69,7 +69,7 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = (data ? [].concat(...data?.map((res) => res?.data?.results)) : []).map((cohort) => ({
+  const patientListsData = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map((cohort) => ({
     id: cohort.uuid,
     display: cohort.name,
     description: cohort.description,
