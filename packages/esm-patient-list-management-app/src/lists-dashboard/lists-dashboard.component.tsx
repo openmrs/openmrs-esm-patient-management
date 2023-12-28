@@ -18,36 +18,28 @@ const TabIndices = {
   ALL_LISTS: 3,
 } as const;
 
-function usePatientListFilterForCurrentTab(selectedTab: number, search: string) {
+function usePatientListFilterForCurrentTab(selectedTab: number) {
   const { t } = useTranslation();
 
   return useMemo<PatientListFilter>(() => {
     switch (selectedTab) {
       case TabIndices.STARRED_LISTS:
-        return { isStarred: true, name: search, label: t('starred', 'starred') };
+        return { isStarred: true, label: t('starred', 'starred') };
       case TabIndices.SYSTEM_LISTS:
-        return { type: PatientListType.SYSTEM, name: search, label: t('systemDefined', 'system-defined') };
+        return { type: PatientListType.SYSTEM, label: t('systemDefined', 'system-defined') };
       case TabIndices.MY_LISTS:
-        return { type: PatientListType.USER, name: search, label: t('userDefined', 'user-defined') };
+        return { type: PatientListType.USER, label: t('userDefined', 'user-defined') };
       case TabIndices.ALL_LISTS:
       default:
-        return { name: search, label: '' };
+        return { label: '' };
     }
-  }, [selectedTab, search, t]);
+  }, [selectedTab, t]);
 }
 
 const ListsDashboard: React.FC = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
-  const [searchTerms, setSearchTerms] = useState({
-    [TabIndices.STARRED_LISTS]: '',
-    [TabIndices.SYSTEM_LISTS]: '',
-    [TabIndices.MY_LISTS]: '',
-    [TabIndices.ALL_LISTS]: '',
-  });
-
-  const currentSearchTerm = searchTerms[selectedTab];
-  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab, currentSearchTerm);
+  const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
 
