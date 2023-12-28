@@ -75,6 +75,7 @@
   "sex": "الجنس",
   "starred": "مميز",
   "starredLists": "القوائم المميزة",
+  "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
   "startDate": "تاريخ البداية",
   "submitting": "جاري الإرسال",
   "successAddPatientToList": "تمت إضافة المريض إلى القائمة",

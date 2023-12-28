@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, type FetchResponse, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
 import { type ConfigSchema } from '../config-schema';
 import {
@@ -20,7 +20,6 @@ interface PatientListResponse {
 }
 
 export function useAllPatientLists({ name, isStarred, type }: PatientListFilter) {
-  const [totalResults, setTotalResults] = useState(0);
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
@@ -70,21 +69,23 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const patientListsData = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map((cohort) => ({
+    id: cohort.uuid,
+    display: cohort.name,
+    description: cohort.description,
+    type: cohort.cohortType?.display,
+    size: cohort.size,
+  }));
+  const { user } = useSession();
 
   return {
-    patientLists: patientListsData.map((cohort) => ({
-      id: cohort.uuid,
-      display: cohort.name,
-      description: cohort.description,
-      type: cohort.cohortType?.display,
-      size: cohort.size,
-    })),
+    patientLists: isStarred
+      ? patientListsData.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
+      : patientListsData,
     isLoading,
     isValidating,
     error,
     mutate,
-    totalResults,
   };
 }
 

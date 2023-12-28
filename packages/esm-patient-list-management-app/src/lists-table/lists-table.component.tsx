@@ -1,6 +1,4 @@
-import React, { type CSSProperties, useId, useMemo, useState } from 'react';
-import fuzzy from 'fuzzy';
-import orderBy from 'lodash-es/orderBy';
+import React, { type CSSProperties, useCallback, useId, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -16,19 +14,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Button,
   Tile,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   isDesktop,
+  showToast,
   useConfig,
   useDebounce,
   useLayoutType,
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import { updatePatientList } from '../api/api-remote';
+import fuzzy from 'fuzzy';
+import orderBy from 'lodash-es/orderBy';
+import { starPatientList } from '../api/api-remote';
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
 import { ErrorState } from '../error-state/error-state.component';
@@ -78,15 +80,9 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
   const debouncedSearchTerm = useDebounce(searchTerm);
 
-  const handleToggleStarred = async (patientListId: string, isStarred: boolean) => {
-    if (userId) {
-      await updatePatientList(patientListId, { isStarred });
-      refetch();
-    }
-  };
-
   const { key, order } = sortParams;
   const sortedData = order === 'DESC' ? orderBy(patientLists, [key], ['desc']) : orderBy(patientLists, [key], ['asc']);
+  const { toggleStarredList, starredLists } = usePatientListStar();
 
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
@@ -199,16 +195,11 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
                           case 'isStarred':
                             return (
-                              <TableCell
-                                key={cell.id}
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleToggleStarred(row.id, !cell.value)}>
-                                {cell.value ? (
-                                  <StarFilled size={16} className={styles.interactiveText01} />
-                                ) : (
-                                  <Star size={16} className={styles.interactiveText01} />
-                                )}
-                              </TableCell>
+                              <PatientListStarIcon
+                                cohortUuid={row.id}
+                                isStarred={starredLists.includes(row.id)}
+                                toggleStarredList={toggleStarredList}
+                              />
                             );
 
                           case 'type':
@@ -264,5 +255,82 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
   return <EmptyState launchForm={handleCreate} listType={listType} />;
 };
+
+interface PatientListStarIconProps {
+  cohortUuid: string;
+  isStarred: boolean;
+  toggleStarredList: (cohortUuid: string, starList) => void;
+}
+
+const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, isStarred, toggleStarredList }) => {
+  const isTablet = useLayoutType() === 'tablet';
+
+  return (
+    <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
+      <Button
+        size={isTablet ? 'lg' : 'sm'}
+        kind="ghost"
+        hasIconOnly
+        renderIcon={isStarred ? StarFilled : Star}
+        onClick={() => toggleStarredList(cohortUuid, !isStarred)}
+      />
+    </TableCell>
+  );
+};
+
+function usePatientListStar() {
+  const { t } = useTranslation();
+  const [starredLists, setStarredLists] = useState([]);
+  const [starhandleTimeout, setStarHandleTimeout] = useState(null);
+  const { user: currentUser } = useSession();
+
+  const setInitialStarredLists = useCallback(() => {
+    const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
+    setStarredLists(starredPatientLists.split(','));
+  }, [currentUser?.userProperties?.starredPatientLists, setStarredLists]);
+
+  const updateUserProperties = (newStarredLists: Array<string>) => {
+    const starredPatientLists = newStarredLists.join(',');
+    const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
+
+    starPatientList(currentUser?.uuid, userProperties).catch(() => {
+      setInitialStarredLists();
+      showToast({
+        description: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
+        kind: 'error',
+        title: 'Failed to update patient lists',
+      });
+    });
+  };
+  /**
+   * Handles toggling the starred list
+   * It uses a timeout to store all the changes made by the user
+   * and pass the changes in a single request
+   * @param cohortUuid
+   * @param starPatientList
+   */
+  const toggleStarredList = useCallback(
+    (cohortUuid, starPatientList) => {
+      const newStarredLists = starPatientList
+        ? [...starredLists, cohortUuid]
+        : starredLists.filter((uuid) => uuid !== cohortUuid);
+      setStarredLists(newStarredLists);
+      if (starhandleTimeout) {
+        clearTimeout(starhandleTimeout);
+      }
+      const timeout = setTimeout(() => updateUserProperties(newStarredLists), 1500);
+      setStarHandleTimeout(timeout);
+    },
+    [starredLists, starhandleTimeout, setStarredLists, setStarHandleTimeout, updateUserProperties],
+  );
+
+  useEffect(() => {
+    if (currentUser?.userProperties?.starredPatientLists) {
+      setInitialStarredLists();
+    }
+  }, [currentUser?.userProperties?.starredPatientLists, setInitialStarredLists]);
+
+  return { toggleStarredList, starredLists };
+}
 
 export default ListsTable;
