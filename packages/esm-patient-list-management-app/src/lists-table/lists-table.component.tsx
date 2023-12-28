@@ -281,10 +281,8 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
 function usePatientListStar() {
   const { t } = useTranslation();
   const [starredLists, setStarredLists] = useState([]);
-  console.log(starredLists);
   const [starhandleTimeout, setStarHandleTimeout] = useState(null);
   const { user: currentUser } = useSession();
-  console.log("user starred lists", currentUser?.userProperties?.starredPatientLists);
 
   const setInitialStarredLists = useCallback(() => {
     const starredPatientLists = currentUser?.userProperties?.starredPatientLists ?? '';
@@ -295,15 +293,14 @@ function usePatientListStar() {
     const starredPatientLists = newStarredLists.join(',');
     const userProperties = { ...(currentUser?.userProperties ?? {}), starredPatientLists };
 
-    starPatientList(currentUser?.uuid, userProperties)
-      .catch(() => {
-        setInitialStarredLists();
-        showToast({
-          description: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
-          kind: 'error',
-          title: 'Failed to update patient lists',
-        });
+    starPatientList(currentUser?.uuid, userProperties).catch(() => {
+      setInitialStarredLists();
+      showToast({
+        description: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
+        kind: 'error',
+        title: 'Failed to update patient lists',
       });
+    });
   };
   /**
    * Handles toggling the starred list
