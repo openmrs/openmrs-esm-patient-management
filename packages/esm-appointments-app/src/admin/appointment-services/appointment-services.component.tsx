@@ -8,6 +8,7 @@ import { showNotification, showToast, useLocations } from '@openmrs/esm-framewor
 import type { AppointmentService } from '../../types';
 import { closeOverlay } from '../../hooks/useOverlay';
 import styles from './appointment-services.scss';
+import { appointmentLocationTagName } from '../../constants';
 
 interface AppointmentServicesProps {}
 
@@ -15,7 +16,7 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
   const { t } = useTranslation();
   const { appointmentServiceInitialValue, addNewAppointmentService } = useAppointmentServices();
 
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const handleSubmit = async (values: AppointmentService, helpers: FormikHelpers<AppointmentService>) => {
     const payload = {
       name: values.name,

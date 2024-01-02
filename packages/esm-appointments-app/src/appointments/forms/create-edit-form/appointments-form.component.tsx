@@ -28,7 +28,6 @@ import {
   Toggle,
 } from '@carbon/react';
 import {
-  type ConfigObject,
   ExtensionSlot,
   showNotification,
   showToast,
@@ -55,6 +54,8 @@ import { useInitialAppointmentFormValue, type PatientAppointment } from '../useI
 import LocationSelectOption from '../../common-components/location-select-option.component';
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
+import { appointmentLocationTagName } from '../../../constants';
+import { type ConfigObject } from '../../../config-schema';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -67,7 +68,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
   const { providers } = useProviders();
   const { services } = useServices();
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const sessionUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const initialAppointmentFormValues = useInitialAppointmentFormValue(appointment, patientUuid);

@@ -45,6 +45,7 @@ import { useAppointments } from '../../appointments/appointments-table.resource'
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
 import styles from './visit-form.scss';
+import { appointmentLocationTagName } from '../../constants';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -56,7 +57,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { currentAppointmentDate } = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(sessionUser?.sessionLocation?.uuid ?? '');
