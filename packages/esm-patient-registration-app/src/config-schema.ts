@@ -11,14 +11,14 @@ export interface FieldDefinition {
   type: string;
   label?: string;
   uuid: string;
-  placeholder: string;
+  placeholder?: string;
   showHeading: boolean;
-  validation: {
+  validation?: {
     required: boolean;
     matches?: string;
   };
   answerConceptSetUuid?: string;
-  customConceptAnswers: Array<CustomConceptAnswer>;
+  customConceptAnswers?: Array<CustomConceptAnswer>;
 }
 export interface CustomConceptAnswer {
   uuid: string;
@@ -58,6 +58,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    phone: {
+      personAttributeUuid: string;
+    };
   };
   links: {
     submitButton: string;
@@ -84,7 +87,8 @@ export const builtInSections: Array<SectionDefinition> = [
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
 
-export const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'phone & email'] as const;
+// These fields are handled specially in field.component.tsx
+export const builtInFields = ['name', 'gender', 'dob', 'id', 'address', 'phone'] as const;
 
 export const esmPatientRegistrationSchema = {
   sections: {
@@ -184,17 +188,8 @@ export const esmPatientRegistrationSchema = {
         _description: 'For coded questions only. Provide ability to add custom concept answers.',
       },
     },
-    _default: [
-      {
-        id: 'phone',
-        type: 'person attribute',
-        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-        showHeading: false,
-        validation: {
-          matches: '',
-        },
-      },
-    ],
+    // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
+    _default: [],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
@@ -308,6 +303,13 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
+      },
+    },
+    phone: {
+      personAttributeUuid: {
+        _type: Type.UUID,
+        _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        _description: 'The UUID of the phone number person attribute type',
       },
     },
   },
