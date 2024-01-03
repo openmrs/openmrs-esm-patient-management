@@ -1,4 +1,4 @@
-import React, { useMemo, useState, type MouseEvent, type AnchorHTMLAttributes, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -7,7 +7,6 @@ import {
   DataTableSkeleton,
   DefinitionTooltip,
   Dropdown,
-  Layer,
   Tab,
   Table,
   TableBody,
@@ -33,8 +32,6 @@ import {
 import { Add } from '@carbon/react/icons';
 import {
   useLayoutType,
-  navigate,
-  interpolateUrl,
   isDesktop,
   ExtensionSlot,
   usePagination,
@@ -42,13 +39,9 @@ import {
   type ConfigObject,
   useSession,
   showModal,
+  ConfigurableLink,
 } from '@openmrs/esm-framework';
-import {
-  useVisitQueueEntries,
-  useServices,
-  getOriginFromPathName,
-  type MappedVisitQueueEntry,
-} from './active-visits-table.resource';
+import { useVisitQueueEntries, useServices, type MappedVisitQueueEntry } from './active-visits-table.resource';
 import { SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
@@ -88,29 +81,11 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  to: string;
-  from: string;
-}
-
 interface PaginationData {
   goTo: (page: number) => void;
   results: Array<MappedVisitQueueEntry>;
   currentPage: number;
 }
-
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', from);
-  };
-  return (
-    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {children}
-    </a>
-  );
-};
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
@@ -136,9 +111,6 @@ function ActiveVisitsTable() {
   const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
 
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
-  const currentPathName: string = window.location.pathname;
-  const fromPage: string = getOriginFromPathName(currentPathName);
-
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
   const [overlayHeader, setOverlayTitle] = useState('');
@@ -196,9 +168,7 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
-            {entry.name}
-          </PatientNameLink>
+          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
         ),
       },
       queueNumber: {
