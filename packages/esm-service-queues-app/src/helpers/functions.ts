@@ -17,7 +17,7 @@ export const buildStatusString = (status: string, service: string) => {
     return '';
   }
 
-  return status;
+  return `${status} ${service}`;
 };
 
 export const formatWaitTime = (waitTime: string, t) => {

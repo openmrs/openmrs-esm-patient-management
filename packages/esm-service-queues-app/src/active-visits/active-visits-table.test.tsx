@@ -114,8 +114,8 @@ describe('ActiveVisitsTable: ', () => {
     });
 
     const expectedTableRows = [
-      /Eric Test Ric Not Urgent waiting 206 hours and 2 minutes/,
-      /John Smith Emergency in service 206 hours and 2 minutes/,
+      /Eric Test Ric Not Urgent waiting Triage 206 hours and 2 minutes/,
+      /John Smith Emergency in service Clinical Consultation 206 hours and 2 minutes/,
     ];
 
     expectedTableRows.forEach((row) => {
