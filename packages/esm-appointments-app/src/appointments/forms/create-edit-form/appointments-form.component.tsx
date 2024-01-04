@@ -90,7 +90,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   );
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
-  const today = dayjs().startOf('day').format();
+  const today = dayjs().startOf('day').format('DD/MM/YYYY');
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
