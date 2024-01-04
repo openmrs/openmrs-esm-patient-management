@@ -17,13 +17,7 @@ export const buildStatusString = (status: string, service: string) => {
     return '';
   }
 
-  if (status === 'waiting') {
-    return `${status} for ${service}`;
-  } else if (status === 'in service') {
-    return `Attending ${service}`;
-  } else if (status === 'finished service') {
-    return `Finished ${service}`;
-  }
+  return status;
 };
 
 export const formatWaitTime = (waitTime: string, t) => {
