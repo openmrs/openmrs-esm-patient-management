@@ -203,7 +203,7 @@ function ActiveVisitsTable() {
         content: (
           <span className={styles.statusContainer}>
             <StatusIcon status={entry.status.toLowerCase()} />
-            <span>{buildStatusString(entry.status.toLowerCase(), entry.service)}</span>
+            <span>{buildStatusString(entry.status, entry.service)}</span>
           </span>
         ),
       },
