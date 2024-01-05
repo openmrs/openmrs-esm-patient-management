@@ -21,7 +21,7 @@ import { Star, StarFilled } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   isDesktop,
-  showToast,
+  showSnackbar,
   useConfig,
   useDebounce,
   useLayoutType,
@@ -295,8 +295,8 @@ function usePatientListStar() {
 
     starPatientList(currentUser?.uuid, userProperties).catch(() => {
       setInitialStarredLists();
-      showToast({
-        description: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
+      showSnackbar({
+        subtitle: t('starringPatientListFailed', 'Marking patient lists starred / unstarred failed'),
         kind: 'error',
         title: 'Failed to update patient lists',
       });

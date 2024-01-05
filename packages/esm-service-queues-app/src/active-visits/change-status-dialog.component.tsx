@@ -14,7 +14,7 @@ import {
   RadioButtonGroup,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type ConfigObject, navigate, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
 import {
   updateQueueEntry,
@@ -68,11 +68,11 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       ).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
-              critical: true,
+            showSnackbar({
+              isLowContrast: true,
               title: t('updateEntry', 'Update entry'),
               kind: 'success',
-              description: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
+              subtitle: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
             });
             closeModal();
             mutate();
@@ -80,11 +80,10 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('queueEntryStatusUpdateFailed', 'Error updating queue entry status'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            subtitle: error?.message,
           });
         },
       );
