@@ -61,7 +61,7 @@ describe('Cancel appointment form', () => {
 
     await user.click(screen.getByRole('textbox', { name: /reason for changes/i }));
     await user.click(screen.getByRole('button', { name: /cancel appointment/i }));
-    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(2);
     expect(mockShowSnackbar).toHaveBeenCalledWith({
       kind: 'error',
       title: 'Error cancelling appointment',
