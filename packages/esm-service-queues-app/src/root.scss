@@ -13,3 +13,7 @@
 .bodyLong01 {
   @include type.type-style('body-01');
 }
+
+.navlinkIcon {
+  margin-top: spacing.$spacing-04;
+}

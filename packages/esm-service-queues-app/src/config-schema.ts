@@ -138,6 +138,11 @@ export const configSchema = {
     _default: '',
     _description: 'Custom label for patient chart button',
   },
+  showDashboardLinkIcon: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Whether to show icons in the dashboard links',
+  },
 };
 
 export interface ConfigObject {
@@ -170,6 +175,7 @@ export interface ConfigObject {
   customPatientIdUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
+  showDashboardLinkIcon: boolean;
 }
 
 export interface OutpatientConfig {
