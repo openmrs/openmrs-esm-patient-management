@@ -4,7 +4,7 @@ import styles from './clear-queue-entries-dialog.scss';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
-import { MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 
 interface ClearQueueEntriesDialogProps {
   visitQueueEntries: Array<MappedVisitQueueEntry>;

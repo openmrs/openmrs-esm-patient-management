@@ -334,12 +334,12 @@ export const mockPatient = {
   phoneNumber: '0700000000',
 };
 
-export const mockServices = [
+export const mockAppointmentServices = [
   { uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'Clinical consultation' },
   { uuid: 'd80ff12a-06a7-11ed-b939-0242ac120002', display: 'Triage' },
 ];
 
-export const mockServiceTypes = {
+export const mockAppointmentServiceTypes = {
   data: [
     {
       name: 'HIV Clinic',

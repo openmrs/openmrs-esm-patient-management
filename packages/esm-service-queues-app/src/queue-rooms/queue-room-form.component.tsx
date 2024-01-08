@@ -13,7 +13,7 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { SearchTypes } from '../types';
+import { type SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { useServices } from '../active-visits/active-visits-table.resource';

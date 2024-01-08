@@ -3,7 +3,7 @@ import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { launchOverlay } from '../../hooks/useOverlay';
 import VisitForm from '../../patient-queue/visit-form/visit-form.component';
-import { MappedAppointment } from '../../types';
+import { type MappedAppointment } from '../../types';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';

@@ -15,7 +15,7 @@ import {
 import { mutate } from 'swr';
 import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { SearchTypes } from '../types';
+import { type SearchTypes } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 

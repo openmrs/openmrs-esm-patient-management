@@ -15,7 +15,7 @@ import {
   TableExpandedRow,
 } from '@carbon/react';
 import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
-import { Observation } from '../visit.resource';
+import { type Observation } from '../visit.resource';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 

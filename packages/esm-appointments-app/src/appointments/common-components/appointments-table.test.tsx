@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { MappedAppointment } from '../../types';
+import { type MappedAppointment } from '../../types';
 import { usePagination } from '@openmrs/esm-framework';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import { launchOverlay } from '../../hooks/useOverlay';

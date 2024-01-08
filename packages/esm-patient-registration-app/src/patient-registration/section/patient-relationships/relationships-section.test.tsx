@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { RelationshipsSection } from './relationships-section.component';
 
 jest.mock('../../patient-registration.resource', () => ({
@@ -17,7 +17,7 @@ jest.mock('../../patient-registration.resource', () => ({
 }));
 
 let mockResourcesContextValue = {
-  addressTemplate: [],
+  addressTemplate: null,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
@@ -40,7 +40,7 @@ describe('RelationshipsSection', () => {
     );
 
     expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
-    expect(screen.getByRole(/progressbar/i)).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/add relationship/i)).not.toBeInTheDocument();
   });
 

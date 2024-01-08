@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, useCallback, type MouseEvent, type AnchorHTMLAttributes } from 'react';
 import {
   DataTable,
   DataTableSkeleton,
@@ -25,18 +25,12 @@ import {
   useConfig,
   usePagination,
   ExtensionSlot,
-  interpolateUrl,
-  navigate,
   ErrorState,
+  ConfigurableLink,
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { useActiveVisits, getOriginFromPathName } from './active-visits.resource';
 import styles from './active-visits.scss';
-
-interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  to: string;
-  from: string;
-}
 
 function ComputeExpensiveValue(t, config) {
   let headersIndex = 0;
@@ -99,19 +93,6 @@ function ComputeExpensiveValue(t, config) {
   return headers;
 }
 
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', from);
-  };
-  return (
-    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {children}
-    </a>
-  );
-};
-
 const ActiveVisitsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
@@ -120,10 +101,6 @@ const ActiveVisitsTable = () => {
   const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const { activeVisits, isLoading, isValidating, error } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
-
-  const currentPathName = window.location.pathname;
-  const fromPage = getOriginFromPathName(currentPathName);
-
   const headerData = useMemo(() => ComputeExpensiveValue(t, config), [config, t]);
 
   const searchResults = useMemo(() => {
@@ -261,9 +238,7 @@ const ActiveVisitsTable = () => {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id} data-testid={cell.id}>
                               {cell.info.header === 'name' && visit.patientUuid ? (
-                                <PatientNameLink from={fromPage} to={patientLink}>
-                                  {cell.value}
-                                </PatientNameLink>
+                                <ConfigurableLink to={patientLink}>{cell.value}</ConfigurableLink>
                               ) : (
                                 cell.value
                               )}

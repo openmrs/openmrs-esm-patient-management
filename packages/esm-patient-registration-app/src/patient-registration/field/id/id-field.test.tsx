@@ -2,11 +2,10 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { Identifiers } from './id-field.component';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { openmrsID } from '../__mocks__/identifiers.mock';
-import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
+import { openmrsID, mockedIdentifierTypes } from '__mocks__';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -17,7 +16,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 describe('Identifiers', () => {
   const mockResourcesContextValue = {
-    addressTemplate: [],
+    addressTemplate: {},
     currentSession: {
       authenticated: true,
       sessionId: 'JSESSION',

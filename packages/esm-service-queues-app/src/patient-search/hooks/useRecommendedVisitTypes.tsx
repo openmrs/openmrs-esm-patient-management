@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject, OutpatientConfig } from '../../config-schema';
+import { type ConfigObject, type OutpatientConfig } from '../../config-schema';
 import { useMemo } from 'react';
 
 interface EnrollmentVisitType {

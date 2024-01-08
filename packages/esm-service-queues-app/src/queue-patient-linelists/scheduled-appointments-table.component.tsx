@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   Layer,
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
 } from '@carbon/react';
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import {
-  ConfigObject,
+  type ConfigObject,
   ExtensionSlot,
   formatDatetime,
   useConfig,

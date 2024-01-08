@@ -1,6 +1,6 @@
 import { openmrsFetch, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
 import { generateVisitQueueNumber } from '../../active-visits/active-visits-table.resource';
-import { Appointment } from '../../types';
+import { type Appointment } from '../../types';
 
 export async function addQueueEntry(
   visitUuid: string,

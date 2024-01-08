@@ -7,8 +7,8 @@ import {
   StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
-import { OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
-import { Note, Encounter, Observation, DiagnosisItem } from '../../types/index';
+import { type OpenmrsResource, formatTime, parseDate } from '@openmrs/esm-framework';
+import { type Note, type Encounter, type Observation, type DiagnosisItem } from '../../types/index';
 import { useVitalsFromObs } from '../hooks/useVitalsConceptMetadata';
 import TriageNote from './triage-note.component';
 import Vitals from './vitals.component';

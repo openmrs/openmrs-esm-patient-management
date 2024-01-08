@@ -1,12 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
+import { renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { mockPatientsVisits, mockLocations, mockSession, mockPatient } from '__mocks__';
+import { type ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { mockPatientsVisits } from '../../../../__mocks__/patient-visits.mock';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
-import { ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/appointments.mock';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockToggleSearchType = jest.fn();

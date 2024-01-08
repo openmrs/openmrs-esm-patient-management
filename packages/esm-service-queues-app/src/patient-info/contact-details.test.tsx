@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { renderWithSwr } from '../../../../tools/test-helpers';
+import { renderWithSwr } from 'tools';
 import { usePatientAttributes, usePatientContactAttributes } from './hooks/usePatientAttributes';
 import ContactDetails from './contact-details.component';
 

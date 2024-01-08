@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/appointments.mock';
+import { mockPatient } from '__mocks__';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
 
 describe('EditPatientDetailsButton', () => {

@@ -1,4 +1,4 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface Location {
   uuid: string;

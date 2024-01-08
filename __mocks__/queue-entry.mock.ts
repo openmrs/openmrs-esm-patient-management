@@ -18,6 +18,8 @@ export const mockQueueEntry = {
   visitType: 'Facility Visit',
   visitUuid: 'b90d8438-a0db-4318-a57e-cda773b21433',
   waitTime: '12362',
+  queueLocation: 'Triage',
+  sortWeight: '0',
 };
 
 export const mockMappedQueueEntries = {
