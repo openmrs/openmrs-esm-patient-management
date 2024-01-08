@@ -47,8 +47,20 @@ describe('RelationshipsSection', () => {
   it('renders relationships when relationshipTypes are available', () => {
     const relationshipTypes = {
       results: [
-        { aIsToB: 'Mother', bIsToA: 'Child', uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd34' },
-        { aIsToB: 'Father', bIsToA: 'Child', uuid: '52ae5ce0-d64b-11ea-9064-5adc43bbdd24' },
+        {
+          displayAIsToB: 'Mother',
+          aIsToB: 'Mother',
+          bIsToA: 'Child',
+          displayBIsToA: 'Child',
+          uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd34',
+        },
+        {
+          displayAIsToB: 'Father',
+          aIsToB: 'Father',
+          bIsToA: 'Child',
+          displayBIsToA: 'Child',
+          uuid: '52ae5ce0-d64b-11ea-9064-5adc43bbdd24',
+        },
       ],
     };
     mockResourcesContextValue = {

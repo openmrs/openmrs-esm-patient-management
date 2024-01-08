@@ -168,12 +168,12 @@ export const RelationshipsSection = () => {
       const tmp: RelationshipType[] = [];
       relationshipTypes.results.forEach((type) => {
         const aIsToB = {
-          display: type.displayAIsToB ? type.displayAIsToB : type.aIsToB,
+          display: type.displayAIsToB ? type.displayAIsToB : type.displayBIsToA,
           uuid: type.uuid,
           direction: 'aIsToB',
         };
         const bIsToA = {
-          display: type.displayBIsToA ? type.displayBIsToA : type.bIsToA,
+          display: type.displayBIsToA ? type.displayBIsToA : type.displayAIsToB,
           uuid: type.uuid,
           direction: 'bIsToA',
         };
