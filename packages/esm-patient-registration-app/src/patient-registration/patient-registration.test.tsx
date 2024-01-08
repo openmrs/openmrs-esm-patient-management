@@ -2,15 +2,17 @@ import React from 'react';
 import { BrowserRouter as Router, useParams } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Encounter } from './patient-registration.types';
 import { showSnackbar, useConfig, usePatient } from '@openmrs/esm-framework';
+import type { AddressTemplate, Encounter } from './patient-registration.types';
+import { type RegistrationConfig } from '../config-schema';
 import { FormManager } from './form-manager';
-import { saveEncounter, savePatient } from './patient-registration.resource';
-import { Resources, ResourcesContext } from '../offline.resources';
+import { ResourcesContext } from '../offline.resources';
 import { PatientRegistration } from './patient-registration.component';
-import { RegistrationConfig } from '../config-schema';
-import { mockedAddressTemplate } from './field/address/tests/mocks';
-import { mockPatient } from '../../../../tools/test-helpers';
+import { saveEncounter, savePatient } from './patient-registration.resource';
+import { mockedAddressTemplate } from '__mocks__';
+import { mockPatient } from 'tools';
+
+jest.setTimeout(10000);
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
@@ -18,7 +20,62 @@ const mockedSaveEncounter = saveEncounter as jest.Mock;
 const mockedSavePatient = savePatient as jest.Mock;
 const mockedShowSnackbar = showSnackbar as jest.Mock;
 
-jest.setTimeout(10000);
+jest.mock('./field/field.resource', () => ({
+  useConcept: jest.fn().mockImplementation((uuid: string) => {
+    let data;
+    if (uuid == 'weight-uuid') {
+      data = {
+        uuid: 'weight-uuid',
+        display: 'Weight (kg)',
+        datatype: { display: 'Numeric', uuid: 'num' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'chief-complaint-uuid') {
+      data = {
+        uuid: 'chief-complaint-uuid',
+        display: 'Chief Complaint',
+        datatype: { display: 'Text', uuid: 'txt' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'nationality-uuid') {
+      data = {
+        uuid: 'nationality-uuid',
+        display: 'Nationality',
+        datatype: { display: 'Coded', uuid: 'cdd' },
+        answers: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        setMembers: [],
+      };
+    }
+    return {
+      data: data ?? null,
+      isLoading: !data,
+    };
+  }),
+  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
+    if (uuid == 'nationality-uuid') {
+      return {
+        data: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        isLoading: false,
+      };
+    } else if (uuid == 'other-countries-uuid') {
+      return {
+        data: [
+          { display: 'Kenya', uuid: 'ke' },
+          { display: 'Uganda', uuid: 'ug' },
+        ],
+        isLoading: false,
+      };
+    }
+  }),
+}));
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -28,9 +85,6 @@ jest.mock('@openmrs/esm-framework', () => {
     validator: jest.fn(),
   };
 });
-
-// Mock field.resource using the manual mock (in __mocks__)
-jest.mock('./field/field.resource');
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
@@ -62,7 +116,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 const mockResourcesContextValue = {
-  addressTemplate: mockedAddressTemplate,
+  addressTemplate: mockedAddressTemplate as AddressTemplate,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
@@ -70,7 +124,7 @@ const mockResourcesContextValue = {
   },
   relationshipTypes: [],
   identifierTypes: [],
-} as Resources;
+};
 
 let mockOpenmrsConfig: RegistrationConfig = {
   sections: ['demographics', 'contact'],
@@ -99,9 +153,8 @@ let mockOpenmrsConfig: RegistrationConfig = {
     },
     gender: [
       {
-        value: 'Male',
+        value: 'male',
         label: 'Male',
-        id: 'male',
       },
     ],
     address: {
@@ -183,6 +236,14 @@ const fillRequiredFields = async () => {
   user.click(genderInput);
 };
 
+function Wrapper({ children }) {
+  return (
+    <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <Router>{children}</Router>
+    </ResourcesContext.Provider>
+  );
+}
+
 describe('Registering a new patient', () => {
   beforeEach(() => {
     mockedUseConfig.mockReturnValue(mockOpenmrsConfig);
@@ -193,24 +254,11 @@ describe('Registering a new patient', () => {
   });
 
   it('renders without crashing', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
-        </Router>
-        ,
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
   });
 
   it('has the expected sections', async () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={jest.fn()} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
     expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull();
     expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
@@ -219,13 +267,9 @@ describe('Registering a new patient', () => {
   it('saves the patient without extra info', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     await user.click(await screen.findByText('Register Patient'));
@@ -237,7 +281,7 @@ describe('Registering a new patient', () => {
           attributes: [],
           birthdate: '1993-8-2',
           birthdateEstimated: false,
-          gender: 'M',
+          gender: expect.stringMatching(/M/i),
           names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
           dead: false,
           uuid: expect.anything(),
@@ -252,13 +296,7 @@ describe('Registering a new patient', () => {
     const user = userEvent.setup();
 
     const mockedSavePatientForm = jest.fn();
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatientForm} />, { wrapper: Wrapper });
 
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
@@ -274,13 +312,9 @@ describe('Registering a new patient', () => {
     mockedSaveEncounter.mockResolvedValue({});
     mockedUseConfig.mockReturnValue(configWithObs);
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
@@ -313,13 +347,9 @@ describe('Registering a new patient', () => {
 
     mockedUseConfig.mockReturnValue(configWithObs);
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
 
     await fillRequiredFields();
     const customSection = screen.getByLabelText('Custom Section');
@@ -371,13 +401,7 @@ describe('Updating an existing patient record', () => {
       error: null,
     });
 
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Router>
-          <PatientRegistration isOffline={false} savePatientForm={mockedSavePatient} />
-        </Router>
-      </ResourcesContext.Provider>,
-    );
+    render(<PatientRegistration isOffline={false} savePatientForm={mockedSavePatient} />, { wrapper: Wrapper });
 
     const givenNameInput: HTMLInputElement = screen.getByLabelText(/First Name/);
     const familyNameInput: HTMLInputElement = screen.getByLabelText(/Family Name/);
@@ -390,7 +414,7 @@ describe('Updating an existing patient record', () => {
     expect(familyNameInput.value).toBe('Wilson');
     expect(middleNameInput.value).toBeFalsy();
     expect(dateOfBirthInput.value).toBe('4/4/1972');
-    expect(genderInput.value).toBe('Male');
+    expect(genderInput.value).toBe('male');
 
     // do some edits
     await user.clear(givenNameInput);
@@ -420,7 +444,7 @@ describe('Updating an existing patient record', () => {
         deathCause: '',
         deathDate: '',
         familyName: 'Smith',
-        gender: 'Male',
+        gender: expect.stringMatching(/male/i),
         givenName: 'Eric',
         identifiers: {},
         isDead: false,

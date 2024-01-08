@@ -39,7 +39,7 @@ import {
 } from '@openmrs/esm-framework';
 import { useAppointmentDate, convertTime12to24 } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
-import { MappedAppointment, AppointmentPayload } from '../../../types';
+import { type MappedAppointment, type AppointmentPayload } from '../../../types';
 import {
   saveAppointment,
   toAppointmentDateTime,
@@ -47,14 +47,15 @@ import {
   useProviders,
   useServices,
 } from '../forms.resource';
-import { useInitialAppointmentFormValue, PatientAppointment } from '../useInitialFormValues';
+import { useAppointmentList } from '../../../hooks/useAppointmentList';
 import { useCalendarDistribution } from '../workload-helper';
 import { useDefaultLoginLocation } from '../../../hooks/useDefaultLocation';
+import { useInitialAppointmentFormValue, type PatientAppointment } from '../useInitialFormValues';
 import LocationSelectOption from '../../common-components/location-select-option.component';
 import WorkloadCard from '../workload.component';
 import styles from './appointments-form.scss';
-import { useAppointmentList } from '../../../hooks/useAppointmentList';
-import { ConfigObject } from '../../../config-schema';
+import { appointmentLocationTagName } from '../../../constants';
+import { type ConfigObject } from '../../../config-schema';
 
 interface AppointmentFormProps {
   appointment?: MappedAppointment;
@@ -67,7 +68,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
   const { providers } = useProviders();
   const { services } = useServices();
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const sessionUser = useSession();
   const isTablet = useLayoutType() === 'tablet';
   const initialAppointmentFormValues = useInitialAppointmentFormValue(appointment, patientUuid);
@@ -89,7 +90,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   );
 
   const appointmentService = services?.find(({ uuid }) => uuid === patientAppointment.serviceUuid);
-  const today = dayjs().startOf('day').format();
+  const today = dayjs().startOf('day').format('DD/MM/YYYY');
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
@@ -185,7 +186,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
                 id="location"
                 invalidText="Required"
                 value={selectedLocation}
-                defaultSelected={selectedLocation}
+                defaultValue={selectedLocation}
                 onChange={(event) => setSelectedLocation(event.target.value)}>
                 <LocationSelectOption
                   selectedLocation={selectedLocation}

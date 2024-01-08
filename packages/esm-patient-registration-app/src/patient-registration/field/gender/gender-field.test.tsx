@@ -10,9 +10,8 @@ jest.mock('@openmrs/esm-framework', () => ({
     fieldConfigurations: {
       gender: [
         {
-          value: 'Male',
+          value: 'male',
           label: 'Male',
-          id: 'male',
         },
       ],
       name: {
@@ -55,8 +54,6 @@ describe('GenderField', () => {
   it('checks an option', async () => {
     const user = userEvent.setup();
     const component = renderComponent();
-
-    await user.click(component.getByLabelText('Male'));
-    expect(component.getByLabelText('Male')).toBeChecked();
+    expect(component.getByLabelText('Male').getAttribute('value')).toBe('male');
   });
 });

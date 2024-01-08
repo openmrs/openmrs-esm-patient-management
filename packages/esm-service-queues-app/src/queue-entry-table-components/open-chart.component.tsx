@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConfigObject, navigate, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, navigate, useConfig } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
 import styles from './open-chart.scss';
 import usePatientId from './open-chart.resource';

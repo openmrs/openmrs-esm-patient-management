@@ -99,3 +99,12 @@
 .patientListResultsTableContainer {
   margin: spacing.$spacing-03;
 }
+
+.starButton {
+  :global(.cds--popover) {
+    display: none;
+  }
+  :global(.cds--btn--ghost:not([disabled])) svg {
+    fill: $interactive-01;
+  }
+}

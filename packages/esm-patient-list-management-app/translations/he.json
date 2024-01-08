@@ -73,6 +73,7 @@
   "sex": "מין",
   "starred": "מסומן",
   "starredLists": "רשימות מסומנות",
+  "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
   "startDate": "תאריך התחלה",
   "submitting": "מגיב",
   "successAddPatientToList": "המטופל נוסף לרשימה",

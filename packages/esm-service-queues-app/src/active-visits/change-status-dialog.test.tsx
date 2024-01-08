@@ -1,12 +1,8 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { mockServices } from '../../__mocks__/active-visits.mock';
-import { mockPriorities, mockStatus } from '../../../../__mocks__/metrics.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { ConfigObject, showToast, useConfig, showNotification } from '@openmrs/esm-framework';
-import { mockQueueEntry } from '../../../../__mocks__/queue-entry.mock';
+import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockQueueEntry } from '__mocks__';
+import { type ConfigObject, showToast, useConfig, showNotification } from '@openmrs/esm-framework';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
 
@@ -15,8 +11,8 @@ const mockShowToast = showToast as jest.Mock;
 const mockUpdateQueueEntry = updateQueueEntry as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('./active-visits-table.resource.ts', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource.ts');
+jest.mock('./active-visits-table.resource', () => {
+  const originalModule = jest.requireActual('./active-visits-table.resource');
 
   return {
     ...originalModule,

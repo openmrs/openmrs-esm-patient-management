@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
-import { SearchedPatient } from '../types';
+import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 
 interface CommonProps {

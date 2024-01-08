@@ -5,16 +5,16 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { useTranslation } from 'react-i18next';
 import {
-  FetchResponse,
+  type FetchResponse,
   formatDate,
   openmrsFetch,
   parseDate,
   toDateObjectStrict,
   toOmrsIsoString,
   useConfig,
-  Visit,
+  type Visit,
 } from '@openmrs/esm-framework';
-import { Identifer, MappedServiceQueueEntry, QueueServiceInfo } from '../types';
+import { type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
 

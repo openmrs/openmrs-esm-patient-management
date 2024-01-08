@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../../constants';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
 import DailyWorkloadView from './daily-view-workload.component';
 
 jest.mock('@openmrs/esm-framework', () => ({

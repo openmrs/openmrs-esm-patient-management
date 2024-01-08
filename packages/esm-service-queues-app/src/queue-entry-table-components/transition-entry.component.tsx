@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import { Button } from '@carbon/react';
 import { Notification } from '@carbon/react/icons';
 import { showModal, showNotification } from '@openmrs/esm-framework';
-import { MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './transition-entry.scss';
 interface TransitionMenuProps {
   queueEntry: MappedVisitQueueEntry;

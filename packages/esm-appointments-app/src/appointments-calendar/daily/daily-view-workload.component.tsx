@@ -6,7 +6,7 @@ import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { spaBasePath } from '../../constants';
 import { isSameMonth } from '../../helpers';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
 
 interface WeeklyCellProps {
   type: CalendarType;
@@ -30,8 +30,8 @@ const DailyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, currentD
           type === 'daily'
             ? 'weekly-cell'
             : isSameMonth(dateTime, currentDate)
-            ? 'monthly-cell'
-            : 'monthly-cell-disabled'
+              ? 'monthly-cell'
+              : 'monthly-cell-disabled'
         ]
       }>
       {type === 'daily' ? (

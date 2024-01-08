@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConfigObject, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
 import ActiveVisitsTable from './active-visits/active-visits-table.component';
 import ActiveVisitsTabs from './active-visits/active-visits-tab.component';
 import ClinicMetrics from './patient-queue-metrics/clinic-metrics.component';

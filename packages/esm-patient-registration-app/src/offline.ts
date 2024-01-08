@@ -4,7 +4,7 @@ import {
   navigate,
   setupDynamicOfflineDataHandler,
   setupOfflineSync,
-  SyncProcessOptions,
+  type SyncProcessOptions,
 } from '@openmrs/esm-framework';
 import { patientRegistration, personRelationshipRepresentation } from './constants';
 import {
@@ -15,7 +15,7 @@ import {
   fetchPatientIdentifierTypesWithSources,
 } from './offline.resources';
 import { FormManager } from './patient-registration/form-manager';
-import { PatientRegistration } from './patient-registration/patient-registration.types';
+import { type PatientRegistration } from './patient-registration/patient-registration.types';
 
 export function setupOffline() {
   setupOfflineSync(patientRegistration, [], syncPatientRegistration, {

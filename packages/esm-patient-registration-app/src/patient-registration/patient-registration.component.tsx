@@ -4,18 +4,18 @@ import { Button, Link, InlineLoading } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Formik, Form, FormikHelpers } from 'formik';
+import { Formik, Form, type FormikHelpers } from 'formik';
 import { createErrorHandler, showSnackbar, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
-import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration.types';
+import { getValidationSchema } from './validation/patient-registration-validation';
+import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
-import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
+import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
@@ -32,7 +32,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
-  const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
@@ -46,6 +45,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
+  const validationSchema = getValidationSchema(config);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -194,7 +194,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 value={{
                   identifierTypes: identifierTypes,
                   validationSchema,
-                  setValidationSchema,
                   values: props.values,
                   inEditMode,
                   setFieldValue: props.setFieldValue,

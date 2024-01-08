@@ -1,24 +1,24 @@
 import {
-  FetchResponse,
-  OpenmrsResource,
+  type FetchResponse,
+  type OpenmrsResource,
   getSynchronizationItems,
   openmrsFetch,
   useConfig,
   usePatient,
 } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
-import { Dispatch, useEffect, useMemo, useState } from 'react';
+import { type Dispatch, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import { v4 } from 'uuid';
-import { RegistrationConfig } from '../config-schema';
+import { type RegistrationConfig } from '../config-schema';
 import { patientRegistration } from '../constants';
 import {
-  FormValues,
-  PatientRegistration,
-  PatientUuidMapType,
-  PersonAttributeResponse,
-  PatientIdentifierResponse,
-  Encounter,
+  type FormValues,
+  type PatientRegistration,
+  type PatientUuidMapType,
+  type PersonAttributeResponse,
+  type PatientIdentifierResponse,
+  type Encounter,
 } from './patient-registration.types';
 import {
   getAddressFieldValuesFromFhirPatient,

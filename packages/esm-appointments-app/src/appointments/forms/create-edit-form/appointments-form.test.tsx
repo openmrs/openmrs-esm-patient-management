@@ -1,10 +1,8 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
-import { mockPatient, mockServices, mockProviders } from '../../../../../../__mocks__/appointments.mock';
-import { mockLocations } from '../../../../../../__mocks__/locations.mock';
-import { mockSession } from '../../../../../../__mocks__/session.mock';
-import { MappedAppointment } from '../../../types';
+import { mockLocations, mockSession, mockPatient, mockServices, mockProviders } from '__mocks__';
+import { type MappedAppointment } from '../../../types';
 import AppointmentForm from './appointments-form.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
@@ -14,8 +12,8 @@ function renderAppointmentsForm(context: string, patientUuid?: string, appointme
   render(<AppointmentForm patientUuid={patientUuid} context={context} appointment={appointment} />);
 }
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,
@@ -43,6 +41,7 @@ const mockedConfig = {
 
 describe('AppointmentForm', () => {
   const patient = mockPatient;
+
   beforeEach(() => {
     mockedUseConfig.mockReturnValue(mockedConfig);
     mockedUsePatient.mockReturnValue({
@@ -53,14 +52,17 @@ describe('AppointmentForm', () => {
     });
   });
 
-  it('renders details of the correct patient in the patient banner', () => {
+  it('renders details of the correct patient in the patient banner', async () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
 
+    await screen.findByText(/date and time/i);
     expect(screen.getByText(/Date and time/i)).toBeInTheDocument();
   });
 
-  it('renders the form with all expected inputs in create mode', () => {
+  it('renders the form with all expected inputs in create mode', async () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
+
+    await screen.findByLabelText(/select a location/i);
 
     expect(screen.getByRole('combobox', { name: /select a location/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /select a service/i })).toBeInTheDocument();
@@ -68,8 +70,11 @@ describe('AppointmentForm', () => {
     expect(screen.getByRole('combobox', { name: /select a provider/i })).toBeInTheDocument();
   });
 
-  it('renders the expected appointment types', () => {
+  it('renders the expected appointment types', async () => {
     renderAppointmentsForm('creating', mockPatient.uuid);
+
+    await screen.findByLabelText(/select an appointment type/i);
+
     const appointmentTypeSelect = screen.getByLabelText('Select an appointment type');
 
     expect(within(appointmentTypeSelect).getAllByRole('option')).toHaveLength(3);
