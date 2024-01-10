@@ -281,7 +281,7 @@ describe('Registering a new patient', () => {
           attributes: [],
           birthdate: '1993-8-2',
           birthdateEstimated: false,
-          gender: expect.stringMatching(/M/i),
+          gender: expect.stringMatching(/^M$/),
           names: [{ givenName: 'Paul', middleName: '', familyName: 'Gaihre', preferred: true, uuid: undefined }],
           dead: false,
           uuid: expect.anything(),
