@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
-import type { PatientSearchResponse, SearchedPatient } from '../types';
+import type { PatientSearchResponse } from '../types';
 import styles from './patient-search.scss';
 
 interface PatientSearchProps extends PatientSearchResponse {
