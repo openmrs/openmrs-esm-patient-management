@@ -134,6 +134,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           title: t('incompleteForm', 'The following field has errors:'),
           kind: 'warning',
           isLowContrast: true,
+          timeoutInMs: 5000,
         });
       });
     }
