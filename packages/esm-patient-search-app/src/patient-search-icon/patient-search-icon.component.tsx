@@ -92,7 +92,7 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
               className={styles.activeSearchIconButton}
               enterDelayMs={500}
               name="CloseSearchIcon"
-              data-testid="searchPatientIcon"
+              data-testid="closeSearchIcon"
               onClick={closePatientSearch}>
               <Close size={20} />
             </HeaderGlobalAction>

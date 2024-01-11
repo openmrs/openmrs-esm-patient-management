@@ -73,7 +73,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     },
     [config.search.patientResultUrl, user, currentLocation],
   );
-  const focussedResult = useArrowNavigation(
+  const focusedResult = useArrowNavigation(
     !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,
     handlePatientSelection,
     handleFocusToInput,
@@ -81,17 +81,17 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   useEffect(() => {
-    if (bannerContainerRef.current && focussedResult > -1) {
-      bannerContainerRef.current.children?.[focussedResult]?.focus();
-      bannerContainerRef.current.children?.[focussedResult]?.scrollIntoView({
+    if (bannerContainerRef.current && focusedResult > -1) {
+      bannerContainerRef.current.children?.[focusedResult]?.focus();
+      bannerContainerRef.current.children?.[focusedResult]?.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
       });
-    } else if (bannerContainerRef.current && searchInputRef.current && focussedResult === -1) {
+    } else if (bannerContainerRef.current && searchInputRef.current && focusedResult === -1) {
       handleFocusToInput();
     }
-  }, [focussedResult, bannerContainerRef, handleFocusToInput]);
+  }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
   const handleSubmit = useCallback(
     (searchTerm) => {

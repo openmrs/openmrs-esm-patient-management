@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PatientSearch from './patient-search.component';
 import { useConfig } from '@openmrs/esm-framework';
+import { PatientSearchContext } from '../patient-search-context';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
@@ -53,13 +54,19 @@ describe('PatientSearch', () => {
   });
 
   it('should render search results correctly', () => {
-    render(<PatientSearch currentPage={0} {...mockProps} />);
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        {/* @ts-ignore: Don't need the other props for this test */}
+        <PatientSearch currentPage={0} {...mockProps} />
+      </PatientSearchContext.Provider>,
+    );
 
     const resultsTextElement = screen.getByText('John Doe Smith');
     expect(resultsTextElement).toBeInTheDocument();
   });
 
   it('should render loading state correctly', () => {
+    // @ts-ignore: Don't need the other props for this test
     render(<PatientSearch currentPage={0} {...mockProps} isLoading={true} />);
 
     const skeletonAvatar = screen.getAllByTestId('search-skeleton');
@@ -68,6 +75,7 @@ describe('PatientSearch', () => {
 
   it('should render error state correctly', () => {
     const error = new Error('Error');
+    // @ts-ignore: Don't need the other props for this test
     render(<PatientSearch {...mockProps} fetchError={error} />);
 
     const errorMessageElement = screen.getByText('Error');
