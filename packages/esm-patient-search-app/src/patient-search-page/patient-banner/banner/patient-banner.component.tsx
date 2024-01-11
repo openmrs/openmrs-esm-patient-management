@@ -202,9 +202,9 @@ const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientCo
       <ConfigurableLink
         className={styles.patientBanner}
         onBeforeNavigate={() => patientClickSideEffect?.(patientUuid)}
-        to={`${interpolateString(config.search.patientResultUrl, {
-          patientUuid: patientUuid,
-        })}`}>
+        to={config.search.patientResultUrl}
+        templateParams={{patientUuid: patientUuid}}
+   >
         {children}
       </ConfigurableLink>
     );
