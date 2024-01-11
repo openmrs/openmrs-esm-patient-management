@@ -252,7 +252,7 @@ export class FormManager {
       });
 
     /*
-      If there was initially an identifier assigned to the patient, 
+      If there was initially an identifier assigned to the patient,
       which is now not present in the patientIdentifiers(values.identifiers),
       this means that the identifier is meant to be deleted, hence we need
       to delete the respective identifiers.
@@ -302,7 +302,7 @@ export class FormManager {
       person: {
         uuid: values.patientUuid,
         names: FormManager.getNames(values, patientUuidMap),
-        gender: values.gender.charAt(0),
+        gender: values.gender.charAt(0).toUpperCase(),
         birthdate,
         birthdateEstimated: values.birthdateEstimated,
         attributes: FormManager.getPatientAttributes(isNewPatient, values, patientUuidMap),
