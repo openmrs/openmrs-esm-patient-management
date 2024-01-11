@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import PatientSearch from '../compact-patient-search/patient-search.component';
-import { FHIRPatientType, type SearchedPatient } from '../types';
+import { type FHIRPatientType, type SearchedPatient } from '../types';
 import { Search, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './compact-patient-search.scss';
