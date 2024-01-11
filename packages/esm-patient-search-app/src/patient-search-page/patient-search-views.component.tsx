@@ -1,9 +1,10 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
-import { SearchedPatient } from '../types';
+import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 
 interface CommonProps {
@@ -19,7 +20,10 @@ export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   const { t } = useTranslation();
   return (
     <Layer>
-      <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+      <Tile
+        className={classNames(styles.emptySearchResultsTile, {
+          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
+        })}>
         <EmptyDataIllustration />
         <p className={styles.emptyResultText}>
           {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}
@@ -34,7 +38,10 @@ export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
 
 export const LoadingState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   return (
-    <div className={`${styles.results} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+    <div
+      className={classNames(styles.results, {
+        [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
+      })}>
       <PatientBannerSkeleton />
       <PatientBannerSkeleton />
       <PatientBannerSkeleton />
@@ -48,7 +55,10 @@ export const ErrorState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
   const { t } = useTranslation();
   return (
     <Layer>
-      <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+      <Tile
+        className={classNames(styles.emptySearchResultsTile, {
+          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
+        })}>
         <EmptyDataIllustration />
         <div>
           <p className={styles.errorMessage}>{`${t('error', 'Error')}`}</p>
@@ -68,7 +78,10 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
   const { t } = useTranslation();
   return (
     <Layer>
-      <Tile className={`${styles.emptySearchResultsTile} ${inTabletOrOverlay && styles.paddedEmptySearchResultsTile}`}>
+      <Tile
+        className={classNames(styles.emptySearchResultsTile, {
+          [styles.paddedEmptySearchResultsTile]: inTabletOrOverlay,
+        })}>
         <EmptyDataIllustration />
         <p className={styles.emptyResultText}>
           {t('noPatientChartsFoundMessage', 'Sorry, no patient charts were found')}

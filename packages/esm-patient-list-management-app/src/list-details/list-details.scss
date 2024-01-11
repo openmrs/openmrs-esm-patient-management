@@ -1,0 +1,47 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../style.scss';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #ededed;
+}
+
+.cohortHeader {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid $ui-03;
+  padding: spacing.$spacing-04 spacing.$spacing-05;
+  padding-right: 0;
+  background-color: $ui-01;
+}
+
+.overflowMenu {
+  display: flex;
+  align-items: flex-start;
+  margin-top: spacing.$spacing-04;
+}
+
+.marginTop {
+  margin-top: spacing.$spacing-03;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.actionsButtonText {
+  @include type.type-style('body-compact-01');
+  color: $interactive-01;
+}
+
+.tableContainer {
+  padding: 0 spacing.$spacing-05 spacing.$spacing-05;
+  height: calc(100vh - 11rem);
+}
+
+.menuItem {
+  max-width: none;
+}

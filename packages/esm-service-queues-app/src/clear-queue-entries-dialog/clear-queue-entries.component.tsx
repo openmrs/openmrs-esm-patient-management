@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { Button } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
 import styles from './clear-queue-entries-dialog.scss';

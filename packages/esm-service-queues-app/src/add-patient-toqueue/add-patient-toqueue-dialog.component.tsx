@@ -12,7 +12,7 @@ import {
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
-import { ConfigObject, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   addQueueEntry,
   usePriority,
@@ -21,7 +21,7 @@ import {
   useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
-import { ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
+import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 interface AddVisitToQueueDialogProps {
@@ -79,11 +79,11 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     ).then(
       ({ status }) => {
         if (status === 201) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             title: t('addEntry', 'Add entry'),
             kind: 'success',
-            description: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
+            subtitle: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
           mutate();
@@ -91,11 +91,11 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('queueEntryAddFailed', 'Error adding queue entry status'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );

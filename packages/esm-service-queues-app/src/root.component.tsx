@@ -22,7 +22,7 @@ const Root: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/screen" element={<QueueScreen />} />
             <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
-            <Route path="/queue-list/:value/" element={<ServicesTable />} />
+            <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />
           </Routes>
         </BrowserRouter>
       </SWRConfig>

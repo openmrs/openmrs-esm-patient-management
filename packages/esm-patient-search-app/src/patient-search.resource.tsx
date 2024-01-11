@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, showNotification, useSession, FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
+import { openmrsFetch, showNotification, useSession, type FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
 const v =
@@ -76,10 +76,31 @@ export function useRecentlyViewedPatients() {
     }
   }, [error, t]);
 
+  const addViewedPatient = useCallback(
+    (patientUuid: string) => {
+      const userProperties: Record<string, string> = data?.data?.userProperties ?? {};
+      const recentlyViewedPatients: Array<string> = userProperties.patientsVisited?.split(',') ?? [];
+      const remainingPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
+      const newUserProperties = { ...userProperties, patientsVisited: [patientUuid, ...remainingPatients].join(',') };
+
+      return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: {
+          userProperties: newUserProperties,
+        },
+      });
+    },
+    [data?.data?.userProperties, user],
+  );
+
   const result = useMemo(
     () => ({
       isLoadingPatients: !data && !error,
       recentlyViewedPatients: data?.data?.userProperties?.patientsVisited?.split(',') ?? [],
+      addViewedPatient,
       mutateUserProperties: mutate,
     }),
     [data, error, mutate],
@@ -136,22 +157,4 @@ export function useRESTPatients(
   );
 
   return results;
-}
-
-export function updateRecentlyViewedPatients(patientUuid: string, user: LoggedInUser) {
-  const recentlyViewedPatients: Array<string> = user?.userProperties?.patientsVisited?.split(',') ?? [];
-  const restPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
-  const newPatientsVisited = [patientUuid, ...restPatients].join(',');
-
-  return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: {
-      userProperties: {
-        patientsVisited: newPatientsVisited,
-      },
-    },
-  });
 }

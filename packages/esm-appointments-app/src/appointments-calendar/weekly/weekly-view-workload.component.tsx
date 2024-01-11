@@ -1,12 +1,13 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import classNames from 'classnames';
+import dayjs, { type Dayjs } from 'dayjs';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
-import styles from './weekly-workload-module.scss';
 import { spaBasePath } from '../../constants';
 import { isSameMonth } from '../../helpers';
-import { CalendarType } from '../../types';
+import { type CalendarType } from '../../types';
+import styles from './weekly-workload-module.scss';
 
 interface WeeklyCellProps {
   type: CalendarType;
@@ -31,8 +32,8 @@ const WeeklyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, current
           type === 'weekly'
             ? 'weekly-cell'
             : isSameMonth(dateTime, currentDate)
-            ? 'monthly-cell'
-            : 'monthly-cell-disabled'
+              ? 'monthly-cell'
+              : 'monthly-cell-disabled'
         ]
       }>
       {type === 'weekly' ? (
@@ -43,17 +44,17 @@ const WeeklyWorkloadView: React.FC<WeeklyCellProps> = ({ type, dateTime, current
               <div className={styles.currentData}>
                 {currentData?.service.map(({ serviceName, count }, index) => (
                   <div
+                    className={classNames(styles.serviceArea, styles[colorCoding[serviceName]])}
                     role="button"
                     tabIndex={0}
                     onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` })}
-                    key={serviceName}
-                    className={`${styles.serviceArea} ${styles[colorCoding[serviceName]]}`}>
+                    key={serviceName}>
                     <span>{serviceName}</span>
                     <span>{count}</span>
                   </div>
                 ))}
                 <div
-                  className={`${styles.serviceArea} ${styles.green}`}
+                  className={classNames(styles.serviceArea, styles.green)}
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/Total` })}>

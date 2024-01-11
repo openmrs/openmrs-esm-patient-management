@@ -2,8 +2,8 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
-import { openmrsFetch, Visit, useSession } from '@openmrs/esm-framework';
-import { VisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { openmrsFetch, type Visit, useSession } from '@openmrs/esm-framework';
+import { type VisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
 dayjs.extend(isToday);
 

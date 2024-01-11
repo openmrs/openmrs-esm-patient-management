@@ -1,4 +1,4 @@
-import { ConceptResponse } from '../../patient-registration.types';
+import { type ConceptResponse } from '../../patient-registration.types';
 
 export const useConcept = jest.fn(function mockUseConceptImplementation(uuid: string): {
   data: ConceptResponse;

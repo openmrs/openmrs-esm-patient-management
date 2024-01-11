@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { navigate, showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import styles from './actions-menu.scss';
 

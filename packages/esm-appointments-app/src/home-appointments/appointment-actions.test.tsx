@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { ActionsMenu } from './appointment-actions.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -30,7 +31,9 @@ describe('ActionsMenu', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the actions menu with correct options and handlers', () => {
+  it('renders the actions menu with correct options and handlers', async () => {
+    const user = userEvent.setup();
+
     const mockAppointment = {
       id: '123',
       recurring: false,
@@ -39,12 +42,12 @@ describe('ActionsMenu', () => {
 
     renderActionsMenu({ appointment: mockAppointment, useBahmniUI: 'true' });
 
-    fireEvent.click(screen.getByText(/Edit Appointment/i));
-    fireEvent.click(screen.getByText(/Check In/i));
-    fireEvent.click(screen.getByText(/Complete/i));
-    fireEvent.click(screen.getByText(/Missed/i));
-    fireEvent.click(screen.getByText(/Cancel/i));
-    fireEvent.click(screen.getByText(/Add new appointment/i));
+    await user.click(screen.getByText(/Edit Appointment/i));
+    await user.click(screen.getByText(/Check In/i));
+    await user.click(screen.getByText(/Complete/i));
+    await user.click(screen.getByText(/Missed/i));
+    await user.click(screen.getByText(/Cancel/i));
+    await user.click(screen.getByText(/Add new appointment/i));
 
     expect(screen.getByText(/Edit Appointment/i)).toBeInTheDocument();
     expect(screen.getByText(/Check In/i)).toBeInTheDocument();
@@ -54,7 +57,9 @@ describe('ActionsMenu', () => {
     expect(screen.getByText(/Add new appointment/i)).toBeInTheDocument();
   });
 
-  it('renders the actions menu with correct options and handlers in non-BahmniUI mode', () => {
+  it('renders the actions menu with correct options and handlers in non-BahmniUI mode', async () => {
+    const user = userEvent.setup();
+
     const mockAppointment = {
       id: '456',
       recurring: true,
@@ -63,12 +68,12 @@ describe('ActionsMenu', () => {
 
     renderActionsMenu({ appointment: mockAppointment, useBahmniUI: undefined });
 
-    fireEvent.click(screen.getByText(/Edit Appointment/i));
-    fireEvent.click(screen.getByText(/Check In/i));
-    fireEvent.click(screen.getByText(/Complete/i));
-    fireEvent.click(screen.getByText(/Missed/i));
-    fireEvent.click(screen.getByText(/Cancel/i));
-    fireEvent.click(screen.getByText(/Add new appointment/i));
+    await user.click(screen.getByText(/Edit Appointment/i));
+    await user.click(screen.getByText(/Check In/i));
+    await user.click(screen.getByText(/Complete/i));
+    await user.click(screen.getByText(/Missed/i));
+    await user.click(screen.getByText(/Cancel/i));
+    await user.click(screen.getByText(/Add new appointment/i));
 
     expect(screen.getByText('Edit Appointment')).toBeInTheDocument();
     expect(screen.getByText('Check In')).toBeInTheDocument();

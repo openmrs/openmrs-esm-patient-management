@@ -1,11 +1,12 @@
 import React from 'react';
-import { Layer, Select, SelectItem } from '@carbon/react';
-import { Input } from '../../input/basic-input/input/input.component';
-import { PersonAttributeTypeResponse } from '../../patient-registration.types';
-import { useConceptAnswers } from '../field.resource';
-import styles from './../field.scss';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
+import { Layer, Select, SelectItem } from '@carbon/react';
+import { Input } from '../../input/basic-input/input/input.component';
+import { type PersonAttributeTypeResponse } from '../../patient-registration.types';
+import { useConceptAnswers } from '../field.resource';
+import styles from './../field.scss';
 
 export interface CodedPersonAttributeFieldProps {
   id: string;
@@ -25,7 +26,7 @@ export function CodedPersonAttributeField({
   const fieldName = `attributes.${personAttributeType.uuid}`;
 
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers && conceptAnswers?.length ? (
         <Layer>
           <Field name={fieldName}>

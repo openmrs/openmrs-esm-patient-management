@@ -1,10 +1,11 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { ConceptResponse } from '../../patient-registration.types';
-import { FieldDefinition, RegistrationConfig } from '../../../config-schema';
+import { type ConceptResponse } from '../../patient-registration.types';
+import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
@@ -15,6 +16,7 @@ export interface ObsFieldProps {
 
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
+
   const config = useConfig() as RegistrationConfig;
 
   if (!config.registrationObs.encounterTypeUuid) {
@@ -29,6 +31,7 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
   if (isLoading) {
     return null;
   }
+
   switch (concept.datatype.display) {
     case 'Text':
       return (
@@ -89,7 +92,7 @@ function TextObsField({ concept, validationRegex, label, required }: TextObsFiel
 
   const fieldName = `obs.${concept.uuid}`;
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName} validate={validateInput}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
@@ -119,7 +122,7 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
   const fieldName = `obs.${concept.uuid}`;
 
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       <Field name={fieldName}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
@@ -155,7 +158,7 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required }: Coded
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'obs' && def.uuid === concept.uuid)[0];
 
   return (
-    <div className={`${styles.customField} ${styles.halfWidthInDesktopView}`}>
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Field name={fieldName}>
           {({ field, form: { touched, errors }, meta }) => {

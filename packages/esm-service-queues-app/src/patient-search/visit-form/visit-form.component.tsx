@@ -35,14 +35,14 @@ import {
   showNotification,
   showToast,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
 } from '@openmrs/esm-framework';
 import BaseVisitType from './base-visit-type.component';
 import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
-import { convertTime12to24, amPm } from '../../helpers/time-helpers';
+import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { SearchTypes, PatientProgram, NewVisitPayload } from '../../types';
+import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';

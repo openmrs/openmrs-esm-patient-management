@@ -1,6 +1,8 @@
 import { Type } from '@openmrs/esm-framework';
-import vitalsConfigSchema, { VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
-import biometricsConfigSchema, { BiometricsConfigObject } from './current-visit/visit-details/biometrics-config-schema';
+import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
+import biometricsConfigSchema, {
+  type BiometricsConfigObject,
+} from './current-visit/visit-details/biometrics-config-schema';
 
 export const configSchema = {
   concepts: {

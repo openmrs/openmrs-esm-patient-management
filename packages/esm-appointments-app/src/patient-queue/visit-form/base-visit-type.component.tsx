@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import debounce from 'lodash-es/debounce';
-import { Layer, Search, RadioButtonGroup, RadioButton, Tile } from '@carbon/react';
+import { Layer, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './base-visit-type.scss';
 
@@ -29,7 +30,11 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
   const { results } = usePagination<{ uuid: string; display: string; name: string }>(searchResults, 5);
 
   return (
-    <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
+    <div
+      className={classNames(styles.visitTypeOverviewWrapper, {
+        [styles.tablet]: isTablet,
+        [styles.desktop]: !isTablet,
+      })}>
       <>
         {isTablet ? (
           <Layer>

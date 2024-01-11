@@ -1,10 +1,10 @@
 import React from 'react';
-import { screen, render, waitFor } from '@testing-library/react';
-import CancelAppointment from './cancel-appointment.component';
-import { mockMappedAppointmentsData } from '../../../../../../__mocks__/appointments.mock';
 import userEvent from '@testing-library/user-event';
+import { screen, render } from '@testing-library/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
+import { mockMappedAppointmentsData } from '__mocks__';
+import CancelAppointment from './cancel-appointment.component';
 
 const testProps = {
   appointment: mockMappedAppointmentsData.data[0],
@@ -14,8 +14,8 @@ const mockShowToast = showToast as jest.Mock;
 const mockCancelAppointment = cancelAppointment as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('../forms.resource.ts', () => {
-  const originalModule = jest.requireActual('../forms.resource.ts');
+jest.mock('../forms.resource', () => {
+  const originalModule = jest.requireActual('../forms.resource');
 
   return {
     ...originalModule,
@@ -39,8 +39,8 @@ describe('Cancel appointment form', () => {
 
     renderCancelAppointment();
 
-    await waitFor(() => user.click(screen.getByRole('textbox', { name: /reason for changes/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /cancel appointment/i })));
+    await user.click(screen.getByRole('textbox', { name: /reason for changes/i }));
+    await user.click(screen.getByRole('button', { name: /cancel appointment/i }));
 
     expect(mockShowToast).toHaveBeenCalledTimes(1);
     expect(mockShowToast).toHaveBeenCalledWith({
@@ -50,6 +50,7 @@ describe('Cancel appointment form', () => {
       description: 'It has been cancelled successfully',
     });
   });
+
   it('should display an error message when rest api call to cancel appointment fails', async () => {
     const user = userEvent.setup();
     mockCancelAppointment.mockResolvedValueOnce({
@@ -59,8 +60,8 @@ describe('Cancel appointment form', () => {
 
     renderCancelAppointment();
 
-    await waitFor(() => user.click(screen.getByRole('textbox', { name: /reason for changes/i })));
-    await waitFor(() => user.click(screen.getByRole('button', { name: /cancel appointment/i })));
+    await user.click(screen.getByRole('textbox', { name: /reason for changes/i }));
+    await user.click(screen.getByRole('button', { name: /cancel appointment/i }));
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
     expect(mockShowNotification).toHaveBeenCalledWith({
       critical: true,

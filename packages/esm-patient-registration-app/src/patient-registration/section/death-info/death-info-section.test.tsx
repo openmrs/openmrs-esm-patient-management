@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { initialFormValues } from '../../patient-registration.component';
 import { DeathInfoSection } from './death-info-section.component';
-import { FormValues } from '../../patient-registration-types';
+import { type FormValues } from '../../patient-registration.types';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -15,62 +15,50 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-// TODO: Implement feature and get tests to pass
-describe('death info section', () => {
-  const formValues: FormValues = initialFormValues;
+const initialContextValues = {
+  currentPhoto: 'data:image/png;base64,1234567890',
+  identifierTypes: [],
+  inEditMode: false,
+  initialFormValues: {} as FormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  validationSchema: null,
+  values: {
+    isDead: true,
+  } as FormValues,
+};
 
-  const setupSection = async (isDead?: boolean) => {
-    render(
-      <PatientRegistrationContext.Provider value={{ values: { isDead: isDead || false } }}>
-        <Formik initialValues={{ ...initialFormValues, isDead }} onSubmit={null}>
+describe('Death info section', () => {
+  const renderDeathInfoSection = (isDead) => {
+    initialContextValues.values.isDead = isDead;
+
+    return render(
+      <PatientRegistrationContext.Provider value={initialContextValues}>
+        <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
           <Form>
             <DeathInfoSection />
           </Form>
         </Formik>
       </PatientRegistrationContext.Provider>,
     );
-    const allInputs = screen.queryAllByLabelText(
-      (content, element) => element.tagName.toLowerCase() === 'input',
-    ) as Array<HTMLInputElement>;
-    const allSelects = screen.queryAllByRole('combobox') as Array<HTMLInputElement>;
-    let inputAndSelectNames = [];
-    allInputs.forEach((input) => inputAndSelectNames.push(input.name));
-    allSelects.forEach((select) => inputAndSelectNames.push(select.name));
-    return inputAndSelectNames;
   };
 
-  it('has the correct number of inputs if is dead is checked', async () => {
-    const inputAndSelectNames = await setupSection(true);
-    expect(inputAndSelectNames.length).toBe(3);
+  it('shows fields for recording death info when the patient is marked as dead', () => {
+    renderDeathInfoSection(true);
+
+    expect(screen.getByRole('region', { name: /death info section/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /death info/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /is dead \(optional\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /date of death \(optional\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /cause of death \(optional\)/i })).toBeInTheDocument();
   });
 
   it('has the correct number of inputs if is dead is not checked', async () => {
-    const inputAndSelectNames = await setupSection(false);
-    expect(inputAndSelectNames.length).toBe(1);
-  });
+    renderDeathInfoSection(false);
 
-  it('has isDead checkbox', async () => {
-    const inputAndSelectNames = await setupSection();
-    expect(inputAndSelectNames).toContain('isDead');
-  });
-
-  it('has death date if is dead is checked', async () => {
-    const inputAndSelectNames = await setupSection(true);
-    expect(inputAndSelectNames).toContain('deathDate');
-  });
-
-  it('has no death date if is dead is not checked', async () => {
-    const inputAndSelectNames = await setupSection(false);
-    expect(inputAndSelectNames).not.toContain('deathDate');
-  });
-
-  it('has death cause if is dead is checked', async () => {
-    const inputAndSelectNames = await setupSection(true);
-    expect(inputAndSelectNames).toContain('deathCause');
-  });
-
-  it('has no death cause if is dead is not checked', async () => {
-    const inputAndSelectNames = await setupSection(false);
-    expect(inputAndSelectNames).not.toContain('deathCause');
+    expect(screen.queryByRole('textbox', { name: /date of death \(optional\)/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /cause of death \(optional\)/i })).not.toBeInTheDocument();
   });
 });

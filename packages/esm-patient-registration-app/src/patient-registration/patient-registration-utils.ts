@@ -1,11 +1,11 @@
 import * as Yup from 'yup';
 import {
-  AddressValidationSchemaType,
-  FormValues,
-  PatientIdentifier,
-  PatientUuidMapType,
-  PatientIdentifierValue,
-  Encounter,
+  type AddressValidationSchemaType,
+  type FormValues,
+  type PatientIdentifier,
+  type PatientUuidMapType,
+  type PatientIdentifierValue,
+  type Encounter,
 } from './patient-registration.types';
 import { parseDate } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
@@ -120,7 +120,7 @@ export function getFormValuesFromFhirPatient(patient: fhir.Patient) {
   result.additionalMiddleName = additionalPatientName?.given[1];
   result.additionalFamilyName = additionalPatientName?.family;
 
-  result.gender = capitalize(patient.gender);
+  result.gender = patient.gender;
   result.birthdate = patient.birthDate ? parseDate(patient.birthDate) : undefined;
   result.telephoneNumber = patient.telecom ? patient.telecom[0].value : '';
 

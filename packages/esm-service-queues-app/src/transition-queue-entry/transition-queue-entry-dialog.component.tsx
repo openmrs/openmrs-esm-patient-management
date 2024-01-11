@@ -3,19 +3,18 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import {
-  ConfigObject,
+  type ConfigObject,
   ExtensionSlot,
   formatDatetime,
   navigate,
   parseDate,
-  showNotification,
-  showToast,
+  showSnackbar,
   toDateObjectStrict,
   toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
 import {
-  MappedVisitQueueEntry,
+  type MappedVisitQueueEntry,
   serveQueueEntry,
   updateQueueEntry,
   useVisitQueueEntries,
@@ -69,11 +68,11 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         if (status === 201) {
           serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
             if (status === 200) {
-              showToast({
-                critical: true,
+              showSnackbar({
+                isLowContrast: true,
                 title: t('success', 'Success'),
                 kind: 'success',
-                description: t('patientAttendingService', 'Patient attending service'),
+                subtitle: t('patientAttendingService', 'Patient attending service'),
               });
               closeModal();
               mutate();
@@ -83,11 +82,11 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );
@@ -97,22 +96,22 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     requeueQueueEntry(priorityComment.REQUEUED, queueEntry?.queueUuid, queueEntry?.queueEntryUuid).then(
       ({ status }) => {
         if (status === 200) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             title: t('success', 'Success'),
             kind: 'success',
-            description: t('patientRequeued', 'Patient has been requeued'),
+            subtitle: t('patientRequeued', 'Patient has been requeued'),
           });
           closeModal();
           mutate();
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('queueEntryUpdateFailed', 'Error updating queue entry'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       },
     );

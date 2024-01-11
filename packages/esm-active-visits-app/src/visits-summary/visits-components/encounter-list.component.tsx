@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -14,7 +15,7 @@ import {
   TableExpandedRow,
 } from '@carbon/react';
 import { useLayoutType, isDesktop } from '@openmrs/esm-framework';
-import { Observation } from '../visit.resource';
+import { type Observation } from '../visit.resource';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 
@@ -116,7 +117,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   ) : (
     <div className={styles.encounterEmptyState}>
       <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
-      <p className={`${styles.bodyLong01} ${styles.text02}`}>
+      <p className={classNames(styles.bodyLong01, styles.text02)}>
         {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
       </p>
     </div>

@@ -12,12 +12,12 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
-import styles from './queue-service.scss';
-import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { SearchTypes } from '../types';
 import { mutate } from 'swr';
+import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { saveQueue, useServiceConcepts } from './queue-service.resource';
+import { type SearchTypes } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import styles from './queue-service-form.scss';
 
 interface QueueServiceFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -60,10 +60,10 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
       saveQueue(queueName, queueConcept, queueName, userLocation).then(
         ({ status }) => {
           if (status === 201) {
-            showToast({
+            showSnackbar({
               title: t('addQueue', 'Add queue'),
               kind: 'success',
-              description: t('queueAddedSuccessfully', 'Queue addeded successfully'),
+              subtitle: t('queueAddedSuccessfully', 'Queue addeded successfully'),
             });
             closePanel();
             mutate(`/ws/rest/v1/queue?${userLocation}`);
@@ -71,11 +71,11 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
           }
         },
         (error) => {
-          showNotification({
+          showSnackbar({
             title: t('errorAddingQueue', 'Error adding queue'),
             kind: 'error',
-            critical: true,
-            description: error?.message,
+            isLowContrast: false,
+            subtitle: error?.message,
           });
         },
       );
@@ -87,7 +87,6 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
     <Form onSubmit={createQueue} className={styles.form}>
       <Stack gap={4} className={styles.grid}>
         <Column>
-          <h3 className={styles.heading}>{t('addNewQueue', 'Add new queue')}</h3>
           <Layer className={styles.input}>
             <TextInput
               id="queueName"
@@ -108,7 +107,9 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               </section>
             )}
           </Layer>
+        </Column>
 
+        <Column>
           <Layer className={styles.input}>
             <Select
               labelText={t('selectServiceType', 'Select a service type')}
@@ -137,7 +138,9 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               </section>
             )}
           </Layer>
+        </Column>
 
+        <Column>
           <Layer className={styles.input}>
             <Select
               labelText={t('selectLocation', 'Select a location')}

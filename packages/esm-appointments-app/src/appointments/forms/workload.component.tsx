@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import classNames from 'classnames';
 import styles from './workload.scss';
 
 interface WorkloadCardProp {
@@ -9,13 +9,14 @@ interface WorkloadCardProp {
   onClick: () => void;
 }
 const WorkloadCard: React.FC<WorkloadCardProp> = ({ date, count, isActive, onClick }) => {
-  const { t } = useTranslation();
   return (
     <div
       tabIndex={0}
       role="button"
       onClick={onClick}
-      className={`${styles.tileContainer}  ${isActive && styles.activeWorkloadCard}`}>
+      className={classNames(styles.tileContainer, {
+        [styles.activeWorkloadCard]: isActive,
+      })}>
       <div className={styles.tileHeader}>
         <label className={styles.headerLabel}>{date}</label>
       </div>

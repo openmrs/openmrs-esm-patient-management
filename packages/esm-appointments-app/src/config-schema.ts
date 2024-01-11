@@ -66,10 +66,27 @@ export const configSchema = {
     _default: '/ws/rest/v1/kenyaemr/default-facility',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  customPatientChartUrl: {
+    _type: Type.String,
+    _description:
+      'Template URL that will be used when clicking on the patient name in the appointment list. Available argument: patientUuid',
+    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
+  },
   patientIdentifierType: {
     _type: Type.String,
     _description: 'The name of the patient identifier type to be used for the patient identifier field',
     _default: 'OpenMRS ID',
+  },
+  showUnscheduledAppointmentsTab: {
+    _type: Type.Boolean,
+    _description:
+      'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
+    _default: false,
+  },
+  allowAllDayAppointments: {
+    _type: Type.Boolean,
+    _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
+    _default: true,
   },
 };
 
@@ -87,5 +104,8 @@ export interface ConfigObject {
   hiddenFormFields: Array<string>;
   showServiceQueueFields: boolean;
   defaultFacilityUrl: string;
+  customPatientChartUrl: string;
   patientIdentifierType: string;
+  showUnscheduledAppointmentsTab: boolean;
+  allowAllDayAppointments: boolean;
 }

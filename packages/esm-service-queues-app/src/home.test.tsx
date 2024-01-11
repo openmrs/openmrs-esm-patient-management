@@ -15,8 +15,8 @@ jest.mock('@openmrs/esm-framework', () => ({
   })),
 }));
 
-jest.mock('./helpers/helpers.ts', () => ({
-  ...jest.requireActual('./helpers/helpers.ts'),
+jest.mock('./helpers/helpers', () => ({
+  ...jest.requireActual('./helpers/helpers'),
   useSelectedQueueLocationName: jest.fn(() => 'Test Location'),
 }));
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { mockServices } from '__mocks__';
 import QueueRoomForm from './queue-room-form.component';
-import { mockServices } from '../../__mocks__/active-visits.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -10,7 +11,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   useQueueLocations: jest.fn(() => ({
     queueLocations: { uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' },
   })),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 jest.mock('./queue-room.resource', () => ({
@@ -28,37 +29,47 @@ describe('QueueRoomForm', () => {
     expect(screen.getByText('Save')).toBeInTheDocument();
   });
 
-  it('displays error notification if queue room name is missing on submission', () => {
+  it('displays error notification if queue room name is missing on submission', async () => {
+    const user = userEvent.setup();
+
     render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
 
-    fireEvent.click(screen.getByText('Save'));
+    await user.click(screen.getByText('Save'));
 
     expect(screen.getByText('Missing queue room name')).toBeInTheDocument();
   });
 
-  it('displays error notification if queue room service is missing on submission', () => {
+  it('displays error notification if queue room service is missing on submission', async () => {
+    const user = userEvent.setup();
+
     render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
 
-    fireEvent.change(screen.getByLabelText('Queue room name'), { target: { value: 'Room 123' } });
-    fireEvent.click(screen.getByText('Save'));
+    const queueRoomNameInput = screen.getByLabelText('Queue room name');
+
+    await user.type(queueRoomNameInput, 'Room 123');
+    await user.click(screen.getByText('Save'));
 
     expect(screen.getByText('Missing queue room service')).toBeInTheDocument();
   });
 
-  it('calls closePanel when Cancel button is clicked', () => {
+  it('calls closePanel when Cancel button is clicked', async () => {
+    const user = userEvent.setup();
+
     const closePanelMock = jest.fn();
     render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={closePanelMock} />);
 
-    fireEvent.click(screen.getByText('Cancel'));
+    await user.click(screen.getByText('Cancel'));
 
     expect(closePanelMock).toHaveBeenCalledTimes(1);
   });
 
-  it('updates queue room name state when a value is entered', () => {
+  it('updates queue room name state when a value is entered', async () => {
+    const user = userEvent.setup();
+
     render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
 
     const queueRoomNameInput = screen.getByLabelText('Queue room name');
-    fireEvent.change(queueRoomNameInput, { target: { value: 'Room 123' } });
+    await user.type(queueRoomNameInput, 'Room 123');
 
     expect(queueRoomNameInput).toHaveValue('Room 123');
   });

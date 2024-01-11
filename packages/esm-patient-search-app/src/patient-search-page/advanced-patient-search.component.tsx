@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import classNames from 'classnames';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { AdvancedPatientSearchState } from '../types';
+import { type AdvancedPatientSearchState } from '../types';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch from './refine-search.component';
@@ -118,18 +119,20 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
 
   return (
     <div
-      className={`${
-        inTabletOrOverlay ? styles.advancedPatientSearchTabletOrOverlay : styles.advancedPatientSearchDesktop
-      }`}>
+      className={classNames({
+        [styles.advancedPatientSearchTabletOrOverlay]: inTabletOrOverlay,
+        [styles.advancedPatientSearchDesktop]: !inTabletOrOverlay,
+      })}>
       {!inTabletOrOverlay && (
         <div className={styles.refineSearchDesktop}>
           <RefineSearch filtersApplied={filtersApplied} setFilters={setFilters} inTabletOrOverlay={inTabletOrOverlay} />
         </div>
       )}
       <div
-        className={`${
-          inTabletOrOverlay ? styles.patientSearchResultsTabletOrOverlay : styles.patientSearchResultsDesktop
-        }`}>
+        className={classNames({
+          [styles.patientSearchResultsTabletOrOverlay]: inTabletOrOverlay,
+          [styles.patientSearchResultsDesktop]: !inTabletOrOverlay,
+        })}>
         <PatientSearchComponent
           query={query}
           stickyPagination={stickyPagination}

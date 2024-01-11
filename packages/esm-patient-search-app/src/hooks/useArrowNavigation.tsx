@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { SearchedPatient } from '../types';
+import { type SearchedPatient } from '../types';
 
 const useArrowNavigation = (
   totalResults: number,

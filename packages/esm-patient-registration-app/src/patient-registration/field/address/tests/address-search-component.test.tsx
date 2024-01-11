@@ -1,13 +1,13 @@
 import React from 'react';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { Formik, Form, useFormikContext } from 'formik';
-import { Resources, ResourcesContext } from '../../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../../offline.resources';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { useConfig } from '@openmrs/esm-framework';
 import { useAddressHierarchy, useOrderedAddressHierarchyLevels } from '../address-hierarchy.resource';
-import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from './mocks';
+import { mockedAddressTemplate, mockedAddressOptions, mockedOrderedFields } from '__mocks__';
 import AddressSearchComponent from '../address-search.component';
-import userEvent from '@testing-library/user-event';
 
 useAddressHierarchy;
 jest.mock('@openmrs/esm-framework', () => ({
@@ -60,7 +60,6 @@ const setFieldValue = jest.fn();
 
 describe('Testing address search bar', () => {
   beforeEach(() => {
-    cleanup();
     (useConfig as jest.Mock).mockImplementation(() => ({
       fieldConfigurations: {
         address: {
@@ -88,23 +87,31 @@ describe('Testing address search bar', () => {
       error: null,
       isLoading: false,
     }));
+
     renderAddressHierarchy();
+
     const searchbox = screen.getByRole('searchbox');
     expect(searchbox).toBeInTheDocument();
+
     const ul = screen.queryByRole('list');
     expect(ul).not.toBeInTheDocument();
   });
 
   it("should render only the results for the search term matched address' parents", async () => {
+    const user = userEvent.setup();
+
     (useAddressHierarchy as jest.Mock).mockImplementation(() => ({
       addresses: mockedAddressOptions,
       error: null,
       isLoading: false,
     }));
+
     renderAddressHierarchy();
+
     const searchString = 'nea';
     const separator = ' > ';
     const options: Set<string> = new Set();
+
     mockedAddressOptions.forEach((address) => {
       const values = address.split(separator);
       values.forEach((val, index) => {
@@ -118,10 +125,10 @@ describe('Testing address search bar', () => {
     addressOptions.forEach(async (address) => {
       const optionElement = screen.getByText(address);
       expect(optionElement).toBeInTheDocument();
-      fireEvent.click(optionElement);
+      await user.click(optionElement);
       const values = address.split(separator);
       allFields.map(({ name }, index) => {
-        waitFor(() => expect(setFieldValue).toBeCalledWith(`address.${name}`, values?.[index]));
+        expect(setFieldValue).toHaveBeenCalledWith(`address.${name}`, values?.[index]);
       });
     });
   });

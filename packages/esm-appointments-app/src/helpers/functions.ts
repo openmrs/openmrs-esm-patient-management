@@ -1,6 +1,7 @@
 import { AppointmentSummary, Appointment } from '../types';
 import { formatDate, parseDate, formatDatetime } from '@openmrs/esm-framework';
 import dayjs, { Dayjs } from 'dayjs';
+import { configSchema } from '../config-schema';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
   const groupedAppointments = appointmentSummary?.map(({ countMap, serviceName }) => ({
@@ -63,7 +64,9 @@ export const mapAppointmentProperties = (appointment: Appointment, t?: Function)
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
     color: appointment?.service?.color ?? '',
-    identifier: appointment.patient?.identifier,
+    identifier: appointment?.patient?.identifiers?.find(
+      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
+    ).identifier,
     duration: appointment.service?.durationMins
       ? appointment?.service?.durationMins + t('minutes', 'min')
       : getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
@@ -90,7 +93,9 @@ export const getAppointment = (appointment: Appointment) => {
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
     providers: appointment.providers,
-    identifier: appointment.patient.identifier,
+    identifier: appointment?.patient?.identifiers?.find(
+      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
+    ).identifier,
   };
   return formattedAppointment;
 };

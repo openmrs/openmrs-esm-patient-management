@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import classNames from 'classnames';
 import type { KeyedMutator } from 'swr';
 import { useTranslation } from 'react-i18next';
 import {
@@ -30,9 +31,10 @@ import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
-import { Appointment, MappedHomeAppointment } from '../types';
+import { type Appointment, type MappedHomeAppointment } from '../types';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
+import { type ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -102,6 +104,7 @@ const AppointmentsBaseTable = () => {
   const { appointments, isLoading, mutate } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
+  const { customPatientChartUrl } = useConfig<ConfigObject>();
 
   const filteredAppointments = !fullView
     ? appointments.filter((appointment) => appointment.status === 'Scheduled')
@@ -172,7 +175,7 @@ const AppointmentsBaseTable = () => {
     name: {
       content: (
         <div className={styles.nameContainer}>
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${appointment.patientUuid}/chart`}>
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
             {appointment.name}
           </ConfigurableLink>
         </div>
@@ -307,7 +310,7 @@ const AppointmentsBaseTable = () => {
                               <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                             ))}
                             {fullView && (
-                              <TableCell className={`cds--table-column-menu ${styles.overflowMenu}`}>
+                              <TableCell className={classNames('cds--table-column-menu', styles.overflowMenu)}>
                                 <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
                               </TableCell>
                             )}

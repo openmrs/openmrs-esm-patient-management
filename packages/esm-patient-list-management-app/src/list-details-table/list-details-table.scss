@@ -1,0 +1,143 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.searchContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: spacing.$spacing-05;
+  background-color: #ededed;
+}
+
+.searchContainer > div {
+  align-self: center;
+  justify-self: end;
+}
+
+.searchOverrides {
+  width: 100%;
+  max-width: 250px;
+  border: 0px !important;
+}
+
+div.tableOverride {
+  background-color: $ui-01;
+}
+
+div.tableOverride > div {
+  white-space: nowrap;
+}
+
+div#table-tool-bar {
+  margin-top: spacing.$spacing-09;
+}
+
+.table {
+  background-color: $ui-03;
+}
+
+.desktopRow,
+.desktopHeader {
+  height: spacing.$spacing-07 !important;
+}
+
+.tabletRow,
+.tabletHeader {
+  height: spacing.$spacing-09 !important;
+}
+
+.paginationOverride {
+  background-color: $ui-background;
+  border-top: 1px solid $ui-03 !important;
+  border-bottom: 1px solid $ui-03 !important;
+  overflow-x: hidden;
+}
+
+.paginationOverride > div {
+  background-color: $ui-background;
+  border-bottom: 0px !important;
+  border-top: 0px !important;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.dataTableSkeleton {
+  background-color: transparent;
+  padding: 0rem;
+}
+
+.skeletonContainer {
+  margin: spacing.$spacing-05;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  margin: spacing.$spacing-05 0;
+}
+
+.illo {
+  margin-top: spacing.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.backButton {
+  padding: spacing.$spacing-03 0;
+  max-width: fit-content;
+
+  a {
+    text-decoration: none;
+  }
+
+  button {
+    display: flex;
+    padding-left: 0 !important;
+
+    svg {
+      order: 1;
+      margin: 0 spacing.$spacing-03;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.tile {
+  text-align: center;
+  border-bottom: 1px solid $ui-03;
+}
+
+.filterEmptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-09 !important;
+  text-align: center;
+  border: 1px solid $ui-03;
+  background-color: white;
+}
+
+.filterEmptyStateTile {
+  margin: auto;
+}
+
+.filterEmptyStateContent {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.filterEmptyStateHelper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}

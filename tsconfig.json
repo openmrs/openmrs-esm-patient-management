@@ -20,7 +20,9 @@
     "noEmit": true,
     "target": "esnext",
     "paths": {
-      "@openmrs/*": ["./node_modules/@openmrs/*"]
+      "@openmrs/*": ["./node_modules/@openmrs/*"],
+      "__mocks__": ["./__mocks__"],
+      "tools": ["./tools"],
     }
   }
 }

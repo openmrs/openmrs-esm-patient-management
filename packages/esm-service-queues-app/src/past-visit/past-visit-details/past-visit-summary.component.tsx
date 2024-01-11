@@ -1,14 +1,22 @@
 import React, { useState, useMemo } from 'react';
+import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { formatTime, parseDate, useLayoutType, formatDatetime } from '@openmrs/esm-framework';
-import { Encounter, OrderItem, Order, Note, DiagnosisItem, Observation } from '../../types/index';
-import EncounterList from './encounter-list.component';
-import styles from '../past-visit.scss';
-import Vitals from '../../current-visit/visit-details/vitals.component';
+import {
+  type Encounter,
+  type OrderItem,
+  type Order,
+  type Note,
+  type DiagnosisItem,
+  type Observation,
+} from '../../types/index';
 import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
+import EncounterList from './encounter-list.component';
 import Notes from './notes-list.component';
 import Medications from './medications-list.component';
+import Vitals from '../../current-visit/visit-details/vitals.component';
+import styles from '../past-visit.scss';
 
 interface PastVisitSummaryProps {
   encounters: Array<any>;
@@ -121,27 +129,28 @@ const PastVisitSummary: React.FC<PastVisitSummaryProps> = ({ encounters, patient
     return [medications, notes, diagnoses, vitalsToRetrieve];
   }, [encounters]);
 
+  const tabsClasses = classNames(styles.verticalTabs, {
+    [styles.tabletTabs]: isTablet,
+    [styles.desktopTabs]: !isTablet,
+  });
+
+  const tabClasses = (index) =>
+    classNames(styles.tab, styles.bodyLong01, {
+      [styles.selectedTab]: selectedTabIndex === index,
+    });
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.visitContainer}>
-        <Tabs className={`${styles.verticalTabs} ${isTablet ? styles.tabletTabs : styles.desktopTabs}`}>
+        <Tabs className={tabsClasses}>
           <TabList className={styles.verticalTabList} aria-label="Past visits tabs">
-            <Tab
-              className={`${styles.tab} ${styles.bodyLong01} ${selectedTabIndex === 0 && styles.selectedTab}`}
-              id="vitals-tab"
-              onClick={() => setSelectedTabIndex(0)}>
+            <Tab className={tabClasses(0)} id="vitals-tab" onClick={() => setSelectedTabIndex(0)}>
               {t('vitals', 'Vitals')}
             </Tab>
-            <Tab
-              className={`${styles.tab} ${selectedTabIndex === 1 && styles.selectedTab}`}
-              id="notes-tab"
-              onClick={() => setSelectedTabIndex(1)}>
+            <Tab className={tabClasses(1)} id="notes-tab" onClick={() => setSelectedTabIndex(1)}>
               {t('notes', 'Notes')}
             </Tab>
-            <Tab
-              className={`${styles.tab} ${selectedTabIndex === 2 && styles.selectedTab}`}
-              id="medications-tab"
-              onClick={() => setSelectedTabIndex(2)}>
+            <Tab className={tabClasses(2)} id="medications-tab" onClick={() => setSelectedTabIndex(2)}>
               {t('medications', 'Medications')}
             </Tab>
           </TabList>

@@ -15,7 +15,7 @@ export interface Appointment {
   endDateTime: Date | number | any;
   location: OpenmrsResource;
   patient: {
-    identifier: string;
+    identifiers: Array<Identifier>;
     name: string;
     uuid: string;
     age?: string;
@@ -109,6 +109,7 @@ export interface MappedAppointment {
   dateTime: string;
   serviceType: string;
   serviceUuid: string;
+  serviceTypeUuid?: string;
   appointmentKind: string;
   provider: string;
   location: string;
@@ -193,3 +194,8 @@ export enum AppointmentTypes {
 }
 
 export type CalendarType = 'daily' | 'weekly' | 'monthly';
+
+export interface Identifier {
+  identifier: string;
+  identifierName?: string;
+}

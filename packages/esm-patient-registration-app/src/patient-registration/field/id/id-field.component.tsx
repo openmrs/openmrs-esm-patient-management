@@ -1,16 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
-import IdentifierSelectionOverlay from './identifier-selection-overlay';
+import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
 import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import {
-  FormValues,
-  IdentifierSource,
-  PatientIdentifierType,
-  PatientIdentifierValue,
+  type FormValues,
+  type IdentifierSource,
+  type PatientIdentifierType,
+  type PatientIdentifierValue,
 } from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
@@ -31,8 +31,8 @@ export function setIdentifierSource(
     identifierValue: autoGeneration
       ? 'auto-generated'
       : identifierValue !== 'auto-generated'
-      ? identifierValue
-      : initialValue,
+        ? identifierValue
+        : initialValue,
   };
 }
 
@@ -101,6 +101,11 @@ export const Identifiers: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [identifierTypes, setFieldValue, defaultPatientIdentifierTypes, values.identifiers, initializeIdentifier]);
 
+  const closeIdentifierSelectionOverlay = useCallback(
+    () => setShowIdentifierOverlay(false),
+    [setShowIdentifierOverlay],
+  );
+
   if (isLoading && !isOffline) {
     return (
       <div data-testid="loading-skeleton" className={styles.halfWidthInDesktopView}>
@@ -131,10 +136,7 @@ export const Identifiers: React.FC = () => {
           <IdentifierInput key={fieldName} fieldName={fieldName} patientIdentifier={identifier} />
         ))}
         {showIdentifierOverlay && (
-          <IdentifierSelectionOverlay
-            setFieldValue={setFieldValue}
-            closeOverlay={() => setShowIdentifierOverlay(false)}
-          />
+          <IdentifierSelectionOverlay setFieldValue={setFieldValue} closeOverlay={closeIdentifierSelectionOverlay} />
         )}
       </div>
     </div>

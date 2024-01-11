@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect, useState, useCallback, MouseEvent, AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, type AnchorHTMLAttributes } from 'react';
+import classNames from 'classnames';
 import {
   DataTable,
   DataTableSkeleton,
@@ -29,14 +30,13 @@ import {
   ExtensionSlot,
   formatDatetime,
   parseDate,
-  interpolateUrl,
-  navigate,
   showModal,
+  ConfigurableLink,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './visits-missing-inqueue.scss';
 import { getOriginFromPathName } from '../active-visits/active-visits-table.resource';
-import { ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
+import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
 
 interface PaginationData {
@@ -44,23 +44,6 @@ interface PaginationData {
   results: Array<ActiveVisit>;
   currentPage: number;
 }
-interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  to: string;
-  from: string;
-}
-
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', from);
-  };
-  return (
-    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {children}
-    </a>
-  );
-};
 
 function AddMenu({ visitDetails }: { visitDetails: ActiveVisit }) {
   const { t } = useTranslation();
@@ -90,9 +73,6 @@ const MissingQueueEntries = () => {
   const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const [searchString, setSearchString] = useState('');
-
-  const currentPathName = window.location.pathname;
-  const fromPage = getOriginFromPathName(currentPathName);
 
   const headerData = useMemo(
     () => [
@@ -212,11 +192,10 @@ const MissingQueueEntries = () => {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'name' ? (
-                              <PatientNameLink
-                                from={fromPage}
+                              <ConfigurableLink
                                 to={`\${openmrsSpaBase}/patient/${paginatedActiveVisits?.[index]?.patientUuid}/chart/`}>
                                 {cell.value}
-                              </PatientNameLink>
+                              </ConfigurableLink>
                             ) : (
                               cell.value
                             )}
@@ -252,7 +231,7 @@ const MissingQueueEntries = () => {
                     height: isDesktop(layout) ? '2rem' : '3rem',
                     margin: '1rem 1.5rem',
                   }}
-                  className={`${styles.emptyRow} ${styles.bodyLong01}`}>
+                  className={classNames(styles.emptyRow, styles.bodyLong01)}>
                   {t('noVisitsNotInQueueFound', 'No visits currently not in queue found')}
                 </p>
               )}

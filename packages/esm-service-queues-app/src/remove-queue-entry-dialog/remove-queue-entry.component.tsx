@@ -1,15 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import {
-  parseDate,
-  showNotification,
-  showToast,
-  toDateObjectStrict,
-  toOmrsIsoString,
-  useVisit,
-} from '@openmrs/esm-framework';
-import { MappedQueueEntry } from '../types';
+import { parseDate, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { type MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
 import { useCheckedInAppointments, voidQueueEntry } from './remove-queue-entry.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
@@ -48,18 +41,18 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
     ).then((response) => {
       closeModal();
       mutate();
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'success',
-        description: t('queueEntryRemovedSuccessfully', `Queue entry removed successfully`),
+        subtitle: t('queueEntryRemovedSuccessfully', `Queue entry removed successfully`),
         title: t('queueEntryRemoved', 'Queue entry removed'),
       });
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('removeQueueEntryError', 'Error removing queue entry'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          isLowContrast: false,
+          subtitle: error?.message,
         });
       };
     });

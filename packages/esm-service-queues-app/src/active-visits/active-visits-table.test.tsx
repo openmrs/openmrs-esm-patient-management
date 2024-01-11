@@ -1,13 +1,11 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
-import { ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
 import { of } from 'rxjs';
-import { renderWithSwr } from '../../../../tools/test-helpers';
-import { mockServices, mockVisitQueueEntries } from '../../__mocks__/active-visits.mock';
-import { mockMappedQueueEntries } from '../../../../__mocks__/queue-entry.mock';
+import { screen } from '@testing-library/react';
+import { type ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
+import { mockServices, mockVisitQueueEntries, mockMappedQueueEntries, mockSession } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import { useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { mockSession } from '../../../../__mocks__/session.mock';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActiveVisitsTable from './active-visits-table.component';
 
@@ -103,7 +101,7 @@ describe('ActiveVisitsTable: ', () => {
 
     renderActiveVisitsTable();
 
-    await waitFor(() => screen.getByRole('table'));
+    await screen.findByRole('table');
 
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
@@ -116,8 +114,8 @@ describe('ActiveVisitsTable: ', () => {
     });
 
     const expectedTableRows = [
-      /Eric Test Ric Not Urgent Waiting For Triage 206 hours and 2 minutes/,
-      /John Smith Emergency Attending Clinical Consultation 206 hours and 2 minutes/,
+      /Eric Test Ric Not Urgent Waiting - Triage 206 hours and 2 minutes/,
+      /John Smith Emergency In Service - Clinical consultation 206 hours and 2 minutes/,
     ];
 
     expectedTableRows.forEach((row) => {

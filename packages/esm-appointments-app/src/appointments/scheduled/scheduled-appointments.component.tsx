@@ -1,126 +1,213 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
-import { useAppointmentList, useEarlyAppointmentList } from '../../hooks/useAppointmentList';
-import { useAppointmentDate } from '../../helpers';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-dayjs.extend(isSameOrBefore);
+import {
+  ExtensionSlot,
+  Extension,
+  useConnectedExtensions,
+  type ConnectedExtension,
+  type ConfigObject,
+} from '@openmrs/esm-framework';
+import { useAppointmentDate } from '../../helpers';
 import styles from './scheduled-appointments.scss';
-import AppointmentsTable from '../common-components/appointments-table.component';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../config-schema';
+
+dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
   visits: Array<any>;
   isLoading: boolean;
   appointmentServiceType?: string;
 }
-type scheduleType = 'CameEarly' | 'Rescheduled' | 'Honoured' | 'Pending' | 'Scheduled';
+
+type DateType = 'pastDate' | 'today' | 'futureDate';
+
+const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
   const { t } = useTranslation();
-  const { patientIdentifierType } = useConfig<ConfigObject>();
-  const { currentAppointmentDate } = useAppointmentDate();
-  const [scheduleType, setScheduleType] = useState<scheduleType>('Scheduled');
-  const { appointmentList, isLoading } = useAppointmentList(
-    scheduleType,
-    currentAppointmentDate,
-    patientIdentifierType,
+  const { currentAppointmentDate: date } = useAppointmentDate();
+
+  // added to prevent auto-removal of translations for dynamic keys
+  // t('checkedIn', 'Checked In');
+  // t('expected', 'Expected');
+
+  const [currentTab, setCurrentTab] = useState<string>(null);
+  const [dateType, setDateType] = useState<DateType>('today');
+  const scheduledAppointmentPanels = useConnectedExtensions(scheduledAppointmentsPanelsSlot);
+  const { allowedExtensions, showExtension, hideExtension } = useAllowedExtensions();
+  const shouldShowPanel = useCallback(
+    (panel: Omit<ConnectedExtension, 'config'>) => allowedExtensions[panel.name] ?? false,
+    [allowedExtensions],
   );
-  const { earlyAppointmentList, isLoading: loading } = useEarlyAppointmentList(
-    currentAppointmentDate,
-    patientIdentifierType,
-  );
-  const isDateInPast = dayjs(currentAppointmentDate).isBefore(dayjs(), 'date');
-  const isDateInFuture = dayjs(currentAppointmentDate).isAfter(dayjs(), 'date');
-  const isToday = dayjs(currentAppointmentDate).isSame(dayjs(), 'date');
 
   useEffect(() => {
-    setScheduleType('Scheduled');
-  }, [currentAppointmentDate]);
+    const dayjsDate = dayjs(date);
+    const now = dayjs();
+    if (dayjsDate.isBefore(now, 'date')) {
+      setDateType('pastDate');
+    } else if (dayjsDate.isAfter(now, 'date')) {
+      setDateType('futureDate');
+    } else {
+      setDateType('today');
+    }
+  }, [date]);
 
-  const filteredAppointments = appointmentServiceType
-    ? appointmentList.filter(({ serviceTypeUuid }) => serviceTypeUuid === appointmentServiceType)
-    : appointmentList;
-  const rowData = appointmentList.map((appointment, index) => {
-    return {
-      id: `${index}`,
-      ...appointment,
-    };
-  });
-  const filteredRow = appointmentServiceType
-    ? rowData.filter((app) => app.serviceTypeUuid === appointmentServiceType)
-    : rowData;
+  useEffect(() => {
+    // This is intended to cover two things:
+    //  1. If no current tab is set, set it to the first allowed tab
+    //  2. If a current tab is set, but the tab is no longer allowed in this context, set it to the
+    //     first allowed tab
+    if (allowedExtensions && (currentTab === null || !allowedExtensions[currentTab])) {
+      for (const extension of Object.getOwnPropertyNames(allowedExtensions)) {
+        if (allowedExtensions[extension]) {
+          setCurrentTab(extension);
+          break;
+        }
+      }
+    }
+  }, [allowedExtensions, currentTab]);
 
-  const appointmentsBaseTableConfig = {
-    Scheduled: {
-      appointments: filteredAppointments,
-      isLoading,
-      tableHeading: t('scheduled', 'Scheduled'),
-      visits,
-      scheduleType,
-    },
-    CameEarly: {
-      appointments: earlyAppointmentList,
-      isLoading: loading,
-      tableHeading: t('cameEarly', 'Came early'),
-      visits,
-      scheduleType,
-    },
-    Honoured: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: t('checkedIn', 'Checked in'),
-      visits,
-      scheduleType,
-    },
-    Rescheduled: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: t('rescheduled', 'Rescheduled'),
-      visits,
-      scheduleType,
-    },
-    Pending: {
-      appointments: filteredRow,
-      isLoading,
-      tableHeading: isDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived'),
-      visits,
-      scheduleType,
-    },
-  };
-
-  const currentConfig = appointmentsBaseTableConfig[scheduleType];
+  const panelsToShow = scheduledAppointmentPanels.filter(shouldShowPanel);
 
   return (
     <>
-      {isToday && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('checkedIn', 'Checked in')} />
-          <Switch name={'Pending'} text={t('notArrived', 'Not arrived')} />
-          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
-        </ContentSwitcher>
-      )}
-      {isDateInPast && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'Honoured'} text={t('checkedIn', 'Checked in')} />
-          <Switch name={'Pending'} text={t('missed', 'Missed')} />
-        </ContentSwitcher>
-      )}
-      {isDateInFuture && (
-        <ContentSwitcher className={styles.switcher} size="sm" onChange={({ name }) => setScheduleType(name)}>
-          <Switch name={'Scheduled'} text={t('scheduled', 'Scheduled')} />
-          <Switch name={'CameEarly'} text={t('cameEarly', 'Came early')} />
-        </ContentSwitcher>
-      )}
-      <div className={styles.container}>
-        <AppointmentsTable {...currentConfig} />
-      </div>
+      <ContentSwitcher
+        className={styles.switcher}
+        size="sm"
+        onChange={({ name }) => setCurrentTab(name)}
+        selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
+        selectionMode="manual">
+        {panelsToShow.map((panel) => {
+          return <Switch key={`panel-${panel.name}`} name={panel.name} text={t(panel.config.title)} />;
+        })}
+      </ContentSwitcher>
+
+      <ExtensionSlot name={scheduledAppointmentsPanelsSlot}>
+        {(extension) => {
+          return (
+            <ExtensionWrapper
+              extension={extension}
+              currentTab={currentTab}
+              appointmentServiceType={appointmentServiceType}
+              date={date}
+              dateType={dateType}
+              showExtensionTab={showExtension}
+              hideExtensionTab={hideExtension}
+            />
+          );
+        }}
+      </ExtensionSlot>
     </>
   );
 };
+
+function useAllowedExtensions() {
+  const [allowedExtensions, dispatch] = useReducer(
+    (state: Record<string, boolean>, action: { type: 'show_extension' | 'hide_extension'; extension: string }) => {
+      let addedState = {} as Record<string, boolean>;
+      switch (action.type) {
+        case 'show_extension':
+          addedState[action.extension] = true;
+          break;
+        case 'hide_extension':
+          addedState[action.extension] = false;
+          break;
+      }
+
+      return { ...state, ...addedState };
+    },
+    {},
+  );
+
+  return {
+    allowedExtensions: allowedExtensions as Readonly<Record<string, boolean>>,
+    showExtension: (extension: string) => dispatch({ type: 'show_extension', extension }),
+    hideExtension: (extension: string) => dispatch({ type: 'hide_extension', extension }),
+  };
+}
+
+function ExtensionWrapper({
+  extension,
+  currentTab,
+  appointmentServiceType,
+  date,
+  dateType,
+  showExtensionTab,
+  hideExtensionTab,
+}: {
+  extension: ConnectedExtension;
+  currentTab: string;
+  appointmentServiceType: string;
+  date: string;
+  dateType: DateType;
+  showExtensionTab: (extension: string) => void;
+  hideExtensionTab: (extension: string) => void;
+}) {
+  const currentConfig = useRef(null);
+  const currentDateType = useRef(dateType);
+
+  // This use effect hook controls whether the tab for this extension should render
+  useEffect(() => {
+    if (
+      currentConfig.current === null ||
+      (currentConfig.current !== null && !shallowEqual(currentConfig.current, extension.config)) ||
+      currentDateType.current !== dateType
+    ) {
+      currentConfig.current = extension.config;
+      currentDateType.current = dateType;
+      shouldDisplayExtensionTab(extension?.config, dateType)
+        ? showExtensionTab(extension.name)
+        : hideExtensionTab(extension.name);
+    }
+  }, [extension, dateType, showExtensionTab, hideExtensionTab]);
+
+  return (
+    <div
+      key={extension.name}
+      className={styles.container}
+      style={{ display: currentTab === extension.name ? 'block' : 'none' }}>
+      <Extension
+        state={{
+          date,
+          appointmentServiceType,
+          status: extension.config?.status,
+          title: extension.config?.title,
+        }}
+      />
+    </div>
+  );
+}
+
+function shouldDisplayExtensionTab(config: ConfigObject | undefined, dateType: DateType): boolean {
+  if (!config) {
+    return false;
+  }
+
+  switch (dateType) {
+    case 'futureDate':
+      return config.showForFutureDate ?? false;
+    case 'pastDate':
+      return config.showForPastDate ?? false;
+    case 'today':
+      return config.showForToday ?? false;
+  }
+}
+
+function shallowEqual(objA: object, objB: object) {
+  if (Object.is(objA, objB)) {
+    return true;
+  }
+
+  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+    return false;
+  }
+
+  const objAKeys = Object.getOwnPropertyNames(objA);
+  const objBKeys = Object.getOwnPropertyNames(objB);
+
+  return objAKeys.length === objBKeys.length && objAKeys.every((key) => objA[key] === objB[key]);
+}
 
 export default ScheduledAppointments;

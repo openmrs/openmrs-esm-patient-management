@@ -1,9 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TransitionQueueEntryModal from './transition-queue-entry-dialog.component';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { navigate } from '@openmrs/esm-framework';
 import { serveQueueEntry, updateQueueEntry } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
+import TransitionQueueEntryModal from './transition-queue-entry-dialog.component';
 
 const mockedNavigate = navigate as jest.Mock;
 
@@ -70,26 +71,26 @@ describe('TransitionQueueEntryModal', () => {
   });
 
   it('handles requeueing patient', async () => {
+    const user = userEvent.setup();
+
     const closeModal = jest.fn();
     render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
-    fireEvent.click(screen.getByText('Requeue'));
+    await user.click(screen.getByText('Requeue'));
 
-    await waitFor(() => {
-      expect(requeueQueueEntry).toHaveBeenCalledWith('Requeued', queueEntry.queueUuid, queueEntry.queueEntryUuid);
-    });
+    expect(requeueQueueEntry).toHaveBeenCalledWith('Requeued', queueEntry.queueUuid, queueEntry.queueEntryUuid);
   });
 
   it('handles serving patient', async () => {
+    const user = userEvent.setup();
+
     const closeModal = jest.fn();
     render(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
 
-    fireEvent.click(screen.getByText('Serve'));
+    await user.click(screen.getByText('Serve'));
 
-    await waitFor(() => {
-      expect(updateQueueEntry).toHaveBeenCalled();
-      expect(serveQueueEntry).toHaveBeenCalled();
-      expect(mockedNavigate).toHaveBeenCalled();
-    });
+    expect(updateQueueEntry).toHaveBeenCalled();
+    expect(serveQueueEntry).toHaveBeenCalled();
+    expect(mockedNavigate).toHaveBeenCalled();
   });
 });

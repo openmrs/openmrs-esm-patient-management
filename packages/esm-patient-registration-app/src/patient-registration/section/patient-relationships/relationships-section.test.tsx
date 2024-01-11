@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { RelationshipsSection } from './relationships-section.component';
 
 jest.mock('../../patient-registration.resource', () => ({
@@ -17,7 +17,7 @@ jest.mock('../../patient-registration.resource', () => ({
 }));
 
 let mockResourcesContextValue = {
-  addressTemplate: [],
+  addressTemplate: null,
   currentSession: {
     authenticated: true,
     sessionId: 'JSESSION',
@@ -40,15 +40,27 @@ describe('RelationshipsSection', () => {
     );
 
     expect(screen.getByLabelText(/loading relationships section/i)).toBeInTheDocument();
-    expect(screen.getByRole(/progressbar/i)).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
     expect(screen.queryByText(/add relationship/i)).not.toBeInTheDocument();
   });
 
   it('renders relationships when relationshipTypes are available', () => {
     const relationshipTypes = {
       results: [
-        { aIsToB: 'Mother', bIsToA: 'Child', uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd34' },
-        { aIsToB: 'Father', bIsToA: 'Child', uuid: '52ae5ce0-d64b-11ea-9064-5adc43bbdd24' },
+        {
+          displayAIsToB: 'Mother',
+          aIsToB: 'Mother',
+          bIsToA: 'Child',
+          displayBIsToA: 'Child',
+          uuid: '42ae5ce0-d64b-11ea-9064-5adc43bbdd34',
+        },
+        {
+          displayAIsToB: 'Father',
+          aIsToB: 'Father',
+          bIsToA: 'Child',
+          displayBIsToA: 'Child',
+          uuid: '52ae5ce0-d64b-11ea-9064-5adc43bbdd24',
+        },
       ],
     };
     mockResourcesContextValue = {

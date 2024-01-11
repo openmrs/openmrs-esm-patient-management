@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectionDefinition } from '../../config-schema';
+import { type SectionDefinition } from '../../config-schema';
 import { Field } from '../field/field.component';
 
 export interface GenericSectionProps {

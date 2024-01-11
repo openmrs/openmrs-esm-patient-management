@@ -1,13 +1,13 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '../../../../__mocks__/appointments.mock';
+import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '__mocks__';
 import AppointmentsMetrics from './appointments-metrics.component';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('../hooks/useClinicalMetrics', () => {
-  const originalModule = jest.requireActual('../hooks/useClinicalMetrics.tsx');
+  const originalModule = jest.requireActual('../hooks/useClinicalMetrics');
 
   return {
     ...originalModule,
@@ -36,13 +36,11 @@ describe('Appointment metrics', () => {
 
     renderAppointmentMetrics();
 
-    await act(() => {
-      expect(screen.getByText(/appointment metrics/i)).toBeInTheDocument();
-      expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
-      expect(screen.getByText(/patients/i)).toBeInTheDocument();
-      expect(screen.getByText(/16/i)).toBeInTheDocument();
-      expect(screen.getByText(/4/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/appointment metrics/i);
+    expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/16/i)).toBeInTheDocument();
+    expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
 });
 

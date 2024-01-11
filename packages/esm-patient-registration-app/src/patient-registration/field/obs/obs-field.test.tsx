@@ -2,17 +2,72 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig } from '@openmrs/esm-framework';
-import { FieldDefinition } from '../../../config-schema';
+import { type FieldDefinition } from '../../../config-schema';
 import { ObsField } from './obs-field.component';
 
 const mockUseConfig = useConfig as jest.Mock;
 
-// The UUIDs in this test all refer to ones that are in `__mocks__/field.resource.ts`
-jest.mock('../field.resource');
+jest.mock('../field.resource', () => ({
+  useConcept: jest.fn().mockImplementation((uuid: string) => {
+    let data;
+    if (uuid == 'weight-uuid') {
+      data = {
+        uuid: 'weight-uuid',
+        display: 'Weight (kg)',
+        datatype: { display: 'Numeric', uuid: 'num' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'chief-complaint-uuid') {
+      data = {
+        uuid: 'chief-complaint-uuid',
+        display: 'Chief Complaint',
+        datatype: { display: 'Text', uuid: 'txt' },
+        answers: [],
+        setMembers: [],
+      };
+    } else if (uuid == 'nationality-uuid') {
+      data = {
+        uuid: 'nationality-uuid',
+        display: 'Nationality',
+        datatype: { display: 'Coded', uuid: 'cdd' },
+        answers: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        setMembers: [],
+      };
+    }
+    return {
+      data: data ?? null,
+      isLoading: !data,
+    };
+  }),
+  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
+    if (uuid == 'nationality-uuid') {
+      return {
+        data: [
+          { display: 'USA', uuid: 'usa' },
+          { display: 'Mexico', uuid: 'mex' },
+        ],
+        isLoading: false,
+      };
+    } else if (uuid == 'other-countries-uuid') {
+      return {
+        data: [
+          { display: 'Kenya', uuid: 'ke' },
+          { display: 'Uganda', uuid: 'ug' },
+        ],
+        isLoading: false,
+      };
+    }
+  }),
+}));
 
 type FieldProps = {
   children: ({ field, form: { touched, errors } }) => React.ReactNode;
 };
+
 jest.mock('formik', () => ({
   ...(jest.requireActual('formik') as object),
   Field: jest.fn(({ children }: FieldProps) => <>{children({ field: {}, form: { touched: {}, errors: {} } })}</>),
@@ -24,6 +79,7 @@ const textFieldDef: FieldDefinition = {
   type: 'obs',
   label: '',
   placeholder: '',
+  showHeading: false,
   uuid: 'chief-complaint-uuid',
   validation: {
     required: false,
@@ -43,6 +99,7 @@ const numberFieldDef: FieldDefinition = {
   type: 'obs',
   label: '',
   placeholder: '',
+  showHeading: false,
   uuid: 'weight-uuid',
   validation: {
     required: false,
@@ -62,6 +119,7 @@ const codedFieldDef: FieldDefinition = {
   type: 'obs',
   label: '',
   placeholder: '',
+  showHeading: false,
   uuid: 'nationality-uuid',
   validation: {
     required: false,
@@ -85,7 +143,9 @@ describe('ObsField', () => {
     mockUseConfig.mockReturnValue({ registrationObs: { encounterTypeUuid: null } });
     console.error = jest.fn();
     render(<ObsField fieldDefinition={textFieldDef} />);
-    expect(console.error).toHaveBeenCalledWith(expect.stringMatching(/no registration encounter type.*configure/i));
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringMatching(/no registration encounter type has been configured/i),
+    );
     expect(screen.queryByRole('textbox')).toBeNull();
   });
 
