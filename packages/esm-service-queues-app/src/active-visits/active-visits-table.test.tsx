@@ -74,6 +74,7 @@ describe('ActiveVisitsTable: ', () => {
         },
         visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
         showQueueTableTab: false,
+        customPatientChartUrl: 'someUrl',
       } as ConfigObject);
   });
 
