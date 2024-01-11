@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
-import { Dropdown } from '@carbon/react';
+import { Dropdown, DropdownSkeleton } from '@carbon/react';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+
 import {
   updateSelectedQueueLocationUuid,
   updateSelectedQueueLocationName,
@@ -26,14 +27,6 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
     updateSelectedServiceName('All');
   }, []);
 
-  if (isLoading) {
-    return <p>Loading...</p>; // Show loading state while fetching data
-  }
-
-  if (error) {
-    return <p>Error: {error.message}</p>; // Display error if fetching fails
-  }
-
   return (
     <>
       <div className={styles.header} data-testid="patient-queue-header">
@@ -54,14 +47,20 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
           </div>
           <div className={styles.dropdown}>
             <label className={styles.view}>{t('view', 'View')}:</label>
-            <Dropdown
-              id="typeOfCare"
-              label={currentQueueLocationName ?? (queueLocations.length > 0 ? queueLocations[0].name : '')}
-              items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
-              itemToString={(item) => (item ? item.name : '')}
-              type="inline"
-              onChange={handleQueueLocationChange}
-            />
+            {isLoading ? (
+              <div style={{ width: 150 }}>
+                <DropdownSkeleton />
+              </div>
+            ) : (
+              <Dropdown
+                id="typeOfCare"
+                label={currentQueueLocationName ?? t('all', 'All')}
+                items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
+                itemToString={(item) => (item ? item.name : '')}
+                type="inline"
+                onChange={handleQueueLocationChange}
+              />
+            )}
           </div>
         </div>
       </div>
