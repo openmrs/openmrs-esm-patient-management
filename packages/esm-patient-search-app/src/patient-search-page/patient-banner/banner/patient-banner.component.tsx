@@ -1,4 +1,4 @@
-import React, { type MouseEvent, useMemo } from 'react';
+import React, { type MouseEvent, useMemo, useContext } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
@@ -18,34 +18,25 @@ import { type SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { PatientSearchContext } from '../../../patient-search-context';
 
 interface PatientBannerProps {
   patient: SearchedPatient;
   patientUuid: string;
-  onTransition?: () => void;
   hideActionsOverflow?: boolean;
-  selectPatientAction: (evt: any, patientUuid: string) => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({
-  patient,
-  patientUuid,
-  onTransition,
-  hideActionsOverflow,
-  selectPatientAction,
-}) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const { t } = useTranslation();
   const overflowMenuRef = React.useRef(null);
-  const showContactDetailsRef = React.useRef(null);
-  const startVisitButtonRef = React.useRef(null);
   const { currentVisit } = useVisit(patientUuid);
   const [showDropdown, setShowDropdown] = React.useState(false);
-  const config = useConfig();
+  const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
   const patientSearchActions = useConnectedExtensions('patient-search-actions-slot');
 
   const patientActionsSlotState = React.useMemo(
-    () => ({ patientUuid, selectPatientAction, onTransition, launchPatientChart: true }),
-    [patientUuid, selectPatientAction, onTransition],
+    () => ({ patientUuid, selectPatientAction: nonNavigationSelectPatientAction, launchPatientChart: true }),
+    [patientUuid, nonNavigationSelectPatientAction],
   );
 
   const patientName = patient.person.personName.display;
@@ -104,14 +95,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           [styles.activePatientContainer]: !isDeceased,
         })}
         role="banner">
-        <ConfigurableLink
-          className={classNames(styles.patientBanner, {
-            [styles.patientAvatarButton]: selectPatientAction,
-          })}
-          onClick={(evt) => selectPatientAction(evt, patientUuid)}
-          to={`${interpolateString(config.search.patientResultUrl, {
-            patientUuid: patientUuid,
-          })}`}>
+        <ClickablePatientContainer patientUuid={patientUuid}>
           {patientAvatar}
           <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
             <div className={styles.flexRow}>
@@ -130,7 +114,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               {patient.identifiers?.length ? patient.identifiers.map((i) => i.identifier).join(', ') : '--'}
             </div>
           </div>
-        </ConfigurableLink>
+        </ClickablePatientContainer>
         <div className={styles.buttonCol}>
           {showActionsMenu && (
             <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
@@ -188,6 +172,43 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       )}
     </>
   );
+};
+
+interface ClickablePatientContainerProps {
+  patientUuid: string;
+  children: React.ReactNode;
+}
+
+const ClickablePatientContainer = ({ patientUuid, children }: ClickablePatientContainerProps) => {
+  const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
+  const config = useConfig();
+
+  if (nonNavigationSelectPatientAction) {
+    return (
+      <button
+        className={classNames(styles.patientBannerButton, styles.patientBanner, {
+          [styles.patientAvatarButton]: nonNavigationSelectPatientAction,
+        })}
+        key={patientUuid}
+        onClick={() => {
+          nonNavigationSelectPatientAction(patientUuid);
+          patientClickSideEffect?.(patientUuid);
+        }}>
+        {children}
+      </button>
+    );
+  } else {
+    return (
+      <ConfigurableLink
+        className={styles.patientBanner}
+        onBeforeNavigate={() => patientClickSideEffect?.(patientUuid)}
+        to={`${interpolateString(config.search.patientResultUrl, {
+          patientUuid: patientUuid,
+        })}`}>
+        {children}
+      </ConfigurableLink>
+    );
+  }
 };
 
 export const PatientBannerSkeleton = () => {

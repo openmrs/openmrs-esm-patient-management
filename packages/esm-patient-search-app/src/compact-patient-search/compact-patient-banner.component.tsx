@@ -1,139 +1,167 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
-import type { Identifier, SearchedPatient } from '../types';
+import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
+import { PatientSearchContext } from '../patient-search-context';
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
-  selectPatientAction?: (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    index: number,
-    patients: Array<SearchedPatient>,
-  ) => void;
 }
 
-const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(
-  ({ patients, selectPatientAction }, ref) => {
-    const config = useConfig();
-    const { t } = useTranslation();
+const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(({ patients }, ref) => {
+  const config = useConfig();
+  const { t } = useTranslation();
 
-    const getGender = (gender: string) => {
-      switch (gender) {
-        case 'M':
-          return t('male', 'Male');
-        case 'F':
-          return t('female', 'Female');
-        case 'O':
-          return t('other', 'Other');
-        case 'U':
-          return t('unknown', 'Unknown');
-        default:
-          return gender;
-      }
-    };
+  const getGender = (gender: string) => {
+    switch (gender) {
+      case 'M':
+        return t('male', 'Male');
+      case 'F':
+        return t('female', 'Female');
+      case 'O':
+        return t('other', 'Other');
+      case 'U':
+        return t('unknown', 'Unknown');
+      default:
+        return gender;
+    }
+  };
 
-    const fhirPatients = useMemo(() => {
-      // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
-      // be removed. In fact, it could maybe be done at this point already, but doing it when the
-      // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
-      // doesn't have to be touched then.
-      return patients.map((patient) => {
-        const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
-        return {
-          id: patient.uuid,
-          name: [
-            {
-              given: [patient.person.personName.givenName, patient.person.personName.middleName],
-              family: patient.person.personName.familyName,
-            },
-          ],
-          gender: patient.person.gender,
-          birthDate: patient.person.birthdate,
-          deceasedDateTime: patient.person.deathDate,
-          deceasedBoolean: patient.person.death,
-          identifier: patient.identifiers,
-          address: preferredAddress
-            ? [
-                {
-                  city: preferredAddress.cityVillage,
-                  country: preferredAddress.country,
-                  postalCode: preferredAddress.postalCode,
-                  state: preferredAddress.stateProvince,
-                  use: 'home',
-                },
-              ]
-            : [],
-          telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display == 'Telephone Number'),
-        };
-      });
-    }, [patients]);
+  const fhirPatients: Array<FHIRPatientType> = useMemo(() => {
+    // TODO: If/When the online patient search is migrated to the FHIR API at some point, this could
+    // be removed. In fact, it could maybe be done at this point already, but doing it when the
+    // search returns FHIR objects is much simpler because the code which uses the `fhirPatients`
+    // doesn't have to be touched then.
+    return patients.map((patient) => {
+      const preferredAddress = patient.person.addresses?.find((address) => address.preferred);
+      return {
+        id: patient.uuid,
+        name: [
+          {
+            id: String(Math.random()), // not used
+            given: [patient.person.personName.givenName, patient.person.personName.middleName],
+            family: patient.person.personName.familyName,
+          },
+        ],
+        gender: patient.person.gender,
+        birthDate: patient.person.birthdate,
+        deceasedDateTime: patient.person.deathDate,
+        deceasedBoolean: patient.person.death,
+        identifier: patient.identifiers as any as Array<FHIRIdentifier>,
+        address: preferredAddress
+          ? [
+              {
+                id: String(Math.random()), // not used
+                city: preferredAddress.cityVillage,
+                country: preferredAddress.country,
+                postalCode: preferredAddress.postalCode,
+                state: preferredAddress.stateProvince,
+                use: 'home',
+              },
+            ]
+          : [],
+        telecom: patient.attributes?.filter((attribute) => attribute.attributeType.display == 'Telephone Number'),
+      };
+    });
+  }, [patients]);
 
-    return (
-      <div ref={ref}>
-        {fhirPatients.map((patient, index) => {
-          const patientIdentifiers = patient.identifier.filter((identifier) =>
-            config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
-          );
-          const isDeceased = Boolean(patient?.deceasedDateTime);
+  return (
+    <div ref={ref}>
+      {fhirPatients.map((patient, index) => {
+        const patientIdentifiers = patients[index].identifiers.filter((identifier) =>
+          config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
+        );
 
-          return (
-            <ConfigurableLink
-              className={classNames(styles.patientSearchResult, {
-                [styles.deceased]: isDeceased,
-              })}
-              key={patient.id}
-              onClick={(event) => selectPatientAction(event, index, patients)}
-              to={`${interpolateString(config.search.patientResultUrl, {
-                patientUuid: patient.id,
-              })}`}>
-              <div className={styles.patientAvatar} role="img">
-                <ExtensionSlot
-                  name="patient-photo-slot"
-                  state={{
-                    patientUuid: patient.id,
-                    patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
-                    size: 'small',
-                  }}
-                />
-              </div>
-              <div>
-                <div className={styles.flexRow}>
-                  <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]
-                    ?.family}`}</h2>
-                  {/* <ExtensionSlot
+        return (
+          <ClickablePatientContainer patient={patients[index]}>
+            <div className={styles.patientAvatar} role="img">
+              <ExtensionSlot
+                name="patient-photo-slot"
+                state={{
+                  patientUuid: patient.id,
+                  patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
+                  size: 'small',
+                }}
+              />
+            </div>
+            <div>
+              <div className={styles.flexRow}>
+                <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]
+                  ?.family}`}</h2>
+                {/* <ExtensionSlot
                     name="patient-banner-tags-slot"
                     state={{ patient, patientUuid: patient.id }}
                     className={styles.flexRow}
                   /> */}
-                </div>
-                <div className={styles.demographics}>
-                  {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
-                  <span className={styles.middot}>&middot;</span>
-                  {config.defaultIdentifierTypes.length ? (
-                    <>
-                      {patientIdentifiers.length > 1 ? (
-                        <PatientIdentifier identifiers={patientIdentifiers} />
-                      ) : (
-                        <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <span className={styles.middot}>&middot;</span> {patient.identifier?.[0]?.identifier}
-                    </>
-                  )}
-                </div>
               </div>
-            </ConfigurableLink>
-          );
+              <div className={styles.demographics}>
+                {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
+                <span className={styles.middot}>&middot;</span>
+                {config.defaultIdentifierTypes.length ? (
+                  <>
+                    {patientIdentifiers.length > 1 ? (
+                      <PatientIdentifier identifiers={patientIdentifiers} />
+                    ) : (
+                      <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <span className={styles.middot}>&middot;</span> {patients[index].identifiers?.[0]?.identifier}
+                  </>
+                )}
+              </div>
+            </div>
+          </ClickablePatientContainer>
+        );
+      })}
+    </div>
+  );
+});
+
+interface ClickablePatientContainerProps {
+  patient: SearchedPatient;
+  children: React.ReactNode;
+}
+
+const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
+  const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);
+  const config = useConfig();
+  const isDeceased = Boolean(patient?.person?.deathDate);
+
+  if (nonNavigationSelectPatientAction) {
+    return (
+      <button
+        className={classNames(styles.patientSearchResult, styles.patientSearchResultButton, {
+          [styles.deceased]: isDeceased,
         })}
-      </div>
+        key={patient.uuid}
+        onClick={() => {
+          nonNavigationSelectPatientAction(patient.uuid);
+          patientClickSideEffect?.(patient.uuid);
+        }}>
+        {children}
+      </button>
     );
-  },
-);
+  } else {
+    return (
+      <ConfigurableLink
+        className={classNames(styles.patientSearchResult, {
+          [styles.deceased]: isDeceased,
+        })}
+        key={patient.uuid}
+        onBeforeNavigate={() => patientClickSideEffect?.(patient.uuid)}
+        to={`${interpolateString(config.search.patientResultUrl, {
+          patientUuid: patient.uuid,
+        })}`}>
+        {children}
+      </ConfigurableLink>
+    );
+  }
+};
 
 export const SearchResultSkeleton = () => {
   return (

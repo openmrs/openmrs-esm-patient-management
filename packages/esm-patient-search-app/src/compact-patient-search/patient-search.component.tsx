@@ -8,18 +8,10 @@ import styles from './patient-search.scss';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
-  selectPatientAction?: (
-    evt: React.MouseEvent<HTMLAnchorElement>,
-    index: number,
-    patients: Array<SearchedPatient>,
-  ) => void;
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  (
-    { selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults },
-    ref,
-  ) => {
+  ({ isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
     const loadingIconRef = useCallback(
@@ -87,7 +79,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <PatientSearchResults patients={searchResults} selectPatientAction={selectPatientAction} ref={ref} />
+            <PatientSearchResults patients={searchResults} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
