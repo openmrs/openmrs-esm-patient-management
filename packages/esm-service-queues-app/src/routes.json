@@ -20,6 +20,7 @@
         "slot": "service-queues-dashboard-slot",
         "title": "Service queues"
       },
+      "order": 1,
       "online": true,
       "offline": true
     }, 

@@ -12,7 +12,8 @@
         "name": "patient-lists",
         "slot": "patient-lists-dashboard-slot",
         "title": "Patient lists"
-      }
+      },
+      "order": 3
     },
     {
       "component": "root",
