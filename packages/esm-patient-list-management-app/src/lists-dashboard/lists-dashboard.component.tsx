@@ -51,23 +51,25 @@ const ListsDashboard: React.FC = () => {
         ?.map((searchParam) => searchParam?.split('=')),
     )['new_cohort'] === 'true';
 
-  const showCohortType = selectedTab === TabIndices.ALL_LISTS || selectedTab === TabIndices.STARRED_LISTS;
-
+  const showCohortTypeColumn = selectedTab === TabIndices.ALL_LISTS || selectedTab === TabIndices.STARRED_LISTS;
   const handleHideNewListOverlay = () => {
     navigate({
       to: window.getOpenmrsSpaBase() + 'home/patient-lists',
     });
   };
 
-  const tableHeaders = [
-    { id: 1, key: 'display', header: t('listName', 'List name') },
-    { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
-    { id: 4, key: 'isStarred', header: '' },
-  ];
-
-  if (showCohortType) {
-    tableHeaders.splice(1, 0, { id: 2, key: 'type', header: t('listType', 'List type') });
-  }
+  const tableHeaders = showCohortTypeColumn
+    ? [
+        { id: 1, key: 'display', header: t('listName', 'List name') },
+        { id: 2, key: 'type', header: t('listType', 'List type') },
+        { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
+        { id: 4, key: 'isStarred', header: '' },
+      ]
+    : [
+        { id: 1, key: 'display', header: t('listName', 'List name') },
+        { id: 2, key: 'size', header: t('noOfPatients', 'No. of patients') },
+        { id: 4, key: 'isStarred', header: '' },
+      ];
 
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>

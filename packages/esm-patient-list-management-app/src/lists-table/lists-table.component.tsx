@@ -8,7 +8,6 @@ import {
   DataTableSkeleton,
   InlineLoading,
   Layer,
-  Pagination,
   Search,
   Table,
   TableBody,
@@ -34,6 +33,7 @@ import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
 import { starPatientList } from '../api/api-remote';
 import { ErrorState } from '../error-state/error-state.component';
+import { CustomPagination } from './custom-pagination.component';
 import EmptyState from '../empty-state/empty-state.component';
 import styles from './lists-table.scss';
 
@@ -57,6 +57,13 @@ interface PatientListTableProps {
   style?: CSSProperties;
 }
 
+interface PaginationProps {
+  paginated: boolean;
+  goTo: (page: number) => void;
+  results: Array<PatientList>;
+  currentPage: number;
+}
+
 const ListsTable: React.FC<PatientListTableProps> = ({
   error,
   handleCreate,
@@ -73,15 +80,12 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const userId = useSession()?.user?.uuid;
   const layout = useLayoutType();
   const config: ConfigSchema = useConfig();
-  const pageSizes = [10, 20, 25, 50];
-  const [pageSize, setPageSize] = useState(config.patientListsToShow ?? 20);
+  const pageSize = config.patientListsToShow ?? 10;
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const [searchTerm, setSearchTerm] = useState('');
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
   const debouncedSearchTerm = useDebounce(searchTerm);
 
-  const { key, order } = sortParams;
-  const sortedData = order === 'DESC' ? orderBy(patientLists, [key], ['desc']) : orderBy(patientLists, [key], ['asc']);
   const { toggleStarredList, starredLists } = useStarredLists();
 
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
@@ -89,11 +93,9 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     setSortParams({ key, order: sortDirection });
   }
 
-  const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
-
-  const filteredLists = useMemo(() => {
+  const filteredLists: Array<PatientList> = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return results;
+      return patientLists;
     }
 
     return debouncedSearchTerm
@@ -101,19 +103,25 @@ const ListsTable: React.FC<PatientListTableProps> = ({
           .filter(debouncedSearchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
-      : results;
-  }, [results, debouncedSearchTerm]);
+      : patientLists;
+  }, [patientLists, debouncedSearchTerm]);
+
+  const { key, order } = sortParams;
+  const sortedData =
+    order === 'DESC' ? orderBy(filteredLists, [key], ['desc']) : orderBy(filteredLists, [key], ['asc']);
+
+  const { paginated, goTo, results, currentPage }: PaginationProps = usePagination(sortedData, pageSize);
 
   const tableRows = useMemo(
     () =>
-      filteredLists?.map((list) => ({
+      results.map((list) => ({
         id: list.id,
         display: list.display,
         description: list.description,
         type: list.type,
         size: list.size,
       })) ?? [],
-    [filteredLists],
+    [results],
   );
 
   if (isLoading) {
@@ -135,113 +143,101 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     return <ErrorState error={error} headerTitle={t('patientLists', 'Patient lists')} />;
   }
 
-  if (patientLists?.length) {
-    return (
-      <>
-        <div id="tableToolBar" className={styles.searchContainer}>
-          <div>{isValidating && <InlineLoading />}</div>
-          <Layer>
-            <Search
-              className={styles.searchbox}
-              id={`${id}-search`}
-              labelText=""
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              placeholder={t('searchThisList', 'Search this list')}
-              size={responsiveSize}
-              value={searchTerm}
-            />
-          </Layer>
-        </div>
-        <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-            <TableContainer {...getTableContainerProps()}>
-              <Table
-                {...getTableProps()}
-                className={styles.table}
-                data-testid="patientListsTable"
-                isSortable
-                useZebraStyles>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}
-                        key={header.key}
-                        {...getHeaderProps({ header })}
-                        isSortable>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody className={styles.tableBody}>
-                  {rows.map((row) => {
-                    const currentList = patientLists?.find((list) => list?.id === row.id);
-                    const detailPageUrl = window.getOpenmrsSpaBase() + `home/patient-lists/${row.id}`;
-
-                    return (
-                      <TableRow
-                        {...getRowProps({ row })}
-                        className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
-                        key={row.id}>
-                        <TableCell>
-                          <ConfigurableLink className={styles.link} to={detailPageUrl}>
-                            {currentList?.display ?? ''}
-                          </ConfigurableLink>
-                        </TableCell>
-                        <TableCell>{currentList?.type ?? ''}</TableCell>
-                        <TableCell>{currentList?.size ?? ''}</TableCell>
-                        <PatientListStarIcon
-                          cohortUuid={row.id}
-                          isStarred={starredLists.includes(row.id)}
-                          toggleStarredList={toggleStarredList}
-                        />
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-        {filteredLists?.length === 0 && (
-          <div className={styles.filterEmptyState}>
-            <Layer level={0}>
-              <Tile className={styles.filterEmptyStateTile}>
-                <p className={styles.filterEmptyStateContent}>{t('noMatchingLists', 'No matching lists to display')}</p>
-                <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-              </Tile>
-            </Layer>
-          </div>
-        )}
-        {paginated && (
-          <Layer>
-            <Pagination
-              backwardText={t('previousPage', 'Previous page')}
-              forwardText={t('nextPage', 'Next page')}
-              itemsPerPageText={t('itemsPerPage', 'Items per page:')}
-              onChange={({ page: newPage, pageSize: newPageSize }) => {
-                if (newPageSize !== pageSize) {
-                  setPageSize(newPageSize);
-                }
-                if (newPage !== currentPage) {
-                  goTo(newPage);
-                }
-              }}
-              page={currentPage}
-              pageNumberText={t('pageNumber', 'Page number')}
-              pageSize={pageSize}
-              pageSizes={pageSizes}
-              size={isDesktop(layout) ? 'sm' : 'lg'}
-              totalItems={patientLists?.length}
-            />
-          </Layer>
-        )}
-      </>
-    );
+  if (patientLists.length === 0) {
+    return <EmptyState launchForm={handleCreate} listType={listType} />;
   }
 
-  return <EmptyState launchForm={handleCreate} listType={listType} />;
+  return (
+    <>
+      <div id="tableToolBar" className={styles.searchContainer}>
+        <div>{isValidating && <InlineLoading />}</div>
+        <Layer>
+          <Search
+            className={styles.searchbox}
+            id={`${id}-search`}
+            labelText=""
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            placeholder={t('searchThisList', 'Search this list')}
+            size={responsiveSize}
+            value={searchTerm}
+          />
+        </Layer>
+      </div>
+      <DataTable rows={tableRows} headers={headers} size={responsiveSize} sortRow={customSortRow}>
+        {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getTableContainerProps }) => (
+          <TableContainer {...getTableContainerProps()} className={styles.tableContainer}>
+            <Table
+              {...getTableProps()}
+              className={styles.table}
+              data-testid="patientListsTable"
+              isSortable
+              useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader
+                      className={isDesktop(layout) ? styles.desktopHeader : styles.tabletHeader}
+                      key={header.key}
+                      {...getHeaderProps({ header })}
+                      isSortable>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody className={styles.tableBody}>
+                {rows.map((row) => {
+                  const currentList = patientLists?.find((list) => list?.id === row.id);
+                  const detailPageUrl = window.getOpenmrsSpaBase() + `home/patient-lists/${row.id}`;
+
+                  return (
+                    <TableRow
+                      {...getRowProps({ row })}
+                      className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
+                      key={row.id}>
+                      <TableCell>
+                        <ConfigurableLink className={styles.link} to={detailPageUrl}>
+                          {currentList?.display ?? ''}
+                        </ConfigurableLink>
+                      </TableCell>
+                      <TableCell>{currentList?.type ?? ''}</TableCell>
+                      <TableCell>{currentList?.size ?? ''}</TableCell>
+                      <PatientListStarIcon
+                        cohortUuid={row.id}
+                        isStarred={starredLists.includes(row.id)}
+                        toggleStarredList={toggleStarredList}
+                      />
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {results?.length === 0 && (
+        <div className={styles.filterEmptyState}>
+          <Layer level={0}>
+            <Tile className={styles.filterEmptyStateTile}>
+              <p className={styles.filterEmptyStateContent}>{t('noMatchingLists', 'No matching lists to display')}</p>
+              <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+            </Tile>
+          </Layer>
+        </div>
+      )}
+      {paginated && (
+        <CustomPagination
+          currentItems={results.length}
+          totalItems={filteredLists.length}
+          onPageNumberChange={({ page }) => {
+            goTo(page);
+          }}
+          pageNumber={currentPage}
+          pageSize={pageSize}
+        />
+      )}
+    </>
+  );
 };
 
 interface PatientListStarIconProps {

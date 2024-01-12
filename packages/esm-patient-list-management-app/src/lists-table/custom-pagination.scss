@@ -1,0 +1,67 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.desktop,
+.tablet {
+  @include type.type-style('body-compact-01');
+  display: flex;
+  justify-content: space-between;
+  color: colors.$gray-70;
+  background-color: colors.$white-0;
+  padding-left: 1rem;
+  align-items: center;
+  border: 1px solid colors.$gray-20;
+  border-top: none;
+}
+
+.desktop :global(.cds--pagination) {
+  min-height: 0rem;
+  height: 2rem;
+  width: auto;
+  border: none;
+
+  & :global(.cds--select-input),
+  :global(.cds--btn),
+  :global(.cds--pagination__right) {
+    min-height: 0rem;
+    height: 2rem;
+  }
+}
+
+.tablet :global(.cds--pagination) {
+  min-height: 0rem;
+  height: 3rem;
+  width: auto;
+  border: none;
+
+  & :global(.cds--select-input),
+  :global(.cds--btn),
+  :global(.cds--pagination__right) {
+    min-height: 0rem;
+    height: 3rem;
+  }
+}
+
+.configurableLink {
+  text-decoration: none;
+  @extend .bodyShort01;
+  padding: 0 layout.$spacing-03;
+}
+
+.pagination {
+  @include type.type-style('body-compact-01');
+  background-color: colors.$white-0;
+  color: colors.$gray-70;
+  display: flex;
+}
+
+div.pagination {
+  & > :global(.cds--pagination__left) {
+    display: none;
+  }
+}

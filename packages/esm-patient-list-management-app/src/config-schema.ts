@@ -14,7 +14,7 @@ export const configSchema = {
   patientListsToShow: {
     _type: Type.Number,
     _description: 'The UUID of the `My List` cohort type',
-    _default: '10',
+    _default: 10,
   },
 };
 
