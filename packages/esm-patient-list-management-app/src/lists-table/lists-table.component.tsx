@@ -1,6 +1,9 @@
 import React, { type CSSProperties, useCallback, useId, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import fuzzy from 'fuzzy';
+import orderBy from 'lodash-es/orderBy';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
   InlineLoading,
@@ -14,7 +17,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
   Tile,
 } from '@carbon/react';
 import { Star, StarFilled } from '@carbon/react/icons';
@@ -28,11 +30,9 @@ import {
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import fuzzy from 'fuzzy';
-import orderBy from 'lodash-es/orderBy';
-import { starPatientList } from '../api/api-remote';
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
+import { starPatientList } from '../api/api-remote';
 import { ErrorState } from '../error-state/error-state.component';
 import EmptyState from '../empty-state/empty-state.component';
 import styles from './lists-table.scss';
@@ -46,7 +46,7 @@ interface DataTableHeader {
 }
 
 interface PatientListTableProps {
-  error?: any;
+  error?: Error | null;
   handleCreate?: () => void;
   headers?: Array<DataTableHeader>;
   isLoading?: boolean;
@@ -82,7 +82,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
   const { key, order } = sortParams;
   const sortedData = order === 'DESC' ? orderBy(patientLists, [key], ['desc']) : orderBy(patientLists, [key], ['asc']);
-  const { toggleStarredList, starredLists } = usePatientListStar();
+  const { toggleStarredList, starredLists } = useStarredLists();
 
   function customSortRow(listA, listB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
@@ -98,7 +98,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
     return debouncedSearchTerm
       ? fuzzy
-          .filter(debouncedSearchTerm, results, { extract: (list) => `${list.display} ${list.type}` })
+          .filter(debouncedSearchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
       : results;
@@ -135,7 +135,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
     return <ErrorState error={error} headerTitle={t('patientLists', 'Patient lists')} />;
   }
 
-  if (patientLists.length) {
+  if (patientLists?.length) {
     return (
       <>
         <div id="tableToolBar" className={styles.searchContainer}>
@@ -175,42 +175,30 @@ const ListsTable: React.FC<PatientListTableProps> = ({
                   </TableRow>
                 </TableHead>
                 <TableBody className={styles.tableBody}>
-                  {rows.map((row, index) => (
-                    <TableRow
-                      className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
-                      key={row.id}
-                      {...getRowProps({ row })}>
-                      {row.cells.map((cell) => {
-                        switch (cell.info.header) {
-                          case 'display':
-                            return (
-                              <TableCell className={styles.tableCell} key={cell.id}>
-                                <ConfigurableLink
-                                  className={styles.link}
-                                  to={window.getOpenmrsSpaBase() + `home/patient-lists/${patientLists[index]?.id}`}>
-                                  {cell.value}
-                                </ConfigurableLink>
-                              </TableCell>
-                            );
+                  {rows.map((row) => {
+                    const currentList = patientLists?.find((list) => list?.id === row.id);
+                    const detailPageUrl = window.getOpenmrsSpaBase() + `home/patient-lists/${row.id}`;
 
-                          case 'isStarred':
-                            return (
-                              <PatientListStarIcon
-                                cohortUuid={row.id}
-                                isStarred={starredLists.includes(row.id)}
-                                toggleStarredList={toggleStarredList}
-                              />
-                            );
-
-                          case 'type':
-                            return <TableCell key={cell.id}>{cell.value}</TableCell>;
-
-                          default:
-                            return <TableCell key={cell.id}>{cell.value}</TableCell>;
-                        }
-                      })}
-                    </TableRow>
-                  ))}
+                    return (
+                      <TableRow
+                        {...getRowProps({ row })}
+                        className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
+                        key={row.id}>
+                        <TableCell>
+                          <ConfigurableLink className={styles.link} to={detailPageUrl}>
+                            {currentList?.display ?? ''}
+                          </ConfigurableLink>
+                        </TableCell>
+                        <TableCell>{currentList?.type ?? ''}</TableCell>
+                        <TableCell>{currentList?.size ?? ''}</TableCell>
+                        <PatientListStarIcon
+                          cohortUuid={row.id}
+                          isStarred={starredLists.includes(row.id)}
+                          toggleStarredList={toggleStarredList}
+                        />
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -268,6 +256,7 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
   return (
     <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
       <Button
+        iconDescription="Star patient list"
         size={isTablet ? 'lg' : 'sm'}
         kind="ghost"
         hasIconOnly
@@ -278,7 +267,7 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
   );
 };
 
-function usePatientListStar() {
+function useStarredLists() {
   const { t } = useTranslation();
   const [starredLists, setStarredLists] = useState([]);
   const [starhandleTimeout, setStarHandleTimeout] = useState(null);
@@ -302,6 +291,7 @@ function usePatientListStar() {
       });
     });
   };
+
   /**
    * Handles toggling the starred list
    * It uses a timeout to store all the changes made by the user
