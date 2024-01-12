@@ -8,8 +8,6 @@ import AppointmentTabs from './appointment-tabs.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.setTimeout(10000);
-
 describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
     const user = userEvent.setup();

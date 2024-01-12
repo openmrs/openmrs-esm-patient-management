@@ -62,8 +62,6 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-jest.setTimeout(20000);
-
 describe('ActiveVisitsTable: ', () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession),
