@@ -35,8 +35,6 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.setTimeout(20000);
-
 describe('Queue entry details', () => {
   beforeEach(() =>
     mockedUseConfig.mockReturnValue({
