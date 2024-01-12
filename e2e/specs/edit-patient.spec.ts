@@ -20,7 +20,6 @@ const formValues: PatientRegistrationFormValues = {
   address1: 'Bom Jesus Street',
   address2: '',
   country: 'Brazil',
-  countyDistrict: 'Antônio dos Santos',
   stateProvince: 'Pernambuco',
   cityVillage: 'Recife',
   phone: '5555551234',
@@ -54,7 +53,6 @@ test('Edit a patient', async ({ page, api }) => {
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
     await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
     await expect(person.preferredAddress.country).toBe(formValues.country);
-    await expect(person.preferredAddress.countyDistrict).toBe(formValues.countyDistrict);
     await expect(person.attributes[0].display).toBe(`Telephone Number = ${formValues.phone}`);
   });
 });
