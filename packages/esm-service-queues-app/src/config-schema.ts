@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
@@ -123,8 +123,10 @@ export const configSchema = {
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description:
-      'Template URL that will be used when clicking on the patient name in the queues table. Available argument: patientUuid',
+    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+      Available argument: patientUuid, openmrsSpaBase, openBase
+      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   defaultFacilityUrl: {
     _type: Type.String,

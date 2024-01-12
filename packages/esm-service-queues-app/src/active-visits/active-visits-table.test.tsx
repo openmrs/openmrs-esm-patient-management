@@ -107,7 +107,9 @@ describe('ActiveVisitsTable: ', () => {
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /john smith/i })).toBeInTheDocument();
+    const john = screen.getByRole('link', { name: /john smith/i });
+    expect(john).toBeInTheDocument();
+    expect(john).toHaveAttribute('href', 'someUrl');
 
     const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time/];
     expectedColumnHeaders.forEach((header) => {
