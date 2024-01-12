@@ -143,6 +143,7 @@ describe('ListsTable', () => {
           currentPage: 1,
           goTo: () => {},
           results: patientLists.slice(0, pageSize),
+          paginated: true,
         }) as unknown as PaginationData,
     );
 
@@ -175,6 +176,7 @@ describe('ListsTable', () => {
           currentPage: 1,
           goTo: () => {},
           results: patientLists.slice(0, pageSize),
+          paginated: true,
         }) as unknown as PaginationData,
     );
 

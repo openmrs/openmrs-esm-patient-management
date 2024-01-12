@@ -32,8 +32,8 @@ import {
 import type { ConfigSchema } from '../config-schema';
 import type { PatientList } from '../api/types';
 import { starPatientList } from '../api/api-remote';
-import { ErrorState } from '../error-state/error-state.component';
 import { CustomPagination } from './custom-pagination.component';
+import { ErrorState } from '../error-state/error-state.component';
 import EmptyState from '../empty-state/empty-state.component';
 import styles from './lists-table.scss';
 
@@ -77,7 +77,6 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const id = useId();
-  const userId = useSession()?.user?.uuid;
   const layout = useLayoutType();
   const config: ConfigSchema = useConfig();
   const pageSize = config.patientListsToShow ?? 10;
@@ -114,14 +113,16 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
   const tableRows = useMemo(
     () =>
-      results.map((list) => ({
-        id: list.id,
-        display: list.display,
-        description: list.description,
-        type: list.type,
-        size: list.size,
-      })) ?? [],
-    [results],
+      debouncedSearchTerm
+        ? filteredLists
+        : results.map((list) => ({
+            id: list.id,
+            display: list.display,
+            description: list.description,
+            type: list.type,
+            size: list.size,
+          })) ?? [],
+    [filteredLists, results],
   );
 
   if (isLoading) {
@@ -215,7 +216,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
           </TableContainer>
         )}
       </DataTable>
-      {results?.length === 0 && (
+      {filteredLists?.length === 0 && (
         <div className={styles.filterEmptyState}>
           <Layer level={0}>
             <Tile className={styles.filterEmptyStateTile}>
