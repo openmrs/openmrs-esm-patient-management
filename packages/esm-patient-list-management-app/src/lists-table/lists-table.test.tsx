@@ -160,7 +160,7 @@ describe('ListsTable', () => {
 
     patientLists.slice(0, pageSize).forEach((list) => {
       expect(
-        screen.getByRole('row', { name: `${list.display} ${list.type} ${list.size} Star patient list` }),
+        screen.getByRole('row', { name: `${list.display} ${list.type} ${list.size} Star list` }),
       ).toBeInTheDocument();
     });
   });
@@ -182,7 +182,7 @@ describe('ListsTable', () => {
 
     patientLists.slice(0, pageSize).forEach((list) => {
       expect(
-        screen.getByRole('row', { name: `${list.display} ${list.type} ${list.size} Star patient list` }),
+        screen.getByRole('row', { name: `${list.display} ${list.type} ${list.size} Star list` }),
       ).toBeInTheDocument();
     });
 
@@ -192,14 +192,14 @@ describe('ListsTable', () => {
     // Search for an existing list
     await user.type(searchInput, 'cobalt');
 
-    expect(screen.getByRole('row', { name: /cobalt cohort my list 200 star patient list/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /cobalt cohort my list 200 star list/i })).toBeInTheDocument();
     expect(screen.getAllByRole('row').length).toBe(2);
 
     // Search for a list that is not in the first page of results
     await user.clear(searchInput);
     await user.type(searchInput, 'mend');
 
-    expect(screen.getByRole('row', { name: /mend cohort my list 150 star patient list/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /mend cohort my list 150 star list/i })).toBeInTheDocument();
 
     // Search for a list that does not exist
     await user.clear(searchInput);

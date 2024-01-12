@@ -256,11 +256,13 @@ const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, i
   return (
     <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
       <Button
-        iconDescription="Star patient list"
+        iconDescription="Star list"
         size={isTablet ? 'lg' : 'sm'}
         kind="ghost"
         hasIconOnly
         renderIcon={isStarred ? StarFilled : Star}
+        tooltipPosition="left"
+        enterDelayMs={500}
         onClick={() => toggleStarredList(cohortUuid, !isStarred)}
       />
     </TableCell>
