@@ -71,6 +71,7 @@
   "searchForList": "ابحث عن قائمة",
   "searchThisList": "ابحث في هذه القائمة",
   "sex": "الجنس",
+  "starList": "Star list",
   "starred": "مميز",
   "starredLists": "القوائم المميزة",
   "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
@@ -80,6 +81,7 @@
   "successfullyAdded": "تمت الإضافة بنجاح",
   "systemDefined": "معرف من النظام",
   "systemLists": "قوائم النظام",
+  "unstarList": "Unstar list",
   "updated": "Updated",
   "userDefined": "معرف من المستخدم"
 }

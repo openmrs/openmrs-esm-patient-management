@@ -69,6 +69,7 @@
   "searchForList": "חפש רשימה",
   "searchThisList": "חפש ברשימה זו",
   "sex": "מין",
+  "starList": "Star list",
   "starred": "מסומן",
   "starredLists": "רשימות מסומנות",
   "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
@@ -78,6 +79,7 @@
   "successfullyAdded": "נוסף בהצלחה",
   "systemDefined": "הוגדר על ידי המערכת",
   "systemLists": "רשימות מערכת",
+  "unstarList": "Unstar list",
   "updated": "עודכן",
   "userDefined": "הוגדר על ידי המשתמש"
 }

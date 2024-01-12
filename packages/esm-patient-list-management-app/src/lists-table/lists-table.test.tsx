@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { usePagination, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import type { PatientList } from '../api/types';
@@ -208,5 +208,32 @@ describe('ListsTable', () => {
     await user.type(searchInput, 'apollo-soyuz');
     expect(screen.getByText(/no matching lists to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+  });
+
+  it('clicking the "Star list" button toggles the starred status of a patient list', async () => {
+    const user = userEvent.setup();
+    const pageSize = 5;
+
+    mockedUsePagination.mockImplementation(
+      () =>
+        ({
+          currentPage: 1,
+          goTo: () => {},
+          results: patientLists.slice(0, pageSize),
+          paginated: true,
+        }) as unknown as PaginationData,
+    );
+
+    render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
+
+    const cobaltCohortRow = screen.getByRole('row', { name: /cobalt cohort my list 200/i });
+    const starListButton = within(cobaltCohortRow).queryByRole('button', { name: /^star list$/i });
+    const unstarListButton = within(cobaltCohortRow).queryByRole('button', { name: /^unstar list$/i });
+
+    expect(unstarListButton).not.toBeInTheDocument();
+    expect(starListButton).toBeInTheDocument();
+
+    await user.click(starListButton);
+    await screen.findByRole('button', { name: /^unstar list$/i });
   });
 });

@@ -2,6 +2,7 @@ import React, { type CSSProperties, useCallback, useId, useMemo, useState, useEf
 import { useTranslation } from 'react-i18next';
 import fuzzy from 'fuzzy';
 import orderBy from 'lodash-es/orderBy';
+import type { TFunction } from 'i18next';
 import {
   Button,
   DataTable,
@@ -57,13 +58,6 @@ interface PatientListTableProps {
   style?: CSSProperties;
 }
 
-interface PaginationProps {
-  paginated: boolean;
-  goTo: (page: number) => void;
-  results: Array<PatientList>;
-  currentPage: number;
-}
-
 const ListsTable: React.FC<PatientListTableProps> = ({
   error,
   handleCreate,
@@ -97,19 +91,17 @@ const ListsTable: React.FC<PatientListTableProps> = ({
       return patientLists;
     }
 
-    return debouncedSearchTerm
-      ? fuzzy
-          .filter(debouncedSearchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : patientLists;
+    return fuzzy
+      .filter(debouncedSearchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
   }, [patientLists, debouncedSearchTerm]);
 
   const { key, order } = sortParams;
   const sortedData =
     order === 'DESC' ? orderBy(filteredLists, [key], ['desc']) : orderBy(filteredLists, [key], ['asc']);
 
-  const { paginated, goTo, results, currentPage }: PaginationProps = usePagination(sortedData, pageSize);
+  const { paginated, goTo, results, currentPage } = usePagination(sortedData, pageSize);
 
   const tableRows = useMemo(
     () =>
@@ -189,7 +181,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
               <TableBody className={styles.tableBody}>
                 {rows.map((row) => {
                   const currentList = patientLists?.find((list) => list?.id === row.id);
-                  const detailPageUrl = window.getOpenmrsSpaBase() + `home/patient-lists/${row.id}`;
+                  const listDetailsPageUrl = '${openmrsSpaBase}/home/patient-lists/${listUuid}';
 
                   return (
                     <TableRow
@@ -197,7 +189,10 @@ const ListsTable: React.FC<PatientListTableProps> = ({
                       className={isDesktop(layout) ? styles.desktopRow : styles.tabletRow}
                       key={row.id}>
                       <TableCell>
-                        <ConfigurableLink className={styles.link} to={detailPageUrl}>
+                        <ConfigurableLink
+                          className={styles.link}
+                          to={listDetailsPageUrl}
+                          templateParams={{ listUuid: row.id }}>
                           {currentList?.display ?? ''}
                         </ConfigurableLink>
                       </TableCell>
@@ -207,6 +202,7 @@ const ListsTable: React.FC<PatientListTableProps> = ({
                         cohortUuid={row.id}
                         isStarred={starredLists.includes(row.id)}
                         toggleStarredList={toggleStarredList}
+                        t={t}
                       />
                     </TableRow>
                   );
@@ -245,15 +241,16 @@ interface PatientListStarIconProps {
   cohortUuid: string;
   isStarred: boolean;
   toggleStarredList: (cohortUuid: string, starList) => void;
+  t: TFunction;
 }
 
-const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, isStarred, toggleStarredList }) => {
+const PatientListStarIcon: React.FC<PatientListStarIconProps> = ({ cohortUuid, isStarred, toggleStarredList, t }) => {
   const isTablet = useLayoutType() === 'tablet';
 
   return (
     <TableCell className={`cds--table-column-menu ${styles.starButton}`} key={cohortUuid} style={{ cursor: 'pointer' }}>
       <Button
-        iconDescription="Star list"
+        iconDescription={isStarred ? t('unstarList', 'Unstar list') : t('starList', 'Star list')}
         size={isTablet ? 'lg' : 'sm'}
         kind="ghost"
         hasIconOnly

@@ -68,6 +68,7 @@
   "searchForList": "Rechercher une liste",
   "searchThisList": "Search this list",
   "sex": "Sexe",
+  "starList": "Star list",
   "starred": "starred",
   "starredLists": "Starred lists",
   "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
@@ -77,6 +78,7 @@
   "successfullyAdded": "Ajouté avec succès",
   "systemDefined": "system-defined",
   "systemLists": "System lists",
+  "unstarList": "Unstar list",
   "updated": "Updated",
   "userDefined": "user-defined"
 }
