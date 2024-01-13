@@ -24,6 +24,29 @@
   align-items: center;
 }
 
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  padding: 0;
+  @include type.type-style('body-compact-01');
+
+  button {
+    display: flex;
+    padding: 0;
+
+    svg {
+      order: 1;
+      margin-right: 0.5rem;
+      margin-left: 0rem !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .titleContent {
