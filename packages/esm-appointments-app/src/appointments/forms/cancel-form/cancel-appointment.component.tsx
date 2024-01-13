@@ -60,6 +60,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
           state={{
             patient,
             patientUuid: appointment.patientUuid,
+            hideActionsOverflow: true,
           }}
         />
       )}

@@ -192,6 +192,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             state={{
               patient,
               patientUuid: appointment.patientUuid,
+              hideActionsOverflow: true,
             }}
           />
         )}
