@@ -13,7 +13,6 @@ interface CommonProps {
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
-  handlePatientSelection: (evt: any, patientUuid: string) => void;
 }
 
 export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
@@ -94,20 +93,11 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
   );
 };
 
-export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
-  searchResults,
-  handlePatientSelection,
-}) => {
-  const { t } = useTranslation();
+export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
   return (
     <div className={styles.results}>
       {searchResults.map((patient, indx) => (
-        <PatientBanner
-          key={indx}
-          selectPatientAction={handlePatientSelection}
-          patientUuid={patient.uuid}
-          patient={patient}
-        />
+        <PatientBanner key={indx} patientUuid={patient.uuid} patient={patient} />
       ))}
     </div>
   );

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Search } from '@carbon/react/icons';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
+import { PatientSearchContext } from '../patient-search-context';
 
 interface PatientSearchButtonProps {
   buttonText?: string;
@@ -20,14 +21,20 @@ const PatientSearchButton: React.FC<PatientSearchButtonProps> = ({
   const { t } = useTranslation();
   const [showSearchOverlay, setShowSearchOverlay] = useState<boolean>(false);
 
+  const hidePanel = useCallback(() => {
+    setShowSearchOverlay(false);
+  }, [setShowSearchOverlay]);
+
   return (
     <>
       {showSearchOverlay && (
-        <PatientSearchOverlay
-          onClose={() => setShowSearchOverlay(false)}
-          header={overlayHeader}
-          selectPatientAction={selectPatientAction}
-        />
+        <PatientSearchContext.Provider
+          value={{
+            nonNavigationSelectPatientAction: selectPatientAction,
+            patientClickSideEffect: hidePanel,
+          }}>
+          <PatientSearchOverlay onClose={hidePanel} header={overlayHeader} />
+        </PatientSearchContext.Provider>
       )}
 
       <Button

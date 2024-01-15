@@ -36,19 +36,12 @@ export interface Address {
 }
 export interface FHIRPatientType {
   id: string;
-  identifier: Array<{
-    id: string;
-    use: string;
-    value: string;
-  }>;
-  name: Array<{
-    id: string;
-    family: string;
-    given: Array<string>;
-  }>;
+  identifier: Array<FHIRIdentifier>;
+  name: Array<FHIRName>;
   gender: string;
   birthDate: string;
   deceasedBoolean: boolean;
+  deceasedDateTime: string;
   address: Array<{
     id: string;
     use: string;
@@ -58,6 +51,19 @@ export interface FHIRPatientType {
     country: string;
   }>;
 }
+
+export interface FHIRIdentifier {
+  id: string;
+  use: string;
+  value: string;
+}
+
+export interface FHIRName {
+  id: string;
+  family: string;
+  given: Array<string>;
+}
+
 export interface FHIRPatientSearchResponse {
   total: number;
   link?: Array<{
