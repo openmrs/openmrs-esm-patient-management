@@ -12,8 +12,6 @@ import { saveEncounter, savePatient } from './patient-registration.resource';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
 
-jest.setTimeout(10000);
-
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
 const mockedSaveEncounter = saveEncounter as jest.Mock;

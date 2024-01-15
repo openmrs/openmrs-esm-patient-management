@@ -157,7 +157,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   }, [currentAppointmentDate, patientAppointment, t]);
 
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} onClick={(e) => e.preventDefault()}>
       <section>
         {isLoading ? (
           <div className={styles.loaderContainer}>
@@ -170,6 +170,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
               state={{
                 patient,
                 patientUuid: patientAppointment.patientUuid,
+                hideActionsOverflow: false,
               }}
             />
           </div>
