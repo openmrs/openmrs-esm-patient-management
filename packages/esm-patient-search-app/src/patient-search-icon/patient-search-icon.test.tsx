@@ -42,7 +42,8 @@ describe('PatientSearchLaunch', () => {
     const searchInput = screen.getByText('Search results');
     expect(searchInput).toBeInTheDocument();
 
-    await user.click(searchButton);
+    const closeButton = screen.getByTestId('closeSearchIcon');
+    await user.click(closeButton);
     expect(searchInput).not.toBeInTheDocument();
   });
 

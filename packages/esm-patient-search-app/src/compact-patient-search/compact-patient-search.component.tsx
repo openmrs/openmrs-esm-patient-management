@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import debounce from 'lodash-es/debounce';
-import { navigate, interpolateString, useConfig, setSessionLocation, useSession } from '@openmrs/esm-framework';
+import { navigate, interpolateString, useConfig, useSession } from '@openmrs/esm-framework';
 import type { SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
@@ -8,17 +8,16 @@ import RecentPatientSearch from './recent-patient-search.component';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import { useRecentlyViewedPatients, useInfinitePatientSearch, useRESTPatients } from '../patient-search.resource';
 import styles from './compact-patient-search.scss';
+import { PatientSearchContext } from '../patient-search-context';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
   initialSearchTerm: string;
-  selectPatientAction?: (patient: SearchedPatient) => undefined;
   onPatientSelect?: () => void;
   shouldNavigateToPatientSearchPage?: boolean;
 }
 
 const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
-  selectPatientAction,
   initialSearchTerm,
   isSearchPage,
   onPatientSelect,
@@ -50,36 +49,31 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     onPatientSelect?.();
   }, [onPatientSelect, setSearchTerm]);
 
+  const addViewedPatientAndCloseSearchResults = useCallback(
+    (patientUuid: string) => {
+      addViewedPatient(patientUuid).then(() => {
+        mutateUserProperties();
+      });
+      handleCloseSearchResults();
+    },
+    [handleCloseSearchResults, mutateUserProperties, addViewedPatient],
+  );
+
   const handlePatientSelection = useCallback(
     (evt, index: number, patients: Array<SearchedPatient>) => {
       evt.preventDefault();
       if (patients) {
-        if (selectPatientAction) {
-          selectPatientAction(patients[index]);
-        } else {
-          addViewedPatient(patients[index].uuid).then(() => {
-            mutateUserProperties();
-          });
-          navigate({
-            to: `${interpolateString(config.search.patientResultUrl, {
-              patientUuid: patients[index].uuid,
-            })}`,
-          });
-        }
-        handleCloseSearchResults();
+        addViewedPatientAndCloseSearchResults(patients[index].uuid);
+        navigate({
+          to: `${interpolateString(config.search.patientResultUrl, {
+            patientUuid: patients[index].uuid,
+          })}`,
+        });
       }
     },
-    [
-      selectPatientAction,
-      handleCloseSearchResults,
-      config.search.patientResultUrl,
-      user,
-      currentLocation,
-      mutateUserProperties,
-      addViewedPatient,
-    ],
+    [config.search.patientResultUrl, user, currentLocation],
   );
-  const focussedResult = useArrowNavigation(
+  const focusedResult = useArrowNavigation(
     !recentPatients ? searchedPatients?.length ?? 0 : recentPatients?.length ?? 0,
     handlePatientSelection,
     handleFocusToInput,
@@ -87,17 +81,17 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   );
 
   useEffect(() => {
-    if (bannerContainerRef.current && focussedResult > -1) {
-      bannerContainerRef.current.children?.[focussedResult]?.focus();
-      bannerContainerRef.current.children?.[focussedResult]?.scrollIntoView({
+    if (bannerContainerRef.current && focusedResult > -1) {
+      bannerContainerRef.current.children?.[focusedResult]?.focus();
+      bannerContainerRef.current.children?.[focusedResult]?.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
       });
-    } else if (bannerContainerRef.current && searchInputRef.current && focussedResult === -1) {
+    } else if (bannerContainerRef.current && searchInputRef.current && focusedResult === -1) {
       handleFocusToInput();
     }
-  }, [focussedResult, bannerContainerRef, handleFocusToInput]);
+  }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
   const handleSubmit = useCallback(
     (searchTerm) => {
@@ -120,37 +114,33 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   const handleSearchQueryChange = debounce((val) => setSearchTerm(val), 300);
 
   return (
-    <div className={styles.patientSearchBar}>
-      <PatientSearchBar
-        small
-        initialSearchTerm={initialSearchTerm ?? ''}
-        onChange={handleSearchQueryChange}
-        onSubmit={handleSubmit}
-        onClear={handleClear}
-        ref={searchInputRef}
-      />
-      {!isSearchPage &&
-        (showSearchResults ? (
-          <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
-            <PatientSearch
-              query={searchTerm}
-              selectPatientAction={handlePatientSelection}
-              ref={bannerContainerRef}
-              {...patientSearchResponse}
-            />
-          </div>
-        ) : (
-          <>
+    <PatientSearchContext.Provider
+      value={{
+        patientClickSideEffect: addViewedPatientAndCloseSearchResults,
+      }}>
+      <div className={styles.patientSearchBar}>
+        <PatientSearchBar
+          small
+          initialSearchTerm={initialSearchTerm ?? ''}
+          onChange={handleSearchQueryChange}
+          onSubmit={handleSubmit}
+          onClear={handleClear}
+          ref={searchInputRef}
+        />
+        {!isSearchPage &&
+          (showSearchResults ? (
             <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
-              <RecentPatientSearch
-                selectPatientAction={handlePatientSelection}
-                ref={bannerContainerRef}
-                {...recentPatientSearchResponse}
-              />
+              <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
             </div>
-          </>
-        ))}
-    </div>
+          ) : (
+            <>
+              <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
+                <RecentPatientSearch ref={bannerContainerRef} {...recentPatientSearchResponse} />
+              </div>
+            </>
+          ))}
+      </div>
+    </PatientSearchContext.Provider>
   );
 };
 
