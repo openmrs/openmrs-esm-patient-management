@@ -48,9 +48,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
           <div className={styles.dropdown}>
             <label className={styles.view}>{t('view', 'View')}:</label>
             {isLoading ? (
-              <div style={{ width: 150 }}>
-                <DropdownSkeleton />
-              </div>
+              <DropdownSkeleton />
             ) : (
               <Dropdown
                 id="typeOfCare"
