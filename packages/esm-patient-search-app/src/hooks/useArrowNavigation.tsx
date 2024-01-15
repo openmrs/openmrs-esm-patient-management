@@ -5,32 +5,32 @@ const useArrowNavigation = (
   totalResults: number,
   enterCallback: (evt: React.MouseEvent<HTMLAnchorElement>, index: number, patients?: Array<SearchedPatient>) => void,
   resetFocusCallback: () => void,
-  initalFocussedResult: number = -1,
+  initalFocusedResult: number = -1,
 ) => {
-  const [focussedResult, setFocussedResult] = useState(initalFocussedResult);
+  const [focusedResult, setFocusedResult] = useState(initalFocusedResult);
 
   const handleKeyPress = useCallback(
     (e) => {
       if (e.key === 'ArrowUp') {
-        const newFocussedResult = Math.max(-1, focussedResult - 1);
-        setFocussedResult(newFocussedResult);
-        if (newFocussedResult === -1) {
+        const newFocusedResult = Math.max(-1, focusedResult - 1);
+        setFocusedResult(newFocusedResult);
+        if (newFocusedResult === -1) {
           resetFocusCallback();
         }
       } else if (e.key === 'ArrowDown') {
-        setFocussedResult((prev) => Math.min(totalResults - 1, prev + 1));
-      } else if (e.key === 'Enter' && focussedResult > -1) {
-        enterCallback(e, focussedResult);
-      } else if (focussedResult !== -1) {
+        setFocusedResult((prev) => Math.min(totalResults - 1, prev + 1));
+      } else if (e.key === 'Enter' && focusedResult > -1) {
+        enterCallback(e, focusedResult);
+      } else if (focusedResult !== -1) {
         // This condition will be met when scrolling through the list, the user presses another
         // key, then the user should be focussed to the input.
         // The focus to input should only be called when the user is scrolling through the list
         // Hence the if condition
         resetFocusCallback();
-        setFocussedResult(initalFocussedResult);
+        setFocusedResult(initalFocusedResult);
       }
     },
-    [setFocussedResult, totalResults, focussedResult, enterCallback, initalFocussedResult, resetFocusCallback],
+    [setFocusedResult, totalResults, focusedResult, enterCallback, initalFocusedResult, resetFocusCallback],
   );
 
   useEffect(() => {
@@ -40,7 +40,7 @@ const useArrowNavigation = (
     };
   }, [handleKeyPress]);
 
-  return focussedResult;
+  return focusedResult;
 };
 
 export default useArrowNavigation;

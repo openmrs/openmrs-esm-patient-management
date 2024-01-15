@@ -3,23 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
-import type { PatientSearchResponse, SearchedPatient } from '../types';
+import type { PatientSearchResponse } from '../types';
 import styles from './patient-search.scss';
 
 interface PatientSearchProps extends PatientSearchResponse {
   query: string;
-  selectPatientAction?: (
-    evt: React.MouseEvent<HTMLAnchorElement>,
-    index: number,
-    patients: Array<SearchedPatient>,
-  ) => void;
 }
 
 const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
-  (
-    { selectPatientAction, isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults },
-    ref,
-  ) => {
+  ({ isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore, totalResults }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
     const loadingIconRef = useCallback(
@@ -87,7 +79,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <PatientSearchResults patients={searchResults} selectPatientAction={selectPatientAction} ref={ref} />
+            <PatientSearchResults patients={searchResults} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
