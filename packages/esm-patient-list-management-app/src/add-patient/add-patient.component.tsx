@@ -8,7 +8,7 @@ import {
   getDynamicOfflineDataEntries,
   putDynamicOfflineData,
   syncDynamicOfflineData,
-  showToast,
+  showSnackbar,
   toOmrsIsoString,
   usePagination,
   navigate,
@@ -62,17 +62,18 @@ const AddPatient: React.FC<AddPatientProps> = ({ closeModal, patientUuid }) => {
       patientList
         .addPatient()
         .then(() =>
-          showToast({
+          showSnackbar({
             title: t('successfullyAdded', 'Successfully added'),
             kind: 'success',
-            description: `${t('successAddPatientToList', 'Patient added to list')}: ${patientList.displayName}`,
+            isLowContrast: true,
+            subtitle: `${t('successAddPatientToList', 'Patient added to list')}: ${patientList.displayName}`,
           }),
         )
         .catch(() =>
-          showToast({
+          showSnackbar({
             title: t('error', 'Error'),
             kind: 'error',
-            description: `${t('errorAddPatientToList', 'Patient not added to list')}: ${patientList.displayName}`,
+            subtitle: `${t('errorAddPatientToList', 'Patient not added to list')}: ${patientList.displayName}`,
           }),
         );
     }

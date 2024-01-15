@@ -2,14 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
 import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockQueueEntry } from '__mocks__';
-import { type ConfigObject, showToast, useConfig, showNotification } from '@openmrs/esm-framework';
+import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 const mockUpdateQueueEntry = updateQueueEntry as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
 
 jest.mock('./active-visits-table.resource', () => {
   const originalModule = jest.requireActual('./active-visits-table.resource');
@@ -57,12 +56,12 @@ describe('Queue entry details', () => {
 
     await user.click(screen.getByRole('button', { name: /move to next service/i }));
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
-      critical: true,
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
       kind: 'success',
       title: 'Update entry',
-      description: 'Queue Entry Updated Successfully',
+      subtitle: 'Queue Entry Updated Successfully',
     });
   });
   it('should display error message when rest api call to update queue entry fails', async () => {
@@ -89,11 +88,10 @@ describe('Queue entry details', () => {
 
     await user.click(screen.getByRole('button', { name: /move to next service/i }));
 
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      description: 'Internal Server Error',
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      subtitle: 'Internal Server Error',
       kind: 'error',
       title: 'Error updating queue entry status',
-      critical: true,
     });
   });
 });
