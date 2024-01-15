@@ -1,16 +1,18 @@
 import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import PatientSearch from '../compact-patient-search/patient-search.component';
-import { type SearchedPatient } from '../types';
+import { type FHIRPatientType, type SearchedPatient } from '../types';
 import { Search, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './compact-patient-search.scss';
 import { useInfinitePatientSearch } from '../patient-search.resource';
 import { useConfig, navigate, interpolateString } from '@openmrs/esm-framework';
 import useArrowNavigation from '../hooks/useArrowNavigation';
+import { PatientSearchContext } from '../patient-search-context';
 
 interface CompactPatientSearchProps {
   initialSearchTerm: string;
-  selectPatientAction?: (patient: SearchedPatient) => undefined;
+  /** An action to take when the patient is selected, other than navigation. If not provided, navigation takes place. */
+  selectPatientAction?: (patientUuid: string) => undefined;
   buttonProps?: Object;
 }
 
@@ -39,11 +41,14 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     setSearchTerm('');
   }, [setSearchTerm]);
 
+  // handlePatientSelection: Manually handles everything that needs to happen when a patient
+  // from the result list is selected. This is used for the arrow navigation, but is not used
+  // for click handling.
   const handlePatientSelection = useCallback(
     (evt, index: number) => {
       evt.preventDefault();
       if (selectPatientAction) {
-        selectPatientAction(patients[index]);
+        selectPatientAction(patients[index].uuid);
       } else {
         navigate({
           to: `${interpolateString(config.search.patientResultUrl, {
@@ -65,20 +70,20 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     inputRef.current.focus();
   }, [inputRef]);
 
-  const focussedResult = useArrowNavigation(patients?.length ?? 0, handlePatientSelection, handleFocusToInput, -1);
+  const focusedResult = useArrowNavigation(patients?.length ?? 0, handlePatientSelection, handleFocusToInput, -1);
 
   useEffect(() => {
-    if (bannerContainerRef.current && focussedResult > -1) {
-      bannerContainerRef.current.children?.[focussedResult]?.focus();
-      bannerContainerRef.current.children?.[focussedResult]?.scrollIntoView({
+    if (bannerContainerRef.current && focusedResult > -1) {
+      bannerContainerRef.current.children?.[focusedResult]?.focus();
+      bannerContainerRef.current.children?.[focusedResult]?.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
       });
-    } else if (bannerContainerRef.current && inputRef.current && focussedResult === -1) {
+    } else if (bannerContainerRef.current && inputRef.current && focusedResult === -1) {
       handleFocusToInput();
     }
-  }, [focussedResult, bannerContainerRef, handleFocusToInput]);
+  }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
   return (
     <div className={styles.patientSearchBar}>
@@ -100,14 +105,15 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         </Button>
       </form>
       {showSearchResults && (
-        <div className={styles.floatingSearchResultsContainer}>
-          <PatientSearch
-            query={searchTerm}
-            selectPatientAction={handlePatientSelection}
-            ref={bannerContainerRef}
-            {...patientSearchResponse}
-          />
-        </div>
+        <PatientSearchContext.Provider
+          value={{
+            nonNavigationSelectPatientAction: selectPatientAction,
+            patientClickSideEffect: handleReset,
+          }}>
+          <div className={styles.floatingSearchResultsContainer}>
+            <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
+          </div>
+        </PatientSearchContext.Provider>
       )}
     </div>
   );

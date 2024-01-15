@@ -8,6 +8,7 @@ import { isDesktop, navigate, useLayoutType, useOnClickOutside } from '@openmrs/
 import CompactPatientSearchComponent from '../compact-patient-search/compact-patient-search.component';
 import PatientSearchOverlay from '../patient-search-overlay/patient-search-overlay.component';
 import styles from './patient-search-icon.scss';
+import { PatientSearchContext } from '../patient-search-context';
 
 interface PatientSearchLaunchProps {}
 
@@ -32,19 +33,19 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
 
   const ref = useOnClickOutside<HTMLDivElement>(handleCloseSearchInput, canClickOutside);
 
-  const handleGlobalAction = useCallback(() => {
-    if (showSearchInput) {
-      if (isSearchPage) {
-        navigate({
-          to: window.sessionStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
-        });
-        window.sessionStorage.removeItem('searchReturnUrl');
-      }
-      setShowSearchInput(false);
-    } else {
-      setShowSearchInput(true);
+  const closePatientSearch = useCallback(() => {
+    if (isSearchPage) {
+      navigate({
+        to: window.sessionStorage.getItem('searchReturnUrl') ?? '${openmrsSpaBase}/',
+      });
+      window.sessionStorage.removeItem('searchReturnUrl');
     }
-  }, [isSearchPage, setShowSearchInput, showSearchInput]);
+    setShowSearchInput(false);
+  }, [isSearchPage, setShowSearchInput]);
+
+  const handleShowSearchInput = useCallback(() => {
+    setShowSearchInput(true);
+  }, [setShowSearchInput]);
 
   const resetToInitialState = useCallback(() => {
     setShowSearchInput(false);
@@ -54,47 +55,62 @@ const PatientSearchLaunch: React.FC<PatientSearchLaunchProps> = () => {
   useEffect(() => {
     // Search input should always be open when we direct to the search page.
     setShowSearchInput(isSearchPage);
-    if (isSearchPage) {
-      setCanClickOutside(false);
-    }
   }, [isSearchPage]);
 
   useEffect(() => {
-    showSearchInput ? setCanClickOutside(true) : setCanClickOutside(false);
-  }, [showSearchInput]);
+    if (showSearchInput) {
+      if (isSearchPage) {
+        setCanClickOutside(false);
+      } else {
+        setCanClickOutside(true);
+      }
+    } else {
+      setCanClickOutside(false);
+    }
+  }, [showSearchInput, isSearchPage]);
 
   return (
     <div className={styles.patientSearchIconWrapper} ref={ref}>
-      {showSearchInput &&
-        (isDesktop(layout) ? (
-          <CompactPatientSearchComponent
-            isSearchPage={isSearchPage}
-            initialSearchTerm={initialSearchTerm}
-            shouldNavigateToPatientSearchPage
-            onPatientSelect={resetToInitialState}
-          />
-        ) : (
-          <PatientSearchOverlay onClose={handleGlobalAction} query={initialSearchTerm} />
-        ))}
-
-      <div
-        className={classNames({
-          [styles.closeButton]: showSearchInput,
-        })}>
-        <HeaderGlobalAction
-          aria-label={t('searchPatient', 'Search Patient')}
-          aria-labelledby="Search Patient"
-          className={classNames({
-            [styles.activeSearchIconButton]: showSearchInput,
-            [styles.searchIconButton]: !showSearchInput,
-          })}
-          enterDelayMs={500}
-          name="SearchPatientIcon"
-          data-testid="searchPatientIcon"
-          onClick={handleGlobalAction}>
-          {showSearchInput ? <Close size={20} /> : <Search size={20} />}
-        </HeaderGlobalAction>
-      </div>
+      {showSearchInput ? (
+        <>
+          {isDesktop(layout) ? (
+            /* CompactPatientSearchComponent provides the search context */
+            <CompactPatientSearchComponent
+              isSearchPage={isSearchPage}
+              initialSearchTerm={initialSearchTerm}
+              shouldNavigateToPatientSearchPage
+              onPatientSelect={resetToInitialState}
+            />
+          ) : (
+            <PatientSearchContext.Provider value={{ patientClickSideEffect: closePatientSearch }}>
+              <PatientSearchOverlay onClose={closePatientSearch} query={initialSearchTerm} />
+            </PatientSearchContext.Provider>
+          )}
+          <div className={styles.closeButton}>
+            <HeaderGlobalAction
+              aria-label={t('closeSearch', 'Close Search Panel')}
+              className={styles.activeSearchIconButton}
+              enterDelayMs={500}
+              name="CloseSearchIcon"
+              data-testid="closeSearchIcon"
+              onClick={closePatientSearch}>
+              <Close size={20} />
+            </HeaderGlobalAction>
+          </div>
+        </>
+      ) : (
+        <div>
+          <HeaderGlobalAction
+            aria-label={t('searchPatient', 'Search Patient')}
+            className={styles.searchIconButton}
+            enterDelayMs={500}
+            name="SearchPatientIcon"
+            data-testid="searchPatientIcon"
+            onClick={handleShowSearchInput}>
+            <Search size={20} />
+          </HeaderGlobalAction>
+        </div>
+      )}
     </div>
   );
 };

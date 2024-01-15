@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import PatientSearchResults from './compact-patient-banner.component';
 import { useConfig } from '@openmrs/esm-framework';
+import { type SearchedPatient } from '../types';
+import { PatientSearchContext } from '../patient-search-context';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
@@ -33,10 +35,14 @@ describe('Compact Patient Search Results', () => {
       },
       identifiers: [{ identifier: '123', identifierType: { uuid: 'identifier-type-1' } }],
     },
-  ];
+  ] as Array<SearchedPatient>;
 
   it('should render patient search results', () => {
-    render(<PatientSearchResults patients={patients} />);
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <PatientSearchResults patients={patients} />
+      </PatientSearchContext.Provider>,
+    );
 
     expect(screen.getByText('John Doe Smith')).toBeInTheDocument();
 
