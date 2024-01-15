@@ -35,7 +35,6 @@ import {
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './visits-missing-inqueue.scss';
-import { getOriginFromPathName } from '../active-visits/active-visits-table.resource';
 import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
 

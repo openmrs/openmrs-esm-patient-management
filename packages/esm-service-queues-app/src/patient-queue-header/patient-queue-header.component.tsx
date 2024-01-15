@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
-import { Dropdown } from '@carbon/react';
+import { Dropdown, DropdownSkeleton } from '@carbon/react';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+
 import {
   updateSelectedQueueLocationUuid,
   updateSelectedQueueLocationName,
@@ -15,16 +16,16 @@ import styles from './patient-queue-header.scss';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
-  const { queueLocations } = useQueueLocations();
+  const { queueLocations, isLoading, error } = useQueueLocations();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
 
-  const handleQueueLocationChange = ({ selectedItem }) => {
+  const handleQueueLocationChange = useCallback((selectedItem) => {
     updateSelectedQueueLocationUuid(selectedItem.id);
     updateSelectedQueueLocationName(selectedItem.name);
     updateSelectedServiceName('All');
-  };
+  }, []);
 
   return (
     <>
@@ -46,14 +47,18 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
           </div>
           <div className={styles.dropdown}>
             <label className={styles.view}>{t('view', 'View')}:</label>
-            <Dropdown
-              id="typeOfCare"
-              label={currentQueueLocationName ?? queueLocations?.[0]?.name}
-              items={[{ display: `${t('all', 'All')}` }, ...queueLocations]}
-              itemToString={(item) => (item ? item.name : '')}
-              type="inline"
-              onChange={handleQueueLocationChange}
-            />
+            {isLoading ? (
+              <DropdownSkeleton />
+            ) : (
+              <Dropdown
+                id="typeOfCare"
+                label={currentQueueLocationName ?? t('all', 'All')}
+                items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
+                itemToString={(item) => (item ? item.name : '')}
+                type="inline"
+                onChange={handleQueueLocationChange}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -28,7 +28,7 @@ export const patientSearchIcon = getSyncLifecycle(patientSearchIconComponent, op
 // This extension renders the a Patient-Search Button, which when clicked, opens the search bar in an overlay.
 export const patientSearchButton = getSyncLifecycle(patientSearchButtonComponent, options);
 
-// P.S. This extension is not compatible with the tablet view.
+// This extension is not compatible with the tablet view.
 export const patientSearchBar = getSyncLifecycle(patientSearchBarComponent, options);
 
 export function startupApp() {
