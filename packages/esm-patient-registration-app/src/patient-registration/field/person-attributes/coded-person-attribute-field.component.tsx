@@ -33,7 +33,11 @@ export function CodedPersonAttributeField({
   useEffect(() => {
     if (!answerConceptSetUuid) {
       reportError(
-        `The person attribute field '${id}' is of type 'coded' but has been defined without an answer concept set UUID. The 'answerConceptSetUuid' key is required.`,
+        t(
+          'codedPersonAttributeNoAnswerSet',
+          `The person attribute field '{{codedPersonAttributeFieldId}}' is of type 'coded' but has been defined without an answer concept set UUID. The 'answerConceptSetUuid' key is required.`,
+          { codedPersonAttributeFieldId: id },
+        ),
       );
       setError(true);
     }
@@ -43,13 +47,24 @@ export function CodedPersonAttributeField({
     if (!isLoadingConceptAnswers) {
       if (!conceptAnswers) {
         reportError(
-          `The coded person attribute field '${id}' has been defined with an invalid answer concept set UUID '${answerConceptSetUuid}'.`,
+          t(
+            'codedPersonAttributeAnswerSetInvalid',
+            `The coded person attribute field '{{codedPersonAttributeFieldId}}' has been defined with an invalid answer concept set UUID '{{answerConceptSetUuid}}'.`,
+            { codedPersonAttributeFieldId: id, answerConceptSetUuid },
+          ),
         );
         setError(true);
       }
       if (conceptAnswers?.length == 0) {
         reportError(
-          `The coded person attribute field '${id}' has been defined with an answer concept set UUID '${answerConceptSetUuid}' that does not have any concept answers.`,
+          t(
+            'codedPersonAttributeAnswerSetEmpty',
+            `The coded person attribute field '{{codedPersonAttributeFieldId}}' has been defined with an answer concept set UUID '{{answerConceptSetUuid}}' that does not have any concept answers.`,
+            {
+              codedPersonAttributeFieldId: id,
+              answerConceptSetUuid,
+            },
+          ),
         );
         setError(true);
       }

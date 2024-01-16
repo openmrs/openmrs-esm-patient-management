@@ -15,6 +15,7 @@ export interface ObsFieldProps {
 }
 
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
+  const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
 
   const config = useConfig<RegistrationConfig>();
@@ -63,7 +64,11 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
     default:
       return (
         <InlineNotification kind="error" title="Error">
-          Concept for obs field "{fieldDefinition.id}" has unknown datatype "{concept.datatype.display}"
+          {t(
+            'obsFieldUnknownDatatype',
+            `Concept for obs field '{{fieldDefinitionId}}' has unknown datatype '{{datatypeName}}'`,
+            { fieldDefinitionId: fieldDefinition.id, datatypeName: concept.datatype.display },
+          )}
         </InlineNotification>
       );
   }
