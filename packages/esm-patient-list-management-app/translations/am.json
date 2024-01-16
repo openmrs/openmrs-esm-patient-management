@@ -32,6 +32,7 @@
   "home": "Home",
   "identifier": "Identifier",
   "items": "items",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "e.g. Patients with diagnosed asthma who may be willing to be a part of a university research study",
   "listName": "List name",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pagination } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { usePaginationInfo } from './use-pagination-info';
+import { usePaginationInfo } from './use-pagination-info.component';
 import styles from './custom-pagination.scss';
 
 interface CustomPaginationProps {

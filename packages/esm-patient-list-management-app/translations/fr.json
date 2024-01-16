@@ -32,6 +32,7 @@
   "home": "Home",
   "identifier": "Identifiant",
   "items": "Eléments",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "par ex. Les patients atteints d'asthme diagnostiqué qui peuvent être disposés à faire partie d'une étude de recherche universitaire",
   "listName": "List name",

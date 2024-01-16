@@ -32,6 +32,7 @@
   "home": "الرئيسية",
   "identifier": "المعرف",
   "items": "العناصر",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "مثل: المرضى الذين تم تشخيصهم بالربو والذين قد يكونون على استعداد للمشاركة في دراسة جامعية",
   "listName": "اسم القائمة",

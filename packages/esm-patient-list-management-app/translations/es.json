@@ -32,6 +32,7 @@
   "home": "Inicio",
   "identifier": "Identificador",
   "items": "elementos",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "p. ej. Pacientes con asma diagnosticada que podrían estar dispuestos a participar en un estudio de investigación universitaria",
   "listName": "Nombre de la lista",

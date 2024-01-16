@@ -32,6 +32,7 @@
   "home": "בית",
   "identifier": "מזהה",
   "items": "פריטים",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "רשימה נוצרה בהצלחה",
   "listDescriptionPlaceholder": "לדוגמה, מטופלים עם אסתמה שנמצאים בראשית הדרך להשתתפות במחקר אוניברסיטאי",
   "listName": "שם הרשימה",

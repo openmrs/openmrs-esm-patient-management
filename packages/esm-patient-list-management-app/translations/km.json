@@ -32,6 +32,7 @@
   "home": "ទំព័រដើម",
   "identifier": "អ្នកកំណត់អត្តសញ្ញាណ",
   "items": "ពត៌មានតាមមុខនិមួយៗ",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "ឧ.ការធ្វើរោគវិនិច្ឆ័យអ្នកជំងឺហឺតជាផ្នែកមួយនៃការសិក្សាស្រាវជ្រាវនៅសាកលវិទ្យាល័យ",
   "listName": "ឈ្មោះបញ្ជី",

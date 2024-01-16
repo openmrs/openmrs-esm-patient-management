@@ -27,6 +27,9 @@ export function usePaginationInfo(pageSize: number, totalItems: number, pageNumb
 
   return {
     pageSizes,
-    itemsDisplayed: `${numberOfItemsDisplayed} ${t('items', ' items')}`,
+    itemsDisplayed: t('itemsDisplayed', '{{numberOfItemsDisplayed}} items', {
+      numberOfItemsDisplayed,
+      interpolation: { escapeValue: false },
+    }),
   };
 }
