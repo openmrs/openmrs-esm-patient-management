@@ -17,6 +17,8 @@ import {
 import { type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
+import { type ConfigObject } from '../config-schema';
+import { t } from 'i18next';
 
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
@@ -105,8 +107,8 @@ export interface MappedVisitQueueEntry {
   queueComingFrom: string;
 }
 
-interface UseVisitQueueEntries {
-  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+interface UseVisitQueueEntries<T extends MappedVisitQueueEntry | VisitQueueEntry> {
+  visitQueueEntries: Array<T> | null;
   visitQueueEntriesCount: number;
   isLoading: boolean;
   isError: Error;
@@ -186,11 +188,9 @@ export function usePriority() {
   };
 }
 
-export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
+export function useUnmappedVisitQueueEntries(locationUuid: string): UseVisitQueueEntries<VisitQueueEntry> {
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-  const config = useConfig();
-  const { visitQueueNumberAttributeUuid } = config;
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();
@@ -198,6 +198,26 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     apiUrl,
     openmrsFetch,
   );
+
+  const visitQueueEntries = data?.data?.results;
+
+  return {
+    visitQueueEntries,
+    visitQueueEntriesCount: visitQueueEntries?.length ?? 0,
+    isLoading,
+    isError: error,
+    isValidating,
+    mutate,
+  };
+}
+
+export function useVisitQueueEntries(
+  currServiceName: string,
+  locationUuid: string,
+): UseVisitQueueEntries<MappedVisitQueueEntry> {
+  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const useVisitQueueEntriesObj = useUnmappedVisitQueueEntries(locationUuid);
+  const { visitQueueEntries } = useVisitQueueEntriesObj;
 
   const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
     diagnoses: encounter.diagnoses,
@@ -209,7 +229,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     voided: encounter.voided,
   });
 
-  const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
+  const useVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
     encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
     name: visitQueueEntry.queueEntry.display,
@@ -249,23 +269,15 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
     queueComingFrom: visitQueueEntry.queueEntry?.queueComingFrom?.name,
   });
 
-  let mappedVisitQueueEntries;
-
-  if (!currServiceName || currServiceName == t('all', 'All')) {
-    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
-  } else {
-    mappedVisitQueueEntries = data?.data?.results
-      ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service == currServiceName);
+  const mappedVisitQueueEntries = visitQueueEntries?.map(useVisitQueueEntryProperties);
+  if (currServiceName && currServiceName !== t('all', 'All')) {
+    mappedVisitQueueEntries?.filter((data) => data.service == currServiceName);
   }
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : [],
-    visitQueueEntriesCount: mappedVisitQueueEntries ? mappedVisitQueueEntries.length : 0,
-    isLoading,
-    isError: error,
-    isValidating,
-    mutate,
+    ...useVisitQueueEntriesObj,
+    visitQueueEntries: mappedVisitQueueEntries,
+    visitQueueEntriesCount: mappedVisitQueueEntries?.length ?? 0,
   };
 }
 

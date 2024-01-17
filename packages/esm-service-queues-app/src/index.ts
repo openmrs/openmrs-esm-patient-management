@@ -10,6 +10,7 @@ import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
 import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
+import { QueueTableName, QueueTablePriority, QueueTableStatus } from './queue-table/queue-table-cells.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -93,6 +94,10 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 );
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
+
+export const queueTableName = getSyncLifecycle(QueueTableName, options);
+export const queueTablePriority = getSyncLifecycle(QueueTablePriority, options);
+export const queueTableStatus = getSyncLifecycle(QueueTableStatus, options);
 
 export function startupApp() {
   registerBreadcrumbs([]);

@@ -70,6 +70,21 @@
       "name": "add-queue-entry-widget",
       "component": "addQueueEntry",
       "slot": "add-queue-entry-slot"
-    }
+    },
+    {
+      "name": "queue-table-name-column",
+      "component": "queueTableName",
+      "slot": "queue-table-name-slot"
+    },
+    {
+      "name": "queue-table-priority-column",
+      "component": "queueTablePriority",
+      "slot": "queue-table-priority-slot"
+    },
+    {
+      "name": "queue-table-status-column",
+      "component": "queueTableStatus",
+      "slot": "queue-table-status-slot"
+    } 
   ]
 }

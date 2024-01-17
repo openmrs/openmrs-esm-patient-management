@@ -44,6 +44,10 @@ export function getSelectedQueueLocationUuid() {
   return getGlobalStore<{ queueLocationUuid: string }>('queueLocationUuidSelected', initialQueueLocationUuidState);
 }
 
+export function getSelectedQueueUuid() {
+  return getGlobalStore<{ queueUuid: string }>('queueUuidSelected', null);
+}
+
 export function getSelectedQueueRoomTimestamp() {
   return getGlobalStore<{ providerQueueRoomTimestamp: Date }>(
     'queueProviderRoomTimestamp',
@@ -141,6 +145,15 @@ export const useSelectedQueueLocationUuid = () => {
     getSelectedQueueLocationUuid().subscribe(({ queueLocationUuid }) => setCurrentQueueLocationUuid(queueLocationUuid));
   }, []);
   return currentQueueLocationUuid;
+};
+
+export const useSelectedQueueUuid = () => {
+  const [currentQueueUuid, setCurrentQueueUuid] = useState<string>();
+
+  useEffect(() => {
+    getSelectedQueueUuid().subscribe(({ queueUuid }) => setCurrentQueueUuid(queueUuid));
+  }, []);
+  return currentQueueUuid;
 };
 
 export const useSelectedProviderRoomTimestamp = () => {
