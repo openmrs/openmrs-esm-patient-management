@@ -5,6 +5,7 @@
   "addPatientToQueue": "Add patient to queue",
   "age": "Age",
   "all": "All",
+  "allDay": "All day",
   "appointment": "appointment",
   "appointmentCancelError": "Error cancelling appointment",
   "appointmentCancelled": "Appointment Cancelled",
