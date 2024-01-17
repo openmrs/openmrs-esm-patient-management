@@ -38,7 +38,7 @@ function usePatientListFilterForCurrentTab(selectedTab: number) {
 
 const ListsDashboard: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState<number>(TabIndices.STARRED_LISTS);
+  const [selectedTab, setSelectedTab] = useState(TabIndices.STARRED_LISTS);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
   const { patientLists, isLoading, error, mutate } = useAllPatientLists(patientListFilter);
   const { search } = useLocation();
@@ -51,8 +51,6 @@ const ListsDashboard: React.FC = () => {
         ?.map((searchParam) => searchParam?.split('=')),
     )['new_cohort'] === 'true';
 
-  const showCohortType = selectedTab === TabIndices.ALL_LISTS || selectedTab === TabIndices.STARRED_LISTS;
-
   const handleHideNewListOverlay = () => {
     navigate({
       to: window.getOpenmrsSpaBase() + 'home/patient-lists',
@@ -61,13 +59,10 @@ const ListsDashboard: React.FC = () => {
 
   const tableHeaders = [
     { id: 1, key: 'display', header: t('listName', 'List name') },
+    { id: 2, key: 'type', header: t('listType', 'List type') },
     { id: 3, key: 'size', header: t('noOfPatients', 'No. of patients') },
     { id: 4, key: 'isStarred', header: '' },
   ];
-
-  if (showCohortType) {
-    tableHeaders.splice(1, 0, { id: 2, key: 'type', header: t('listType', 'List type') });
-  }
 
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>

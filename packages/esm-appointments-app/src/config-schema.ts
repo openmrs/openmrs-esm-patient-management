@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 import { spaBasePath } from './constants';
 
 export const configSchema = {
@@ -68,9 +68,11 @@ export const configSchema = {
   },
   customPatientChartUrl: {
     _type: Type.String,
-    _description:
-      'Template URL that will be used when clicking on the patient name in the appointment list. Available argument: patientUuid',
+    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+      Available argument: patientUuid, openmrsSpaBase, openBase
+      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
+    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   patientIdentifierType: {
     _type: Type.String,

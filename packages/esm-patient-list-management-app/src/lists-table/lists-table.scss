@@ -37,6 +37,15 @@
   color: $interactive-01;
 }
 
+.tableContainer {
+  padding: 0;
+
+  :global(.cds--data-table-content) {
+    border: 1px solid colors.$gray-20;
+    border-bottom: none;
+  }
+}
+
 .link {
   text-decoration: none;
 }

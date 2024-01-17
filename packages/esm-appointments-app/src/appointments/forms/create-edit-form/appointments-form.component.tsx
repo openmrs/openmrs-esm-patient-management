@@ -29,8 +29,7 @@ import {
 } from '@carbon/react';
 import {
   ExtensionSlot,
-  showNotification,
-  showToast,
+  showSnackbar,
   useConfig,
   useLayoutType,
   useLocations,
@@ -128,10 +127,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
     saveAppointment(appointmentPayload).then(
       ({ status }) => {
         if (status === 200) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
-            description: t('appointmentNowVisible', 'It is now visible on the appointments page'),
+            subtitle: t('appointmentNowVisible', 'It is now visible on the appointments page'),
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
           setIsSubmitting(false);
@@ -145,11 +144,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          subtitle: error?.message,
         });
         setIsSubmitting(false);
       },
@@ -157,7 +155,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
   }, [currentAppointmentDate, patientAppointment, t]);
 
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} onClick={(e) => e.preventDefault()}>
       <section>
         {isLoading ? (
           <div className={styles.loaderContainer}>
@@ -170,6 +168,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ appointment, patientU
               state={{
                 patient,
                 patientUuid: patientAppointment.patientUuid,
+                hideActionsOverflow: false,
               }}
             />
           </div>

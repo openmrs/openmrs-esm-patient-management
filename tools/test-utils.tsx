@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react';
+import React, { type ReactElement } from 'react';
 import { SWRConfig } from 'swr';
-import { RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { type RenderOptions, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 const swrWrapper = ({ children }) => {
   return (

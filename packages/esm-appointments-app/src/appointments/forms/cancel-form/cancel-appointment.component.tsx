@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, TextArea } from '@carbon/react';
-import { useSession, showToast, showNotification, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { useSession, showSnackbar, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../../../helpers';
@@ -32,21 +32,20 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
     setIsSubmitting(true);
     const { status } = await cancelAppointment('Cancelled', appointment.id);
     if (status === 200) {
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'success',
-        description: t('cancelledSuccessfully', 'It has been cancelled successfully'),
+        subtitle: t('cancelledSuccessfully', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
       mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Cancelled`);
       closeOverlay();
     } else {
-      showNotification({
+      showSnackbar({
         title: t('appointmentCancelError', 'Error cancelling appointment'),
         kind: 'error',
-        critical: true,
-        description: t('errorCancellingAppointment', 'Error cancelling the appointment'),
+        subtitle: t('errorCancellingAppointment', 'Error cancelling the appointment'),
       });
       setIsSubmitting(false);
     }
@@ -60,6 +59,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
           state={{
             patient,
             patientUuid: appointment.patientUuid,
+            hideActionsOverflow: true,
           }}
         />
       )}

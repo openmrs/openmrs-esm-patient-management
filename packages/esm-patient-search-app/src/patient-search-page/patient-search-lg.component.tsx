@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { interpolateString, navigate, useConfig, usePagination } from '@openmrs/esm-framework';
+import { useConfig, usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
 import {
   EmptyState,
@@ -17,8 +17,6 @@ interface PatientSearchComponentProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  selectPatientAction?: (patientUuid: string) => void;
-  hidePanel?: () => void;
   searchResults: Array<SearchedPatient>;
   isLoading: boolean;
   fetchError: Error;
@@ -27,9 +25,7 @@ interface PatientSearchComponentProps {
 const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   query,
   stickyPagination,
-  selectPatientAction,
   inTabletOrOverlay,
-  hidePanel,
   searchResults,
   isLoading,
   fetchError,
@@ -48,25 +44,6 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
     goTo(1);
   }, [query, goTo]);
 
-  const handlePatientSelection = useCallback(
-    (evt, patientUuid: string) => {
-      evt.preventDefault();
-      if (selectPatientAction) {
-        selectPatientAction(patientUuid);
-      } else {
-        navigate({
-          to: `${interpolateString(config.search.patientResultUrl, {
-            patientUuid: patientUuid,
-          })}`,
-        });
-      }
-      if (hidePanel) {
-        hidePanel();
-      }
-    },
-    [config, selectPatientAction, hidePanel],
-  );
-
   const searchResultsView = useMemo(() => {
     if (!query) {
       return <EmptyState inTabletOrOverlay={inTabletOrOverlay} />;
@@ -84,8 +61,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
       return <SearchResultsEmptyState inTabletOrOverlay={inTabletOrOverlay} />;
     }
 
-    return <PatientSearchResults searchResults={results} handlePatientSelection={handlePatientSelection} />;
-  }, [query, isLoading, inTabletOrOverlay, results, handlePatientSelection, fetchError]);
+    return <PatientSearchResults searchResults={results} />;
+  }, [query, isLoading, inTabletOrOverlay, results, fetchError]);
 
   return (
     <div

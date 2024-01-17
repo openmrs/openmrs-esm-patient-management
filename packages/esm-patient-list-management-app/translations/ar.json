@@ -32,7 +32,7 @@
   "home": "الرئيسية",
   "identifier": "المعرف",
   "items": "العناصر",
-  "itemsPerPage": "عناصر في الصفحة:",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "List created successfully",
   "listDescriptionPlaceholder": "مثل: المرضى الذين تم تشخيصهم بالربو والذين قد يكونون على استعداد للمشاركة في دراسة جامعية",
   "listName": "اسم القائمة",
@@ -54,7 +54,6 @@
   "noPatientsInList": "There are no patients in this list",
   "offlinePatients": "المرضى غير المتصلين",
   "openPatientList": "أضف إلى القائمة",
-  "pageNumber": "رقم الصفحة",
   "patientListMemberCount_zero": "This list has {{count}} patients",
   "patientListMemberCount_one": "This list has {{count}} patient",
   "patientListMemberCount_two": "This list has {{count}} patients",
@@ -73,6 +72,7 @@
   "searchForList": "ابحث عن قائمة",
   "searchThisList": "ابحث في هذه القائمة",
   "sex": "الجنس",
+  "starList": "Star list",
   "starred": "مميز",
   "starredLists": "القوائم المميزة",
   "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
@@ -82,6 +82,7 @@
   "successfullyAdded": "تمت الإضافة بنجاح",
   "systemDefined": "معرف من النظام",
   "systemLists": "قوائم النظام",
+  "unstarList": "Unstar list",
   "updated": "Updated",
   "userDefined": "معرف من المستخدم"
 }

@@ -32,7 +32,7 @@
   "home": "בית",
   "identifier": "מזהה",
   "items": "פריטים",
-  "itemsPerPage": "פריטים לעמוד:",
+  "itemsDisplayed": "{{numberOfItemsDisplayed}} items",
   "listCreated": "רשימה נוצרה בהצלחה",
   "listDescriptionPlaceholder": "לדוגמה, מטופלים עם אסתמה שנמצאים בראשית הדרך להשתתפות במחקר אוניברסיטאי",
   "listName": "שם הרשימה",
@@ -54,7 +54,6 @@
   "noPatientsInList": "אין מטופלים ברשימה זו",
   "offlinePatients": "מטופלים במצב לא מקוון",
   "openPatientList": "הוסף לרשימה",
-  "pageNumber": "מספר עמוד",
   "patientListMemberCount_one": "ברשימה זו יש {{count}} מטופל",
   "patientListMemberCount_two": "ברשימה זו יש {{count}} מטופלים",
   "patientListMemberCount_many": "ברשימה זו יש {{count}} מטופלים",
@@ -71,6 +70,7 @@
   "searchForList": "חפש רשימה",
   "searchThisList": "חפש ברשימה זו",
   "sex": "מין",
+  "starList": "Star list",
   "starred": "מסומן",
   "starredLists": "רשימות מסומנות",
   "starringPatientListFailed": "Marking patient lists starred / unstarred failed",
@@ -80,6 +80,7 @@
   "successfullyAdded": "נוסף בהצלחה",
   "systemDefined": "הוגדר על ידי המערכת",
   "systemLists": "רשימות מערכת",
+  "unstarList": "Unstar list",
   "updated": "עודכן",
   "userDefined": "הוגדר על ידי המשתמש"
 }

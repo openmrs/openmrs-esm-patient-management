@@ -36,7 +36,6 @@ import {
   ExtensionSlot,
   usePagination,
   useConfig,
-  type ConfigObject,
   useSession,
   showModal,
   ConfigurableLink,
@@ -58,12 +57,12 @@ import ActionsMenu from '../queue-entry-table-components/actions-menu.component'
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import CurrentVisit from '../current-visit/current-visit-summary.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
+import { type ConfigObject } from '../config-schema';
 
 /**
  * FIXME Temporarily moved here
@@ -99,8 +98,7 @@ function ActiveVisitsTable() {
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
-  const config = useConfig() as ConfigObject;
-  const useQueueTableTabs = config.showQueueTableTab;
+  const { showQueueTableTab: useQueueTableTabs, customPatientChartUrl } = useConfig<ConfigObject>();
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
   const differenceInTime = timeDiffInMinutes(
@@ -168,7 +166,9 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <ConfigurableLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`}>{entry.name}</ConfigurableLink>
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: entry.patientUuid }}>
+            {entry.name}
+          </ConfigurableLink>
         ),
       },
       queueNumber: {
@@ -360,9 +360,6 @@ function ActiveVisitsTable() {
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <OpenChartMenu patientUuid={visitQueueEntries?.[index]?.patientUuid} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />

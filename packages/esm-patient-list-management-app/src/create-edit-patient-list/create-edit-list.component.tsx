@@ -1,7 +1,7 @@
 import React, { useCallback, type SyntheticEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, Layer, TextArea, TextInput } from '@carbon/react';
-import { useLayoutType, showToast, useSession, useConfig } from '@openmrs/esm-framework';
+import { useLayoutType, showSnackbar, useSession, useConfig } from '@openmrs/esm-framework';
 import type { ConfigSchema } from '../config-schema';
 import type { NewCohortData, OpenmrsCohort } from '../api/types';
 import { createPatientList, editPatientList } from '../api/api-remote';
@@ -47,10 +47,11 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
     if (isEditing) {
       editPatientList(patientListDetails.uuid, cohortDetails)
         .then(() => {
-          showToast({
+          showSnackbar({
             title: t('updated', 'Updated'),
-            description: t('listUpdated', 'List updated successfully'),
+            subtitle: t('listUpdated', 'List updated successfully'),
             kind: 'success',
+            isLowContrast: true,
           });
 
           onSuccess();
@@ -58,10 +59,9 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
           close();
         })
         .catch((error) => {
-          console.error('Error updating list: ', error);
-          showToast({
+          showSnackbar({
             title: t('errorUpdatingList', 'Error updating list'),
-            description: t('problemUpdatingList', 'There was a problem updating the list'),
+            subtitle: t('problemUpdatingList', 'There was a problem updating the list'),
             kind: 'error',
           });
           setIsSubmitting(false);
@@ -75,20 +75,20 @@ const CreateEditPatientList: React.FC<CreateEditPatientListProps> = ({
         location: session?.sessionLocation?.uuid,
       })
         .then(() => {
-          showToast({
+          showSnackbar({
             title: t('created', 'Created'),
-            description: `${t('listCreated', 'List created successfully')}`,
+            subtitle: `${t('listCreated', 'List created successfully')}`,
             kind: 'success',
+            isLowContrast: true,
           });
           onSuccess();
           setIsSubmitting(false);
           close();
         })
         .catch((error) => {
-          console.error('Error creating list: ', error);
-          showToast({
+          showSnackbar({
             title: t('errorCreatingList', 'Error creating list'),
-            description: t('problemCreatingList', 'There was a problem creating the list'),
+            subtitle: t('problemCreatingList', 'There was a problem creating the list'),
             kind: 'error',
           });
           setIsSubmitting(false);
