@@ -10,6 +10,7 @@ const config: PlaywrightTestConfig = {
     timeout: 40 * 1000,
   },
   fullyParallel: true,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: 0,
   reporter: process.env.CI ? [['junit', { outputFile: 'results.xml' }], ['html']] : [['html']],
