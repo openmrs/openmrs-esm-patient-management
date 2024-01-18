@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,10 @@ export interface ObsFieldProps {
 }
 
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
+  const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
 
-  const config = useConfig() as RegistrationConfig;
+  const config = useConfig<RegistrationConfig>();
 
   if (!config.registrationObs.encounterTypeUuid) {
     console.error(
@@ -57,12 +58,17 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
+          customConceptAnswers={fieldDefinition.customConceptAnswers}
         />
       );
     default:
       return (
         <InlineNotification kind="error" title="Error">
-          Concept has unknown datatype "{concept.datatype.display}"
+          {t(
+            'obsFieldUnknownDatatype',
+            `Concept for obs field '{{fieldDefinitionId}}' has unknown datatype '{{datatypeName}}'`,
+            { fieldDefinitionId: fieldDefinition.id, datatypeName: concept.datatype.display },
+          )}
         </InlineNotification>
       );
   }
@@ -117,8 +123,6 @@ interface NumericObsFieldProps {
 }
 
 function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
-  const { t } = useTranslation();
-
   const fieldName = `obs.${concept.uuid}`;
 
   return (
@@ -146,40 +150,32 @@ interface CodedObsFieldProps {
   answerConceptSetUuid?: string;
   label?: string;
   required?: boolean;
+  customConceptAnswers: Array<{ uuid: string; label?: string }>;
 }
 
-function CodedObsField({ concept, answerConceptSetUuid, label, required }: CodedObsFieldProps) {
-  const config = useConfig() as RegistrationConfig;
+function CodedObsField({ concept, answerConceptSetUuid, label, required, customConceptAnswers }: CodedObsFieldProps) {
+  const { t } = useTranslation();
+  const fieldName = `obs.${concept.uuid}`;
+
   const { data: conceptAnswers, isLoading: isLoadingConceptAnswers } = useConceptAnswers(
-    answerConceptSetUuid ?? concept.uuid,
+    customConceptAnswers.length ? '' : answerConceptSetUuid ?? concept.uuid,
   );
 
-  const fieldName = `obs.${concept.uuid}`;
-  const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'obs' && def.uuid === concept.uuid)[0];
+  const answers = useMemo(
+    () =>
+      customConceptAnswers.length
+        ? customConceptAnswers
+        : isLoadingConceptAnswers
+          ? []
+          : conceptAnswers.map((answer) => ({ ...answer, label: answer.display })),
+    [customConceptAnswers, conceptAnswers, isLoadingConceptAnswers],
+  );
 
   return (
     <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
       {!isLoadingConceptAnswers ? (
         <Field name={fieldName}>
           {({ field, form: { touched, errors }, meta }) => {
-            if (fieldDefinition?.customConceptAnswers?.length) {
-              return (
-                <Layer>
-                  <Select
-                    id={fieldName}
-                    name={fieldName}
-                    required={required}
-                    labelText={label ?? concept?.display}
-                    invalid={errors[fieldName] && touched[fieldName]}
-                    {...field}>
-                    <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                    {fieldDefinition?.customConceptAnswers.map((answer) => (
-                      <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
-                    ))}
-                  </Select>
-                </Layer>
-              );
-            }
             return (
               <Layer>
                 <Select
@@ -189,9 +185,13 @@ function CodedObsField({ concept, answerConceptSetUuid, label, required }: Coded
                   required={required}
                   invalid={errors[fieldName] && touched[fieldName]}
                   {...field}>
-                  <SelectItem key={`no-answer-select-item-${fieldName}`} value={''} text="" />
-                  {conceptAnswers.map((answer) => (
-                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.display} />
+                  <SelectItem
+                    key={`no-answer-select-item-${fieldName}`}
+                    value={''}
+                    text={t('selectAnOption', 'Select an option')}
+                  />
+                  {answers.map((answer) => (
+                    <SelectItem key={answer.uuid} value={answer.uuid} text={answer.label} />
                   ))}
                 </Select>
               </Layer>

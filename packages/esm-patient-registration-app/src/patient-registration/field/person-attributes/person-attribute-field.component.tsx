@@ -37,6 +37,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
             label={fieldDefinition.label}
             id={fieldDefinition?.id}
+            customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
           />
         );
       default:
