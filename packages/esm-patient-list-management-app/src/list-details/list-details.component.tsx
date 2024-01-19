@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem, Modal } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
-import { navigate, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
+import { navigate, formatDate, parseDate, showSnackbar } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
@@ -88,18 +88,19 @@ const ListDetails = () => {
   const confirmDeletePatientList = useCallback(() => {
     deletePatientList(patientListUuid)
       .then(() => {
-        showToast({
+        showSnackbar({
           title: t('deleted', 'Deleted'),
-          description: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
+          subtitle: `${t('deletedPatientList', 'Deleted patient list')}: ${listDetails?.name}`,
           kind: 'success',
+          isLowContrast: true,
         });
 
         navigate({ to: window.getOpenmrsSpaBase() + 'home/patient-lists' });
       })
       .catch((e) =>
-        showToast({
+        showSnackbar({
           title: t('errorDeletingList', 'Error deleting patient list'),
-          description: e?.message,
+          subtitle: e?.message,
           kind: 'error',
         }),
       )

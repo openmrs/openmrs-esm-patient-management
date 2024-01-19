@@ -32,8 +32,7 @@ import {
   saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   useConfig,
   type ConfigObject,
 } from '@openmrs/esm-framework';
@@ -140,10 +139,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               ).then(
                 ({ status }) => {
                   if (status === 201) {
-                    showToast({
+                    showSnackbar({
                       kind: 'success',
+                      isLowContrast: true,
                       title: t('startAVisit', 'Start a visit'),
-                      description: t(
+                      subtitle: t(
                         'startVisitQueueSuccessfully',
                         'Patient has been added to active visits list and queue.',
                         `${hours} : ${minutes}`,
@@ -154,22 +154,20 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                   }
                 },
                 (error) => {
-                  showNotification({
+                  showSnackbar({
                     title: t('queueEntryError', 'Error adding patient to the queue'),
                     kind: 'error',
-                    critical: true,
-                    description: error?.message,
+                    subtitle: error?.message,
                   });
                 },
               );
             }
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              subtitle: error?.message,
             });
           },
         );

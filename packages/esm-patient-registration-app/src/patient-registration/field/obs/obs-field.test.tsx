@@ -3,66 +3,80 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
+import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
 
 const mockUseConfig = useConfig as jest.Mock;
 
-jest.mock('../field.resource', () => ({
-  useConcept: jest.fn().mockImplementation((uuid: string) => {
-    let data;
-    if (uuid == 'weight-uuid') {
-      data = {
-        uuid: 'weight-uuid',
-        display: 'Weight (kg)',
-        datatype: { display: 'Numeric', uuid: 'num' },
-        answers: [],
-        setMembers: [],
-      };
-    } else if (uuid == 'chief-complaint-uuid') {
-      data = {
-        uuid: 'chief-complaint-uuid',
-        display: 'Chief Complaint',
-        datatype: { display: 'Text', uuid: 'txt' },
-        answers: [],
-        setMembers: [],
-      };
-    } else if (uuid == 'nationality-uuid') {
-      data = {
-        uuid: 'nationality-uuid',
-        display: 'Nationality',
-        datatype: { display: 'Coded', uuid: 'cdd' },
-        answers: [
-          { display: 'USA', uuid: 'usa' },
-          { display: 'Mexico', uuid: 'mex' },
-        ],
-        setMembers: [],
-      };
-    }
-    return {
-      data: data ?? null,
-      isLoading: !data,
+jest.mock('../field.resource'); // Mock the useConceptAnswers hook
+
+const mockedUseConcept = useConcept as jest.Mock;
+const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
+
+const useConceptMockImpl = (uuid: string) => {
+  let data;
+  if (uuid == 'weight-uuid') {
+    data = {
+      uuid: 'weight-uuid',
+      display: 'Weight (kg)',
+      datatype: { display: 'Numeric', uuid: 'num' },
+      answers: [],
+      setMembers: [],
     };
-  }),
-  useConceptAnswers: jest.fn().mockImplementation((uuid: string) => {
-    if (uuid == 'nationality-uuid') {
-      return {
-        data: [
-          { display: 'USA', uuid: 'usa' },
-          { display: 'Mexico', uuid: 'mex' },
-        ],
-        isLoading: false,
-      };
-    } else if (uuid == 'other-countries-uuid') {
-      return {
-        data: [
-          { display: 'Kenya', uuid: 'ke' },
-          { display: 'Uganda', uuid: 'ug' },
-        ],
-        isLoading: false,
-      };
-    }
-  }),
-}));
+  } else if (uuid == 'chief-complaint-uuid') {
+    data = {
+      uuid: 'chief-complaint-uuid',
+      display: 'Chief Complaint',
+      datatype: { display: 'Text', uuid: 'txt' },
+      answers: [],
+      setMembers: [],
+    };
+  } else if (uuid == 'nationality-uuid') {
+    data = {
+      uuid: 'nationality-uuid',
+      display: 'Nationality',
+      datatype: { display: 'Coded', uuid: 'cdd' },
+      answers: [
+        { display: 'USA', uuid: 'usa' },
+        { display: 'Mexico', uuid: 'mex' },
+      ],
+      setMembers: [],
+    };
+  } else {
+    throw Error(`Programming error, you probably didn't mean to do this: unknown concept uuid '${uuid}'`);
+  }
+  return {
+    data: data ?? null,
+    isLoading: !data,
+  };
+};
+
+const useConceptAnswersMockImpl = (uuid: string) => {
+  if (uuid == 'nationality-uuid') {
+    return {
+      data: [
+        { display: 'USA', uuid: 'usa' },
+        { display: 'Mexico', uuid: 'mex' },
+      ],
+      isLoading: false,
+    };
+  } else if (uuid == 'other-countries-uuid') {
+    return {
+      data: [
+        { display: 'Kenya', uuid: 'ke' },
+        { display: 'Uganda', uuid: 'ug' },
+      ],
+      isLoading: false,
+    };
+  } else if (uuid == '') {
+    return {
+      data: [],
+      isLoading: false,
+    };
+  } else {
+    throw Error(`Programming error, you probably didn't mean to do this: unknown concept answer set uuid '${uuid}'`);
+  }
+};
 
 type FieldProps = {
   children: ({ field, form: { touched, errors } }) => React.ReactNode;
@@ -86,12 +100,7 @@ const textFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
-  customConceptAnswers: [
-    {
-      uuid: 'concept-uuid',
-      label: '',
-    },
-  ],
+  customConceptAnswers: [],
 };
 
 const numberFieldDef: FieldDefinition = {
@@ -106,12 +115,7 @@ const numberFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
-  customConceptAnswers: [
-    {
-      uuid: 'concept-uuid',
-      label: '',
-    },
-  ],
+  customConceptAnswers: [],
 };
 
 const codedFieldDef: FieldDefinition = {
@@ -126,17 +130,14 @@ const codedFieldDef: FieldDefinition = {
     matches: null,
   },
   answerConceptSetUuid: null,
-  customConceptAnswers: [
-    {
-      uuid: 'concept-uuid',
-      label: 'Kenya',
-    },
-  ],
+  customConceptAnswers: [],
 };
 
 describe('ObsField', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue({ registrationObs: { encounterTypeUuid: 'reg-enc-uuid' } });
+    mockedUseConcept.mockImplementation(useConceptMockImpl);
+    mockedUseConceptAnswers.mockImplementation(useConceptAnswersMockImpl);
   });
 
   it("logs an error and doesn't render if no registration encounter type is provided", () => {
@@ -167,15 +168,10 @@ describe('ObsField', () => {
     // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
-    expect(select).toHaveDisplayValue('');
+    expect(select).toHaveDisplayValue('Select an option');
   });
 
   it('select uses answerConcept for answers when it is provided', async () => {
-    mockUseConfig.mockReturnValue({
-      registrationObs: { encounterTypeUuid: 'reg-enc-uuid' },
-      fieldDefinitions: [codedFieldDef],
-    });
-
     const user = userEvent.setup();
 
     render(<ObsField fieldDefinition={{ ...codedFieldDef, answerConceptSetUuid: 'other-countries-uuid' }} />);
@@ -183,5 +179,27 @@ describe('ObsField', () => {
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
     await user.selectOptions(select, 'Kenya');
+  });
+
+  it('select uses customConceptAnswers for answers when provided', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ObsField
+        fieldDefinition={{
+          ...codedFieldDef,
+          customConceptAnswers: [
+            {
+              uuid: 'mozambique-uuid',
+              label: 'Mozambique',
+            },
+          ],
+        }}
+      />,
+    );
+    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
+    const select = screen.getByRole('combobox');
+    expect(select).toBeInTheDocument();
+    await user.selectOptions(select, 'Mozambique');
   });
 });

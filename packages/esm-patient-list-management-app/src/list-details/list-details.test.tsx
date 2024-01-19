@@ -19,7 +19,7 @@ jest.mock('../api/api-remote');
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
   navigate: jest.fn(),
   ExtensionSlot: jest.fn(),
 }));
