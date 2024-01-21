@@ -51,8 +51,9 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
             />
           </DatePicker>
         </div>
-        {typeof onChange === 'function' && (
-          <div className={styles.dropdownContainer}>
+        <div className={styles.dropdownContainer}>
+          <label className={styles.view}>{t('view', 'View')}:</label>
+          {typeof onChange === 'function' && (
             <Layer>
               <Dropdown
                 ariaLabel="Dropdown"
@@ -60,15 +61,14 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
                 items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
                 itemToString={(item) => (item ? item.name : '')}
                 label={t('selectServiceType', 'Select service type')}
-                titleText={t('view', 'View')}
                 type="inline"
                 size="sm"
                 direction="bottom"
                 onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
               />
             </Layer>
+          )}
           </div>
-        )}
       </div>
     </div>
   );
