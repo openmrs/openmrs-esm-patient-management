@@ -144,8 +144,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
               kind="danger--ghost"
               onClick={handleDelete}
               iconDescription={t('deleteIdentifierTooltip', 'Delete')}
-              disabled={disabled}
-              hasIconOnly>
+              disabled={disabled}>
               <TrashCan size={16} />
             </Button>
           </UserHasAccess>
