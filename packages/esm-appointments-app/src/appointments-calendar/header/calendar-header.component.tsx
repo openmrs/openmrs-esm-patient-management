@@ -39,16 +39,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarV
   return (
     <div className={styles.calendarHeaderContainer}>
       <div className={styles.titleContainer}>
-        <div className={styles.backButton}>
-          <Button
-            kind="ghost"
-            onClick={backButtonOnClick}
-            renderIcon={ArrowLeft}
-            iconDescription={t('back', 'Back')}
-            size="lg">
-            <span>{t('back', 'Back')}</span>
-          </Button>
-        </div>
+        <Button
+          kind="ghost"
+          onClick={backButtonOnClick}
+          renderIcon={ArrowLeft}
+          iconDescription={t('back', 'Back')}
+          size="lg">
+          <span>{t('back', 'Back')}</span>
+        </Button>
         <p>{t('calendar', 'Calendar')}</p>
         <Button size="md" kind="ghost" renderIcon={ArrowRight} onClick={addNewClinicDayOnClick}>
           {t('addNewClinicDay', 'Add new clinic day')}

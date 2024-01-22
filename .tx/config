@@ -49,4 +49,11 @@ type                   = KEYVALUEJSON
 replace_edited_strings = false
 keep_translations      = false
 
+[o:openmrs:p:openmrs-esm-patient-management:r:esm-service-queues-app]
+file_filter            = packages/esm-service-queues-app/translations/<lang>.json
+source_file            = packages/esm-service-queues-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
 

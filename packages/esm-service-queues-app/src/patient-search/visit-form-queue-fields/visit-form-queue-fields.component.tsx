@@ -44,7 +44,7 @@ const StartVisitQueueFields: React.FC = () => {
   }, [queueLocations]);
 
   return (
-    <div className={styles.container}>
+    <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper isTablet={isTablet}>
