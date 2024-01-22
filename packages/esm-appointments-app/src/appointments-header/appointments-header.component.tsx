@@ -42,7 +42,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
             dateFormat="d-M-Y"
             datePickerType="single">
             <DatePickerInput
-              style={{ backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
+              style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
               id="date-picker-calendar-id"
               placeholder="DD-MMM-YYYY"
               labelText=""
