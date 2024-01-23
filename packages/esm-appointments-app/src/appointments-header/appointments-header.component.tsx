@@ -68,7 +68,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
               />
             </Layer>
           )}
-        </div>
+        </div>
       </div>
     </div>
   );
