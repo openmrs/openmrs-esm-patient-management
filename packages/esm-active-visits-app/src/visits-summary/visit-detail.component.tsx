@@ -65,7 +65,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   } else {
     return (
       <div className={styles.visitEmptyState}>
-        <h4 className={styles.productiveHeading02}>{t('noVisitsFound', 'No visits found')}</h4>
+        <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
         <p className={classNames(styles.bodyLong01, styles.text02)}>
           {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
         </p>
