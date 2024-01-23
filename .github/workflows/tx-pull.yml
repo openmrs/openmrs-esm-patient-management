@@ -1,8 +1,8 @@
 on:
   workflow_dispatch:
   schedule:
-    # every day at 8:15 PM UTC
-    - cron: "0 20 15 * *"
+    # every day at 8:00 PM UTC
+    - cron: "0 20 * * *"
 
 name: "Scheduled Transifex Update"
 
