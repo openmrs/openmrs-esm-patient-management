@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
 import { IdentifierInput } from './identifier-input.component';
 import { initialFormValues } from '../../../patient-registration.component';
-import { PatientIdentifierType } from '../../../patient-registration-types';
+import { type PatientIdentifierType } from '../../../patient-registration-types';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -52,10 +52,7 @@ describe.skip('identifier input', () => {
       </Formik>,
     );
     const identifierInput = screen.getByLabelText(identifierType.fieldName) as HTMLInputElement;
-    let identifierSourceSelectInput = undefined;
-    try {
-      identifierSourceSelectInput = screen.getByLabelText('source-for-' + identifierType.fieldName) as HTMLInputElement;
-    } catch (e) {}
+    let identifierSourceSelectInput = screen.getByLabelText('source-for-' + identifierType.fieldName);
     return {
       identifierInput,
       identifierSourceSelectInput,

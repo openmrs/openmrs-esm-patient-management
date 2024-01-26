@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import { deletePatientList } from '../api/api-remote';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { getByTextWithMarkup } from 'tools';
 import ListDetails from './list-details.component';
 
 const mockedUsePatientListDetails = usePatientListDetails as jest.Mock;
@@ -19,7 +19,7 @@ jest.mock('../api/api-remote');
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  showToast: jest.fn(),
+  showSnackbar: jest.fn(),
   navigate: jest.fn(),
   ExtensionSlot: jest.fn(),
 }));

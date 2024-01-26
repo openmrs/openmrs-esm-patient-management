@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { mockVisitTypes } from '__mocks__';
 import QueueLinelistFilter from './queue-linelist-filter.component';
-import { mockVisitTypes } from '../../__mocks__/visits.mock';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -9,7 +10,6 @@ jest.mock('@openmrs/esm-framework', () => ({
   useVisitTypes: jest.fn(() => mockVisitTypes),
   toOpemrsIsoString: jest.fn(),
 }));
-// Additional mock functions if needed
 
 describe('QueueLinelistFilter', () => {
   it('renders the form with filter elements', () => {
@@ -26,50 +26,62 @@ describe('QueueLinelistFilter', () => {
     expect(screen.getByText('Apply filters')).toBeInTheDocument();
   });
 
-  it('calls closePanel function when cancel button is clicked', () => {
+  it('calls closePanel function when cancel button is clicked', async () => {
+    const user = userEvent.setup();
     const closePanelMock = jest.fn();
+
     render(<QueueLinelistFilter closePanel={closePanelMock} />);
 
     const cancelButton = screen.getByText('Cancel');
-    fireEvent.click(cancelButton);
+    await user.click(cancelButton);
 
     expect(closePanelMock).toHaveBeenCalledTimes(1);
   });
 
-  it('updates gender state when a radio button is selected', () => {
+  it('updates gender state when a radio button is selected', async () => {
+    const user = userEvent.setup();
+
     render(<QueueLinelistFilter closePanel={jest.fn()} />);
 
     const maleRadioButton = screen.getByLabelText('Male');
-    fireEvent.click(maleRadioButton);
+    await user.click(maleRadioButton);
 
     expect(maleRadioButton).toBeChecked();
   });
 
-  it('updates startAge state when a number is entered', () => {
+  it('updates startAge state when a number is entered', async () => {
+    const user = userEvent.setup();
     render(<QueueLinelistFilter closePanel={jest.fn()} />);
 
     const startAgeInput = screen.getByLabelText('Between');
-    fireEvent.change(startAgeInput, { target: { value: '10' } });
+    await user.type(startAgeInput, '10');
 
     expect(startAgeInput).toHaveValue(10);
   });
 
-  it('updates returnDate state when date input changes', () => {
+  it('updates returnDate state when date input changes', async () => {
+    const user = userEvent.setup();
+
     render(<QueueLinelistFilter closePanel={jest.fn()} />);
 
     const returnDateInput = screen.getByLabelText('Date');
-    fireEvent.change(returnDateInput, { target: { value: '2023-08-20' } });
+
+    await user.clear(returnDateInput);
+    await user.type(returnDateInput, '2023-08-20');
 
     expect(returnDateInput).toHaveValue('2023-08-20');
   });
 
-  it('should open the visit type dropdown and close after selection', () => {
+  it('should open the visit type dropdown and close after selection', async () => {
+    const user = userEvent.setup();
+
     render(<QueueLinelistFilter closePanel={jest.fn()} />);
 
     const visitTypeDropdown = screen.getByRole('button', { name: /Select visit type/i });
-    fireEvent.click(visitTypeDropdown);
+    await user.click(visitTypeDropdown);
+
     const type1Option = screen.getByText('Outpatient Visit');
-    fireEvent.click(type1Option);
+    await user.click(type1Option);
 
     expect(visitTypeDropdown).toHaveTextContent('Open menu');
   });

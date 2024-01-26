@@ -4,7 +4,7 @@ import styles from '../field.scss';
 import { useTranslation } from 'react-i18next';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { useField } from 'formik';
-import { RegistrationConfig } from '../../../config-schema';
+import { type RegistrationConfig } from '../../../config-schema';
 import { useConfig } from '@openmrs/esm-framework';
 
 export const GenderField: React.FC = () => {
@@ -33,10 +33,10 @@ export const GenderField: React.FC = () => {
         <RadioButtonGroup name="gender" orientation="vertical" onChange={setGender} valueSelected={field.value}>
           {fieldConfigs.map((option) => (
             <RadioButton
-              key={option.label}
-              id={option.id}
+              key={option.label ?? option.value}
+              id={`gender-option-${option.value}`}
               value={option.value}
-              labelText={t(`${option.label}`, `${option.label}`)}
+              labelText={t(option.label ?? option.value, option.label ?? option.value)}
             />
           ))}
         </RadioButtonGroup>

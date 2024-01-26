@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import PatientSearchLaunch from './patient-search-icon.component';
 import { isDesktop } from '@openmrs/esm-framework';
 
@@ -30,24 +31,31 @@ describe('PatientSearchLaunch', () => {
     expect(screen.getByRole('button', { name: 'Search Patient' })).toBeInTheDocument();
   });
 
-  it('toggles search input when search button is clicked', () => {
+  it('toggles search input when search button is clicked', async () => {
+    const user = userEvent.setup();
+
     render(<PatientSearchLaunch />);
+
     const searchButton = screen.getByTestId('searchPatientIcon');
 
-    fireEvent.click(searchButton);
+    await user.click(searchButton);
     const searchInput = screen.getByText('Search results');
     expect(searchInput).toBeInTheDocument();
 
-    fireEvent.click(searchButton);
+    const closeButton = screen.getByTestId('closeSearchIcon');
+    await user.click(closeButton);
     expect(searchInput).not.toBeInTheDocument();
   });
 
-  it('displays search input in overlay on mobile', () => {
+  it('displays search input in overlay on mobile', async () => {
+    const user = userEvent.setup();
     isDesktopMock.mockReturnValue(false);
+
     render(<PatientSearchLaunch />);
+
     const searchButton = screen.getByTestId('searchPatientIcon');
 
-    fireEvent.click(searchButton);
+    await user.click(searchButton);
     const overlay = screen.getByText('Search results');
     expect(overlay).toBeInTheDocument();
   });

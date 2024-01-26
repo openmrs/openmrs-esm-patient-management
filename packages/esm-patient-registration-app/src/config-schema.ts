@@ -11,14 +11,14 @@ export interface FieldDefinition {
   type: string;
   label?: string;
   uuid: string;
-  placeholder: string;
+  placeholder?: string;
   showHeading: boolean;
-  validation: {
+  validation?: {
     required: boolean;
     matches?: string;
   };
   answerConceptSetUuid?: string;
-  customConceptAnswers: Array<CustomConceptAnswer>;
+  customConceptAnswers?: Array<CustomConceptAnswer>;
 }
 export interface CustomConceptAnswer {
   uuid: string;
@@ -27,7 +27,6 @@ export interface CustomConceptAnswer {
 export interface Gender {
   label?: string;
   value: string;
-  id: string;
 }
 
 export interface RegistrationConfig {
@@ -59,6 +58,9 @@ export interface RegistrationConfig {
         month: number;
       };
     };
+    phone: {
+      personAttributeUuid: string;
+    };
   };
   links: {
     submitButton: string;
@@ -85,7 +87,8 @@ export const builtInSections: Array<SectionDefinition> = [
   { id: 'relationships', name: 'Relationships', fields: [] },
 ];
 
-export const builtInFields = ['name', 'gender', 'dob', 'address', 'id', 'phone & email'] as const;
+// These fields are handled specially in field.component.tsx
+export const builtInFields = ['name', 'gender', 'dob', 'id', 'address', 'phone'] as const;
 
 export const esmPatientRegistrationSchema = {
   sections: {
@@ -133,7 +136,7 @@ export const esmPatientRegistrationSchema = {
       type: {
         _type: Type.String,
         _description: "How this field's data will be stored—a person attribute or an obs.",
-        // _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _validators: [validators.oneOf(['person attribute', 'obs'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -182,20 +185,12 @@ export const esmPatientRegistrationSchema = {
           },
         },
         _default: [],
-        _description: 'For coded questions only. Provide ability to add custom concept answers.',
+        _description:
+          'For coded questions only (obs or person attrbute). A list of custom concept answers. Overrides answers that come from the obs concept or from `answerSetConceptUuid`.',
       },
     },
-    _default: [
-      {
-        id: 'phone',
-        type: 'person attribute',
-        uuid: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
-        showHeading: false,
-        validation: {
-          matches: '',
-        },
-      },
-    ],
+    // Do not add fields here. If you want to add a field in code, add it to built-in fields above.
+    _default: [],
     _description:
       'Definitions for custom fields that can be used in sectionDefinitions. Can also be used to override built-in fields.',
   },
@@ -233,42 +228,33 @@ export const esmPatientRegistrationSchema = {
       _elements: {
         value: {
           _type: Type.String,
-          _description: 'The value for sex option',
+          _description:
+            'Value that will be sent to the server. Limited to FHIR-supported values for Administrative Gender',
+          _validators: [validators.oneOf(['male', 'female', 'other', 'unknown'])],
         },
         label: {
           _type: Type.String,
           _default: null,
-          _description: 'The label displayed for sex option.',
-        },
-        id: {
-          _type: Type.String,
-          _default: null,
-          _description: 'The id for sex option.',
+          _description:
+            'The label displayed for the sex option, if it should be different from the value (the value will be translated; the English "translation" is upper-case).',
         },
       },
       _default: [
         {
-          id: 'male',
-          value: 'Male',
-          label: 'Male',
+          value: 'male',
         },
         {
-          id: 'female',
-          value: 'Female',
-          label: 'Female',
+          value: 'female',
         },
         {
-          id: 'other',
-          value: 'Other',
-          label: 'Other',
+          value: 'other',
         },
         {
-          id: 'unknown',
-          value: 'Unknown',
-          label: 'Unknown',
+          value: 'unknown',
         },
       ],
-      _description: 'Provide ability to configure sex options.',
+      _description:
+        'The options for sex selection during patient registration. This is Administrative Gender as it is called by FHIR (Possible options are limited to those defined in FHIR Administrative Gender, see https://hl7.org/fhir/R4/valueset-administrative-gender.html).',
     },
     address: {
       useAddressHierarchy: {
@@ -318,6 +304,13 @@ export const esmPatientRegistrationSchema = {
           _description: 'The custom month to use on the estimated date of birth i.e 0 = Jan & 11 = Dec',
           _default: 0,
         },
+      },
+    },
+    phone: {
+      personAttributeUuid: {
+        _type: Type.UUID,
+        _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
+        _description: 'The UUID of the phone number person attribute type',
       },
     },
   },

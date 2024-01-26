@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useInfinitePatientSearch } from '../patient-search.resource';
-import { AdvancedPatientSearchState } from '../types';
+import { type AdvancedPatientSearchState } from '../types';
 import { initialState } from './advanced-search-reducer';
 import PatientSearchComponent from './patient-search-lg.component';
 import RefineSearch from './refine-search.component';
@@ -11,16 +11,12 @@ interface AdvancedPatientSearchProps {
   query: string;
   inTabletOrOverlay?: boolean;
   stickyPagination?: boolean;
-  selectPatientAction?: (patientUuid: string) => void;
-  hidePanel?: () => void;
 }
 
 const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
   query,
   stickyPagination,
-  selectPatientAction,
   inTabletOrOverlay,
-  hidePanel,
 }) => {
   const [filters, setFilters] = useState<AdvancedPatientSearchState>(initialState);
   const filtersApplied = useMemo(() => {
@@ -136,9 +132,7 @@ const AdvancedPatientSearchComponent: React.FC<AdvancedPatientSearchProps> = ({
         <PatientSearchComponent
           query={query}
           stickyPagination={stickyPagination}
-          selectPatientAction={selectPatientAction}
           inTabletOrOverlay={inTabletOrOverlay}
-          hidePanel={hidePanel}
           isLoading={isLoading}
           fetchError={fetchError}
           searchResults={filteredResults ?? []}

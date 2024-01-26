@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
-import { Encounter, useVisit } from './visit.resource';
+import { type Encounter, useVisit } from './visit.resource';
 import { formatTime, formatDatetime, parseDate } from '@openmrs/esm-framework';
 import EncounterList from './visits-components/encounter-list.component';
 import VisitSummary from './visits-components/visit-summary.component';
@@ -65,7 +65,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visitUuid, 
   } else {
     return (
       <div className={styles.visitEmptyState}>
-        <h4 className={styles.productiveHeading02}>{t('noVisitsFound', 'No visits found')}</h4>
+        <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
         <p className={classNames(styles.bodyLong01, styles.text02)}>
           {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
         </p>

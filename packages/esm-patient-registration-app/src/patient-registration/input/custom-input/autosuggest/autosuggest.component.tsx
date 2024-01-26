@@ -1,10 +1,11 @@
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react';
-import { Layer, Search, SearchProps } from '@carbon/react';
+import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
+import { Layer, Search, type SearchProps } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './autosuggest.scss';
 
 // FIXME Temporarily included types from Carbon
 type InputPropsBase = Omit<HTMLAttributes<HTMLInputElement>, 'onChange'>;
+
 interface SearchProps extends InputPropsBase {
   /**
    * Specify an optional value for the `autocomplete` property on the underlying
@@ -136,6 +137,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     onSuggestionSelected(name, undefined);
+
     if (query) {
       getSearchResults(query).then((suggestions) => {
         setSuggestions(suggestions);
@@ -173,9 +175,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>
           {suggestions.map((suggestion, index) => (
-            <li //eslint-disable-line jsx-a11y/no-noninteractive-element-interactions
-              key={index}
-              onClick={(e) => handleClick(index)}>
+            <li key={index} onClick={(e) => handleClick(index)}>
               {getDisplayValue(suggestion)}
             </li>
           ))}

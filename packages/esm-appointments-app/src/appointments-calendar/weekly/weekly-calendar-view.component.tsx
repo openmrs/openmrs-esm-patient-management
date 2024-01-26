@@ -1,8 +1,8 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './weekly-calendar.scss';
-import { CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { type CalendarType, DailyAppointmentsCountByService } from '../../types';
 import { isSameMonth, weekAllDays, weekDays } from '../../helpers';
 import WeeklyWorkloadView from './weekly-workload-view.component';
 import WeeklyHeader from './weekly-header.component';
@@ -52,8 +52,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                       type === 'weekly'
                         ? 'weekly-cell'
                         : isSameMonth(dateTime, currentDate)
-                        ? 'monthly-cell'
-                        : 'monthly-cell-disabled'
+                          ? 'monthly-cell'
+                          : 'monthly-cell-disabled'
                     ]
                   }>
                   {type === 'weekly' ? (
@@ -62,7 +62,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                 </div>
               </>
             ))}
-          </p>*/}
+          </p>
         </>
       </div>
     </div>

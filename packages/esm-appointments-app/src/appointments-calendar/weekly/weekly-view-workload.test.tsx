@@ -1,12 +1,16 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import dayjs from 'dayjs';
 import WeeklyWorkloadView from './weekly-workload-view.component';
 import { CalendarType } from '../../types';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { type CalendarType } from '../../types';
 import { spaBasePath } from '../../constants';
 import { navigate } from '@openmrs/esm-framework';
+import WeeklyWorkloadView from './weekly-view-workload.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
   navigate: jest.fn(),
   useLayoutType: jest.fn(),
 }));
@@ -36,10 +40,12 @@ describe('WeeklyWorkloadView Component', () => {
     expect(screen.getByText('Lab testing')).toBeInTheDocument();
   });
 
-  it('navigates when a service area is clicked', () => {
+  it('navigates when a service area is clicked', async () => {
+    const user = userEvent.setup();
+
     render(<WeeklyWorkloadView {...mockData} />);
 
-    fireEvent.click(screen.getByText('HIV'));
+    await user.click(screen.getByText('HIV'));
 
     expect(navigate).toHaveBeenCalledWith({
       to: `${spaBasePath}/appointments/list/Thu, 17 Aug 2023 00:00:00 GMT/HIV`,

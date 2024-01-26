@@ -25,26 +25,24 @@ import {
   ExtensionSlot,
   useLayoutType,
   useVisitTypes,
-  NewVisitPayload,
+  type NewVisitPayload,
   saveVisit,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   usePatient,
   useConfig,
   useLocations,
 } from '@openmrs/esm-framework';
+import isEmpty from 'lodash-es/isEmpty';
 import BaseVisitType from './base-visit-type.component';
-import { amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
+import { type amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
-import { MappedAppointment } from '../../types';
-import styles from './visit-form.scss';
+import { type MappedAppointment } from '../../types';
 import { useAppointments } from '../../appointments/appointments-table.resource';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
-import isEmpty from 'lodash-es/isEmpty';
+import styles from './visit-form.scss';
+import { appointmentLocationTagName } from '../../constants';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -56,7 +54,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { currentAppointmentDate } = useAppointmentDate();
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(sessionUser?.sessionLocation?.uuid ?? '');
@@ -137,10 +135,11 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                   ({ status }) => {
                     if (status === 201) {
                       mutate();
-                      showToast({
+                      showSnackbar({
                         kind: 'success',
+                        isLowContrast: true,
                         title: t('visitStarted', 'Visit started'),
-                        description: t(
+                        subtitle: t(
                           'queueAddedSuccessfully',
                           `Patient has been added to the queue successfully.`,
                           `${hours} : ${minutes}`,
@@ -149,11 +148,10 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                     }
                   },
                   (error) => {
-                    showNotification({
+                    showSnackbar({
                       title: t('queueEntryError', 'Error adding patient to the queue'),
                       kind: 'error',
-                      critical: true,
-                      description: error?.message,
+                      subtitle: error?.message,
                     });
                   },
                 );
@@ -164,11 +162,10 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             }
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              subtitle: error?.message,
             });
           },
         );
@@ -191,6 +188,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             state={{
               patient,
               patientUuid: appointment.patientUuid,
+              hideActionsOverflow: true,
             }}
           />
         )}

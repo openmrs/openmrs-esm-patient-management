@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import PatientBanner, { PatientBannerSkeleton } from './patient-banner/banner/patient-banner.component';
-import { SearchedPatient } from '../types';
+import { type SearchedPatient } from '../types';
 import styles from './patient-search-lg.scss';
 
 interface CommonProps {
@@ -13,7 +13,6 @@ interface CommonProps {
 
 interface PatientSearchResultsProps {
   searchResults: SearchedPatient[];
-  handlePatientSelection: (evt: any, patientUuid: string) => void;
 }
 
 export const EmptyState: React.FC<CommonProps> = ({ inTabletOrOverlay }) => {
@@ -94,20 +93,11 @@ export const SearchResultsEmptyState: React.FC<CommonProps> = ({ inTabletOrOverl
   );
 };
 
-export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({
-  searchResults,
-  handlePatientSelection,
-}) => {
-  const { t } = useTranslation();
+export const PatientSearchResults: React.FC<PatientSearchResultsProps> = ({ searchResults }) => {
   return (
     <div className={styles.results}>
       {searchResults.map((patient, indx) => (
-        <PatientBanner
-          key={indx}
-          selectPatientAction={handlePatientSelection}
-          patientUuid={patient.uuid}
-          patient={patient}
-        />
+        <PatientBanner key={indx} patientUuid={patient.uuid} patient={patient} />
       ))}
     </div>
   );

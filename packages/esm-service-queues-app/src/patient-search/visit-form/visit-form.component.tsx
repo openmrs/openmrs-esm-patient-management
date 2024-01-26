@@ -32,17 +32,16 @@ import {
   saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
-  showNotification,
-  showToast,
+  showSnackbar,
   useConfig,
-  ConfigObject,
+  type ConfigObject,
 } from '@openmrs/esm-framework';
 import BaseVisitType from './base-visit-type.component';
 import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
-import { convertTime12to24, amPm } from '../../helpers/time-helpers';
+import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { SearchTypes, PatientProgram, NewVisitPayload } from '../../types';
+import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
@@ -140,10 +139,11 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               ).then(
                 ({ status }) => {
                   if (status === 201) {
-                    showToast({
+                    showSnackbar({
                       kind: 'success',
+                      isLowContrast: true,
                       title: t('startAVisit', 'Start a visit'),
-                      description: t(
+                      subtitle: t(
                         'startVisitQueueSuccessfully',
                         'Patient has been added to active visits list and queue.',
                         `${hours} : ${minutes}`,
@@ -154,22 +154,20 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                   }
                 },
                 (error) => {
-                  showNotification({
+                  showSnackbar({
                     title: t('queueEntryError', 'Error adding patient to the queue'),
                     kind: 'error',
-                    critical: true,
-                    description: error?.message,
+                    subtitle: error?.message,
                   });
                 },
               );
             }
           },
           (error) => {
-            showNotification({
+            showSnackbar({
               title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
-              critical: true,
-              description: error?.message,
+              subtitle: error?.message,
             });
           },
         );

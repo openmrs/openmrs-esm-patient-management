@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import classNames from 'classnames';
-import { Button, Link } from '@carbon/react';
+import { Button, Link, InlineLoading } from '@carbon/react';
 import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Formik, Form, FormikHelpers } from 'formik';
-import { createErrorHandler, showToast, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
-import { validationSchema as initialSchema } from './validation/patient-registration-validation';
-import { FormValues, CapturePhotoProps } from './patient-registration.types';
+import { Formik, Form, type FormikHelpers } from 'formik';
+import { createErrorHandler, showSnackbar, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
+import { getValidationSchema } from './validation/patient-registration-validation';
+import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
-import { SavePatientForm, SavePatientTransactionManager } from './form-manager';
+import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
-import { builtInSections, RegistrationConfig, SectionDefinition } from '../config-schema';
+import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
@@ -32,7 +32,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { search } = useLocation();
   const config = useConfig() as RegistrationConfig;
   const [target, setTarget] = useState<undefined | string>();
-  const [validationSchema, setValidationSchema] = useState(initialSchema);
   const { patientUuid: uuidOfPatientToEdit } = useParams();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(uuidOfPatientToEdit);
   const { t } = useTranslation();
@@ -46,6 +45,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
   const { data: photo } = usePatientPhoto(patientToEdit?.id);
   const savePatientTransactionManager = useRef(new SavePatientTransactionManager());
   const fieldDefinition = config?.fieldDefinitions?.filter((def) => def.type === 'address');
+  const validationSchema = getValidationSchema(config);
 
   useEffect(() => {
     exportedInitialFormValuesForTesting = initialFormValues;
@@ -81,17 +81,18 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         abortController,
       );
 
-      showToast({
-        description: inEditMode
-          ? t('updationSuccessToastDescription', "The patient's information has been successfully updated")
+      showSnackbar({
+        subtitle: inEditMode
+          ? t('updatePatientSuccessSnackbarSubtitle', "The patient's information has been successfully updated")
           : t(
-              'registrationSuccessToastDescription',
+              'registerPatientSuccessSnackbarSubtitle',
               'The patient can now be found by searching for them using their name or ID number',
             ),
         title: inEditMode
-          ? t('updationSuccessToastTitle', 'Patient Details Updated')
-          : t('registrationSuccessToastTitle', 'New Patient Created'),
+          ? t('updatePatientSuccessSnackbarTitle', 'Patient Details Updated')
+          : t('registerPatientSuccessSnackbarTitle', 'New Patient Created'),
         kind: 'success',
+        isLowContrast: true,
       });
 
       const afterUrl = new URLSearchParams(search).get('afterUrl');
@@ -101,10 +102,22 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     } catch (error) {
       if (error.responseBody?.error?.globalErrors) {
         error.responseBody.error.globalErrors.forEach((error) => {
-          showToast({ description: error.message });
+          showSnackbar({
+            title: inEditMode
+              ? t('updatePatientErrorSnackbarTitle', 'Patient Details Update Failed')
+              : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
+            subtitle: error.message,
+            kind: 'error',
+          });
         });
       } else if (error.responseBody?.error?.message) {
-        showToast({ description: error.responseBody.error.message });
+        showSnackbar({
+          title: inEditMode
+            ? t('updatePatientErrorSnackbarTitle', 'Patient Details Update Failed')
+            : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
+          subtitle: error.responseBody.error.message,
+          kind: 'error',
+        });
       } else {
         createErrorHandler()(error);
       }
@@ -113,25 +126,16 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
     }
   };
 
-  const getDescription = (errors) => {
-    return (
-      <div>
-        <p>{t('fieldErrorTitleMessage', 'The following fields have errors:')}</p>
-        <ul style={{ listStyle: 'inside' }}>
-          {Object.keys(errors).map((error, index) => (
-            <li key={index}>{t(`${error}LabelText`, error)}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
   const displayErrors = (errors) => {
     if (errors && typeof errors === 'object' && !!Object.keys(errors).length) {
-      showToast({
-        description: getDescription(errors),
-        title: t('incompleteForm', 'Incomplete form'),
-        kind: 'warning',
+      Object.keys(errors).forEach((error) => {
+        showSnackbar({
+          subtitle: t(`${error}LabelText`, error),
+          title: t('incompleteForm', 'The following field has errors:'),
+          kind: 'warning',
+          isLowContrast: true,
+          timeoutInMs: 5000,
+        });
       });
     }
   };
@@ -167,8 +171,19 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   // Current session and identifiers are required for patient registration.
                   // If currentSession or identifierTypes are not available, then the
                   // user should be blocked to register the patient.
-                  disabled={!currentSession || !identifierTypes}>
-                  {inEditMode ? t('updatePatient', 'Update Patient') : t('registerPatient', 'Register Patient')}
+                  disabled={!currentSession || !identifierTypes || props.isSubmitting}>
+                  {props.isSubmitting ? (
+                    <InlineLoading
+                      className={styles.spinner}
+                      description={`${t('submitting', 'Submitting')} ...`}
+                      iconDescription="submitting"
+                      status="active"
+                    />
+                  ) : inEditMode ? (
+                    t('updatePatient', 'Update Patient')
+                  ) : (
+                    t('registerPatient', 'Register Patient')
+                  )}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>
                   {t('cancel', 'Cancel')}
@@ -180,7 +195,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                 value={{
                   identifierTypes: identifierTypes,
                   validationSchema,
-                  setValidationSchema,
                   values: props.values,
                   inEditMode,
                   setFieldValue: props.setFieldValue,

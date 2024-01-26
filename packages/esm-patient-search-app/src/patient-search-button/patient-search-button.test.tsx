@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import PatientSearchButton from './patient-search-button.component';
 
 describe('PatientSearchButton', () => {
@@ -19,12 +20,14 @@ describe('PatientSearchButton', () => {
     expect(customButton).toBeInTheDocument();
   });
 
-  it('displays overlay when button is clicked', () => {
+  it('displays overlay when button is clicked', async () => {
+    const user = userEvent.setup();
+
     render(<PatientSearchButton />);
 
     const searchButton = screen.getByLabelText('Search Patient Button');
 
-    fireEvent.click(searchButton);
+    await user.click(searchButton);
 
     const overlayHeader = screen.getByText('Search results');
 

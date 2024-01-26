@@ -1,22 +1,17 @@
 import React from 'react';
-import { screen, render, waitFor, within } from '@testing-library/react';
-import { mockServices } from '../../__mocks__/active-visits.mock';
-import { mockPriorities, mockStatus } from '../../../../__mocks__/metrics.mock';
-import { mockSession } from '../../../../__mocks__/session.mock';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
-import { ConfigObject, showToast, useConfig, showNotification } from '@openmrs/esm-framework';
-import ChangeStatus from './change-status-dialog.component';
-import { mockQueueEntry } from '../../../../__mocks__/queue-entry.mock';
 import userEvent from '@testing-library/user-event';
+import { screen, render, within } from '@testing-library/react';
+import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockQueueEntry } from '__mocks__';
+import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { updateQueueEntry } from './active-visits-table.resource';
+import ChangeStatus from './change-status-dialog.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
+const mockShowSnackbar = showSnackbar as jest.Mock;
 const mockUpdateQueueEntry = updateQueueEntry as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
 
-jest.mock('./active-visits-table.resource.ts', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource.ts');
+jest.mock('./active-visits-table.resource', () => {
+  const originalModule = jest.requireActual('./active-visits-table.resource');
 
   return {
     ...originalModule,
@@ -59,14 +54,14 @@ describe('Queue entry details', () => {
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
     expect(screen.getByText(/queue priority/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(screen.getByRole('button', { name: /move to next service/i })));
+    await user.click(screen.getByRole('button', { name: /move to next service/i }));
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
-    expect(mockShowToast).toHaveBeenCalledWith({
-      critical: true,
+    expect(mockShowSnackbar).toHaveBeenCalledTimes(1);
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
       kind: 'success',
       title: 'Update entry',
-      description: 'Queue Entry Updated Successfully',
+      subtitle: 'Queue Entry Updated Successfully',
     });
   });
   it('should display error message when rest api call to update queue entry fails', async () => {
@@ -91,13 +86,12 @@ describe('Queue entry details', () => {
     expect(within(queueServiceTypes).getAllByRole('option')[0]).toHaveValue('176052c7-5fd4-4b33-89cc-7bae6848c65a');
     expect(within(queueServiceTypes).getAllByRole('option')[1]).toHaveValue('d80ff12a-06a7-11ed-b939-0242ac120002');
 
-    await waitFor(() => user.click(screen.getByRole('button', { name: /move to next service/i })));
+    await user.click(screen.getByRole('button', { name: /move to next service/i }));
 
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      description: 'Internal Server Error',
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      subtitle: 'Internal Server Error',
       kind: 'error',
       title: 'Error updating queue entry status',
-      critical: true,
     });
   });
 });

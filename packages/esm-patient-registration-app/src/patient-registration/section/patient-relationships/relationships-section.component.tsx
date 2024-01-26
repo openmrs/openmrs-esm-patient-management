@@ -15,7 +15,7 @@ import { Autosuggest } from '../../input/custom-input/autosuggest/autosuggest.co
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { ResourcesContext } from '../../../offline.resources';
 import { fetchPerson } from '../../patient-registration.resource';
-import { RelationshipValue } from '../../patient-registration.types';
+import { type RelationshipValue } from '../../patient-registration.types';
 import sectionStyles from '../section.scss';
 import styles from './relationships.scss';
 
@@ -168,12 +168,12 @@ export const RelationshipsSection = () => {
       const tmp: RelationshipType[] = [];
       relationshipTypes.results.forEach((type) => {
         const aIsToB = {
-          display: type.displayAIsToB ? type.displayAIsToB : type.aIsToB,
+          display: type.displayAIsToB ? type.displayAIsToB : type.displayBIsToA,
           uuid: type.uuid,
           direction: 'aIsToB',
         };
         const bIsToA = {
-          display: type.displayBIsToA ? type.displayBIsToA : type.bIsToA,
+          display: type.displayBIsToA ? type.displayBIsToA : type.displayAIsToB,
           uuid: type.uuid,
           direction: 'bIsToA',
         };

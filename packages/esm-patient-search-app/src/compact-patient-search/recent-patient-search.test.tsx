@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import RecentPatientSearch from './recent-patient-search.component';
 import { useConfig } from '@openmrs/esm-framework';
+import { type SearchedPatient } from '../types';
+import { PatientSearchContext } from '../patient-search-context';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
@@ -20,7 +22,8 @@ describe('RecentPatientSearch', () => {
   });
 
   it('should render loading skeleton when isLoading is true', () => {
-    render(<RecentPatientSearch isLoading={true} loadingNewData={true} hasMore={true} />);
+    // @ts-ignore: Don't need the other props for this test
+    render(<RecentPatientSearch isLoading={true} />);
 
     const resultText = screen.queryByText(/recent search result/i);
     expect(resultText).not.toBeInTheDocument();
@@ -28,6 +31,7 @@ describe('RecentPatientSearch', () => {
 
   it('should render error message when fetchError is true', () => {
     const error = new Error('Error');
+    // @ts-ignore: Don't need the other props for this test
     render(<RecentPatientSearch fetchError={error} />);
     const errorMessage = screen.getByText('Error');
 
@@ -46,16 +50,22 @@ describe('RecentPatientSearch', () => {
           },
         },
       },
-    ];
+    ] as Array<SearchedPatient>;
 
-    render(<RecentPatientSearch data={mockSearchResults} />);
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        {/* @ts-ignore: Don't need the other props for this test */}
+        <RecentPatientSearch data={mockSearchResults} />
+      </PatientSearchContext.Provider>,
+    );
     const resultText = screen.getByText(/recent search result/i);
 
     expect(resultText).toBeInTheDocument();
   });
 
   it('should render empty result message when searchResults is empty', () => {
-    render(<RecentPatientSearch searchResults={[]} />);
+    // @ts-ignore: Don't need the other props for this test
+    render(<RecentPatientSearch data={[]} />);
     const emptyResultText = screen.getByText(/no patient charts were found/i);
 
     expect(emptyResultText).toBeInTheDocument();

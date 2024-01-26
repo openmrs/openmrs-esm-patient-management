@@ -54,6 +54,13 @@
   grid-template-columns: auto 1fr;
 }
 
+.patientBannerButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
 .patientName {
   @include type.type-style('heading-03');
   margin-right: 0.25rem;

@@ -1,6 +1,8 @@
-import { Type } from '@openmrs/esm-framework';
-import vitalsConfigSchema, { VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
-import biometricsConfigSchema, { BiometricsConfigObject } from './current-visit/visit-details/biometrics-config-schema';
+import { Type, validators } from '@openmrs/esm-framework';
+import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
+import biometricsConfigSchema, {
+  type BiometricsConfigObject,
+} from './current-visit/visit-details/biometrics-config-schema';
 
 export const configSchema = {
   concepts: {
@@ -120,13 +122,11 @@ export const configSchema = {
   },
   customPatientChartUrl: {
     _type: Type.String,
-    _default: '',
-    _description: 'Custom URL to load patient chart',
-  },
-  customPatientIdUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Custom URL to fetch patient with id',
+    _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
+    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+      Available arguments: patientUuid, openmrsSpaBase, openBase
+      (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
+    _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   defaultFacilityUrl: {
     _type: Type.String,
@@ -167,7 +167,6 @@ export interface ConfigObject {
   defaultIdentifierTypes: Array<string>;
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
-  customPatientIdUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
 }

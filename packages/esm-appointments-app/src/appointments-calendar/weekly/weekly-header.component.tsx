@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@carbon/react';
-import { Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { weekDays } from '../../helpers';
 import type { CalendarType } from '../../types';
@@ -34,10 +34,10 @@ function WeeklyHeader({
           {type === 'monthly'
             ? currentDate.format(monthFormat)
             : type === 'daily'
-            ? currentDate.format(dateFormat)
-            : `${currentDate.startOf('week').format(dateFormat)} - ${currentDate
-                .endOf('week')
-                .format(dateFormat)} , ${currentDate.format(yearFormat)}`}
+              ? currentDate.format(dateFormat)
+              : `${currentDate.startOf('week').format(dateFormat)} - ${currentDate
+                  .endOf('week')
+                  .format(dateFormat)} , ${currentDate.format(yearFormat)}`}
         </span>
         <Button size="sm" onClick={() => setCurrentDate(currentDate.add(1, Format[type]))} kind="tertiary">
           {t('next', 'Next')}

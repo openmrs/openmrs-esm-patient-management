@@ -1,10 +1,10 @@
-import React, { type CSSProperties, HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
+import React, { type CSSProperties, type HTMLAttributes, useCallback, useId, useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableRow,
+  type DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   Layer,
@@ -21,7 +21,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { ArrowLeft, TrashCan } from '@carbon/react/icons';
-import { ConfigurableLink, useLayoutType, isDesktop, showToast, useDebounce } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType, isDesktop, showSnackbar, useDebounce } from '@openmrs/esm-framework';
 import { removePatientFromList } from '../api/api-remote';
 import { EmptyDataIllustration } from '../empty-state/empty-data-illustration.component';
 import styles from './list-details-table.scss';
@@ -215,17 +215,16 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
       mutateListMembers();
       mutateListDetails();
 
-      showToast({
-        critical: true,
+      showSnackbar({
+        isLowContrast: true,
         kind: 'success',
-        description: t('listUpToDate', 'The list is now up to date'),
+        subtitle: t('listUpToDate', 'The list is now up to date'),
         title: t('patientRemovedFromList', 'Patient removed from list'),
       });
     } catch (error) {
-      showToast({
-        critical: true,
+      showSnackbar({
         kind: 'error',
-        description: error?.message,
+        subtitle: error?.message,
         title: t('errorRemovingPatientFromList', 'Failed to remove patient from list'),
       });
     }
@@ -315,7 +314,6 @@ const ListDetailsTable: React.FC<ListDetailsTableProps> = ({
                           ))}
                           <TableCell className="cds--table-column-menu">
                             <Button
-                              className={styles.removeButton}
                               kind="ghost"
                               hasIconOnly
                               renderIcon={TrashCan}

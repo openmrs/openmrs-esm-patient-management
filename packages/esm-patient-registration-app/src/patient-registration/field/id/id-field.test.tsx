@@ -1,11 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { Identifiers } from './id-field.component';
-import { Resources, ResourcesContext } from '../../../offline.resources';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { openmrsID } from '../__mocks__/identifiers.mock';
-import { mockedIdentifierTypes } from '../__mocks__/identifier-types.mock';
+import { openmrsID, mockedIdentifierTypes } from '__mocks__';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -16,7 +16,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 describe('Identifiers', () => {
   const mockResourcesContextValue = {
-    addressTemplate: [],
+    addressTemplate: {},
     currentSession: {
       authenticated: true,
       sessionId: 'JSESSION',
@@ -76,7 +76,9 @@ describe('Identifiers', () => {
     expect(configureButton).toBeEnabled();
   });
 
-  it('should open identifier selection overlay when "Configure" button is clicked', () => {
+  it('should open identifier selection overlay when "Configure" button is clicked', async () => {
+    const user = userEvent.setup();
+
     render(
       <ResourcesContext.Provider value={mockResourcesContextValue}>
         <Formik initialValues={{}} onSubmit={null}>
@@ -98,7 +100,7 @@ describe('Identifiers', () => {
     );
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });
-    fireEvent.click(configureButton);
+    await user.click(configureButton);
 
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
   });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import Pagination from './pagination.component';
 
 describe('Pagination', () => {
@@ -15,46 +15,58 @@ describe('Pagination', () => {
 
   it('should disable previous button on first page', () => {
     render(<Pagination totalPages={5} currentPage={1} setCurrentPage={() => {}} hasMore={true} />);
+
     const previousButton = screen.getByLabelText(/previous page/i);
     expect(previousButton).toBeDisabled();
   });
 
   it('should disable next button on last page when hasMore is false', () => {
     render(<Pagination totalPages={5} currentPage={5} setCurrentPage={() => {}} hasMore={false} />);
+
     const nextButton = screen.getByLabelText(/next page/i);
     expect(nextButton).toBeDisabled();
   });
 
-  it('should increment the page when next button is clicked', () => {
+  it('should increment the page when next button is clicked', async () => {
+    const user = userEvent.setup();
     const setCurrentPageMock = jest.fn();
+
     render(<Pagination totalPages={5} currentPage={1} setCurrentPage={setCurrentPageMock} hasMore={true} />);
 
     const nextButton = screen.getByLabelText(/next page/i);
-    fireEvent.click(nextButton);
+
+    await user.click(nextButton);
     expect(setCurrentPageMock).toHaveBeenCalledWith(2);
   });
 
-  it('should decrement the page when previous button is clicked', () => {
+  it('should decrement the page when previous button is clicked', async () => {
+    const user = userEvent.setup();
     const setCurrentPageMock = jest.fn();
+
     render(<Pagination totalPages={5} currentPage={3} setCurrentPage={setCurrentPageMock} hasMore={true} />);
 
     const previousButton = screen.getByLabelText(/previous page/i);
-    fireEvent.click(previousButton);
+
+    await user.click(previousButton);
     expect(setCurrentPageMock).toHaveBeenCalledWith(2);
   });
 
-  it('should call setCurrentPage when page button is clicked', () => {
+  it('should call setCurrentPage when page button is clicked', async () => {
+    const user = userEvent.setup();
     const setCurrentPageMock = jest.fn();
+
     render(<Pagination totalPages={5} currentPage={3} setCurrentPage={setCurrentPageMock} hasMore={true} />);
 
     const pageButton = screen.getByRole('button', { name: '4' });
-    fireEvent.click(pageButton);
+    await user.click(pageButton);
     expect(setCurrentPageMock).toHaveBeenCalledWith(4);
   });
 
   it('should render empty component when totalPages is 1', () => {
     render(<Pagination totalPages={1} currentPage={1} setCurrentPage={() => {}} hasMore={true} />);
+
     const pagination = screen.queryByRole('button', { name: 'next page' });
+
     expect(pagination).not.toBeInTheDocument();
   });
 });

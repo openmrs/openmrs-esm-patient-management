@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import { expect } from '@playwright/test';
 import { test } from '../core';
-import { deletePatient, generateRandomPatient, getPatient, Patient } from '../commands';
-import { PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
+import { deletePatient, generateRandomPatient, getPatient, type Patient } from '../commands';
+import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
 
 let patient: Patient;
 test.beforeEach(async ({ api }) => {
@@ -20,7 +20,6 @@ const formValues: PatientRegistrationFormValues = {
   address1: 'Bom Jesus Street',
   address2: '',
   country: 'Brazil',
-  countyDistrict: 'Antônio dos Santos',
   stateProvince: 'Pernambuco',
   cityVillage: 'Recife',
   phone: '5555551234',
@@ -48,13 +47,12 @@ test('Edit a patient', async ({ page, api }) => {
     const { givenName, middleName, familyName, sex } = formValues;
 
     await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
-    await expect(person.gender).toBe(sex[0].toUpperCase());
+    await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
     await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
     await expect(person.preferredAddress.address1).toBe(formValues.address1);
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
     await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
     await expect(person.preferredAddress.country).toBe(formValues.country);
-    await expect(person.preferredAddress.countyDistrict).toBe(formValues.countyDistrict);
     await expect(person.attributes[0].display).toBe(`Telephone Number = ${formValues.phone}`);
   });
 });

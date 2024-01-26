@@ -93,6 +93,12 @@
   }
 }
 
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: 1rem;
+  }
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .linkName {

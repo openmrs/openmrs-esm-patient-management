@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
 import { initialFormValues } from '../../patient-registration.component';
-import { FormValues } from '../../patient-registration-types';
+import { type FormValues } from '../../patient-registration-types';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -33,11 +34,10 @@ describe('dummy data input', () => {
   });
 
   it('can input data on button click', async () => {
+    const user = userEvent.setup();
     const input = await setupInput();
 
-    fireEvent.click(input);
-    waitFor(() => {
-      expect(formValues).toEqual(dummyFormValues);
-    });
+    await user.click(input);
+    expect(formValues).toEqual(dummyFormValues);
   });
 });

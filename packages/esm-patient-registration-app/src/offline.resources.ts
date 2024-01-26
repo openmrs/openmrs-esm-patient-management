@@ -2,7 +2,7 @@ import React from 'react';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { getConfig, messageOmrsServiceWorker, openmrsFetch, Session } from '@openmrs/esm-framework';
+import { getConfig, messageOmrsServiceWorker, openmrsFetch, type Session } from '@openmrs/esm-framework';
 import type {
   PatientIdentifierType,
   FetchedPatientIdentifierType,

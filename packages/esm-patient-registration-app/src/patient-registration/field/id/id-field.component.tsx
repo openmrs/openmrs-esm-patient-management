@@ -7,10 +7,10 @@ import IdentifierSelectionOverlay from './identifier-selection-overlay.component
 import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import {
-  FormValues,
-  IdentifierSource,
-  PatientIdentifierType,
-  PatientIdentifierValue,
+  type FormValues,
+  type IdentifierSource,
+  type PatientIdentifierType,
+  type PatientIdentifierValue,
 } from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
 import styles from '../field.scss';
@@ -31,8 +31,8 @@ export function setIdentifierSource(
     identifierValue: autoGeneration
       ? 'auto-generated'
       : identifierValue !== 'auto-generated'
-      ? identifierValue
-      : initialValue,
+        ? identifierValue
+        : initialValue,
   };
 }
 

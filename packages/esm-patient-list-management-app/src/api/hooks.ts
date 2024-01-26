@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, FetchResponse, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, type FetchResponse, useConfig, useSession } from '@openmrs/esm-framework';
 import { cohortUrl, getAllPatientLists, getPatientListIdsForPatient, getPatientListMembers } from './api-remote';
-import { ConfigSchema } from '../config-schema';
+import { type ConfigSchema } from '../config-schema';
 import {
-  CohortResponse,
-  CohortType,
-  OpenmrsCohort,
-  OpenmrsCohortMember,
-  PatientListFilter,
+  type CohortResponse,
+  type CohortType,
+  type OpenmrsCohort,
+  type OpenmrsCohortMember,
+  type PatientListFilter,
   PatientListType,
 } from './types';
 
@@ -19,18 +19,13 @@ interface PatientListResponse {
   totalCount: number;
 }
 
-export function useAllPatientLists({ name, isStarred, type }: PatientListFilter) {
-  const [totalResults, setTotalResults] = useState(0);
+export function useAllPatientLists({ isStarred, type }: PatientListFilter) {
   const custom = 'custom:(uuid,name,description,display,size,attributes,cohortType)';
   const query: Array<[string, string]> = [
     ['v', custom],
     ['totalCount', 'true'],
   ];
   const config: ConfigSchema = useConfig();
-
-  if (name) {
-    query.push(['q', name]);
-  }
 
   if (type === PatientListType.USER) {
     query.push(['cohortType', config.myListCohortTypeUUID]);
@@ -70,21 +65,23 @@ export function useAllPatientLists({ name, isStarred, type }: PatientListFilter)
     }
   }, [data, pageNumber, setSize]);
 
-  const patientListsData = data ? [].concat(...data?.map((res) => res?.data?.results)) : [];
+  const patientListsData = (data?.flatMap((res) => res?.data?.results ?? []) ?? []).map((cohort) => ({
+    id: cohort.uuid,
+    display: cohort.name,
+    description: cohort.description,
+    type: cohort.cohortType?.display,
+    size: cohort.size,
+  }));
+  const { user } = useSession();
 
   return {
-    patientLists: patientListsData.map((cohort) => ({
-      id: cohort.uuid,
-      display: cohort.name,
-      description: cohort.description,
-      type: cohort.cohortType?.display,
-      size: cohort.size,
-    })),
+    patientLists: isStarred
+      ? patientListsData.filter(({ id }) => user?.userProperties?.starredPatientLists?.includes(id))
+      : patientListsData,
     isLoading,
     isValidating,
     error,
     mutate,
-    totalResults,
   };
 }
 

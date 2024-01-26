@@ -5,7 +5,7 @@ import { useQueueLocations } from '../hooks/useQueueLocations';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 import styles from './visit-form-queue-fields.scss';
-import { ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 const StartVisitQueueFields: React.FC = () => {
@@ -44,7 +44,7 @@ const StartVisitQueueFields: React.FC = () => {
   }, [queueLocations]);
 
   return (
-    <div className={styles.container}>
+    <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper isTablet={isTablet}>

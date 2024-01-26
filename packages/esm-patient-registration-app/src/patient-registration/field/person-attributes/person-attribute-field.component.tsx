@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { InlineNotification, TextInputSkeleton, SkeletonText } from '@carbon/react';
-import { FieldDefinition } from '../../../config-schema';
+import { type FieldDefinition } from '../../../config-schema';
 import { CodedPersonAttributeField } from './coded-person-attribute-field.component';
 import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
@@ -24,9 +24,9 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
         return (
           <TextPersonAttributeField
             personAttributeType={personAttributeType}
-            validationRegex={fieldDefinition.validation.matches}
+            validationRegex={fieldDefinition.validation?.matches ?? ''}
             label={fieldDefinition.label}
-            required={fieldDefinition.validation.required}
+            required={fieldDefinition.validation?.required ?? false}
             id={fieldDefinition?.id}
           />
         );
@@ -37,6 +37,7 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
             label={fieldDefinition.label}
             id={fieldDefinition?.id}
+            customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
           />
         );
       default:

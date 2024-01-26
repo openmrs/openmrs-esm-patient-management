@@ -3,7 +3,14 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { formatTime, parseDate, useLayoutType, formatDatetime } from '@openmrs/esm-framework';
-import { Encounter, OrderItem, Order, Note, DiagnosisItem, Observation } from '../../types/index';
+import {
+  type Encounter,
+  type OrderItem,
+  type Order,
+  type Note,
+  type DiagnosisItem,
+  type Observation,
+} from '../../types/index';
 import { useVitalsFromObs } from '../../current-visit/hooks/useVitalsConceptMetadata';
 import EncounterList from './encounter-list.component';
 import Notes from './notes-list.component';

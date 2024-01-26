@@ -1,7 +1,10 @@
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import PatientSearchResults from './compact-patient-banner.component';
 import { useConfig } from '@openmrs/esm-framework';
+import { type SearchedPatient } from '../types';
+import { PatientSearchContext } from '../patient-search-context';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
@@ -32,10 +35,14 @@ describe('Compact Patient Search Results', () => {
       },
       identifiers: [{ identifier: '123', identifierType: { uuid: 'identifier-type-1' } }],
     },
-  ];
+  ] as Array<SearchedPatient>;
 
   it('should render patient search results', () => {
-    render(<PatientSearchResults patients={patients} />);
+    render(
+      <PatientSearchContext.Provider value={{}}>
+        <PatientSearchResults patients={patients} />
+      </PatientSearchContext.Provider>,
+    );
 
     expect(screen.getByText('John Doe Smith')).toBeInTheDocument();
 
@@ -43,11 +50,12 @@ describe('Compact Patient Search Results', () => {
   });
 
   // Fix this test later
-  // it('should call selectPatientAction when a patient is clicked', () => {
+  // const user = userEvent.setup();
+  // it('should call selectPatientAction when a patient is clicked', async () => {
   //   const selectPatientActionMock = jest.fn();
   //   render(<PatientSearchResults patients={patients} selectPatientAction={selectPatientActionMock} />);
 
-  //   fireEvent.click(screen.getByText('John Doe Smith'));
-  //   expect(selectPatientActionMock).toBeCalledWith(patients[0]);
+  //   user.click(screen.getByText('John Doe Smith'));
+  //   expect(selectPatientActionMock).toHaveBeenCalledWith(patients[0]);
   // });
 });

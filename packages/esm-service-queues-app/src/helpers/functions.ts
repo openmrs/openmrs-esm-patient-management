@@ -1,5 +1,5 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
-import { MappedQueuePriority } from '../active-visits/active-visits-table.resource';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type MappedQueuePriority } from '../active-visits/active-visits-table.resource';
 
 export const getTagType = (priority: string) => {
   switch (priority as MappedQueuePriority) {
@@ -17,13 +17,7 @@ export const buildStatusString = (status: string, service: string) => {
     return '';
   }
 
-  if (status === 'waiting') {
-    return `${status} for ${service}`;
-  } else if (status === 'in service') {
-    return `Attending ${service}`;
-  } else if (status === 'finished service') {
-    return `Finished ${service}`;
-  }
+  return `${status} - ${service}`;
 };
 
 export const formatWaitTime = (waitTime: string, t) => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { StructuredListSkeleton } from '@carbon/react';
 import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
 import BaseVisitType from './base-visit-type.component';
-import { PatientProgram } from '../../types';
+import { type PatientProgram } from '../../types';
 
 interface RecommendedVisitTypeProp {
   patientUuid: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './daily-calendar.scss';
 import { CalendarType, DailyAppointmentsCountByService } from '../../types';

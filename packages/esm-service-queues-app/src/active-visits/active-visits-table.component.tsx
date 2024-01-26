@@ -1,13 +1,12 @@
-import React, { useMemo, useState, MouseEvent, AnchorHTMLAttributes, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  DataTableHeader,
+  type DataTableHeader,
   DataTableSkeleton,
   DefinitionTooltip,
   Dropdown,
-  Layer,
   Tab,
   Table,
   TableBody,
@@ -33,22 +32,15 @@ import {
 import { Add } from '@carbon/react/icons';
 import {
   useLayoutType,
-  navigate,
-  interpolateUrl,
   isDesktop,
   ExtensionSlot,
   usePagination,
   useConfig,
-  ConfigObject,
   useSession,
   showModal,
+  ConfigurableLink,
 } from '@openmrs/esm-framework';
-import {
-  useVisitQueueEntries,
-  useServices,
-  getOriginFromPathName,
-  MappedVisitQueueEntry,
-} from './active-visits-table.resource';
+import { useVisitQueueEntries, useServices, type MappedVisitQueueEntry } from './active-visits-table.resource';
 import { SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
@@ -65,12 +57,12 @@ import ActionsMenu from '../queue-entry-table-components/actions-menu.component'
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import CurrentVisit from '../current-visit/current-visit-summary.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import OpenChartMenu from '../queue-entry-table-components/open-chart.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
 import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
+import { type ConfigObject } from '../config-schema';
 
 /**
  * FIXME Temporarily moved here
@@ -88,29 +80,11 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-interface NameLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  to: string;
-  from: string;
-}
-
 interface PaginationData {
   goTo: (page: number) => void;
   results: Array<MappedVisitQueueEntry>;
   currentPage: number;
 }
-
-const PatientNameLink: React.FC<NameLinkProps> = ({ from, to, children }) => {
-  const handleNameClick = (event: MouseEvent, to: string) => {
-    event.preventDefault();
-    navigate({ to });
-    localStorage.setItem('fromPage', from);
-  };
-  return (
-    <a onClick={(e) => handleNameClick(e, to)} href={interpolateUrl(to)}>
-      {children}
-    </a>
-  );
-};
 
 function ActiveVisitsTable() {
   const { t } = useTranslation();
@@ -124,8 +98,7 @@ function ActiveVisitsTable() {
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
-  const config = useConfig() as ConfigObject;
-  const useQueueTableTabs = config.showQueueTableTab;
+  const { showQueueTableTab: useQueueTableTabs, customPatientChartUrl } = useConfig<ConfigObject>();
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
   const differenceInTime = timeDiffInMinutes(
@@ -136,9 +109,6 @@ function ActiveVisitsTable() {
   const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
 
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
-  const currentPathName: string = window.location.pathname;
-  const fromPage: string = getOriginFromPathName(currentPathName);
-
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
   const [overlayHeader, setOverlayTitle] = useState('');
@@ -196,9 +166,9 @@ function ActiveVisitsTable() {
       ...entry,
       name: {
         content: (
-          <PatientNameLink to={`\${openmrsSpaBase}/patient/${entry.patientUuid}/chart`} from={fromPage}>
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: entry.patientUuid }}>
             {entry.name}
-          </PatientNameLink>
+          </ConfigurableLink>
         ),
       },
       queueNumber: {
@@ -233,7 +203,7 @@ function ActiveVisitsTable() {
         content: (
           <span className={styles.statusContainer}>
             <StatusIcon status={entry.status.toLowerCase()} />
-            <span>{buildStatusString(entry.status.toLowerCase(), entry.service)}</span>
+            <span>{buildStatusString(entry.status, entry.service)}</span>
           </span>
         ),
       },
@@ -338,7 +308,7 @@ function ActiveVisitsTable() {
           headers={tableHeaders}
           overflowMenuOnHover={isDesktop(layout) ? true : false}
           rows={tableRows}
-          size="xs"
+          size="sm"
           useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps, getToolbarProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
@@ -358,14 +328,12 @@ function ActiveVisitsTable() {
                       size="sm"
                     />
                   </div>
-                  <Layer>
-                    <TableToolbarSearch
-                      className={styles.search}
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
-                      size="sm"
-                    />
-                  </Layer>
+                  <TableToolbarSearch
+                    className={styles.search}
+                    onChange={onInputChange}
+                    placeholder={t('searchThisList', 'Search this list')}
+                    size="sm"
+                  />
                   <ClearQueueEntries visitQueueEntries={visitQueueEntries} />
                 </TableToolbarContent>
               </TableToolbar>
@@ -392,9 +360,6 @@ function ActiveVisitsTable() {
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <OpenChartMenu patientUuid={visitQueueEntries?.[index]?.patientUuid} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
                             <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />

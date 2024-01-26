@@ -11,6 +11,14 @@
   margin-top: spacing.$spacing-07;
 }
 
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
 .buttonsGroup {
   width: 100%;
   display: grid;

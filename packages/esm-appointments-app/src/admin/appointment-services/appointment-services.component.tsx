@@ -1,13 +1,14 @@
 import React from 'react';
 import { Button, ButtonSet, Dropdown, Layer, SelectItem, TextInput, TimePicker, TimePickerSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Form, Formik, FormikHelpers } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { validationSchema } from './appointment-services-validation';
 import { useAppointmentServices } from './appointment-services-hook';
-import { showNotification, showToast, useLocations } from '@openmrs/esm-framework';
+import { showSnackbar, useLocations } from '@openmrs/esm-framework';
 import type { AppointmentService } from '../../types';
 import { closeOverlay } from '../../hooks/useOverlay';
 import styles from './appointment-services.scss';
+import { appointmentLocationTagName } from '../../constants';
 
 interface AppointmentServicesProps {}
 
@@ -15,7 +16,7 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
   const { t } = useTranslation();
   const { appointmentServiceInitialValue, addNewAppointmentService } = useAppointmentServices();
 
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const handleSubmit = async (values: AppointmentService, helpers: FormikHelpers<AppointmentService>) => {
     const payload = {
       name: values.name,
@@ -28,21 +29,20 @@ const AppointmentServices: React.FC<AppointmentServicesProps> = () => {
     addNewAppointmentService(payload).then(
       ({ status }) => {
         if (status === 200) {
-          showToast({
-            critical: true,
+          showSnackbar({
+            isLowContrast: true,
             kind: 'success',
-            description: t('appointmentServiceCreate', 'Appointment service created successfully'),
+            subtitle: t('appointmentServiceCreate', 'Appointment service created successfully'),
             title: t('appointmentService', 'Appointment service'),
           });
           closeOverlay();
         }
       },
       (error) => {
-        showNotification({
+        showSnackbar({
           title: t('errorCreatingAppointmentService', 'Error creating appointment service'),
           kind: 'error',
-          critical: true,
-          description: error?.message,
+          subtitle: error?.message,
         });
       },
     );

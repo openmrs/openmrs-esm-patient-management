@@ -11,7 +11,7 @@ const Overlay: React.FC = () => {
   const overlayClass = layout !== 'tablet' ? styles.desktopOverlay : styles.tabletOverlay;
   return (
     <>
-      {isOverlayOpen && (
+      {isOverlayOpen ? (
         <div className={overlayClass}>
           {layout === 'tablet' && (
             <Header onClick={() => closeOverlay()} aria-label="Tablet overlay" className={styles.tabletOverlayHeader}>
@@ -32,7 +32,7 @@ const Overlay: React.FC = () => {
           )}
           {component}
         </div>
-      )}
+      ) : null}
     </>
   );
 };
