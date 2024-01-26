@@ -2,6 +2,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
+import { type DailyAppointmentsCountByService } from '../types';
 
 interface AppointmentCountMapEntry {
   allAppointmentsCount: number;

@@ -6,7 +6,7 @@ import { navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { spaBasePath } from '../../constants';
 import { isSameMonth } from '../../helpers';
-import { type CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
 interface WeeklyCellProps {
   type: CalendarType;

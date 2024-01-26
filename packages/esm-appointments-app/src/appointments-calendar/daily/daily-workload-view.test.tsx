@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import DailyWorkloadView from './daily-workload-view.component';
 import { spaBasePath } from '../../constants';
-import { type CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -58,4 +58,3 @@ describe('DailyWorkloadView Component', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 });
-t

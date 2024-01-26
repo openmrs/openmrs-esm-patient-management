@@ -2,7 +2,7 @@ import React from 'react';
 import DailyCalendarView from './daily/daily-calendar-view.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
-import { CalendarType, DailyAppointmentsCountByService } from '../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../types';
 
 const CalendarView: React.FC<{
   calendarView: CalendarType;

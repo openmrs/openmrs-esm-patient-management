@@ -1,12 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { spaBasePath } from '../../constants';
 import styles from './monthly-view-workload.scss';
-import { CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
 interface MonthlyWorkloadViewProps {
   type: CalendarType;

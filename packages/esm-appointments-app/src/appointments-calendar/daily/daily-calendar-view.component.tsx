@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './daily-calendar.scss';
-import { CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 import { dailyHours } from '../../helpers';
 import DailyHeader from './daily-header.component';
 import DailyWorkloadView from './daily-workload-view.component';
