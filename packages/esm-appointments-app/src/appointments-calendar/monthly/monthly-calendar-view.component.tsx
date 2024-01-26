@@ -1,9 +1,9 @@
 import React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { CalendarType } from '../../types';
-import { monthDays } from '../../helpers/functions';
-import MonthlyViewWorkload from './monthly-view-workload.component';
+import { CalendarType, DailyAppointmentsCountByService } from '../../types';
+import { monthDays } from '../../helpers';
+import MonthlyViewWorkload from './monthly-workload-view.component';
 import MonthlyHeader from './monthly-header.module';
 import styles from '../appointments-calendar-view-view.scss';
 
@@ -11,7 +11,7 @@ dayjs.extend(isBetween);
 
 interface MonthlyCalendarViewProps {
   type: CalendarType;
-  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
+  events: Array<DailyAppointmentsCountByService>;
   currentDate: Dayjs;
   setCurrentDate: (date) => void;
 }

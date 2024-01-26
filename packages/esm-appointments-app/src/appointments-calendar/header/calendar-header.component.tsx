@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
-import { ArrowRight, Filter, ArrowLeft } from '@carbon/react/icons';
+import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../../constants';
 import type { CalendarType } from '../../types';
@@ -18,22 +18,10 @@ interface CalendarHeaderProps {
   calendarView: CalendarType;
 }
 
-const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarView }) => {
+const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView }) => {
   const { t } = useTranslation();
   const backButtonOnClick = () => {
     navigate({ to: `${spaBasePath}/appointments` });
-  };
-  const addNewClinicDayOnClick = () => {
-    // add new clinic day functionality
-  };
-  const filterOnClick = () => {
-    // filter functionality
-  };
-
-  const calendarViewObject = {
-    daily: CalendarView.Daily,
-    weekly: CalendarView.Weekly,
-    monthly: CalendarView.Monthly,
   };
 
   return (
@@ -50,14 +38,8 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView, calendarV
           </Button>
         </div>
         <p>{t('calendar', 'Calendar')}</p>
-        <Button size="md" kind="ghost" renderIcon={ArrowRight} onClick={addNewClinicDayOnClick}>
-          {t('addNewClinicDay', 'Add new clinic day')}
-        </Button>
       </div>
       <div className={styles.titleContent}>
-        <Button size="md" renderIcon={Filter} kind="ghost" onClick={filterOnClick}>
-          {t('filter', 'Filter')}
-        </Button>
         <ContentSwitcher
           selectedIndex={2}
           size="md"

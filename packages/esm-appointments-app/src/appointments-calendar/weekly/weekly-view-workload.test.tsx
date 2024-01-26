@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import dayjs from 'dayjs';
-import WeeklyWorkloadView from './weekly-view-workload.component';
+import WeeklyWorkloadView from './weekly-workload-view.component';
 import { CalendarType } from '../../types';
 import { spaBasePath } from '../../constants';
 import { navigate } from '@openmrs/esm-framework';

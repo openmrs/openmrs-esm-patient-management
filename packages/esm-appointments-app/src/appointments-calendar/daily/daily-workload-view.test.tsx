@@ -2,9 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { navigate } from '@openmrs/esm-framework';
-import DailyWorkloadView from './daily-view-workload.component';
+import DailyWorkloadView from './daily-workload-view.component';
 import { spaBasePath } from '../../constants';
-import { CalendarType } from '../../types';
+import { CalendarType, DailyAppointmentsCountByService } from '../../types';
 
 jest.mock('@openmrs/esm-framework', () => ({
   navigate: jest.fn(),
@@ -12,19 +12,21 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('DailyWorkloadView Component', () => {
+  const events: Array<DailyAppointmentsCountByService> = [
+    {
+      appointmentDate: '2023-08-18',
+      services: [
+        { serviceName: 'HIV', count: 2 },
+        { serviceName: 'Lab testing', count: 3 },
+      ],
+    },
+  ];
+
   const mockData = {
     type: 'daily' as CalendarType,
     dateTime: dayjs('2023-08-18'),
     currentDate: dayjs('2023-08-18'),
-    events: [
-      {
-        appointmentDate: '2023-08-18',
-        service: [
-          { serviceName: 'HIV', count: 2 },
-          { serviceName: 'Lab testing', count: 3 },
-        ],
-      },
-    ],
+    events: events,
   };
 
   it('renders properly when type is "daily"', () => {

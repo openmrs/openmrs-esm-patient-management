@@ -2,15 +2,15 @@ import React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './weekly-calendar.scss';
-import { CalendarType } from '../../types';
+import { CalendarType, DailyAppointmentsCountByService } from '../../types';
 import { isSameMonth, weekAllDays, weekDays } from '../../helpers';
-import WeeklyWorkloadView from './weekly-view-workload.component';
+import WeeklyWorkloadView from './weekly-workload-view.component';
 import WeeklyHeader from './weekly-header.component';
 dayjs.extend(isBetween);
 
 interface WeeklyCalendarViewProps {
   type: CalendarType;
-  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
+  events: Array<DailyAppointmentsCountByService>;
   currentDate: Dayjs;
   setCurrentDate: (date) => void;
 }
@@ -23,7 +23,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
 }) => {
   return (
     <div className={styles.container}>
-      <WeeklyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} events={events} />
+      <WeeklyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
       <div className={styles.wrapper}>
         <>
           <p className={styles['weekly-calendar']}>
@@ -42,7 +42,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
               );
             })}
           </p>
-          <p className={styles['weekly-calendar-all']}>
+          {/* displays hours of day but commented out because showing the appts by hour is not currently implemented within this code
+         <p className={styles['weekly-calendar-all']}>
             {weekAllDays(currentDate).map((dateTime, i) => (
               <>
                 <div
@@ -61,7 +62,7 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({
                 </div>
               </>
             ))}
-          </p>
+          </p>*/}
         </>
       </div>
     </div>

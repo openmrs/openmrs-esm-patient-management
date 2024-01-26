@@ -11,7 +11,6 @@ const Format = {
   weekly: 'week',
   daily: 'day',
 } as const;
-const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 const dateFormat = 'D MMM';
 const monthFormat = 'MMMM, YYYY';
 const yearFormat = 'YYYY';
@@ -19,12 +18,10 @@ function WeeklyHeader({
   type,
   currentDate,
   setCurrentDate,
-  events,
 }: {
   type: CalendarType;
   currentDate: Dayjs;
   setCurrentDate: (date: Dayjs) => void;
-  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
 }) {
   const { t } = useTranslation();
   return (

@@ -1,15 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
 import { spaBasePath } from '../../constants';
 import styles from './monthly-view-workload.scss';
+import { CalendarType, DailyAppointmentsCountByService } from '../../types';
 
-const colorCoding = { HIV: 'red', 'Lab testing': 'purple', Refill: 'blue' };
+interface MonthlyWorkloadViewProps {
+  type: CalendarType;
+  events: Array<DailyAppointmentsCountByService>;
+  dateTime: Dayjs;
+  currentDate: Dayjs;
+}
 
-const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ type, dateTime, currentDate, events }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
 
@@ -24,16 +30,16 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
   return (
     <div
       className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
-        [styles.greyBackground]: currentData?.service,
+        [styles.greyBackground]: currentData?.services,
         [styles.smallDesktop]: layout === 'small-desktop',
         [styles.largeDesktop]: layout !== 'small-desktop',
       })}>
       {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
         <p>
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
-          {currentData?.service && (
+          {currentData?.services && (
             <div className={styles.currentData}>
-              {currentData.service.map(({ serviceName, count, i }) => (
+              {currentData.services.map(({ serviceName, count }, i) => (
                 <div
                   key={`${serviceName}-${count}-${i}`}
                   role="button"
@@ -50,7 +56,7 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
                 onClick={() => serviceAreaOnClick('Total')}
                 className={classNames(styles.serviceArea, styles.green)}>
                 <span>{t('total', 'Total')}</span>
-                <span>{currentData?.service.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
+                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
               </div>
             </div>
           )}
@@ -60,4 +66,4 @@ const MonthlyWorkload = ({ type, dateTime, currentDate, events }) => {
   );
 };
 
-export default MonthlyWorkload;
+export default MonthlyWorkloadView;

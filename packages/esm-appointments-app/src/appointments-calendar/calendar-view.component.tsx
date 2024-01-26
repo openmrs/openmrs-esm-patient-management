@@ -2,11 +2,11 @@ import React from 'react';
 import DailyCalendarView from './daily/daily-calendar-view.component';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 import WeeklyCalendarView from './weekly/weekly-calendar-view.component';
-import { CalendarType } from '../types';
+import { CalendarType, DailyAppointmentsCountByService } from '../types';
 
 const CalendarView: React.FC<{
   calendarView: CalendarType;
-  events: any;
+  events: Array<DailyAppointmentsCountByService>;
   currentDate: any;
   setCurrentDate: any;
 }> = ({ calendarView, events, currentDate, setCurrentDate }) => {
