@@ -24,7 +24,7 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry, closeModal }) => 
     <Layer>
       <OverflowMenu
         aria-label="Actions menu"
-        iconDescription={t('actionsMenu', 'Actions menu')}
+        iconDescription={t('actions', 'Actions')}
         selectorPrimaryFocus={'#editPatientDetails'}
         size="sm"
         flipped>
