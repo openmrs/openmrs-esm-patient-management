@@ -11,3 +11,11 @@ window.openmrsBase = '/openmrs';
 window.spaBase = '/spa';
 window.getOpenmrsSpaBase = () => '/openmrs/spa/';
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
+window.matchMedia = jest.fn().mockImplementation(() => {
+  return {
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {},
+  };
+});

@@ -22,7 +22,7 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry, closeModal }) => 
 
   return (
     <Layer>
-      <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
+      <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#editPatientDetails'} size="sm" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="#editPatientDetails"
