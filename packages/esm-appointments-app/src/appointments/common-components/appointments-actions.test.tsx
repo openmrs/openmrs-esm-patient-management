@@ -14,7 +14,8 @@ describe('AppointmentActions', () => {
   };
 
   beforeAll(() => {
-    jest.useFakeTimers('modern');
+    jest.useFakeTimers();
+
     const currentDateTime = new Date();
     currentDateTime.setHours(12);
     currentDateTime.setMinutes(0);
@@ -57,21 +58,21 @@ describe('AppointmentActions', () => {
   it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
     const props = { ...defaultProps, scheduleType: 'Pending' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: 'Actions' });
+    const button = screen.getByRole('button', { name: /options/i });
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
     const props = { ...defaultProps, scheduleType: 'Confirmed' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: 'Actions' });
+    const button = screen.getByRole('button', { name: /options/i });
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when the appointment is in the past or has not been scheduled', () => {
     const props = { ...defaultProps, appointment: { ...defaultProps.appointment, dateTime: '2022-01-01' } };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: 'Follow up' });
+    const button = screen.getByRole('button', { name: /follow up/i });
     expect(button).toBeInTheDocument();
   });
 });

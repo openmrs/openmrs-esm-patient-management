@@ -145,7 +145,7 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
               <Layer>
                 <Dropdown
                   id="visitType"
-                  label={t('selectVisitTyoe', 'Select visit type')}
+                  label={t('selectAVisitType', 'Select visit type')}
                   items={allVisitTypes}
                   onChange={(event) => setVisitType(event.selectedItem.toString)}
                   size="sm"
