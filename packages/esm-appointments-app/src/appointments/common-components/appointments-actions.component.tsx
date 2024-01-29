@@ -99,7 +99,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
       {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisit)) ? (
-        <OverflowMenu aria-label="Actions" size="sm" flipped>
+        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
           <OverflowMenuItem
             itemText={t('editAppointments', 'Edit Appointment')}
             onClick={() =>
