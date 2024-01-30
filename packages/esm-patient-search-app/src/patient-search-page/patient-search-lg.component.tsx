@@ -32,7 +32,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
 }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const resultsToShow = inTabletOrOverlay ? 15 : 5;
+  const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
 
   const { results, goTo, totalPages, currentPage, showNextButton, paginated } = usePagination(
