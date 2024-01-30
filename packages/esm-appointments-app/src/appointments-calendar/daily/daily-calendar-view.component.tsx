@@ -2,15 +2,15 @@ import React from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './daily-calendar.scss';
-import { type CalendarType } from '../../types';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 import { dailyHours } from '../../helpers';
 import DailyHeader from './daily-header.component';
-import DailyWorkloadView from './daily-view-workload.component';
+import DailyWorkloadView from './daily-workload-view.component';
 dayjs.extend(isBetween);
 
 interface DailyCalendarViewProps {
   type: CalendarType;
-  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
+  events: Array<DailyAppointmentsCountByService>;
   currentDate: Dayjs;
   setCurrentDate: (date) => void;
 }
@@ -23,7 +23,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
 }) => {
   return (
     <div className={styles.container}>
-      <DailyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} events={events} />
+      <DailyHeader type={type} currentDate={currentDate} setCurrentDate={setCurrentDate} />
       <div className={styles.wrapper}>
         <>
           <p className={styles['containerRow']}>
@@ -33,6 +33,8 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
               </p>
             </>
           </p>
+
+          {/* displays hours of day but commented out because showing the appts by hour is not currently implemented within this code
           <p className={styles['daily-calendar-all']}>
             {dailyHours(currentDate).map((dateTime, i) => (
               <>
@@ -44,7 +46,7 @@ const DailyCalendarView: React.FC<DailyCalendarViewProps> = ({
                 </div>
               </>
             ))}
-          </p>
+          </p>*/}
         </>
       </div>
     </div>

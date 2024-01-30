@@ -1,5 +1,5 @@
 import { Button } from '@carbon/react';
-import dayjs, { type Dayjs } from 'dayjs';
+import { type Dayjs } from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type CalendarType } from '../../types';
@@ -12,17 +12,14 @@ const Format = {
 } as const;
 const dateFormat = 'MMMM DD, YYYY';
 const yearFormat = 'YYYY';
-const now = dayjs();
 function DailyHeader({
   type,
   currentDate,
   setCurrentDate,
-  events,
 }: {
   type: CalendarType;
   currentDate: Dayjs;
   setCurrentDate: (date: Dayjs) => void;
-  events: { appointmentDate: string; service: Array<any>; [key: string]: any }[];
 }) {
   const { t } = useTranslation();
   return (

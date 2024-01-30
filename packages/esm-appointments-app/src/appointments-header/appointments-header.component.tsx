@@ -55,7 +55,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
           <div className={styles.dropdownContainer}>
             <Layer>
               <Dropdown
-                ariaLabel="Dropdown"
+                aria-label="Select service type"
                 id="selectServicesDropDown"
                 items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
                 itemToString={(item) => (item ? item.name : '')}

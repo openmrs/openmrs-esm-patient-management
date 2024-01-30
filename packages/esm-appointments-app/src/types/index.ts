@@ -199,3 +199,11 @@ export interface Identifier {
   identifier: string;
   identifierName?: string;
 }
+
+export interface DailyAppointmentsCountByService {
+  appointmentDate: string;
+  services: Array<{
+    serviceName: string;
+    count: number;
+  }>;
+}

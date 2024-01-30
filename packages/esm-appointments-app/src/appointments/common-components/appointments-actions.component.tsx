@@ -5,13 +5,12 @@ import utc from 'dayjs/plugin/utc';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-
 import { launchOverlay } from '../../hooks/useOverlay';
-import AppointmentForm from '../forms/create-edit-form/appointments-form.component';
-import CheckInButton from './checkin-button.component';
 import { type MappedAppointment } from '../../types';
 import { showModal } from '@openmrs/esm-framework';
 import { useVisits } from '../../hooks/useVisits';
+import AppointmentForm from '../forms/create-edit-form/appointments-form.component';
+import CheckInButton from './checkin-button.component';
 import DefaulterTracingForm from '../forms/defaulter-tracing-form/default-tracing-form.component';
 
 dayjs.extend(utc);
@@ -100,7 +99,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
       {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisit)) ? (
-        <OverflowMenu ariaLabel="Actions" size="sm" flipped>
+        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
           <OverflowMenuItem
             itemText={t('editAppointments', 'Edit Appointment')}
             onClick={() =>

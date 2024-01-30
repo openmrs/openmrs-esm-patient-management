@@ -96,7 +96,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   return (
     <Layer>
       <OverflowMenu
-        ariaLabel="Edit appointment"
+        aria-label="Edit appointment"
         selectorPrimaryFocus={'#editPatientDetails'}
         size={isDesktop ? 'sm' : 'lg'}
         flipped>

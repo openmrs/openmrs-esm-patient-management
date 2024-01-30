@@ -45,7 +45,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ patients, toggleSearchTyp
     <>
       <div className={styles.sortingCriteriaSelect}>
         <Dropdown
-          ariaLabel="sortBy"
+          aria-label="sortBy"
           id="sortingCriteriaDropdown"
           items={sortingCriteria}
           initialSelectedItem={sortingCriteria[0]}

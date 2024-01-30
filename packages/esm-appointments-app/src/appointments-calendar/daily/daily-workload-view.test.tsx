@@ -2,10 +2,10 @@ import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { type CalendarType } from '../../types';
-import { spaBasePath } from '../../constants';
 import { navigate } from '@openmrs/esm-framework';
-import WeeklyWorkloadView from './weekly-view-workload.component';
+import DailyWorkloadView from './daily-workload-view.component';
+import { spaBasePath } from '../../constants';
+import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -13,25 +13,26 @@ jest.mock('@openmrs/esm-framework', () => ({
   useLayoutType: jest.fn(),
 }));
 
-describe('WeeklyWorkloadView Component', () => {
+describe('DailyWorkloadView Component', () => {
+  const events: Array<DailyAppointmentsCountByService> = [
+    {
+      appointmentDate: '2023-08-18',
+      services: [
+        { serviceName: 'HIV', count: 2 },
+        { serviceName: 'Lab testing', count: 3 },
+      ],
+    },
+  ];
+
   const mockData = {
-    type: 'weekly' as CalendarType,
-    dateTime: dayjs('2023-08-17'),
-    currentDate: dayjs('2023-08-17'),
-    events: [
-      {
-        appointmentDate: '2023-08-17',
-        service: [
-          { serviceName: 'HIV', count: 2 },
-          { serviceName: 'Lab testing', count: 3 },
-        ],
-      },
-    ],
-    index: 1,
+    type: 'daily' as CalendarType,
+    dateTime: dayjs('2023-08-18'),
+    currentDate: dayjs('2023-08-18'),
+    events: events,
   };
 
-  it('renders properly when type is "weekly"', () => {
-    render(<WeeklyWorkloadView {...mockData} />);
+  it('renders properly when type is "daily"', () => {
+    render(<DailyWorkloadView {...mockData} />);
 
     expect(screen.getByText('All Day')).toBeInTheDocument();
     expect(screen.getByText('HIV')).toBeInTheDocument();
@@ -41,17 +42,17 @@ describe('WeeklyWorkloadView Component', () => {
   it('navigates when a service area is clicked', async () => {
     const user = userEvent.setup();
 
-    render(<WeeklyWorkloadView {...mockData} />);
+    render(<DailyWorkloadView {...mockData} />);
 
     await user.click(screen.getByText('HIV'));
 
     expect(navigate).toHaveBeenCalledWith({
-      to: `${spaBasePath}/appointments/list/Thu, 17 Aug 2023 00:00:00 GMT/HIV`,
+      to: `${spaBasePath}/appointments/list/Fri, 18 Aug 2023 00:00:00 GMT/HIV`,
     });
   });
 
   it('calculates and displays the total count correctly', () => {
-    render(<WeeklyWorkloadView {...mockData} />);
+    render(<DailyWorkloadView {...mockData} />);
 
     expect(screen.getByText('Total')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
