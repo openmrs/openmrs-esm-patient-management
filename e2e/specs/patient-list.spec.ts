@@ -90,6 +90,47 @@ test('Manage patients in a list', async ({ api, page }) => {
   });
 });
 
+test('User should return to patient list from the patient chart', async ({ api, page }) => {
+  await test.step("When a user visits a specific patient list's page", async () => {
+    const patientListPage = new PatientListsPage(page);
+    await patientListPage.goto(cohort.uuid);
+  });
+
+  await test.step('And adds a patient to the list', async () => {
+    const patientListPage = new PatientListsPage(page);
+    createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
+    await patientListPage.goto(cohort.uuid);
+    await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
+
+  await test.step('Then should be able to wind up back to patient list from the patient chart', async () => {
+    await page.locator('table tbody tr td:nth-child(1) a').click();
+    await page.getByLabel('Open menu').click();
+    await page.getByRole('button', { name: 'Close' }).click();
+    const patientListPage = new PatientListsPage(page);
+    await expect(page).toHaveURL(/.*patient-lists/);
+    await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+    await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+
+    await page.locator('table tbody tr td:nth-child(1) a').click();
+    await page.getByLabel('Open menu').click();
+    await page.getByRole('link', { name: 'Visits' }).click();
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page).toHaveURL(/.*patient-lists/);
+    await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+    await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+
+    await page.locator('table tbody tr td:nth-child(1) a').click();
+    await page.getByLabel('Open menu').click();
+    await page.getByRole('link', { name: 'Visits' }).click();
+    await page.reload();
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page).toHaveURL(/.*patient-lists/);
+    await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+    await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
+});
+
 test.afterEach(async ({ api }) => {
   if (createdCohortMember) {
     await removePatientFromCohort(api, createdCohortMember.uuid);
