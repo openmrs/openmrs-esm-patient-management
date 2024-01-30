@@ -1,14 +1,13 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import debounce from 'lodash-es/debounce';
-import { navigate, interpolateString, useConfig, useSession } from '@openmrs/esm-framework';
+import { navigate, interpolateString, useConfig, useSession, useDebounce } from '@openmrs/esm-framework';
+import useArrowNavigation from '../hooks/useArrowNavigation';
 import type { SearchedPatient } from '../types';
+import { useRecentlyViewedPatients, useInfinitePatientSearch, useRESTPatients } from '../patient-search.resource';
+import { PatientSearchContext } from '../patient-search-context';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
 import RecentPatientSearch from './recent-patient-search.component';
-import useArrowNavigation from '../hooks/useArrowNavigation';
-import { useRecentlyViewedPatients, useInfinitePatientSearch, useRESTPatients } from '../patient-search.resource';
 import styles from './compact-patient-search.scss';
-import { PatientSearchContext } from '../patient-search-context';
 
 interface CompactPatientSearchProps {
   isSearchPage: boolean;
@@ -24,14 +23,17 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   shouldNavigateToPatientSearchPage,
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const showSearchResults = useMemo(() => !!searchTerm.trim(), [searchTerm]);
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const hasSearchTerm = useMemo(() => Boolean(debouncedSearchTerm.trim()), [debouncedSearchTerm]);
   const bannerContainerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const config = useConfig();
-  const patientSearchResponse = useInfinitePatientSearch(searchTerm, config.includeDead, showSearchResults);
+  const { showRecentlySearchedPatients } = config.search;
+  const patientSearchResponse = useInfinitePatientSearch(debouncedSearchTerm, config.includeDead);
   const { data: searchedPatients } = patientSearchResponse;
-  const { recentlyViewedPatients, addViewedPatient, mutateUserProperties } = useRecentlyViewedPatients();
-  const recentPatientSearchResponse = useRESTPatients(recentlyViewedPatients, !showSearchResults);
+  const { recentlyViewedPatients, addViewedPatient, mutateUserProperties } =
+    useRecentlyViewedPatients(showRecentlySearchedPatients);
+  const recentPatientSearchResponse = useRESTPatients(recentlyViewedPatients, !hasSearchTerm);
   const { data: recentPatients } = recentPatientSearchResponse;
   const {
     user,
@@ -94,8 +96,8 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
   }, [focusedResult, bannerContainerRef, handleFocusToInput]);
 
   const handleSubmit = useCallback(
-    (searchTerm) => {
-      if (shouldNavigateToPatientSearchPage && searchTerm.trim()) {
+    (debouncedSearchTerm) => {
+      if (shouldNavigateToPatientSearchPage && debouncedSearchTerm.trim()) {
         if (!isSearchPage) {
           window.sessionStorage.setItem('searchReturnUrl', window.location.pathname);
         }
@@ -111,7 +113,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
     setSearchTerm('');
   }, [setSearchTerm]);
 
-  const handleSearchQueryChange = debounce((val) => setSearchTerm(val), 300);
+  const handleSearchTermChange = (searchTerm: string) => setSearchTerm(searchTerm ?? '');
 
   return (
     <PatientSearchContext.Provider
@@ -122,23 +124,23 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
         <PatientSearchBar
           small
           initialSearchTerm={initialSearchTerm ?? ''}
-          onChange={handleSearchQueryChange}
+          onChange={handleSearchTermChange}
           onSubmit={handleSubmit}
           onClear={handleClear}
           ref={searchInputRef}
         />
-        {!isSearchPage &&
-          (showSearchResults ? (
-            <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
-              <PatientSearch query={searchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
-            </div>
-          ) : (
-            <>
-              <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
-                <RecentPatientSearch ref={bannerContainerRef} {...recentPatientSearchResponse} />
-              </div>
-            </>
-          ))}
+
+        {!isSearchPage && hasSearchTerm && (
+          <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
+            <PatientSearch query={debouncedSearchTerm} ref={bannerContainerRef} {...patientSearchResponse} />
+          </div>
+        )}
+
+        {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
+          <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
+            <RecentPatientSearch ref={bannerContainerRef} {...recentPatientSearchResponse} />
+          </div>
+        )}
       </div>
     </PatientSearchContext.Provider>
   );
