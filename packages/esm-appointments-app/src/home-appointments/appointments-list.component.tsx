@@ -32,9 +32,9 @@ import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
 import { type Appointment, type MappedHomeAppointment } from '../types';
+import { type ConfigObject } from '../config-schema';
 import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
-import { type ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -184,7 +184,7 @@ const AppointmentsBaseTable = () => {
     identifier: {
       content: (
         <div className={styles.nameContainer}>
-          <span className={styles.identifier}>{appointment.identifier}</span>
+          <span>{appointment.identifier}</span>
         </div>
       ),
       sortKey: appointment.identifier,
@@ -204,7 +204,7 @@ const AppointmentsBaseTable = () => {
     },
     actionButton: {
       content: (
-        <span className={styles.serviceContainer}>
+        <span>
           <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
         </span>
       ),
@@ -285,7 +285,7 @@ const AppointmentsBaseTable = () => {
           sortRow={handleSorting}
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
-          size={isDesktop(layout) ? 'md' : 'lg'}
+          size={isDesktop(layout) ? 'lg' : 'sm'}
           useZebraStyles={true}>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => {
             return (

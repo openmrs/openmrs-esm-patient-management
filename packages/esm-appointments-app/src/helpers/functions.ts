@@ -1,6 +1,6 @@
-import { AppointmentSummary, Appointment } from '../types';
-import { formatDate, parseDate, formatDatetime } from '@openmrs/esm-framework';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { type AppointmentSummary, type Appointment } from '../types';
 import { configSchema } from '../config-schema';
 
 export const getHighestAppointmentServiceLoad = (appointmentSummary: Array<any> = []) => {
@@ -29,18 +29,18 @@ export const getServiceCountByAppointmentType = (
 
 function getAppointmentDuration(startTime = 0, endTime = 0) {
   const diff = endTime - startTime;
-  var minutes = Math.floor(diff / 60000);
+  const minutes = Math.floor(diff / 60000);
   return minutes + 'min';
 }
 
 function formatAMPM(date) {
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var ampm = hours >= 12 ? 'PM' : 'AM';
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = minutes < 10 ? '0' + minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm;
+  const strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
 
@@ -64,9 +64,11 @@ export const mapAppointmentProperties = (appointment: Appointment, t?: Function)
     comments: appointment.comments ? appointment.comments : '--',
     appointmentNumber: appointment.appointmentNumber,
     color: appointment?.service?.color ?? '',
-    identifier: appointment?.patient?.identifiers?.find(
-      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
-    ).identifier,
+    identifier: appointment?.patient?.identifiers?.length
+      ? appointment.patient.identifiers.find(
+          (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
+        ).identifier
+      : appointment.patient?.identifier,
     duration: appointment.service?.durationMins
       ? appointment?.service?.durationMins + t('minutes', 'min')
       : getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
