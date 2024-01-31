@@ -1,36 +1,44 @@
-import { openmrsFetch, type OpenmrsResource } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
+import { type DailyAppointmentsCountByService } from '../types';
 
-interface CalendarEvent {
-  services: Array<{
-    appointmentServiceName: string;
-    allAppointmentsCount: number;
-    missedAppointmentsCount: number | null;
-    appointmentDate: string | null;
-  }>;
-  appointmentDate: string;
-  appointmentService: string;
-  appointmentCountMap: OpenmrsResource | null;
-  totalServiceCount: number;
+interface AppointmentCountMapEntry {
+  allAppointmentsCount: number;
+}
+
+interface AppointmentSummaryResponse {
+  appointmentService: {
+    name: string;
+  };
+  appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
 
 export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
-  const url = `/ws/rest/v1/appointment/appointmentCalendar?startDate=${startDate}&endDate=${endDate}`;
+  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
 
-  const { data, error, isLoading } = useSWR<{ data: Array<CalendarEvent> }>(
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
     startDate && endDate ? url : null,
     openmrsFetch,
     { errorRetryCount: 2 },
   );
-  const results =
-    data?.data.map((event) => ({
-      appointmentDate: event.appointmentDate,
-      service: event.services.map((s) => ({ serviceName: s.appointmentServiceName, count: s.allAppointmentsCount })),
-    })) ?? [];
-
+  const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
+    const serviceName = service.appointmentService.name;
+    Object.entries(service.appointmentCountMap).map(([key, value]) => {
+      const existingEntry = acc.find((entry) => entry.appointmentDate === key);
+      if (existingEntry) {
+        existingEntry.services.push({ serviceName, count: value.allAppointmentsCount });
+      } else {
+        acc.push({
+          appointmentDate: key,
+          services: [{ serviceName, count: value.allAppointmentsCount }],
+        });
+      }
+    });
+    return acc;
+  }, []);
   return { isLoading, calendarEvents: results, error };
 };
 

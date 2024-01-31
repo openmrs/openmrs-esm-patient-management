@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  InlineNotification,
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Form,
-  InlineNotification,
   Select,
   SelectItem,
-  Checkbox,
-  Dropdown,
 } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { useServices, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import { useServices } from '../active-visits/active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -154,7 +154,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
             <Dropdown
               id="queueLocation"
-              label={t('selectQueueLocation', 'Select a queue location')}
+              aria-label={t('selectQueueLocation', 'Select a queue location')}
               type="default"
               items={queueLocations}
               itemToString={(item) => (item ? item.name : '')}
@@ -168,7 +168,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
             <Dropdown
               id="service"
-              label={t('selectService', 'Select a service')}
+              aria-label={t('selectService', 'Select a service')}
               type="default"
               items={services}
               itemToString={(item) => (item ? item.display : '')}

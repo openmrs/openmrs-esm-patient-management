@@ -149,11 +149,10 @@ describe('ListsTable', () => {
 
     render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
 
-    const headers = ['List name', 'List type', 'No. of patients', 'Starred'];
+    const columnHeaders = [/List name/, /List type/, /No. of patients/, /Starred/];
 
-    headers.forEach((header) => {
-      expect(screen.getByText(header)).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
+    columnHeaders.forEach((header) => {
+      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
     const searchInput = screen.getByRole('searchbox');

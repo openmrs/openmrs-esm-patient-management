@@ -141,7 +141,7 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
           <UserHasAccess privilege="Delete Patient Identifiers">
             <Button
               size="md"
-              kind="danger--ghost"
+              kind="ghost"
               onClick={handleDelete}
               iconDescription={t('deleteIdentifierTooltip', 'Delete')}
               disabled={disabled}

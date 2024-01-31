@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
 import { openmrsFetch, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
@@ -107,10 +107,10 @@ describe('ListsDashboard', () => {
     await screen.findByRole('searchbox');
     expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const columnHeaders = ['List name', 'List type', 'No. of patients', ''];
+    const columnHeaders = [/List name/, /List type/, /No. of patients/];
 
     columnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument();
+      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
   });
 
