@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { navigate, interpolateString, useConfig, useSession, useDebounce } from '@openmrs/esm-framework';
 import useArrowNavigation from '../hooks/useArrowNavigation';
 import type { SearchedPatient } from '../types';
@@ -24,7 +24,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm);
-  const hasSearchTerm = useMemo(() => Boolean(debouncedSearchTerm.trim()), [debouncedSearchTerm]);
+  const hasSearchTerm = Boolean(debouncedSearchTerm.trim());
   const bannerContainerRef = useRef(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const config = useConfig();
