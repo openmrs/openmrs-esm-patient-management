@@ -265,6 +265,13 @@ function ActiveVisitsTable() {
     launchAddProviderRoomModal,
   ]);
 
+  useEffect(() => {
+    // Clean up the modal state when navigating away or resetting provider room
+    return () => {
+      setProviderRoomModalShown(false);
+    };
+  }, [setProviderRoomModalShown]);
+
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   }
