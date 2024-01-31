@@ -78,7 +78,7 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps)
       );
     case 'CheckedIn':
       return (
-        <Button kind="ghost" className={styles.actionButton} onClick={() => handleComplete(appointmentUuid, mutate, t)}>
+        <Button kind="ghost" onClick={() => handleComplete(appointmentUuid, mutate, t)}>
           {t('complete', 'Complete')}
         </Button>
       );
@@ -87,7 +87,6 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps)
         <Button
           size="sm"
           kind="ghost"
-          className={styles.actionButton}
           disabled={status === 'CheckedIn'}
           onClick={() => launchCheckInAppointmentModal(appointmentUuid)}>
           {t('checkIn', 'Check In')}
