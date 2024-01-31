@@ -46,15 +46,16 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
             <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
           </div>
           <div className={styles.dropdown}>
-            <label className={styles.view}>{t('view', 'View')}:</label>
             {isLoading ? (
               <DropdownSkeleton />
             ) : (
               <Dropdown
+                ariaLabel="Dropdown"
                 id="typeOfCare"
                 label={currentQueueLocationName ?? t('all', 'All')}
                 items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
                 itemToString={(item) => (item ? item.name : '')}
+                titleText={t('view', 'View')}
                 type="inline"
                 onChange={handleQueueLocationChange}
               />
