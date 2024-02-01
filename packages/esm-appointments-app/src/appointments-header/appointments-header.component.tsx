@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { DatePicker, DatePickerInput, Dropdown, Layer } from '@carbon/react';
 import { Location } from '@carbon/react/icons';
 import { useSession } from '@openmrs/esm-framework';
-import AppointmentsIllustration from './appointments-illustration.component';
-import styles from './appointments-header.scss';
-import { DatePicker, DatePickerInput, Dropdown, Layer } from '@carbon/react';
-import dayjs from 'dayjs';
 import { changeStartDate, useAppointmentDate } from '../helpers';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
+import AppointmentsIllustration from './appointments-illustration.component';
+import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
@@ -43,7 +43,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
             datePickerType="single">
             <DatePickerInput
               style={{ cursor: 'pointer', backgroundColor: 'transparent', border: 'none', maxWidth: '10rem' }}
-              id="date-picker-calendar-id"
+              id="appointment-date-picker"
               placeholder="DD-MMM-YYYY"
               labelText=""
               type="text"
@@ -52,21 +52,20 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
           </DatePicker>
         </div>
         <div className={styles.dropdownContainer}>
-          <label className={styles.view}>{t('view', 'View')}:</label>
           {typeof onChange === 'function' && (
-            <Layer>
-              <Dropdown
-                aria-label="Select service type"
-                id="selectServicesDropDown"
-                items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
-                itemToString={(item) => (item ? item.name : '')}
-                label={t('selectServiceType', 'Select service type')}
-                type="inline"
-                size="sm"
-                direction="bottom"
-                onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
-              />
-            </Layer>
+            <Dropdown
+              className={styles.dropdown}
+              aria-label="Select service type"
+              id="serviceDropdown"
+              items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
+              itemToString={(item) => (item ? item.name : '')}
+              label={t('selectServiceType', 'Select service type')}
+              type="inline"
+              size="sm"
+              direction="bottom"
+              titleText={t('view', 'View')}
+              onChange={({ selectedItem }) => onChange(selectedItem?.uuid)}
+            />
           )}
         </div>
       </div>

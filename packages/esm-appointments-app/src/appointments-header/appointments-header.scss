@@ -72,6 +72,17 @@
   }
 }
 
+.dropdown {
+  :global(.cds--list-box__field) {
+    width: 14rem;
+    overflow: hidden;
+  }
+
+  :global(.cds--dropdown--inline .cds--list-box__menu) {
+    left: -4rem;
+  }
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .date-and-location {
