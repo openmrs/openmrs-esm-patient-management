@@ -1,13 +1,11 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { mockServices } from '__mocks__';
 import QueueRoomForm from './queue-room-form.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useLayoutType: jest.fn(() => 'tablet'),
-  useServices: jest.fn(() => ({ services: mockServices })),
   useQueueLocations: jest.fn(() => ({
     queueLocations: { uuid: 'e7786d9a-ab62-11ec-b909-0242ac120002', display: 'Location Test' },
   })),

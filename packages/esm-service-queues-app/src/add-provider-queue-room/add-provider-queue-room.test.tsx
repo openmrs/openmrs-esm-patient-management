@@ -31,14 +31,16 @@ jest.mock('./add-provider-queue-room.resource', () => ({
   })),
 }));
 
-jest.mock('../active-visits/active-visits-table.resource', () => ({
-  useServices: jest.fn(() => ({
-    services: [
-      { uuid: 'e7786ac0-ab62-11ec-b909-0242ac120002', display: 'Service 1' },
-      { uuid: 'e7786ac0-ab62-11ec-b909-0242ac120032', display: 'Service 2' },
-    ],
-  })),
-}));
+jest.mock('../helpers/useQueues', () => {
+  return {
+    useQueues: jest.fn().mockReturnValue({
+      queues: [
+        { uuid: 'e7786ac0-ab62-11ec-b909-0242ac120002', display: 'Service 1' },
+        { uuid: 'e7786ac0-ab62-11ec-b909-0242ac120032', display: 'Service 2' },
+      ],
+    }),
+  };
+});
 
 jest.mock('../patient-search/hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({

@@ -29,12 +29,13 @@ jest.mock('../../active-visits/active-visits-table.resource', () => ({
   })),
 }));
 
-jest.mock('../../patient-queue-metrics/queue-metrics.resource', () => ({
-  useServices: jest.fn((selectedQueueLocation) => ({
-    allServices: [{ uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', name: 'Service 1' }],
-    isLoading: false,
-  })),
-}));
+jest.mock('../../helpers/useQueues', () => {
+  return {
+    useQueues: jest
+      .fn()
+      .mockReturnValue({ queues: [{ uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', name: 'Service 1' }] }),
+  };
+});
 
 describe('StartVisitQueueFields', () => {
   it('renders the form fields', () => {

@@ -13,7 +13,6 @@ import {
   SelectItem,
 } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { useServices } from '../active-visits/active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   addProviderToQueueRoom,
@@ -34,6 +33,7 @@ import {
   useSelectedServiceUuid,
 } from '../helpers/helpers';
 import styles from './add-provider-queue-room.scss';
+import { useQueues } from '../helpers/useQueues';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;
@@ -60,7 +60,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
   }, [providerRoom]);
 
   const { mutate } = useProvidersQueueRoom(providerUuid);
-  const { services } = useServices(currentLocationUuid);
+  const { queues } = useQueues(currentLocationUuid);
   const { rooms } = useQueueRooms(currentLocationUuid, currentServiceUuid);
   const { queueLocations } = useQueueLocations();
   const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
@@ -170,7 +170,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               id="service"
               aria-label={t('selectService', 'Select a service')}
               type="default"
-              items={services}
+              items={queues}
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}
               size="md"

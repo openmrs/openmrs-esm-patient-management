@@ -3,10 +3,10 @@ import classNames from 'classnames';
 import { InlineNotification, Layer, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
-import { useServices } from '../../patient-queue-metrics/queue-metrics.resource';
 import styles from './visit-form-queue-fields.scss';
 import { type ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useQueues } from '../../helpers/useQueues';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ const StartVisitQueueFields: React.FC = () => {
   const defaultPriority = config.concepts.defaultPriorityConceptUuid;
   const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
-  const { allServices, isLoading } = useServices(selectedQueueLocation);
+  const { queues } = useQueues(selectedQueueLocation);
   const [priority, setPriority] = useState(defaultPriority);
   const [status, setStatus] = useState(defaultStatus);
   const [sortWeight, setSortWeight] = useState(0);
@@ -32,10 +32,10 @@ const StartVisitQueueFields: React.FC = () => {
   }, [priority]);
 
   useEffect(() => {
-    if (allServices?.length > 0) {
-      setSelectedService(allServices[0].uuid);
+    if (queues?.length > 0) {
+      setSelectedService(queues[0].uuid);
     }
-  }, [allServices]);
+  }, [queues]);
 
   useEffect(() => {
     if (queueLocations?.length > 0) {
@@ -70,7 +70,7 @@ const StartVisitQueueFields: React.FC = () => {
 
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-        {!allServices?.length ? (
+        {!queues?.length ? (
           <InlineNotification
             className={styles.inlineNotification}
             kind={'error'}
@@ -87,8 +87,8 @@ const StartVisitQueueFields: React.FC = () => {
             value={service}
             onChange={(event) => setSelectedService(event.target.value)}>
             {!service ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
-            {allServices?.length > 0 &&
-              allServices.map((service) => (
+            {queues?.length > 0 &&
+              queues.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
                   {service.name}
                 </SelectItem>
