@@ -54,21 +54,19 @@
   @include type.type-style('label-01');
 }
 
-.dropdownContainer {
+.dropdown {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 0.5rem;
-}
+  margin-top: 0.25rem;
 
-.dropdown {
-  :global(.cds--list-box__field) {
-    width: 14rem;
-    overflow: hidden;
+  :global(.cds--dropdown__wrapper--inline) {
+    align-items: center;
+    display: flex;
   }
 
-  :global(.cds--dropdown--inline .cds--list-box__menu) {
-    left: -4rem;
+  :global(.cds--list-box__menu) {
+    left: -10.15rem;
   }
 }
 

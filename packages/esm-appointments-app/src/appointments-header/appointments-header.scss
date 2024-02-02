@@ -46,9 +46,7 @@
 
 .dropdownContainer {
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  margin-top: 0.25rem;
 }
 
 .value {
@@ -69,17 +67,6 @@
   border: none;
   & > input {
     color: colors.$blue-10;
-  }
-}
-
-.dropdown {
-  :global(.cds--list-box__field) {
-    width: 14rem;
-    overflow: hidden;
-  }
-
-  :global(.cds--dropdown--inline .cds--list-box__menu) {
-    left: -4rem;
   }
 }
 
