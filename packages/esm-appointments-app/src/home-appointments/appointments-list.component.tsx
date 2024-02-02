@@ -32,8 +32,8 @@ import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
 import { type Appointment, type MappedHomeAppointment } from '../types';
+import { useTodaysAppointments } from './home-appointments.resource';
 import { type ConfigObject } from '../config-schema';
-import { useTodaysAppointments } from './appointments-table.resource';
 import styles from './appointments-list.scss';
 
 interface PaginationData {

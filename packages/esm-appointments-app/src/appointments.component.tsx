@@ -5,7 +5,7 @@ import AppointmentsHeader from './appointments-header/appointments-header.compon
 import AppointmentMetrics from './appointments-metrics/appointments-metrics.component';
 import Overlay from './overlay.component';
 
-const ClinicalAppointments: React.FC = () => {
+const Appointments: React.FC = () => {
   const { t } = useTranslation();
   const [appointmentServiceType, setAppointmentServiceType] = useState<string>('');
 
@@ -19,4 +19,4 @@ const ClinicalAppointments: React.FC = () => {
   );
 };
 
-export default ClinicalAppointments;
+export default Appointments;

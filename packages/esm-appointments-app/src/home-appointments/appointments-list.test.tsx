@@ -2,13 +2,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { mockSession } from '__mocks__';
 import { usePagination } from '@openmrs/esm-framework';
-import { useTodaysAppointments } from './appointments-table.resource';
+import { useTodaysAppointments } from './home-appointments.resource';
 import AppointmentsBaseTable from './appointments-list.component';
 
 const useTodaysAppointmentsMock = useTodaysAppointments as jest.Mock;
 const usePaginationMock = usePagination as jest.Mock;
 
-jest.mock('./appointments-table.resource');
+jest.mock('./home-appointments.resource');
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
