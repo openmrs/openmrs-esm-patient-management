@@ -3,9 +3,9 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentService, Appointment } from '../types';
 import { useAppointmentDate, mapAppointmentProperties } from '../helpers';
 import { omrsDateFormat } from '../constants';
+import type { AppointmentService, Appointment } from '../types';
 
 export function useTodaysAppointments() {
   const { t } = useTranslation();
