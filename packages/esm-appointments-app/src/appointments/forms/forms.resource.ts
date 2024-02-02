@@ -78,7 +78,6 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
     .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
 
-
 // NOTE: I don't think this is used anywhere?
 export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
   return await openmrsFetch('/ws/rest/v1/appointments/conflicts', {
