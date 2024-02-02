@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { updateAppointmentStatus } from '../appointments-table.resource';
+import { updateAppointmentStatus } from '../home-appointments.resource';
 import { showActionableNotification, showNotification } from '@openmrs/esm-framework';
 import CheckInAppointmentModal from './check-in-modal.component';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { mockSession } from '__mocks__';
 import { usePagination } from '@openmrs/esm-framework';
-import { useTodaysAppointments } from './appointments-table.resource';
+import { useTodaysAppointments } from './home-appointments.resource';
 import AppointmentsBaseTable from './appointments-list.component';
 
 const useTodaysAppointmentsMock = useTodaysAppointments as jest.Mock;

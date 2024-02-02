@@ -22,15 +22,6 @@ export function useServices() {
     isValidating,
   };
 }
-
-export function getAppointmentService(uuid: string) {
-  const abortController = new AbortController();
-
-  return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
-    signal: abortController.signal,
-  });
-}
-
 export function useProviders() {
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Provider> } }, Error>(
     `/ws/rest/v1/provider`,
@@ -86,6 +77,9 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
     }))
     .sort((dateA, dateB) => new Date(dateA.date).getTime() - new Date(dateB.date).getTime());
 };
+
+
+// NOTE: I don't think this is used anywhere?
 export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
   return await openmrsFetch('/ws/rest/v1/appointments/conflicts', {
     method: 'POST',
