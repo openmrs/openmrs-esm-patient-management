@@ -1,5 +1,5 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
-import { amPm } from '../helpers';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type amPm } from '../helpers';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -15,6 +15,7 @@ export interface Appointment {
   endDateTime: Date | number | any;
   location: OpenmrsResource;
   patient: {
+    identifier: string;
     identifiers: Array<Identifier>;
     name: string;
     uuid: string;
