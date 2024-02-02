@@ -8,7 +8,7 @@ import AppointmentsBaseTable from './appointments-list.component';
 const useTodaysAppointmentsMock = useTodaysAppointments as jest.Mock;
 const usePaginationMock = usePagination as jest.Mock;
 
-jest.mock('./appointments-table.resource');
+jest.mock('./home-appointments.resource');
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),

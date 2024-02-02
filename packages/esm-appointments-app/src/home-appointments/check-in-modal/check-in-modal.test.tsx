@@ -9,7 +9,7 @@ const mockUpdateAppointmentStatus = updateAppointmentStatus as jest.Mock;
 const appointmentUuid = '7cd38a6d-377e-491b-8284-b04cf8b8c6d8';
 
 jest.mock('@openmrs/esm-framework');
-jest.mock('../appointments-table.resource');
+jest.mock('../home-appointments.resource');
 
 describe('CheckInAppointmentModal', () => {
   afterEach(() => {
