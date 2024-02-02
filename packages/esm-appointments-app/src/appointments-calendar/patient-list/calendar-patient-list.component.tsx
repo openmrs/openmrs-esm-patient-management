@@ -21,7 +21,7 @@ import { ExtensionSlot, formatDate, formatDatetime } from '@openmrs/esm-framewor
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import { Download } from '@carbon/react/icons';
 import styles from './calenar-patient-list.scss';
-import { useAppointments } from '../../appointments/appointments-table.resource';
+import { useAppointments } from '../../hooks/useAppointments';
 
 interface CalendarPatientListProps {}
 
