@@ -9,6 +9,7 @@ import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta, appointmentCalendarDashboardMeta } from './dashboard.meta';
 import {
+  apointmentsByStatusSchema,
   cancelledAppointmentsPanelConfigSchema,
   checkedInAppointmentsPanelConfigSchema,
   completedAppointmentsPanelConfigSchema,
@@ -36,12 +37,7 @@ export function startupApp() {
 
   defineConfigSchema(moduleName, configSchema);
 
-  defineExtensionConfigSchema('expected-appointments-panel', expectedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('checked-in-appointments-panel', checkedInAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('completed-appointments-panel', completedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('missed-appointments-panel', missedAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('cancelled-appointments-panel', cancelledAppointmentsPanelConfigSchema);
-  defineExtensionConfigSchema('early-appointments-panel', earlyAppointmentsPanelConfigSchema);
+  defineExtensionConfigSchema('appointments-by-status-schema', apointmentsByStatusSchema);
 
   registerBreadcrumbs([
     {
