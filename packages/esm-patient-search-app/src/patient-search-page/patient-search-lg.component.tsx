@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import Pagination from '../ui-components/pagination/pagination.component';
 import {
   EmptyState,
@@ -31,7 +31,6 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
   fetchError,
 }) => {
   const { t } = useTranslation();
-  const config = useConfig();
   const resultsToShow = inTabletOrOverlay ? 15 : 20;
   const totalResults = searchResults.length;
 
@@ -84,7 +83,7 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
         </h2>
         {searchResultsView}
       </div>
-      {paginated && (
+      {paginated ? (
         <div
           className={classNames(styles.pagination, {
             [styles.stickyPagination]: stickyPagination,
@@ -96,6 +95,8 @@ const PatientSearchComponent: React.FC<PatientSearchComponentProps> = ({
             totalPages={totalPages}
           />
         </div>
+      ) : (
+        <div className={styles.spacer} />
       )}
     </div>
   );
