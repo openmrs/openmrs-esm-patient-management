@@ -32,9 +32,9 @@ import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
 import { type Appointment, type MappedHomeAppointment } from '../types';
-import { useTodaysAppointments } from './appointments-table.resource';
-import styles from './appointments-list.scss';
+import { useTodaysAppointments } from './home-appointments.resource';
 import { type ConfigObject } from '../config-schema';
+import styles from './appointments-list.scss';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -78,7 +78,7 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps)
       );
     case 'CheckedIn':
       return (
-        <Button kind="ghost" className={styles.actionButton} onClick={() => handleComplete(appointmentUuid, mutate, t)}>
+        <Button kind="ghost" onClick={() => handleComplete(appointmentUuid, mutate, t)}>
           {t('complete', 'Complete')}
         </Button>
       );
@@ -87,7 +87,6 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps)
         <Button
           size="sm"
           kind="ghost"
-          className={styles.actionButton}
           disabled={status === 'CheckedIn'}
           onClick={() => launchCheckInAppointmentModal(appointmentUuid)}>
           {t('checkIn', 'Check In')}
@@ -185,7 +184,7 @@ const AppointmentsBaseTable = () => {
     identifier: {
       content: (
         <div className={styles.nameContainer}>
-          <span className={styles.identifier}>{appointment.identifier}</span>
+          <span>{appointment.identifier}</span>
         </div>
       ),
       sortKey: appointment.identifier,
@@ -205,7 +204,7 @@ const AppointmentsBaseTable = () => {
     },
     actionButton: {
       content: (
-        <span className={styles.serviceContainer}>
+        <span>
           <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
         </span>
       ),
@@ -286,7 +285,7 @@ const AppointmentsBaseTable = () => {
           sortRow={handleSorting}
           overflowMenuOnHover={isDesktop(layout)}
           rows={tableRows}
-          size={isDesktop(layout) ? 'md' : 'lg'}
+          size={isDesktop(layout) ? 'lg' : 'sm'}
           useZebraStyles={true}>
           {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => {
             return (

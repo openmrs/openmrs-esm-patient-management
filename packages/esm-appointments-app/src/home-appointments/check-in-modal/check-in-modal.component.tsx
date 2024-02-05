@@ -4,7 +4,7 @@ import { Button, Layer, ModalBody, ModalFooter, ModalHeader, TimePicker } from '
 import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
-import { updateAppointmentStatus } from '../appointments-table.resource';
+import { updateAppointmentStatus } from '../home-appointments.resource';
 import { handleUndoAction } from '../common';
 import styles from './check-in-modal.scss';
 

@@ -38,7 +38,7 @@ import { type amPm, convertTime12to24, useAppointmentDate } from '../../helpers'
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { type MappedAppointment } from '../../types';
-import { useAppointments } from '../../appointments/appointments-table.resource';
+import { useAppointments } from '../../hooks/useAppointments';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
 import styles from './visit-form.scss';

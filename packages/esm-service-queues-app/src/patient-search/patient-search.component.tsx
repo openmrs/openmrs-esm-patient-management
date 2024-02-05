@@ -6,6 +6,7 @@ import PatientScheduledVisits from './patient-scheduled-visits.component';
 import QueueServiceForm from '../queue-services/queue-service-form.component';
 import QueueRoomForm from '../queue-rooms/queue-room-form.component';
 import VisitForm from './visit-form/visit-form.component';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 
 interface PatientSearchProps {
   closePanel: () => void;
@@ -19,6 +20,7 @@ interface PatientSearchProps {
 const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewState, headerTitle }) => {
   const { t } = useTranslation();
   const { selectedPatientUuid } = viewState;
+  const { patient } = usePatient(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(
     view === 'queue_service_form'
       ? SearchTypes.QUEUE_SERVICE_FORM
@@ -36,6 +38,16 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, view, viewSta
   return (
     <>
       <Overlay header={headerTitle} closePanel={closePanel}>
+        {patient && (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: selectedPatientUuid,
+              hideActionsOverflow: true,
+            }}
+          />
+        )}
         <div className="omrs-main-content">
           {searchType === SearchTypes.SCHEDULED_VISITS ? (
             <PatientScheduledVisits
