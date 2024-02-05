@@ -7,6 +7,11 @@ export const configSchema = {
       _description: 'Where clicking a patient result takes the user. Accepts template parameter ${patientUuid}',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
+    showRecentlySearchedPatients: {
+      _type: Type.Boolean,
+      _default: false,
+      _description: 'Whether to show recently searched patients',
+    },
   },
   includeDead: {
     _type: Type.Boolean,

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
 import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
-import styles from './compact-patient-banner.scss';
 import { PatientSearchContext } from '../patient-search-context';
+import styles from './compact-patient-banner.scss';
 
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;

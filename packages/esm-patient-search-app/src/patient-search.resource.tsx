@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, showNotification, useSession, type FetchResponse, LoggedInUser } from '@openmrs/esm-framework';
+import { openmrsFetch, showNotification, useSession, type FetchResponse } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
 const v =
@@ -57,12 +57,12 @@ export function useInfinitePatientSearch(
   return results;
 }
 
-export function useRecentlyViewedPatients() {
+export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean = false) {
   const { t } = useTranslation();
   const { user } = useSession();
   const userUuid = user?.uuid;
   const { data, error, mutate } = useSWR<FetchResponse<User>, Error>(
-    userUuid ? `/ws/rest/v1/user/${userUuid}` : null,
+    showRecentlySearchedPatients && userUuid ? `/ws/rest/v1/user/${userUuid}` : null,
     openmrsFetch,
   );
 
