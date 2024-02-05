@@ -60,8 +60,12 @@
   text-align: center;
 }
 
-.pagination {
+.spacer {
   padding: spacing.$spacing-05 0;
+}
+
+.pagination {
+  @extend .spacer;
   background: $ui-01;
 }
 
