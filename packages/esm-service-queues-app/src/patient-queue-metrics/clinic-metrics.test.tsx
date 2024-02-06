@@ -12,8 +12,13 @@ jest.mock('./queue-metrics.resource', () => {
 
   return {
     ...originalModule,
-    useServices: jest.fn().mockImplementation(() => ({ allServices: mockServiceTypes.data })),
     useServiceMetricsCount: jest.fn().mockReturnValue(5),
+  };
+});
+
+jest.mock('../helpers/useQueues', () => {
+  return {
+    useQueues: jest.fn().mockReturnValue({ queues: mockServiceTypes.data }),
   };
 });
 

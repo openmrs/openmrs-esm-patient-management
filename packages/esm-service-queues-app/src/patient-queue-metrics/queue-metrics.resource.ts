@@ -4,21 +4,6 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import { type Appointment, type QueueServiceInfo } from '../types';
 import { startOfDay } from '../constants';
 
-export function useServices(location: string) {
-  const apiUrl = `/ws/rest/v1/queue?location=${location}`;
-
-  const { data, isLoading } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
-    location ? apiUrl : null,
-    openmrsFetch,
-  );
-
-  return {
-    services: data ? data?.data?.results?.map((service) => service.display) : [],
-    allServices: data ? data?.data.results : [],
-    isLoading: isLoading,
-  };
-}
-
 export function useServiceMetricsCount(service: string, location: string) {
   const status = 'Waiting';
   const apiUrl = `/ws/rest/v1/queue-entry-metrics?service=${service}&status=${status}&location=${location}`;

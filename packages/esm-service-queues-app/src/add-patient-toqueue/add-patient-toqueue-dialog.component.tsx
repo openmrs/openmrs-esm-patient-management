@@ -16,13 +16,13 @@ import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framewo
 import {
   addQueueEntry,
   usePriority,
-  useServices,
   useStatus,
   useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueues } from '../helpers/useQueues';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;
@@ -41,7 +41,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const { priorities } = usePriority();
   const { statuses, isLoading } = useStatus();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { services } = useServices(selectedQueueLocation);
+  const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
   const [isMissingPriority, setIsMissingPriority] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
@@ -151,8 +151,8 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
               value={queueUuid}
               onChange={(event) => setQueueUuid(event.target.value)}>
               {!queueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {services?.length > 0 &&
-                services.map((service) => (
+              {queues?.length > 0 &&
+                queues.map((service) => (
                   <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
                     {service.display}
                   </SelectItem>

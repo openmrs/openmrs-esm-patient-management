@@ -11,10 +11,11 @@ import {
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
-import { useServiceMetricsCount, useServices } from './queue-metrics.resource';
+import { useServiceMetricsCount } from './queue-metrics.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import styles from './clinic-metrics.scss';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import { useQueues } from '../helpers/useQueues';
 
 export interface Service {
   uuid: string;
@@ -26,7 +27,7 @@ function ClinicMetrics() {
 
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queueLocations } = useQueueLocations();
-  const { allServices } = useServices(currentQueueLocation ?? queueLocations?.[0]?.id);
+  const { queues } = useQueues(currentQueueLocation);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceName, currentQueueLocation ?? queueLocations?.[0]?.id);
@@ -74,7 +75,7 @@ function ClinicMetrics() {
             id="inline"
             type="inline"
             label={currentServiceName ?? `${t('all', 'All')}`}
-            items={[{ display: `${t('all', 'All')}` }, ...allServices]}
+            items={[{ display: `${t('all', 'All')}` }, ...queues]}
             itemToString={(item) => (item ? item.display : '')}
             onChange={handleServiceChange}
           />

@@ -16,15 +16,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
-import {
-  updateQueueEntry,
-  usePriority,
-  useServices,
-  useStatus,
-  useVisitQueueEntries,
-} from './active-visits-table.resource';
+import { updateQueueEntry, usePriority, useStatus, useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
+import { useQueues } from '../helpers/useQueues';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;
@@ -39,7 +34,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const { priorities } = usePriority();
   const config = useConfig() as ConfigObject;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueEntry?.queueLocation);
-  const { services } = useServices(selectedQueueLocation);
+  const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
   const [editLocation, setEditLocation] = useState(false);
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
@@ -154,8 +149,8 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                   <SelectItem text={t('selectService', 'Select a service')} value="" />
                 ) : null}
                 {!queueEntry.queueUuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
-                {services?.length > 0 &&
-                  services.map((service) => (
+                {queues?.length > 0 &&
+                  queues.map((service) => (
                     <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
                       {service.display}
                     </SelectItem>

@@ -32,18 +32,14 @@ import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
-import {
-  usePriority,
-  useServices,
-  useStatus,
-  useVisitQueueEntries,
-} from '../active-visits/active-visits-table.resource';
+import { usePriority, useStatus, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
+import { useQueues } from '../helpers/useQueues';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
@@ -71,7 +67,7 @@ const ScheduledVisits: React.FC<{
   const [userLocation, setUserLocation] = useState('');
   const locations = useLocations();
   const session = useSession();
-  const { services } = useServices(userLocation);
+  const { queues } = useQueues(userLocation);
   const { mutate } = useVisitQueueEntries('', '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
@@ -112,7 +108,7 @@ const ScheduledVisits: React.FC<{
         location: userLocation,
       };
 
-      const service = head(services)?.uuid;
+      const service = head(queues)?.uuid;
       const defaultStatus = config.concepts.defaultStatusConceptUuid;
       const defaultPriority = config.concepts.defaultPriorityConceptUuid;
 
@@ -190,7 +186,7 @@ const ScheduledVisits: React.FC<{
       patientId,
       visitDate,
       userLocation,
-      services,
+      queues,
       config.concepts.defaultStatusConceptUuid,
       config.concepts.defaultPriorityConceptUuid,
       currentVisit,
