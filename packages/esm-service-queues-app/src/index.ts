@@ -10,7 +10,6 @@ import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
 import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
-import { QueueTableName, QueueTablePriority, QueueTableStatus } from './queue-table/queue-table-cells.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -95,9 +94,33 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
-export const queueTableName = getSyncLifecycle(QueueTableName, options);
-export const queueTablePriority = getSyncLifecycle(QueueTablePriority, options);
-export const queueTableStatus = getSyncLifecycle(QueueTableStatus, options);
+export const queueTableName = getAsyncLifecycle(
+  () => import('./queue-table/queue-table-cells.component').then(({ QueueTableName }) => ({ default: QueueTableName })),
+  {
+    featureName: 'queue table name column',
+    moduleName,
+  },
+);
+
+export const queueTablePriority = getAsyncLifecycle(
+  () =>
+    import('./queue-table/queue-table-cells.component').then(({ QueueTablePriority }) => ({
+      default: QueueTablePriority,
+    })),
+  {
+    featureName: 'queue table name column',
+    moduleName,
+  },
+);
+
+export const queueTableStatus = getAsyncLifecycle(
+  () =>
+    import('./queue-table/queue-table-cells.component').then(({ QueueTableStatus }) => ({ default: QueueTableStatus })),
+  {
+    featureName: 'queue table name column',
+    moduleName,
+  },
+);
 
 export function startupApp() {
   registerBreadcrumbs([]);
