@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useConfig, useDebounce } from '@openmrs/esm-framework';
+import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
 import Overlay from '../ui-components/overlay';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
-import debounce from 'lodash-es/debounce';
-import AdvancedPatientSearchComponent from '../patient-search-page/advanced-patient-search.component';
+import { type PatientSearchConfig } from '../config-schema';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
@@ -13,29 +14,26 @@ interface PatientSearchOverlayProps {
 
 const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query = '', header }) => {
   const { t } = useTranslation();
+  const {
+    search: { disableTabletSearchOnKeyUp },
+  } = useConfig<PatientSearchConfig>();
   const [searchTerm, setSearchTerm] = useState(query);
-  const handleClear = useCallback(() => setSearchTerm(''), [setSearchTerm]);
-  const showSearchResults = useMemo(() => !!searchTerm?.trim(), [searchTerm]);
+  const showSearchResults = Boolean(searchTerm?.trim());
+  const debouncedSearchTerm = useDebounce(searchTerm);
 
-  useEffect(() => {
-    if (query) {
-      setSearchTerm(query);
-    }
-  }, [query]);
+  const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
-  const onSearchQueryChange = debounce((val) => {
-    setSearchTerm(val);
-  }, 300);
+  const onSearchTermChange = (query: string) => setSearchTerm(query);
 
   return (
     <Overlay header={header ?? t('searchResults', 'Search results')} close={onClose}>
       <PatientSearchBar
         initialSearchTerm={query}
-        onSubmit={onSearchQueryChange}
-        onChange={onSearchQueryChange}
-        onClear={handleClear}
+        onChange={(query) => !disableTabletSearchOnKeyUp && onSearchTermChange(query)}
+        onClear={handleClearSearchTerm}
+        onSubmit={onSearchTermChange}
       />
-      {showSearchResults && <AdvancedPatientSearchComponent query={searchTerm} inTabletOrOverlay />}
+      {showSearchResults && <AdvancedPatientSearchComponent query={debouncedSearchTerm} inTabletOrOverlay />}
     </Overlay>
   );
 };

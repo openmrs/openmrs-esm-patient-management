@@ -33,7 +33,7 @@
 
 .tabletOverlayHeader {
   button {
-    background-color: $brand-01 !important;
+    @include brand-01(background-color);
   }
   .headerContent {
     color: $ui-02;
@@ -51,12 +51,16 @@
 
 .headerContent {
   @include type.type-style('heading-compact-02');
-  padding: 0 spacing.$spacing-05;
   color: $ui-05;
 }
 
 .closeButton {
   background-color: $ui-02;
+  margin-right: spacing.$spacing-05;
+
+  svg {
+    fill: white !important;
+  }
 }
 
 .overlayContent {

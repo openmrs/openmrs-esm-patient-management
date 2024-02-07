@@ -142,19 +142,6 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-export function useServices(location: string) {
-  const apiUrl = `/ws/rest/v1/queue?location=${location}`;
-
-  const { data } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
-    location ? apiUrl : null,
-    openmrsFetch,
-  );
-
-  return {
-    services: data ? data?.data?.results : [],
-  };
-}
-
 export function useStatus() {
   const config = useConfig();
   const {

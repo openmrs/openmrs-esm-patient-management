@@ -40,7 +40,7 @@ import {
   showModal,
   ConfigurableLink,
 } from '@openmrs/esm-framework';
-import { useVisitQueueEntries, useServices, type MappedVisitQueueEntry } from './active-visits-table.resource';
+import { useVisitQueueEntries, type MappedVisitQueueEntry } from './active-visits-table.resource';
 import { SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
@@ -63,6 +63,7 @@ import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
+import { useQueues } from '../helpers/useQueues';
 
 /**
  * FIXME Temporarily moved here
@@ -89,7 +90,7 @@ interface PaginationData {
 function ActiveVisitsTable() {
   const { t } = useTranslation();
   const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { services } = useServices(currentQueueLocation);
+  const { queues } = useQueues(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const currentServiceUuid = useSelectedServiceUuid();
@@ -322,7 +323,7 @@ function ActiveVisitsTable() {
                       titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
                       label={currentServiceName}
                       type="inline"
-                      items={[{ display: `${t('all', 'All')}` }, ...services]}
+                      items={[{ display: `${t('all', 'All')}` }, ...queues]}
                       itemToString={(item) => (item ? item.display : '')}
                       onChange={handleServiceChange}
                       size="sm"

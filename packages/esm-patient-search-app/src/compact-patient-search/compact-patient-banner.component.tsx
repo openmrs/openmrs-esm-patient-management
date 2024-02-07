@@ -2,11 +2,15 @@ import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
-import { ExtensionSlot, useConfig, interpolateString, ConfigurableLink, age } from '@openmrs/esm-framework';
+import { ConfigurableLink, ExtensionSlot, age, interpolateString, useConfig } from '@openmrs/esm-framework';
+import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
-import { PatientSearchContext } from '../patient-search-context';
 
+interface ClickablePatientContainerProps {
+  patient: SearchedPatient;
+  children: React.ReactNode;
+}
 interface PatientSearchResultsProps {
   patients: Array<SearchedPatient>;
 }
@@ -121,11 +125,6 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
     </div>
   );
 });
-
-interface ClickablePatientContainerProps {
-  patient: SearchedPatient;
-  children: React.ReactNode;
-}
 
 const ClickablePatientContainer = ({ patient, children }: ClickablePatientContainerProps) => {
   const { nonNavigationSelectPatientAction, patientClickSideEffect } = useContext(PatientSearchContext);

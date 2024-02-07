@@ -291,11 +291,16 @@ export interface QueueEntryPayload {
   };
 }
 
+export type AllowedPriority = OpenmrsResource;
+export type AllowedStatus = OpenmrsResource;
+
 export interface QueueServiceInfo {
   uuid: string;
   display: string;
   name: string;
   description: string;
+  allowedPriorities: Array<AllowedPriority>;
+  allowedStatuses: Array<AllowedStatus>;
 }
 
 export interface MappedServiceQueueEntry {

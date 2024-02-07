@@ -15,10 +15,15 @@ jest.mock('./active-visits-table.resource', () => {
 
   return {
     ...originalModule,
-    useServices: jest.fn().mockReturnValue({ services: mockServices }),
     usePriority: jest.fn().mockReturnValue({ priorities: mockPriorities }),
     useStatus: jest.fn().mockReturnValue({ statuses: mockStatus }),
     updateQueueEntry: jest.fn(),
+  };
+});
+
+jest.mock('../helpers/useQueues', () => {
+  return {
+    useQueues: jest.fn().mockReturnValue({ queues: mockServices }),
   };
 });
 

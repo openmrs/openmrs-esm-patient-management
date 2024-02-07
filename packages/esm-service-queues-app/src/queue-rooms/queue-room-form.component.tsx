@@ -16,9 +16,9 @@ import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useServices } from '../active-visits/active-visits-table.resource';
 import { saveQueueRoom } from './queue-room.resource';
 import styles from './queue-room-form.scss';
+import { useQueues } from '../helpers/useQueues';
 
 interface QueueRoomFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -33,7 +33,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
   const [isMissingRoomName, setMissingRoomName] = useState(false);
   const [isMissingQueueRoomService, setMissingQueueRoomService] = useState(false);
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { services } = useServices(selectedQueueLocation);
+  const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
 
   const createQueueRoom = useCallback(
@@ -138,8 +138,8 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
                 value={queueRoomService}
                 onChange={(event) => setQueueRoomService(event.target.value)}>
                 {!queueRoomService ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
-                {services?.length > 0 &&
-                  services.map((service) => (
+                {queues?.length > 0 &&
+                  queues.map((service) => (
                     <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
                       {service.display}
                     </SelectItem>

@@ -2,6 +2,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PatientSearchRootComponent from './root.component';
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  isDesktop: jest.fn(),
+  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
+}));
+
 describe('PatientSearchRootComponent', () => {
   const originalPushState = window.history.pushState;
 

@@ -3,6 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import PatientSearchButton from './patient-search-button.component';
 
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
+}));
+
 describe('PatientSearchButton', () => {
   it('renders with default props', () => {
     render(<PatientSearchButton />);
