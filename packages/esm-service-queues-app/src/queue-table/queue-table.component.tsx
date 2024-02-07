@@ -6,6 +6,10 @@ import {
   DataTable,
   Dropdown,
   Tab,
+  Tabs,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableBody,
   TableCell,
@@ -26,10 +30,6 @@ import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
 import { TableToolbarSearch } from '@carbon/react';
 import { type AllowedStatus, type QueueServiceInfo } from '../types';
-import { Tabs } from '@carbon/react';
-import { TabList } from '@carbon/react';
-import { TabPanels } from '@carbon/react';
-import { TabPanel } from '@carbon/react';
 
 export const QueueTableByStatus: React.FC = () => {
   const layout = useLayoutType();
@@ -57,21 +57,24 @@ export const QueueTableByStatus: React.FC = () => {
 
   useEffect(() => {
     if (currentQueue) {
-      const newQueueHasCurrentStatus = currentQueue?.allowedStatuses?.some((s) => s?.uuid == currentStatusUuid);
+      const newQueueHasCurrentStatus = currentQueue?.allowedStatuses?.some((s) => s.uuid == currentStatusUuid);
       if (!newQueueHasCurrentStatus) {
         setCurrentStatusUuid(currentQueue.allowedStatuses?.[0]?.uuid);
       }
     }
   }, [currentQueue]);
 
-  const currentStatusIndex = Math.max(0, allowedStatuses?.findIndex((s) => s?.uuid == currentStatusUuid));
+  const currentStatusIndex = Math.max(0, allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid));
 
-  const visitedQueueEntriesByLocationAndQueueAndStatus = visitQueueEntriesByLocation
+  const visitQueueEntriesByLocationAndQueueAndStatus = visitQueueEntriesByLocation
     ?.filter((entry) => !currentQueueUuid || entry.queueEntry.queue.uuid == currentQueueUuid)
     ?.filter((entry) => !currentStatusUuid || entry.queueEntry.status.uuid == currentStatusUuid);
 
-  if (isLoading || !allowedStatuses?.length) {
+  const noStatuses = !allowedStatuses?.length;
+  if (isLoading) {
     return <>Loading....</>;
+  } else if (noStatuses) {
+    return <>No available statuses configured for queue</>;
   }
 
   const handleServiceChange = ({ selectedItem }: { selectedItem: QueueServiceInfo }) => {
@@ -101,15 +104,13 @@ export const QueueTableByStatus: React.FC = () => {
         selectedIndex={currentStatusIndex}
         onChange={({ selectedIndex }) => setCurrentStatusUuid(allowedStatuses[selectedIndex].uuid)}
         className={styles.tabs}>
-        <TabList style={{ paddingLeft: '1rem' }} aria-label="Outpatient tabs" contained>
+        <TabList style={{ paddingLeft: '1rem' }} aria-label={t('queueStatus', 'Queue Status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
         </TabList>
         <TabPanels>
           {allowedStatuses?.map((s) => (
             <TabPanel key={s?.uuid} style={{ padding: 0 }}>
-              <QueueTable
-                visitedQueueEntriesByLocationAndQueueAndStatus={visitedQueueEntriesByLocationAndQueueAndStatus}
-              />
+              <QueueTable visitQueueEntriesByLocationAndQueueAndStatus={visitQueueEntriesByLocationAndQueueAndStatus} />
             </TabPanel>
           ))}
         </TabPanels>
@@ -119,10 +120,10 @@ export const QueueTableByStatus: React.FC = () => {
 };
 
 interface QueueTableProps {
-  visitedQueueEntriesByLocationAndQueueAndStatus: VisitQueueEntry[];
+  visitQueueEntriesByLocationAndQueueAndStatus: VisitQueueEntry[];
 }
 
-function QueueTable({ visitedQueueEntriesByLocationAndQueueAndStatus }: QueueTableProps) {
+function QueueTable({ visitQueueEntriesByLocationAndQueueAndStatus }: QueueTableProps) {
   const { t } = useTranslation();
   const { queueTableColumns } = useConfig<ConfigObject>();
   const [currentPageSize, setPageSize] = useState(10);
@@ -131,14 +132,14 @@ function QueueTable({ visitedQueueEntriesByLocationAndQueueAndStatus }: QueueTab
     goTo,
     results: paginatedQueueEntries,
     currentPage,
-  } = usePagination(visitedQueueEntriesByLocationAndQueueAndStatus, currentPageSize);
+  } = usePagination(visitQueueEntriesByLocationAndQueueAndStatus, currentPageSize);
 
-  const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.id }));
+  const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
   const rows =
     paginatedQueueEntries?.map((queueEntry) => {
-      const row = {};
+      const row: Record<string, JSX.Element> = {};
       queueTableColumns.forEach((conf) => {
-        row[conf.id] = <ExtensionSlot name={conf.extensionSlotName} state={{ queueEntry }} />;
+        row[conf.headerI18nKey] = <ExtensionSlot name={conf.extensionSlotName} state={{ queueEntry }} />;
       });
 
       return row;
@@ -198,7 +199,7 @@ function QueueTable({ visitedQueueEntriesByLocationAndQueueAndStatus }: QueueTab
             page={currentPage}
             pageSize={currentPageSize}
             pageSizes={pageSizes}
-            totalItems={visitedQueueEntriesByLocationAndQueueAndStatus?.length}
+            totalItems={visitQueueEntriesByLocationAndQueueAndStatus?.length}
             className={styles.pagination}
             onChange={({ pageSize, page }) => {
               if (pageSize !== currentPageSize) {

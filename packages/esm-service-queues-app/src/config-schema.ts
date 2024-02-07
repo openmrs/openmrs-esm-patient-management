@@ -140,16 +140,12 @@ export const configSchema = {
   },
   queueTableColumns: {
     _type: Type.Array,
-    _description: 'Columns to appear in the queues table.',
+    _description: 'Columns to appear in the queue table.',
     _elements: {
-      id: {
-        _type: Type.String,
-        _description:
-          'string id for the column. Must be unique for each column configured to appear in the queue table',
-      },
       headerI18nKey: {
         _type: Type.String,
-        _description: 'i18n key for the column header name',
+        _description:
+          'i18n key for the column header name. Must be unique for each column configured to appear in the queue table',
       },
       extensionSlotName: {
         _type: Type.String,
@@ -214,7 +210,6 @@ export interface OutpatientConfig {
 }
 
 export interface QueueTableColumn {
-  id: string;
   headerI18nKey: string;
   extensionSlotName: string;
 }
