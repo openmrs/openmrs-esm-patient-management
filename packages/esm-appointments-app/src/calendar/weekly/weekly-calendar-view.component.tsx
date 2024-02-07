@@ -3,7 +3,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import styles from './weekly-calendar.scss';
 import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
-import { isSameMonth, weekAllDays, weekDays } from '../../helpers';
+import { weekDays } from '../../helpers';
 import WeeklyWorkloadView from './weekly-workload-view.component';
 import WeeklyHeader from './weekly-header.component';
 dayjs.extend(isBetween);

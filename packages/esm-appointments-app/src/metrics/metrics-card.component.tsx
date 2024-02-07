@@ -7,7 +7,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { Tile, Layer } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { basePath, spaBasePath, spaRoot } from '../constants';
+import { basePath, spaBasePath } from '../constants';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {

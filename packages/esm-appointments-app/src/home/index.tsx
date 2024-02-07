@@ -1,7 +1,7 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 
-import AppointmentsBaseTable from './appointments-list.component';
+import AppointmentsBaseTable from './appointments-base-table.component';
 
 const swrConfiguration = {
   errorRetryCount: 3,

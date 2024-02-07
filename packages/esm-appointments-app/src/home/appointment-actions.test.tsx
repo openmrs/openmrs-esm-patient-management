@@ -85,5 +85,5 @@ describe('ActionsMenu', () => {
 });
 
 function renderActionsMenu({ appointment, useBahmniUI }) {
-  return render(<ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} />);
+  return render(<ActionsMenu appointment={appointment} useBahmniUI={useBahmniUI} mutate={() => {}} />);
 }

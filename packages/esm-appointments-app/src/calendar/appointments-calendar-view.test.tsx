@@ -1,10 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import userEvent from '@testing-library/user-event';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
-
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('../hooks/useAppointments'),
   () => ({
@@ -14,8 +10,6 @@ jest.mock('../hooks/useAppointments'),
 
 describe('Appointment calendar view', () => {
   it('renders appointments in calendar view from appointments list', async () => {
-    const user = userEvent.setup();
-
     renderAppointmentsCalendarListView();
 
     expect(screen.getByText(/monthly/i)).toBeInTheDocument();

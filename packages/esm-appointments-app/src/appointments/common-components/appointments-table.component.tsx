@@ -25,7 +25,7 @@ import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import { launchOverlay } from '../../hooks/useOverlay';
-import { type MappedAppointment } from '../../types';
+import { type Appointment } from '../../types';
 import { getPageSizes, useSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
 import AppointmentDetails from '../details/appointment-details.component';
@@ -34,10 +34,10 @@ import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
 
 interface AppointmentsTableProps {
-  appointments: Array<MappedAppointment>;
+  appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
-  mutate?: () => void;
+  mutate: () => void;
   visits?: Array<any>;
   scheduleType?: string;
 }
@@ -46,6 +46,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
   isLoading,
   tableHeading,
+  mutate,
   visits,
   scheduleType,
 }) => {
@@ -82,16 +83,18 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}
         to={customPatientChartUrl}
-        templateParams={{ patientUuid: appointment.patientUuid }}>
-        {appointment.name}
+        templateParams={{ patientUuid: appointment.patient.uuid }}>
+        {appointment.patient.name}
       </ConfigurableLink>
     ),
     nextAppointmentDate: '--',
-    identifier: appointment.identifier,
-    dateTime: formatDatetime(new Date(appointment.dateTime)),
-    serviceType: appointment.serviceType,
+    identifier: appointment.patient.identifier,
+    dateTime: formatDatetime(new Date(appointment.startDateTime)),
+    serviceType: appointment.service.name,
     provider: appointment.provider,
-    actions: <AppointmentActions visits={visits} appointment={appointment} scheduleType={scheduleType} />,
+    actions: (
+      <AppointmentActions visits={visits} appointment={appointment} scheduleType={scheduleType} mutate={mutate} />
+    ),
   }));
 
   if (isLoading) {
@@ -130,7 +133,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                   onClick={() =>
                     downloadAppointmentsAsExcel(
                       appointments,
-                      `${tableHeading} Appointments ${formatDate(new Date(appointments[0]?.dateTime), { year: true })}`,
+                      `${tableHeading} Appointments ${formatDate(new Date(appointments[0]?.startDateTime), {
+                        year: true,
+                      })}`,
                     )
                   }>
                   {t('download', 'Download')}

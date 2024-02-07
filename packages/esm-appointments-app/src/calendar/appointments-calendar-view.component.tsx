@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import type { CalendarType } from '../types';
-import AppointmentsHeader from '../appointments-header/appointments-header.component';
+import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
 import CalendarView from './calendar-view.component';
 import { useAppointmentDate } from '../helpers';

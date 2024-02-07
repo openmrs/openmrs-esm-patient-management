@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AppointmentTabs from './appointments/appointment-tabs.component';
-import AppointmentsHeader from './appointments-header/appointments-header.component';
-import AppointmentMetrics from './appointments-metrics/appointments-metrics.component';
+import AppointmentsHeader from './header/appointments-header.component';
+import AppointmentMetrics from './metrics/appointments-metrics.component';
 import Overlay from './overlay.component';
 
 const Appointments: React.FC = () => {

@@ -26,23 +26,23 @@ import {
   usePagination,
   useSession,
   userHasAccess,
+  parseDate,
 } from '@openmrs/esm-framework';
 import { ActionsMenu } from './appointment-actions.component';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 import { launchCheckInAppointmentModal, handleComplete } from './common';
 import { SeeAllAppointmentsLink, AddAppointmentLink, ViewCalendarLink } from './links.component';
-import { type Appointment, type MappedHomeAppointment } from '../types';
+import { type Appointment } from '../types';
 import { useTodaysAppointments } from './home-appointments.resource';
 import { type ConfigObject } from '../config-schema';
-import styles from './appointments-list.scss';
+import { formatAMPM } from '../helpers';
+import styles from './appointments-base-table.scss';
 
 interface PaginationData {
   goTo: (page: number) => void;
-  results: Array<MappedHomeAppointment>;
+  results: Array<Appointment>;
   currentPage: number;
 }
-
-const ServiceColor = ({ color }) => <div className={styles.serviceColor} style={{ backgroundColor: `${color}` }} />;
 
 type RenderStatusProps = {
   status: string;
@@ -123,7 +123,7 @@ const AppointmentsBaseTable = () => {
       {
         id: 0,
         header: t('dateAndTime', 'Date and time'),
-        key: 'dateTime',
+        key: 'startDateTime',
         isSortable: true,
       },
       {
@@ -161,51 +161,45 @@ const AppointmentsBaseTable = () => {
   );
 
   const tableRows = paginatedAppointments?.map((appointment) => ({
-    id: appointment.id,
-    dateTime: {
+    id: appointment.uuid,
+    startDateTime: {
       content: (
         <span className={styles.statusContainer}>
-          <span className={styles.startTime}>{appointment.dateTime}</span>
-          {appointment.duration}
+          <span className={styles.startTime}>{formatAMPM(parseDate(appointment.startDateTime))}</span>
         </span>
       ),
-      sortKey: appointment.dateTime,
+      sortKey: appointment.startDateTime,
     },
     name: {
       content: (
         <div className={styles.nameContainer}>
-          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: appointment.patientUuid }}>
-            {appointment.name}
+          <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: appointment.patient.uuid }}>
+            {appointment.patient.name}
           </ConfigurableLink>
         </div>
       ),
-      sortKey: appointment.name,
+      sortKey: appointment.patient.name,
     },
     identifier: {
       content: (
         <div className={styles.nameContainer}>
-          <span>{appointment.identifier}</span>
+          <span>{appointment.patient.identifier}</span>
         </div>
       ),
-      sortKey: appointment.identifier,
+      sortKey: appointment.patient.identifier,
     },
     location: {
-      content: <span className={styles.statusContainer}>{appointment.location}</span>,
+      content: <span className={styles.statusContainer}>{appointment.location.display}</span>,
       sortKey: appointment.location,
     },
     service: {
-      content: (
-        <span className={styles.serviceContainer}>
-          <ServiceColor color={appointment.serviceColor} />
-          {appointment.serviceType}
-        </span>
-      ),
-      sortKey: appointment.serviceType,
+      content: <span className={styles.serviceContainer}>{appointment.service.name}</span>,
+      sortKey: appointment.service.name,
     },
     actionButton: {
       content: (
         <span>
-          <RenderStatus status={appointment.status} appointmentUuid={appointment.id} t={t} mutate={mutate} />
+          <RenderStatus status={appointment.status} appointmentUuid={appointment.uuid} t={t} mutate={mutate} />
         </span>
       ),
     },
@@ -310,7 +304,11 @@ const AppointmentsBaseTable = () => {
                             ))}
                             {fullView && (
                               <TableCell className={classNames('cds--table-column-menu', styles.overflowMenu)}>
-                                <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
+                                <ActionsMenu
+                                  appointment={filteredAppointments?.[index]}
+                                  useBahmniUI={useBahmniUI}
+                                  mutate={mutate}
+                                />
                               </TableCell>
                             )}
                           </TableRow>

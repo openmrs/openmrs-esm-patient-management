@@ -8,7 +8,7 @@ import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
 import { spaBasePath } from '../constants';
 
-import styles from './appointments-list.scss';
+import styles from './appointments-base-table.scss';
 
 const SeeAllAppointmentsLink = () => {
   const { useBahmniAppointmentsUI: useBahmniUI, bahmniAppointmentsUiBaseUrl } = useConfig();

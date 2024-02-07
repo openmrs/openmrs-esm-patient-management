@@ -3,22 +3,22 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { useAppointmentDate, mapAppointmentProperties } from '../helpers';
+import { useAppointmentDate } from '../helpers';
 import { omrsDateFormat } from '../constants';
-import type { AppointmentService, Appointment } from '../types';
+import type { AppointmentService, AppointmentsFetchResponse } from '../types';
 
 export function useTodaysAppointments() {
   const { t } = useTranslation();
   const { currentAppointmentDate } = useAppointmentDate();
 
   const apiUrl = `/ws/rest/v1/appointment/all?forDate=${currentAppointmentDate}`;
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     currentAppointmentDate ? apiUrl : null,
     openmrsFetch,
   );
 
   const results = useMemo(() => {
-    const appointments = data?.data?.map((appointment) => mapAppointmentProperties(appointment, t)) ?? [];
+    const appointments = data?.data ?? [];
 
     return {
       appointments,

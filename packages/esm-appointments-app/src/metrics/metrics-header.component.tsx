@@ -1,25 +1,30 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
-dayjs.extend(isToday);
+
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
-import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
 import styles from './metrics-header.scss';
+import AppointmentsForm from '../form/appointments-form.component';
+
+dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
 
   const launchCreateAppointmentForm = (patientUuid) => {
+    const props = {
+      patientUuid: patientUuid,
+      context: 'creating',
+      closeWorkspace: closeOverlay,
+      mutate: () => {}, // TODO get this to mutate properly
+    };
     closeOverlay();
-    launchOverlay(
-      t('appointmentForm', 'Create Appointment'),
-      <AppointmentForm patientUuid={patientUuid} context="creating" />,
-    );
+    launchOverlay(t('appointmentForm', 'Create Appointment'), <AppointmentsForm {...props} />);
   };
 
   return (

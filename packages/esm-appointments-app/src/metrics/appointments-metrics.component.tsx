@@ -16,7 +16,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid })
   const { t } = useTranslation();
 
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
-  const { totalProviders, isLoading: allAppointmentsLoading } = useAllAppointmentsByDate();
+  const { totalProviders } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(serviceUuid);
 
   const { currentAppointmentDate } = useAppointmentDate();
@@ -27,10 +27,10 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid })
   const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
   const filteredArrivedAppointments = serviceUuid
-    ? arrivedAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
+    ? arrivedAppointments.filter(({ service }) => service.uuid === serviceUuid)
     : arrivedAppointments;
   const filteredPendingAppointments = serviceUuid
-    ? pendingAppointments.filter(({ serviceTypeUuid }) => serviceTypeUuid === serviceUuid)
+    ? pendingAppointments.filter(({ service }) => service.uuid === serviceUuid)
     : pendingAppointments;
 
   if (clinicalMetricsError) {

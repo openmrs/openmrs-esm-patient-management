@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { DatePicker, DatePickerInput, Dropdown, Layer } from '@carbon/react';
+import { DatePicker, DatePickerInput, Dropdown } from '@carbon/react';
 import { Location } from '@carbon/react/icons';
 import { useSession } from '@openmrs/esm-framework';
 import { changeStartDate, useAppointmentDate } from '../helpers';

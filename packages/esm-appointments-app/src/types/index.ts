@@ -46,7 +46,7 @@ export interface AppointmentService {
   appointmentServiceId: number;
   creatorName: string;
   description: string;
-  durationMins?: string | null;
+  durationMins?: number;
   endTime: string;
   initialAppointmentStatus: string;
   location?: OpenmrsResource;
@@ -99,53 +99,6 @@ export interface Observation {
   obsDatetime: string;
 }
 
-export interface MappedAppointment {
-  id: string;
-  name: string;
-  age: string;
-  gender: string;
-  phoneNumber: string;
-  dob: string;
-  patientUuid: string;
-  dateTime: string;
-  serviceType: string;
-  serviceUuid: string;
-  serviceTypeUuid?: string;
-  appointmentKind: string;
-  provider: string;
-  location: string;
-  comments: string;
-  status: string;
-  appointmentNumber: string;
-  recurring?: boolean;
-  uuid?: string;
-  providers?: Array<OpenmrsResource>;
-  identifier?: string;
-}
-
-export interface MappedHomeAppointment {
-  id: string;
-  name: string;
-  age: string;
-  gender: string;
-  phoneNumber: string;
-  dob: string;
-  patientUuid: string;
-  dateTime: string;
-  serviceType: string;
-  serviceUuid: string;
-  appointmentKind: string;
-  provider: string;
-  location: string;
-  comments: string;
-  status: string;
-  appointmentNumber: string;
-  recurring?: boolean;
-  uuid?: string;
-  serviceColor?: string;
-  duration?: string;
-  identifier?: string;
-}
 export interface AppointmentPayload {
   patientUuid: string;
   serviceUuid: string;
@@ -207,4 +160,16 @@ export interface DailyAppointmentsCountByService {
     serviceName: string;
     count: number;
   }>;
+}
+
+export interface RecurringPattern {
+  type: 'DAY' | 'WEEK';
+  period: number;
+  endDate: string;
+  daysOfWeek?: Array<string>; //'MONDAY' | 'TUESDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'>;
+}
+
+export interface RecurringAppointmentsPayload {
+  appointmentRequest: AppointmentPayload;
+  recurringPattern: RecurringPattern;
 }

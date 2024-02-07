@@ -1,26 +1,24 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { isDesktop, navigate, useConfig } from '@openmrs/esm-framework';
-import type { MappedAppointment } from '../types';
-import { launchOverlay } from '../hooks/useOverlay';
+import type { Appointment } from '../types';
+import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import { spaBasePath } from '../constants';
 import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } from './common';
-import AppointmentForm from '../appointments/forms/create-edit-form/appointments-form.component';
+import AppointmentForm from '../form/appointments-form.component';
 import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
 import PatientSearch from '../patient-search/patient-search.component';
-import styles from './appointments-list.scss';
+import styles from './appointments-base-table.scss';
 
 interface ActionMenuProps {
-  appointment: MappedAppointment;
+  appointment: Appointment;
   useBahmniUI?: string;
-  mutate?: () => void;
+  mutate: () => void;
 }
 
-export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
+export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProps) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
   const { bahmniAppointmentsUiBaseUrl } = useConfig();
 
   const { status } = appointment;
@@ -34,7 +32,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
     const errorTitle = t('appointmentMissedError', 'Error marking appointment as Missed');
     return handleUpdateStatus(
       'Missed',
-      appointment.id,
+      appointment.uuid, /// TODO: will this still work?
       successDescription,
       errorDescription,
       successTitle,
@@ -50,7 +48,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
         className={styles.menuItemLink}
         id="#editAppointment"
         target="_blank"
-        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.id}?isRecurring=${appointment.recurring}`}
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.uuid}?isRecurring=${appointment.recurring}`} //TODO will this stil work can I get rid of Bahmni UI?
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
@@ -62,7 +60,12 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
           navigate({ to: `${spaBasePath}` });
           launchOverlay(
             t('editAppointment', 'Edit Appointment'),
-            <AppointmentForm appointment={appointment} context="editing" />,
+            <AppointmentForm
+              appointment={appointment}
+              context="editing"
+              closeWorkspace={closeOverlay}
+              mutate={mutate}
+            />,
           );
         }}
         itemText={t('editAppointment', 'Edit Appointment')}>
@@ -106,7 +109,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
           className={styles.menuItem}
           disabled={status === 'CheckedIn' || disableActions}
           id="#checkInAppointment"
-          onClick={() => launchCheckInAppointmentModal(appointment.id)}
+          onClick={() => launchCheckInAppointmentModal(appointment.uuid)}
           itemText={t('checkIn', 'Check In')}>
           {t('checkIn', 'Check In')}
         </OverflowMenuItem>
@@ -114,7 +117,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
           className={styles.menuItem}
           id="#completeAppointment"
           disabled={isScheduled || disableActions}
-          onClick={() => handleComplete(appointment.id, mutate, t)}
+          onClick={() => handleComplete(appointment.uuid, mutate, t)}
           itemText={t('complete', 'Complete')}>
           {t('complete', 'Complete')}
         </OverflowMenuItem>
