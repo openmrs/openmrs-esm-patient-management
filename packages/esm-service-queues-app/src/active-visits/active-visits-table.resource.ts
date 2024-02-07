@@ -180,7 +180,6 @@ export function useUnmappedVisitQueueEntries(locationUuid: string): UseVisitQueu
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
 
   const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
-  useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -205,6 +204,7 @@ export function useVisitQueueEntries(
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
   const useVisitQueueEntriesObj = useUnmappedVisitQueueEntries(locationUuid);
   const { visitQueueEntries } = useVisitQueueEntriesObj;
+  const { t } = useTranslation();
 
   const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
     diagnoses: encounter.diagnoses,
