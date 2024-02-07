@@ -28,6 +28,7 @@ export interface Identifier {
 }
 export interface Address {
   preferred: boolean;
+  voided: boolean;
   address1: string;
   cityVillage: string;
   country: string;
