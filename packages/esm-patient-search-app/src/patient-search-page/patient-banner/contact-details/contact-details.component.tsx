@@ -7,7 +7,6 @@ import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import styles from './contact-details.scss';
 import classNames from 'classnames';
-import type { Address as AddressType } from '../../../types';
 
 interface ContactDetailsProps {
   patientId: string;
@@ -66,17 +65,16 @@ const Address: React.FC<{ patientId: string }> = ({ patientId }) => {
   /*
     DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
 
-    t('postalCode', 'Postal code')
     t('address1', 'Address line 1')
     t('address2', 'Address line 2')
-    t('countyDistrict', 'District')
-    t('stateProvince', 'State')
+    t('city', 'City')
     t('cityVillage', 'City')
     t('country', 'Country')
     t('countyDistrict', 'District')
-    t('state', 'State')
-    t('city', 'City')
     t('district', 'District')
+    t('postalCode', 'Postal code')
+    t('state', 'State')
+    t('stateProvince', 'State')
   */
 
   return isLoading ? (
@@ -115,21 +113,27 @@ const Address: React.FC<{ patientId: string }> = ({ patientId }) => {
 
 const Contact: React.FC<{ patientUuid: string; deceased?: boolean }> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
+  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
+  const { isLoading: isLoadingAttributes, contactAttributes } = usePatientContactAttributes(patientUuid);
 
   const contacts = useMemo(
     () =>
-      contactAttributes?.map((contact) => [
-        t(contact.attributeType.display, contact.attributeType.display),
-        contact.value,
-      ]),
-    [contactAttributes],
+      patient && contactAttributes
+        ? [
+            ...patient?.telecom?.map((contact) => [t(contact.system, contact.system), contact.value]),
+            ...contactAttributes?.map((contact) => [
+              t(contact.attributeType.display, contact.attributeType.display),
+              contact.value,
+            ]),
+          ]
+        : [],
+    [patient, contactAttributes],
   );
 
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      {isLoading ? (
+      {isLoadingPatient || isLoadingAttributes ? (
         <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
       ) : (
         <ul>

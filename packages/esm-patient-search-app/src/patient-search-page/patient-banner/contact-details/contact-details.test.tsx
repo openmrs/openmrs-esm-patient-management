@@ -1,82 +1,161 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithSwr } from 'tools';
+import { usePatientAttributes, usePatientContactAttributes } from '../hooks/usePatientAttributes';
+import { usePatientListsForPatient } from '../hooks/usePatientListsForPatient';
 import { useRelationships } from './relationships.resource';
-import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import { mockAddress } from '__mocks__';
 import ContactDetails from './contact-details.component';
+import { usePatient } from '@openmrs/esm-framework';
 
+const mockedUsePatient = usePatient as jest.Mock;
+const mockedUsePatientAttributes = usePatientAttributes as jest.Mock;
+const mockedUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;
+const mockUsePatientListsForPatient = usePatientListsForPatient as jest.Mock;
 const mockUseRelationships = useRelationships as jest.Mock;
-const mockUsePatientContactAttributes = usePatientContactAttributes as jest.Mock;
-
-const mockContactAttributes = [
-  { attributeType: { display: 'Email' }, value: 'test@example.com', uuid: '24252571-dd5a-11e6-9d9c-0242ac152222' },
-];
 
 const mockRelationships = [
   {
-    uuid: '24252571-dd5a-11e6-9d9c-0242ac150002',
-    display: 'John Doe',
-    relationshipType: 'Family',
-    relativeAge: 30,
+    display: '100ADT - Amanda Robinson',
+    name: 'Amanda Robinson',
+    relationshipType: 'Sibling',
+    relativeAge: 24,
+    relativeUuid: '07006bcb-91d4-4c57-a5f7-49751899d9b5',
+    uuid: '993bc79d-5ca5-4c76-b4b3-adf49e25bd0b',
   },
 ];
 
-jest.mock('./relationships.resource');
-jest.mock('../hooks/usePatientAttributes');
+const mockPersonAttributes = [
+  {
+    display: 'Next of Kin Contact Phone Number = 0000000000',
+    uuid: '1de1ac71-68e8-4a08-a7e2-5042093d4e46',
+    value: '0700-000-000',
+    attributeType: {
+      uuid: 'a657a4f1-9c0f-444b-a1fd-445bb91dd12d',
+      display: 'Next of Kin Contact Phone Number',
+    },
+  },
+];
 
-mockUsePatientContactAttributes.mockReturnValue({
-  isLoading: false,
-  contactAttributes: mockContactAttributes,
-});
+const mockCohorts = [
+  {
+    uuid: 'fdc95682-e206-421b-9534-e2a4010cc05d',
+    name: 'List three',
+    startDate: '2023-04-19T23:26:27.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '1d48bec7-6aab-464c-ac16-687ba46e7812',
+    name: ' Test patient List-47',
+    startDate: '2023-04-24T23:28:49.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '6ce81b61-387d-43ab-86fb-606fa16d39dd',
+    name: ' Test patient List-41',
+    startDate: '2023-04-24T23:28:49.000+0000',
+    endDate: null,
+  },
+  {
+    uuid: '1361caf0-b3c3-4937-88e3-40074f7f3320',
+    name: 'Potential Patients',
+    startDate: '2023-06-07T15:40:00.000+0000',
+    endDate: null,
+  },
+];
 
-mockUseRelationships.mockReturnValue({ isLoading: false, data: mockRelationships });
+jest.mock('../hooks/usePatientAttributes', () => ({
+  usePatientAttributes: jest.fn(),
+  usePatientContactAttributes: jest.fn(),
+}));
+
+jest.mock('../hooks/usePatientListsForPatient', () => ({
+  usePatientListsForPatient: jest.fn(),
+}));
+
+jest.mock('./relationships.resource', () => ({
+  useRelationships: jest.fn(),
+}));
 
 describe('ContactDetails', () => {
   beforeEach(() => {
-    mockUsePatientContactAttributes.mockReturnValue({
+    mockedUsePatient.mockReturnValue({
       isLoading: false,
-      contactAttributes: mockContactAttributes,
+      patient: {
+        address: [
+          {
+            city: 'Foo',
+            country: 'Bar',
+            id: '0000',
+            postalCode: '00100',
+            state: 'Quux',
+            use: 'home',
+          },
+        ],
+        telecom: [{ system: 'Cellular', value: '+0123456789' }],
+      },
+    });
+    mockedUsePatientContactAttributes.mockReturnValue({
+      isLoading: false,
+      contactAttributes: mockPersonAttributes,
     });
 
-    mockUseRelationships.mockReturnValue({ isLoading: false, data: mockRelationships });
+    mockUsePatientListsForPatient.mockReturnValue({
+      isLoading: false,
+      cohorts: mockCohorts,
+    });
+
+    mockUseRelationships.mockReturnValue({
+      isLoading: false,
+      data: mockRelationships,
+    });
   });
-  it('renders address', () => {
-    render(<ContactDetails address={[mockAddress]} patientId="123" isDeceased={false} />);
+
+  it("renders the patient's address, contact details, patient lists, and relationships when available", async () => {
+    renderWithSwr(<ContactDetails patientId={'some-uuid'} deceased={false} />);
 
     expect(screen.getByText('Address')).toBeInTheDocument();
-    expect(screen.getByText('12345')).toBeInTheDocument();
-    expect(screen.getByText('123 Main St')).toBeInTheDocument();
-    expect(screen.getByText('City')).toBeInTheDocument();
-    expect(screen.getByText('State')).toBeInTheDocument();
-    expect(screen.getByText('Country')).toBeInTheDocument();
-  });
-
-  it('renders contact attributes', async () => {
-    render(<ContactDetails address={[]} patientId="123" isDeceased={false} />);
-
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
-    expect(screen.getByText('Email : test@example.com'));
-  });
-
-  it('renders relationships', async () => {
-    render(<ContactDetails address={[]} patientId="123" isDeceased={false} />);
-
     expect(screen.getByText('Relationships')).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText(/Amanda Robinson/)).toBeInTheDocument();
+    expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
+    expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(/\+0123456789/i)).toBeInTheDocument();
+    expect(screen.getByText(/Next of Kin Contact Phone Number/i)).toBeInTheDocument();
+    expect(screen.getByText(/0700-000-000/)).toBeInTheDocument();
+    expect(screen.getByText(/Patient Lists/)).toBeInTheDocument();
+    expect(screen.getByText(/Test patient List-47/)).toBeInTheDocument();
+    expect(screen.getByText(/List three/)).toBeInTheDocument();
   });
 
-  it('renders skeleton when loading', async () => {
-    mockUsePatientContactAttributes.mockReturnValue({
-      isLoading: true,
+  it('renders an empty state view when contact details, relations, patient lists and addresses are not available', async () => {
+    mockedUsePatient.mockReturnValue({
+      isLoading: false,
+      address: [],
+    });
+    mockedUsePatientAttributes.mockReturnValue({
+      isLoading: false,
+      attributes: [],
+      error: null,
+    });
+    mockedUsePatientContactAttributes.mockReturnValue({
+      isLoading: false,
       contactAttributes: [],
     });
+    mockUsePatientListsForPatient.mockReturnValue({
+      isLoading: false,
+      cohorts: [],
+    });
+    mockUseRelationships.mockReturnValue({
+      isLoading: false,
+      data: [],
+    });
 
-    mockUseRelationships.mockReturnValue({ isLoading: true, data: [] });
+    renderWithSwr(<ContactDetails patientId={'some-uuid'} deceased={false} />);
 
-    render(<ContactDetails address={[]} patientId="123" isDeceased={false} />);
-
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Relationships')).toBeInTheDocument();
     expect(screen.getByText('Contact Details')).toBeInTheDocument();
-    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
-    expect(screen.queryByText('Email : test@example.com')).not.toBeInTheDocument();
+    expect(screen.getByText(/Patient Lists/)).toBeInTheDocument();
+    expect(screen.getAllByText('--').length).toBe(4);
   });
 });
