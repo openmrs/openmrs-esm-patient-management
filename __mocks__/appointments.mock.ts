@@ -264,7 +264,8 @@ export const mockAppointmentsData = {
   ],
 };
 
-/*export const mockMappedAppointmentsData = {
+// TODO: still used by the queue-linelist-base-table test?
+export const mockMappedAppointmentsData = {
   data: [
     {
       id: 'e10ce4e3-0e91-4b97-bc6c-9b5068e58428',
@@ -305,7 +306,7 @@ export const mockAppointmentsData = {
       status: 'Scheduled',
     },
   ],
-};*/
+};
 
 export const mockAppointmentMetrics = {
   totalAppointments: 16,

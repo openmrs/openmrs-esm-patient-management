@@ -32,7 +32,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
     const errorTitle = t('appointmentMissedError', 'Error marking appointment as Missed');
     return handleUpdateStatus(
       'Missed',
-      appointment.uuid, /// TODO: will this still work?
+      appointment.uuid,
       successDescription,
       errorDescription,
       successTitle,
@@ -48,7 +48,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
         className={styles.menuItemLink}
         id="#editAppointment"
         target="_blank"
-        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.uuid}?isRecurring=${appointment.recurring}`} //TODO will this stil work can I get rid of Bahmni UI?
+        href={`${bahmniAppointmentsUiBaseUrl}/#/home/manage/appointments/calendar/${appointment.uuid}?isRecurring=${appointment.recurring}`} //TODO will this stil work/do we still need this?
         itemText={t('editAppointment', 'Edit Appointment')}>
         {t('editAppointment', 'Edit Appointment')}
       </OverflowMenuItem>
