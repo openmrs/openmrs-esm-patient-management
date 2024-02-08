@@ -12,6 +12,12 @@ export const configSchema = {
       _default: false,
       _description: 'Whether to show recently searched patients',
     },
+    disableTabletSearchOnKeyUp: {
+      _type: Type.Boolean,
+      _default: false,
+      _description:
+        'Disable the default "keyup search" for instant patient search as typing concludes on tablet devices',
+    },
   },
   includeDead: {
     _type: Type.Boolean,
@@ -43,4 +49,12 @@ export const configSchema = {
     _description: 'Identifier to be shown in the event defaultIdentifierTypes does is empty',
     _default: 'OpenMRS ID',
   },
+};
+
+export type PatientSearchConfig = {
+  search: { patientSearchResult: string; showRecentlySearchedPatients: string; disableTabletSearchOnKeyUp: boolean };
+  includeDead: boolean;
+  contactAttributeType: Array<string>;
+  defaultIdentifierTypes: Array<string>;
+  defaultIdentifier: string;
 };
