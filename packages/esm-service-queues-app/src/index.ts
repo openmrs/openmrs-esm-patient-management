@@ -94,30 +94,26 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
-export const queueTableName = getAsyncLifecycle(
-  () => import('./queue-table/queue-table-cells.component').then(({ QueueTableName }) => ({ default: QueueTableName })),
+export const queueTableNameCell = getAsyncLifecycle(
+  () => import('./queue-table/cells/queue-table-name-cell.component'),
   {
     featureName: 'queue table name column',
     moduleName,
   },
 );
 
-export const queueTablePriority = getAsyncLifecycle(
-  () =>
-    import('./queue-table/queue-table-cells.component').then(({ QueueTablePriority }) => ({
-      default: QueueTablePriority,
-    })),
+export const queueTablePriorityCell = getAsyncLifecycle(
+  () => import('./queue-table/cells/queue-table-priority-cell.component'),
   {
-    featureName: 'queue table name column',
+    featureName: 'queue table priority column',
     moduleName,
   },
 );
 
-export const queueTableStatus = getAsyncLifecycle(
-  () =>
-    import('./queue-table/queue-table-cells.component').then(({ QueueTableStatus }) => ({ default: QueueTableStatus })),
+export const queueTableStatusCell = getAsyncLifecycle(
+  () => import('./queue-table/cells/queue-table-status-cell.component'),
   {
-    featureName: 'queue table name column',
+    featureName: 'queue table status column',
     moduleName,
   },
 );
