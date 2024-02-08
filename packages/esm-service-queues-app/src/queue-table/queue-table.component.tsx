@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from '../active-visits/active-visits-table.scss';
 import { updateSelectedServiceUuid, useSelectedServiceUuid } from '../helpers/helpers';
 import {
@@ -72,9 +72,9 @@ export const QueueTableByStatus: React.FC = () => {
 
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
-    return <>Loading....</>;
+    return <>{t('loading', 'Loading....')}</>;
   } else if (noStatuses) {
-    return <>No available statuses configured for queue</>;
+    return <>{t('noStatusConfigured', 'No status configured')}</>;
   }
 
   const handleServiceChange = ({ selectedItem }: { selectedItem: QueueServiceInfo }) => {
@@ -104,13 +104,13 @@ export const QueueTableByStatus: React.FC = () => {
         selectedIndex={currentStatusIndex}
         onChange={({ selectedIndex }) => setCurrentStatusUuid(allowedStatuses[selectedIndex].uuid)}
         className={styles.tabs}>
-        <TabList style={{ paddingLeft: '1rem' }} aria-label={t('queueStatus', 'Queue Status')} contained>
+        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
         </TabList>
         <TabPanels>
           {allowedStatuses?.map((s) => (
-            <TabPanel key={s?.uuid} style={{ padding: 0 }}>
-              <QueueTable visitQueueEntriesByLocationAndQueueAndStatus={visitQueueEntriesByLocationAndQueueAndStatus} />
+            <TabPanel key={s.uuid}>
+              <QueueTable queueEntries={visitQueueEntriesByLocationAndQueueAndStatus} />
             </TabPanel>
           ))}
         </TabPanels>
@@ -120,24 +120,20 @@ export const QueueTableByStatus: React.FC = () => {
 };
 
 interface QueueTableProps {
-  visitQueueEntriesByLocationAndQueueAndStatus: VisitQueueEntry[];
+  queueEntries: VisitQueueEntry[];
 }
 
-function QueueTable({ visitQueueEntriesByLocationAndQueueAndStatus }: QueueTableProps) {
+function QueueTable({ queueEntries }: QueueTableProps) {
   const { t } = useTranslation();
   const { queueTableColumns } = useConfig<ConfigObject>();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
-  const {
-    goTo,
-    results: paginatedQueueEntries,
-    currentPage,
-  } = usePagination(visitQueueEntriesByLocationAndQueueAndStatus, currentPageSize);
+  const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
 
   const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
-  const rows =
+  const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
-      const row: Record<string, JSX.Element> = {};
+      const row: Record<string, JSX.Element | string> = { id: queueEntry.queueEntry.uuid };
       queueTableColumns.forEach((conf) => {
         row[conf.headerI18nKey] = <ExtensionSlot name={conf.extensionSlotName} state={{ queueEntry }} />;
       });
@@ -146,7 +142,7 @@ function QueueTable({ visitQueueEntriesByLocationAndQueueAndStatus }: QueueTable
     }) ?? [];
 
   return (
-    <DataTable rows={rows} headers={headers}>
+    <DataTable rows={rowsData} headers={headers}>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
         <TableContainer className={styles.tableContainer}>
           <TableToolbar
@@ -199,7 +195,7 @@ function QueueTable({ visitQueueEntriesByLocationAndQueueAndStatus }: QueueTable
             page={currentPage}
             pageSize={currentPageSize}
             pageSizes={pageSizes}
-            totalItems={visitQueueEntriesByLocationAndQueueAndStatus?.length}
+            totalItems={queueEntries?.length}
             className={styles.pagination}
             onChange={({ pageSize, page }) => {
               if (pageSize !== currentPageSize) {

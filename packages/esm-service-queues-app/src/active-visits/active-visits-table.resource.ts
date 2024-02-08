@@ -78,6 +78,8 @@ export interface VisitQueueEntry {
   };
 }
 
+// TODO: transition away from using MappedVisitQueueEntry, as it does not
+// generalize well to arbitary columns to display in QueueTable
 export interface MappedVisitQueueEntry {
   id: string;
   encounters: Array<MappedEncounter>;
