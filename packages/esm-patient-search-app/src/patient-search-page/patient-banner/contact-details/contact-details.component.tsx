@@ -113,27 +113,25 @@ const Address: React.FC<{ patientId: string }> = ({ patientId }) => {
 
 const Contact: React.FC<{ patientUuid: string; deceased?: boolean }> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const { isLoading: isLoadingAttributes, contactAttributes } = usePatientContactAttributes(patientUuid);
 
   const contacts = useMemo(
     () =>
-      patient && contactAttributes
+      contactAttributes
         ? [
-            ...patient?.telecom?.map((contact) => [t(contact.system, contact.system), contact.value]),
             ...contactAttributes?.map((contact) => [
               t(contact.attributeType.display, contact.attributeType.display),
               contact.value,
             ]),
           ]
         : [],
-    [patient, contactAttributes],
+    [contactAttributes],
   );
 
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      {isLoadingPatient || isLoadingAttributes ? (
+      {isLoadingAttributes ? (
         <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
       ) : (
         <ul>

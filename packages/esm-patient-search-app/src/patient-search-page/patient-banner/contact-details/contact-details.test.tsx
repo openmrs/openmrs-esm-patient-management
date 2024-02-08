@@ -34,6 +34,15 @@ const mockPersonAttributes = [
       display: 'Next of Kin Contact Phone Number',
     },
   },
+  {
+    display: 'Phone number',
+    uuid: 'asdflkjhasdf',
+    value: '+0123456789',
+    attributeType: {
+      uuid: 'qweproiuqweproiu',
+      display: 'Phone number',
+    },
+  },
 ];
 
 const mockCohorts = [
