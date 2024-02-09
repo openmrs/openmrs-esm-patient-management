@@ -1,5 +1,5 @@
 import { test } from '../core';
-import { PatientListsPage } from '../pages';
+import { HomePage, PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
   type Cohort,
@@ -68,14 +68,12 @@ test('Create and edit a patient list', async ({ page }) => {
 });
 
 test('Manage patients in a list', async ({ api, page }) => {
+  const patientListPage = new PatientListsPage(page);
   await test.step("When I visit a specific patient list's page", async () => {
-    const patientListPage = new PatientListsPage(page);
     await patientListPage.goto(cohort.uuid);
   });
 
   await test.step('Then I should be able to add and remove patients from that list', async () => {
-    const patientListPage = new PatientListsPage(page);
-
     // Add a patient to the list
     createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);
@@ -91,40 +89,93 @@ test('Manage patients in a list', async ({ api, page }) => {
 });
 
 test('User should return to patient list from the patient chart', async ({ api, page }) => {
-  await test.step("When a user visits a specific patient list's page", async () => {
-    const patientListPage = new PatientListsPage(page);
+  const homePage = new HomePage(page);
+  const patientListPage = new PatientListsPage(page);
+  await test.step("When I visit a specific patient list's page", async () => {
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('And adds a patient to the list', async () => {
-    const patientListPage = new PatientListsPage(page);
+  await test.step('And I add a patient to the list', async () => {
     createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
   });
 
-  await test.step('Then should be able to wind up back to patient list from the patient chart', async () => {
+  await test.step('And I click on the patient link', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
-    await page.getByLabel('Open menu').click();
+  });
+
+  await test.step('Then I should be redirected to the patient chart', async () => {
+    await expect(homePage.page).toHaveURL(
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+    );
+  });
+
+  await test.step('When I click on the `Close` button', async () => {
     await page.getByRole('button', { name: 'Close' }).click();
-    const patientListPage = new PatientListsPage(page);
+  });
+
+  await test.step('Then I should be redirected to the patient list', async () => {
     await expect(page).toHaveURL(/.*patient-lists/);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
 
+  await test.step('When I click on the patient link', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
+  });
+
+  await test.step('Then I should be redirected to the patient chart', async () => {
+    await expect(homePage.page).toHaveURL(
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+    );
+  });
+
+  await test.step('When I click on the `Open menu` button', async () => {
     await page.getByLabel('Open menu').click();
+  });
+
+  await test.step('And I click on the `Visits` link', async () => {
     await page.getByRole('link', { name: 'Visits' }).click();
+  });
+
+  await test.step('And I click on the `Close` button', async () => {
     await page.getByRole('button', { name: 'Close' }).click();
+  });
+
+  await test.step('Then I should be redirected to the patient list', async () => {
     await expect(page).toHaveURL(/.*patient-lists/);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
 
+  await test.step('When I click on the patient link', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
+  });
+
+  await test.step('Then I should be redirected to the patient chart', async () => {
+    await expect(homePage.page).toHaveURL(
+      `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
+    );
+  });
+
+  await test.step('When I click on the `Open menu` button', async () => {
     await page.getByLabel('Open menu').click();
+  });
+
+  await test.step('And I click on the `Visits` link', async () => {
     await page.getByRole('link', { name: 'Visits' }).click();
+  });
+
+  await test.step('And I refesh the page', async () => {
     await page.reload();
+  });
+
+  await test.step('And I click on the `Close` button', async () => {
     await page.getByRole('button', { name: 'Close' }).click();
+  });
+
+  await test.step('Then I should be redirected to the patient list', async () => {
     await expect(page).toHaveURL(/.*patient-lists/);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));

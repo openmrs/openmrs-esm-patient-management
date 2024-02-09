@@ -74,18 +74,12 @@ test('Search patient by full name', async ({ page, api }) => {
       `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
     );
   });
-});
 
-test('User should return to home page from the patient chart', async ({ api, page }) => {
-  await test.step('When a user goes to patient chart using the url', async () => {
-    await page.goto(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
-  });
-
-  await test.step('And clicks on `Close` button', async () => {
+  await test.step('When I click on the `Close` button', async () => {
     await page.getByRole('button', { name: 'Close' }).click();
   });
 
-  await test.step('Then should be able to wind up back to home page from the patient chart', async () => {
+  await test.step('Then I should be redirected to the home page', async () => {
     await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home`);
   });
 });
