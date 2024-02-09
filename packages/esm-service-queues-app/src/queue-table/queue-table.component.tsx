@@ -1,15 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import styles from '../active-visits/active-visits-table.scss';
-import { updateSelectedServiceUuid, useSelectedServiceUuid } from '../helpers/helpers';
 import {
   Button,
   DataTable,
-  Dropdown,
-  Tab,
-  Tabs,
-  TabList,
-  TabPanel,
-  TabPanels,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -19,111 +11,22 @@ import {
   TableRow,
   TableToolbar,
   TableToolbarContent,
+  TableToolbarSearch,
   Tile,
-  Pagination,
 } from '@carbon/react';
-import { ExtensionSlot, isDesktop, useConfig, useLayoutType, usePagination, useSession } from '@openmrs/esm-framework';
-import { type VisitQueueEntry, useUnmappedVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { Add } from '@carbon/react/icons';
+import { ExtensionSlot, useConfig, usePagination } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { type VisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import styles from '../active-visits/active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
-import { useQueues } from '../helpers/useQueues';
-import { TableToolbarSearch } from '@carbon/react';
-import { type AllowedStatus, type QueueServiceInfo } from '../types';
-
-export const QueueTableByStatus: React.FC = () => {
-  const layout = useLayoutType();
-  const currentUser = useSession();
-  const { t } = useTranslation();
-
-  const currentLocationUuid = currentUser?.sessionLocation?.uuid;
-  const { visitQueueEntries: visitQueueEntriesByLocation, isLoading } =
-    useUnmappedVisitQueueEntries(currentLocationUuid);
-  const currentQueueUuid = useSelectedServiceUuid();
-  const { queues } = useQueues();
-  const allQueueAllowedStatuses = useCallback(() => {
-    const allStatusFromAllQueues = queues.flatMap((q) => q.allowedStatuses);
-    const statusByUuid = new Map<string, AllowedStatus>();
-    for (const status of allStatusFromAllQueues) {
-      statusByUuid.set(status.uuid, status);
-    }
-    return [...statusByUuid.values()];
-  }, [queues]);
-
-  const currentQueue = queues.find((q) => q.uuid === currentQueueUuid);
-  const allowedStatuses = currentQueue?.allowedStatuses ?? allQueueAllowedStatuses();
-
-  const [currentStatusUuid, setCurrentStatusUuid] = useState<string>(allowedStatuses?.[0]?.uuid);
-
-  useEffect(() => {
-    if (currentQueue) {
-      const newQueueHasCurrentStatus = currentQueue?.allowedStatuses?.some((s) => s.uuid == currentStatusUuid);
-      if (!newQueueHasCurrentStatus) {
-        setCurrentStatusUuid(currentQueue.allowedStatuses?.[0]?.uuid);
-      }
-    }
-  }, [currentQueue]);
-
-  const currentStatusIndex = Math.max(0, allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid));
-
-  const visitQueueEntriesByLocationAndQueueAndStatus = visitQueueEntriesByLocation
-    ?.filter((entry) => !currentQueueUuid || entry.queueEntry.queue.uuid == currentQueueUuid)
-    ?.filter((entry) => !currentStatusUuid || entry.queueEntry.status.uuid == currentStatusUuid);
-
-  const noStatuses = !allowedStatuses?.length;
-  if (isLoading) {
-    return <>{t('loading', 'Loading....')}</>;
-  } else if (noStatuses) {
-    return <>{t('noStatusConfigured', 'No status configured')}</>;
-  }
-
-  const handleServiceChange = ({ selectedItem }: { selectedItem: QueueServiceInfo }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-  };
-
-  return (
-    <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
-        </div>
-      </div>
-      <div className={styles.filterContainer}>
-        <Dropdown
-          id="serviceFilter"
-          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-          label={currentQueue?.name ?? t('all', 'All')}
-          type="inline"
-          items={[{ display: `${t('all', 'All')}` }, ...queues]}
-          itemToString={(item) => (item ? item.display : '')}
-          onChange={handleServiceChange}
-          size="sm"
-        />
-      </div>
-      <Tabs
-        selectedIndex={currentStatusIndex}
-        onChange={({ selectedIndex }) => setCurrentStatusUuid(allowedStatuses[selectedIndex].uuid)}
-        className={styles.tabs}>
-        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
-          {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
-        </TabList>
-        <TabPanels>
-          {allowedStatuses?.map((s) => (
-            <TabPanel key={s.uuid}>
-              <QueueTable queueEntries={visitQueueEntriesByLocationAndQueueAndStatus} />
-            </TabPanel>
-          ))}
-        </TabPanels>
-      </Tabs>
-    </div>
-  );
-};
 
 interface QueueTableProps {
   queueEntries: VisitQueueEntry[];
 }
 
-function QueueTable({ queueEntries }: QueueTableProps) {
+export function QueueTable({ queueEntries }: QueueTableProps) {
   const { t } = useTranslation();
   const { queueTableColumns } = useConfig<ConfigObject>();
   const [currentPageSize, setPageSize] = useState(10);
