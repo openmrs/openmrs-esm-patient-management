@@ -27,6 +27,7 @@ import { z } from 'zod';
 import { useLocations, useSession, showSnackbar, useLayoutType, useConfig } from '@openmrs/esm-framework';
 import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { saveAppointment, saveRecurringAppointments, useAppointmentService } from './appointments-form.resource';
+import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
@@ -536,6 +537,17 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             )}
           </div>
         </section>
+
+        {getValues('selectedService') && (
+          <section>
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Workload
+                selectedService={watch('selectedService')}
+                appointmentDate={watch('appointmentDateTime').startDate}
+              />
+            </ResponsiveWrapper>
+          </section>
+        )}
 
         {context !== 'creating' ? (
           <section className={styles.formGroup}>
