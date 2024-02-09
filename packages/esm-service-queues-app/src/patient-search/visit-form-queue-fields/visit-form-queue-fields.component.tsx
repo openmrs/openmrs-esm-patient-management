@@ -6,7 +6,7 @@ import { usePriority, useStatus } from '../../active-visits/active-visits-table.
 import styles from './visit-form-queue-fields.scss';
 import { type ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useQueues } from '../../helpers/useQueues';
+import { useQueues } from '../../hooks/useQueues';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();

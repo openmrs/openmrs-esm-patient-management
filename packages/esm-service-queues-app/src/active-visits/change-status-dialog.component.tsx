@@ -19,7 +19,7 @@ import { type MappedQueueEntry } from '../types';
 import { updateQueueEntry, usePriority, useStatus, useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;

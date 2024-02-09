@@ -1,10 +1,10 @@
 import React from 'react';
-import { type VisitQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { Tag } from '@carbon/react';
+import { type QueueEntry } from '../../types';
 
 // TODO: color code the Tag based on priority
-const QueueTablePriorityCell = ({ queueEntry }: { queueEntry: VisitQueueEntry }) => {
-  return <Tag>{queueEntry.queueEntry.priority.display}</Tag>;
+const QueueTablePriorityCell = ({ queueEntry }: { queueEntry: QueueEntry }) => {
+  return <Tag>{queueEntry.priority.display}</Tag>;
 };
 
 export default QueueTablePriorityCell;

@@ -39,7 +39,7 @@ import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;

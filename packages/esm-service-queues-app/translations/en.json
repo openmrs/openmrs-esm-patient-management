@@ -85,6 +85,7 @@
   "idNumber": "ID Number",
   "indication": "Indication",
   "InQueue": "In Queue",
+  "invalidQueue": "Invalid Queue",
   "lastClinicalVisit": "Last clinical visit",
   "lastEncounter": "Last encounter",
   "lastName": "Last name",

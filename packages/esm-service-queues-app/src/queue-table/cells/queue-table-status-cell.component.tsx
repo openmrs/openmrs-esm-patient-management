@@ -1,8 +1,8 @@
 import React from 'react';
-import { type VisitQueueEntry } from '../../active-visits/active-visits-table.resource';
+import { type QueueEntry } from '../../types';
 
-const QueueTableStatusCell = ({ queueEntry }: { queueEntry: VisitQueueEntry }) => {
-  return <>{queueEntry.queueEntry.status.display}</>;
+const QueueTableStatusCell = ({ queueEntry }: { queueEntry: QueueEntry }) => {
+  return <>{queueEntry.status.display}</>;
 };
 
 export default QueueTableStatusCell;

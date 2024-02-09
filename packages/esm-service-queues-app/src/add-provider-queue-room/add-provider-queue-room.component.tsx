@@ -33,7 +33,7 @@ import {
   useSelectedServiceUuid,
 } from '../helpers/helpers';
 import styles from './add-provider-queue-room.scss';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;

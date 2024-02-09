@@ -138,38 +138,6 @@ export const configSchema = {
     _default: '',
     _description: 'Custom label for patient chart button',
   },
-  queueTableColumns: {
-    _type: Type.Array,
-    _description: 'Columns to appear in the queue table.',
-    _elements: {
-      headerI18nKey: {
-        _type: Type.String,
-        _description:
-          'i18n key for the column header name. Must be unique for each column configured to appear in the queue table',
-      },
-      extensionSlotName: {
-        _type: Type.String,
-        _description: 'name of the extension slot for this column',
-      },
-    },
-    _default: [
-      {
-        id: 'name',
-        headerI18nKey: 'name',
-        extensionSlotName: 'queue-table-name-slot',
-      },
-      {
-        id: 'priority',
-        headerI18nKey: 'priority',
-        extensionSlotName: 'queue-table-priority-slot',
-      },
-      {
-        id: 'status',
-        headerI18nKey: 'status',
-        extensionSlotName: 'queue-table-status-slot',
-      },
-    ],
-  },
 };
 
 export interface ConfigObject {
@@ -202,14 +170,8 @@ export interface ConfigObject {
   customPatientChartUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
-  queueTableColumns: Array<QueueTableColumn>;
 }
 
 export interface OutpatientConfig {
   visitTypeResourceUrl: string;
-}
-
-export interface QueueTableColumn {
-  headerI18nKey: string;
-  extensionSlotName: string;
 }
