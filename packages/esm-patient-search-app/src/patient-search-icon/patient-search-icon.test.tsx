@@ -10,7 +10,6 @@ jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   isDesktop: jest.fn(),
   useOnClickOutside: jest.fn(),
-  useConfig: jest.fn().mockReturnValue({ search: { disableTabletSearchOnKeyUp: false } }),
 }));
 
 jest.mock('react-router-dom', () => ({
