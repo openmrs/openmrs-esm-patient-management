@@ -3,12 +3,7 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .searchArea {
-  width: inherit;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.patientSearchInput {
-  border: none;
 }
