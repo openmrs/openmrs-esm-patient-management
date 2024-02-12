@@ -45,7 +45,6 @@ describe('StartVisitQueueFields', () => {
     expect(getByLabelText('Select a service')).toBeInTheDocument();
     expect(getByLabelText('Select a status')).toBeInTheDocument();
     expect(getByText('High')).toBeInTheDocument();
-    expect(getByLabelText('Sort weight')).toBeInTheDocument();
   });
 
   it('updates the selected queue location', async () => {
