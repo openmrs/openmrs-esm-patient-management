@@ -85,6 +85,11 @@ export const configSchema = {
       'Whether to show the Unscheduled Appointments tab. Note that configuring this to true requires a custom unscheduledAppointment endpoint not currently available',
     _default: false,
   },
+  allowAllDayAppointments: {
+    _type: Type.Boolean,
+    _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
+    _default: true,
+  },
 };
 
 export interface ConfigObject {
@@ -104,4 +109,5 @@ export interface ConfigObject {
   customPatientChartUrl: string;
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
+  allowAllDayAppointments: boolean;
 }

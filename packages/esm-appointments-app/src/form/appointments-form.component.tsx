@@ -84,9 +84,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const locations = useLocations();
   const session = useSession();
   const { data: services, isLoading } = useAppointmentService();
-  const { appointmentStatuses, appointmentTypes } = useConfig<ConfigObject>();
+  const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
+  const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
 
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
@@ -396,6 +397,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           <div>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
+                {allowAllDayAppointments && (
+                  <Toggle
+                    id="allDayToggle"
+                    labelB={t('yes', 'Yes')}
+                    labelA={t('no', 'No')}
+                    labelText={t('allDay', 'All day')}
+                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
+                    toggled={isAllDayAppointment}
+                  />
+                )}
                 <ResponsiveWrapper isTablet={isTablet}>
                   <Controller
                     name="appointmentDateTime"
@@ -434,7 +445,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   />
                 </ResponsiveWrapper>
 
-                <TimeAndDuration control={control} isTablet={isTablet} services={services} watch={watch} t={t} />
+                {!isAllDayAppointment && (
+                  <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
+                )}
 
                 <ResponsiveWrapper isTablet={isTablet}>
                   <Controller
@@ -510,6 +523,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
             {!isRecurringAppointment && (
               <div className={styles.inputContainer}>
+                {allowAllDayAppointments && (
+                  <Toggle
+                    id="allDayToggle"
+                    labelB={t('yes', 'Yes')}
+                    labelA={t('no', 'No')}
+                    labelText={t('allDay', 'All day')}
+                    onClick={() => setIsAllDayAppointment(!isAllDayAppointment)}
+                    toggled={isAllDayAppointment}
+                  />
+                )}
                 <ResponsiveWrapper isTablet={isTablet}>
                   <Controller
                     name="appointmentDateTime"
@@ -532,14 +555,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   />
                 </ResponsiveWrapper>
 
-                <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
+                {!isAllDayAppointment && (
+                  <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
+                )}
               </div>
             )}
           </div>
         </section>
 
         {getValues('selectedService') && (
-          <section>
+          <section className={styles.formGroup}>
             <ResponsiveWrapper isTablet={isTablet}>
               <Workload
                 selectedService={watch('selectedService')}
