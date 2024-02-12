@@ -5,7 +5,6 @@ import {
   defineConfigSchema,
   getDefaultsFromConfigSchema,
   navigate,
-  provide,
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';

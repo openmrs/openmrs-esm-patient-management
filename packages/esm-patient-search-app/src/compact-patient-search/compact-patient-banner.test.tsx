@@ -1,61 +1,72 @@
 import React from 'react';
-import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import PatientSearchResults from './compact-patient-banner.component';
-import { useConfig } from '@openmrs/esm-framework';
+import CompactPatientBanner from './compact-patient-banner.component';
+import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
+import { configSchema } from '../config-schema';
 
-const mockedUseConfig = useConfig as jest.Mock;
+defineConfigSchema('@openmrs/esm-patient-search-app', configSchema);
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-}));
-
-describe('Compact Patient Search Results', () => {
-  beforeEach(() => {
-    mockedUseConfig.mockReturnValue({
-      defaultIdentifierTypes: ['identifier-type-1', 'identifier-type-2'],
-      search: {
-        patientResultUrl: '/patient/{{patientUuid}}/chart',
-      },
-    });
-  });
-  const patients = [
-    {
-      uuid: 'patient-1',
-      person: {
-        personName: {
-          givenName: 'John',
-          middleName: 'Doe',
-          familyName: 'Smith',
+const mockedUseConfig = jest.mocked(useConfig);
+const patients: Array<SearchedPatient> = [
+  {
+    attributes: [],
+    identifiers: [
+      {
+        display: 'OpenMRS ID = 1000NLY',
+        uuid: '19e98c23-d26f-4668-8810-00da0e10e326',
+        identifier: '1000NLY',
+        identifierType: {
+          uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
+          display: 'OpenMRS ID',
+          links: [
+            {
+              rel: 'self',
+              uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334',
+              resourceAlias: 'patientidentifiertype',
+            },
+          ],
         },
-        gender: 'M',
-        birthdate: '1990-01-01',
+        location: {
+          uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
+          display: 'Outpatient Clinic',
+        },
       },
-      identifiers: [{ identifier: '123', identifierType: { uuid: 'identifier-type-1' } }],
+    ],
+    person: {
+      age: 34,
+      addresses: [],
+      birthdate: '1990-01-01',
+      dead: false,
+      deathDate: null,
+      gender: 'M',
+      personName: {
+        display: 'John Doe Smith',
+        givenName: 'John',
+        middleName: 'Doe',
+        familyName: 'Smith',
+      },
     },
-  ] as Array<SearchedPatient>;
+    uuid: 'test-patient-uuid',
+  },
+];
 
-  it('should render patient search results', () => {
+describe('CompactPatientBanner', () => {
+  beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+
+  it('renders a compact patient banner', () => {
     render(
       <PatientSearchContext.Provider value={{}}>
-        <PatientSearchResults patients={patients} />
+        <CompactPatientBanner patients={patients} />
       </PatientSearchContext.Provider>,
     );
 
-    expect(screen.getByText('John Doe Smith')).toBeInTheDocument();
-
+    expect(
+      screen.getByRole('link', { name: /John Doe Smith Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link')).toHaveAttribute('href', `/openmrs/spa/patient/${patients[0].uuid}/chart/`);
     expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
   });
-
-  // Fix this test later
-  // const user = userEvent.setup();
-  // it('should call selectPatientAction when a patient is clicked', async () => {
-  //   const selectPatientActionMock = jest.fn();
-  //   render(<PatientSearchResults patients={patients} selectPatientAction={selectPatientActionMock} />);
-
-  //   user.click(screen.getByText('John Doe Smith'));
-  //   expect(selectPatientActionMock).toHaveBeenCalledWith(patients[0]);
-  // });
 });
