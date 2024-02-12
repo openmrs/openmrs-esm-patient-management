@@ -110,13 +110,19 @@
   opacity: 0.8;
   border: 1px solid grey;
 }
-
-.smallDesktop {
+.smallDesktopEmpty {
   height: 100px;
 }
 
-.largeDesktop {
+.largeDesktopEmpty {
   height: 150px;
+}
+.smallDesktop {
+  height: auto;
+}
+
+.largeDesktop {
+  height: auto;
 }
 
 .red {

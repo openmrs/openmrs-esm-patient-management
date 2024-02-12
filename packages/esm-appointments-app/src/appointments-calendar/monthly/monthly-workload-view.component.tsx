@@ -26,44 +26,58 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ type, dateTim
   const serviceAreaOnClick = (serviceName) => {
     navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` });
   };
-
-  return (
-    <div
-      className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
-        [styles.greyBackground]: currentData?.services,
-        [styles.smallDesktop]: layout === 'small-desktop',
-        [styles.largeDesktop]: layout !== 'small-desktop',
-      })}>
-      {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
-        <p>
+  if (!currentData) {
+    return (
+      <div
+        className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
+          [styles.greyBackground]: currentData?.services,
+          [styles.smallDesktopEmpty]: layout === 'small-desktop',
+          [styles.largeDesktopEmpty]: layout !== 'small-desktop',
+        })}>
+        {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
-          {currentData?.services && (
-            <div className={styles.currentData}>
-              {currentData.services.map(({ serviceName, count }, i) => (
+        )}
+      </div>
+    );
+  } else {
+    return (
+      <div
+        className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
+          [styles.greyBackground]: currentData?.services,
+          [styles.smallDesktop]: layout === 'small-desktop',
+          [styles.largeDesktop]: layout !== 'small-desktop',
+        })}>
+        {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
+          <p>
+            <b className={styles.calendarDate}>{dateTime.format('D')}</b>
+            {currentData?.services && (
+              <div className={styles.currentData}>
+                {currentData.services.map(({ serviceName, count }, i) => (
+                  <div
+                    key={`${serviceName}-${count}-${i}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => serviceAreaOnClick(serviceName)}
+                    className={styles.serviceArea}>
+                    <span>{serviceName}</span>
+                    <span>{count}</span>
+                  </div>
+                ))}
                 <div
-                  key={`${serviceName}-${count}-${i}`}
                   role="button"
                   tabIndex={0}
-                  onClick={() => serviceAreaOnClick(serviceName)}
-                  className={styles.serviceArea}>
-                  <span>{serviceName}</span>
-                  <span>{count}</span>
+                  onClick={() => serviceAreaOnClick('Total')}
+                  className={classNames(styles.serviceArea, styles.green)}>
+                  <span>{t('total', 'Total')}</span>
+                  <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
                 </div>
-              ))}
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => serviceAreaOnClick('Total')}
-                className={classNames(styles.serviceArea, styles.green)}>
-                <span>{t('total', 'Total')}</span>
-                <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>
               </div>
-            </div>
-          )}
-        </p>
-      )}
-    </div>
-  );
+            )}
+          </p>
+        )}
+      </div>
+    );
+  }
 };
 
 export default MonthlyWorkloadView;
