@@ -88,7 +88,7 @@ test('Manage patients in a list', async ({ api, page }) => {
   });
 });
 
-test('User should return to patient list from the patient chart', async ({ api, page }) => {
+test('User should return to patient list from the patient chart', async ({ api, page, context }) => {
   const homePage = new HomePage(page);
   const patientListPage = new PatientListsPage(page);
   await test.step("When I visit a specific patient list's page", async () => {
@@ -179,6 +179,42 @@ test('User should return to patient list from the patient chart', async ({ api, 
     await expect(page).toHaveURL(/.*patient-lists/);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+  });
+
+  await test.step('Navigate to the patient list on a new browser tab', async () => {
+    const locator = await page.locator('table tbody tr td:nth-child(1) a');
+    const pagePromise = context.waitForEvent('page');
+
+    await test.step('When I open the patient link in a new tab', async () => {
+      await locator.click({ button: 'middle' });
+    });
+
+    let newPage = await pagePromise;
+    await newPage.bringToFront();
+
+    await test.step('Then I should be redirected to the patient chart', async () => {
+      await expect(newPage).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
+    });
+
+    await test.step('When I click on the `Close` button', async () => {
+      await newPage.getByRole('button', { name: 'Close' }).click();
+    });
+
+    await test.step('Then I should be redirected to the patient list', async () => {
+      await expect(newPage).toHaveURL(/.*patient-lists/);
+      await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+      await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+    });
+
+    await test.step('And I should have two tabs on the patient list', async () => {
+      await expect(newPage).toHaveURL(/.*patient-lists/);
+      await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+      await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+      await page.bringToFront();
+      await expect(page).toHaveURL(/.*patient-lists/);
+      await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
+      await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
+    });
   });
 });
 
