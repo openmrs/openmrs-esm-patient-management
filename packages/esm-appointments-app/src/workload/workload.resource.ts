@@ -37,8 +37,8 @@ export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Arra
   const startDate = dayjs(fromDate).startOf('week').format(omrsDateFormat);
   const endDate = dayjs(startDate).add(2, 'week').format(omrsDateFormat);
   const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
-  const { data, error } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
-  const results = first(data?.data.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
+  const { data } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
+  const results = first(data?.data?.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
   const appointmentCountMap = results?.appointmentCountMap;
   return Object.entries(appointmentCountMap ?? [])
     .map(([key, value]) => ({

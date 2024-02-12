@@ -3,7 +3,7 @@ import { Tabs, Tab, TabPanel, TabPanels, TabList } from '@carbon/react';
 import WorkloadCard from './workload-card.component';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCalendarDistribution } from './workload-resource';
+import { useCalendarDistribution } from './workload.resource';
 import styles from './workload.scss';
 import { useAppointmentService } from '../form/appointments-form.resource';
 
@@ -15,7 +15,7 @@ interface WorkloadProps {
 const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate }) => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
-  const { data: services, isLoading } = useAppointmentService();
+  const { data: services } = useAppointmentService();
   const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
   const calendarWorkload = useCalendarDistribution(serviceUuid, selectedTab === 0 ? 'week' : 'month', appointmentDate);
 

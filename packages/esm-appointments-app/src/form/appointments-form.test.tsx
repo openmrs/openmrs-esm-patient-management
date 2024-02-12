@@ -55,8 +55,12 @@ jest.mock('react-hook-form', () => ({
       _formValues: [],
       _defaultValues: [],
     },
-    getValues: () => {
-      return [];
+    getValues: (str) => {
+      if (str === 'recurringPatternDaysOfWeek') {
+        return [];
+      } else {
+        return null;
+      }
     },
     setValue: () => jest.fn(),
     formState: () => jest.fn(),
