@@ -101,12 +101,14 @@ export function saveRecurringAppointments(
   });
 }
 
+// TODO refactor to use SWR?
 export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
     signal: abortController.signal,
   });
 }
 
+// TODO refactor to use SWR?
 export function getAppointmentService(abortController: AbortController, uuid) {
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,

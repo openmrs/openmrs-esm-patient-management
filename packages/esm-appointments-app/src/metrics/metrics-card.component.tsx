@@ -7,7 +7,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { Tile, Layer } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { basePath, spaBasePath } from '../constants';
+import { basePath, spaHomePage } from '../constants';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
@@ -48,7 +48,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           </div>
           {view && (
             <div className={styles.link}>
-              <ConfigurableLink className={styles.link} to={`${spaBasePath}${basePath}/${metricsLink[view]}`}>
+              <ConfigurableLink className={styles.link} to={`${spaHomePage}${basePath}/${metricsLink[view]}`}>
                 <span style={{ fontSize: '0.825rem', marginRight: '0.325rem' }}>{t('view', 'View')}</span>{' '}
                 <ArrowRight size={16} className={styles.viewListBtn} />
               </ConfigurableLink>

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { navigate } from '@openmrs/esm-framework';
 import DailyWorkloadView from './daily-workload-view.component';
-import { spaBasePath } from '../../constants';
+import { spaHomePage } from '../../constants';
 import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -47,7 +47,7 @@ describe('DailyWorkloadView Component', () => {
     await user.click(screen.getByText('HIV'));
 
     expect(navigate).toHaveBeenCalledWith({
-      to: `${spaBasePath}/appointments/list/Fri, 18 Aug 2023 00:00:00 GMT/HIV`,
+      to: `${spaHomePage}/appointments/list/Fri, 18 Aug 2023 00:00:00 GMT/HIV`,
     });
   });
 

@@ -6,7 +6,7 @@ import { Add, Calendar } from '@carbon/react/icons';
 import { useConfig, navigate } from '@openmrs/esm-framework';
 import PatientSearch from '../patient-search/patient-search.component';
 import { launchOverlay } from '../hooks/useOverlay';
-import { spaBasePath } from '../constants';
+import { spaHomePage } from '../constants';
 
 import styles from './appointments-base-table.scss';
 
@@ -25,7 +25,7 @@ const SeeAllAppointmentsLink = () => {
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   ) : (
-    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaBasePath}` })}>
+    <Button kind="ghost" className={styles.seeAllLink} onClick={() => navigate({ to: `${spaHomePage}` })}>
       {t('seeAllAppointments', 'See all appointments')}
     </Button>
   );
@@ -50,7 +50,7 @@ const AddAppointmentLink = () => {
       kind="ghost"
       renderIcon={(props) => <Add size={16} {...props} />}
       onClick={() => {
-        navigate({ to: `${spaBasePath}/appointments` });
+        navigate({ to: `${spaHomePage}/appointments` });
         launchOverlay(t('search', 'Search'), <PatientSearch />);
       }}>
       {t('addNewAppointment', 'Add ')}
@@ -77,7 +77,7 @@ const ViewCalendarLink = () => {
     <Button
       className={styles.calendarButton}
       kind="ghost"
-      onClick={() => navigate({ to: `${spaBasePath}/calendar` })}
+      onClick={() => navigate({ to: `${spaHomePage}/calendar` })}
       renderIcon={(props) => <Calendar size={16} {...props} />}
       data-floating-menu-primary-focus
       iconDescription={t('viewCalendar', 'View Calendar')}>

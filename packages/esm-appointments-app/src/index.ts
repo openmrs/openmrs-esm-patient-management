@@ -51,7 +51,7 @@ export function startupApp() {
     },
     {
       path: `${window.spaBase}/patient-list/:forDate/:serviceName`,
-      title: ([serviceName]) => `Patient Lists / ${decodeURI(serviceName)}`,
+      title: ([_, serviceName]) => `Patient Lists / ${decodeURI(serviceName)}`,
       parent: `${window.spaBase}`,
     },
   ]);

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
-import { spaBasePath } from '../constants';
+import { spaHomePage } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import styles from './metrics-header.scss';
 import AppointmentsForm from '../form/appointments-form.component';
@@ -34,7 +34,7 @@ const MetricsHeader: React.FC = () => {
         <Button
           kind="tertiary"
           renderIcon={Calendar}
-          onClick={() => navigate({ to: `${spaBasePath}/appointments/calendar` })}>
+          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar` })}>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot

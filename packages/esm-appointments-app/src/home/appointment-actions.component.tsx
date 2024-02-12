@@ -4,7 +4,7 @@ import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { isDesktop, navigate, useConfig } from '@openmrs/esm-framework';
 import type { Appointment } from '../types';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
-import { spaBasePath } from '../constants';
+import { spaHomePage } from '../constants';
 import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } from './common';
 import AppointmentForm from '../form/appointments-form.component';
 import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
@@ -57,7 +57,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
         className={styles.menuItem}
         id="#editAppointment"
         onClick={() => {
-          navigate({ to: `${spaBasePath}` });
+          navigate({ to: `${spaHomePage}` });
           launchOverlay(
             t('editAppointment', 'Edit Appointment'),
             <AppointmentForm
@@ -88,7 +88,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
         className={styles.menuItem}
         id="#createAppointment"
         onClick={() => {
-          navigate({ to: `${spaBasePath}` });
+          navigate({ to: `${spaHomePage}` });
           launchOverlay(t('search', 'Search'), <PatientSearch />);
         }}
         itemText={t('addNewAppointment', 'Add new appointment')}>
@@ -134,7 +134,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
           id="#cancelAppointment"
           disabled={disableActions}
           onClick={() => {
-            navigate({ to: `${spaBasePath}` });
+            navigate({ to: `${spaHomePage}` });
             launchOverlay(
               t('cancelAppointment', 'Cancel Appointment'),
               <CancelAppointment appointment={appointment} />,

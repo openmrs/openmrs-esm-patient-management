@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
-import { spaBasePath } from '../../constants';
+import { spaHomePage } from '../../constants';
 import styles from './monthly-view-workload.scss';
 import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
 
@@ -24,7 +24,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ type, dateTim
   );
 
   const serviceAreaOnClick = (serviceName) => {
-    navigate({ to: `${spaBasePath}/appointments/list/${dateTime}/${serviceName}` });
+    navigate({ to: `${spaHomePage}/appointments/list/${dateTime}/${serviceName}` });
   };
 
   return (

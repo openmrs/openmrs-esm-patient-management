@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Switch } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
-import { spaBasePath } from '../../constants';
+import { spaHomePage } from '../../constants';
 import type { CalendarType } from '../../types';
 import styles from './calendar-header.scss';
 
@@ -21,7 +21,7 @@ interface CalendarHeaderProps {
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({ onChangeView }) => {
   const { t } = useTranslation();
   const backButtonOnClick = () => {
-    navigate({ to: `${spaBasePath}/appointments` });
+    navigate({ to: `${spaHomePage}/appointments` });
   };
 
   return (
