@@ -1,4 +1,5 @@
 import { type FetchResponse, type OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface SearchedPatient {
   uuid: string;
   identifiers: Array<Identifier>;
@@ -7,8 +8,8 @@ export interface SearchedPatient {
     age: number;
     birthdate: string;
     gender: string;
-    death: boolean;
-    deathDate: string;
+    dead: boolean;
+    deathDate: string | null;
     personName: {
       display: string;
       givenName: string;
