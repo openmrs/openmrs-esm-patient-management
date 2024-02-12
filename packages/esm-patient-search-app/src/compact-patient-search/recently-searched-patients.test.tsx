@@ -1,18 +1,18 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import RecentlySearchedPatients from './recently-searched-patients.component';
+import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
-import { type SearchedPatient } from '../types';
-import PatientSearch from './patient-search.component';
 
 const mockedUseConfig = jest.mocked(useConfig);
 
-describe('PatientSearch', () => {
+describe('RecentlySearchedPatients', () => {
   beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a loading state when search results are being fetched', () => {
-    renderPatientSearch({
+    renderRecentlySearchedPatients({
       isLoading: true,
     });
 
@@ -21,7 +21,7 @@ describe('PatientSearch', () => {
   });
 
   it('renders an empty state when there are no matching search results', () => {
-    renderPatientSearch({
+    renderRecentlySearchedPatients({
       isLoading: false,
       data: [],
     });
@@ -40,7 +40,7 @@ describe('PatientSearch', () => {
       },
     };
 
-    renderPatientSearch({
+    renderRecentlySearchedPatients({
       fetchError: error,
       isLoading: false,
     });
@@ -93,7 +93,7 @@ describe('PatientSearch', () => {
       },
     ];
 
-    renderPatientSearch({
+    renderRecentlySearchedPatients({
       currentPage: 0,
       data: mockSearchResults,
       hasMore: false,
@@ -109,10 +109,11 @@ describe('PatientSearch', () => {
     );
     expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });
 });
 
-function renderPatientSearch(otherProps = {}) {
+function renderRecentlySearchedPatients(overrideProps = {}) {
   const mockProps = {
     currentPage: 0,
     data: [],
@@ -121,13 +122,12 @@ function renderPatientSearch(otherProps = {}) {
     isLoading: false,
     loadingNewData: false,
     setPage: jest.fn(),
-    totalResults: 1,
-    query: 'John',
+    totalResults: 0,
   };
 
   return render(
     <PatientSearchContext.Provider value={{}}>
-      <PatientSearch {...mockProps} {...otherProps} />
+      <RecentlySearchedPatients {...mockProps} {...overrideProps} />
     </PatientSearchContext.Provider>,
   );
 }

@@ -42,7 +42,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
 
     if (isLoading) {
       return (
-        <div className={styles.searchResultsContainer}>
+        <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
             <Loader key={index} />
           ))}
