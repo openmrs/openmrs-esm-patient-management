@@ -24,11 +24,11 @@ export const getMonthlyCalendarDistribution = (startDate: Date, appointmentCount
 };
 
 export const useCalendarDistribution = (
-  servieUuid: string,
+  serviceUuid: string,
   distributionType: 'month' | 'week',
   appointmentDate: Date,
 ) => {
-  const appointmentSummary = useAppointmentSummary(new Date(appointmentDate), servieUuid);
+  const appointmentSummary = useAppointmentSummary(new Date(appointmentDate), serviceUuid);
   const monthlyData = getMonthlyCalendarDistribution(new Date(appointmentDate), appointmentSummary) ?? [];
   return distributionType === 'month' ? monthlyData : monthlyData.slice(0, 7);
 };
