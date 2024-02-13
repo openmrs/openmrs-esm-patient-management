@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import RecentlySearchedPatients from './recently-searched-patients.component';
 import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
+import RecentlySearchedPatients from './recently-searched-patients.component';
 
 const mockedUseConfig = jest.mocked(useConfig);
 
@@ -107,7 +107,7 @@ describe('RecentlySearchedPatients', () => {
       'href',
       `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     );
-    expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /John Doe Smith/i })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
     expect(screen.getByText(/1 recent search result/i)).toBeInTheDocument();
   });

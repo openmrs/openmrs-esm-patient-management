@@ -4,13 +4,13 @@ export const configSchema = {
     patientResultUrl: {
       _type: Type.String,
       _default: '${openmrsSpaBase}/patient/${patientUuid}/chart/',
-      _description: 'Where clicking a patient result takes the user. Accepts template parameter ${patientUuid}',
+      _description: 'The URL to navigate to when a patient is selected from the search results.',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
     showRecentlySearchedPatients: {
       _type: Type.Boolean,
       _default: false,
-      _description: 'Whether to show recently searched patients',
+      _description: 'Whether to show recently searched patients by default in the patient search results.',
     },
     disableTabletSearchOnKeyUp: {
       _type: Type.Boolean,
@@ -41,20 +41,26 @@ export const configSchema = {
     _elements: {
       _type: Type.UUID,
     },
-    _description: 'The identifier types to be display on all patient search result page',
+    _description:
+      'A list of identifier types to be displayed in the patient search results as banner tags. If no defaultIdentifierTypes are provided, the defaultIdentifier will be displayed.',
+    // These values correspond to the Patient Clinic Number and National Unique Patient Identifier (NUPI) identifier types respectively
     _default: ['b4d66522-11fc-45c7-83e3-39a1af21ae0d', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
   },
   defaultIdentifier: {
     _type: Type.String,
-    _description: 'Identifier to be shown in the event defaultIdentifierTypes does is empty',
+    _description: 'Identifer type to be displayed when no defaultIdentifierTypes are provided. Default is OpenMRS ID.',
     _default: 'OpenMRS ID',
   },
 };
 
 export type PatientSearchConfig = {
-  search: { patientSearchResult: string; showRecentlySearchedPatients: string; disableTabletSearchOnKeyUp: boolean };
-  includeDead: boolean;
+  search: {
+    disableTabletSearchOnKeyUp: boolean;
+    patientSearchResult: string;
+    showRecentlySearchedPatients: string;
+  };
   contactAttributeType: Array<string>;
-  defaultIdentifierTypes: Array<string>;
   defaultIdentifier: string;
+  defaultIdentifierTypes: Array<string>;
+  includeDead: boolean;
 };

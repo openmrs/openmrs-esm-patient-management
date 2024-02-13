@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { forwardRef, useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
@@ -10,6 +10,10 @@ import styles from './compact-patient-banner.scss';
 interface ClickablePatientContainerProps {
   patient: SearchedPatient;
   children: React.ReactNode;
+}
+
+interface CompactPatientBannerProps {
+  patients: Array<SearchedPatient>;
 }
 
 interface CustomIdentifierProps {
@@ -25,11 +29,7 @@ interface IdentifiersProps {
   identifiers: Array<Identifier>;
 }
 
-interface PatientSearchResultsProps {
-  patients: Array<SearchedPatient>;
-}
-
-const CompactPatientBanner = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(({ patients }, ref) => {
+const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
   const config = useConfig();
   const { t } = useTranslation();
 
@@ -68,7 +68,7 @@ const CompactPatientBanner = React.forwardRef<HTMLDivElement, PatientSearchResul
         birthDate: patient.person.birthdate,
         deceasedDateTime: patient.person.deathDate,
         deceasedBoolean: patient.person.dead,
-        identifier: patient.identifiers as any as Array<FHIRIdentifier>,
+        identifier: patient.identifiers as unknown as Array<FHIRIdentifier>,
         address: preferredAddress
           ? [
               {
@@ -121,9 +121,9 @@ const CompactPatientBanner = React.forwardRef<HTMLDivElement, PatientSearchResul
                 {config.defaultIdentifierTypes.length ? (
                   <>
                     {patientIdentifiers.length > 1 ? (
-                      <Identifiers identifiers={patientIdentifiers} />
+                      <DefaultIdentifiers identifiers={patientIdentifiers} />
                     ) : (
-                      <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
+                      <FallbackIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
                     )}
                   </>
                 ) : (
@@ -187,7 +187,7 @@ const IdentifierTag: React.FC<IdentifierTagProps> = ({ identifier }) => {
   );
 };
 
-const Identifiers: React.FC<IdentifiersProps> = ({ identifiers }) => {
+const DefaultIdentifiers: React.FC<IdentifiersProps> = ({ identifiers }) => {
   return (
     <>
       {identifiers.map((identifier) => (
@@ -197,7 +197,7 @@ const Identifiers: React.FC<IdentifiersProps> = ({ identifiers }) => {
   );
 };
 
-const CustomIdentifier: React.FC<CustomIdentifierProps> = ({ patient, identifierName }) => {
+const FallbackIdentifier: React.FC<CustomIdentifierProps> = ({ patient, identifierName }) => {
   const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
 
   return identifier ? <IdentifierTag identifier={identifier} /> : null;
