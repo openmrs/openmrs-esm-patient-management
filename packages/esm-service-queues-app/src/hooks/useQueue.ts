@@ -4,11 +4,10 @@ import { type QueueServiceInfo } from '../types';
 import { useQueues } from './useQueues';
 
 export function useQueue(queueUuid?: string) {
-  const { queues, isLoading, error } = useQueues();
+  const { queues, ...rest } = useQueues();
 
   return {
     queue: queues.find((q) => q.uuid == queueUuid),
-    isLoading,
-    error,
+    ...rest,
   };
 }

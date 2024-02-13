@@ -1,4 +1,5 @@
 import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
+import type React from 'react';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -422,18 +423,18 @@ export interface WaitTime {
   averageWaitTime: string;
 }
 
+export interface QueueTableCellComponentProps {
+  queueEntry: QueueEntry;
+}
+
 export interface QueueTableColumn {
   headerI18nKey: string;
-  cellComponent: (queueEntry: QueueEntry) => JSX.Element;
+  CellComponent: React.FC<QueueTableCellComponentProps>;
 }
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];
 }
-
-export interface Concept extends OpenmrsResource {}
-export interface Provider extends OpenmrsResource {}
-export interface PatientIdentifierType extends OpenmrsResource {}
 
 export interface Queue {
   uuid: string;
@@ -468,16 +469,13 @@ export interface QueueEntrySearchCriteria {
   status?: Array<string> | string;
 }
 
-export interface PatientIdentifier {
-  uuid: string;
-  display: string;
-  identifier: string;
-  identifierType: PatientIdentifierType;
-  location: Location;
-  preferred: boolean;
-}
+// TODO: The follow types match the types from backend.
+// They should be common enough to move to esm-core
 
-// TODO: Add these types to esm-core
+export interface Concept extends OpenmrsResource {}
+export interface Provider extends OpenmrsResource {}
+export interface PatientIdentifierType extends OpenmrsResource {}
+
 export interface Person {
   uuid: string;
   display: string;
@@ -542,4 +540,12 @@ export interface Patient {
   display: string;
   identifiers: PatientIdentifier[];
   person: Person;
+}
+export interface PatientIdentifier {
+  uuid: string;
+  display: string;
+  identifier: string;
+  identifierType: PatientIdentifierType;
+  location: Location;
+  preferred: boolean;
 }

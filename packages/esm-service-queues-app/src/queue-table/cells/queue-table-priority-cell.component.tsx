@@ -1,9 +1,9 @@
-import React from 'react';
 import { Tag } from '@carbon/react';
-import { type QueueEntry } from '../../types';
+import React from 'react';
+import { type QueueTableCellComponentProps } from '../../types';
 
 // TODO: color code the Tag based on priority
-const QueueTablePriorityCell = ({ queueEntry }: { queueEntry: QueueEntry }) => {
+const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <Tag>{queueEntry.priority.display}</Tag>;
 };
 

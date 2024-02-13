@@ -1,7 +1,7 @@
 import React from 'react';
-import { type QueueEntry } from '../../types';
+import { type QueueTableCellComponentProps } from '../../types';
 
-const QueueTableStatusCell = ({ queueEntry }: { queueEntry: QueueEntry }) => {
+const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <>{queueEntry.status.display}</>;
 };
 

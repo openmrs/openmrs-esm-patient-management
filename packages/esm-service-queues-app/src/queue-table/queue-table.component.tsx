@@ -15,12 +15,10 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, useConfig, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { type VisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from '../active-visits/active-visits-table.scss';
-import { type ConfigObject } from '../config-schema';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 
 interface QueueTableProps {
@@ -37,9 +35,9 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
   const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
-      const row = {};
-      queueTableColumns.forEach((column) => {
-        row[column.headerI18nKey] = column.cellComponent(queueEntry);
+      const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
+      queueTableColumns.forEach(({ headerI18nKey, CellComponent }) => {
+        row[headerI18nKey] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
@@ -60,7 +58,7 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
               />
             </TableToolbarContent>
           </TableToolbar>
-          <Table {...getTableProps()} className={styles.activeVisitsTable}>
+          <Table {...getTableProps()} className={styles.activeVisitsTable} useZebraStyles>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
@@ -93,8 +91,8 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
             </div>
           ) : null}
           <Pagination
-            forwardText="Next page"
-            backwardText="Previous page"
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
             page={currentPage}
             pageSize={currentPageSize}
             pageSizes={pageSizes}

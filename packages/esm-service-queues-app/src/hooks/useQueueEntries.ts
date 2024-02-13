@@ -10,16 +10,10 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria) {
   searchParam.append('v', 'full');
 
   const apiUrl = `/ws/rest/v1/queue-entry?` + searchParam.toString();
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<QueueEntry> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
+  const { data, ...rest } = useSWR<{ data: { results: Array<QueueEntry> } }, Error>(apiUrl, openmrsFetch);
 
   return {
     queueEntries: data?.data?.results,
-    isLoading,
-    error,
-    isValidating,
-    mutate,
+    ...rest,
   };
 }
