@@ -1,9 +1,9 @@
 import React from 'react';
 import { SWRConfig } from 'swr';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import AppointmentsCalendarView from './appointments-calendar/appointments-calendar-view.component';
+import AppointmentsCalendarView from './calendar/appointments-calendar-view.component';
 import Appointments from './appointments.component';
-import CalendarPatientList from './appointments-calendar/patient-list/calendar-patient-list.component';
+import CalendarPatientList from './calendar/patient-list/calendar-patient-list.component';
 
 const swrConfiguration = {
   errorRetryCount: 3,

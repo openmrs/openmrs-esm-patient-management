@@ -1,12 +1,11 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { amPm } from '../../helpers';
-import { AppointmentService } from '../../types';
+import { type AppointmentService } from '../../types';
 
 const appointmentServiceInitialValue: AppointmentService = {
   appointmentServiceId: 0,
   creatorName: '',
   description: '',
-  durationMins: '',
+  durationMins: 0,
   endTime: '',
   initialAppointmentStatus: '',
   location: { uuid: '', display: '' },

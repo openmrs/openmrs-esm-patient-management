@@ -1,0 +1,105 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+$openmrs-background-grey: #ededed;
+
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formWrapper {
+  background-color: $openmrs-background-grey;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formWrapper {
+  background-color: colors.$white;
+}
+
+.formGroup {
+  display: flex;
+  margin-bottom: spacing.$spacing-02;
+  padding: spacing.$spacing-05;
+
+  checkbox {
+    color: colors.$gray-70;
+    @include type.type-style('heading-compact-02');
+    margin-bottom: spacing.$spacing-03;
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formGroup {
+  flex-direction: column;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup {
+  flex-direction: row;
+
+  .heading {
+    flex: 1;
+  }
+
+  div {
+    flex: 3;
+  }
+}
+
+.heading {
+  color: colors.$gray-70;
+  @include type.type-style('heading-compact-02');
+  margin-bottom: spacing.$spacing-03;
+}
+
+.inputContainer {
+  display: flex;
+  flex-flow: row wrap;
+  gap: spacing.$spacing-05;
+  align-items: center;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.loader {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: spacing.$spacing-09;
+  height: 100vh;
+}
+
+.tablet {
+  padding: spacing.$spacing-06 spacing.$spacing-05;
+  background-color: colors.$white;
+}
+
+.desktop {
+  padding: 0;
+}
+
+.weekSelect {
+  max-inline-size: fit-content;
+  padding-top: spacing.$spacing-03;
+}
+
+:global(.cds--select-input):focus {
+  outline: 2.5px solid colors.$red-60;
+}
+
+.errorMessage {
+  @include type.type-style('label-02');
+  color: colors.$red-60;
+  margin-top: 0.5rem;
+}
+
+:global(.cds--number input[type='number']):focus {
+  outline: 2.5px solid colors.$red-60;
+}

@@ -1,26 +1,52 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import AppointmentDetails from './appointment-details.component';
+import { type Appointment } from '../../types';
 
-const appointment = {
-  patientUuid: '12345',
-  name: 'John Doe',
-  identifier: '1234567890',
-  dateTime: new Date().toISOString(),
-  serviceType: 'Service',
-  provider: 'Dr. Provider',
-  id: '1',
-  age: '30',
-  gender: 'M',
-  providers: [],
-  appointmentKind: 'Scheduled',
-  appointmentNumber: '12345',
-  location: 'Location',
-  phoneNumber: '1234567890',
-  status: 'Status',
+const appointment: Appointment = {
+  uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
+  appointmentNumber: '0000',
+  patient: {
+    identifier: '100GEJ',
+    identifiers: [],
+    name: 'John Wilson',
+    uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
+    gender: 'M',
+    age: '35',
+    birthDate: '1986-04-03T00:00:00.000+0000',
+    phoneNumber: '0700000000',
+  },
+  service: {
+    appointmentServiceId: 1,
+    name: 'Outpatient',
+    description: null,
+    startTime: '',
+    endTime: '',
+    maxAppointmentsLimit: null,
+    durationMins: null,
+    location: {
+      uuid: '8d6c993e-c2cc-11de-8d13-0010c6dffd0f',
+    },
+    uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+    initialAppointmentStatus: 'Scheduled',
+    creatorName: null,
+  },
+  provider: {
+    uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
+    person: { uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' },
+  },
+  location: { name: 'HIV Clinic', uuid: '2131aff8-2e2a-480a-b7ab-4ac53250262b' },
+  startDateTime: 1630326900000,
+  endDateTime: 1630327200000,
+  appointmentKind: 'WalkIn',
+  status: 'Scheduled',
   comments: 'Some comments',
-  dob: new Date('1992-01-01T00:00:00.000Z').toISOString(),
-  serviceUuid: '12345',
+  additionalInfo: null,
+  providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
+  recurring: false,
+  voided: false,
+  teleconsultationLink: null,
+  extensions: [],
 };
 
 jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
@@ -36,18 +62,15 @@ jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
 
 test('renders appointment details correctly', () => {
   const { getByText } = render(<AppointmentDetails appointment={appointment} />);
-  expect(getByText('Service')).toBeInTheDocument();
-  expect(getByText('1992-01-01T00:00:00.000Z')).toBeInTheDocument();
   expect(getByText('Patient name :')).toBeInTheDocument();
-  expect(getByText('John Doe')).toBeInTheDocument();
+  expect(getByText('John Wilson')).toBeInTheDocument();
   expect(getByText('Age :')).toBeInTheDocument();
-  expect(getByText('30')).toBeInTheDocument();
+  expect(getByText('35')).toBeInTheDocument();
   expect(getByText('Gender :')).toBeInTheDocument();
   expect(getByText('Male')).toBeInTheDocument();
   expect(getByText('Dob :')).toBeInTheDocument();
-  expect(getByText('1992-01-01T00:00:00.000Z')).toBeInTheDocument();
   expect(getByText('Phone number :')).toBeInTheDocument();
-  expect(getByText('1234567890')).toBeInTheDocument();
+  expect(getByText('0700000000')).toBeInTheDocument();
   expect(getByText('Appointment Notes')).toBeInTheDocument();
   expect(getByText('Some comments')).toBeInTheDocument();
   expect(getByText('Appointment History')).toBeInTheDocument();

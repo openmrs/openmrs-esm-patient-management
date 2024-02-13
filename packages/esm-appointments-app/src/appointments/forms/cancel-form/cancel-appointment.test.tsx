@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
-import { mockMappedAppointmentsData } from '__mocks__';
+import { mockAppointmentsData } from '__mocks__';
 import CancelAppointment from './cancel-appointment.component';
 
 const testProps = {
-  appointment: mockMappedAppointmentsData.data[0],
+  appointment: mockAppointmentsData.data[0],
 };
 
 const mockShowSnackbar = showSnackbar as jest.Mock;

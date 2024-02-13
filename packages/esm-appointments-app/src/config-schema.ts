@@ -1,5 +1,5 @@
 import { Type, validators } from '@openmrs/esm-framework';
-import { spaBasePath } from './constants';
+import { spaHomePage } from './constants';
 
 export const configSchema = {
   concepts: {
@@ -49,7 +49,7 @@ export const configSchema = {
   appointmentsBaseUrl: {
     _type: Type.String,
     _description: 'Configurable alternative URL for the Appointments UI. Eg, the Bahmni Appointments UI URL',
-    _default: `${spaBasePath}`,
+    _default: `${spaHomePage}`,
   },
   hiddenFormFields: {
     _type: Type.Array,
@@ -68,7 +68,7 @@ export const configSchema = {
   },
   customPatientChartUrl: {
     _type: Type.String,
-    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
       Available argument: patientUuid, openmrsSpaBase, openBase
       (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',

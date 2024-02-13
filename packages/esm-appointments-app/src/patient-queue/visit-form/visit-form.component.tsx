@@ -37,7 +37,7 @@ import BaseVisitType from './base-visit-type.component';
 import { type amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
-import { type MappedAppointment } from '../../types';
+import { type Appointment } from '../../types';
 import { useAppointments } from '../../hooks/useAppointments';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
@@ -46,7 +46,7 @@ import { appointmentLocationTagName } from '../../constants';
 
 interface VisitFormProps {
   patientUuid: string;
-  appointment: MappedAppointment;
+  appointment: Appointment;
 }
 
 const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
@@ -187,7 +187,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
             name="patient-header-slot"
             state={{
               patient,
-              patientUuid: appointment.patientUuid,
+              patientUuid: appointment.patient.uuid,
               hideActionsOverflow: true,
             }}
           />
