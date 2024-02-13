@@ -2,7 +2,8 @@ import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
-import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
+import CompactPatientBanner from './compact-patient-banner.component';
+import Loader from './loader.component';
 import type { PatientSearchResponse } from '../types';
 import styles from './patient-search.scss';
 
@@ -43,7 +44,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
       return (
         <div className={styles.searchResultsContainer}>
           {[...Array(5)].map((_, index) => (
-            <SearchResultSkeleton key={index} />
+            <Loader key={index} />
           ))}
         </div>
       );
@@ -79,7 +80,7 @@ const PatientSearch = React.forwardRef<HTMLDivElement, PatientSearchProps>(
                 count: totalResults,
               })}
             </p>
-            <PatientSearchResults patients={searchResults} ref={ref} />
+            <CompactPatientBanner patients={searchResults} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
