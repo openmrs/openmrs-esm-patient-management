@@ -3,7 +3,7 @@ import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { launchOverlay } from '../../hooks/useOverlay';
 import VisitForm from '../../patient-queue/visit-form/visit-form.component';
-import { type MappedAppointment } from '../../types';
+import { type Appointment } from '../../types';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
@@ -12,14 +12,14 @@ dayjs.extend(isToday);
 
 interface CheckInButtonProps {
   patientUuid: string;
-  appointment: MappedAppointment;
+  appointment: Appointment;
 }
 
 const CheckInButton: React.FC<CheckInButtonProps> = ({ appointment, patientUuid }) => {
   const { t } = useTranslation();
   return (
     <>
-      {(dayjs(appointment.dateTime).isAfter(dayjs()) || dayjs(appointment.dateTime).isToday()) && (
+      {(dayjs(appointment.startDateTime).isAfter(dayjs()) || dayjs(appointment.startDateTime).isToday()) && (
         <Button
           size="sm"
           kind="tertiary"

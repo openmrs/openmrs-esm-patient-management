@@ -33,7 +33,7 @@ function getAppointmentDuration(startTime = 0, endTime = 0) {
   return minutes + 'min';
 }
 
-function formatAMPM(date) {
+export const formatAMPM = (date) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
   let ampm = hours >= 12 ? 'PM' : 'AM';
@@ -42,40 +42,9 @@ function formatAMPM(date) {
   minutes = minutes < 10 ? '0' + minutes : minutes;
   const strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
-}
-
-export const mapAppointmentProperties = (appointment: Appointment, t?: Function) => {
-  return {
-    id: appointment?.uuid,
-    name: appointment.patient?.name,
-    age: appointment.patient?.birthDate,
-    gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.phoneNumber,
-    dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
-    patientUuid: appointment.patient?.uuid,
-    dateTime: formatAMPM(parseDate(appointment.startDateTime)),
-    serviceType: appointment.service ? appointment.service.name : '--',
-    serviceColor: appointment.service?.color ? appointment.service.color : '__',
-    serviceUuid: appointment.service ? appointment.service.uuid : null,
-    appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
-    status: appointment.status,
-    provider: appointment.provider ? appointment.provider.person?.display : '--',
-    location: appointment.location ? appointment.location.name : '--',
-    comments: appointment.comments ? appointment.comments : '--',
-    appointmentNumber: appointment.appointmentNumber,
-    color: appointment?.service?.color ?? '',
-    identifier: appointment?.patient?.identifiers?.length
-      ? appointment.patient.identifiers.find(
-          (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
-        ).identifier
-      : appointment.patient?.identifier,
-    duration: appointment.service?.durationMins
-      ? appointment?.service?.durationMins + t('minutes', 'min')
-      : getAppointmentDuration(appointment.startDateTime, appointment.endDateTime),
-    recurring: appointment.recurring,
-  };
 };
 
+// TODO remove?
 export const getAppointment = (appointment: Appointment) => {
   let formattedAppointment = {
     id: appointment.uuid,

@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { MappedAppointment } from '../types';
 
 /**
  * Returns an array of page sizes for the given data and page size.

@@ -1,0 +1,87 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.workLoadCard {
+  display: flex;
+  margin: 0 1rem;
+  color: #525252;
+}
+
+.monthlyWorkLoadCard {
+  color: #525252;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.workLoadContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding-bottom: 1rem;
+}
+
+.cardContainer {
+  background-color: $ui-02;
+  display: flex;
+  height: layout.$spacing-12;
+}
+
+.tileContainer {
+  padding: 0.5rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  cursor: pointer;
+  border: 1px solid colors.$blue-30;
+
+  &:first-child {
+    border-left-width: 1px;
+  }
+
+  & label {
+    color: colors.$gray-70;
+  }
+}
+
+.tileHeader {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: layout.$spacing-05;
+}
+
+.headerLabel {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.totalsLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
+}
+
+.totalsValue {
+  @include type.type-style('heading-04');
+  color: $ui-05;
+}
+
+.headerLabelContainer {
+  display: flex;
+  align-items: center;
+  height: layout.$spacing-07;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.activeWorkloadCard {
+  background-color: colors.$blue-10;
+
+  & label {
+    color: colors.$blue-60;
+  }
+}

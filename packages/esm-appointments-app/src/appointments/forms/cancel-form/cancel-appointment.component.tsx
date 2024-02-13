@@ -6,18 +6,18 @@ import { cancelAppointment } from '../forms.resource';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
-import { type MappedAppointment } from '../../../types';
 import styles from './cancel-appointment.scss';
+import { type Appointment } from '../../../types';
 
 interface CancelAppointmentProps {
-  appointment: MappedAppointment;
+  appointment: Appointment;
 }
 const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) => {
   const { t } = useTranslation();
   const { mutate } = useSWRConfig();
-  const { patient } = usePatient(appointment.patientUuid);
+  const { patient } = usePatient(appointment.patient.uuid);
   const session = useSession();
-  const [selectedLocation, setSelectedLocation] = useState(appointment.location);
+  const [selectedLocation, setSelectedLocation] = useState(appointment.location.uuid);
   const [reason, setReason] = useState('');
   const { currentAppointmentDate } = useAppointmentDate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,7 +30,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    const { status } = await cancelAppointment('Cancelled', appointment.id);
+    const { status } = await cancelAppointment('Cancelled', appointment.uuid);
     if (status === 200) {
       showSnackbar({
         isLowContrast: true,
@@ -58,7 +58,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
           name="patient-header-slot"
           state={{
             patient,
-            patientUuid: appointment.patientUuid,
+            patientUuid: appointment.patient.uuid,
             hideActionsOverflow: true,
           }}
         />
