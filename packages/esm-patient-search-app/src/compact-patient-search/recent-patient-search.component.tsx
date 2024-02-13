@@ -1,9 +1,10 @@
 import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
-import type { PatientSearchResponse, SearchedPatient } from '../types';
+import type { PatientSearchResponse } from '../types';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
-import PatientSearchResults, { SearchResultSkeleton } from './compact-patient-banner.component';
+import Loader from './loader.component';
+import PatientSearchResults from './compact-patient-banner.component';
 import styles from './patient-search.scss';
 
 interface RecentPatientSearchProps extends PatientSearchResponse {}
@@ -41,7 +42,7 @@ const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearch
       return (
         <div className={styles.searchResultsContainer}>
           {[...Array(5)].map((_, index) => (
-            <SearchResultSkeleton key={index} />
+            <Loader key={index} />
           ))}
         </div>
       );

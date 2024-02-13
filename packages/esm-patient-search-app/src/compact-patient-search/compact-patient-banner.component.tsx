@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { SkeletonIcon, SkeletonText, Tag } from '@carbon/react';
+import { Tag } from '@carbon/react';
 import { ConfigurableLink, ExtensionSlot, age, interpolateString, useConfig } from '@openmrs/esm-framework';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
@@ -53,7 +53,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
         gender: patient.person.gender,
         birthDate: patient.person.birthdate,
         deceasedDateTime: patient.person.deathDate,
-        deceasedBoolean: patient.person.death,
+        deceasedBoolean: patient.person.dead,
         identifier: patient.identifiers as any as Array<FHIRIdentifier>,
         address: preferredAddress
           ? [
@@ -95,11 +95,11 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
               <div className={styles.flexRow}>
                 <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]
                   ?.family}`}</h2>
-                {/* <ExtensionSlot
-                    name="patient-banner-tags-slot"
-                    state={{ patient, patientUuid: patient.id }}
-                    className={styles.flexRow}
-                  /> */}
+                <ExtensionSlot
+                  name="patient-banner-tags-slot"
+                  state={{ patient, patientUuid: patient.id }}
+                  className={styles.flexRow}
+                />
               </div>
               <div className={styles.demographics}>
                 {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
@@ -107,7 +107,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                 {config.defaultIdentifierTypes.length ? (
                   <>
                     {patientIdentifiers.length > 1 ? (
-                      <PatientIdentifier identifiers={patientIdentifiers} />
+                      <Identifiers identifiers={patientIdentifiers} />
                     ) : (
                       <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
                     )}
@@ -162,31 +162,7 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
   }
 };
 
-export const SearchResultSkeleton = () => {
-  return (
-    <div className={styles.patientSearchResult} data-testid="search-skeleton">
-      <div className={styles.patientAvatar} role="img">
-        <SkeletonIcon
-          style={{
-            height: '3rem',
-            width: '3rem',
-          }}
-        />
-      </div>
-      <div>
-        <h2>
-          <SkeletonText />
-        </h2>
-        <span className={styles.demographics}>
-          <SkeletonIcon /> <span className={styles.middot}>&middot;</span> <SkeletonIcon />{' '}
-          <span className={styles.middot}>&middot;</span> <SkeletonIcon />
-        </span>
-      </div>
-    </div>
-  );
-};
-
-const PatientIdentifier: React.FC<{ identifiers: Array<Identifier> }> = ({ identifiers }) => {
+const Identifiers: React.FC<{ identifiers: Array<Identifier> }> = ({ identifiers }) => {
   return (
     <>
       {identifiers.map((identifier) => (
