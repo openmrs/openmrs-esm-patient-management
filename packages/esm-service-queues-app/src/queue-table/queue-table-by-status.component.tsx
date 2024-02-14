@@ -3,7 +3,7 @@ import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styles from '../active-visits/active-visits-table.scss';
+import styles from './queue-table.scss';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { type Concept, type Queue, type QueueTableTabConfig } from '../types';
 import { queueTableComingFromColumn } from './cells/queue-table-coming-from-cell.component';
@@ -64,7 +64,6 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   } else if (noStatuses) {
     return (
       <InlineNotification
-        className={styles.inlineNotification}
         kind={'error'}
         lowContrast
         subtitle={t('configureStatus', 'Please configure status to continue.')}
@@ -86,8 +85,7 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
           const newStatusUuid = allowedStatuses[selectedIndex]?.uuid;
           const url = `/queue-table-by-status/${selectedQueue.uuid}` + (newStatusUuid ? '/' + newStatusUuid : '');
           navigate(url);
-        }}
-        className={styles.tabs}>
+        }}>
         <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
           {allStatusTabConfig && <Tab>{t('all', 'All')}</Tab>}

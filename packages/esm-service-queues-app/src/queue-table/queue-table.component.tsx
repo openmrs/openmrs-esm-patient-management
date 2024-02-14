@@ -1,5 +1,4 @@
 import {
-  Button,
   DataTable,
   Pagination,
   Table,
@@ -12,13 +11,11 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import { usePagination } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from '../active-visits/active-visits-table.scss';
+import styles from './queue-table.scss';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 
 interface QueueTableProps {
@@ -58,7 +55,7 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
               />
             </TableToolbarContent>
           </TableToolbar>
-          <Table {...getTableProps()} className={styles.activeVisitsTable} useZebraStyles>
+          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
@@ -83,7 +80,6 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
             pageSize={currentPageSize}
             pageSizes={pageSizes}
             totalItems={queueEntries?.length}
-            className={styles.pagination}
             onChange={({ pageSize, page }) => {
               if (pageSize !== currentPageSize) {
                 setPageSize(pageSize);
