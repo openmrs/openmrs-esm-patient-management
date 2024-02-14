@@ -17,6 +17,32 @@
   color: $ui-05;
 }
 
+.medicationRecord {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .bodyLong01 {
+    margin: 0.25rem 0;
+  }
+}
+
+.medicationContainer {
+  background-color: $ui-01;
+  padding: 1rem;
+  width: 100% !important;
+}
+
+.dosage {
+  @include type.type-style('heading-compact-01');
+}
+
+.metadata {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin: spacing.$spacing-03 0 spacing.$spacing-05;
+}
+
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
   width: 100%;
@@ -49,6 +75,10 @@
 
   tbody tr[data-parent-row]:nth-child(even) td {
     background-color: $ui-01;
+  }
+
+  td {
+    border-bottom: none !important;
   }
 }
 
@@ -92,7 +122,7 @@
   margin: 0 1rem;
 
   :global(.cds--tabs) {
-    max-height: fit-content;
+    max-height: 7rem;
   }
 }
 
@@ -179,11 +209,6 @@
   border-bottom: 1px solid $ui-03;
 }
 
-.testSummaryExtension p {
-  @include type.type-style('body-01');
-  color: #525252;
-}
-
 .actions {
   margin: 0 1rem;
 }
@@ -197,6 +222,58 @@
   :global(.cds--content-switcher__label) {
     height: spacing.$spacing-05;
   }
+}
+
+.notesContainer {
+  margin-bottom: 2rem;
+}
+
+.noteText {
+  background-color: $ui-01;
+  padding: 1rem;
+  width: 100% !important;
+  white-space: pre-wrap;
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
+
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+
+    &:after {
+      content: '';
+      display: block;
+      width: 2rem;
+      padding-top: 3px;
+      border-bottom: 0.375rem solid;
+      @include brand-03(border-bottom-color);
+    }
+  }
+}
+
+.tile {
+  text-align: center;
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.emptyStateContainer {
+  background-color: $ui-02;
+  border: 1px solid $ui-03;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 95vw;
+  padding-bottom: 0;
 }
 
 // Overriding styles for RTL support

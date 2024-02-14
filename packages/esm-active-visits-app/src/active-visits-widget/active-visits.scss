@@ -23,6 +23,15 @@
   background-color: $ui-02;
 }
 
+.activeVisitsTable {
+  tbody tr[data-parent-row] {
+    // Don't show a bottom border on the last row so we don't end up with a double border from the activeVisitContainer
+    &:nth-last-of-type(2) > td {
+      border-bottom: none;
+    }
+  }
+}
+
 .backgroundDataFetchingIndicator {
   align-items: center;
   display: flex;
@@ -62,16 +71,22 @@
   margin: 1rem auto;
 }
 
-.expandedActiveVisitRow > td > div {
-  max-height: max-content !important;
-}
+.expandedActiveVisitRow {
+  td {
+    padding: 0 2rem;
 
-.expandedActiveVisitRow td {
-  padding: 0 2rem;
-}
+    > div {
+      max-height: max-content !important;
+    }
+  }
 
-.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
-  padding: 0 1rem;
+  th[colspan] td[colspan] > div:first-child {
+    padding: 0 1rem;
+  }
+
+  &:last-of-type th[colspan]:last-child {
+    border-bottom: none;
+  }
 }
 
 .action {

@@ -1,4 +1,4 @@
-import { openmrsFetch, type Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, type OpenmrsResource, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export interface Encounter {
@@ -72,7 +72,10 @@ export interface Observation {
 export interface Order {
   uuid: string;
   dateActivated: string;
+  dateStopped?: Date | null;
   dose: number;
+  dosingInstructions: string | null;
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   doseUnits: {
     uuid: string;
     display: string;
@@ -81,6 +84,7 @@ export interface Order {
     uuid: string;
     name: string;
     strength: string;
+    display: string;
   };
   duration: number;
   durationUnits: {
@@ -92,6 +96,9 @@ export interface Order {
     display: string;
   };
   numRefills: number;
+  orderNumber: string;
+  orderReason: string | null;
+  orderReasonNonCoded: string | null;
   orderer: {
     uuid: string;
     person: {
@@ -107,6 +114,8 @@ export interface Order {
     uuid: string;
     display: string;
   };
+  quantity: number;
+  quantityUnits: OpenmrsResource;
 }
 
 export interface Note {
