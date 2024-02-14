@@ -76,20 +76,6 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
               ))}
             </TableBody>
           </Table>
-          {rows.length === 0 ? (
-            <div className={styles.tileContainer}>
-              <Tile className={styles.tile}>
-                <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
-                  <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                </div>
-                <p className={styles.separator}>{t('or', 'or')}</p>
-                <Button kind="ghost" size="sm" renderIcon={(props) => <Add size={16} {...props} />} onClick={() => {}}>
-                  {t('addPatientToList', 'Add patient to list')}
-                </Button>
-              </Tile>
-            </div>
-          ) : null}
           <Pagination
             forwardText={t('nextPage', 'Next page')}
             backwardText={t('previousPage', 'Previous page')}

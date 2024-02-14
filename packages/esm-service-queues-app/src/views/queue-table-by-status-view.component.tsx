@@ -6,7 +6,7 @@ import { useQueue } from '../hooks/useQueue';
 import { QueueTableByStatus } from '../queue-table/queue-table-by-status.component';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
 
-export const QueueTableByStatusPage: React.FC = () => {
+export const QueueTableByStatusView: React.FC = () => {
   const { queueUuid, statusUuid } = useParams();
   const { queue, isLoading } = useQueue(queueUuid);
   const status = queue?.allowedStatuses.find((s) => s.uuid == statusUuid);
