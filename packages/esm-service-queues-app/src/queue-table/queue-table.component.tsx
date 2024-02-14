@@ -40,7 +40,7 @@ function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps) {
     }) ?? [];
 
   return (
-    <DataTable rows={rowsData} headers={headers}>
+    <DataTable rows={rowsData} headers={headers} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
         <TableContainer className={styles.tableContainer}>
           <TableToolbar {...getToolbarProps()}>
