@@ -6,7 +6,7 @@ import { useRecentlyViewedPatients, useInfinitePatientSearch, useRESTPatients } 
 import { PatientSearchContext } from '../patient-search-context';
 import PatientSearch from './patient-search.component';
 import PatientSearchBar from '../patient-search-bar/patient-search-bar.component';
-import RecentPatientSearch from './recent-patient-search.component';
+import RecentlySearchedPatients from './recently-searched-patients.component';
 import styles from './compact-patient-search.scss';
 
 interface CompactPatientSearchProps {
@@ -138,7 +138,7 @@ const CompactPatientSearchComponent: React.FC<CompactPatientSearchProps> = ({
 
         {!isSearchPage && !hasSearchTerm && showRecentlySearchedPatients && (
           <div className={styles.floatingSearchResultsContainer} data-testid="floatingSearchResultsContainer">
-            <RecentPatientSearch ref={bannerContainerRef} {...recentPatientSearchResponse} />
+            <RecentlySearchedPatients ref={bannerContainerRef} {...recentPatientSearchResponse} />
           </div>
         )}
       </div>

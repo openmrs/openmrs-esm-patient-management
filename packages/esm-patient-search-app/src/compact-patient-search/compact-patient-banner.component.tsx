@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { forwardRef, useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
@@ -11,11 +11,25 @@ interface ClickablePatientContainerProps {
   patient: SearchedPatient;
   children: React.ReactNode;
 }
-interface PatientSearchResultsProps {
+
+interface CompactPatientBannerProps {
   patients: Array<SearchedPatient>;
 }
 
-const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResultsProps>(({ patients }, ref) => {
+interface CustomIdentifierProps {
+  patient: SearchedPatient;
+  identifierName: string;
+}
+
+interface IdentifierTagProps {
+  identifier: Identifier;
+}
+
+interface IdentifiersProps {
+  identifiers: Array<Identifier>;
+}
+
+const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProps>(({ patients }, ref) => {
   const config = useConfig();
   const { t } = useTranslation();
 
@@ -54,7 +68,7 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
         birthDate: patient.person.birthdate,
         deceasedDateTime: patient.person.deathDate,
         deceasedBoolean: patient.person.dead,
-        identifier: patient.identifiers as any as Array<FHIRIdentifier>,
+        identifier: patient.identifiers as unknown as Array<FHIRIdentifier>,
         address: preferredAddress
           ? [
               {
@@ -107,9 +121,9 @@ const PatientSearchResults = React.forwardRef<HTMLDivElement, PatientSearchResul
                 {config.defaultIdentifierTypes.length ? (
                   <>
                     {patientIdentifiers.length > 1 ? (
-                      <Identifiers identifiers={patientIdentifiers} />
+                      <DefaultIdentifiers identifiers={patientIdentifiers} />
                     ) : (
-                      <CustomIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
+                      <FallbackIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
                     )}
                   </>
                 ) : (
@@ -162,35 +176,31 @@ const ClickablePatientContainer = ({ patient, children }: ClickablePatientContai
   }
 };
 
-const Identifiers: React.FC<{ identifiers: Array<Identifier> }> = ({ identifiers }) => {
+const IdentifierTag: React.FC<IdentifierTagProps> = ({ identifier }) => {
+  return (
+    <>
+      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
+        {identifier.identifierType.display}
+      </Tag>
+      <span className={styles.configuredLabel}>{identifier.identifier}</span>
+    </>
+  );
+};
+
+const DefaultIdentifiers: React.FC<IdentifiersProps> = ({ identifiers }) => {
   return (
     <>
       {identifiers.map((identifier) => (
-        <>
-          <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.identifierType.display}>
-            {identifier.identifierType.display}
-          </Tag>
-          <span className={styles.configuredLabel}>{identifier.identifier}</span>
-        </>
+        <IdentifierTag identifier={identifier} />
       ))}
     </>
   );
 };
 
-const CustomIdentifier: React.FC<{ patient: SearchedPatient; identifierName: string }> = ({
-  patient,
-  identifierName,
-}) => {
+const FallbackIdentifier: React.FC<CustomIdentifierProps> = ({ patient, identifierName }) => {
   const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
 
-  return identifier ? (
-    <>
-      <Tag size="sm" className={styles.configuredTag} type="warm-gray" title={identifier.display}>
-        {identifier.identifierType.display}
-      </Tag>
-      <span className={styles.configuredLabel}>{identifier.identifier}</span>
-    </>
-  ) : null;
+  return identifier ? <IdentifierTag identifier={identifier} /> : null;
 };
 
-export default PatientSearchResults;
+export default CompactPatientBanner;

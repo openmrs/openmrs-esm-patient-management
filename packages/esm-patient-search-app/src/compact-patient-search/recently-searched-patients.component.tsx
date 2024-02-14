@@ -2,14 +2,14 @@ import React, { useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Loading, Tile } from '@carbon/react';
 import type { PatientSearchResponse } from '../types';
+import CompactPatientBanner from './compact-patient-banner.component';
 import EmptyDataIllustration from '../ui-components/empty-data-illustration.component';
 import Loader from './loader.component';
-import PatientSearchResults from './compact-patient-banner.component';
 import styles from './patient-search.scss';
 
 interface RecentPatientSearchProps extends PatientSearchResponse {}
 
-const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
+const RecentlySearchedPatients = React.forwardRef<HTMLDivElement, RecentPatientSearchProps>(
   ({ isLoading, data: searchResults, fetchError, loadingNewData, setPage, hasMore }, ref) => {
     const { t } = useTranslation();
     const observer = useRef(null);
@@ -40,7 +40,7 @@ const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearch
 
     if (isLoading) {
       return (
-        <div className={styles.searchResultsContainer}>
+        <div className={styles.searchResultsContainer} role="progressbar">
           {[...Array(5)].map((_, index) => (
             <Loader key={index} />
           ))}
@@ -78,7 +78,7 @@ const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearch
                 count: searchResults.length,
               })}
             </p>
-            <PatientSearchResults patients={searchResults} ref={ref} />
+            <CompactPatientBanner patients={searchResults} ref={ref} />
             {hasMore && (
               <div className={styles.loadingIcon} ref={loadingIconRef}>
                 <Loading withOverlay={false} small />
@@ -111,4 +111,4 @@ const RecentPatientSearch = React.forwardRef<HTMLDivElement, RecentPatientSearch
   },
 );
 
-export default RecentPatientSearch;
+export default RecentlySearchedPatients;

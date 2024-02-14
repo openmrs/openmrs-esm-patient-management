@@ -8,8 +8,8 @@ import {
   useConfig,
   useSession,
 } from '@openmrs/esm-framework';
-import CompactPatientSearchComponent from './compact-patient-search.component';
 import { configSchema } from '../config-schema';
+import CompactPatientSearchComponent from './compact-patient-search.component';
 
 defineConfigSchema('@openmrs/esm-patient-search-app', configSchema);
 
