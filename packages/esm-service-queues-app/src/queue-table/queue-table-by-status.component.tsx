@@ -1,59 +1,54 @@
 import { InlineNotification, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styles from '../active-visits/active-visits-table.scss';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import { type Concept, type Queue, type QueueTableColumn, type QueueTableTabConfig } from '../types';
-import QueueTableNameCell from './cells/queue-table-name-cell.component';
+import { type Concept, type Queue, type QueueTableTabConfig } from '../types';
+import { queueTableComingFromColumn } from './cells/queue-table-coming-from-cell.component';
+import { queueTableNameColumn } from './cells/queue-table-name-cell.component';
+import { queueTablePriorityColumn } from './cells/queue-table-priority-cell.component';
+import { queueTableStatusColumn } from './cells/queue-table-status-cell.component';
+import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
+import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
 import { QueueTable } from './queue-table.component';
-import QueueTableStatusCell from './cells/queue-table-status-cell.component';
-import QueueTablePriorityCell from './cells/queue-table-priority-cell.component';
-import { useNavigate } from 'react-router-dom';
-import { SkeletonPlaceholder } from '@carbon/react';
 
 interface QueueTableByStatusProps {
-  queue: Queue; // the selected queue
-  status: Concept; // the selected status
+  selectedQueue: Queue; // the selected queue
+  selectedStatus: Concept; // the selected status
 
   // Table configuration for each status, keyed by status uuid
   // If not provided, defaults to defaultQueueTableConfig
   configByStatus?: Map<string, QueueTableTabConfig>;
 
-  configForAllTab?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
+  allStatusTabConfig?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
 }
 
 const defaultQueueTableConfig: QueueTableTabConfig = {
   columns: [
-    {
-      headerI18nKey: 'name',
-      CellComponent: QueueTableNameCell,
-    },
-    {
-      headerI18nKey: 'priority',
-      CellComponent: QueueTablePriorityCell,
-    },
-    {
-      headerI18nKey: 'status',
-      CellComponent: QueueTableStatusCell,
-    },
+    queueTableNameColumn,
+    queueTableComingFromColumn,
+    queueTablePriorityColumn,
+    queueTableStatusColumn,
+    queueTableWaitTimeColumn,
   ],
 };
 
 export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
-  queue,
-  status,
+  selectedQueue,
+  selectedStatus,
   configByStatus,
-  configForAllTab,
+  allStatusTabConfig,
 }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { queueEntries, isLoading } = useQueueEntries({ queue: queue.uuid });
-  const allowedStatuses = queue.allowedStatuses;
+  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid });
+  const allowedStatuses = selectedQueue.allowedStatuses;
 
-  const currentStatusUuid = status?.uuid;
+  const currentStatusUuid = selectedStatus?.uuid;
 
   const currentStatusIndex = Math.max(0, allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid));
 
@@ -65,7 +60,7 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
 
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
-    return <SkeletonPlaceholder />;
+    return <QueueTableByStatusSkeleton />;
   } else if (noStatuses) {
     return (
       <InlineNotification
@@ -82,20 +77,20 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
     <div className={styles.container}>
       <div className={styles.headerContainer}>
         <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h3>{queue.display}</h3>
+          <h3>{selectedQueue.display}</h3>
         </div>
       </div>
       <Tabs
         selectedIndex={currentStatusIndex}
         onChange={({ selectedIndex }) => {
           const newStatusUuid = allowedStatuses[selectedIndex]?.uuid;
-          const url = `/queue-table-by-status/${queue.uuid}` + (newStatusUuid ? '/' + newStatusUuid : '');
+          const url = `/queue-table-by-status/${selectedQueue.uuid}` + (newStatusUuid ? '/' + newStatusUuid : '');
           navigate(url);
         }}
         className={styles.tabs}>
         <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
-          {configForAllTab && <Tab>{t('all', 'All')}</Tab>}
+          {allStatusTabConfig && <Tab>{t('all', 'All')}</Tab>}
         </TabList>
         <TabPanels>
           {allowedStatuses?.map((s) => (
@@ -103,9 +98,9 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
               <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={tableConfig.columns} />
             </TabPanel>
           ))}
-          {configForAllTab && (
+          {allStatusTabConfig && (
             <TabPanel>
-              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={configForAllTab.columns} />
+              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={allStatusTabConfig.columns} />
             </TabPanel>
           )}
         </TabPanels>

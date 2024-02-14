@@ -428,12 +428,13 @@ export interface QueueTableCellComponentProps {
 }
 
 export interface QueueTableColumn {
-  headerI18nKey: string;
+  headerI18nKey: string; // i18n key for the column header. Must be unique for each column in the queue table
   CellComponent: React.FC<QueueTableCellComponentProps>;
 }
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];
+  tabNameI18nKey?: string;
 }
 
 export interface Queue {

@@ -18,7 +18,7 @@ import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { saveQueueRoom } from './queue-room.resource';
 import styles from './queue-room-form.scss';
-import { useQueues } from '../hooks/useQueues';
+import { useQueues } from '../helpers/useQueues';
 
 interface QueueRoomFormProps {
   toggleSearchType: (searchMode: SearchTypes) => void;

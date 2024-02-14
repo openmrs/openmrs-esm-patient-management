@@ -22,7 +22,7 @@ import {
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useQueues } from '../hooks/useQueues';
+import { useQueues } from '../helpers/useQueues';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;

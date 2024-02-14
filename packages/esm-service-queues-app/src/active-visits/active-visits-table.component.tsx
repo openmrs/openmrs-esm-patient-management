@@ -63,7 +63,7 @@ import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
-import { useQueues } from '../hooks/useQueues';
+import { useQueues } from '../helpers/useQueues';
 
 /**
  * FIXME Temporarily moved here

@@ -15,7 +15,7 @@ import { useServiceMetricsCount } from './queue-metrics.resource';
 import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import styles from './clinic-metrics.scss';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useQueues } from '../hooks/useQueues';
+import { useQueues } from '../helpers/useQueues';
 
 export interface Service {
   uuid: string;

@@ -2,6 +2,8 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { type Queue } from '../types';
 
+// TODO: make a utility function in esm-core for unpacking the result
+// from useSWR
 export function useQueues(locationUuid?: string) {
   const customRepresentation =
     'custom:(uuid,display,name,description,allowedPriorities:(uuid,display),allowedStatuses:(uuid,display))';
