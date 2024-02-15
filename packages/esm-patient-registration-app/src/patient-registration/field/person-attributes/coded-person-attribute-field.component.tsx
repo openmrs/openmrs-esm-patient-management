@@ -77,7 +77,9 @@ export function CodedPersonAttributeField({
     }
     return isLoadingConceptAnswers || !conceptAnswers
       ? []
-      : conceptAnswers.map((answer) => ({ ...answer, label: answer.display }));
+      : conceptAnswers
+          .map((answer) => ({ ...answer, label: answer.display }))
+          .sort((a, b) => a.label.localeCompare(b.label));
   }, [customConceptAnswers, conceptAnswers, isLoadingConceptAnswers]);
 
   if (error) {
