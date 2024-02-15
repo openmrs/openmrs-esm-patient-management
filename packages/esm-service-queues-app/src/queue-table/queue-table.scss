@@ -1,0 +1,126 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.container {
+  background-color: $ui-01;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: $ui-background;
+}
+
+.search {
+  max-width: 16rem;
+  display: inline;
+
+  input {
+    background-color: $ui-02 !important;
+  }
+}
+
+.tableContainer {
+  background-color: $ui-01;
+  margin: 0 spacing.$spacing-05;
+  padding: 0;
+
+  a {
+    text-decoration: none;
+  }
+
+  th {
+    color: $text-02;
+  }
+
+  :global(.cds--data-table) {
+    background-color: $ui-03;
+  }
+
+  .toolbarContent {
+    display: flex;
+    align-items: baseline;
+    height: spacing.$spacing-07;
+    margin-bottom: spacing.$spacing-02;
+  }
+
+  :global(.cds--table-toolbar) {
+    position: static;
+    height: 3rem;
+    overflow: visible;
+  }
+}
+
+.tableToolbaer {
+}
+
+.queueTable tr:last-of-type {
+  td {
+    border-bottom: none;
+  }
+}
+
+.desktopHeading {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
+
+  h4:after {
+    content: '';
+    display: block;
+    width: 2rem;
+    padding-top: 3px;
+    border-bottom: 0.375rem solid var(--brand-03);
+  }
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .headerContainer {
+    svg {
+      margin-left: 0;
+      margin-right: spacing.$spacing-03;
+    }
+    h4 {
+      text-align: right;
+    }
+  }
+  .tableContainer {
+    th > div {
+      text-align: right;
+    }
+    td {
+      text-align: right;
+      .serviceColor {
+        margin-right: 0;
+        margin-left: spacing.$spacing-03;
+      }
+      button {
+        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        text-align: right;
+      }
+    }
+  }
+}
+
+.tabList {
+  padding-left: spacing.$spacing-05;
+}

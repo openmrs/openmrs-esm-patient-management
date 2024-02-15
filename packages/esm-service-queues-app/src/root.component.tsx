@@ -5,6 +5,7 @@ import AppointmentsTable from './queue-patient-linelists/scheduled-appointments-
 import Home from './home.component';
 import ServicesTable from './queue-patient-linelists/queue-services-table.component';
 import QueueScreen from './queue-screen/queue-screen.component';
+import QueueTableByStatusView from './views/queue-table-by-status-view.component';
 
 const swrConfiguration = {
   // Maximum number of retries when the backend returns an error
@@ -20,6 +21,8 @@ const Root: React.FC = () => {
         <BrowserRouter basename={serviceQueuesBasename}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/queue-table-by-status/:queueUuid" element={<QueueTableByStatusView />} />
+            <Route path="/queue-table-by-status/:queueUuid/:statusUuid" element={<QueueTableByStatusView />} />
             <Route path="/screen" element={<QueueScreen />} />
             <Route path="/appointments-list/:value/" element={<AppointmentsTable />} />
             <Route path="/queue-list/:service/:serviceUuid/:locationUuid" element={<ServicesTable />} />

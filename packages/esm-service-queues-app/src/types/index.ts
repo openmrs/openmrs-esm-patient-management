@@ -1,4 +1,5 @@
-import { type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
+import type React from 'react';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -10,28 +11,11 @@ export enum SearchTypes {
   QUEUE_ROOM_FORM = 'queue_room_form',
 }
 
-export interface Patient {
-  uuid: string;
-  display: string;
-  identifiers: Array<any>;
-  person: Person;
-}
-
 export interface Attribute {
   attributeType: OpenmrsResource;
   display: string;
   uuid: string;
   value: string | number;
-}
-
-export interface Person {
-  age: number;
-  attributes: Array<Attribute>;
-  birthDate: string;
-  gender: string;
-  display: string;
-  preferredAddress: OpenmrsResource;
-  uuid: string;
 }
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
@@ -294,6 +278,7 @@ export interface QueueEntryPayload {
 export type AllowedPriority = OpenmrsResource;
 export type AllowedStatus = OpenmrsResource;
 
+// TODO: remove this in favor of Queue
 export interface QueueServiceInfo {
   uuid: string;
   display: string;
@@ -436,4 +421,132 @@ export interface ProvidersQueueRoom {
 export interface WaitTime {
   metric: string;
   averageWaitTime: string;
+}
+
+export interface QueueTableCellComponentProps {
+  queueEntry: QueueEntry;
+}
+
+export interface QueueTableColumn {
+  headerI18nKey: string; // i18n key for the column header. Must be unique for each column in the queue table
+  CellComponent: React.FC<QueueTableCellComponentProps>;
+}
+
+export interface QueueTableTabConfig {
+  columns: QueueTableColumn[];
+  tabNameI18nKey?: string;
+}
+
+export interface Queue {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  allowedPriorities: Array<Concept>;
+  allowedStatuses: Array<Concept>;
+}
+
+export interface QueueEntry {
+  uuid: string;
+  display: string;
+  endedAt: null;
+  locationWaitingFor: Location;
+  patient: Patient;
+  priority: Concept;
+  priorityComment: string | null;
+  providerWaitingFor: Provider;
+  queue: Queue;
+  startedAt: string;
+  status: Concept;
+  visit: Visit;
+  sortWeight: number;
+  queueComingFrom: Queue;
+}
+
+export interface QueueEntrySearchCriteria {
+  queue?: Array<string> | string;
+  location?: Array<string> | string;
+  service?: Array<string> | string;
+  status?: Array<string> | string;
+}
+
+// TODO: The follow types match the types from backend.
+// They should be common enough to move to esm-core
+
+export interface Concept extends OpenmrsResource {}
+export interface Provider extends OpenmrsResource {}
+export interface PatientIdentifierType extends OpenmrsResource {}
+
+export interface Person {
+  uuid: string;
+  display: string;
+  gender: string;
+  age: number;
+  birthdate: string;
+  birthdateEstimated: boolean;
+  dead: boolean;
+  deathDate: string;
+  causeOfDeath: Concept;
+  preferredName: PersonName;
+  preferredAddress: PersonAddress;
+  names: Array<PersonName>;
+  addresses: Array<PersonAddress>;
+  attributes: Array<Attribute>;
+  birthtime: string;
+  deathdateEstimated: boolean;
+  causeOfDeathNonCoded: string;
+}
+
+export interface PersonName {
+  uuid: string;
+  display: string;
+  givenName: string;
+  middleName: string;
+  familyName: string;
+  familyName2: string;
+}
+
+export interface PersonAddress {
+  uuid: string;
+  display: string;
+  preferred: true;
+  cityVillage: string;
+  stateProvince: string;
+  country: string;
+  postalCode: string;
+  countyDistrict: string;
+  startDate: string;
+  endDate: string;
+  latitude: string;
+  longitude: string;
+  address1: string;
+  address2: string;
+  address3: string;
+  address4: string;
+  address5: string;
+  address6: string;
+  address7: string;
+  address8: string;
+  address9: string;
+  address10: string;
+  address11: string;
+  address12: string;
+  address13: string;
+  address14: string;
+  address15: string;
+}
+
+export interface Patient {
+  uuid: string;
+  display: string;
+  identifiers: PatientIdentifier[];
+  person: Person;
+}
+export interface PatientIdentifier {
+  uuid: string;
+  display: string;
+  identifier: string;
+  identifierType: PatientIdentifierType;
+  location: Location;
+  preferred: boolean;
 }
