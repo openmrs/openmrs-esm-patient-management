@@ -1,0 +1,28 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+
+.container {
+  margin: 1rem;
+}
+
+.header {
+  margin-bottom: 1rem;
+  & > h2 {
+    @include type.type-style('heading-02');
+    color: colors.$gray-100;
+  }
+}
+
+.tableContainer {
+  :global(.cds--table-toolbar) {
+    position: relative;
+    height: 3rem;
+    min-height: 0rem;
+    overflow: visible;
+    top: 0;
+  }
+
+  &:global(.cds--data-table-container) {
+    padding-top: 0rem;
+  }
+}
