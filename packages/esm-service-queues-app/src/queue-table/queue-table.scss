@@ -46,6 +46,15 @@
     height: spacing.$spacing-07;
     margin-bottom: spacing.$spacing-02;
   }
+
+  :global(.cds--table-toolbar) {
+    position: static;
+    height: 3rem;
+    overflow: visible;
+  }
+}
+
+.tableToolbaer {
 }
 
 .queueTable tr:last-of-type {

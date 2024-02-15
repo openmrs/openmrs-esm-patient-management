@@ -1,7 +1,7 @@
 import React from 'react';
 import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
 
-const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+export const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <>{queueEntry.queueComingFrom?.display}</>;
 };
 

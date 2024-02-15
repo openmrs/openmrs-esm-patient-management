@@ -5,8 +5,7 @@ import AppointmentsTable from './queue-patient-linelists/scheduled-appointments-
 import Home from './home.component';
 import ServicesTable from './queue-patient-linelists/queue-services-table.component';
 import QueueScreen from './queue-screen/queue-screen.component';
-import { QueueTableByStatus } from './queue-table/queue-table-by-status.component';
-import { QueueTableByStatusView } from './views/queue-table-by-status-view.component';
+import QueueTableByStatusView from './views/queue-table-by-status-view.component';
 
 const swrConfiguration = {
   // Maximum number of retries when the backend returns an error

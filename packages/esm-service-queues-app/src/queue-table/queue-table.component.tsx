@@ -23,7 +23,7 @@ interface QueueTableProps {
   queueTableColumns: QueueTableColumn[];
 }
 
-export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps) {
+function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
@@ -43,9 +43,7 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
     <DataTable rows={rowsData} headers={headers}>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
         <TableContainer className={styles.tableContainer}>
-          <TableToolbar
-            {...getToolbarProps()}
-            style={{ position: 'static', height: '3rem', overflow: 'visible', backgroundColor: 'color' }}>
+          <TableToolbar {...getToolbarProps()}>
             <TableToolbarContent className={styles.toolbarContent}>
               <TableToolbarSearch
                 className={styles.search}
@@ -94,3 +92,5 @@ export function QueueTable({ queueEntries, queueTableColumns }: QueueTableProps)
     </DataTable>
   );
 }
+
+export default QueueTable;

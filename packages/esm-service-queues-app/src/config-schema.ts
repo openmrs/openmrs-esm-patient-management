@@ -160,7 +160,6 @@ export interface ConfigObject {
     historicalObsConceptUuid: Array<string>;
   };
   contactAttributeType: Array<string>;
-  visitQueueNumberAttributeUuid: string;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
   showQueueTableTab: boolean;

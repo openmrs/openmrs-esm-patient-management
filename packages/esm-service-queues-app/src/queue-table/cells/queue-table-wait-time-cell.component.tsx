@@ -3,7 +3,7 @@ import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { t } = useTranslation();
   const [currentTime, setCurrentTime] = useState(dayjs());
 

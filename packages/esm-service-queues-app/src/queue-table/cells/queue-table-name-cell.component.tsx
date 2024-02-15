@@ -3,7 +3,7 @@ import React from 'react';
 import { type ConfigObject } from '../../config-schema';
 import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
 
-const QueueTableNameCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+export const QueueTableNameCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { customPatientChartUrl } = useConfig<ConfigObject>();
   return (
     <ConfigurableLink to={customPatientChartUrl} templateParams={{ patientUuid: queueEntry.patient.uuid }}>

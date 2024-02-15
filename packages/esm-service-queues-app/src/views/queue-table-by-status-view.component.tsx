@@ -3,10 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQueue } from '../hooks/useQueue';
-import { QueueTableByStatus } from '../queue-table/queue-table-by-status.component';
+import QueueTableByStatus from '../queue-table/queue-table-by-status.component';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
 
-export const QueueTableByStatusView: React.FC = () => {
+const QueueTableByStatusView: React.FC = () => {
   const { queueUuid, statusUuid } = useParams();
   const { queue, isLoading } = useQueue(queueUuid);
   const status = queue?.allowedStatuses.find((s) => s.uuid == statusUuid);
@@ -20,3 +20,5 @@ export const QueueTableByStatusView: React.FC = () => {
     return <QueueTableByStatus selectedQueue={queue} selectedStatus={status} />;
   }
 };
+
+export default QueueTableByStatusView;

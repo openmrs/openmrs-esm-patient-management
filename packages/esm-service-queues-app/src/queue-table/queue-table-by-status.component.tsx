@@ -12,7 +12,7 @@ import { queueTablePriorityColumn } from './cells/queue-table-priority-cell.comp
 import { queueTableStatusColumn } from './cells/queue-table-status-cell.component';
 import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
-import { QueueTable } from './queue-table.component';
+import QueueTable from './queue-table.component';
 
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue
@@ -35,7 +35,7 @@ const defaultQueueTableConfig: QueueTableTabConfig = {
   ],
 };
 
-export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
+const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   selectedQueue,
   selectedStatus,
   configByStatus,
@@ -75,7 +75,7 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
           <h3>{selectedQueue.display}</h3>
         </div>
       </div>
@@ -106,3 +106,5 @@ export const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
     </div>
   );
 };
+
+export default QueueTableByStatus;
