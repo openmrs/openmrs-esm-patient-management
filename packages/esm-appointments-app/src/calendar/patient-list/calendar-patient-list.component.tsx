@@ -105,7 +105,7 @@ const CalendarPatientList: React.FC = () => {
                   </Button>
                 </TableToolbarContent>
               </TableToolbar>
-              <Table className={styles.table}>
+              <Table>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
