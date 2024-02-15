@@ -1,31 +1,29 @@
-import dayjs from 'dayjs';
 import React from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { omrsDateFormat } from '../../constants';
 import {
-  DataTableSkeleton,
+  Button,
   DataTable,
-  TableContainer,
+  DataTableSkeleton,
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Button,
 } from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import { ExtensionSlot, formatDate, formatDatetime } from '@openmrs/esm-framework';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
-import { Download } from '@carbon/react/icons';
-import styles from './calenar-patient-list.scss';
+import { omrsDateFormat } from '../../constants';
 import { useAppointments } from '../../hooks/useAppointments';
+import styles from './calendar-patient-list.scss';
 
-interface CalendarPatientListProps {}
-
-const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
+const CalendarPatientList: React.FC = () => {
   const { t } = useTranslation();
   const currentPathName: string = decodeURI(window.location.pathname);
   const serviceName = currentPathName.split('/')[7];
@@ -84,7 +82,7 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
         </div>
         <DataTable rows={rowData} headers={headers}>
           {({ rows, headers, getHeaderProps, getRowProps, getBatchActionProps, onInputChange }) => (
-            <TableContainer title={`${t('count', 'Count')} ${rowData.length}`}>
+            <TableContainer className={styles.tableContainer} title={`${t('count', 'Count')} ${rowData.length}`}>
               <TableToolbar>
                 <TableToolbarContent>
                   <TableToolbarSearch
@@ -94,7 +92,7 @@ const CalendarPatientList: React.FC<CalendarPatientListProps> = () => {
                   <Button
                     size="lg"
                     kind="tertiary"
-                    renderIcon={Download}
+                    renderIcon={(props) => <Download size={16} {...props} />}
                     onClick={() =>
                       downloadAppointmentsAsExcel(
                         appointments,
