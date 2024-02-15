@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, type MouseEvent, type AnchorHTMLAttributes } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   DataTable,
   DataTableSkeleton,
@@ -7,15 +7,15 @@ import {
   Pagination,
   Search,
   Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
-  TableExpandRow,
-  TableExpandHeader,
+  TableContainer,
   TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tile,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,10 @@ import {
   ConfigurableLink,
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
-import { useActiveVisits, getOriginFromPathName } from './active-visits.resource';
+import { useActiveVisits } from './active-visits.resource';
 import styles from './active-visits.scss';
 
-function ComputeExpensiveValue(t, config) {
+function generateTableHeaders(t, config) {
   let headersIndex = 0;
 
   const headers = [
@@ -101,7 +101,7 @@ const ActiveVisitsTable = () => {
   const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
   const { activeVisits, isLoading, isValidating, error } = useActiveVisits();
   const [searchString, setSearchString] = useState('');
-  const headerData = useMemo(() => ComputeExpensiveValue(t, config), [config, t]);
+  const headerData = useMemo(() => generateTableHeaders(t, config), [config, t]);
 
   const searchResults = useMemo(() => {
     if (activeVisits !== undefined && activeVisits.length > 0) {
@@ -222,23 +222,27 @@ const ActiveVisitsTable = () => {
                 </TableHead>
                 <TableBody>
                   {rows.map((row, index) => {
-                    const visit = activeVisits.find((visit) => visit.id === row.id);
+                    const currentVisit = activeVisits.find((visit) => visit.id === row.id);
 
-                    if (!visit) {
+                    if (!currentVisit) {
                       return null;
                     }
 
-                    const patientLink = `$\{openmrsSpaBase}/patient/${visit.patientUuid}/chart/Patient%20Summary`;
+                    const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
                     return (
                       <React.Fragment key={index}>
                         <TableExpandRow
                           {...getRowProps({ row })}
-                          data-testid={`activeVisitRow${visit.patientUuid || 'unknown'}`}>
+                          data-testid={`activeVisitRow${currentVisit.patientUuid || 'unknown'}`}>
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id} data-testid={cell.id}>
-                              {cell.info.header === 'name' && visit.patientUuid ? (
-                                <ConfigurableLink to={patientLink}>{cell.value}</ConfigurableLink>
+                              {cell.info.header === 'name' && currentVisit.patientUuid ? (
+                                <ConfigurableLink
+                                  to={patientChartUrl}
+                                  templateParams={{ patientUuid: currentVisit.patientUuid }}>
+                                  {cell.value}
+                                </ConfigurableLink>
                               ) : (
                                 cell.value
                               )}
@@ -252,8 +256,8 @@ const ActiveVisitsTable = () => {
                                 className={styles.visitSummaryContainer}
                                 name="visit-summary-slot"
                                 state={{
-                                  visitUuid: visit.visitUuid,
-                                  patientUuid: visit.patientUuid,
+                                  patientUuid: currentVisit.patientUuid,
+                                  visitUuid: currentVisit.visitUuid,
                                 }}
                               />
                             </th>

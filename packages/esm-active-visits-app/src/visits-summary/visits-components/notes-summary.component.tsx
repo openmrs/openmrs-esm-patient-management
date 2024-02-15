@@ -1,7 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { Layer, Tile } from '@carbon/react';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import type { Note } from '../visit.resource';
+import { EmptyDataIllustration } from '../../active-visits-widget/empty-data-illustration.component';
 import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {
@@ -10,24 +13,38 @@ interface NotesSummaryProps {
 
 const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
 
   return (
-    <React.Fragment>
-      {notes.length > 0 ? (
-        notes.map((note, index) => (
-          <React.Fragment key={index}>
-            <p className={classNames(styles.medicationBlock, styles.bodyLong01)} data-testid={'note'}>
+    <>
+      {notes.length ? (
+        notes.map((note: Note, i) => (
+          <div className={styles.notesContainer} key={i}>
+            <p className={classNames(styles.noteText, styles.bodyLong01)} data-testid="note">
               {note.note}
             </p>
-            <p className={styles.caption01} style={{ color: '#525252' }}>
-              {note.time} &middot; {note.provider.name} &middot; {note.provider.role}
+            <p className={styles.metadata}>
+              {note.time} {note.provider.name ? <span>&middot; {note.provider.name} </span> : null}
+              {note.provider.role ? <span>&middot; {note.provider.role}</span> : null}
             </p>
-          </React.Fragment>
+          </div>
         ))
       ) : (
-        <p className={classNames(styles.bodyLong01, styles.text02)}>{t('noNotesFound', 'No notes found')}</p>
+        <div className={styles.emptyStateContainer}>
+          <Layer>
+            <Tile className={styles.tile}>
+              <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+                <h4>{t('notes', 'Notes')}</h4>
+              </div>
+              <EmptyDataIllustration />
+              <p className={styles.emptyStateContent}>
+                {t('noNotesToShowForPatient', 'There are no notes to display for this patient')}
+              </p>
+            </Tile>
+          </Layer>
+        </div>
       )}
-    </React.Fragment>
+    </>
   );
 };
 
