@@ -35,3 +35,20 @@ export interface Attribute {
   uuid: string;
   value: string | number;
 }
+
+export interface CohortMemberResponse {
+  results: Array<CohortMember>;
+}
+
+interface CohortMember {
+  uuid: string;
+  patient: OpenmrsResource;
+  cohort: Cohort;
+}
+
+interface Cohort {
+  uuid: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
