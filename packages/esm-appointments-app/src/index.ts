@@ -75,3 +75,5 @@ export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, opti
 export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
+
+export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);

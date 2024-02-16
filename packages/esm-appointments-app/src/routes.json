@@ -68,6 +68,10 @@
     {
       "name": "early-appointments-panel",
       "component": "earlyAppointments"
+    },
+    {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace"
     }
   ]
 }
