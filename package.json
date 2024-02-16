@@ -11,7 +11,7 @@
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
-    "verify": "turbo lint && turbo typescript && turbo test --color --concurrency=5",
+    "verify": "turbo lint typescript test --color --concurrency=2",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "test-e2e": "playwright test",
     "postinstall": "husky install",
