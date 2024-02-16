@@ -9,7 +9,6 @@ import {
   DatePickerInput,
   Form,
   InlineNotification,
-  Layer,
   Row,
   Select,
   SelectItem,
@@ -34,6 +33,7 @@ import {
   toDateObjectStrict,
   showSnackbar,
   useConfig,
+  ResponsiveWrapper,
   type ConfigObject,
 } from '@openmrs/esm-framework';
 import BaseVisitType from './base-visit-type.component';
@@ -229,7 +229,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                   style={{ width: '100%' }}
                 />
               </DatePicker>
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <TimePicker
                   id="visitStartTime"
                   labelText={t('time', 'Time')}
@@ -356,9 +356,5 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     </Form>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }) {
-  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
-}
 
 export default StartVisitForm;
