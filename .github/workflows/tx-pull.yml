@@ -19,7 +19,7 @@ jobs:
         uses: transifex/cli-action@v2
         with:
           token: ${{ secrets.TRANSIFEX_TOKEN }}
-          args: pull
+          args: pull --force --all
       - name: Create PR if necessary
         uses: peter-evans/create-pull-request@v5
         with:
