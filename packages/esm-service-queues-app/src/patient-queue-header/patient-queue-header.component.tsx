@@ -21,7 +21,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
 
-  const handleQueueLocationChange = useCallback((selectedItem) => {
+  const handleQueueLocationChange = useCallback(({ selectedItem }) => {
     updateSelectedQueueLocationUuid(selectedItem.id);
     updateSelectedQueueLocationName(selectedItem.name);
     updateSelectedServiceName('All');
