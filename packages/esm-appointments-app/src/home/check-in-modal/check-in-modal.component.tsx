@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, Layer, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
-import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
 import { updateAppointmentStatus } from '../home-appointments.resource';
 import { handleUndoAction } from '../common';
 import styles from './check-in-modal.scss';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
 
 interface ChangeStatusDialogProps {
   closeCheckInModal: () => void;
@@ -15,7 +15,7 @@ interface ChangeStatusDialogProps {
 
 const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheckInModal, appointmentUuid }) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
+  const { mutate: mutateAppointments } = useMutateAppointments();
   const [checkInTime, setCheckInTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,11 +29,11 @@ const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheck
         kind: 'success',
         actionButtonLabel: t('undo', 'Undo'),
         progressActionLabel: t('revertingAppointmentStatus', 'Reverting appointment status'),
-        onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
+        onActionButtonClick: () => handleUndoAction(appointmentUuid, mutateAppointments),
         subtitle: t('appointmentSuccessfullyCheckedIn', 'It has been checked-in successfully'),
         title: t('appointmentCheckedIn', 'Appointment Checked-in'),
       });
-      mutate(`/ws/rest/v1/appointment/appointment/all`);
+      mutateAppointments();
     } else {
       showNotification({
         title: t('appointmentCheckInError', 'Error checking in appointment'),

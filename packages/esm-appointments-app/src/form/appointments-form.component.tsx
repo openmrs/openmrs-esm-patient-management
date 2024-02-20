@@ -26,7 +26,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useLocations, useSession, showSnackbar, useLayoutType, useConfig } from '@openmrs/esm-framework';
 import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { saveAppointment, saveRecurringAppointments, useAppointmentService } from './appointments-form.resource';
+import {
+  saveAppointment,
+  saveRecurringAppointments,
+  useAppointmentService,
+  useMutateAppointments,
+} from './appointments-form.resource';
 import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
@@ -62,7 +67,6 @@ interface AppointmentsFormProps {
   patientUuid?: string;
   context: string;
   closeWorkspace: () => void;
-  mutate: () => void;
 }
 
 const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
@@ -71,8 +75,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   patientUuid,
   context,
   closeWorkspace,
-  mutate,
 }) => {
+  const { mutate: mutateAppointments } = useMutateAppointments();
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
   const defaultTimeFormat = appointment?.startDateTime
     ? editedAppointmentTimeFormat
@@ -189,7 +193,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         if (status === 200) {
           setIsSubmitting(false);
           closeWorkspace();
-          mutate();
+          mutateAppointments();
 
           showSnackbar({
             isLowContrast: true,

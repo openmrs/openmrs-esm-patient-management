@@ -11,7 +11,7 @@ export const launchCheckInAppointmentModal = (appointmentUuid: string) => {
 export const handleUndoAction = async (appointmentUuid, mutate) => {
   const { status } = await undoAppointmentStatus(appointmentUuid);
   if (status === 200) {
-    mutate(`/ws/rest/v1/appointment/appointment/all`);
+    mutate();
   } else {
     showNotification({
       title: 'Error Undoing',
@@ -43,7 +43,7 @@ export const handleUpdateStatus = async (
       progressActionLabel: t('revertingAppointmentStatus', 'Reverting appointment status'),
       onActionButtonClick: () => handleUndoAction(appointmentUuid, mutate),
     });
-    mutate(`/ws/rest/v1/appointment/appointment/all`);
+    mutate();
   } else {
     showNotification({
       title: errorTitle,

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import {
   type AppointmentPayload,
@@ -8,9 +8,30 @@ import {
   type RecurringAppointmentsPayload,
 } from '../types';
 import isToday from 'dayjs/plugin/isToday';
+import { useCallback } from 'react';
 dayjs.extend(isToday);
 
-const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+const appointmentUrlMatcher = '/ws/rest/v1/appointment';
+const appointmentsSearchUrl = '/ws/rest/v1/appointments/search';
+
+export function useMutateAppointments() {
+  const { mutate } = useSWRConfig();
+  // this mutate is intentionally broad because there may be many different keys that need to be invalidated when appointments are updated
+  const mutateAppointments = useCallback(
+    () =>
+      mutate((key) => {
+        return (
+          (typeof key === 'string' && key.startsWith(appointmentUrlMatcher)) ||
+          (Array.isArray(key) && key[0].startsWith(appointmentUrlMatcher))
+        );
+      }),
+    [mutate],
+  );
+
+  return {
+    mutate: mutateAppointments,
+  };
+}
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
   /*
