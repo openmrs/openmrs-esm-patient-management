@@ -108,6 +108,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
     : dayjs(new Date()).format('hh:mm');
 
+  const defaultDuration =
+    appointment?.startDateTime && appointment?.endDateTime
+      ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
+      : null;
+
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
@@ -121,6 +126,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
       startTime: defaultAppointmentStartDate,
+      duration: defaultDuration,
       timeFormat: defaultTimeFormat,
       appointmentDateTime: {
         startDate: defaultStartDate,
