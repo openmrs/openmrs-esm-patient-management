@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentService } from '../../types';
 
 const appointmentServiceInitialValue: AppointmentService = {
@@ -19,7 +19,7 @@ const appointmentServiceInitialValue: AppointmentService = {
 };
 
 const addNewAppointmentService = (payload) => {
-  return openmrsFetch('${restBaseUrl}/appointmentService', {
+  return openmrsFetch(`${restBaseUrl}/appointmentService`, {
     method: 'POST',
     body: payload,
     headers: { 'Content-Type': 'application/json' },
