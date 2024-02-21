@@ -4,9 +4,10 @@ import { InlineNotification, Layer, Select, SelectItem, RadioButtonGroup, RadioB
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import styles from './visit-form-queue-fields.scss';
-import { type ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../helpers/useQueues';
+import { type ConfigObject } from '../../config-schema';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
@@ -14,22 +15,14 @@ const StartVisitQueueFields: React.FC = () => {
   const { priorities } = usePriority();
   const { statuses } = useStatus();
   const { queueLocations } = useQueueLocations();
-  const config = useConfig() as ConfigObject;
-  const defaultStatus = config.concepts.defaultStatusConceptUuid;
-  const defaultPriority = config.concepts.defaultPriorityConceptUuid;
-  const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
+  const {
+    concepts: { defaultPriorityConceptUuid, defaultStatusConceptUuid },
+  } = useConfig<ConfigObject>();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues } = useQueues(selectedQueueLocation);
-  const [priority, setPriority] = useState(defaultPriority);
-  const [status, setStatus] = useState(defaultStatus);
-  const [sortWeight, setSortWeight] = useState(0);
+  const [priority, setPriority] = useState(defaultPriorityConceptUuid);
+  const [status, setStatus] = useState(defaultStatusConceptUuid);
   const [service, setSelectedService] = useState('');
-
-  useEffect(() => {
-    if (priority === emergencyPriorityConceptUuid) {
-      setSortWeight(1);
-    }
-  }, [priority]);
 
   useEffect(() => {
     if (queues?.length > 0) {
@@ -131,7 +124,7 @@ const StartVisitQueueFields: React.FC = () => {
             className={styles.radioButtonWrapper}
             name="priority"
             id="priority"
-            defaultSelected={defaultPriority}
+            defaultSelected={defaultPriorityConceptUuid}
             onChange={(uuid) => {
               setPriority(uuid);
             }}>
@@ -139,16 +132,6 @@ const StartVisitQueueFields: React.FC = () => {
               priorities.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
           </RadioButtonGroup>
         )}
-      </section>
-
-      <section className={classNames(styles.section, styles.sectionHidden)}>
-        <TextInput
-          type="number"
-          id="sortWeight"
-          name="sortWeight"
-          labelText={t('sortWeight', 'Sort weight')}
-          value={sortWeight}
-        />
       </section>
     </div>
   );
