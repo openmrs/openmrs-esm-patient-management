@@ -449,7 +449,7 @@ export interface Queue {
 export interface QueueEntry {
   uuid: string;
   display: string;
-  endedAt: null;
+  endedAt: string;
   locationWaitingFor: Location;
   patient: Patient;
   priority: Concept;

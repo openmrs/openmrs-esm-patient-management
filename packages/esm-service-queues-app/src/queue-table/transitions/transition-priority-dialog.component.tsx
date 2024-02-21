@@ -74,7 +74,7 @@ const TransitionPriorityDialog: React.FC<TransitionPriorityDialogProps> = ({ que
               }}>
               {allowedPriorities?.length > 0 ? (
                 allowedPriorities.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
+                  return <Switch role="radio" name={display} text={display} key={uuid} value={uuid} />;
                 })
               ) : (
                 <InlineNotification
@@ -91,7 +91,10 @@ const TransitionPriorityDialog: React.FC<TransitionPriorityDialogProps> = ({ que
           <Button kind="secondary" onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button disabled={selectedQueuePriority == queueEntry.priority.uuid} type="submit">
+          <Button
+            disabled={selectedQueuePriority == queueEntry.priority.uuid}
+            aria-label={t('transitionPriority', 'Transition priority')}
+            type="submit">
             {t('transitionPriority', 'Transition priority')}
           </Button>
         </ModalFooter>

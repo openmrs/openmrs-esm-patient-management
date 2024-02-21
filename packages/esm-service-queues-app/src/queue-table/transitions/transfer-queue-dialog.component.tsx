@@ -108,14 +108,13 @@ const TransferQueueDialog: React.FC<ChangeStatusDialogProps> = ({ queueEntry, cl
           </div>
 
           <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
+            <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
             <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
+              labelText={t('selectQueue', 'Select a queue')}
+              id="queue"
               invalidText="Required"
               value={formState.selectedQueue}
               onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-              <SelectItem text={t('selectService', 'Select a service')} value={null} />
               {queues?.map((queue) => (
                 <SelectItem key={queue.uuid} text={queue.display} value={queue.uuid}>
                   {queue.display}
@@ -140,7 +139,9 @@ const TransferQueueDialog: React.FC<ChangeStatusDialogProps> = ({ queueEntry, cl
                 onChange={(uuid) => {
                   setSelectedStatusUuid(uuid);
                 }}>
-                {statuses?.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
+                {statuses?.map(({ uuid, display }) => (
+                  <RadioButton key={uuid} name={display} labelText={display} value={uuid} />
+                ))}
               </RadioButtonGroup>
             )}
           </section>
@@ -163,7 +164,7 @@ const TransferQueueDialog: React.FC<ChangeStatusDialogProps> = ({ queueEntry, cl
                   setSelectedPriorityUuid(event.name as string);
                 }}>
                 {priorities?.map(({ uuid, display }) => {
-                  return <Switch name={uuid} text={display} key={uuid} value={uuid} />;
+                  return <Switch role="radio" name={uuid} text={display} key={uuid} value={uuid} />;
                 })}
               </ContentSwitcher>
             )}

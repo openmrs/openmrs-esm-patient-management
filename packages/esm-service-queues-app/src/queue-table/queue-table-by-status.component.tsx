@@ -26,7 +26,7 @@ interface QueueTableByStatusProps {
   allStatusTabConfig?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
 }
 
-const defaultQueueTableConfig: QueueTableTabConfig = {
+export const defaultQueueTableConfig: QueueTableTabConfig = {
   columns: [
     queueTableNameColumn,
     queueTableComingFromColumn,

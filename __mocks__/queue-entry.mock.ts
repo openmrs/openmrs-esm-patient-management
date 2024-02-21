@@ -1,6 +1,95 @@
-export const mockQueueEntry = {
+import {
+  type Concept,
+  type MappedQueueEntry,
+  type Queue,
+  type QueueEntry,
+} from '../packages/esm-service-queues-app/src/types';
+import { mockPatientAlice, mockPatientBrian } from './patient.mock';
+
+// Priorities:
+export const mockPriorityNonUrgent: Concept = {
+  uuid: '00000000-0000-0000-0000-000000000001',
+  display: 'Non urgent',
+};
+export const mockPriorityUrgent: Concept = {
+  uuid: '00000000-0000-0000-0000-000000000002',
+  display: 'Urgent',
+};
+
+// Statuses:
+export const mockStatusWaiting: Concept = {
+  uuid: '00000000-0000-0000-0000-000000000010',
+  display: 'Waiting',
+};
+export const mockStatusInService: Concept = {
+  uuid: '00000000-0000-0000-0000-000000000020',
+  display: 'In Service',
+};
+export const mockStatusWaitingForTransfer: Concept = {
+  uuid: '00000000-0000-0000-0000-000000000030',
+  display: 'Waiting for Transfer',
+};
+
+// Queues:
+export const mockQueueTriage: Queue = {
+  uuid: '00000000-0000-0000-0001-000000000000',
+  display: 'Triage',
+  name: 'Triage',
+  description: '',
+  allowedPriorities: [mockPriorityNonUrgent, mockPriorityUrgent],
+  allowedStatuses: [mockStatusWaiting, mockStatusInService],
+};
+
+export const mockQueueSurgery: Queue = {
+  uuid: '00000000-0000-0000-0002-000000000000',
+  display: 'Surgery',
+  name: 'Surgery',
+  description: '',
+  allowedPriorities: [mockPriorityNonUrgent, mockPriorityUrgent],
+  allowedStatuses: [mockStatusWaiting, mockStatusInService, mockStatusWaitingForTransfer],
+};
+
+export const mockQueues = [mockQueueTriage, mockQueueSurgery];
+
+// Queues Entries:
+export const mockQueueEntryBrian: QueueEntry = {
+  uuid: '8824d1e4-8513-4a78-bcec-37173f417f18',
+  display: mockPatientBrian.display,
+  endedAt: null,
+  locationWaitingFor: null,
+  patient: mockPatientBrian,
+  priority: mockPriorityNonUrgent,
+  priorityComment: null,
+  providerWaitingFor: null,
+  queue: mockQueueTriage,
+  startedAt: '2024-01-01T00:00:00.000+0000',
+  status: mockStatusWaiting,
+  visit: null,
+  sortWeight: 0,
+  queueComingFrom: null,
+};
+
+export const mockQueueEntryAlice: QueueEntry = {
+  uuid: '00000000-8513-4a78-bcec-37173f417f18',
+  display: mockPatientAlice.display,
+  endedAt: null,
+  locationWaitingFor: null,
+  patient: mockPatientAlice,
+  priority: mockPriorityNonUrgent,
+  priorityComment: null,
+  providerWaitingFor: null,
+  queue: mockQueueSurgery,
+  startedAt: '2024-01-02T00:00:00.000+0000',
+  status: mockStatusWaiting,
+  visit: null,
+  sortWeight: 0,
+  queueComingFrom: mockQueueTriage,
+};
+
+export const mockQueueEntries = [mockQueueEntryBrian, mockQueueEntryAlice];
+
+export const mockMappedQueueEntry: MappedQueueEntry = {
   id: '8824d1e4-8513-4a78-bcec-37173f417f18',
-  encounters: [],
   name: 'Brian Johnson',
   patientAge: '32',
   patientSex: 'F',
