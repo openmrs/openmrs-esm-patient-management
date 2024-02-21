@@ -4,7 +4,9 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
+  translateFrom,
 } from '@openmrs/esm-framework';
+import { registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta, appointmentCalendarDashboardMeta } from './dashboard.meta';
@@ -76,4 +78,8 @@ export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent,
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 
-export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
+registerWorkspace({
+  name: 'appointments-form-workspace',
+  load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
+  title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
+});
