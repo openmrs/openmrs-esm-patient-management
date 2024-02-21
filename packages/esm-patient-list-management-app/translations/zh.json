@@ -54,6 +54,7 @@
   "noPatientsInList": "There are no patients in this list",
   "offlinePatients": "Offline patients",
   "openPatientList": "Add to list",
+  "patientListMemberCount_one": "该列表有{{count}}名患者",
   "patientListMemberCount_other": "This list has {{count}} patients",
   "patientLists": "Patient lists",
   "patientRemovedFromList": "Patient removed from list",

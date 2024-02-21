@@ -55,8 +55,6 @@
   "offlinePatients": "מטופלים במצב לא מקוון",
   "openPatientList": "הוסף לרשימה",
   "patientListMemberCount_one": "ברשימה זו יש {{count}} מטופל",
-  "patientListMemberCount_two": "ברשימה זו יש {{count}} מטופלים",
-  "patientListMemberCount_many": "ברשימה זו יש {{count}} מטופלים",
   "patientListMemberCount_other": "ברשימה זו יש {{count}} מטופלים",
   "patientLists": "רשימות מטופלים",
   "patientRemovedFromList": "המטופל הוסר מהרשימה",
