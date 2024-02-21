@@ -19,10 +19,9 @@ interface AppointmentActionsProps {
   visits: Array<any>;
   appointment: Appointment;
   scheduleType: string;
-  mutate: () => void;
 }
 
-const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appointment, mutate }) => {
+const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appointment }) => {
   const { t } = useTranslation();
   const { mutateVisit } = useVisits();
   const patientUuid = appointment.patient.uuid;
@@ -83,12 +82,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appoint
             onClick={() =>
               launchOverlay(
                 t('editAppointments', 'Edit Appointment'),
-                <AppointmentForm
-                  appointment={appointment}
-                  context="editing"
-                  closeWorkspace={closeOverlay}
-                  mutate={mutate}
-                />,
+                <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
               )
             }
           />

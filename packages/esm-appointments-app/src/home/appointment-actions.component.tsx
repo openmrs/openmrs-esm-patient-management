@@ -10,16 +10,17 @@ import AppointmentForm from '../form/appointments-form.component';
 import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import styles from './appointments-base-table.scss';
+import { useMutateAppointments } from '../form/appointments-form.resource';
 
 interface ActionMenuProps {
   appointment: Appointment;
   useBahmniUI?: string;
-  mutate: () => void;
 }
 
-export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProps) => {
+export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   const { t } = useTranslation();
   const { bahmniAppointmentsUiBaseUrl } = useConfig();
+  const { mutate: mutateAppointments } = useMutateAppointments();
 
   const { status } = appointment;
   const disableActions = status === 'Completed' || status === 'Missed' || status === 'Cancelled';
@@ -37,7 +38,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
       errorDescription,
       successTitle,
       errorTitle,
-      mutate,
+      mutateAppointments,
       t,
     );
   };
@@ -60,12 +61,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
           navigate({ to: `${spaHomePage}` });
           launchOverlay(
             t('editAppointment', 'Edit Appointment'),
-            <AppointmentForm
-              appointment={appointment}
-              context="editing"
-              closeWorkspace={closeOverlay}
-              mutate={mutate}
-            />,
+            <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
           );
         }}
         itemText={t('editAppointment', 'Edit Appointment')}>
@@ -117,7 +113,7 @@ export const ActionsMenu = ({ appointment, useBahmniUI, mutate }: ActionMenuProp
           className={styles.menuItem}
           id="#completeAppointment"
           disabled={isScheduled || disableActions}
-          onClick={() => handleComplete(appointment.uuid, mutate, t)}
+          onClick={() => handleComplete(appointment.uuid, mutateAppointments, t)}
           itemText={t('complete', 'Complete')}>
           {t('complete', 'Complete')}
         </OverflowMenuItem>

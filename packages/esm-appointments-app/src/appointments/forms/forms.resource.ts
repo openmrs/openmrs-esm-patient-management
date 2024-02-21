@@ -3,7 +3,7 @@ import { type AppointmentPayload } from '../../types';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from '../../constants';
 
-// TODO we will refactor all this stuff to use the cancel functionality from patient-chart (or vice versa, but will move into the forms directory regardless)
+// TODO we should refactor all this stuff to use the cancel functionality from patient-chart (or vice versa, but should move into the forms directory regardless)
 
 export const cancelAppointment = async (toStatus: string, appointmentUuid: string) => {
   const abortController = new AbortController();

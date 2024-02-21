@@ -10,7 +10,7 @@ interface AppointmentsByStatusProps {
   date: string;
 }
 const AppointmentsByStatus: React.FC<AppointmentsByStatusProps> = ({ appointmentServiceType, status, title, date }) => {
-  const { appointmentList, isLoading, mutate } = useAppointmentList(status, date);
+  const { appointmentList, isLoading } = useAppointmentList(status, date);
 
   const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment, index) => {
     return {
@@ -19,7 +19,7 @@ const AppointmentsByStatus: React.FC<AppointmentsByStatusProps> = ({ appointment
     };
   });
 
-  return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={title} mutate={mutate} />;
+  return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={title} />;
 };
 
 export default AppointmentsByStatus;

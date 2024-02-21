@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import classNames from 'classnames';
-import type { KeyedMutator } from 'swr';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -37,6 +36,7 @@ import { useTodaysAppointments } from './home-appointments.resource';
 import { type ConfigObject } from '../config-schema';
 import { formatAMPM } from '../helpers';
 import styles from './appointments-base-table.scss';
+import { useMutateAppointments } from '../form/appointments-form.resource';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -48,12 +48,10 @@ type RenderStatusProps = {
   status: string;
   t: (key: string, fallback: string) => string;
   appointmentUuid: string;
-  mutate: KeyedMutator<{
-    data: Array<Appointment>;
-  }>;
 };
 
-const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps) => {
+const RenderStatus = ({ status, t, appointmentUuid }: RenderStatusProps) => {
+  const { mutate: mutateAppointments } = useMutateAppointments();
   switch (status) {
     case 'Completed':
       return (
@@ -78,7 +76,7 @@ const RenderStatus = ({ status, t, appointmentUuid, mutate }: RenderStatusProps)
       );
     case 'CheckedIn':
       return (
-        <Button kind="ghost" onClick={() => handleComplete(appointmentUuid, mutate, t)}>
+        <Button kind="ghost" onClick={() => handleComplete(appointmentUuid, mutateAppointments, t)}>
           {t('complete', 'Complete')}
         </Button>
       );
@@ -100,7 +98,7 @@ const AppointmentsBaseTable = () => {
   const { user } = useSession();
   const { t } = useTranslation();
   const { useBahmniAppointmentsUI: useBahmniUI, useFullViewPrivilege, fullViewPrivilege } = useConfig();
-  const { appointments, isLoading, mutate } = useTodaysAppointments();
+  const { appointments, isLoading } = useTodaysAppointments();
 
   const fullView = userHasAccess(fullViewPrivilege, user) || !useFullViewPrivilege;
   const { customPatientChartUrl } = useConfig<ConfigObject>();
@@ -199,7 +197,7 @@ const AppointmentsBaseTable = () => {
     actionButton: {
       content: (
         <span>
-          <RenderStatus status={appointment.status} appointmentUuid={appointment.uuid} t={t} mutate={mutate} />
+          <RenderStatus status={appointment.status} appointmentUuid={appointment.uuid} t={t} />
         </span>
       ),
     },
@@ -304,11 +302,7 @@ const AppointmentsBaseTable = () => {
                             ))}
                             {fullView && (
                               <TableCell className={classNames('cds--table-column-menu', styles.overflowMenu)}>
-                                <ActionsMenu
-                                  appointment={filteredAppointments?.[index]}
-                                  useBahmniUI={useBahmniUI}
-                                  mutate={mutate}
-                                />
+                                <ActionsMenu appointment={filteredAppointments?.[index]} useBahmniUI={useBahmniUI} />
                               </TableCell>
                             )}
                           </TableRow>
