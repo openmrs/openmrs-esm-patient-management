@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
-import { InlineNotification, Layer, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
+import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import styles from './visit-form-queue-fields.scss';
-import { type ConfigObject, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { type ConfigObject, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../helpers/useQueues';
 
@@ -47,7 +47,7 @@ const StartVisitQueueFields: React.FC = () => {
     <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
-        <ResponsiveWrapper isTablet={isTablet}>
+        <ResponsiveWrapper>
           <Select
             labelText={t('selectQueueLocation', 'Select a queue location')}
             id="queueLocation"
@@ -153,9 +153,5 @@ const StartVisitQueueFields: React.FC = () => {
     </div>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }) {
-  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
-}
 
 export default StartVisitQueueFields;

@@ -8,7 +8,6 @@ import {
   DatePicker,
   Form,
   InlineLoading,
-  Layer,
   MultiSelect,
   NumberInput,
   Select,
@@ -24,7 +23,14 @@ import {
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useLocations, useSession, showSnackbar, useLayoutType, useConfig } from '@openmrs/esm-framework';
+import {
+  useLocations,
+  useSession,
+  showSnackbar,
+  useLayoutType,
+  useConfig,
+  ResponsiveWrapper,
+} from '@openmrs/esm-framework';
 import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
@@ -302,7 +308,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
           <div>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="location"
                 control={control}
@@ -330,7 +336,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('service', 'Service')}</span>
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <Controller
               name="selectedService"
               control={control}
@@ -364,7 +370,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('appointmentType_title', 'Appointment Type')}</span>
-          <ResponsiveWrapper isTablet={isTablet}>
+          <ResponsiveWrapper>
             <Controller
               name="appointmentType"
               control={control}
@@ -417,12 +423,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     toggled={isAllDayAppointment}
                   />
                 )}
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="appointmentDateTime"
                     control={control}
                     render={({ field: { onChange, value, ref } }) => (
-                      <ResponsiveWrapper isTablet={isTablet}>
+                      <ResponsiveWrapper>
                         <DatePicker
                           datePickerType="range"
                           dateFormat={datePickerFormat}
@@ -459,7 +465,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <TimeAndDuration isTablet={isTablet} control={control} services={services} watch={watch} t={t} />
                 )}
 
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="recurringPatternPeriod"
                     control={control}
@@ -482,7 +488,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   />
                 </ResponsiveWrapper>
 
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="recurringPatternType"
                     control={control}
@@ -543,7 +549,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     toggled={isAllDayAppointment}
                   />
                 )}
-                <ResponsiveWrapper isTablet={isTablet}>
+                <ResponsiveWrapper>
                   <Controller
                     name="appointmentDateTime"
                     control={control}
@@ -575,7 +581,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         {getValues('selectedService') && (
           <section className={styles.formGroup}>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Workload
                 selectedService={watch('selectedService')}
                 appointmentDate={watch('appointmentDateTime').startDate}
@@ -587,7 +593,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         {context !== 'creating' ? (
           <section className={styles.formGroup}>
             <span className={styles.heading}>{t('appointmentStatus', 'Appointment Status')}</span>
-            <ResponsiveWrapper isTablet={isTablet}>
+            <ResponsiveWrapper>
               <Controller
                 name="appointmentStatus"
                 control={control}
@@ -621,7 +627,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="appointmentNote"
             control={control}
             render={({ field: { onChange, onBlur, value, ref } }) => (
-              <ResponsiveWrapper isTablet={isTablet}>
+              <ResponsiveWrapper>
                 <TextArea
                   id="appointmentNote"
                   value={value}
@@ -648,16 +654,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   );
 };
 
-function ResponsiveWrapper({ children, isTablet }) {
-  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
-}
-
 function TimeAndDuration({ isTablet, t, watch, control, services }) {
   const defaultDuration = services?.find((service) => service.name === watch('selectedService'))?.durationMins || null;
 
   return (
-    <React.Fragment>
-      <ResponsiveWrapper isTablet={isTablet}>
+    <>
+      <ResponsiveWrapper>
         <Controller
           name="startTime"
           control={control}
@@ -687,7 +689,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           )}
         />
       </ResponsiveWrapper>
-      <ResponsiveWrapper isTablet={isTablet}>
+      <ResponsiveWrapper>
         <Controller
           name="duration"
           control={control}
@@ -709,7 +711,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           )}
         />
       </ResponsiveWrapper>
-    </React.Fragment>
+    </>
   );
 }
 
