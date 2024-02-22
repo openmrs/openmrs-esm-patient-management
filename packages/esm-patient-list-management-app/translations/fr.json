@@ -55,7 +55,6 @@
   "offlinePatients": "Patients hors ligne",
   "openPatientList": "Ajouter à la liste",
   "patientListMemberCount_one": "This list has {{count}} patient",
-  "patientListMemberCount_many": "This list has {{count}} patients",
   "patientListMemberCount_other": "This list has {{count}} patients",
   "patientLists": "Listes de patients",
   "patientRemovedFromList": "Patient removed from list",
