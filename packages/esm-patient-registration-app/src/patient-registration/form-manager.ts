@@ -1,4 +1,10 @@
-import { type FetchResponse, openmrsFetch, queueSynchronizationItem, type Session } from '@openmrs/esm-framework';
+import {
+  type FetchResponse,
+  openmrsFetch,
+  queueSynchronizationItem,
+  type Session,
+  restBaseUrl,
+} from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
   type FormValues,
@@ -128,7 +134,7 @@ export class FormManager {
         await savePatientPhoto(
           savePatientResponse.data.uuid,
           capturePhotoProps.imageData,
-          '/ws/rest/v1/obs',
+          `${restBaseUrl}/obs`,
           capturePhotoProps.dateTime || new Date().toISOString(),
           config.concepts.patientPhotoUuid,
         );
@@ -354,7 +360,7 @@ export class FormManager {
           .filter(([, value]) => !value)
           .forEach(async ([key]) => {
             const attributeUuid = patientUuidMap[`attribute.${key}`];
-            await openmrsFetch(`/ws/rest/v1/person/${values.patientUuid}/attribute/${attributeUuid}`, {
+            await openmrsFetch(`${restBaseUrl}/person/${values.patientUuid}/attribute/${attributeUuid}`, {
               method: 'DELETE',
             }).catch((err) => {
               console.error(err);

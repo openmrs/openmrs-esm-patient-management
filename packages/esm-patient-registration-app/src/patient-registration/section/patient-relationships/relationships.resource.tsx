@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type RelationshipValue } from '../../patient-registration.types';
 import { personRelationshipRepresentation } from '../../../constants';
 
@@ -10,7 +10,7 @@ export function useInitialPatientRelationships(patientUuid: string): {
 } {
   const shouldFetch = !!patientUuid;
   const { data, error, isLoading } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
-    shouldFetch ? `/ws/rest/v1/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}` : null,
+    shouldFetch ? `${restBaseUrl}/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}` : null,
     openmrsFetch,
   );
 

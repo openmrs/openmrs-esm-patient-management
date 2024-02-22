@@ -19,7 +19,7 @@ const appointmentServiceInitialValue: AppointmentService = {
 };
 
 const addNewAppointmentService = (payload) => {
-  return openmrsFetch('/ws/rest/v1/appointmentService', {
+  return openmrsFetch('${restBaseUrl}/appointmentService', {
     method: 'POST',
     body: payload,
     headers: { 'Content-Type': 'application/json' },

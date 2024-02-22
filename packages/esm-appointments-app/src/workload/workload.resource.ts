@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import first from 'lodash-es/first';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentSummary } from '../types';
 import { omrsDateFormat } from '../constants';
 interface AppointmentCount {
@@ -36,7 +36,7 @@ export const useCalendarDistribution = (
 export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Array<{ date: string; count: number }> => {
   const startDate = dayjs(fromDate).startOf('week').format(omrsDateFormat);
   const endDate = dayjs(startDate).add(2, 'week').format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
   const { data } = useSWR<{ data: Array<AppointmentSummary> }>(url, openmrsFetch);
   const results = first(data?.data?.filter(({ appointmentService }) => appointmentService.uuid === serviceUuid));
   const appointmentCountMap = results?.appointmentCountMap;

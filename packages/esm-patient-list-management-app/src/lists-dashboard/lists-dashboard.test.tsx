@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
-import { openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
@@ -45,12 +45,12 @@ describe('ListsDashboard', () => {
               links: [
                 {
                   rel: 'self',
-                  uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad',
+                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad`,
                   resourceAlias: 'cohorttype',
                 },
                 {
                   rel: 'full',
-                  uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad?v=full',
+                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad?v=full`,
                   resourceAlias: 'cohorttype',
                 },
               ],
@@ -72,12 +72,12 @@ describe('ListsDashboard', () => {
               links: [
                 {
                   rel: 'self',
-                  uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad',
+                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad`,
                   resourceAlias: 'cohorttype',
                 },
                 {
                   rel: 'full',
-                  uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad?v=full',
+                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/cohortm/cohorttype/e71857cb-33af-4f2c-86ab-7223bcfa37ad?v=full`,
                   resourceAlias: 'cohorttype',
                 },
               ],

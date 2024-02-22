@@ -1,4 +1,4 @@
-import { useSession, type Visit, openmrsFetch } from '@openmrs/esm-framework';
+import { useSession, type Visit, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { type WaitTime } from '../types';
@@ -15,7 +15,7 @@ export function useActiveVisits() {
     startDate +
     '&location=' +
     sessionLocation;
-  const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
+  const url = `${restBaseUrl}/visit?includeInactive=false&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     sessionLocation ? url : null,
     openmrsFetch,
@@ -41,7 +41,7 @@ export function useActiveVisits() {
 }
 
 export function useAverageWaitTime(serviceUuid: string, statusUuid: string) {
-  const apiUrl = `/ws/rest/v1/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
+  const apiUrl = `${restBaseUrl}/queue-metrics?queue=${serviceUuid}&status=${statusUuid}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: WaitTime }, Error>(
     serviceUuid && statusUuid ? apiUrl : null,

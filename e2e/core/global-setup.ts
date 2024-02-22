@@ -1,3 +1,4 @@
+import { restBaseUrl } from '@openmrs/esm-framework';
 import { request } from '@playwright/test';
 import * as dotenv from 'dotenv';
 
@@ -15,7 +16,7 @@ async function globalSetup() {
   const token = Buffer.from(`${process.env.E2E_USER_ADMIN_USERNAME}:${process.env.E2E_USER_ADMIN_PASSWORD}`).toString(
     'base64',
   );
-  await requestContext.post(`${process.env.E2E_BASE_URL}/ws/rest/v1/session`, {
+  await requestContext.post(`${process.env.E2E_BASE_URL}/${restBaseUrl}/session`, {
     data: {
       sessionLocation: process.env.E2E_LOGIN_DEFAULT_LOCATION_UUID,
       locale: 'en',

@@ -1,11 +1,11 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 const customRepresentation =
   'custom:(display,uuid,personA:(age,display,birthdate,uuid),personB:(age,display,birthdate,uuid),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
 export function useRelationships(patientUuid: string) {
-  const apiUrl = `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`;
+  const apiUrl = `${restBaseUrl}/relationship?v=${customRepresentation}&person=${patientUuid}`;
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: RelationshipsResponse }, Error>(
     patientUuid ? apiUrl : null,

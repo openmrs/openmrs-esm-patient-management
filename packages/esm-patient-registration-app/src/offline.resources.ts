@@ -2,7 +2,7 @@ import React from 'react';
 import find from 'lodash-es/find';
 import camelCase from 'lodash-es/camelCase';
 import escapeRegExp from 'lodash-es/escapeRegExp';
-import { getConfig, messageOmrsServiceWorker, openmrsFetch, type Session } from '@openmrs/esm-framework';
+import { getConfig, messageOmrsServiceWorker, openmrsFetch, restBaseUrl, type Session } from '@openmrs/esm-framework';
 import type {
   PatientIdentifierType,
   FetchedPatientIdentifierType,
@@ -20,17 +20,17 @@ export interface Resources {
 export const ResourcesContext = React.createContext<Resources>(null);
 
 export async function fetchCurrentSession(): Promise<Session> {
-  const { data } = await cacheAndFetch<Session>('/ws/rest/v1/session');
+  const { data } = await cacheAndFetch<Session>(`${restBaseUrl}/session`);
   return data;
 }
 
 export async function fetchAddressTemplate() {
-  const { data } = await cacheAndFetch<AddressTemplate>('/ws/rest/v1/addresstemplate');
+  const { data } = await cacheAndFetch<AddressTemplate>(`${restBaseUrl}/addresstemplate`);
   return data;
 }
 
 export async function fetchAllRelationshipTypes() {
-  const { data } = await cacheAndFetch('/ws/rest/v1/relationshiptype?v=default');
+  const { data } = await cacheAndFetch(`${restBaseUrl}/relationshiptype?v=default`);
   return data;
 }
 
@@ -59,11 +59,11 @@ async function fetchFieldDefinitionType(fieldDefinition) {
   let apiUrl = '';
 
   if (fieldDefinition.type === 'person attribute') {
-    apiUrl = `/ws/rest/v1/personattributetype/${fieldDefinition.uuid}`;
+    apiUrl = `${restBaseUrl}/personattributetype/${fieldDefinition.uuid}`;
   }
 
   if (fieldDefinition.answerConceptSetUuid) {
-    await cacheAndFetch(`/ws/rest/v1/concept/${fieldDefinition.answerConceptSetUuid}`);
+    await cacheAndFetch(`${restBaseUrl}/concept/${fieldDefinition.answerConceptSetUuid}`);
   }
   const { data } = await cacheAndFetch(apiUrl);
   return data;
@@ -93,8 +93,10 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
 
 async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdentifierType>> {
   const [patientIdentifierTypesResponse, primaryIdentifierTypeResponse] = await Promise.all([
-    cacheAndFetch('/ws/rest/v1/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)'),
-    cacheAndFetch('/ws/rest/v1/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType'),
+    cacheAndFetch(
+      `${restBaseUrl}/patientidentifiertype?v=custom:(display,uuid,name,format,required,uniquenessBehavior)`,
+    ),
+    cacheAndFetch(`${restBaseUrl}/metadatamapping/termmapping?v=full&code=emr.primaryIdentifierType`),
   ]);
 
   if (patientIdentifierTypesResponse.ok) {
@@ -124,11 +126,11 @@ async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdenti
 }
 
 async function fetchIdentifierSources(identifierType: string) {
-  return await cacheAndFetch(`/ws/rest/v1/idgen/identifiersource?v=default&identifierType=${identifierType}`);
+  return await cacheAndFetch(`${restBaseUrl}/idgen/identifiersource?v=default&identifierType=${identifierType}`);
 }
 
 async function fetchAutoGenerationOptions(abortController?: AbortController) {
-  return await cacheAndFetch(`/ws/rest/v1/idgen/autogenerationoption?v=full`);
+  return await cacheAndFetch(`${restBaseUrl}/idgen/autogenerationoption?v=full`);
 }
 
 async function cacheAndFetch<T = any>(url?: string) {

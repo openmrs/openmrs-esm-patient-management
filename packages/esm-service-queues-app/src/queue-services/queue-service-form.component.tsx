@@ -13,7 +13,7 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { mutate } from 'swr';
-import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
 import { type SearchTypes } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
@@ -66,8 +66,8 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, c
               subtitle: t('queueAddedSuccessfully', 'Queue addeded successfully'),
             });
             closePanel();
-            mutate(`/ws/rest/v1/queue?${userLocation}`);
-            mutate(`/ws/rest/v1/queue?location=${userLocation}`);
+            mutate(`${restBaseUrl}/queue?${userLocation}`);
+            mutate(`${restBaseUrl}/queue?location=${userLocation}`);
           }
         },
         (error) => {

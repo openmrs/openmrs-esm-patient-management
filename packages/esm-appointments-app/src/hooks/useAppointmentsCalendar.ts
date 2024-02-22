@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
@@ -17,7 +17,7 @@ interface AppointmentSummaryResponse {
 
 export const useAppointmentsCalendar = (forDate: string, period: string) => {
   const { startDate, endDate } = evaluateAppointmentCalendarDates(forDate, period);
-  const url = `/ws/rest/v1/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${startDate}&endDate=${endDate}`;
 
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentSummaryResponse> }>(
     startDate && endDate ? url : null,

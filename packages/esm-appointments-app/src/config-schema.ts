@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
 import { spaHomePage } from './constants';
 
 export const configSchema = {
@@ -63,7 +63,7 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: '/ws/rest/v1/kenyaemr/default-facility',
+    _default: `${restBaseUrl}/kenyaemr/default-facility`,
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   customPatientChartUrl: {

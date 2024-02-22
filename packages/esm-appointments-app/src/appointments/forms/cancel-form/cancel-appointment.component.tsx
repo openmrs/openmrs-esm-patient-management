@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, TextArea } from '@carbon/react';
-import { useSession, showSnackbar, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { useSession, showSnackbar, ExtensionSlot, usePatient, restBaseUrl } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
 import { useSWRConfig } from 'swr';
 import { useAppointmentDate } from '../../../helpers';
@@ -38,8 +38,8 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         subtitle: t('cancelledSuccessfully', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
-      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
-      mutate(`/ws/rest/v1/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Cancelled`);
+      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
+      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Cancelled`);
       closeOverlay();
     } else {
       showSnackbar({

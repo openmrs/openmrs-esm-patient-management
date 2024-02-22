@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { mutate } from 'swr';
 import { Button } from '@carbon/react';
 import { Notification } from '@carbon/react/icons';
-import { showModal, showNotification } from '@openmrs/esm-framework';
+import { restBaseUrl, showModal, showNotification } from '@openmrs/esm-framework';
 import { type MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './transition-entry.scss';
 interface TransitionMenuProps {
@@ -18,7 +18,7 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry, closeModal 
     serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'calling').then(
       ({ status }) => {
         if (status === 200) {
-          mutate(`/ws/rest/v1/queueutil/assignticket`);
+          mutate(`${restBaseUrl}/queueutil/assignticket`);
         }
       },
       (error) => {

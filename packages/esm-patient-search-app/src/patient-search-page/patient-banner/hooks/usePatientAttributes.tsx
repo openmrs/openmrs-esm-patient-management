@@ -1,4 +1,4 @@
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { type Patient } from '../types';
 
@@ -12,7 +12,7 @@ const customRepresentation =
  */
 export const usePatientAttributes = (patientUuid: string) => {
   const { data, error, isLoading } = useSWRImmutable<{ data: Patient }>(
-    `/ws/rest/v1/patient/${patientUuid}?v=${customRepresentation}`,
+    `${restBaseUrl}/patient/${patientUuid}?v=${customRepresentation}`,
     openmrsFetch,
   );
 

@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentPayload } from '../../types';
 import dayjs from 'dayjs';
 import { omrsDateFormat } from '../../constants';
@@ -9,7 +9,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
   const abortController = new AbortController();
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',
@@ -20,7 +20,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
 
 // NOTE: I don't think this is used anywhere?
 export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
-  return await openmrsFetch('/ws/rest/v1/appointments/conflicts', {
+  return await openmrsFetch(`${restBaseUrl}/appointments/conflicts`, {
     method: 'POST',
     body: {
       patientUuid: appointmentPayload.patientUuid,

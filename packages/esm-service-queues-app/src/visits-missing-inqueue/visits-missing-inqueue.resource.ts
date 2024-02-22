@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import last from 'lodash-es/last';
-import { openmrsFetch, type Visit, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, type Visit, useSession, restBaseUrl } from '@openmrs/esm-framework';
 import { type VisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
 dayjs.extend(isToday);
@@ -32,14 +32,14 @@ export function useMissingQueueEntries() {
     startDate +
     '&location=' +
     sessionLocation;
-  const url = `/ws/rest/v1/visit?includeInactive=false&v=${customRepresentation}`;
+  const url = `${restBaseUrl}/visit?includeInactive=false&v=${customRepresentation}`;
   const {
     data: visitsData,
     error: visitsError,
     isValidating: visitsIsValidating,
   } = useSWR<{ data: { results: Array<Visit> } }, Error>(sessionLocation ? url : null, openmrsFetch);
 
-  const apiUrl = `/ws/rest/v1/visit-queue-entry`;
+  const apiUrl = `${restBaseUrl}/visit-queue-entry`;
   const {
     data: queueData,
     error: queueError,

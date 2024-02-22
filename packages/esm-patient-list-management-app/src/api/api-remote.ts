@@ -1,4 +1,4 @@
-import { type LoggedInUser, openmrsFetch, refetchCurrentUser } from '@openmrs/esm-framework';
+import { type LoggedInUser, openmrsFetch, refetchCurrentUser, restBaseUrl } from '@openmrs/esm-framework';
 import {
   type AddPatientData,
   type CohortResponse,
@@ -13,7 +13,7 @@ import {
   type PatientListUpdate,
 } from './types';
 
-export const cohortUrl = '/ws/rest/v1/cohortm';
+export const cohortUrl = `${restBaseUrl}/cohortm`;
 
 async function postData(url: string, data = {}, ac = new AbortController()) {
   const response = await openmrsFetch(url, {
@@ -87,7 +87,7 @@ export async function getAllPatientLists(
 }
 
 export function starPatientList(userUuid: string, userProperties: LoggedInUser['userProperties']) {
-  return openmrsFetch(`/ws/rest/v1/user/${userUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/user/${userUuid}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

@@ -13,6 +13,7 @@ import {
   toOmrsIsoString,
   useConfig,
   type Visit,
+  restBaseUrl,
 } from '@openmrs/esm-framework';
 import { type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
@@ -148,7 +149,7 @@ export function useStatus() {
     concepts: { statusConceptSetUuid },
   } = config;
 
-  const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
+  const apiUrl = `${restBaseUrl}/concept/${statusConceptSetUuid}`;
   const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
@@ -163,7 +164,7 @@ export function usePriority() {
     concepts: { priorityConceptSetUuid },
   } = config;
 
-  const apiUrl = `/ws/rest/v1/concept/${priorityConceptSetUuid}`;
+  const apiUrl = `${restBaseUrl}/concept/${priorityConceptSetUuid}`;
   const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
@@ -179,7 +180,7 @@ export function useVisitQueueEntries(currServiceName: string, locationUuid: stri
   const config = useConfig();
   const { visitQueueNumberAttributeUuid } = config;
 
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
@@ -277,7 +278,7 @@ export async function updateQueueEntry(
 
   await Promise.all([endPatientStatus(previousQueueUuid, queueEntryUuid, endedAt)]);
 
-  return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
+  return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -308,7 +309,7 @@ export async function updateQueueEntry(
 
 export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid: string, endedAt: Date) {
   const abortController = new AbortController();
-  await openmrsFetch(`/ws/rest/v1/queue/${previousQueueUuid}/entry/${queueEntryUuid}`, {
+  await openmrsFetch(`${restBaseUrl}/queue/${previousQueueUuid}/entry/${queueEntryUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -321,7 +322,7 @@ export async function endPatientStatus(previousQueueUuid: string, queueEntryUuid
 }
 
 export function useServiceQueueEntries(service: string, locationUuid: string) {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?status=waiting&service=${service}&location=${locationUuid}&v=full`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     service && locationUuid ? apiUrl : null,
     openmrsFetch,
@@ -362,7 +363,7 @@ export async function addQueueEntry(
 
   await Promise.all([generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, visitQueueNumberAttributeUuid)]);
 
-  return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
+  return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -399,7 +400,7 @@ export async function generateVisitQueueNumber(
   const abortController = new AbortController();
 
   await openmrsFetch(
-    `/ws/rest/v1/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
+    `${restBaseUrl}/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
     {
       method: 'GET',
       headers: {
@@ -413,7 +414,7 @@ export async function generateVisitQueueNumber(
 export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
   const abortController = new AbortController();
 
-  return openmrsFetch(`/ws/rest/v1/queueutil/assignticket`, {
+  return openmrsFetch(`${restBaseUrl}/queueutil/assignticket`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

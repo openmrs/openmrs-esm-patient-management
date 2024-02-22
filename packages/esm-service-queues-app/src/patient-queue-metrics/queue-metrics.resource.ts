@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Appointment, type QueueServiceInfo } from '../types';
 import { startOfDay } from '../constants';
 
 export function useServiceMetricsCount(service: string, location: string) {
   const status = 'Waiting';
-  const apiUrl = `/ws/rest/v1/queue-entry-metrics?service=${service}&status=${status}&location=${location}`;
+  const apiUrl = `${restBaseUrl}/queue-entry-metrics?service=${service}&status=${status}&location=${location}`;
 
   const { data } = useSWRImmutable<
     {
@@ -23,7 +23,7 @@ export function useServiceMetricsCount(service: string, location: string) {
 }
 
 export const useAppointmentMetrics = () => {
-  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startOfDay}`;
+  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${startOfDay}`;
 
   const { data, error, isLoading } = useSWR<{
     data: Array<Appointment>;

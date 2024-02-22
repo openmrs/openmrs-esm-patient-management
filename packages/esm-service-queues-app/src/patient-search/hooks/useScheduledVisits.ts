@@ -1,12 +1,12 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { type AppointmentsFetchResponse } from '../../types';
 
 export function useScheduledVisits(patientUuid: string) {
   const abortController = new AbortController();
   let startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
-  const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+  const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {

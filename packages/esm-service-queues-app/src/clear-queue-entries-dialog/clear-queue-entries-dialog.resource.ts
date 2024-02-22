@@ -1,4 +1,4 @@
-import { openmrsFetch, parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
 import { endPatientStatus, type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
 export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueueEntry>) {
@@ -18,7 +18,7 @@ export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueu
       ]);
 
       concurrentReq.push(
-        openmrsFetch(`/ws/rest/v1/visit/${queueEntries[index].visitUuid}`, {
+        openmrsFetch(`${restBaseUrl}/visit/${queueEntries[index].visitUuid}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
