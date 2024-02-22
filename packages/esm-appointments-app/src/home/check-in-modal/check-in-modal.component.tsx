@@ -15,7 +15,7 @@ interface ChangeStatusDialogProps {
 
 const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheckInModal, appointmentUuid }) => {
   const { t } = useTranslation();
-  const { mutate: mutateAppointments } = useMutateAppointments();
+  const { mutateAppointments } = useMutateAppointments();
   const [checkInTime, setCheckInTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [isSubmitting, setIsSubmitting] = useState(false);
 

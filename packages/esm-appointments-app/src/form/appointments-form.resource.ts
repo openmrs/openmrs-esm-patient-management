@@ -29,7 +29,7 @@ export function useMutateAppointments() {
   );
 
   return {
-    mutate: mutateAppointments,
+    mutateAppointments,
   };
 }
 

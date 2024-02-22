@@ -51,7 +51,7 @@ type RenderStatusProps = {
 };
 
 const RenderStatus = ({ status, t, appointmentUuid }: RenderStatusProps) => {
-  const { mutate: mutateAppointments } = useMutateAppointments();
+  const { mutateAppointments } = useMutateAppointments();
   switch (status) {
     case 'Completed':
       return (

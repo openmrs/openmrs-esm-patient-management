@@ -82,7 +82,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   context,
   closeWorkspace,
 }) => {
-  const { mutate: mutateAppointments } = useMutateAppointments();
+  const { mutateAppointments } = useMutateAppointments();
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
   const defaultTimeFormat = appointment?.startDateTime
     ? editedAppointmentTimeFormat
