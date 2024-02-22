@@ -57,6 +57,13 @@ export function startupApp() {
       parent: `${window.spaBase}`,
     },
   ]);
+
+  registerWorkspace({
+    name: 'appointments-form-workspace',
+    load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
+    title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
+    width: 'wider',
+  });
 }
 
 export const root = getSyncLifecycle(rootComponent, options);
@@ -77,9 +84,3 @@ export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, opti
 export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
-
-registerWorkspace({
-  name: 'appointments-form-workspace',
-  load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
-  title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
-});
