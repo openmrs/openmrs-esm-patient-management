@@ -71,7 +71,13 @@
     },
     {
       "name": "appointments-form-workspace",
-      "component": "appointmentsFormWorkspace"
+      "component": "appointmentsFormWorkspace",
+      "meta": {
+        "title": {
+          "key": "createNewAppointment",
+          "default": "Create new appointment"
+        }
+      }
     }
   ]
 }
