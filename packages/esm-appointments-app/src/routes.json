@@ -76,8 +76,7 @@
         "title": {
           "key": "createNewAppointment",
           "default": "Create new appointment"
-        },
-        "width": "wider"
+        }
       }
     }
   ]
