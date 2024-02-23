@@ -30,7 +30,7 @@ export const useCalendarDistribution = (
 ) => {
   const appointmentSummary = useAppointmentSummary(new Date(appointmentDate), serviceUuid);
   const monthlyData = getMonthlyCalendarDistribution(new Date(appointmentDate), appointmentSummary) ?? [];
-  return distributionType === 'month' ? monthlyData : monthlyData.slice(0, 7);
+  return distributionType === 'month' ? monthlyData : monthlyData.slice(0, 6);
 };
 
 export const useAppointmentSummary = (fromDate: Date, serviceUuid: string): Array<{ date: string; count: number }> => {
