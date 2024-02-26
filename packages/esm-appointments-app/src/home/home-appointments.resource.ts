@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useAppointmentDate } from '../helpers';
 import { omrsDateFormat } from '../constants';
 import type { AppointmentService, AppointmentsFetchResponse } from '../types';
@@ -11,7 +11,7 @@ export function useTodaysAppointments() {
   const { t } = useTranslation();
   const { currentAppointmentDate } = useAppointmentDate();
 
-  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${currentAppointmentDate}`;
+  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${currentAppointmentDate}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     currentAppointmentDate ? apiUrl : null,
     openmrsFetch,
@@ -33,7 +33,7 @@ export function useTodaysAppointments() {
 }
 
 export function useServices() {
-  const apiUrl = `/ws/rest/v1/appointmentService/all/default`;
+  const apiUrl = `${restBaseUrl}/appointmentService/all/default`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<AppointmentService> }, Error>(
     apiUrl,
     openmrsFetch,
@@ -51,7 +51,7 @@ export const updateAppointmentStatus = async (toStatus: string, appointmentUuid:
   const abortController = new AbortController();
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',
@@ -62,7 +62,7 @@ export const updateAppointmentStatus = async (toStatus: string, appointmentUuid:
 
 export const undoAppointmentStatus = async (appointmentUuid: string) => {
   const abortController = new AbortController();
-  const url = `/ws/rest/v1/appointment/undoStatusChange/${appointmentUuid}`;
+  const url = `${restBaseUrl}/appointment/undoStatusChange/${appointmentUuid}`;
   return await openmrsFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

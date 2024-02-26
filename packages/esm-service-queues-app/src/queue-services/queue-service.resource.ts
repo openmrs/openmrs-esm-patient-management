@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl } from '@openmrs/esm-framework';
 
 export function useServiceConcepts() {
   const config = useConfig();
@@ -7,7 +7,7 @@ export function useServiceConcepts() {
     concepts: { serviceConceptSetUuid },
   } = config;
 
-  const apiUrl = `/ws/rest/v1/concept/${serviceConceptSetUuid}`;
+  const apiUrl = `${restBaseUrl}/concept/${serviceConceptSetUuid}`;
   const { data, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
 
   return {
@@ -19,7 +19,7 @@ export function useServiceConcepts() {
 export function saveQueue(queueName: string, queueConcept: string, queueDescription: string, queueLocation: string) {
   const abortController = new AbortController();
 
-  return openmrsFetch(`/ws/rest/v1/queue`, {
+  return openmrsFetch(`${restBaseUrl}/queue`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

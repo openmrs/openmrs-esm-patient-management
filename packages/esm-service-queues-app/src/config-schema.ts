@@ -1,4 +1,4 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
@@ -130,7 +130,7 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: '/ws/rest/v1/kenyaemr/default-facility',
+    _default: `${restBaseUrl}/kenyaemr/default-facility`,
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   customPatientChartText: {

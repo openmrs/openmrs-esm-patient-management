@@ -1,7 +1,9 @@
 import {
+  fhirBaseUrl,
   makeUrl,
   messageOmrsServiceWorker,
   navigate,
+  restBaseUrl,
   setupDynamicOfflineDataHandler,
   setupOfflineSync,
   type SyncProcessOptions,
@@ -54,10 +56,10 @@ export function setupOffline() {
 
 function getPatientUrlsToBeCached(patientUuid: string) {
   return [
-    `/ws/fhir2/R4/Patient/${patientUuid}`,
-    `/ws/rest/v1/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}`,
-    `/ws/rest/v1/person/${patientUuid}/attribute`,
-    `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`,
+    `${fhirBaseUrl}/Patient/${patientUuid}`,
+    `${restBaseUrl}/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}`,
+    `${restBaseUrl}/person/${patientUuid}/attribute`,
+    `${restBaseUrl}/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`,
   ].map((url) => window.origin + makeUrl(url));
 }
 

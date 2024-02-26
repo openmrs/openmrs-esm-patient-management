@@ -1,4 +1,4 @@
-import { openmrsFetch, updateVisit } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, updateVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { endPatientStatus } from '../active-visits/active-visits-table.resource';
 import { type AppointmentsFetchResponse, type EndVisitPayload } from '../types';
@@ -52,7 +52,7 @@ export async function voidQueueEntry(
 export function useCheckedInAppointments(patientUuid: string, startDate: string) {
   const abortController = new AbortController();
 
-  const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+  const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
@@ -84,7 +84,7 @@ export function useCheckedInAppointments(patientUuid: string, startDate: string)
 }
 
 export async function changeAppointmentStatus(toStatus: string, appointmentUuid: string) {
-  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
   return openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',

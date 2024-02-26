@@ -1,3 +1,4 @@
+import { restBaseUrl } from '@openmrs/esm-framework';
 export const mockServiceData = [
   { uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'Clinical consultation' },
   { uuid: 'd80ff12a-06a7-11ed-b939-0242ac120002', display: 'Triage' },
@@ -32,7 +33,7 @@ export const mockVisitQueueEntries = [
         links: [
           {
             rel: 'self',
-            uri: 'http://openmrs:8080/openmrs/ws/rest/v1/concept/aaec62b1-4b03-4166-ada7-230cb4b4aaaa',
+            uri: `http://openmrs:8080/openmrs/${restBaseUrl}/concept/aaec62b1-4b03-4166-ada7-230cb4b4aaaa`,
           },
         ],
       },

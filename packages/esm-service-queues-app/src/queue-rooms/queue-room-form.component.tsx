@@ -12,7 +12,7 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { type SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
@@ -61,7 +61,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePa
               subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
             closePanel();
-            mutate(`/ws/rest/v1/queueroom`);
+            mutate(`${restBaseUrl}/queueroom`);
           }
         },
         (error) => {

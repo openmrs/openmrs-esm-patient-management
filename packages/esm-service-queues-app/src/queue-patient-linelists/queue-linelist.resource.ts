@@ -1,12 +1,12 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Appointment, type AppointmentsFetchResponse } from '../types/index';
 import { type Provider } from '../types';
 import { startOfDay } from '../constants';
 import dayjs from 'dayjs';
 
 export function useAppointments() {
-  const apiUrl = `/ws/rest/v1/appointment/all?forDate=${startOfDay}`;
+  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${startOfDay}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
   return {
@@ -18,7 +18,7 @@ export function useAppointments() {
 }
 
 export function useCheckedInAppointments() {
-  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
+  const apiUrl = `${restBaseUrl}/appointment/appointmentStatus?forDate=${startOfDay}&status=CheckedIn`;
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: Array<Appointment> }, Error>(apiUrl, openmrsFetch);
 
@@ -32,7 +32,7 @@ export function useCheckedInAppointments() {
 
 export function useProviders() {
   const customRepresentation = 'custom:(uuid,display,person:(age,display,gender,uuid))';
-  const apiUrl = `/ws/rest/v1/provider?q=&v=${customRepresentation}`;
+  const apiUrl = `${restBaseUrl}/provider?q=&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Provider> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -49,7 +49,7 @@ export function useProviders() {
 export function usePatientAppointments(patientUuid: string, startDate) {
   const abortController = new AbortController();
 
-  const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+  const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const fetcher = () =>
     openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',

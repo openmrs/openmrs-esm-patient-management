@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable';
-import { openmrsFetch, useConfig, formatTime, parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, formatTime, parseDate, restBaseUrl } from '@openmrs/esm-framework';
 import { type Observation, type PatientVitals, Encounter } from '../../types/index';
 import { type ConfigObject } from '../../config-schema';
 
@@ -7,7 +7,7 @@ export function useVitalsConceptMetadata() {
   const customRepresentation =
     'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 
-  const apiUrl = `/ws/rest/v1/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
+  const apiUrl = `${restBaseUrl}/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
 
   const { data, error, isLoading } = useSWRImmutable<{ data: VitalsConceptMetadataResponse }, Error>(
     apiUrl,

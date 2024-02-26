@@ -1,4 +1,4 @@
-import { openmrsFetch, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, toDateObjectStrict, toOmrsIsoString } from '@openmrs/esm-framework';
 
 export async function saveQueueEntry(
   visitUuid: string,
@@ -15,7 +15,7 @@ export async function saveQueueEntry(
     generateVisitQueueNumber(locationUuid, visitUuid, queueUuid, abortController, visitQueueNumberAttributeUuid),
   ]);
 
-  return openmrsFetch(`/ws/rest/v1/visit-queue-entry`, {
+  return openmrsFetch(`${restBaseUrl}/visit-queue-entry`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export async function generateVisitQueueNumber(
   visitQueueNumberAttributeUuid: string,
 ) {
   await openmrsFetch(
-    `/ws/rest/v1/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
+    `${restBaseUrl}/queue-entry-number?location=${location}&queue=${queueUuid}&visit=${visitUuid}&visitAttributeType=${visitQueueNumberAttributeUuid}`,
     {
       method: 'GET',
       headers: {

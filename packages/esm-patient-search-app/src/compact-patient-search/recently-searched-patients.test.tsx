@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../types';
 import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
@@ -64,7 +64,7 @@ describe('RecentlySearchedPatients', () => {
               links: [
                 {
                   rel: 'self',
-                  uri: 'http://dev3.openmrs.org/openmrs/ws/rest/v1/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334',
+                  uri: `http://dev3.openmrs.org/openmrs/${restBaseUrl}/patientidentifiertype/05a29f94-c0ed-11e2-94be-8c13b969e334`,
                   resourceAlias: 'patientidentifiertype',
                 },
               ],
