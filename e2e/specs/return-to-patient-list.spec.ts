@@ -13,19 +13,20 @@ import {
   removePatientFromCohort,
 } from '../commands';
 
-let cohortMemberShip: CohortMember;
+let cohortMembership: CohortMember;
 let cohort: Cohort;
 let patient: Patient;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   cohort = await generateRandomCohort(api);
-  cohortMemberShip = await addPatientToCohort(api, cohort.uuid, patient.uuid);
+  cohortMembership = await addPatientToCohort(api, cohort.uuid, patient.uuid);
 });
 
 test('Return to patient list from the patient chart', async ({ page }) => {
   const homePage = new HomePage(page);
   const patientListPage = new PatientListsPage(page);
+
   await test.step('When I navigate to the patient list', async () => {
     await patientListPage.goto(cohort.uuid);
   });
@@ -54,6 +55,7 @@ test('Return to patient list from the patient chart', async ({ page }) => {
 test('Return to patient list after navigating to visits page from the patient chart', async ({ page }) => {
   const homePage = new HomePage(page);
   const patientListPage = new PatientListsPage(page);
+
   await test.step('When I navigate to the patient list', async () => {
     await patientListPage.goto(cohort.uuid);
   });
@@ -90,6 +92,7 @@ test('Return to patient list after navigating to visits page from the patient ch
 test('Return to patient list after navigating to visits and refreshing the page', async ({ page }) => {
   const homePage = new HomePage(page);
   const patientListPage = new PatientListsPage(page);
+
   await test.step('When I navigate to the patient list', async () => {
     await patientListPage.goto(cohort.uuid);
   });
@@ -128,10 +131,10 @@ test('Return to patient list after navigating to visits and refreshing the page'
 });
 
 test('Return to patient list from the patient chart on a new tab', async ({ page, context }) => {
-  const homePage = new HomePage(page);
   const patientListPage = new PatientListsPage(page);
   const locator = await page.locator('table tbody tr td:nth-child(1) a');
   const pagePromise = context.waitForEvent('page');
+
   await test.step('When I navigate to the patient list', async () => {
     await patientListPage.goto(cohort.uuid);
   });
@@ -169,8 +172,8 @@ test('Return to patient list from the patient chart on a new tab', async ({ page
 });
 
 test.afterEach(async ({ api }) => {
-  if (cohortMemberShip) {
-    await removePatientFromCohort(api, cohortMemberShip.uuid);
+  if (cohortMembership) {
+    await removePatientFromCohort(api, cohortMembership.uuid);
   }
   await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
