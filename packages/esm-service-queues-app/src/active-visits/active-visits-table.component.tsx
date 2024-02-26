@@ -39,8 +39,9 @@ import {
   useSession,
   showModal,
   ConfigurableLink,
+  useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { useVisitQueueEntries, type MappedVisitQueueEntry } from './active-visits-table.resource';
+import { useVisitQueueEntries, type MappedVisitQueueEntry, mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import { SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
@@ -64,6 +65,12 @@ import TransitionMenu from '../queue-entry-table-components/transition-entry.com
 import styles from './active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
+import QueueTable from '../queue-table/queue-table.component';
+import { queueTableNameColumn } from '../queue-table/cells/queue-table-name-cell.component';
+import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-coming-from-cell.component';
+import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
+import { activeVisitActionsColumn } from './active-visits-row-actions.component';
+import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
 
 /**
  * FIXME Temporarily moved here
@@ -88,13 +95,36 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const { t } = useTranslation();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
+  
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const currentServiceUuid = useSelectedServiceUuid();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
+  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const useNewActiveVisitsTable = useFeatureFlag("new-active-visits-table");
+
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+  else if(useNewActiveVisitsTable) {
+    const queueEntries = visitQueueEntries.map(entry => entry.queueEntry);
+    const columns = [queueTableNameColumn, queueTablePriorityColumn, queueTableComingFromColumn, queueTableStatusColumn, activeVisitActionsColumn];
+    return <QueueTable queueEntries={queueEntries} queueTableColumns={columns}/>;
+  }
+  else {
+    return <OldQueueTable visitQueueEntries={visitQueueEntries.map(
+      entry => mapVisitQueueEntryProperties(entry.queueEntry, visitQueueNumberAttributeUuid)
+    )} />;
+  }
+}
+
+function OldQueueTable({visitQueueEntries}: {visitQueueEntries: MappedVisitQueueEntry[]}) {
+  
+  const { t } = useTranslation();
+  const currentServiceName = useSelectedServiceName();
+  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { queues } = useQueues(currentQueueLocation);
+
+  const currentServiceUuid = useSelectedServiceUuid();
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
@@ -266,10 +296,6 @@ function ActiveVisitsTable() {
     launchAddProviderRoomModal,
   ]);
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
   if (visitQueueEntries?.length) {
     return (
       <div className={styles.container}>
@@ -357,13 +383,13 @@ function ActiveVisitsTable() {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <EditMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (

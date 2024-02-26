@@ -7,10 +7,9 @@ import styles from './actions-menu.scss';
 
 interface ActionsMenuProps {
   queueEntry: MappedVisitQueueEntry;
-  closeModal: () => void;
 }
 
-const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry, closeModal }) => {
+const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
 
   const launchEndVisitModal = useCallback(() => {

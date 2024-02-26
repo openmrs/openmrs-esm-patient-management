@@ -293,7 +293,6 @@ export interface MappedServiceQueueEntry {
   name: string;
   age: string;
   gender: string;
-  phoneNumber: string;
   visitType: string;
   returnDate: string;
   patientUuid: string;
