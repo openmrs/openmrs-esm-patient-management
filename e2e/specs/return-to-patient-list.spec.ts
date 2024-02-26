@@ -95,7 +95,7 @@ test('Return to patient list after navigating to visits and refreshing the page'
   });
 
   await test.step('Then I should be redirected to the patient chart', async () => {
-    await expect(homePage.page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
+    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`);
   });
 
   await test.step('When I click on the `Open menu` button', async () => {
