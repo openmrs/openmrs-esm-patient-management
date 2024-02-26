@@ -1,4 +1,4 @@
-import { type LoggedInUser, openmrsFetch, refetchCurrentUser, restBaseUrl } from '@openmrs/esm-framework';
+import { type LoggedInUser, openmrsFetch, refetchCurrentUser, restBaseUrl, fhirBaseUrl } from '@openmrs/esm-framework';
 import {
   type AddPatientData,
   type CohortResponse,
@@ -124,7 +124,7 @@ export async function getPatientListMembers(cohortUuid: string, ac = new AbortCo
   const currentDate = new Date();
   const searchQuery = results.map((p) => p.patient.uuid).join(',');
 
-  const result = await openmrsFetch(`/ws/fhir2/R4/Patient/_search?_id=${searchQuery}`, {
+  const result = await openmrsFetch(`${fhirBaseUrl}/Patient/_search?_id=${searchQuery}`, {
     method: 'POST',
     signal: ac.signal,
   });

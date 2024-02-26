@@ -1,4 +1,5 @@
 import {
+  fhirBaseUrl,
   makeUrl,
   messageOmrsServiceWorker,
   navigate,
@@ -55,7 +56,7 @@ export function setupOffline() {
 
 function getPatientUrlsToBeCached(patientUuid: string) {
   return [
-    `/ws/fhir2/R4/Patient/${patientUuid}`,
+    `${fhirBaseUrl}/Patient/${patientUuid}`,
     `${restBaseUrl}/relationship?v=${personRelationshipRepresentation}&person=${patientUuid}`,
     `${restBaseUrl}/person/${patientUuid}/attribute`,
     `${restBaseUrl}/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`,
