@@ -13,15 +13,14 @@ import {
   removePatientFromCohort,
 } from '../commands';
 
-let createdCohortMember: CohortMember;
-let createdCohortUuid: string;
+let cohortMemberShip: CohortMember;
 let cohort: Cohort;
 let patient: Patient;
 
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
   cohort = await generateRandomCohort(api);
-  createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
+  cohortMemberShip = await addPatientToCohort(api, cohort.uuid, patient.uuid);
 });
 
 test('Return to patient list from the patient chart', async ({ page }) => {
@@ -31,7 +30,7 @@ test('Return to patient list from the patient chart', async ({ page }) => {
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('And I click on the patient {{name}} in the list', async () => {
+  await test.step('And I click on the patient in the list', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
   });
 
@@ -59,7 +58,7 @@ test('Return to patient list after navigating to visits page from the patient ch
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('And I click on the patient {{name}} in the list', async () => {
+  await test.step('And I click on the patient in the list', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
   });
 
@@ -73,7 +72,7 @@ test('Return to patient list after navigating to visits page from the patient ch
     await page.getByLabel('Open menu').click();
   });
 
-  await test.step('And I click on the `Visits` link', async () => {
+  await test.step('And I click on the `Visits` tab', async () => {
     await page.getByRole('link', { name: 'Visits' }).click();
   });
 
@@ -95,7 +94,7 @@ test('Return to patient list after navigating to visits and refreshing the page'
     await patientListPage.goto(cohort.uuid);
   });
 
-  await test.step('And I click on the patient {{name}} in the list', async () => {
+  await test.step('And I click on the patient in the list', async () => {
     await page.locator('table tbody tr td:nth-child(1) a').click();
   });
 
@@ -109,7 +108,7 @@ test('Return to patient list after navigating to visits and refreshing the page'
     await page.getByLabel('Open menu').click();
   });
 
-  await test.step('And I click on the `Visits` link', async () => {
+  await test.step('And I click on the `Visits` tab', async () => {
     await page.getByRole('link', { name: 'Visits' }).click();
   });
 
@@ -170,11 +169,8 @@ test('Return to patient list from the patient chart on a new tab', async ({ page
 });
 
 test.afterEach(async ({ api }) => {
-  if (createdCohortMember) {
-    await removePatientFromCohort(api, createdCohortMember.uuid);
-  }
-  if (createdCohortUuid) {
-    await deleteCohort(api, createdCohortUuid);
+  if (cohortMemberShip) {
+    await removePatientFromCohort(api, cohortMemberShip.uuid);
   }
   await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
