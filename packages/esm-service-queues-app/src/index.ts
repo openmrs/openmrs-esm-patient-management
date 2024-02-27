@@ -92,24 +92,8 @@ export const addProviderToRoomModal = getAsyncLifecycle(
   },
 );
 
-export const transitionQueueEntryPriorityDialog = getAsyncLifecycle(
-  () => import('./queue-table/transitions/transition-priority-dialog.component'),
-  {
-    featureName: 'transition queue entry priority',
-    moduleName,
-  },
-);
-
-export const transitionQueueEntryStatusDialog = getAsyncLifecycle(
-  () => import('./queue-table/transitions/transition-status-dialog.component'),
-  {
-    featureName: 'transition queue entry status',
-    moduleName,
-  },
-);
-
-export const transferQueueModal = getAsyncLifecycle(
-  () => import('./queue-table/transitions/transfer-queue-dialog.component'),
+export const transitionQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/transitions/transition-queue-entry-modal.component'),
   {
     featureName: 'transfer patient to a different queue',
     moduleName,

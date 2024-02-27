@@ -1,10 +1,9 @@
 import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
-import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 import { mockQueueEntryBrian, mockQueueSurgery, mockStatusInService, mockQueues } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
-import TransferQueueDialog from './transfer-queue-dialog.component';
+import TransitionQueueEntryModal from './transition-queue-entry-modal.component';
 import userEvent from '@testing-library/user-event';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -17,7 +16,7 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('TransferQueueDialog: ', () => {
+describe('TransitionQueueEntryModal: ', () => {
   const queueEntry = mockQueueEntryBrian;
   const { queue } = queueEntry;
   const { allowedStatuses, allowedPriorities } = queue;
@@ -25,7 +24,7 @@ describe('TransferQueueDialog: ', () => {
   const nextQueue = mockQueueSurgery;
 
   it('renders the dialog with the right status and priority options', () => {
-    renderWithSwr(<TransferQueueDialog queueEntry={queueEntry} closeModal={() => {}} />);
+    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
     expect(screen.getByText(queueEntry.patient.display)).toBeInTheDocument();
 
     for (const status of allowedStatuses) {
@@ -37,27 +36,28 @@ describe('TransferQueueDialog: ', () => {
     }
   });
 
-  it('has a cancel button that closes the modal', () => {
+  it('has a cancel button that closes the modal', async () => {
     const closeModal = jest.fn();
+    const user = userEvent.setup();
 
-    renderWithSwr(<TransferQueueDialog queueEntry={queueEntry} closeModal={closeModal} />);
+    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
     const cancelButton = screen.getByText('Cancel');
-    cancelButton.click();
+    await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('has a disabled submit button when selected queue is same as before', () => {
-    renderWithSwr(<TransferQueueDialog queueEntry={queueEntry} closeModal={() => {}} />);
-    const submitButton = screen.getByRole('button', { name: /Transfer to next queue/ });
+  it('has a disabled submit button when selected queue and status is same as before', () => {
+    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
+    const submitButton = screen.getByRole('button', { name: /Transition patient/ });
     expect(submitButton).toBeDisabled();
   });
 
-  it('has an working submit button when selected queue is different from before', async () => {
+  it('has an working submit button when selected queue and status is different from before', async () => {
     mockedOpenmrsFetch.mockResolvedValue({
       status: 200,
     });
     const user = userEvent.setup();
-    renderWithSwr(<TransferQueueDialog queueEntry={queueEntry} closeModal={() => {}} />);
+    renderWithSwr(<TransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     // change queue
     const queueDropdown = screen.getByRole('combobox');
@@ -65,10 +65,11 @@ describe('TransferQueueDialog: ', () => {
     const queueSelection = screen.getByRole('option', { name: nextQueue.display });
     await user.selectOptions(queueDropdown, queueSelection);
 
+    // change status
     const inServiceRadioButton = screen.getByText(mockStatusInService.display);
     await inServiceRadioButton.click();
 
-    const submitButton = screen.getByRole('button', { name: /Transfer to next queue/ });
+    const submitButton = screen.getByRole('button', { name: /Transition patient/ });
     expect(submitButton).not.toBeDisabled();
     await submitButton.click();
 

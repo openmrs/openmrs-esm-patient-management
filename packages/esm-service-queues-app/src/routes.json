@@ -72,16 +72,8 @@
       "slot": "add-queue-entry-slot"
     },
     {
-      "name": "transition-queue-entry-status-dialog",
-      "component": "transitionQueueEntryStatusDialog"
-    },
-    {
-      "name": "transition-queue-entry-priority-dialog",
-      "component": "transitionQueueEntryPriorityDialog"
-    },
-    {
-      "name": "transfer-queue-entry",
-      "component": "transferQueueModal"
+      "name": "transition-queue-entry-modal",
+      "component": "transitionQueueEntryModal"
     } 
   ]
 }

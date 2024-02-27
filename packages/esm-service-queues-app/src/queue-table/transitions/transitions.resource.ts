@@ -17,7 +17,7 @@ interface TransitionQueueEntryParams {
  * @param abortController
  * @returns
  */
-function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
+export function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
   return openmrsFetch(`/ws/rest/v1/queue-entry-transition`, {
     method: 'POST',
     headers: {
@@ -26,29 +26,4 @@ function transitionQueueEntry(params: TransitionQueueEntryParams, abortControlle
     signal: abortController?.signal,
     body: params,
   });
-}
-
-export function transitionQueueEntryStatus(queueEntryToTransition: string, newStatus: string) {
-  return transitionQueueEntry({ queueEntryToTransition, newStatus });
-}
-
-export function transitionQueueEntryPriority(queueEntryToTransition: string, newPriority: string) {
-  return transitionQueueEntry({ queueEntryToTransition, newPriority });
-}
-
-/**
- * A transfer is a special case of a transition that involving move a patient from one queue to another.
- * @param queueEntryToTransition
- * @param newQueue
- * @param newStatus
- * @param newPriority
- * @returns
- */
-export function transferQueueEntry(
-  queueEntryToTransition: string,
-  newQueue: string,
-  newStatus: string,
-  newPriority: string,
-) {
-  return transitionQueueEntry({ queueEntryToTransition, newQueue, newStatus, newPriority });
 }
