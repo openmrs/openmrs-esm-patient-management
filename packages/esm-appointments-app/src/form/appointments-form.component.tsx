@@ -314,32 +314,30 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
-          <div>
-            <ResponsiveWrapper>
-              <Controller
-                name="location"
-                control={control}
-                render={({ field: { onChange, value, onBlur, ref } }) => (
-                  <Select
-                    id="location"
-                    invalidText="Required"
-                    labelText={t('selectLocation', 'Select a location')}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                    ref={ref}>
-                    <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
-                    {locations?.length > 0 &&
-                      locations.map((location) => (
-                        <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                          {location.display}
-                        </SelectItem>
-                      ))}
-                  </Select>
-                )}
-              />
-            </ResponsiveWrapper>
-          </div>
+          <ResponsiveWrapper>
+            <Controller
+              name="location"
+              control={control}
+              render={({ field: { onChange, value, onBlur, ref } }) => (
+                <Select
+                  id="location"
+                  invalidText="Required"
+                  labelText={t('selectLocation', 'Select a location')}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  ref={ref}>
+                  <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
+                  {locations?.length > 0 &&
+                    locations.map((location) => (
+                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                        {location.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
+          </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('service', 'Service')}</span>
@@ -629,42 +627,39 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('provider', 'Provider')}</span>
-          <div>
-            <ResponsiveWrapper>
-              <Controller
-                name="provider"
-                control={control}
-                render={({ field: { onChange, value, onBlur, ref } }) => (
-                  <Select
-                    id="provider"
-                    invalidText="Required"
-                    labelText={t('selectProvider', 'Select a provider')}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                    ref={ref}>
-                    <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
-                    {providers?.providers?.length > 0 &&
-                      providers?.providers?.map((provider) => (
-                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
-                          {provider.display}
-                        </SelectItem>
-                      ))}
-                  </Select>
-                )}
-              />
-            </ResponsiveWrapper>
-          </div>
+          <ResponsiveWrapper>
+            <Controller
+              name="provider"
+              control={control}
+              render={({ field: { onChange, value, onBlur, ref } }) => (
+                <Select
+                  id="provider"
+                  invalidText="Required"
+                  labelText={t('selectProvider', 'Select a provider')}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  ref={ref}>
+                  <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
+                  {providers?.providers?.length > 0 &&
+                    providers?.providers?.map((provider) => (
+                      <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
+                        {provider.display}
+                      </SelectItem>
+                    ))}
+                </Select>
+              )}
+            />
+          </ResponsiveWrapper>
         </section>
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('note', 'Note')}</span>
-
-          <Controller
-            name="appointmentNote"
-            control={control}
-            render={({ field: { onChange, onBlur, value, ref } }) => (
-              <ResponsiveWrapper>
+          <ResponsiveWrapper>
+            <Controller
+              name="appointmentNote"
+              control={control}
+              render={({ field: { onChange, onBlur, value, ref } }) => (
                 <TextArea
                   id="appointmentNote"
                   value={value}
@@ -674,9 +669,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   onBlur={onBlur}
                   ref={ref}
                 />
-              </ResponsiveWrapper>
-            )}
-          />
+              )}
+            />
+          </ResponsiveWrapper>
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

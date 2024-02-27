@@ -8,7 +8,6 @@ $openmrs-background-grey: #ededed;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - 6rem);
 }
 
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
