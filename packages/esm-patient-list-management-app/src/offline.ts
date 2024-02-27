@@ -1,5 +1,6 @@
 import {
   fetchCurrentPatient,
+  fhirBaseUrl,
   makeUrl,
   messageOmrsServiceWorker,
   setupDynamicOfflineDataHandler,
@@ -12,7 +13,7 @@ export function setupOffline() {
     type: 'patient',
     displayName: 'Patient list',
     async isSynced(patientUuid) {
-      const expectedUrls = [`/ws/fhir2/R4/Patient/${patientUuid}`];
+      const expectedUrls = [`${fhirBaseUrl}/Patient/${patientUuid}`];
       const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
       const cache = await caches.open('omrs-spa-cache-v1');
       const keys = (await cache.keys()).map((key) => key.url);
@@ -21,7 +22,7 @@ export function setupOffline() {
     async sync(patientUuid) {
       await messageOmrsServiceWorker({
         type: 'registerDynamicRoute',
-        pattern: `/ws/fhir2/R4/Patient/${patientUuid}`,
+        pattern: `${fhirBaseUrl}/Patient/${patientUuid}`,
       });
 
       await fetchCurrentPatient(patientUuid, { headers: cacheForOfflineHeaders });

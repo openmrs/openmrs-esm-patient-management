@@ -1,9 +1,9 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export const useActiveTickets = () => {
   const { data, isLoading, error, mutate } = useSWR<{ data: Record<string, { status: string; ticketNumber: string }> }>(
-    '/ws/rest/v1/queueutil/active-tickets',
+    `${restBaseUrl}/queueutil/active-tickets`,
     openmrsFetch,
     { refreshInterval: 3000 },
   );

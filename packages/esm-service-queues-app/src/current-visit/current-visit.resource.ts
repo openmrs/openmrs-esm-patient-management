@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, type Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { type ConceptMetadata } from './hooks/useVitalsConceptMetadata';
 import { type ObsMetaInfo } from '../types/index';
 
@@ -17,7 +17,7 @@ export function useVisit(visitUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
 
-  const apiUrl = `/ws/rest/v1/visit/${visitUuid}?v=${customRepresentation}`;
+  const apiUrl = `${restBaseUrl}/visit/${visitUuid}?v=${customRepresentation}`;
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: Visit }, Error>(
     visitUuid ? apiUrl : null,

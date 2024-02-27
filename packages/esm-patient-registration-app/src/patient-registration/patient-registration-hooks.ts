@@ -5,6 +5,7 @@ import {
   openmrsFetch,
   useConfig,
   usePatient,
+  restBaseUrl,
 } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
 import { type Dispatch, useEffect, useMemo, useState } from 'react';
@@ -210,7 +211,7 @@ export function useInitialPatientIdentifiers(patientUuid: string): {
 
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PatientIdentifierResponse> }>, Error>(
     shouldFetch
-      ? `/ws/rest/v1/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`
+      ? `${restBaseUrl}/patient/${patientUuid}/identifier?v=custom:(uuid,identifier,identifierType:(uuid,required,name),preferred)`
       : null,
     openmrsFetch,
   );
@@ -247,7 +248,7 @@ function useInitialEncounters(patientUuid: string, patientToEdit: fhir.Patient) 
   const { registrationObs } = useConfig() as RegistrationConfig;
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Encounter> }>>(
     patientToEdit && registrationObs.encounterTypeUuid
-      ? `/ws/rest/v1/encounter?patient=${patientUuid}&v=custom:(encounterDatetime,obs:(concept:ref,value:ref))&encounterType=${registrationObs.encounterTypeUuid}`
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&v=custom:(encounterDatetime,obs:(concept:ref,value:ref))&encounterType=${registrationObs.encounterTypeUuid}`
       : null,
     openmrsFetch,
   );
@@ -265,7 +266,7 @@ function useInitialPersonAttributes(personUuid: string) {
   const shouldFetch = !!personUuid;
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PersonAttributeResponse> }>, Error>(
     shouldFetch
-      ? `/ws/rest/v1/person/${personUuid}/attribute?v=custom:(uuid,display,attributeType:(uuid,display,format),value)`
+      ? `${restBaseUrl}/person/${personUuid}/attribute?v=custom:(uuid,display,attributeType:(uuid,display,format),value)`
       : null,
     openmrsFetch,
   );

@@ -1,4 +1,4 @@
-import { showModal, showNotification, showActionableNotification } from '@openmrs/esm-framework';
+import { showModal, showNotification, showActionableNotification, restBaseUrl } from '@openmrs/esm-framework';
 import { updateAppointmentStatus, undoAppointmentStatus } from './home-appointments.resource';
 
 export const launchCheckInAppointmentModal = (appointmentUuid: string) => {

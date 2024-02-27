@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Button, Layer, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showNotification, showActionableNotification } from '@openmrs/esm-framework';
+import { showNotification, showActionableNotification, restBaseUrl } from '@openmrs/esm-framework';
 import { updateAppointmentStatus } from '../home-appointments.resource';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
 import { handleUndoAction } from '../common';
 import styles from './check-in-modal.scss';
-import { useMutateAppointments } from '../../form/appointments-form.resource';
 
 interface ChangeStatusDialogProps {
   closeCheckInModal: () => void;
@@ -15,7 +15,7 @@ interface ChangeStatusDialogProps {
 
 const CheckInAppointmentModal: React.FC<ChangeStatusDialogProps> = ({ closeCheckInModal, appointmentUuid }) => {
   const { t } = useTranslation();
-  const { mutate: mutateAppointments } = useMutateAppointments();
+  const { mutateAppointments } = useMutateAppointments();
   const [checkInTime, setCheckInTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [isSubmitting, setIsSubmitting] = useState(false);
 

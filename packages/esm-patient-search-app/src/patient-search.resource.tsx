@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { openmrsFetch, showNotification, useSession, type FetchResponse } from '@openmrs/esm-framework';
+import { openmrsFetch, showNotification, useSession, type FetchResponse, restBaseUrl } from '@openmrs/esm-framework';
 import type { PatientSearchResponse, SearchedPatient, User } from './types';
 
 const v =
@@ -26,7 +26,7 @@ export function useInfinitePatientSearch(
       if (prevPageData && !prevPageData?.data?.links.some((link) => link.rel === 'next')) {
         return null;
       }
-      let url = `/ws/rest/v1/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}&totalCount=true`;
+      let url = `${restBaseUrl}/patient?q=${searchTerm}&v=${customRepresentation}&includeDead=${includeDead}&limit=${resultsToFetch}&totalCount=true`;
       if (page) {
         url += `&startIndex=${page * resultsToFetch}`;
       }
@@ -62,7 +62,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
   const { user } = useSession();
   const userUuid = user?.uuid;
   const { data, error, mutate } = useSWR<FetchResponse<User>, Error>(
-    showRecentlySearchedPatients && userUuid ? `/ws/rest/v1/user/${userUuid}` : null,
+    showRecentlySearchedPatients && userUuid ? `${restBaseUrl}/user/${userUuid}` : null,
     openmrsFetch,
   );
 
@@ -83,7 +83,7 @@ export function useRecentlyViewedPatients(showRecentlySearchedPatients: boolean 
       const remainingPatients = recentlyViewedPatients.filter((uuid) => uuid !== patientUuid);
       const newUserProperties = { ...userProperties, patientsVisited: [patientUuid, ...remainingPatients].join(',') };
 
-      return openmrsFetch(`/ws/rest/v1/user/${user?.uuid}`, {
+      return openmrsFetch(`${restBaseUrl}/user/${user?.uuid}`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -119,7 +119,7 @@ export function useRESTPatients(
 
   const getPatientUrl = (index) => {
     if (index < patientUuids.length) {
-      return `/ws/rest/v1/patient/${patientUuids[index]}?v=${customRepresentation}`;
+      return `${restBaseUrl}/patient/${patientUuids[index]}?v=${customRepresentation}`;
     } else {
       return null;
     }

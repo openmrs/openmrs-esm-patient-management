@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
@@ -16,8 +16,8 @@ interface AppointmentsReturnType {
 export function useAppointments(status?: string, forDate?: string) {
   const { currentAppointmentDate } = useAppointmentDate();
   const startDate = forDate ? forDate : currentAppointmentDate;
-  const apiUrl = `/ws/rest/v1/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
-  const allAppointmentsUrl = `/ws/rest/v1/appointment/all?forDate=${startDate}`;
+  const apiUrl = `${restBaseUrl}/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
+  const allAppointmentsUrl = `${restBaseUrl}/appointment/all?forDate=${startDate}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     isEmpty(status) ? allAppointmentsUrl : apiUrl,
@@ -36,7 +36,7 @@ export function useAppointments(status?: string, forDate?: string) {
 }
 
 export const useDailyAppointments = (startDateTime: string, durationPeriod: DurationPeriod) => {
-  const url = `/ws/rest/v1/appointment/all?forDate=${startDateTime}`;
+  const url = `${restBaseUrl}/appointment/all?forDate=${startDateTime}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }>(startDateTime ? url : null, openmrsFetch);
 
   return {
@@ -48,7 +48,7 @@ export const useDailyAppointments = (startDateTime: string, durationPeriod: Dura
 
 export const useAppointmentsByDurationPeriod = (date: string, durationPeriod: DurationPeriod) => {
   const abortController = new AbortController();
-  const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+  const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
   const { startDate, endDate } = getStartAndEndDate(durationPeriod, date);
 
   const fetcher = () =>
@@ -64,7 +64,7 @@ export const useAppointmentsByDurationPeriod = (date: string, durationPeriod: Du
       },
     });
 
-  const url = 'openmrs/ws/rest/v1/appointments/search';
+  const url = `openmrs/${restBaseUrl}/appointments/search`;
   const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }>(url, fetcher);
   return { isLoading, appointments: data?.data ?? [], error };
 };

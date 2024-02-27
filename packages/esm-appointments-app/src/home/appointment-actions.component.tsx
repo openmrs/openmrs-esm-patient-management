@@ -20,7 +20,7 @@ interface ActionMenuProps {
 export const ActionsMenu = ({ appointment, useBahmniUI }: ActionMenuProps) => {
   const { t } = useTranslation();
   const { bahmniAppointmentsUiBaseUrl } = useConfig();
-  const { mutate: mutateAppointments } = useMutateAppointments();
+  const { mutateAppointments } = useMutateAppointments();
 
   const { status } = appointment;
   const disableActions = status === 'Completed' || status === 'Missed' || status === 'Cancelled';

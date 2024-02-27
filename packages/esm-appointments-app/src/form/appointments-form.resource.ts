@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import useSWR, { useSWRConfig } from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import {
   type AppointmentPayload,
   type AppointmentService,
@@ -29,7 +29,7 @@ export function useMutateAppointments() {
   );
 
   return {
-    mutate: mutateAppointments,
+    mutateAppointments,
   };
 }
 
@@ -86,7 +86,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
 
 export function useAppointmentService() {
   const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
-    `/ws/rest/v1/appointmentService/all/full`,
+    `${restBaseUrl}/appointmentService/all/full`,
     openmrsFetch,
   );
 
@@ -98,7 +98,7 @@ export function useAppointmentService() {
 }
 
 export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointment`, {
+  return openmrsFetch(`${restBaseUrl}/appointment`, {
     method: 'POST',
     signal: abortController.signal,
     headers: {
@@ -112,7 +112,7 @@ export function saveRecurringAppointments(
   recurringAppointments: RecurringAppointmentsPayload,
   abortController: AbortController,
 ) {
-  return openmrsFetch(`/ws/rest/v1/recurring-appointments`, {
+  return openmrsFetch(`${restBaseUrl}/recurring-appointments`, {
     method: 'POST',
     signal: abortController.signal,
     headers: {
@@ -124,14 +124,14 @@ export function saveRecurringAppointments(
 
 // TODO refactor to use SWR?
 export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
+  return openmrsFetch(`${restBaseUrl}/appointments/${appointmentUuid}`, {
     signal: abortController.signal,
   });
 }
 
 // TODO refactor to use SWR?
 export function getAppointmentService(abortController: AbortController, uuid) {
-  return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
+  return openmrsFetch(`${restBaseUrl}/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,
   });
 }
@@ -140,7 +140,7 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
   const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
-  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  const url = `${restBaseUrl}/appointments/${appointmentUuid}/status-change`;
   return await openmrsFetch(url, {
     body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
     method: 'POST',

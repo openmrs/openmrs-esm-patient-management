@@ -11,6 +11,7 @@ import {
   formatDatetime,
   parseDate,
   useConfig,
+  restBaseUrl,
 } from '@openmrs/esm-framework';
 dayjs.extend(isToday);
 
@@ -48,7 +49,7 @@ export function useActiveVisits() {
       return null;
     }
 
-    let url = `/ws/rest/v1/visit?v=${customRepresentation}&`;
+    let url = `${restBaseUrl}/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
 
     urlSearchParams.append('includeInactive', 'false');

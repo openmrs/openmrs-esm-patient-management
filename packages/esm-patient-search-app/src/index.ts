@@ -1,6 +1,7 @@
 import {
   defineConfigSchema,
   fetchCurrentPatient,
+  fhirBaseUrl,
   getSyncLifecycle,
   makeUrl,
   messageOmrsServiceWorker,
@@ -39,7 +40,7 @@ export function startupApp() {
     type: 'patient',
     displayName: 'Patient search',
     async isSynced(patientUuid) {
-      const expectedUrls = [`/ws/fhir2/R4/Patient/${patientUuid}`];
+      const expectedUrls = [`${fhirBaseUrl}/Patient/${patientUuid}`];
       const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
       const cache = await caches.open('omrs-spa-cache-v1');
       const keys = (await cache.keys()).map((key) => key.url);
@@ -48,7 +49,7 @@ export function startupApp() {
     async sync(patientUuid) {
       await messageOmrsServiceWorker({
         type: 'registerDynamicRoute',
-        pattern: `/ws/fhir2/R4/Patient/${patientUuid}`,
+        pattern: `${fhirBaseUrl}/Patient/${patientUuid}`,
       });
 
       await fetchCurrentPatient(patientUuid);

@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 
 export function usePastVisits(patientUuid: string) {
   const customRepresentation =
@@ -10,7 +10,7 @@ export function usePastVisits(patientUuid: string) {
     'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
 
-  const apiUrl = `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`;
+  const apiUrl = `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     patientUuid ? apiUrl : null,
     openmrsFetch,
