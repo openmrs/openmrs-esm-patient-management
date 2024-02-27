@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
 
@@ -9,7 +9,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }
   searchParam.append('v', rep);
 
-  const apiUrl = `/ws/rest/v1/queue-entry?` + searchParam.toString();
+  const apiUrl = `${restBaseUrl}/queue-entry?` + searchParam.toString();
   const { data, ...rest } = useSWR<{ data: { results: Array<QueueEntry> } }, Error>(apiUrl, openmrsFetch);
 
   return {

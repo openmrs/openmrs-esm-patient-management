@@ -10,6 +10,7 @@ import {
   RadioButtonGroup,
   Select,
   SelectItem,
+  Stack,
   Switch,
 } from '@carbon/react';
 import React, { useState } from 'react';
@@ -106,69 +107,70 @@ const TransferQueueDialog: React.FC<ChangeStatusDialogProps> = ({ queueEntry, cl
           <div className={styles.modalBody}>
             <h5>{queueEntry.display}</h5>
           </div>
-
-          <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
-            <Select
-              labelText={t('selectQueue', 'Select a queue')}
-              id="queue"
-              invalidText="Required"
-              value={formState.selectedQueue}
-              onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-              {queues?.map((queue) => (
-                <SelectItem key={queue.uuid} text={queue.display} value={queue.uuid}>
-                  {queue.display}
-                </SelectItem>
-              ))}
-            </Select>
-          </section>
-
-          <section>
-            <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-            {hasNoStatusesConfigured ? (
-              <InlineNotification
-                kind={'error'}
-                lowContrast
-                subtitle={t('configureStatus', 'Please configure status to continue.')}
-                title={t('noStatusConfigured', 'No status configured')}
-              />
-            ) : (
-              <RadioButtonGroup
-                name="status"
-                defaultSelected={formState.selectedStatus}
-                onChange={(uuid) => {
-                  setSelectedStatusUuid(uuid);
-                }}>
-                {statuses?.map(({ uuid, display }) => (
-                  <RadioButton key={uuid} name={display} labelText={display} value={uuid} />
+          <Stack gap={4}>
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
+              <Select
+                labelText={t('selectQueue', 'Select a queue')}
+                id="queue"
+                invalidText="Required"
+                value={formState.selectedQueue}
+                onChange={(event) => setSelectedQueueUuid(event.target.value)}>
+                {queues?.map((queue) => (
+                  <SelectItem key={queue.uuid} text={queue.display} value={queue.uuid}>
+                    {queue.display}
+                  </SelectItem>
                 ))}
-              </RadioButtonGroup>
-            )}
-          </section>
+              </Select>
+            </section>
 
-          <section className={styles.section}>
-            <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
-            {hasNoPrioritiesConfigured ? (
-              <InlineNotification
-                className={styles.inlineNotification}
-                kind={'error'}
-                lowContrast
-                subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
-                title={t('noPrioritiesConfigured', 'No priorities configured')}
-              />
-            ) : (
-              <ContentSwitcher
-                size="sm"
-                selectedIndex={1}
-                onChange={(event) => {
-                  setSelectedPriorityUuid(event.name as string);
-                }}>
-                {priorities?.map(({ uuid, display }) => {
-                  return <Switch role="radio" name={uuid} text={display} key={uuid} value={uuid} />;
-                })}
-              </ContentSwitcher>
-            )}
-          </section>
+            <section>
+              <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
+              {hasNoStatusesConfigured ? (
+                <InlineNotification
+                  kind={'error'}
+                  lowContrast
+                  subtitle={t('configureStatus', 'Please configure status to continue.')}
+                  title={t('noStatusConfigured', 'No status configured')}
+                />
+              ) : (
+                <RadioButtonGroup
+                  name="status"
+                  defaultSelected={formState.selectedStatus}
+                  onChange={(uuid) => {
+                    setSelectedStatusUuid(uuid);
+                  }}>
+                  {statuses?.map(({ uuid, display }) => (
+                    <RadioButton key={uuid} name={display} labelText={display} value={uuid} />
+                  ))}
+                </RadioButtonGroup>
+              )}
+            </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
+              {hasNoPrioritiesConfigured ? (
+                <InlineNotification
+                  className={styles.inlineNotification}
+                  kind={'error'}
+                  lowContrast
+                  subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                  title={t('noPrioritiesConfigured', 'No priorities configured')}
+                />
+              ) : (
+                <ContentSwitcher
+                  size="sm"
+                  selectedIndex={1}
+                  onChange={(event) => {
+                    setSelectedPriorityUuid(event.name as string);
+                  }}>
+                  {priorities?.map(({ uuid, display }) => {
+                    return <Switch role="radio" name={uuid} text={display} key={uuid} value={uuid} />;
+                  })}
+                </ContentSwitcher>
+              )}
+            </section>
+          </Stack>
         </ModalBody>
         <ModalFooter>
           <Button kind="secondary" onClick={closeModal}>

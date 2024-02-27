@@ -1,28 +1,21 @@
-import { usePagination, useSession } from '@openmrs/esm-framework';
-import '@testing-library/jest-dom';
+import { defineConfigSchema, usePagination, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { mockQueueEntries, mockSession } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
 import { defaultQueueTableConfig } from './queue-table-by-status.component';
 import QueueTable from './queue-table.component';
+import { configSchema } from '../config-schema';
 
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
 const mockUseSession = useSession as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    useConfig: jest.fn(() => ({
-      customPatientChartUrl: 'someUrl',
-    })),
-  };
-});
-
 describe('QueueTable: ', () => {
+  beforeAll(() => {
+    defineConfigSchema('@openmrs/esm-service-queues-app', configSchema);
+  });
+
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession);
   });
