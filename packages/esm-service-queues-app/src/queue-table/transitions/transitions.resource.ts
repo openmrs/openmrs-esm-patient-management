@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 interface TransitionQueueEntryParams {
   queueEntryToTransition: string;
@@ -18,7 +18,7 @@ interface TransitionQueueEntryParams {
  * @returns
  */
 export function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/queue-entry-transition`, {
+  return openmrsFetch(`${restBaseUrl}/queue-entry-transition`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
