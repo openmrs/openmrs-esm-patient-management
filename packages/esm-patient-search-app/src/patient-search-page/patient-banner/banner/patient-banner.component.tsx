@@ -9,7 +9,6 @@ import {
   formatDate,
   parseDate,
   useVisit,
-  interpolateString,
   useConfig,
   ConfigurableLink,
   useConnectedExtensions,
@@ -110,10 +109,21 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               <span>{getGender(patient.person.gender)}</span> &middot; <span>{age(patient.person.birthdate)}</span>{' '}
               &middot; <span>{formatDate(parseDate(patient.person.birthdate), { mode: 'wide', time: false })}</span>
             </div>
-            <div className={styles.identifiers}>
-              {patient.identifiers?.length ? patient.identifiers.map((i) => i.identifier).join(', ') : '--'}
+            <div>
+              <div className={styles.identifiers}>
+                {patient.identifiers?.length ? patient.identifiers.map((i) => i.identifier).join(', ') : '--'}
+              </div>
             </div>
           </div>
+          <Button
+            className={styles.toggleContactDetailsButton}
+            kind="ghost"
+            renderIcon={showContactDetails ? ChevronUp : ChevronDown}
+            iconDescription="Toggle contact details"
+            onClick={toggleContactDetails}
+            style={{ marginTop: '-0.25rem' }}>
+            {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
+          </Button>
         </ClickablePatientContainer>
         <div className={styles.buttonCol}>
           {showActionsMenu && (
@@ -135,35 +145,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               </CustomOverflowMenuComponent>
             </div>
           )}
-          {!isDeceased ? (
-            !currentVisit ? (
-              <ExtensionSlot
-                name="start-visit-button-slot"
-                state={{
-                  patientUuid,
-                }}
-              />
-            ) : (
-              <Button
-                className={styles.toggleContactDetailsButton}
-                kind="ghost"
-                renderIcon={showContactDetails ? ChevronUp : ChevronDown}
-                iconDescription="Toggle contact details"
-                onClick={toggleContactDetails}
-                style={{ marginTop: '-0.25rem' }}>
-                {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
-              </Button>
-            )
-          ) : (
-            <Button
-              className={styles.toggleContactDetailsButton}
-              kind="ghost"
-              renderIcon={showContactDetails ? ChevronUp : ChevronDown}
-              iconDescription="Toggle contact details"
-              onClick={toggleContactDetails}
-              style={{ marginTop: '-0.25rem' }}>
-              {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
-            </Button>
+          {!isDeceased && !currentVisit && (
+            <ExtensionSlot
+              name="start-visit-button-slot"
+              state={{
+                patientUuid,
+              }}
+            />
           )}
         </div>
       </div>

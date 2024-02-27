@@ -90,6 +90,7 @@
   @include type.type-style('body-compact-02');
   color: $text-02;
   margin-top: 0.375rem;
+  text-align: left;
 }
 
 .row {
@@ -113,6 +114,7 @@
   @include type.type-style('body-compact-02');
   color: $ui-04;
   margin-top: 0.375rem;
+  text-align: left;
 }
 
 .tooltipPadding {
