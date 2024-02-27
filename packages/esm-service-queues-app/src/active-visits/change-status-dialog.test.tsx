@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, within } from '@testing-library/react';
-import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockQueueEntry } from '__mocks__';
+import { mockServices, mockPriorities, mockStatus, mockSession, mockLocations, mockMappedQueueEntry } from '__mocks__';
 import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { updateQueueEntry } from './active-visits-table.resource';
 import ChangeStatus from './change-status-dialog.component';
@@ -53,7 +53,7 @@ describe('Queue entry details', () => {
   it('should update a queue entry and display toast message', async () => {
     const user = userEvent.setup();
 
-    mockUpdateQueueEntry.mockResolvedValueOnce({ data: mockQueueEntry, status: 201, statusText: 'Updated' });
+    mockUpdateQueueEntry.mockResolvedValueOnce({ data: mockMappedQueueEntry, status: 201, statusText: 'Updated' });
 
     renderUpdateQueueEntryDialog();
     expect(screen.getByText(/queue service/i)).toBeInTheDocument();
@@ -102,5 +102,5 @@ describe('Queue entry details', () => {
 });
 
 const renderUpdateQueueEntryDialog = () => {
-  render(<ChangeStatus queueEntry={mockQueueEntry} closeModal={() => false} />);
+  render(<ChangeStatus queueEntry={mockMappedQueueEntry} closeModal={() => false} />);
 };

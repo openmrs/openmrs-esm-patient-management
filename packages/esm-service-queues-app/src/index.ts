@@ -92,6 +92,14 @@ export const addProviderToRoomModal = getAsyncLifecycle(
   },
 );
 
+export const transitionQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/transitions/transition-queue-entry-modal.component'),
+  {
+    featureName: 'transfer patient to a different queue',
+    moduleName,
+  },
+);
+
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
 export function startupApp() {

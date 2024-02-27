@@ -36,6 +36,7 @@
   "bp": "Bp",
   "call": "Call",
   "cancel": "Cancel",
+  "changePatientStatus": "Change patient status",
   "checkedInPatients": "Checked in patients",
   "checkFilters": "Check the filters above",
   "chooseRoom": "Select a room",

@@ -13,6 +13,7 @@ import { queueTableStatusColumn } from './cells/queue-table-status-cell.componen
 import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
 import QueueTable from './queue-table.component';
+import { queueTableTransitionColumn } from './cells/queue-table-transition-cell.component';
 
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue
@@ -25,13 +26,14 @@ interface QueueTableByStatusProps {
   allStatusTabConfig?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
 }
 
-const defaultQueueTableConfig: QueueTableTabConfig = {
+export const defaultQueueTableConfig: QueueTableTabConfig = {
   columns: [
     queueTableNameColumn,
     queueTableComingFromColumn,
     queueTablePriorityColumn,
     queueTableStatusColumn,
     queueTableWaitTimeColumn,
+    queueTableTransitionColumn,
   ],
 };
 
