@@ -133,7 +133,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       location: appointment?.location?.uuid ?? session?.sessionLocation?.uuid ?? '',
       provider:
         appointment?.providers?.find((provider) => provider.response === 'ACCEPTED')?.uuid ??
-        session?.currentProvider.uuid ??
+        session?.currentProvider?.uuid ??
         '', // assumes only a single previously-scheduled provider with state "ACCEPTED", if multiple, just takes the first
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
