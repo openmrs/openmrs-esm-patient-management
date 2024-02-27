@@ -38,6 +38,7 @@ import {
   useAppointmentService,
   useMutateAppointments,
 } from './appointments-form.resource';
+import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
@@ -47,6 +48,7 @@ import styles from './appointments-form.scss';
 const appointmentsFormSchema = z.object({
   duration: z.number(),
   location: z.string().refine((value) => value !== ''),
+  provider: z.string().refine((value) => value !== ''),
   appointmentStatus: z.string().optional(),
   appointmentNote: z.string(),
   appointmentType: z.string().refine((value) => value !== ''),
@@ -92,6 +94,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
+  const providers = useProviders();
   const session = useSession();
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
@@ -128,6 +131,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     resolver: zodResolver(appointmentsFormSchema),
     defaultValues: {
       location: appointment?.location?.uuid ?? session?.sessionLocation?.uuid ?? '',
+      provider:
+        appointment?.providers?.find((provider) => provider.response === 'ACCEPTED')?.uuid ??
+        session?.currentProvider.uuid ??
+        '', // assumes only a single previously-scheduled provider with state "ACCEPTED", if multiple, just takes the first
       appointmentNote: appointment?.comments || '',
       appointmentStatus: appointment?.status || '',
       appointmentType: appointment?.appointmentKind || '',
@@ -253,7 +260,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       appointmentDateTime: { startDate },
       duration,
       appointmentType: selectedAppointmentType,
-      location: userLocation,
+      location,
+      provider,
       appointmentNote,
       appointmentStatus,
     } = data;
@@ -269,9 +277,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       serviceUuid: serviceUuid,
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
-      providerUuid: session?.currentProvider?.uuid,
-      providers: [{ uuid: session.currentProvider.uuid }],
-      locationUuid: userLocation,
+      locationUuid: location,
+      providers: [{ uuid: provider }],
       patientUuid: patientUuid,
       comments: appointmentNote,
       uuid: context === 'editing' ? appointment.uuid : undefined,
@@ -619,6 +626,36 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             </ResponsiveWrapper>
           </section>
         ) : null}
+
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('provider', 'Provider')}</span>
+          <div>
+            <ResponsiveWrapper>
+              <Controller
+                name="provider"
+                control={control}
+                render={({ field: { onChange, value, onBlur, ref } }) => (
+                  <Select
+                    id="provider"
+                    invalidText="Required"
+                    labelText={t('selectProvider', 'Select a provider')}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    ref={ref}>
+                    <SelectItem text={t('chooseProvider', 'Choose a provider')} value="" />
+                    {providers?.providers?.length > 0 &&
+                      providers?.providers?.map((provider) => (
+                        <SelectItem key={provider.uuid} text={provider.display} value={provider.uuid}>
+                          {provider.display}
+                        </SelectItem>
+                      ))}
+                  </Select>
+                )}
+              />
+            </ResponsiveWrapper>
+          </div>
+        </section>
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('note', 'Note')}</span>
