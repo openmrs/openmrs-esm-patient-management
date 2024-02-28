@@ -26,7 +26,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, header, buttonsGroup
             className={styles.closeButton}
             iconDescription={t('close', 'Close')}
             onClick={close}
-            kind="ghost"
+            kind="primary"
             hasIconOnly>
             <Close size={16} />
           </Button>
