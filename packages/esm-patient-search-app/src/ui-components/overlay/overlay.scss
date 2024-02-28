@@ -51,15 +51,21 @@
 
 .headerContent {
   @include type.type-style('heading-compact-02');
+  align-items: center;
+  border: 0.125rem solid transparent;
   color: $ui-05;
+  outline: none;
+  padding: 0 2rem 0 1rem;
+  text-decoration: none;
+  user-select: none;
+  vertical-align: center;
 }
 
-.closeButton {
-  background-color: $ui-02;
-  margin-right: spacing.$spacing-05;
-
+.closeButton,
+.closeButton:hover {
+  background-color: white;
   svg {
-    fill: white !important;
+    fill: black !important;
   }
 }
 
