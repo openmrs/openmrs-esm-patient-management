@@ -1,5 +1,5 @@
 import { test } from '../core';
-import { HomePage, PatientListsPage } from '../pages';
+import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
   type Cohort,
@@ -163,9 +163,7 @@ test('Return to patient list from the patient chart on a new tab', async ({ page
 });
 
 test.afterEach(async ({ api }) => {
-  if (cohortMembership) {
-    await removePatientFromCohort(api, cohortMembership.uuid);
-  }
+  await removePatientFromCohort(api, cohortMembership.uuid);
   await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
 });

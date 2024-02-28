@@ -1,5 +1,5 @@
 import { test } from '../core';
-import { HomePage, PatientListsPage } from '../pages';
+import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
   type Cohort,
