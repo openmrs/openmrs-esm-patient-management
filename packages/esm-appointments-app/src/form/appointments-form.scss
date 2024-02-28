@@ -12,6 +12,7 @@ $openmrs-background-grey: #ededed;
 
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
   background-color: $openmrs-background-grey;
+  margin-top: 3rem;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .formWrapper {
@@ -76,6 +77,7 @@ $openmrs-background-grey: #ededed;
 }
 
 .tablet {
+  top: 3rem;
   padding: spacing.$spacing-06 spacing.$spacing-05;
   background-color: colors.$white;
 }
