@@ -46,10 +46,10 @@ export class RegistrationAndEditPage {
 
   async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {
     const tryFill = (locator: Locator, value?: string) => value && locator.fill(value);
-    formValues.sex && (await this.sexRadioButton(formValues.sex).check());
     await tryFill(this.givenNameInput(), formValues.givenName);
     await tryFill(this.middleNameInput(), formValues.middleName);
     await tryFill(this.familyNameInput(), formValues.familyName);
+    formValues.sex && (await this.sexRadioButton(formValues.sex).check());
     await tryFill(this.birthdateInput(), formValues.birthdate);
     await tryFill(this.phoneInput(), formValues.phone);
     await tryFill(this.emailInput(), formValues.email);

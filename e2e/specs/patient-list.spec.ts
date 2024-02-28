@@ -68,14 +68,12 @@ test('Create and edit a patient list', async ({ page }) => {
 });
 
 test('Manage patients in a list', async ({ api, page }) => {
+  const patientListPage = new PatientListsPage(page);
   await test.step("When I visit a specific patient list's page", async () => {
-    const patientListPage = new PatientListsPage(page);
     await patientListPage.goto(cohort.uuid);
   });
 
   await test.step('Then I should be able to add and remove patients from that list', async () => {
-    const patientListPage = new PatientListsPage(page);
-
     // Add a patient to the list
     createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);

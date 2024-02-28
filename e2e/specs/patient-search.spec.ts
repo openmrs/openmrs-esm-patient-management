@@ -74,6 +74,14 @@ test('Search patient by full name', async ({ page, api }) => {
       `${process.env.E2E_BASE_URL}/spa/patient/${patient.uuid}/chart/Patient Summary`,
     );
   });
+
+  await test.step('When I click on the `Close` button', async () => {
+    await page.getByRole('button', { name: 'Close' }).click();
+  });
+
+  await test.step('Then I should be redirected to the home page', async () => {
+    await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home`);
+  });
 });
 
 test.afterEach(async ({ api }) => {
