@@ -50,15 +50,8 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid });
   const allowedStatuses = selectedQueue.allowedStatuses;
 
-  const currentStatusUuid = selectedStatus?.uuid;
-
-  const currentStatusIndex = Math.max(0, allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid));
-
-  const queueEntriesForCurrentStatus = queueEntries?.filter(
-    (entry) => !currentStatusUuid || entry.status.uuid == currentStatusUuid,
-  );
-
-  const tableConfig = configByStatus?.get(currentStatusUuid) ?? defaultQueueTableConfig;
+  const currentStatusUuid = selectedStatus?.uuid ?? allowedStatuses?.[0]?.uuid;
+  const currentStatusIndex = allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid);
 
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
@@ -73,6 +66,9 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
       />
     );
   }
+
+  const queueEntriesForCurrentStatus = queueEntries?.filter((entry) => entry.status.uuid == currentStatusUuid);
+  const tableConfig = configByStatus?.get(currentStatusUuid) ?? defaultQueueTableConfig;
 
   return (
     <div className={styles.container}>
