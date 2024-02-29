@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
-import { spaHomePage } from '../constants';
+import { omrsDateFormat, spaHomePage } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import styles from './metrics-header.scss';
 import AppointmentsForm from '../form/appointments-form.component';

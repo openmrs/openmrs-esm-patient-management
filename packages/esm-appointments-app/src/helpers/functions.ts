@@ -83,8 +83,8 @@ export const monthDays = (currentDate: Dayjs) => {
   const nextMonth = dayjs(currentDate).add(1, 'month');
   let days: Dayjs[] = [];
 
-  for (let i = lastMonth.daysInMonth() - monthStart.day(); i < lastMonth.daysInMonth(); i++) {
-    days.push(currentDate.date(i).month(lastMonth.month()));
+  for (let i = lastMonth.daysInMonth() - monthStart.day() + 1; i <= lastMonth.daysInMonth(); i++) {
+    days.push(dayjs().month(lastMonth.month()).date(i));
   }
 
   for (let i = 1; i <= monthDays; i++) {
@@ -94,7 +94,7 @@ export const monthDays = (currentDate: Dayjs) => {
   const dayLen = days.length > 30 ? 7 : 14;
 
   for (let i = 1; i < dayLen - monthEnd.day(); i++) {
-    days.push(currentDate.date(i).month(nextMonth.month()));
+    days.push(dayjs().month(nextMonth.month()).date(i));
   }
   return days;
 };
@@ -112,55 +112,4 @@ export const getGender = (gender, t) => {
     default:
       return gender;
   }
-};
-export const weekDays = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 1; hour++) {
-    for (let day = 0; day < 8; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
-};
-export const weekAllDays = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 24; hour++) {
-    for (let day = 0; day < 8; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
-};
-export const dailyHours = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 24; hour++) {
-    dateTime.push(dayjs(currentDate).hour(hour));
-  }
-  return dateTime;
-};
-
-export const dailyView = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 1; hour++) {
-    for (let day = 0; day < 1; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
 };

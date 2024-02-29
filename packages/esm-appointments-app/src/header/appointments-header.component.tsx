@@ -11,10 +11,11 @@ import styles from './appointments-header.scss';
 
 interface AppointmentHeaderProps {
   title: string;
+  appointmentServiceType?: string;
   onChange?: (evt) => void;
 }
 
-const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange }) => {
+const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceType, onChange }) => {
   const { t } = useTranslation();
   const session = useSession();
   const datePickerRef = useRef(null);
@@ -57,6 +58,9 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, onChange 
               className={styles.dropdown}
               aria-label="Select service type"
               id="serviceDropdown"
+              selectedItem={
+                serviceTypes.find((service) => service.uuid === appointmentServiceType) || { name: 'All', uuid: '' }
+              }
               items={[{ name: 'All', uuid: '' }, ...serviceTypes]}
               itemToString={(item) => (item ? item.name : '')}
               label={t('selectServiceType', 'Select service type')}

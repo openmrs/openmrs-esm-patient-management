@@ -1,25 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
-import type { CalendarType } from '../types';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
-import CalendarView from './calendar-view.component';
 import { useAppointmentDate } from '../helpers';
+import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
-  const [calendarView, setCalendarView] = useState<CalendarType>('monthly');
   const { currentAppointmentDate, setCurrentAppointmentDate } = useAppointmentDate();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(currentAppointmentDate).toISOString(), calendarView);
+  const { calendarEvents } = useAppointmentsCalendar(dayjs(currentAppointmentDate).toISOString(), 'monthly');
 
   return (
     <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('calendar', 'Calendar')} />
-      <CalendarHeader onChangeView={setCalendarView} calendarView={calendarView} />
-      <CalendarView
-        calendarView={calendarView}
+      <CalendarHeader />
+      <MonthlyCalendarView
         events={calendarEvents}
         currentDate={dayjs(currentAppointmentDate)}
         setCurrentDate={setCurrentAppointmentDate}

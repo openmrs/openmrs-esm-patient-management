@@ -147,8 +147,6 @@ export enum AppointmentTypes {
   COMPLETED = 'completed',
 }
 
-export type CalendarType = 'daily' | 'weekly' | 'monthly';
-
 export interface Identifier {
   identifier: string;
   identifierName?: string;
@@ -158,6 +156,7 @@ export interface DailyAppointmentsCountByService {
   appointmentDate: string;
   services: Array<{
     serviceName: string;
+    serviceUuid: string;
     count: number;
   }>;
 }
