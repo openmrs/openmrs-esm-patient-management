@@ -29,13 +29,12 @@ describe('TransitionQueueEntryModal: ', () => {
 
     for (const status of allowedStatuses) {
       const expectedStatusDisplay =
-        queueEntry.status.uuid == status.uuid ? `${status.display} (Current value)` : status.display;
+        queueEntry.status.uuid == status.uuid ? `${status.display} (Current)` : status.display;
       expect(screen.getByRole('radio', { name: expectedStatusDisplay })).toBeInTheDocument();
     }
 
     for (const pri of allowedPriorities) {
-      const expectedPriorityDisplay =
-        queueEntry.priority.uuid == pri.uuid ? `${pri.display} (Current value)` : pri.display;
+      const expectedPriorityDisplay = queueEntry.priority.uuid == pri.uuid ? `${pri.display} (Current)` : pri.display;
       expect(screen.getByRole('radio', { name: expectedPriorityDisplay })).toBeInTheDocument();
     }
   });

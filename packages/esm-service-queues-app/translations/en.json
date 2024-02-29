@@ -49,7 +49,7 @@
   "configureServices": "Please configure services to continue.",
   "configureStatus": "Please configure status to continue.",
   "contactDetails": "Contact Details",
-  "currentValueFormatted": "{{value}} (Current value)",
+  "currentValueFormatted": "{{value}} (Current)",
   "currentVisit": "Current visit",
   "date": "Date",
   "date&Time": "Date & time",

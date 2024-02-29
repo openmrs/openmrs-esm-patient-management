@@ -132,7 +132,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                       key={uuid}
                       text={
                         uuid == queueEntry.queue.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current value)', { value: display })
+                          ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
                           : display
                       }
                       value={uuid}
@@ -163,7 +163,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                         name={display}
                         labelText={
                           uuid == queueEntry.status.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current value)', { value: display })
+                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
                             : display
                         }
                         value={uuid}
@@ -196,7 +196,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                         name={uuid}
                         text={
                           uuid == queueEntry.priority.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current value)', { value: display })
+                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
                             : display
                         }
                         key={uuid}
