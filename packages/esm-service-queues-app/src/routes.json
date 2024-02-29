@@ -10,10 +10,10 @@
       "slot": "outpatient-sidebar-slot",
       "online": true,
       "offline": true
-    },
+    }, 
     {
       "name": "service-queues-dashboard-link",
-      "component": "queueTableByStatusMenu",
+      "component": "serviceQueuesDashboardLink",
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "service-queues",
@@ -22,50 +22,50 @@
       },
       "online": true,
       "offline": true
-    },
+    }, 
     {
       "component": "root",
       "name": "service-queues-dashboard",
       "slot": "service-queues-dashboard-slot"
-    },
+    }, 
     {
       "name": "edit-queue-entry-status-modal",
       "component": "editQueueEntryStatusModal"
-    },
+    }, 
     {
       "name": "patient-info-banner-slot",
       "component": "patientInfoBannerSlot"
-    },
+    }, 
     {
       "name": "add-patient-to-queue",
       "component": "addPatientToQueue",
       "slot": "add-patient-to-queue-slot"
-    },
+    }, 
     {
       "name": "remove-queue-entry",
       "component": "removeQueueEntry"
-    },
+    }, 
     {
       "name": "clear-all-queue-entries",
       "component": "clearAllQueueEntries"
-    },
+    }, 
     {
       "name": "add-visit-to-queue-modal",
       "component": "addVisitToQueueModal"
-    },
+    }, 
     {
       "name": "transition-queue-entry-status-modal",
       "component": "transitionQueueEntryStatusModal"
-    },
+    }, 
     {
       "name": "previous-visit-summary-widget",
       "component": "pastVisitSummary",
       "slot": "previous-visit-summary-slot"
-    },
+    }, 
     {
       "name": "add-provider-to-room-modal",
       "component": "addProviderToRoomModal"
-    },
+    }, 
     {
       "name": "add-queue-entry-widget",
       "component": "addQueueEntry",
