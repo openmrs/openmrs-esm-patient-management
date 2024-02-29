@@ -2,12 +2,12 @@ import { SideNavMenu, SideNavMenuItem } from '@carbon/react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type Queue } from '../types/index';
+import { type Queue } from '../types';
 import { useQueues } from '../hooks/useQueues';
-import classNames from "classnames";
-import {BrowserRouter, useLocation} from "react-router-dom";
+import classNames from 'classnames';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 
-function QueueTableLink({ basePath, queue }: { basePath:string, queue: Queue }) {
+function QueueTableLink({ basePath, queue }: { basePath: string; queue: Queue }) {
   const { t } = useTranslation();
   const location = useLocation();
   const pageUrl = basePath + '/' + queue.uuid;
@@ -15,8 +15,7 @@ function QueueTableLink({ basePath, queue }: { basePath:string, queue: Queue }) 
   return (
     <ConfigurableLink
       className={classNames('cds--side-nav__link', { 'active-left-nav-link': selected })} // TODO: Adjust this CSS
-      to={`${basePath}/${queue.uuid}`}
-    >
+      to={`${basePath}/${queue.uuid}`}>
       {queue.display}
     </ConfigurableLink>
   );
