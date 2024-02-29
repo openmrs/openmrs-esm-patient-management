@@ -27,12 +27,6 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-function getAppointmentDuration(startTime = 0, endTime = 0) {
-  const diff = endTime - startTime;
-  const minutes = Math.floor(diff / 60000);
-  return minutes + 'min';
-}
-
 export const formatAMPM = (date) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
