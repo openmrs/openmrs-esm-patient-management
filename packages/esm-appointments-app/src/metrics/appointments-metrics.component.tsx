@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
 import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
-import { useAppointmentDate } from '../helpers';
 import { useAppointmentList } from '../hooks/useAppointmentList';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
+import { useSelectedDate } from '../helpers';
 
 interface AppointmentMetricsProps {
   appointmentServiceType: string;
@@ -19,8 +19,8 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const { totalProviders } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(appointmentServiceType);
 
-  const { currentAppointmentDate } = useAppointmentDate();
-  const formattedStartDate = formatDate(parseDate(currentAppointmentDate), { mode: 'standard', time: false });
+  const { selectedDate } = useSelectedDate();
+  const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
   // TODO we will need rework these after we discuss the logic we want to use
   const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
@@ -48,7 +48,6 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
-          appointmentDate={currentAppointmentDate}
         />
         <MetricsCard
           label={

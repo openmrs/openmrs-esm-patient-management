@@ -1,12 +1,12 @@
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type AppointmentsFetchResponse } from '../types';
-import { useAppointmentDate } from '../helpers';
 import dayjs from 'dayjs';
+import { useSelectedDate } from '../helpers';
 
 export const useAppointmentList = (appointmentStatus: string, date?: string) => {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const startDate = date ? date : currentAppointmentDate;
+  const { selectedDate } = useSelectedDate();
+  const startDate = date ? date : selectedDate;
   const endDate = dayjs(startDate).endOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZZ'); // TODO: fix? is this correct?
   const searchUrl = `${restBaseUrl}/appointments/search`;
   const abortController = new AbortController();
@@ -35,8 +35,8 @@ export const useAppointmentList = (appointmentStatus: string, date?: string) => 
 };
 
 export const useEarlyAppointmentList = (startDate?: string) => {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const forDate = startDate ? startDate : currentAppointmentDate;
+  const { selectedDate } = useSelectedDate();
+  const forDate = startDate ? startDate : selectedDate;
   const url = `${restBaseUrl}/appointment/earlyAppointment?forDate=${forDate}`;
 
   const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(url, openmrsFetch, {

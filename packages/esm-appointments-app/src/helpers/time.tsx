@@ -19,23 +19,23 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
   return [hours, minutes];
 };
 
-const initialState = { appointmentDate: dayjs(new Date().setHours(0, 0, 0, 0)).format(omrsDateFormat) };
+const initialState = { selectedDate: dayjs(new Date().setHours(0, 0, 0, 0)).format(omrsDateFormat) };
 
-export function getStartDate() {
-  return getGlobalStore<{ appointmentDate: string | Date }>('appointmentStartDate', initialState);
+export function getSelectedDate() {
+  return getGlobalStore<{ selectedDate: string }>('appointment-selected-date', initialState);
 }
 
-export function changeStartDate(updatedDate: string | Date) {
-  const store = getStartDate();
-  store.setState({ appointmentDate: dayjs(new Date(updatedDate).setHours(0, 0, 0, 0)).format(omrsDateFormat) });
+export function changeSelectedDate(updatedDate: string | Date | dayjs.Dayjs) {
+  const store = getSelectedDate();
+  store.setState({ selectedDate: dayjs(updatedDate).hour(0).minute(0).second(0).format(omrsDateFormat) });
 }
 
-export const useAppointmentDate = () => {
-  const [currentAppointmentDate, setCurrentAppointmentDate] = useState(initialState.appointmentDate);
+export const useSelectedDate = () => {
+  const [selectedDate, setSelectedDate] = useState(initialState.selectedDate);
 
   useEffect(() => {
-    getStartDate().subscribe(({ appointmentDate }) => setCurrentAppointmentDate(appointmentDate.toString()));
+    getSelectedDate().subscribe(({ selectedDate }) => setSelectedDate(selectedDate));
   }, []);
 
-  return { currentAppointmentDate, setCurrentAppointmentDate };
+  return { selectedDate };
 };

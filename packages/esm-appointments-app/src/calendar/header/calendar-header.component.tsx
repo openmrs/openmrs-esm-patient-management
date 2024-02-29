@@ -5,11 +5,13 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import styles from './calendar-header.scss';
+import { useSelectedDate } from '../../helpers';
 
 const CalendarHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { selectedDate } = useSelectedDate();
   const backButtonOnClick = () => {
-    navigate({ to: `${spaHomePage}/appointments` });
+    navigate({ to: `${spaHomePage}/appointments/${selectedDate}` });
   };
 
   return (

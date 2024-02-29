@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { DatePicker, DatePickerInput, Dropdown } from '@carbon/react';
 import { Location } from '@carbon/react/icons';
 import { useSession } from '@openmrs/esm-framework';
-import { changeStartDate, useAppointmentDate } from '../helpers';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsIllustration from './appointments-illustration.component';
 import styles from './appointments-header.scss';
+import { changeSelectedDate, useSelectedDate } from '../helpers';
 
 interface AppointmentHeaderProps {
   title: string;
@@ -19,7 +19,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
   const { t } = useTranslation();
   const session = useSession();
   const datePickerRef = useRef(null);
-  const { currentAppointmentDate } = useAppointmentDate();
+  const { selectedDate } = useSelectedDate();
   const location = session?.sessionLocation?.display;
   const { serviceTypes } = useAppointmentServices();
 
@@ -38,7 +38,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
           <span className={styles.value}>{location}</span>
           <span className={styles.middot}>&middot;</span>
           <DatePicker
-            onChange={([date]) => changeStartDate(new Date(date))}
+            onChange={([date]) => changeSelectedDate(dayjs(date))}
             ref={datePickerRef}
             dateFormat="d-M-Y"
             datePickerType="single">
@@ -48,7 +48,7 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
               placeholder="DD-MMM-YYYY"
               labelText=""
               type="text"
-              value={dayjs(currentAppointmentDate).format('DD MMM YYYY')}
+              value={dayjs(selectedDate).format('DD MMM YYYY')}
             />
           </DatePicker>
         </div>

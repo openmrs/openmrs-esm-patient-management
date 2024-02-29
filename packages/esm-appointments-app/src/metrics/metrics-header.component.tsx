@@ -10,11 +10,13 @@ import { spaHomePage } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import styles from './metrics-header.scss';
 import AppointmentsForm from '../form/appointments-form.component';
+import { useSelectedDate } from '../helpers';
 
 dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { selectedDate } = useSelectedDate();
 
   const launchCreateAppointmentForm = (patientUuid) => {
     const props = {
@@ -34,7 +36,7 @@ const MetricsHeader: React.FC = () => {
         <Button
           kind="tertiary"
           renderIcon={Calendar}
-          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar` })}>
+          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar/${selectedDate}` })}>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot

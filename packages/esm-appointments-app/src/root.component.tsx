@@ -14,6 +14,7 @@ const RootComponent: React.FC = () => {
           <Route path="/:date" element={<Appointments />} />
           <Route path="/:date/:serviceType" element={<Appointments />} />
           <Route path="/calendar" element={<AppointmentsCalendarView />} />
+          <Route path="/calendar/:date" element={<AppointmentsCalendarView />} />
         </Routes>
       </BrowserRouter>
     </main>

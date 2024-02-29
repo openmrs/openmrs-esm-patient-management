@@ -5,7 +5,7 @@ import AppointmentsHeader from './header/appointments-header.component';
 import AppointmentMetrics from './metrics/appointments-metrics.component';
 import Overlay from './overlay.component';
 import { useParams } from 'react-router-dom';
-import { changeStartDate } from './helpers';
+import { changeSelectedDate } from './helpers';
 
 const Appointments: React.FC = () => {
   const { t } = useTranslation();
@@ -15,7 +15,7 @@ const Appointments: React.FC = () => {
 
   useEffect(() => {
     if (params.date) {
-      changeStartDate(params.date);
+      changeSelectedDate(params.date);
     }
   }, [params.date]);
 

@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { isSameMonth } from '../../helpers';
+import { isSameMonth, useSelectedDate } from '../../helpers';
 import { omrsDateFormat, spaHomePage } from '../../constants';
 import styles from './monthly-view-workload.scss';
 import { type DailyAppointmentsCountByService } from '../../types';
@@ -11,12 +11,12 @@ import { type DailyAppointmentsCountByService } from '../../types';
 interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
-  currentDate: Dayjs;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, currentDate, events }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
+  const { selectedDate } = useSelectedDate();
 
   const currentData = events?.find(
     (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
@@ -28,15 +28,18 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, cur
 
   return (
     <div
-      onClick={(e) => {
+      onClick={() => {
         onClick('');
       }}
-      className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
-        [styles.greyBackground]: currentData?.services,
-        [styles.smallDesktop]: layout === 'small-desktop',
-        [styles.largeDesktop]: layout !== 'small-desktop',
-      })}>
-      {isSameMonth(dateTime, currentDate) && (
+      className={classNames(
+        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        {
+          [styles.greyBackground]: currentData?.services,
+          [styles.smallDesktop]: layout === 'small-desktop',
+          [styles.largeDesktop]: layout !== 'small-desktop',
+        },
+      )}>
+      {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <p>
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
           {currentData?.services && (

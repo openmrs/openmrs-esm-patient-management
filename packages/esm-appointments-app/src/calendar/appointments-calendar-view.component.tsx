@@ -1,26 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useAppointmentsCalendar } from '../hooks/useAppointmentsCalendar';
 import AppointmentsHeader from '../header/appointments-header.component';
 import CalendarHeader from './header/calendar-header.component';
-import { useAppointmentDate } from '../helpers';
+import { changeSelectedDate, useSelectedDate } from '../helpers';
 import MonthlyCalendarView from './monthly/monthly-calendar-view.component';
+import { useParams } from 'react-router-dom';
 
 const AppointmentsCalendarView: React.FC = () => {
   const { t } = useTranslation();
-  const { currentAppointmentDate, setCurrentAppointmentDate } = useAppointmentDate();
-  const { calendarEvents } = useAppointmentsCalendar(dayjs(currentAppointmentDate).toISOString(), 'monthly');
+  const { selectedDate } = useSelectedDate();
+  const { calendarEvents } = useAppointmentsCalendar(dayjs(selectedDate).toISOString(), 'monthly');
+
+  let params = useParams();
+
+  useEffect(() => {
+    if (params.date) {
+      changeSelectedDate(params.date);
+    }
+  }, [params.date]);
 
   return (
     <div data-testid="appointments-calendar">
       <AppointmentsHeader title={t('calendar', 'Calendar')} />
       <CalendarHeader />
-      <MonthlyCalendarView
-        events={calendarEvents}
-        currentDate={dayjs(currentAppointmentDate)}
-        setCurrentDate={setCurrentAppointmentDate}
-      />
+      <MonthlyCalendarView events={calendarEvents} />
     </div>
   );
 };

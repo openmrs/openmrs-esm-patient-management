@@ -3,19 +3,13 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
 import { type Appointment, DurationPeriod } from '../types';
-import { getAppointment, useAppointmentDate } from '../helpers';
+import { getAppointment, useSelectedDate } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
 import { useMemo } from 'react';
 
-interface AppointmentsReturnType {
-  isLoading: boolean;
-  appointments: Array<Appointment>;
-  error: Error;
-}
-
 export function useAppointments(status?: string, forDate?: string) {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const startDate = forDate ? forDate : currentAppointmentDate;
+  const { selectedDate } = useSelectedDate();
+  const startDate = forDate ? forDate : selectedDate;
   const apiUrl = `${restBaseUrl}/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `${restBaseUrl}/appointment/all?forDate=${startDate}`;
 
@@ -35,7 +29,7 @@ export function useAppointments(status?: string, forDate?: string) {
   };
 }
 
-export const useDailyAppointments = (startDateTime: string, durationPeriod: DurationPeriod) => {
+export const useDailyAppointments = (startDateTime: string) => {
   const url = `${restBaseUrl}/appointment/all?forDate=${startDateTime}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Appointment> }>(startDateTime ? url : null, openmrsFetch);
 

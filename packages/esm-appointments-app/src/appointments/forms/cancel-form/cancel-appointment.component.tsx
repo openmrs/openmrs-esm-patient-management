@@ -4,10 +4,10 @@ import { Button, Layer, TextArea } from '@carbon/react';
 import { useSession, showSnackbar, ExtensionSlot, usePatient, restBaseUrl } from '@openmrs/esm-framework';
 import { cancelAppointment } from '../forms.resource';
 import { useSWRConfig } from 'swr';
-import { useAppointmentDate } from '../../../helpers';
 import { closeOverlay } from '../../../hooks/useOverlay';
 import styles from './cancel-appointment.scss';
 import { type Appointment } from '../../../types';
+import { useSelectedDate } from '../../../helpers';
 
 interface CancelAppointmentProps {
   appointment: Appointment;
@@ -19,7 +19,7 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
   const session = useSession();
   const [selectedLocation, setSelectedLocation] = useState(appointment.location.uuid);
   const [reason, setReason] = useState('');
-  const { currentAppointmentDate } = useAppointmentDate();
+  const { selectedDate } = useSelectedDate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const CancelAppointment: React.FC<CancelAppointmentProps> = ({ appointment }) =>
         subtitle: t('cancelledSuccessfully', 'It has been cancelled successfully'),
         title: t('appointmentCancelled', 'Appointment cancelled'),
       });
-      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Scheduled`);
-      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${currentAppointmentDate}&status=Cancelled`);
+      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${selectedDate}&status=Scheduled`);
+      mutate(`${restBaseUrl}/appointment/appointmentStatus?forDate=${selectedDate}&status=Cancelled`);
       closeOverlay();
     } else {
       showSnackbar({
