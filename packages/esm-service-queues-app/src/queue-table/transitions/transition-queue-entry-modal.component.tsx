@@ -42,8 +42,8 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
   });
-
   const { queues } = useQueues();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
 
@@ -74,6 +74,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
 
   const submitForm = (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     transitionQueueEntry({
       queueEntryToTransition: queueEntry.uuid,
@@ -101,8 +102,13 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
           kind: 'error',
           subtitle: error?.message,
         });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
       });
   };
+
+  const selectedPriorityIndex = priorities.findIndex((p) => p.uuid == formState.selectedPriority);
 
   return (
     <div>
@@ -121,10 +127,16 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                   invalidText="Required"
                   value={formState.selectedQueue}
                   onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                  {queues?.map((queue) => (
-                    <SelectItem key={queue.uuid} text={queue.display} value={queue.uuid}>
-                      {queue.display}
-                    </SelectItem>
+                  {queues?.map(({ uuid, display }) => (
+                    <SelectItem
+                      key={uuid}
+                      text={
+                        uuid == queueEntry.queue.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                          : display
+                      }
+                      value={uuid}
+                    />
                   ))}
                 </Select>
               </section>
@@ -146,7 +158,16 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                       setSelectedStatusUuid(uuid);
                     }}>
                     {statuses?.map(({ uuid, display }) => (
-                      <RadioButton key={uuid} name={display} labelText={display} value={uuid} />
+                      <RadioButton
+                        key={uuid}
+                        name={display}
+                        labelText={
+                          uuid == queueEntry.status.uuid
+                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                            : display
+                        }
+                        value={uuid}
+                      />
                     ))}
                   </RadioButtonGroup>
                 )}
@@ -165,13 +186,23 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                 ) : (
                   <ContentSwitcher
                     size="sm"
-                    selectedIndex={1}
+                    selectedIndex={selectedPriorityIndex}
                     onChange={(event) => {
                       setSelectedPriorityUuid(event.name as string);
                     }}>
-                    {priorities?.map(({ uuid, display }) => {
-                      return <Switch role="radio" name={uuid} text={display} key={uuid} value={uuid} />;
-                    })}
+                    {priorities?.map(({ uuid, display }) => (
+                      <Switch
+                        role="radio"
+                        name={uuid}
+                        text={
+                          uuid == queueEntry.priority.uuid
+                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                            : display
+                        }
+                        key={uuid}
+                        value={uuid}
+                      />
+                    ))}
                   </ContentSwitcher>
                 )}
               </section>
@@ -184,7 +215,8 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
           </Button>
           <Button
             disabled={
-              formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid
+              isSubmitting ||
+              (formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid)
             }
             type="submit">
             {t('transitionPatient', 'Transition patient')}

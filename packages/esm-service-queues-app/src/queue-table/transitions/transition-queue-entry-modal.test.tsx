@@ -28,11 +28,14 @@ describe('TransitionQueueEntryModal: ', () => {
     expect(screen.getByText(queueEntry.patient.display)).toBeInTheDocument();
 
     for (const status of allowedStatuses) {
-      expect(screen.getByRole('radio', { name: status.display })).toBeInTheDocument();
+      const expectedStatusDisplay =
+        queueEntry.status.uuid == status.uuid ? `${status.display} (Current)` : status.display;
+      expect(screen.getByRole('radio', { name: expectedStatusDisplay })).toBeInTheDocument();
     }
 
     for (const pri of allowedPriorities) {
-      expect(screen.getByRole('radio', { name: pri.display })).toBeInTheDocument();
+      const expectedPriorityDisplay = queueEntry.priority.uuid == pri.uuid ? `${pri.display} (Current)` : pri.display;
+      expect(screen.getByRole('radio', { name: expectedPriorityDisplay })).toBeInTheDocument();
     }
   });
 
