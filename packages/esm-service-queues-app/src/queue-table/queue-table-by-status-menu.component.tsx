@@ -14,7 +14,7 @@ function QueueTableLink({ basePath, queue }: { basePath:string, queue: Queue }) 
   const selected = location.pathname.startsWith(pageUrl);
   return (
     <ConfigurableLink
-      className={classNames('cds--side-nav__link', { 'active-left-nav-link': selected })}
+      className={classNames('cds--side-nav__link', { 'active-left-nav-link': selected })} // TODO: Adjust this CSS
       to={`${basePath}/${queue.uuid}`}
     >
       {queue.display}
