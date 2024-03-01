@@ -47,7 +47,7 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid });
+  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
   const allowedStatuses = selectedQueue.allowedStatuses;
 
   const currentStatusUuid = selectedStatus?.uuid ?? allowedStatuses?.[0]?.uuid;
