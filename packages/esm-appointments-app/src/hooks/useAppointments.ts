@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
 import { type Appointment, DurationPeriod } from '../types';
-import { getAppointment, useAppointmentDate } from '../helpers';
+import { useAppointmentDate } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
 import { useMemo } from 'react';
 
@@ -24,7 +24,7 @@ export function useAppointments(status?: string, forDate?: string) {
     openmrsFetch,
   );
 
-  const appointments = useMemo(() => data?.data?.map((appointment) => getAppointment(appointment)) ?? [], [data?.data]);
+  const appointments = useMemo(() => data?.data ?? [], [data?.data]);
 
   return {
     appointments,

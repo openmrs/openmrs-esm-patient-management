@@ -58,11 +58,14 @@ const CalendarPatientList: React.FC = () => {
   ];
 
   const rowData = appointments
-    ?.filter(({ serviceType }) => serviceName === 'Total' || serviceName === serviceType)
+    ?.filter(({ service }) => serviceName === 'Total' || serviceName === service.name)
     .map((appointment) => ({
-      id: `${appointment.identifier}`,
-      ...appointment,
-      dateTime: formatDatetime(new Date(appointment.dateTime)),
+      id: appointment.patient.identifier,
+      name: appointment.patient.name,
+      identifier: appointment.patient.identifier,
+      dateTime: formatDatetime(new Date(appointment.startDateTime)),
+      serviceType: appointment.service.name,
+      provider: appointment?.providers[0]?.name,
     }));
 
   if (isLoading) {
@@ -95,8 +98,8 @@ const CalendarPatientList: React.FC = () => {
                     renderIcon={(props) => <Download size={16} {...props} />}
                     onClick={() =>
                       downloadAppointmentsAsExcel(
-                        appointments,
-                        `${serviceName} ${formatDate(new Date(appointments[0]?.dateTime), {
+                        appointments.filter(({ service }) => serviceName === 'Total' || serviceName === service.name),
+                        `${serviceName} ${formatDate(new Date(appointments[0]?.startDateTime), {
                           year: true,
                         })}`,
                       )
