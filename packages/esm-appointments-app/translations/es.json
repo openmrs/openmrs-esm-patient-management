@@ -11,6 +11,7 @@
   "appointmentCancelled": "Cita cancelada",
   "appointmentCheckedIn": "Cita registrada",
   "appointmentCheckInError": "Error al registrar la cita",
+  "appointmentDuplicateForm": "Ya se ha programado una cita.",
   "appointmentColor": "Color de la cita",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",

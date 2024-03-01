@@ -11,6 +11,7 @@
   "appointmentCancelled": "تم إلغاء الموعد",
   "appointmentCheckedIn": "تم تسجيل الوصول للموعد",
   "appointmentCheckInError": "خطأ في تسجيل الوصول للموعد",
+  "appointmentDuplicateForm": "لقد تم تحديد موعد بالفعل",
   "appointmentColor": "لون الموعد",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",

@@ -30,6 +30,7 @@ import {
   useLayoutType,
   useConfig,
   ResponsiveWrapper,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
@@ -44,6 +45,7 @@ import type { Appointment, AppointmentPayload, RecurringPattern } from '../types
 import { type ConfigObject } from '../config-schema';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
 import styles from './appointments-form.scss';
+import { checkAppointmentConflict } from '../appointments/forms/forms.resource';
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -101,7 +103,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-
+  const [isConflict, setIsConflict] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -191,11 +193,23 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   })();
 
   // Same for creating and editing
-  const handleSaveAppointment = (data: AppointmentFormData) => {
+  const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
 
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
+
+    // check if Duplicate Response Occurs
+    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    if (response.status === 200) {
+      setIsSubmitting(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: t('appointmentDuplicateForm', 'Appointment is not available'),
+      });
+      return;
+    }
 
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
