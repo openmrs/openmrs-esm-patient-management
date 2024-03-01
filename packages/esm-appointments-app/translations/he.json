@@ -11,6 +11,7 @@
   "appointmentCancelled": "התור בוטל",
   "appointmentCheckedIn": "התור נרשם",
   "appointmentCheckInError": "שגיאה בעדכון נתוני התור",
+  "appointmentDuplicateForm": "כבר נקבעה פגישה",
   "appointmentColor": "צבע התור",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",

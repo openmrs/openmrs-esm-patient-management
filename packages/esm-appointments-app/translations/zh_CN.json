@@ -11,6 +11,7 @@
   "appointmentCancelled": "预约已取消",
   "appointmentCheckedIn": "预约已签到",
   "appointmentCheckInError": "预约签到时出现错误",
+  "appointmentDuplicateForm": "预约已经安排好了。",
   "appointmentColor": "预约颜色",
   "appointmentEdited": "预约已编辑",
   "appointmentEditError": "编辑预约时出现错误",

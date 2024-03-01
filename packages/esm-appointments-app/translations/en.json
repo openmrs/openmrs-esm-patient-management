@@ -12,6 +12,7 @@
   "appointmentCheckedIn": "Appointment Checked-in",
   "appointmentCheckInError": "Error checking in appointment",
   "appointmentColor": "Appointment color",
+  "appointmentDuplicateForm": "Appointment has been already Scheduled",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",
   "appointmentForm": "Appointments Form",

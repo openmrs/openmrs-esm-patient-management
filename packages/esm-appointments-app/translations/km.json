@@ -11,6 +11,7 @@
   "appointmentCancelled": "ការណាត់ជួបត្រូវបានលុបចោល",
   "appointmentCheckedIn": "Appointment Checked-in",
   "appointmentCheckInError": "Error checking in appointment",
+  "appointmentDuplicateForm": "ការណាត់ជួបត្រូវបានរៀបចំឡើង។",
   "appointmentColor": "ពណ៌ណាត់ជួប",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",
