@@ -5,6 +5,7 @@ import { deletePatient, generateRandomPatient, getPatient, type Patient } from '
 import { type PatientRegistrationFormValues, RegistrationAndEditPage } from '../pages';
 
 let patient: Patient;
+
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });

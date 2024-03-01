@@ -13,8 +13,8 @@ import {
   removePatientFromCohort,
 } from '../commands';
 
-let createdCohortMember: CohortMember;
-let createdCohortUuid: string;
+let cohortMember: CohortMember;
+let cohortUuid: string;
 let cohort: Cohort;
 let patient: Patient;
 
@@ -46,7 +46,7 @@ test('Create and edit a patient list', async ({ page }) => {
 
   await test.step('Then I should see the information about the list', async () => {
     await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient-lists\\/[\\w\\d-]+$'));
-    createdCohortUuid = /patient-lists\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
+    cohortUuid = /patient-lists\/([\w\d-]+)/.exec(page.url())?.[1] ?? null;
 
     await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListName));
     await expect(patientListPage.patientListHeader()).toHaveText(new RegExp(patientListDescription));
@@ -69,32 +69,31 @@ test('Create and edit a patient list', async ({ page }) => {
 
 test('Manage patients in a list', async ({ api, page }) => {
   const patientListPage = new PatientListsPage(page);
+
   await test.step("When I visit a specific patient list's page", async () => {
     await patientListPage.goto(cohort.uuid);
   });
 
   await test.step('Then I should be able to add and remove patients from that list', async () => {
     // Add a patient to the list
-    createdCohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
+    cohortMember = await addPatientToCohort(api, cohort.uuid, patient.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientListHeader()).toHaveText(/1 patients/);
     await expect(patientListPage.patientsTable()).toHaveText(new RegExp(patient.person.display));
 
     // Remove a patient from the list
-    await removePatientFromCohort(api, createdCohortMember.uuid);
+    await removePatientFromCohort(api, cohortMember.uuid);
     await patientListPage.goto(cohort.uuid);
     await expect(patientListPage.patientListHeader()).toHaveText(/0 patients/);
-    createdCohortMember = null;
+    cohortMember = null;
   });
 });
 
 test.afterEach(async ({ api }) => {
-  if (createdCohortMember) {
-    await removePatientFromCohort(api, createdCohortMember.uuid);
+  if (cohortMember) {
+    await removePatientFromCohort(api, cohortMember.uuid);
   }
-  if (createdCohortUuid) {
-    await deleteCohort(api, createdCohortUuid);
-  }
+  await deleteCohort(api, cohortUuid);
   await deletePatient(api, patient.uuid);
   await deleteCohort(api, cohort.uuid);
 });
