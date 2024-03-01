@@ -38,33 +38,6 @@ export const formatAMPM = (date) => {
   return strTime;
 };
 
-// TODO remove?
-export const getAppointment = (appointment: Appointment) => {
-  let formattedAppointment = {
-    id: appointment.uuid,
-    name: appointment.patient?.name,
-    age: appointment.patient?.birthDate,
-    gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.phoneNumber,
-    dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
-    patientUuid: appointment.patient?.uuid,
-    dateTime: appointment.startDateTime,
-    serviceType: appointment.service ? appointment.service.name : '--',
-    serviceUuid: appointment.service ? appointment.service.uuid : null,
-    appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
-    status: appointment.status,
-    provider: appointment.providers ? appointment?.providers[0]?.name : '--',
-    location: appointment.location ? appointment.location?.name : '--',
-    comments: appointment.comments ? appointment.comments : '--',
-    appointmentNumber: appointment.appointmentNumber,
-    providers: appointment.providers,
-    identifier: appointment?.patient?.identifiers?.find(
-      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
-    ).identifier,
-  };
-  return formattedAppointment;
-};
-
 export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs) => {
   return cellDate.isSame(currentDate, 'month');
 };
