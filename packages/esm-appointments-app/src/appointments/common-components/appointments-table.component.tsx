@@ -37,7 +37,6 @@ interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
-  visits?: Array<any>;
   scheduleType?: string;
 }
 
@@ -45,7 +44,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   appointments,
   isLoading,
   tableHeading,
-  visits,
   scheduleType,
 }) => {
   const { t } = useTranslation();
@@ -90,7 +88,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
     provider: appointment.provider,
-    actions: <AppointmentActions visits={visits} appointment={appointment} scheduleType={scheduleType} />,
+    actions: <AppointmentActions appointment={appointment} scheduleType={scheduleType} />,
   }));
 
   if (isLoading) {

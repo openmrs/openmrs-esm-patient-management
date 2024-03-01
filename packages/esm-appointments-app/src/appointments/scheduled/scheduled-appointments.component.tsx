@@ -16,8 +16,6 @@ import styles from './scheduled-appointments.scss';
 dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
-  visits: Array<any>;
-  isLoading: boolean;
   appointmentServiceType?: string;
 }
 
@@ -25,7 +23,7 @@ type DateType = 'pastDate' | 'today' | 'futureDate';
 
 const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
+const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
   const { currentAppointmentDate: date } = useAppointmentDate();
 
