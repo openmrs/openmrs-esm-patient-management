@@ -468,6 +468,7 @@ export interface QueueEntrySearchCriteria {
   location?: Array<string> | string;
   service?: Array<string> | string;
   status?: Array<string> | string;
+  isEnded: boolean;
 }
 
 // TODO: The follow types match the types from backend.
