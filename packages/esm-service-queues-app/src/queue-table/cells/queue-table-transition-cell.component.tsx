@@ -27,4 +27,5 @@ export function QueueTableTransitionCell({ queueEntry }: QueueTableCellComponent
 export const queueTableTransitionColumn: QueueTableColumn = {
   headerI18nKey: '',
   CellComponent: QueueTableTransitionCell,
+  getFilterableValue: null,
 };

@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import { QueueTableCellComponentProps, QueueTableColumn } from '../types';
+import { type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
+import styles from './active-visits-row-actions.scss';
 
 export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
@@ -14,7 +15,9 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
 
   return (
     <>
-      <TransitionMenu queueEntry={mappedQueueEntry} />
+      <div className={styles.transitionMenuContainer}>
+        <TransitionMenu queueEntry={mappedQueueEntry} />
+      </div>
       <EditMenu queueEntry={mappedQueueEntry} />
       <ActionsMenu queueEntry={mappedQueueEntry} />
     </>
@@ -24,4 +27,5 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
 export const activeVisitActionsColumn: QueueTableColumn = {
   headerI18nKey: '',
   CellComponent: ActiveVisitRowActionsCell,
+  getFilterableValue: null,
 };

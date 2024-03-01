@@ -10,4 +10,5 @@ export const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentPr
 export const queueTablePriorityColumn: QueueTableColumn = {
   headerI18nKey: 'priority',
   CellComponent: QueueTablePriorityCell,
+  getFilterableValue: (queueEntry) => queueEntry.priority.display,
 };

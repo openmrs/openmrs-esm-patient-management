@@ -20,35 +20,33 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ queueEntry }) => {
   }, [queueEntry]);
 
   return (
-    <Layer>
-      <OverflowMenu
-        aria-label="Actions menu"
-        iconDescription={t('actions', 'Actions')}
-        selectorPrimaryFocus={'#editPatientDetails'}
-        size="sm"
-        flipped>
-        <OverflowMenuItem
-          className={styles.menuItem}
-          id="#editPatientDetails"
-          itemText={t('editPatientDetails', 'Edit patient details')}
-          onClick={() =>
-            navigate({
-              to: `\${openmrsSpaBase}/patient/${queueEntry.patientUuid}/edit`,
-            })
-          }>
-          {t('editPatientDetails', 'Edit patient details')}
-        </OverflowMenuItem>
-        <OverflowMenuItem
-          className={styles.menuItem}
-          id="#endVisit"
-          onClick={launchEndVisitModal}
-          hasDivider
-          isDelete
-          itemText={t('endVisit', 'End visit')}>
-          {t('endVisit', 'End visit')}
-        </OverflowMenuItem>
-      </OverflowMenu>
-    </Layer>
+    <OverflowMenu
+      aria-label="Actions menu"
+      iconDescription={t('actions', 'Actions')}
+      selectorPrimaryFocus={'#editPatientDetails'}
+      size="sm"
+      flipped>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#editPatientDetails"
+        itemText={t('editPatientDetails', 'Edit patient details')}
+        onClick={() =>
+          navigate({
+            to: `\${openmrsSpaBase}/patient/${queueEntry.patientUuid}/edit`,
+          })
+        }>
+        {t('editPatientDetails', 'Edit patient details')}
+      </OverflowMenuItem>
+      <OverflowMenuItem
+        className={styles.menuItem}
+        id="#endVisit"
+        onClick={launchEndVisitModal}
+        hasDivider
+        isDelete
+        itemText={t('endVisit', 'End visit')}>
+        {t('endVisit', 'End visit')}
+      </OverflowMenuItem>
+    </OverflowMenu>
   );
 };
 

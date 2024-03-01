@@ -8,4 +8,5 @@ export const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProp
 export const queueTableStatusColumn: QueueTableColumn = {
   headerI18nKey: 'status',
   CellComponent: QueueTableStatusCell,
+  getFilterableValue: (queueEntry) => queueEntry.status.display,
 };

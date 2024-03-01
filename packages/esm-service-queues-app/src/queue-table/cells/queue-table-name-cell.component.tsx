@@ -15,4 +15,5 @@ export const QueueTableNameCell = ({ queueEntry }: QueueTableCellComponentProps)
 export const queueTableNameColumn: QueueTableColumn = {
   headerI18nKey: 'name',
   CellComponent: QueueTableNameCell,
+  getFilterableValue: (queueEntry) => queueEntry.patient.person.display,
 };

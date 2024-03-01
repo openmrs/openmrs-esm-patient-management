@@ -9,13 +9,11 @@ import {
   formatDate,
   openmrsFetch,
   parseDate,
-  toDateObjectStrict,
-  toOmrsIsoString,
   useConfig,
   type Visit,
   restBaseUrl,
 } from '@openmrs/esm-framework';
-import { QueueEntry, type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
+import { type QueueEntry, type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
 
@@ -178,10 +176,9 @@ export const mapVisitQueueEntryProperties = (
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-  const config = useConfig();
-  const { visitQueueNumberAttributeUuid } = config;
 
-  const apiUrl = `${restBaseUrl}/visit-queue-entry?location=${queueLocationUuid}&v=full`;
+  const apiUrl =
+    `${restBaseUrl}/visit-queue-entry?v=full` + (queueLocationUuid ? `&location=${queueLocationUuid}` : '');
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,

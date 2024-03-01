@@ -41,8 +41,12 @@ import {
   ConfigurableLink,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { useVisitQueueEntries, type MappedVisitQueueEntry, mapVisitQueueEntryProperties } from './active-visits-table.resource';
-import { SearchTypes } from '../types';
+import {
+  useVisitQueueEntries,
+  type MappedVisitQueueEntry,
+  mapVisitQueueEntryProperties,
+} from './active-visits-table.resource';
+import { type QueueEntry, SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -71,6 +75,9 @@ import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-com
 import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
 import { activeVisitActionsColumn } from './active-visits-row-actions.component';
 import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
+import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
+import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
+import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
 
 /**
  * FIXME Temporarily moved here
@@ -95,34 +102,60 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
-  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
-  const useNewActiveVisitsTable = useFeatureFlag("new-active-visits-table");
+  const useNewActiveVisitsTable = useFeatureFlag('new-active-visits-table');
+  const layout = useLayoutType();
+  const { t } = useTranslation();
+  const selectedServiceUuid = useSelectedServiceUuid();
 
+  const queueEntries = visitQueueEntries?.map((entry) => entry.queueEntry);
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
-  }
-  else if(useNewActiveVisitsTable) {
-    const queueEntries = visitQueueEntries.map(entry => entry.queueEntry);
-    const columns = [queueTableNameColumn, queueTablePriorityColumn, queueTableComingFromColumn, queueTableStatusColumn, activeVisitActionsColumn];
-    return <QueueTable queueEntries={queueEntries} queueTableColumns={columns}/>;
-  }
-  else {
-    return <OldQueueTable visitQueueEntries={visitQueueEntries.map(
-      entry => mapVisitQueueEntryProperties(entry.queueEntry, visitQueueNumberAttributeUuid)
-    )} />;
+  } else if (useNewActiveVisitsTable) {
+    const queueEntriesInSelectedQueue = queueEntries.filter(
+      (queueEntry) => !selectedServiceUuid || queueEntry.queue.uuid == selectedServiceUuid,
+    );
+
+    const columns = [
+      queueTableNameColumn,
+      queueTablePriorityColumn,
+      queueTableComingFromColumn,
+      queueTableStatusColumn,
+      queueTableQueueColumn,
+      queueTableWaitTimeColumn,
+      activeVisitActionsColumn,
+    ];
+    return (
+      <div className={styles.container}>
+        <div className={styles.headerContainer}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+          </div>
+        </div>
+        <QueueTable
+          queueEntries={queueEntriesInSelectedQueue}
+          queueTableColumns={columns}
+          ExpandedRow={QueueTableExpandedRow}
+          tableFilter={<ActiveVisitsTableFilter />}
+        />
+      </div>
+    );
+  } else {
+    return <OldQueueTable queueEntries={queueEntries} />;
   }
 }
 
-function OldQueueTable({visitQueueEntries}: {visitQueueEntries: MappedVisitQueueEntry[]}) {
-  
+function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const { t } = useTranslation();
   const currentServiceName = useSelectedServiceName();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queues } = useQueues(currentQueueLocation);
+  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const visitQueueEntries = queueEntries.map((entry) =>
+    mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid),
+  );
 
   const currentServiceUuid = useSelectedServiceUuid();
   const [showOverlay, setShowOverlay] = useState(false);
@@ -539,6 +572,34 @@ function OldQueueTable({visitQueueEntries}: {visitQueueEntries: MappedVisitQueue
         />
       )}
     </div>
+  );
+}
+
+function ActiveVisitsTableFilter() {
+  const { t } = useTranslation();
+  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { queues } = useQueues(currentQueueLocation);
+  const currentServiceName = useSelectedServiceName();
+  const handleServiceChange = ({ selectedItem }) => {
+    updateSelectedServiceUuid(selectedItem.uuid);
+    updateSelectedServiceName(selectedItem.display);
+  };
+
+  return (
+    <>
+      <div className={styles.filterContainer}>
+        <Dropdown
+          id="serviceFilter"
+          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+          label={currentServiceName}
+          type="inline"
+          items={[{ display: `${t('all', 'All')}` }, ...queues]}
+          itemToString={(item) => (item ? item.display : '')}
+          onChange={handleServiceChange}
+          size="sm"
+        />
+      </div>
+    </>
   );
 }
 

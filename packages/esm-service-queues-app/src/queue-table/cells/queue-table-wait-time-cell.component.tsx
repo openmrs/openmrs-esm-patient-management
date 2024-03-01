@@ -28,4 +28,5 @@ export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentPr
 export const queueTableWaitTimeColumn: QueueTableColumn = {
   headerI18nKey: 'waitTime',
   CellComponent: QueueTableWaitTimeCell,
+  getFilterableValue: null,
 };
