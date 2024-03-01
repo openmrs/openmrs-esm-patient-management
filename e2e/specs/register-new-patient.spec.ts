@@ -56,7 +56,5 @@ test('Register a new patient', async ({ page, api }) => {
 });
 
 test.afterEach(async ({ api }) => {
-  if (patientUuid) {
-    await deletePatient(api, patientUuid);
-  }
+  await deletePatient(api, patientUuid);
 });
