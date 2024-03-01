@@ -114,8 +114,8 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 
   registerFeatureFlag(
-    'new-active-visits-table',
-    'New Active Visits Table',
-    'Use a newer implementation of the Active Visits Table in the home dashboard of the queues app.',
+    'new-queue-table',
+    'New Queue Table',
+    'Use a newer implementation of the queue table in the home dashboard of the queues app.',
   );
 }

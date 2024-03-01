@@ -105,7 +105,7 @@ function ActiveVisitsTable() {
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
-  const useNewActiveVisitsTable = useFeatureFlag('new-active-visits-table');
+  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
   const layout = useLayoutType();
   const { t } = useTranslation();
   const selectedServiceUuid = useSelectedServiceUuid();
@@ -147,6 +147,7 @@ function ActiveVisitsTable() {
   }
 }
 
+// older implementation of the ActiveVisitsTable that we plan on deprecating
 function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const { t } = useTranslation();
   const currentServiceName = useSelectedServiceName();

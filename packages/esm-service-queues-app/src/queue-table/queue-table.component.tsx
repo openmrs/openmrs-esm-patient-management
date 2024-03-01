@@ -40,7 +40,7 @@ interface QueueTableProps {
   queueTableColumns: QueueTableColumn[];
 
   // if provided, a queue entry row can be expanded with the
-  // provided component rendering for info about the row
+  // provided component rendering more info about the row
   ExpandedRow?: FC<{ queueEntry: QueueEntry }>;
 
   // if provided, adds addition table toolbar elements
@@ -124,7 +124,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
               })}
             </TableBody>
           </Table>
-          {rows.length === 0 ? (
+          {rows.length === 0 && (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
                 <div className={styles.tileContent}>
@@ -133,7 +133,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
                 </div>
               </Tile>
             </div>
-          ) : null}
+          )}
           <Pagination
             forwardText={t('nextPage', 'Next page')}
             backwardText={t('previousPage', 'Previous page')}
