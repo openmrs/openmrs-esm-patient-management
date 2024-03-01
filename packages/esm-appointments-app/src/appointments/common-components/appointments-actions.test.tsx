@@ -48,6 +48,18 @@ const appointment: Appointment = {
   extensions: [],
 };
 
+let visits;
+jest.mock('../../hooks/useVisits', () => {
+  const originalModule = jest.requireActual('../../hooks/useVisits');
+
+  return {
+    ...originalModule,
+    useVisits: () => ({
+      visits: visits,
+    }),
+  };
+});
+
 describe('AppointmentActions', () => {
   const defaultProps = {
     visits: [],
@@ -71,28 +83,28 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when the patient has checked out', () => {
-    const visits = [
+    visits = [
       {
         patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
         startDatetime: new Date().toISOString(),
         stopDatetime: new Date().toISOString(),
       },
     ];
-    const props = { ...defaultProps, visits };
+    const props = { ...defaultProps };
     const { getByText } = render(<AppointmentActions {...props} />);
     const button = getByText('Checked out');
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when the patient has an active visit and today is the appointment date', () => {
-    const visits = [
+    visits = [
       {
         patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
         startDatetime: new Date().toISOString(),
         stopDatetime: null,
       },
     ];
-    const props = { ...defaultProps, visits, scheduleType: 'Scheduled' };
+    const props = { ...defaultProps, scheduleType: 'Scheduled' };
     const { getByText } = render(<AppointmentActions {...props} />);
     const button = getByText('Check out');
     expect(button).toBeInTheDocument();
