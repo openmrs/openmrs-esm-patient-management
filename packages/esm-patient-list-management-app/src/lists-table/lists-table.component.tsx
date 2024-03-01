@@ -105,16 +105,14 @@ const ListsTable: React.FC<PatientListTableProps> = ({
 
   const tableRows = useMemo(
     () =>
-      debouncedSearchTerm
-        ? filteredLists
-        : results.map((list) => ({
-            id: list.id,
-            display: list.display,
-            description: list.description,
-            type: list.type,
-            size: list.size,
-          })) ?? [],
-    [filteredLists, results],
+      results.map((list) => ({
+        id: list.id,
+        display: list.display,
+        description: list.description,
+        type: list.type,
+        size: list.size,
+      })) ?? [],
+    [results],
   );
 
   if (isLoading) {
