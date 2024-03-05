@@ -1,11 +1,20 @@
-import { FetchResponse, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, showNotification, showToast, showSnackbar } from '@openmrs/esm-framework';
 import { generateNUPIPayload, handleClientRegistryResponse } from './patient-verification-utils';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { ConceptAnswers, ConceptResponse, FormValues } from '../patient-registration/patient-registration.types';
+import {
+  type ConceptAnswers,
+  type ConceptResponse,
+  type FormValues,
+} from '../patient-registration/patient-registration.types';
 
-export function searchClientRegistry(identifierType: string, searchTerm: string, token: string) {
-  const url = `https://afyakenyaapi.health.go.ke/partners/registry/search/KE/${identifierType}/${searchTerm}`;
+export function searchClientRegistry(
+  identifierType: string,
+  searchTerm: string,
+  token: string,
+  countryCode: string = 'KE',
+) {
+  const url = `https://afyakenyaapi.health.go.ke/partners/registry/search/${countryCode}/${identifierType}/${searchTerm}`;
   return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then((r) => r.json());
 }
 
@@ -38,12 +47,12 @@ export async function handleSavePatientToClientRegistry(
           postToRegistry(formValues, setValues);
         }
       } catch (error) {
-        showToast({
+        showSnackbar({
           title: 'Client registry error',
-          description: `${error}`,
-          millis: 10000,
+          subtitle: `${error}`,
+          timeoutInMs: 10000,
           kind: 'error',
-          critical: true,
+          isLowContrast: true,
         });
       }
       return;

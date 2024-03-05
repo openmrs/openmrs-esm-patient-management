@@ -121,6 +121,26 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       setTarget(redirectUrl);
     } catch (error) {
+      const fieldErrors = Object.entries(error.responseBody?.error?.fieldErrors || {}) as Array<
+        [string, Array<{ code: string; message: string }>]
+      >;
+
+      if (savePatientTransactionManager.current.patientSaved) {
+        fieldErrors.forEach(([field, error]) => {
+          const errorMessage = error.map((e) => e.message).join(', ');
+          showSnackbar({
+            subtitle: errorMessage,
+            title: `Patient registration successful, with errors for registration encounter`,
+            kind: 'warning',
+            timeoutInMs: 8000,
+          });
+        });
+        const afterUrl = new URLSearchParams(search).get('afterUrl');
+        const redirectUrl = interpolateUrl(afterUrl || config.links.submitButton, { patientUuid: values.patientUuid });
+
+        setTarget(redirectUrl);
+      }
+
       if (error.responseBody?.error?.globalErrors) {
         error.responseBody.error.globalErrors.forEach((error) => {
           showSnackbar({
@@ -141,6 +161,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
         });
       } else {
         createErrorHandler()(error);
+        console.error(error);
       }
 
       helpers.setSubmitting(false);
@@ -239,7 +260,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   initialFormValues: props.initialValues,
                   setInitialFormValues,
                 }}>
-                <PatientVerification props={props} />
+                <PatientVerification props={props} setInitialFormValues={setInitialFormValues} />
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}

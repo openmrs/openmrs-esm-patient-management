@@ -17,14 +17,9 @@
     row-gap: 0.5rem;
     display: flex;
     flex-direction: column;
-
   }
 }
 
 .errorWrapper {
-  color: colors.$red-50;
   margin: 0 0 1rem 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }

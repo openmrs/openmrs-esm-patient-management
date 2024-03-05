@@ -2510,6 +2510,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kenyaemr/esm-patient-registration-app@workspace:packages/esm-patient-registration-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
+  dependencies:
+    "@carbon/react": "npm:~1.37.0"
+    formik: "npm:^2.1.5"
+    lodash-es: "npm:^4.17.15"
+    uuid: "npm:^8.3.2"
+    webpack: "npm:^5.74.0"
+    yup: "npm:^0.29.1"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -2968,26 +2988,6 @@ __metadata:
     webpack-dev-server: "npm:^4.15.1"
     xlsx: "npm:^0.18.5"
     zod: "npm:^3.22.2"
-  languageName: unknown
-  linkType: soft
-
-"@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app":
-  version: 0.0.0-use.local
-  resolution: "@openmrs/esm-patient-registration-app@workspace:packages/esm-patient-registration-app"
-  dependencies:
-    "@carbon/react": "npm:~1.37.0"
-    formik: "npm:^2.1.5"
-    lodash-es: "npm:^4.17.15"
-    uuid: "npm:^8.3.2"
-    webpack: "npm:^5.74.0"
-    yup: "npm:^0.29.1"
-  peerDependencies:
-    "@openmrs/esm-framework": 5.x
-    dayjs: 1.x
-    react: 18.x
-    react-i18next: 11.x
-    react-router-dom: 6.x
-    swr: 2.x
   languageName: unknown
   linkType: soft
 

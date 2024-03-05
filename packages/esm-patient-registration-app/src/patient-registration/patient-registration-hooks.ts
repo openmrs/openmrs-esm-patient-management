@@ -36,7 +36,7 @@ import { useInitialPatientRelationships } from './section/patient-relationships/
 import dayjs from 'dayjs';
 
 export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch<FormValues>] {
-  const { martialStatus, education, occupation, educationLoad, loadingStatus } = useConcepts();
+  const { martialStatus, education, occupation, educationLoad } = useConcepts();
   const { isLoading: isLoadingPatientToEdit, patient: patientToEdit } = usePatient(patientUuid);
   const { data: attributes, isLoading: isLoadingAttributes } = useInitialPersonAttributes(patientUuid);
   const { data: identifiers, isLoading: isLoadingIdentifiers } = useInitialPatientIdentifiers(patientUuid);
@@ -158,13 +158,13 @@ export function useInitialFormValues(patientUuid: string): [FormValues, Dispatch
   // Set Initial encounter
 
   useEffect(() => {
-    if (!educationLoad || !loadingStatus) {
+    if (!educationLoad) {
       setInitialFormValues((initialFormValues) => ({
         ...initialFormValues,
         concepts: [...occupation, ...martialStatus, ...education],
       }));
     }
-  }, [educationLoad, loadingStatus]);
+  }, [educationLoad]);
 
   return [initialFormValues, setInitialFormValues];
 }
@@ -323,7 +323,7 @@ export function usePatientObs(patientUuid: string) {
 }
 
 function useConcepts() {
-  const { data: martialStatus, isLoading: loadingStatus } = useConceptAnswers('1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const config = useConfig<RegistrationConfig>();
   const { data: education, isLoading: educationLoad } = useConceptAnswers('1712AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   const occupation: Array<ConceptAnswers> = [
     {
@@ -356,5 +356,9 @@ function useConcepts() {
     },
   ];
 
-  return { martialStatus, education, occupation, loadingStatus, educationLoad };
+  const martialStatus: Array<ConceptAnswers> = config.fieldDefinitions
+    .find((fieldDefinition) => fieldDefinition.id === 'maritalStatus')
+    .customConceptAnswers.map((concept) => ({ uuid: concept.uuid, display: concept.label }));
+
+  return { martialStatus, education, occupation, educationLoad };
 }

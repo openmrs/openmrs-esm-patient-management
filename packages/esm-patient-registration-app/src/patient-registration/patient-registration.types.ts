@@ -118,7 +118,7 @@ export type Patient = {
 };
 
 export interface Encounter {
-  encounterDatetime: Date;
+  encounterDatetime?: Date;
   patient: string;
   encounterType: string;
   location: string;
@@ -317,7 +317,8 @@ export interface RestAddressTemplate {
   description: string;
   property: string;
   display: string;
-  value: string;}
+  value: string;
+}
 export interface ObsResponse {
   results: Array<{ obs: Array<{ uuid: string; display: string; value: OpenmrsResource; concept: OpenmrsResource }> }>;
 }

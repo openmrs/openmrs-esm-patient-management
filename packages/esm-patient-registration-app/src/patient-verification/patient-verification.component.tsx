@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile, ComboBox, Layer, Button, Search, InlineLoading } from '@carbon/react';
+import { Tile, ComboBox, Layer, Button, Search, InlineLoading, InlineNotification } from '@carbon/react';
 import styles from './patient-verification.scss';
 import { countries, verificationIdentifierTypes } from './assets/verification-assets';
 import { searchClientRegistry, useGlobalProperties } from './patient-verification-hook';
-import { showToast } from '@openmrs/esm-framework';
+import { showSnackbar, showToast } from '@openmrs/esm-framework';
 import { handleClientRegistryResponse } from './patient-verification-utils';
-import { FormikProps } from 'formik';
-import { FormValues } from '../patient-registration/patient-registration.types';
+import { type FormikProps } from 'formik';
+import { type FormValues } from '../patient-registration/patient-registration.types';
 
 interface PatientVerificationProps {
   props: FormikProps<FormValues>;
+  setInitialFormValues: React.Dispatch<FormValues>;
 }
 
 const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
@@ -19,6 +20,7 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
   const [verificationCriteria, setVerificationCriteria] = useState({
     searchTerm: '',
     identifierType: '',
+    countryCode: 'KE',
   });
   const [isLoadingSearch, setIsLoadingSearch] = useState(false);
 
@@ -29,28 +31,23 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
         verificationCriteria.identifierType,
         verificationCriteria.searchTerm,
         props.values.token,
+        verificationCriteria.countryCode,
       );
       setIsLoadingSearch(false);
+
       handleClientRegistryResponse(clientRegistryResponse, props, verificationCriteria.searchTerm);
     } catch (error) {
-      showToast({
+      showSnackbar({
         title: 'Client registry error',
-        description: `Please reload the registration page and re-try again, if the issue persist contact system administrator`,
-        millis: 10000,
+        subtitle: `Please reload the registration page and re-try again, if the issue persist contact system administrator`,
+        timeoutInMs: 10000,
         kind: 'error',
-        critical: true,
+        isLowContrast: true,
       });
       setIsLoadingSearch(false);
     }
   };
 
-  if (error) {
-    return (
-      <Tile className={styles.errorWrapper}>
-        <p>Error occurred while reaching the client registry, please proceed with registration and try again later</p>
-      </Tile>
-    );
-  }
   return (
     <div id={'patientVerification'}>
       <h3 className={styles.productiveHeading02} style={{ color: '#161616' }}>
@@ -60,6 +57,20 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
         <Layer>
           {isLoading && <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />}
         </Layer>
+        {error && (
+          <InlineNotification
+            className={styles.errorWrapper}
+            aria-label="closes notification"
+            kind="error"
+            lowContrast
+            statusIconDescription="notification"
+            subtitle={t(
+              'clientRegistryErrorSubtitle',
+              'Please proceed with registration contact system admin and  try again later',
+            )}
+            title={t('clientRegistryError', 'Error occurred while reaching the client registry')}
+          />
+        )}
         <Tile className={styles.verificationWrapper}>
           <Layer>
             <ComboBox
@@ -67,9 +78,12 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
               id="selectCountry"
               items={countries}
               itemToString={(item) => item?.name ?? ''}
-              label="Combo box menu options"
+              label="Select country"
               titleText={t('selectCountry', 'Select country')}
               initialSelectedItem={countries[0]}
+              onChange={({ selectedItem }) =>
+                setVerificationCriteria({ ...verificationCriteria, countryCode: selectedItem?.initials })
+              }
             />
           </Layer>
           <Layer>
@@ -78,18 +92,18 @@ const PatientVerification: React.FC<PatientVerificationProps> = ({ props }) => {
               id="selectIdentifierType"
               items={verificationIdentifierTypes}
               itemToString={(item) => item?.name ?? ''}
-              label="Combo box menu options"
+              label="Select identifier type"
               titleText={t('selectIdentifierType', 'Select identifier type')}
               onChange={({ selectedItem }) =>
-                setVerificationCriteria({ ...verificationCriteria, identifierType: selectedItem.value })
+                setVerificationCriteria({ ...verificationCriteria, identifierType: selectedItem?.value })
               }
             />
           </Layer>
           <Layer>
             <Search
-              id="search-1"
+              id="clientRegistrySearch"
               autoFocus
-              placeHolderText="Search"
+              placeHolderText={t('searchClientRegistry', 'Search client registry')}
               disabled={!verificationCriteria.identifierType}
               onChange={(event) => setVerificationCriteria({ ...verificationCriteria, searchTerm: event.target.value })}
             />

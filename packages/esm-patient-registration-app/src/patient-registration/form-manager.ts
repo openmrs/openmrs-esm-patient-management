@@ -191,7 +191,6 @@ export class FormManager {
         );
       } else {
         const encounterToSave: Encounter = {
-          encounterDatetime: new Date(),
           patient: savePatientResponse.data.uuid,
           encounterType: config.registrationObs.encounterTypeUuid,
           location: currentLocation,
