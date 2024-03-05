@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
 import { type Appointment, DurationPeriod } from '../types';
-import { getAppointment, useAppointmentDate } from '../helpers';
+import { useAppointmentDate } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
 import { useContext, useMemo } from 'react';
 import SelectedDateContext from './selectedDateContext';
