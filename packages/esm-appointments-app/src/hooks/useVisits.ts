@@ -1,14 +1,15 @@
 import useSWR from 'swr';
 import { useSession, type Visit, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { useSelectedDate } from '../helpers';
+import { useContext } from 'react';
+import SelectedDateContext from './selectedDateContext';
 
 /**
  * Custom hook to fetch visits from the OpenMRS REST API.
  * @returns An object containing the visits, isLoading flag, and error message.
  */
 export const useVisits = () => {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const session = useSession();
 
   const visitsUrl = `${restBaseUrl}/visit?includeInactive=true&v=custom:(uuid,patient:(uuid,identifiers:(identifier,uuid),person:(age,display,gender,uuid)),visitType:(uuid,name,display),location:(uuid,name,display),startDatetime,stopDatetime)&fromStartDate=${dayjs(

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -10,8 +10,8 @@ import {
   type ConnectedExtension,
   type ConfigObject,
 } from '@openmrs/esm-framework';
-import { useSelectedDate } from '../../helpers';
 import styles from './scheduled-appointments.scss';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 dayjs.extend(isSameOrBefore);
 
@@ -27,7 +27,7 @@ const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
 
   // added to prevent auto-removal of translations for dynamic keys
   // t('checkedIn', 'Checked In');

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useContext } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { DatePicker, DatePickerInput, Dropdown } from '@carbon/react';
@@ -7,7 +7,8 @@ import { useSession } from '@openmrs/esm-framework';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import AppointmentsIllustration from './appointments-illustration.component';
 import styles from './appointments-header.scss';
-import { changeSelectedDate, useSelectedDate } from '../helpers';
+import SelectedDateContext from '../hooks/selectedDateContext';
+import { omrsDateFormat } from '../constants';
 
 interface AppointmentHeaderProps {
   title: string;
@@ -18,8 +19,7 @@ interface AppointmentHeaderProps {
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceType, onChange }) => {
   const { t } = useTranslation();
   const session = useSession();
-  const datePickerRef = useRef(null);
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
   const location = session?.sessionLocation?.display;
   const { serviceTypes } = useAppointmentServices();
 
@@ -38,8 +38,8 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
           <span className={styles.value}>{location}</span>
           <span className={styles.middot}>&middot;</span>
           <DatePicker
-            onChange={([date]) => changeSelectedDate(dayjs(date))}
-            ref={datePickerRef}
+            onChange={([date]) => setSelectedDate(dayjs(date).startOf('day').format(omrsDateFormat))}
+            value={dayjs(selectedDate).format('DD MMM YYYY')}
             dateFormat="d-M-Y"
             datePickerType="single">
             <DatePickerInput
@@ -48,7 +48,6 @@ const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointme
               placeholder="DD-MMM-YYYY"
               labelText=""
               type="text"
-              value={dayjs(selectedDate).format('DD MMM YYYY')}
             />
           </DatePicker>
         </div>

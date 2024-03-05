@@ -2,7 +2,8 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type Identifier } from '../types';
 import { configSchema } from '../config-schema';
-import { useSelectedDate } from '../helpers';
+import SelectedDateContext from './selectedDateContext';
+import { useContext } from 'react';
 
 export interface Response {
   age: number;
@@ -20,7 +21,7 @@ export interface Response {
 }
 
 export function useUnscheduledAppointments() {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const url = `${restBaseUrl}/appointment/unScheduledAppointment?forDate=${selectedDate}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch, { errorRetryCount: 2 });
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));

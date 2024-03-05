@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useContext } from 'react';
 import dayjs from 'dayjs';
 import { first } from 'rxjs/operators';
 import {
@@ -34,7 +34,7 @@ import {
 } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import BaseVisitType from './base-visit-type.component';
-import { type amPm, convertTime12to24, useSelectedDate } from '../../helpers';
+import { type amPm, convertTime12to24 } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { type Appointment } from '../../types';
@@ -43,6 +43,7 @@ import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
 import styles from './visit-form.scss';
 import { appointmentLocationTagName } from '../../constants';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -51,7 +52,7 @@ interface VisitFormProps {
 
 const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
   const locations = useLocations(appointmentLocationTagName);

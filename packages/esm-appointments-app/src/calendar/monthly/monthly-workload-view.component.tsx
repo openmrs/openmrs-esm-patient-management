@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import { isSameMonth, useSelectedDate } from '../../helpers';
+import { isSameMonth } from '../../helpers';
 import { omrsDateFormat, spaHomePage } from '../../constants';
 import styles from './monthly-view-workload.scss';
 import { type DailyAppointmentsCountByService } from '../../types';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
@@ -16,7 +17,7 @@ interface MonthlyWorkloadViewProps {
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
 
   const currentData = events?.find(
     (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),

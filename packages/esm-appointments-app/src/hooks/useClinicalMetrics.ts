@@ -8,12 +8,13 @@ import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
-  useSelectedDate,
 } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
+import SelectedDateContext from './selectedDateContext';
+import { useContext } from 'react';
 
 export const useClinicalMetrics = () => {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const endDate = dayjs(new Date(selectedDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
   const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${selectedDate}&endDate=${endDate}`;
   const { data, error, isLoading } = useSWR<{
@@ -37,7 +38,7 @@ export const useClinicalMetrics = () => {
 };
 
 export function useAllAppointmentsByDate() {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const apiUrl = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     apiUrl,
@@ -59,7 +60,7 @@ export function useAllAppointmentsByDate() {
 }
 
 export const useScheduledAppointment = (serviceUuid: string) => {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const url = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
 
   const { data, error, isLoading } = useSWR<{

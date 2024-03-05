@@ -3,12 +3,13 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { omrsDateFormat } from '../constants';
 import { type Appointment, DurationPeriod } from '../types';
-import { getAppointment, useSelectedDate } from '../helpers';
+import { getAppointment } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
+import SelectedDateContext from './selectedDateContext';
 
 export function useAppointments(status?: string, forDate?: string) {
-  const { selectedDate } = useSelectedDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const startDate = forDate ? forDate : selectedDate;
   const apiUrl = `${restBaseUrl}/appointment/appointmentStatus?forDate=${startDate}&status=${status}`;
   const allAppointmentsUrl = `${restBaseUrl}/appointment/all?forDate=${startDate}`;
