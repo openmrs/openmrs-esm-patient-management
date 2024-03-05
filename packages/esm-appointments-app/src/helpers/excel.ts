@@ -4,16 +4,10 @@ import { type Appointment } from '../types';
 
 /**
  * Downloads the provided appointments as an Excel file.
- * @param {Array<MappedAppointment>} appointments - The list of appointments to download.
- * @param {string} [fileName] - The name of the downloaded file (default: 'Appointments {current date and time}').
+ * @param {Array<Appointment>} appointments - The list of appointments to download.
+ * @param {string} [fileName] - The name of the downloaded file
  */
-export function downloadAppointmentsAsExcel(
-  appointments: Array<Appointment>,
-  fileName = `Appointments ${formatDate(new Date(appointments[0]?.startDateTime ?? new Date()), {
-    year: true,
-    time: true,
-  })}`,
-) {
+export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
   const appointmentsJSON = appointments?.map((appointment: Appointment) => ({
     'Patient name': appointment.patient.name,
     Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
@@ -21,7 +15,6 @@ export function downloadAppointmentsAsExcel(
     Identifier: appointment.patient.identifier ?? '--',
     'Appointment type': appointment.service?.name,
     Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
-    'Phone Number': appointment.patient.phoneNumber || '--',
   }));
 
   const worksheet = createWorksheet(appointmentsJSON);

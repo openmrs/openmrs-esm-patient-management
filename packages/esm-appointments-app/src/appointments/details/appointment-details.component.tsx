@@ -34,14 +34,6 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
             <p className={styles.labelBold}>{t('gender', 'Gender')} : </p>
             <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
           </div>
-          <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('dob', 'Dob')} : </p>
-            <p className={styles.label}>{appointment.patient.dob}</p>
-          </div>
-          <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('phoneNumber', 'Phone number')} :</p>
-            <p className={styles.label}>{appointment.patient.phoneNumber}</p>
-          </div>
         </div>
         <div>
           <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>
