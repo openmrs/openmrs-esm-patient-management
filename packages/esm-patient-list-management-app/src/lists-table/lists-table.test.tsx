@@ -1,35 +1,22 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, within } from '@testing-library/react';
-import { usePagination, useSession } from '@openmrs/esm-framework';
+import { useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import type { PatientList } from '../api/types';
 import ListsTable from './lists-table.component';
 
-type PaginationData = {
-  currentPage: number;
-  goTo: (page: number) => void;
-  results: unknown[];
-  totalPages: number;
-  paginated: boolean;
-  showNextButton: boolean;
-  showPreviousButton: boolean;
-  goToNext: () => void;
-  goToPrevious: () => void;
-};
-
 const mockedUseSession = jest.mocked(useSession);
-const mockedUsePagination = jest.mocked(usePagination);
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(() => ({
     patientListsToShow: 10,
   })),
-  usePagination: jest.fn().mockImplementation(() => ({
+  usePagination: jest.fn().mockImplementation((data, pageSize) => ({
     currentPage: 1,
     goTo: () => {},
-    results: [],
+    results: data.slice(0, pageSize),
     paginated: true,
   })),
   isDesktop: jest.fn(() => true),
@@ -137,16 +124,6 @@ describe('ListsTable', () => {
   it('renders the available patient lists in a datatable', () => {
     const pageSize = 5;
 
-    mockedUsePagination.mockImplementation(
-      () =>
-        ({
-          currentPage: 1,
-          goTo: () => {},
-          results: patientLists.slice(0, pageSize),
-          paginated: true,
-        }) as unknown as PaginationData,
-    );
-
     render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
 
     const columnHeaders = [/List name/, /List type/, /No. of patients/, /Starred/];
@@ -165,21 +142,9 @@ describe('ListsTable', () => {
     });
   });
 
-  // disabled because testing search filtering requires a non-mocked
-  // usePagination hook
-  xit('searches for patient lists by the list name or type', async () => {
+  it('searches for patient lists by the list name or type', async () => {
     const user = userEvent.setup();
     const pageSize = 5;
-
-    mockedUsePagination.mockImplementation(
-      () =>
-        ({
-          currentPage: 1,
-          goTo: () => {},
-          results: patientLists.slice(0, pageSize),
-          paginated: true,
-        }) as unknown as PaginationData,
-    );
 
     render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
 
@@ -214,16 +179,6 @@ describe('ListsTable', () => {
   it('clicking the "Star list" button toggles the starred status of a patient list', async () => {
     const user = userEvent.setup();
     const pageSize = 5;
-
-    mockedUsePagination.mockImplementation(
-      () =>
-        ({
-          currentPage: 1,
-          goTo: () => {},
-          results: patientLists.slice(0, pageSize),
-          paginated: true,
-        }) as unknown as PaginationData,
-    );
 
     render(<ListsTable patientLists={patientLists} listType={''} headers={tableHeaders} isLoading={false} />);
 

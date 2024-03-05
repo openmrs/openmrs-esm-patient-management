@@ -25,7 +25,6 @@ import {
   isDesktop,
   showSnackbar,
   useConfig,
-  useDebounce,
   useLayoutType,
   usePagination,
   useSession,
@@ -66,7 +65,6 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   isValidating,
   listType,
   patientLists = [],
-  refetch,
   style,
 }) => {
   const { t } = useTranslation();
@@ -77,7 +75,6 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
   const [searchTerm, setSearchTerm] = useState('');
   const responsiveSize = layout === 'tablet' ? 'lg' : 'sm';
-  const debouncedSearchTerm = useDebounce(searchTerm);
 
   const { toggleStarredList, starredLists } = useStarredLists();
 
@@ -87,15 +84,15 @@ const ListsTable: React.FC<PatientListTableProps> = ({
   }
 
   const filteredLists: Array<PatientList> = useMemo(() => {
-    if (!debouncedSearchTerm) {
+    if (!searchTerm) {
       return patientLists;
     }
 
     return fuzzy
-      .filter(debouncedSearchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
+      .filter(searchTerm, patientLists, { extract: (list) => `${list.display} ${list.type}` })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [patientLists, debouncedSearchTerm]);
+  }, [patientLists, searchTerm]);
 
   const { key, order } = sortParams;
   const sortedData =
