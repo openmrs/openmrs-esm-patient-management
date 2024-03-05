@@ -36,7 +36,9 @@ const MetricsHeader: React.FC = () => {
         <Button
           kind="tertiary"
           renderIcon={Calendar}
-          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar/${selectedDate}` })}>
+          onClick={() =>
+            navigate({ to: `${spaHomePage}/appointments/calendar/${dayjs(selectedDate).format('YYYY-MM-DD')}` })
+          }>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot

@@ -4,7 +4,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
-import { omrsDateFormat, spaHomePage } from '../../constants';
+import { spaHomePage } from '../../constants';
 import styles from './monthly-view-workload.scss';
 import { type DailyAppointmentsCountByService } from '../../types';
 import SelectedDateContext from '../../hooks/selectedDateContext';
@@ -24,7 +24,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   );
 
   const onClick = (serviceUuid) => {
-    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format(omrsDateFormat)}/${serviceUuid}` });
+    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
   };
 
   return (
