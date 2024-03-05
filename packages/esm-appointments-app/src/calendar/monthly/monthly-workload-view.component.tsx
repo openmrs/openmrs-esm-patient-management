@@ -1,50 +1,59 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { isSameMonth } from '../../helpers';
-import { spaHomePage } from '../../constants';
+import { omrsDateFormat, spaHomePage } from '../../constants';
 import styles from './monthly-view-workload.scss';
-import { type CalendarType, type DailyAppointmentsCountByService } from '../../types';
+import { type DailyAppointmentsCountByService } from '../../types';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 interface MonthlyWorkloadViewProps {
-  type: CalendarType;
   events: Array<DailyAppointmentsCountByService>;
   dateTime: Dayjs;
-  currentDate: Dayjs;
 }
 
-const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ type, dateTime, currentDate, events }) => {
+const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
+  const { selectedDate } = useContext(SelectedDateContext);
 
   const currentData = events?.find(
     (event) => dayjs(event.appointmentDate)?.format('YYYY-MM-DD') === dayjs(dateTime)?.format('YYYY-MM-DD'),
   );
 
-  const serviceAreaOnClick = (serviceName) => {
-    navigate({ to: `${spaHomePage}/appointments/list/${dateTime}/${serviceName}` });
+  const onClick = (serviceUuid) => {
+    navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format(omrsDateFormat)}/${serviceUuid}` });
   };
 
   return (
     <div
-      className={classNames(styles[isSameMonth(dateTime, currentDate) ? 'monthly-cell' : 'monthly-cell-disabled'], {
-        [styles.greyBackground]: currentData?.services,
-        [styles.smallDesktop]: layout === 'small-desktop',
-        [styles.largeDesktop]: layout !== 'small-desktop',
-      })}>
-      {type === 'monthly' && isSameMonth(dateTime, currentDate) && (
+      onClick={() => {
+        onClick('');
+      }}
+      className={classNames(
+        styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
+        {
+          [styles.greyBackground]: currentData?.services,
+          [styles.smallDesktop]: layout === 'small-desktop',
+          [styles.largeDesktop]: layout !== 'small-desktop',
+        },
+      )}>
+      {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <p>
           <b className={styles.calendarDate}>{dateTime.format('D')}</b>
           {currentData?.services && (
             <div className={styles.currentData}>
-              {currentData.services.map(({ serviceName, count }, i) => (
+              {currentData.services.map(({ serviceName, serviceUuid, count }, i) => (
                 <div
-                  key={`${serviceName}-${count}-${i}`}
+                  key={`${serviceUuid}-${count}-${i}`}
                   role="button"
                   tabIndex={0}
-                  onClick={() => serviceAreaOnClick(serviceName)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick(serviceUuid);
+                  }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
                   <span>{count}</span>
@@ -53,7 +62,10 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ type, dateTim
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => serviceAreaOnClick('Total')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick('');
+                }}
                 className={classNames(styles.serviceArea, styles.green)}>
                 <span>{t('total', 'Total')}</span>
                 <span>{currentData?.services.reduce((sum, { count = 0 }) => sum + count, 0)}</span>

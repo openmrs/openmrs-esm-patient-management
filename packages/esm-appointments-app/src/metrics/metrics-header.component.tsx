@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 
@@ -10,11 +10,13 @@ import { spaHomePage } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import styles from './metrics-header.scss';
 import AppointmentsForm from '../form/appointments-form.component';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { selectedDate } = useContext(SelectedDateContext);
 
   const launchCreateAppointmentForm = (patientUuid) => {
     const props = {
@@ -34,7 +36,7 @@ const MetricsHeader: React.FC = () => {
         <Button
           kind="tertiary"
           renderIcon={Calendar}
-          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar` })}>
+          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar/${selectedDate}` })}>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot

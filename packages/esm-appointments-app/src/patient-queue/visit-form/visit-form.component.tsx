@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useContext } from 'react';
 import dayjs from 'dayjs';
 import { first } from 'rxjs/operators';
 import {
@@ -34,7 +34,7 @@ import {
 } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import BaseVisitType from './base-visit-type.component';
-import { type amPm, convertTime12to24, useAppointmentDate } from '../../helpers';
+import { type amPm, convertTime12to24 } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { type Appointment } from '../../types';
@@ -43,6 +43,7 @@ import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
 import styles from './visit-form.scss';
 import { appointmentLocationTagName } from '../../constants';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -51,7 +52,7 @@ interface VisitFormProps {
 
 const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const { t } = useTranslation();
-  const { currentAppointmentDate } = useAppointmentDate();
+  const { selectedDate } = useContext(SelectedDateContext);
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
   const locations = useLocations(appointmentLocationTagName);
@@ -64,7 +65,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
-  const { mutate } = useAppointments(currentAppointmentDate);
+  const { mutate } = useAppointments(selectedDate);
   const { mutateVisit } = useVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
@@ -170,7 +171,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           },
         );
     },
-    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutate, currentAppointmentDate],
+    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutate, selectedDate],
   );
 
   return (
