@@ -22,6 +22,7 @@ export interface Response {
 
 export function useUnscheduledAppointments() {
   const { selectedDate } = useContext(SelectedDateContext);
+  // TODO/NOTE: this endpoint is not implemented in main Bahmni Appointments backend
   const url = `${restBaseUrl}/appointment/unScheduledAppointment?forDate=${selectedDate}`;
   const { data, error, isLoading } = useSWR<{ data: Array<Response> }>(url, openmrsFetch, { errorRetryCount: 2 });
   const appointments = data?.data?.map((appointment) => toAppointmentObject(appointment));

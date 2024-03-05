@@ -38,12 +38,12 @@ import { type amPm, convertTime12to24 } from '../../helpers';
 import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { type Appointment } from '../../types';
-import { useAppointments } from '../../hooks/useAppointments';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
 import { useVisits } from '../../hooks/useVisits';
 import styles from './visit-form.scss';
 import { appointmentLocationTagName } from '../../constants';
 import SelectedDateContext from '../../hooks/selectedDateContext';
+import { useMutateAppointments } from '../../form/appointments-form.resource';
 
 interface VisitFormProps {
   patientUuid: string;
@@ -65,7 +65,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
-  const { mutate } = useAppointments(selectedDate);
+  const { mutateAppointments } = useMutateAppointments();
   const { mutateVisit } = useVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
@@ -135,7 +135,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                 ).then(
                   ({ status }) => {
                     if (status === 201) {
-                      mutate();
+                      mutateAppointments();
                       showSnackbar({
                         kind: 'success',
                         isLowContrast: true,
@@ -157,7 +157,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
                   },
                 );
               }
-              mutate();
+              mutateAppointments();
               mutateVisit();
               closeOverlay();
             }
@@ -171,7 +171,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
           },
         );
     },
-    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutate, selectedDate],
+    [visitType, visitTime, timeFormat, patientUuid, visitDate, selectedLocation, t, mutateAppointments, selectedDate],
   );
 
   return (
