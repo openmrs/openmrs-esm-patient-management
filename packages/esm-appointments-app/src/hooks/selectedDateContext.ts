@@ -4,7 +4,7 @@ import { omrsDateFormat } from '../constants';
 
 const SelectedDateContext = createContext({
   selectedDate: dayjs().startOf('day').format(omrsDateFormat),
-  setSelectedDate: () => {},
+  setSelectedDate: (date: string) => {},
 });
 
 export default SelectedDateContext;
