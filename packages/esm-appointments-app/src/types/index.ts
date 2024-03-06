@@ -20,10 +20,7 @@ export interface Appointment {
     name: string;
     uuid: string;
     age?: string;
-    dob?: string;
-    birthDate?: string;
     gender?: string;
-    phoneNumber?: string;
   };
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;

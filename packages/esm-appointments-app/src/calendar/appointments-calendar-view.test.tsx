@@ -2,12 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AppointmentsCalendarView from './appointments-calendar-view.component';
 
-jest.mock('../hooks/useAppointments'),
-  () => ({
-    useDailyAppointments: jest.fn(),
-    useAppointmentsByDurationPeriod: jest.fn(),
-  });
-
 describe('Appointment calendar view', () => {
   it('renders appointments in calendar view from appointments list', async () => {
     renderAppointmentsCalendarListView();

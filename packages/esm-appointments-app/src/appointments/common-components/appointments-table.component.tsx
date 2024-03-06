@@ -19,7 +19,14 @@ import {
   TableToolbarSearch,
   Button,
 } from '@carbon/react';
-import { ConfigurableLink, formatDatetime, usePagination, formatDate, useConfig } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  formatDatetime,
+  usePagination,
+  formatDate,
+  useConfig,
+  parseDate,
+} from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
 import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
@@ -126,14 +133,15 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                   size="lg"
                   kind="tertiary"
                   renderIcon={Download}
-                  onClick={() =>
-                    downloadAppointmentsAsExcel(
-                      appointments,
-                      `${tableHeading} Appointments ${formatDate(new Date(appointments[0]?.startDateTime), {
-                        year: true,
-                      })}`,
-                    )
-                  }>
+                  onClick={() => {
+                    const date = appointments[0]?.startDateTime
+                      ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                          time: false,
+                          noToday: true,
+                        })
+                      : null;
+                    downloadAppointmentsAsExcel(appointments, `${tableHeading}_appointments_${date}`);
+                  }}>
                   {t('download', 'Download')}
                 </Button>
               </TableToolbarContent>
