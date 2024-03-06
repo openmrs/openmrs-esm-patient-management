@@ -1,3 +1,4 @@
+import { type Visit } from '@openmrs/esm-framework';
 import {
   type Concept,
   type MappedQueueEntry,
@@ -64,7 +65,10 @@ export const mockQueueEntryBrian: QueueEntry = {
   queue: mockQueueTriage,
   startedAt: '2024-01-01T00:00:00.000+0000',
   status: mockStatusWaiting,
-  visit: null,
+  visit: {
+    uuid: '090386ff-ae85-45cc-8a01-25852099c5ae',
+    display: 'Facility Visit @ Outpatient Clinic - 04/04/2022 07:22',
+  } as Visit,
   sortWeight: 0,
   queueComingFrom: null,
 };
@@ -81,7 +85,10 @@ export const mockQueueEntryAlice: QueueEntry = {
   queue: mockQueueSurgery,
   startedAt: '2024-01-02T00:00:00.000+0000',
   status: mockStatusWaiting,
-  visit: null,
+  visit: {
+    uuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
+    display: 'Facility Visit @ Outpatient Clinic - 04/03/2022 07:22',
+  } as Visit,
   sortWeight: 0,
   queueComingFrom: mockQueueTriage,
 };

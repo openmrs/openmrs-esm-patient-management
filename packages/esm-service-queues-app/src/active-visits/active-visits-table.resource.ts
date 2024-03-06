@@ -9,13 +9,11 @@ import {
   formatDate,
   openmrsFetch,
   parseDate,
-  toDateObjectStrict,
-  toOmrsIsoString,
   useConfig,
   type Visit,
   restBaseUrl,
 } from '@openmrs/esm-framework';
-import { type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
+import { type QueueEntry, type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
 
@@ -26,55 +24,9 @@ export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 dayjs.extend(isToday);
 
 export interface VisitQueueEntry {
-  queueEntry: VisitQueueEntry;
+  queueEntry: QueueEntry;
   uuid: string;
   visit: Visit;
-}
-
-export interface VisitQueueEntry {
-  display: string;
-  endedAt: null;
-  locationWaitingFor: string | null;
-  patient: {
-    uuid: string;
-    person: {
-      age: string;
-      gender: string;
-      birthdate: string;
-    };
-    phoneNumber: string;
-    identifiers: Array<Identifer>;
-  };
-  priority: {
-    display: QueuePriority;
-    uuid: string;
-  };
-  priorityComment: string | null;
-  providerWaitingFor: null;
-  queue: {
-    description: string;
-    display: string;
-    name: string;
-    service: {
-      display: QueueService;
-    };
-    uuid: string;
-    location: {
-      uuid: string;
-      name: string;
-    };
-  };
-  startedAt: string;
-  status: {
-    display: QueueStatus;
-    uuid: string;
-  };
-  uuid: string;
-  visit: Visit;
-  sortWeight: number;
-  queueComingFrom: {
-    name: string;
-  };
 }
 
 export interface MappedVisitQueueEntry {
@@ -107,7 +59,7 @@ export interface MappedVisitQueueEntry {
 }
 
 interface UseVisitQueueEntries {
-  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+  visitQueueEntries: Array<VisitQueueEntry> | null;
   visitQueueEntriesCount: number;
   isLoading: boolean;
   isError: Error;
@@ -174,82 +126,76 @@ export function usePriority() {
   };
 }
 
+const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
+  diagnoses: encounter.diagnoses,
+  encounterDatetime: encounter.encounterDatetime,
+  encounterType: encounter.encounterType.display,
+  obs: encounter.obs,
+  provider: encounter.encounterProviders[0]?.provider?.person?.display,
+  uuid: encounter.uuid,
+  voided: encounter.voided,
+});
+
+export const mapVisitQueueEntryProperties = (
+  queueEntry: QueueEntry,
+  visitQueueNumberAttributeUuid: string,
+): MappedVisitQueueEntry => ({
+  id: queueEntry.uuid,
+  encounters: queueEntry.visit?.encounters?.map(mapEncounterProperties),
+  name: queueEntry.display,
+  patientUuid: queueEntry.patient.uuid,
+  patientAge: queueEntry.patient.person?.age + '',
+  patientSex: queueEntry.patient.person?.gender === 'M' ? 'MALE' : 'FEMALE',
+  patientDob: queueEntry?.patient?.person?.birthdate
+    ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
+    : '--',
+  // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
+  // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
+  priority: queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display,
+  priorityComment: queueEntry.priorityComment,
+  priorityUuid: queueEntry.priority.uuid,
+  service: queueEntry.queue.name,
+  status: queueEntry.status.display as QueueStatus,
+  statusUuid: queueEntry.status.uuid,
+  waitTime: queueEntry.startedAt ? `${dayjs().diff(dayjs(queueEntry.startedAt), 'minutes')}` : '--',
+  visitStartDateTime: queueEntry.startedAt,
+  visitType: queueEntry.visit?.visitType?.display,
+  visitLocation: queueEntry.visit?.location?.uuid,
+  queueLocation: (queueEntry?.queue as any)?.location?.uuid,
+  visitTypeUuid: queueEntry.visit?.visitType?.uuid,
+  visitUuid: queueEntry.visit?.uuid,
+  queueUuid: queueEntry.queue.uuid,
+  queueEntryUuid: queueEntry.uuid,
+  sortWeight: queueEntry.sortWeight,
+  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e.attributeType.uuid === visitQueueNumberAttributeUuid)
+    ?.value,
+  identifiers: queueEntry.patient?.identifiers as Identifer[],
+  queueComingFrom: queueEntry?.queueComingFrom?.name,
+});
+
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-  const config = useConfig();
-  const { visitQueueNumberAttributeUuid } = config;
 
-  const apiUrl = `${restBaseUrl}/visit-queue-entry?location=${queueLocationUuid}&v=full`;
+  const apiUrl =
+    `${restBaseUrl}/visit-queue-entry?v=full` + (queueLocationUuid ? `&location=${queueLocationUuid}` : '');
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
 
-  const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
-    diagnoses: encounter.diagnoses,
-    encounterDatetime: encounter.encounterDatetime,
-    encounterType: encounter.encounterType.display,
-    obs: encounter.obs,
-    provider: encounter.encounterProviders[0]?.provider?.person?.display,
-    uuid: encounter.uuid,
-    voided: encounter.voided,
-  });
-
-  const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
-    id: visitQueueEntry.queueEntry.uuid,
-    encounters: visitQueueEntry.visit?.encounters?.map(mapEncounterProperties),
-    name: visitQueueEntry.queueEntry.display,
-    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
-    patientAge: visitQueueEntry.queueEntry.patient.person?.age,
-    patientSex: visitQueueEntry.queueEntry.patient.person?.gender === 'M' ? 'MALE' : 'FEMALE',
-    patientDob: visitQueueEntry?.queueEntry?.patient?.person?.birthdate
-      ? formatDate(parseDate(visitQueueEntry.queueEntry.patient.person.birthdate), { time: false })
-      : '--',
-    // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
-    // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
-    priority:
-      visitQueueEntry.queueEntry.priority.display === 'Urgent'
-        ? 'Priority'
-        : visitQueueEntry.queueEntry.priority.display,
-    priorityComment: visitQueueEntry.queueEntry.priorityComment,
-    priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
-    service: visitQueueEntry?.queueEntry.queue.name,
-    status: visitQueueEntry.queueEntry.status.display,
-    statusUuid: visitQueueEntry.queueEntry.status.uuid,
-    waitTime: visitQueueEntry.queueEntry.startedAt
-      ? `${dayjs().diff(dayjs(visitQueueEntry.queueEntry.startedAt), 'minutes')}`
-      : '--',
-    visitStartDateTime: visitQueueEntry.queueEntry.startedAt,
-    visitType: visitQueueEntry.visit?.visitType?.display,
-    visitLocation: visitQueueEntry.visit?.location?.uuid,
-    queueLocation: visitQueueEntry.queueEntry?.queue?.location?.uuid,
-    visitTypeUuid: visitQueueEntry.visit?.visitType?.uuid,
-    visitUuid: visitQueueEntry.visit?.uuid,
-    queueUuid: visitQueueEntry.queueEntry.queue.uuid,
-    queueEntryUuid: visitQueueEntry.queueEntry.uuid,
-    sortWeight: visitQueueEntry.queueEntry.sortWeight,
-    visitQueueNumber: visitQueueEntry?.visit?.attributes?.find(
-      (e) => e.attributeType.uuid === visitQueueNumberAttributeUuid,
-    )?.value,
-    identifiers: visitQueueEntry.queueEntry.patient?.identifiers,
-    queueComingFrom: visitQueueEntry.queueEntry?.queueComingFrom?.name,
-  });
-
-  let mappedVisitQueueEntries;
+  let visitQueueEntries: VisitQueueEntry[];
 
   if (!currServiceName || currServiceName == t('all', 'All')) {
-    mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+    visitQueueEntries = data?.data?.results;
   } else {
-    mappedVisitQueueEntries = data?.data?.results
-      ?.map(mapVisitQueueEntryProperties)
-      .filter((data) => data.service == currServiceName);
+    visitQueueEntries = data?.data?.results.filter((data) => data.queueEntry.queue.name == currServiceName);
   }
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : [],
-    visitQueueEntriesCount: mappedVisitQueueEntries ? mappedVisitQueueEntries.length : 0,
+    visitQueueEntries: visitQueueEntries ?? [],
+    visitQueueEntriesCount: visitQueueEntries?.length ?? 0,
     isLoading,
     isError: error,
     isValidating,
@@ -331,10 +277,9 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   const mapServiceQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedServiceQueueEntry => ({
     id: visitQueueEntry.queueEntry.uuid,
     name: visitQueueEntry.queueEntry.display,
-    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age : '--',
+    age: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.age + '' : '--',
     returnDate: visitQueueEntry.queueEntry.startedAt,
     visitType: visitQueueEntry.visit?.visitType?.display,
-    phoneNumber: visitQueueEntry.patient ? visitQueueEntry.patient?.phoneNumber : '--',
     gender: visitQueueEntry.queueEntry.patient ? visitQueueEntry?.queueEntry?.patient?.person?.gender : '--',
     patientUuid: visitQueueEntry.queueEntry ? visitQueueEntry?.queueEntry.uuid : '--',
   });

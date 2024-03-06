@@ -9,9 +9,8 @@ import { type MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/ac
 import styles from './transition-entry.scss';
 interface TransitionMenuProps {
   queueEntry: MappedVisitQueueEntry;
-  closeModal: () => void;
 }
-const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry, closeModal }) => {
+const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
 
   const launchTransitionPriorityModal = useCallback(() => {

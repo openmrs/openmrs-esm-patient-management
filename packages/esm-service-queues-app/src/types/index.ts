@@ -293,7 +293,6 @@ export interface MappedServiceQueueEntry {
   name: string;
   age: string;
   gender: string;
-  phoneNumber: string;
   visitType: string;
   returnDate: string;
   patientUuid: string;
@@ -430,6 +429,10 @@ export interface QueueTableCellComponentProps {
 export interface QueueTableColumn {
   headerI18nKey: string; // i18n key for the column header. Must be unique for each column in the queue table
   CellComponent: React.FC<QueueTableCellComponentProps>;
+
+  // function to extract from the queue entry a searchable string representing the its value within this column.
+  // May be null to make this column's content unsearchable
+  getFilterableValue: (queueEntry: QueueEntry) => string | null;
 }
 
 export interface QueueTableTabConfig {
