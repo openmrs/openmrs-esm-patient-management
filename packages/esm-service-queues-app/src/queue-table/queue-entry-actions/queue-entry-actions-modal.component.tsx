@@ -13,34 +13,63 @@ import {
   Stack,
   Switch,
 } from '@carbon/react';
+import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
-import styles from './transition-dialogs.scss';
-import { showSnackbar } from '@openmrs/esm-framework';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
-import { transitionQueueEntry } from './transitions.resource';
+import styles from './queue-entry-actons-modal.scss';
+import { TextArea } from '@carbon/react';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
+  formParams: FormParams;
 }
 
 interface FormState {
   selectedQueue: string;
   selectedPriority: string;
   selectedStatus: string;
+  prioritycomment: string;
 }
 
-const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
+interface FormParams {
+  modalTitle: string;
+  modalInstruction: string;
+  submitButtonText: string;
+  submitSuccessTitle: string;
+  submitSuccessText: string;
+  submitFailureTitle: string;
+  submitAction: (queueEntry: QueueEntry, formState: FormState) => Promise<FetchResponse<any>>;
+  disableSubmit: (queueEntry, formState) => boolean;
+}
+
+// Modal with form to provide the same UI for editting or transitioning a queue entry
+export const QueueEntryActionModal: React.FC<TransitionQueueEntryModalProps> = ({
+  queueEntry,
+  closeModal,
+  formParams,
+}) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const {
+    modalTitle,
+    modalInstruction,
+    submitButtonText,
+    submitSuccessTitle,
+    submitSuccessText,
+    submitFailureTitle,
+    submitAction,
+    disableSubmit,
+  } = formParams;
 
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
+    prioritycomment: queueEntry.priorityComment ?? '',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +90,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       selectedQueue: selectedQueueUuid,
       selectedStatus: newQueueHasCurrentStatus ? formState.selectedStatus : allowedStatuses[0]?.uuid,
       selectedPriority: newQueueHasCurrentPriority ? formState.selectedPriority : allowedPriorities[0]?.uuid,
+      prioritycomment: formState.prioritycomment,
     });
   };
 
@@ -72,23 +102,22 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     setFormState({ ...formState, selectedStatus: selectedStatusUuid });
   };
 
+  const setPriorityComment = (prioritycomment: string) => {
+    setFormState({ ...formState, prioritycomment });
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    transitionQueueEntry({
-      queueEntryToTransition: queueEntry.uuid,
-      newQueue: formState.selectedQueue,
-      newStatus: formState.selectedStatus,
-      newPriority: formState.selectedPriority,
-    })
+    submitAction(queueEntry, formState)
       .then(({ status }) => {
         if (status === 200) {
           showSnackbar({
             isLowContrast: true,
-            title: t('queueEntryTransitioned', 'Queue entry transitioned'),
+            title: submitSuccessTitle,
             kind: 'success',
-            subtitle: t('queueEntryTransitionedSuccessfully', 'Queue entry transitioned successfully'),
+            subtitle: submitSuccessText,
           });
           mutateQueueEntries();
           closeModal();
@@ -98,7 +127,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       })
       .catch((error) => {
         showSnackbar({
-          title: t('queueEntryTransitionFailed', 'Error transitioning queue entry'),
+          title: submitFailureTitle,
           kind: 'error',
           subtitle: error?.message,
         });
@@ -113,12 +142,12 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   return (
     <div>
       <Form onSubmit={submitForm}>
-        <ModalHeader closeModal={closeModal} title={t('transitionPatient', 'Transition patient')} />
+        <ModalHeader closeModal={closeModal} title={modalTitle} />
         <ModalBody>
           <div className={styles.modalBody}>
             <Stack gap={4}>
               <h5>{queueEntry.display}</h5>
-              <p>{t('transitionPatientStatusOrQueue', 'Select a new status or queue for patient to transition to.')}</p>
+              <p>{modalInstruction}</p>
               <section className={styles.section}>
                 <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
                 <Select
@@ -206,6 +235,14 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                   </ContentSwitcher>
                 )}
               </section>
+              <section className={styles.section}>
+                <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+                <TextArea
+                  value={formState.prioritycomment}
+                  onChange={(e) => setPriorityComment(e.target.value)}
+                  placeholder={t('enterCommentHere', 'Enter Comment here')}
+                />
+              </section>
             </Stack>
           </div>
         </ModalBody>
@@ -213,13 +250,8 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
           <Button kind="secondary" onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button
-            disabled={
-              isSubmitting ||
-              (formState.selectedQueue == queueEntry.queue.uuid && formState.selectedStatus == queueEntry.status.uuid)
-            }
-            type="submit">
-            {t('transitionPatient', 'Transition patient')}
+          <Button disabled={isSubmitting || disableSubmit(queueEntry, formState)} type="submit">
+            {submitButtonText}
           </Button>
         </ModalFooter>
       </Form>
@@ -227,4 +259,4 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   );
 };
 
-export default TransitionQueueEntryModal;
+export default QueueEntryActionModal;
