@@ -8,6 +8,7 @@ import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import styles from './active-visits-row-actions.scss';
 
+// table column definition containing actions user can perform to each row.
 export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
 
