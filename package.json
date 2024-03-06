@@ -30,7 +30,7 @@
     "@carbon/react": "~1.37.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
-    "@playwright/test": "1.40.1",
+    "@playwright/test": "1.42.1",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
     "@testing-library/dom": "^9.3.3",
