@@ -240,7 +240,7 @@ export const QueueEntryActionModal: React.FC<TransitionQueueEntryModalProps> = (
                 <TextArea
                   value={formState.prioritycomment}
                   onChange={(e) => setPriorityComment(e.target.value)}
-                  placeholder={t('enterCommentHere', 'Enter Comment here')}
+                  placeholder={t('enterCommentHere', 'Enter comment here')}
                 />
               </section>
             </Stack>

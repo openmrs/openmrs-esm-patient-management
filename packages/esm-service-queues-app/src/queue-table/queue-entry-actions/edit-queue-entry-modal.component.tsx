@@ -24,7 +24,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
         submitButtonText: t('editQueueEntry', 'Edit queue entry'),
         submitSuccessTitle: t('queueEntryEdited', 'Queue entry edited'),
         submitSuccessText: t('queueEntryEditedSuccessfully', 'Queue entry edited successfully'),
-        submitFailureTitle: t('queueEntryEdittingFailed', 'Error editting queue entry'),
+        submitFailureTitle: t('queueEntryEditingFailed', 'Error editing queue entry'),
         submitAction: (queueEntry, formState) => {
           const selectedQueue = queues.find((q) => q.uuid == formState.selectedQueue);
           const statuses = selectedQueue?.allowedStatuses;
