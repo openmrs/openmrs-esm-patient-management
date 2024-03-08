@@ -1,8 +1,8 @@
-import React, { type MouseEvent, useMemo, useContext } from 'react';
+import React, { type MouseEvent, useContext } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
-import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
+import { ChevronDown, ChevronUp } from '@carbon/react/icons';
 import {
   ExtensionSlot,
   age,
@@ -11,12 +11,11 @@ import {
   useVisit,
   useConfig,
   ConfigurableLink,
-  useConnectedExtensions,
   PatientPhoto,
+  PatientBannerActionsMenu,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
-import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
 import { PatientSearchContext } from '../../../patient-search-context';
 
@@ -28,16 +27,8 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hideActionsOverflow }) => {
   const { t } = useTranslation();
-  const overflowMenuRef = React.useRef(null);
   const { currentVisit } = useVisit(patientUuid);
-  const [showDropdown, setShowDropdown] = React.useState(false);
   const { nonNavigationSelectPatientAction } = useContext(PatientSearchContext);
-  const patientSearchActions = useConnectedExtensions('patient-search-actions-slot');
-
-  const patientActionsSlotState = React.useMemo(
-    () => ({ patientUuid, selectPatientAction: nonNavigationSelectPatientAction, launchPatientChart: true }),
-    [patientUuid, nonNavigationSelectPatientAction],
-  );
 
   const patientName = patient.person.personName.display;
 
@@ -46,22 +37,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
     event.stopPropagation();
     setShowContactDetails((value) => !value);
   }, []);
-
-  const patientAvatar = (
-    <div className={styles.patientAvatar} role="img">
-      <PatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />
-    </div>
-  );
-
-  const closeDropdownMenu = React.useCallback((event: MouseEvent) => {
-    event.stopPropagation();
-    setShowDropdown((value) => !value);
-  }, []);
-
-  const showActionsMenu = useMemo(
-    () => !hideActionsOverflow && patientSearchActions.length > 0,
-    [patientSearchActions.length, hideActionsOverflow],
-  );
 
   const getGender = (gender) => {
     switch (gender) {
@@ -95,7 +70,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         })}
         role="banner">
         <ClickablePatientContainer patientUuid={patientUuid}>
-          {patientAvatar}
+          <div className={styles.patientAvatar} role="img">
+            <PatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />
+          </div>
           {/* TODO: Replace this section with PatientBannerPatientInfo once the `patient` object is
               changed from SearchedPatient type to fhir.Patient type */}
           <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
@@ -128,25 +105,17 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           </Button>
         </ClickablePatientContainer>
         <div className={styles.buttonCol}>
-          {showActionsMenu && (
-            <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
-              <CustomOverflowMenuComponent
-                isDeceased={isDeceased}
-                menuTitle={
-                  <>
-                    <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical className={styles.menu} size={16} />
-                  </>
-                }
-                dropdownMenu={showDropdown}>
-                <ExtensionSlot
-                  onClick={closeDropdownMenu}
-                  name="patient-search-actions-slot"
-                  state={patientActionsSlotState}
-                />
-              </CustomOverflowMenuComponent>
-            </div>
-          )}
+          {!hideActionsOverflow ? (
+            <PatientBannerActionsMenu
+              patientUuid={patientUuid}
+              actionsSlotName={'patient-search-actions-slot'}
+              additionalActionsSlotState={{
+                selectPatientAction: nonNavigationSelectPatientAction,
+                launchPatientChart: true,
+              }}
+              isDeceased={patient.person.dead}
+            />
+          ) : null}
           {!isDeceased && !currentVisit && (
             <ExtensionSlot
               name="start-visit-button-slot"

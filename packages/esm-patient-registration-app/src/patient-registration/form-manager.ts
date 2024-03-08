@@ -4,6 +4,7 @@ import {
   queueSynchronizationItem,
   type Session,
   restBaseUrl,
+  getConfig,
 } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
@@ -130,13 +131,14 @@ export class FormManager {
 
       await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
 
-      if (config.concepts.patientPhotoUuid && capturePhotoProps?.imageData) {
+      const { patientPhotoUuid } = await getConfig('@openmrs/esm-styleguide');
+      if (patientPhotoUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
           savePatientResponse.data.uuid,
           capturePhotoProps.imageData,
           `${restBaseUrl}/obs`,
           capturePhotoProps.dateTime || new Date().toISOString(),
-          config.concepts.patientPhotoUuid,
+          patientPhotoUuid,
         );
       }
     }
