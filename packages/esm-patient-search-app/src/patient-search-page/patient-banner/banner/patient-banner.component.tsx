@@ -1,8 +1,7 @@
-import React, { type MouseEvent, useContext } from 'react';
+import React, { type MouseEvent, useContext, useCallback } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
-import { ChevronDown, ChevronUp } from '@carbon/react/icons';
+import { ButtonSkeleton, SkeletonIcon, SkeletonText } from '@carbon/react';
 import {
   ExtensionSlot,
   age,
@@ -13,9 +12,10 @@ import {
   ConfigurableLink,
   PatientPhoto,
   PatientBannerActionsMenu,
+  PatientBannerToggleContactDetailsButton,
+  PatientBannerContactDetails,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
-import ContactDetails from '../contact-details/contact-details.component';
 import styles from './patient-banner.scss';
 import { PatientSearchContext } from '../../../patient-search-context';
 
@@ -33,9 +33,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   const patientName = patient.person.personName.display;
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
-  const toggleContactDetails = React.useCallback((event: MouseEvent) => {
-    event.stopPropagation();
-    setShowContactDetails((value) => !value);
+  const toggleContactDetails = useCallback((e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowContactDetails((state) => !state);
   }, []);
 
   const getGender = (gender) => {
@@ -94,15 +95,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
               </div>
             </div>
           </div>
-          <Button
-            className={styles.toggleContactDetailsButton}
-            kind="ghost"
-            renderIcon={showContactDetails ? ChevronUp : ChevronDown}
-            iconDescription="Toggle contact details"
-            onClick={toggleContactDetails}
-            style={{ marginTop: '-0.25rem' }}>
-            {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
-          </Button>
+          <PatientBannerToggleContactDetailsButton
+            showContactDetails={showContactDetails}
+            toggleContactDetails={toggleContactDetails}
+          />
         </ClickablePatientContainer>
         <div className={styles.buttonCol}>
           {!hideActionsOverflow ? (
@@ -126,7 +122,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
           )}
         </div>
       </div>
-      {showContactDetails && <ContactDetails patientId={patient.uuid} deceased={isDeceased} />}
+      {showContactDetails && <PatientBannerContactDetails patientId={patient.uuid} deceased={isDeceased} />}
     </>
   );
 };

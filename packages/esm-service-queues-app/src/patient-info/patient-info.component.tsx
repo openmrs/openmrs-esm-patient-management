@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, ClickableTile } from '@carbon/react';
-import { ChevronDown, ChevronUp, Edit } from '@carbon/react/icons';
-import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink, PatientPhoto } from '@openmrs/esm-framework';
+import { ClickableTile } from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
+import {
+  age,
+  formatDate,
+  parseDate,
+  ConfigurableLink,
+  PatientPhoto,
+  PatientBannerToggleContactDetailsButton,
+  PatientBannerContactDetails,
+} from '@openmrs/esm-framework';
 import AppointmentDetails from './appointment-details.component';
-import ContactDetails from './contact-details.component';
 import styles from './patient-info.scss';
 
 interface PatientInfoProps {
@@ -54,21 +61,16 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
             <span className={styles.identifier}>
               {patient.identifier.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
             </span>
-            <Button
-              kind="ghost"
-              renderIcon={(props) =>
-                showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
-              }
-              iconDescription="Toggle contact details"
-              onClick={(e) => toggleShowMore(e)}>
-              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
-            </Button>
+            <PatientBannerToggleContactDetailsButton
+              showContactDetails={showContactDetails}
+              toggleContactDetails={toggleShowMore}
+            />
           </div>
         </div>
       </div>
       {showContactDetails && (
         <>
-          <ContactDetails patientId={patient.id} address={patient.address ?? []} contact={patient.contact} />
+          <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
           <AppointmentDetails patientUuid={patient.id} />
         </>
       )}
