@@ -1,0 +1,6 @@
+.queueTableByStatusNavMenu {
+  :global(.active-left-nav-link) {
+    // override padding for sub-menu items
+    padding-left: 1.75rem !important;
+  }
+}
