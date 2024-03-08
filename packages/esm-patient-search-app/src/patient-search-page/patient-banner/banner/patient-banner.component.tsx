@@ -71,7 +71,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         role="banner">
         <ClickablePatientContainer patientUuid={patientUuid}>
           <div className={styles.patientAvatar} role="img">
-            <PatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />
+            <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
           </div>
           {/* TODO: Replace this section with PatientBannerPatientInfo once the `patient` object is
               changed from SearchedPatient type to fhir.Patient type */}
