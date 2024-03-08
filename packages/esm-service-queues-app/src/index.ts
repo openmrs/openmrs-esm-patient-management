@@ -99,9 +99,17 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/transitions/transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/transition-queue-entry-modal.component'),
   {
     featureName: 'transfer patient to a different queue',
+    moduleName,
+  },
+);
+
+export const editQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/edit-queue-entry-modal.component'),
+  {
+    featureName: 'edit queue entry of a patient',
     moduleName,
   },
 );

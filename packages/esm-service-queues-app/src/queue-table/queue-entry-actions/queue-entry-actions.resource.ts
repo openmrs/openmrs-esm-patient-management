@@ -1,11 +1,14 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type Location } from '@openmrs/esm-framework';
+import { type Concept, type QueueEntry } from '../../types';
 
+// see QueueEntryTransition.java in openmrs-module-queue
 interface TransitionQueueEntryParams {
   queueEntryToTransition: string;
   transitionDate?: string;
   newQueue?: string;
   newStatus?: string;
   newPriority?: string;
+  newPriorityComment?: string;
 }
 
 /**
@@ -19,6 +22,33 @@ interface TransitionQueueEntryParams {
  */
 export function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
   return openmrsFetch(`${restBaseUrl}/queue-entry-transition`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController?.signal,
+    body: params,
+  });
+}
+
+// see QueueEntryResource.java#getUpdatableProperties() in openmrs-module-queue
+interface UpdateQueueEntryParams {
+  status?: Concept;
+  priority?: Concept;
+  priorityComment?: string;
+  sortWeight?: number;
+  startedAt?: string;
+  endedAt?: string;
+  loationWaitingFor?: Location;
+  providerWaitingFor?: Location;
+}
+
+export function updateQueueEntry(
+  queueEntryUuid: string,
+  params: UpdateQueueEntryParams,
+  abortController?: AbortController,
+) {
+  return openmrsFetch(`${restBaseUrl}/queue-entry/${queueEntryUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
