@@ -12,6 +12,7 @@ import {
   useConfig,
   ConfigurableLink,
   useConnectedExtensions,
+  PatientPhoto,
 } from '@openmrs/esm-framework';
 import { type SearchedPatient } from '../../../types';
 import ContactDetails from '../contact-details/contact-details.component';
@@ -39,7 +40,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
   );
 
   const patientName = patient.person.personName.display;
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
@@ -49,7 +49,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
+      <PatientPhoto patientUuid={patientUuid} patientName={patientName} size="small" />
     </div>
   );
 
@@ -96,6 +96,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, hid
         role="banner">
         <ClickablePatientContainer patientUuid={patientUuid}>
           {patientAvatar}
+          {/* TODO: Replace this section with PatientBannerPatientInfo once the `patient` object is
+              changed from SearchedPatient type to fhir.Patient type */}
           <div className={classNames(styles.patientNameRow, styles.patientInfo)}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>{patientName}</span>

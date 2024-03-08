@@ -5,12 +5,18 @@ import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, type FormikHelpers } from 'formik';
-import { createErrorHandler, showSnackbar, useConfig, interpolateUrl, usePatient } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  showSnackbar,
+  useConfig,
+  interpolateUrl,
+  usePatient,
+  usePatientPhoto,
+} from '@openmrs/esm-framework';
 import { getValidationSchema } from './validation/patient-registration-validation';
 import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
-import { usePatientPhoto } from './patient-registration.resource';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
 import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';

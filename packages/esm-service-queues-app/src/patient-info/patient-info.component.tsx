@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Button, ClickableTile } from '@carbon/react';
 import { ChevronDown, ChevronUp, Edit } from '@carbon/react/icons';
-import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { age, ExtensionSlot, formatDate, parseDate, ConfigurableLink, PatientPhoto } from '@openmrs/esm-framework';
 import AppointmentDetails from './appointment-details.component';
 import ContactDetails from './contact-details.component';
 import styles from './patient-info.scss';
@@ -17,10 +17,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
   const { t } = useTranslation();
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
   const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = React.useMemo(
-    () => ({ patientUuid: patient.id, patientName }),
-    [patient.id, patientName],
-  );
 
   const toggleShowMore = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -34,7 +30,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoCli
           [styles.activePatientInfoContainer]: showContactDetails,
           [styles.patientInfoContainer]: !showContactDetails,
         })}>
-        <ExtensionSlot name="patient-photo-slot" state={patientPhotoSlotState} />
+        <PatientPhoto patientUuid={patient.id} patientName={patientName} size="small" />
         <div className={styles.patientInfoContent}>
           <div className={styles.patientInfoRow}>
             <span className={styles.patientName}>{patientName}</span>

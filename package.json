@@ -78,10 +78,14 @@
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.15.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.1.1",
+  "resolutions": {
+    "@openmrs/esm-styleguide": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-styleguide"
+  }
 }
