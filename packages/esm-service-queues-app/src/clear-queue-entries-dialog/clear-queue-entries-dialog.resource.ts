@@ -1,4 +1,4 @@
-import { openmrsFetch, parseDate, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { endPatientStatus, type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 
 export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueueEntry>) {
@@ -7,11 +7,12 @@ export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueu
   const batchSize = 10;
   // request counter
   let curReq = 0;
+  const endedAt = new Date();
   // as long as there are items in the list continue to form batches
   while (curReq < queueEntries.length) {
     const end = queueEntries.length < curReq + batchSize ? queueEntries.length : curReq + batchSize;
     const concurrentReq = new Array(batchSize);
-    const endedAt = new Date();
+
     for (let index = curReq; index < end; index++) {
       await Promise.all([
         endPatientStatus(queueEntries[index]?.queueUuid, queueEntries[index]?.queueEntryUuid, endedAt),
@@ -25,10 +26,7 @@ export async function batchClearQueueEntries(queueEntries: Array<MappedVisitQueu
           },
           signal: abortController.signal,
           body: {
-            location: queueEntries[index]?.visitLocation,
-            startDatetime: parseDate(queueEntries[index]?.visitStartDateTime),
-            visitType: queueEntries[index]?.visitTypeUuid,
-            stopDatetime: new Date(),
+            stopDatetime: endedAt,
           },
         }),
       );

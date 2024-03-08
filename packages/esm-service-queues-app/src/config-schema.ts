@@ -3,8 +3,25 @@ import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/vis
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
+import { type PriorityStyle, type StatusStyle } from './types';
 
 export const configSchema = {
+  priorityStyles: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
+    },
+    _description: 'The style to apply to priority tags',
+    _default: [],
+  },
+  statusStyles: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
+    },
+    _description: 'The style to apply to statuses',
+    _default: [],
+  },
   concepts: {
     priorityConceptSetUuid: {
       _type: Type.ConceptUuid,
@@ -123,7 +140,7 @@ export const configSchema = {
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
       Available arguments: patientUuid, openmrsSpaBase, openBase
       (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
@@ -141,6 +158,8 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  priorityStyles: Array<PriorityStyle>;
+  statusStyles: Array<StatusStyle>;
   concepts: {
     priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;

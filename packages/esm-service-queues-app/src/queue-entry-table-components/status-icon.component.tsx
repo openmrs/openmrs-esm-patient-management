@@ -1,13 +1,11 @@
 import React from 'react';
 import { Group, InProgress } from '@carbon/react/icons';
 
-function StatusIcon({ status }) {
-  switch (status) {
-    case 'waiting':
+function StatusIcon({ statusStyle }) {
+  switch (statusStyle?.iconComponent) {
+    case 'InProgress':
       return <InProgress size={16} />;
-    case 'in service':
-      return <Group size={16} />;
-    case 'finished service':
+    case 'Group':
       return <Group size={16} />;
     default:
       return null;

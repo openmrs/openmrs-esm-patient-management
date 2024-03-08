@@ -66,7 +66,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     ).then(
       ({ status }) => {
         if (status === 201) {
-          serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
+          serveQueueEntry(queueEntry?.serviceDisplay, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
             if (status === 200) {
               showSnackbar({
                 isLowContrast: true,
