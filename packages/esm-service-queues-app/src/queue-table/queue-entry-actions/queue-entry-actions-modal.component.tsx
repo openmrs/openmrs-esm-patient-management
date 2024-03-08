@@ -22,7 +22,7 @@ import { type QueueEntry } from '../../types';
 import styles from './queue-entry-actons-modal.scss';
 import { TextArea } from '@carbon/react';
 
-interface TransitionQueueEntryModalProps {
+interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
   formParams: FormParams;
@@ -47,11 +47,7 @@ interface FormParams {
 }
 
 // Modal with form to provide the same UI for editting or transitioning a queue entry
-export const QueueEntryActionModal: React.FC<TransitionQueueEntryModalProps> = ({
-  queueEntry,
-  closeModal,
-  formParams,
-}) => {
+export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ queueEntry, closeModal, formParams }) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const {
