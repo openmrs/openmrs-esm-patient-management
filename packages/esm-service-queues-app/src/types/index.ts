@@ -452,6 +452,8 @@ export interface Queue {
   display: string;
   name: string;
   description: string;
+  location: Location;
+  service: Concept;
   allowedPriorities: Array<Concept>;
   allowedStatuses: Array<Concept>;
 }
@@ -563,15 +565,4 @@ export interface PatientIdentifier {
   identifierType: PatientIdentifierType;
   location: Location;
   preferred: boolean;
-}
-
-export interface PriorityStyle {
-  priorityUuid: string;
-  styleComponent: 'priorityTag' | 'tag' | null;
-  tagType: string;
-}
-
-export interface StatusStyle {
-  statusUuid: string;
-  iconComponent: 'Group' | 'InProgress' | null;
 }

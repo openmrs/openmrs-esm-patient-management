@@ -3,23 +3,22 @@ import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/vis
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
-import { type PriorityStyle, type StatusStyle } from './types';
 
 export const configSchema = {
-  priorityStyles: {
+  priorityConfigs: {
     _type: Type.Array,
     _element: {
       _type: Type.Object,
     },
-    _description: 'The style to apply to priority tags',
+    _description: 'Allows customization of how specific priorities are rendered',
     _default: [],
   },
-  statusStyles: {
+  statusConfigs: {
     _type: Type.Array,
     _element: {
       _type: Type.Object,
     },
-    _description: 'The style to apply to statuses',
+    _description: 'Allows customization of how specific statuses are rendered',
     _default: [],
   },
   concepts: {
@@ -158,8 +157,8 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
-  priorityStyles: Array<PriorityStyle>;
-  statusStyles: Array<StatusStyle>;
+  priorityConfigs: Array<PriorityConfig>;
+  statusConfigs: Array<StatusConfig>;
   concepts: {
     priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;
@@ -193,4 +192,15 @@ export interface ConfigObject {
 
 export interface OutpatientConfig {
   visitTypeResourceUrl: string;
+}
+
+export interface PriorityConfig {
+  conceptUuid: string;
+  tagType: string;
+  tagClassName: 'priorityTag' | 'tag' | null;
+}
+
+export interface StatusConfig {
+  conceptUuid: string;
+  iconComponent: 'Group' | 'InProgress' | null;
 }

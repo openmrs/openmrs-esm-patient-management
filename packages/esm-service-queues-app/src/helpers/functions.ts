@@ -1,18 +1,5 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
-import { type StatusStyle } from '../types';
 import dayjs from 'dayjs';
-
-export const getStatusStyle = (status: string, config: StatusStyle[]): StatusStyle => {
-  return config.find((c) => c.statusUuid === status);
-};
-
-export const buildStatusString = (status: string, service: string) => {
-  if (!status || !service) {
-    return '';
-  }
-
-  return `${status} - ${service}`;
-};
 
 export const formatWaitTime = (startedAt: Date, t) => {
   const waitTimeMinutes = dayjs().diff(startedAt, 'minutes');

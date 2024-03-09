@@ -53,7 +53,7 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { buildStatusString, formatWaitTime, getStatusStyle, timeDiffInMinutes } from '../helpers/functions';
+import { formatWaitTime, timeDiffInMinutes } from '../helpers/functions';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
@@ -62,7 +62,6 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
-import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
@@ -76,7 +75,8 @@ import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-
 import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
 import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
 import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
-import PriorityTag from '../queue-entry-table-components/priority-tag.component';
+import QueuePriority from '../queue-entry-table-components/queue-priority.component';
+import QueueStatus from '../queue-entry-table-components/queue-status.component';
 
 /**
  * FIXME Temporarily moved here
@@ -162,12 +162,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
-  const {
-    showQueueTableTab: useQueueTableTabs,
-    customPatientChartUrl,
-    priorityStyles,
-    statusStyles,
-  } = useConfig<ConfigObject>();
+  const { showQueueTableTab: useQueueTableTabs, customPatientChartUrl } = useConfig<ConfigObject>();
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
   const differenceInTime = timeDiffInMinutes(
@@ -244,23 +239,13 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
         content: <span className={styles.statusContainer}>{entry?.visitQueueNumber}</span>,
       },
       priority: {
-        content: (
-          <PriorityTag
-            entry={entry}
-            priorityStyle={priorityStyles.find((c) => c.priorityUuid === entry.priorityUuid)}
-          />
-        ),
+        content: <QueuePriority priority={entry.priority} priorityComment={entry.priorityComment} />,
       },
       queueComingFrom: {
         content: <span className={styles.statusContainer}>{entry?.queueComingFrom}</span>,
       },
       status: {
-        content: (
-          <span className={styles.statusContainer}>
-            <StatusIcon statusStyle={getStatusStyle(entry.statusUuid, statusStyles)} />
-            <span>{buildStatusString(entry.statusDisplay, entry.serviceDisplay)}</span>
-          </span>
-        ),
+        content: <QueueStatus status={entry.status} queue={entry.queue} />,
       },
       waitTime: {
         content: <span className={styles.statusContainer}>{formatWaitTime(entry.startedAt, t)}</span>,

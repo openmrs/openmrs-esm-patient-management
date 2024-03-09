@@ -13,7 +13,7 @@ import {
   useConfig,
   type Visit,
 } from '@openmrs/esm-framework';
-import { type Identifer, type MappedServiceQueueEntry, type QueueEntry } from '../types';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
 
@@ -32,6 +32,9 @@ export interface MappedVisitQueueEntry {
   patientAge: string;
   patientDob: string;
   patientUuid: string;
+  queue: Queue;
+  priority: Concept;
+  status: Concept;
   priorityUuid: string;
   priorityDisplay: string;
   priorityComment: string;
@@ -143,6 +146,9 @@ export const mapVisitQueueEntryProperties = (
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
+  queue: queueEntry.queue,
+  priority: queueEntry.priority,
+  status: queueEntry.status,
   priorityUuid: queueEntry.priority.uuid,
   priorityDisplay: queueEntry.priority.display,
   priorityComment: queueEntry.priorityComment,
