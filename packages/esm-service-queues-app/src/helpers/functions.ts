@@ -1,5 +1,4 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
 
 export const getGender = (gender, t) => {
   switch (gender) {
