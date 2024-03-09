@@ -4,6 +4,8 @@
 
 const path = require('path');
 
+process.env.TZ = 'UTC';
+
 module.exports = {
   transform: {
     '^.+\\.(j|t)sx?$': '@swc/jest',

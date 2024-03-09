@@ -1,18 +1,14 @@
-import useSWRImmutable from 'swr/immutable';
-import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { useSystemSetting } from '../hooks/useSystemSetting';
+import { useConceptSetMembers } from '../hooks/useConceptSetMembers';
 
 export function useServiceConcepts() {
-  const config = useConfig();
-  const {
-    concepts: { serviceConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${serviceConceptSetUuid}`;
-  const { data, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
+  const { data: serviceConceptSetting, isLoading } = useSystemSetting('queue.serviceConceptSetName');
+  const { data: serviceConcepts, ...rest } =
+    !isLoading && serviceConceptSetting ? useConceptSetMembers(serviceConceptSetting.value) : null;
   return {
-    queueConcepts: data ? data?.data?.setMembers : [],
-    isLoading,
+    data: serviceConcepts,
+    ...rest,
   };
 }
 

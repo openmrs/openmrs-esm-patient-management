@@ -32,7 +32,7 @@ import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
-import { usePriority, useStatus, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, type amPm } from '../helpers/time-helpers';
@@ -62,8 +62,6 @@ const ScheduledVisits: React.FC<{
   const [visitsIndex, setVisitsIndex] = useState(0);
   const [hasPriority, setHasPriority] = useState(false);
   const [priority, setPriority] = useState('');
-  const { priorities, isLoading } = usePriority();
-  const { statuses } = useStatus();
   const [userLocation, setUserLocation] = useState('');
   const locations = useLocations();
   const session = useSession();
@@ -207,6 +205,7 @@ const ScheduledVisits: React.FC<{
         {visits?.length > 0 ? (
           <TileGroup name="tile-group" defaultSelected="default-selected">
             {visits?.map((visit, ind) => {
+              const priorities = queues.find((q) => q.uuid === visit.service)?.allowedPriorities ?? [];
               return (
                 <RadioTile
                   value={visit.uuid}
@@ -225,7 +224,7 @@ const ScheduledVisits: React.FC<{
                       {formatDatetime(parseDate(visit?.startDateTime))} · {visit.location?.name}{' '}
                     </p>
 
-                    {isLoading ? (
+                    {!visit.service ? (
                       <DataTableSkeleton />
                     ) : !priorities?.length ? (
                       <InlineNotification
