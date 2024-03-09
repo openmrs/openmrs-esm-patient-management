@@ -12,7 +12,7 @@ interface QueuePriorityProps {
 
 const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment }) => {
   const { priorityConfigs } = useConfig<ConfigObject>();
-  const priorityConfig = priorityConfigs.find((c) => c.conceptUuid === priority.uuid);
+  const priorityConfig = priorityConfigs?.find((c) => c.conceptUuid === priority.uuid);
   return (
     <>
       {priorityComment ? (

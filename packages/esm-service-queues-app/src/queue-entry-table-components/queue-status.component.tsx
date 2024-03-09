@@ -12,7 +12,7 @@ interface QueueStatusProps {
 
 const QueueStatus: React.FC<QueueStatusProps> = ({ status, queue }) => {
   const { statusConfigs } = useConfig<ConfigObject>();
-  const statusConfig = statusConfigs.find((c) => c.conceptUuid === status.uuid);
+  const statusConfig = statusConfigs?.find((c) => c.conceptUuid === status.uuid);
   return (
     <span className={styles.statusContainer}>
       <StatusIcon statusConfig={statusConfig} />
