@@ -34,14 +34,8 @@ export interface MappedVisitQueueEntry {
   patientUuid: string;
   queue: Queue;
   priority: Concept;
-  status: Concept;
-  priorityUuid: string;
-  priorityDisplay: string;
   priorityComment: string;
-  serviceUuid: string;
-  serviceDisplay: string;
-  statusUuid: string;
-  statusDisplay: string;
+  status: Concept;
   startedAt: Date;
   endedAt: Date;
   visitType: string;
@@ -149,14 +143,8 @@ export const mapVisitQueueEntryProperties = (
     : '--',
   queue: queueEntry.queue,
   priority: queueEntry.priority,
-  status: queueEntry.status,
-  priorityUuid: queueEntry.priority.uuid,
-  priorityDisplay: queueEntry.priority.display,
   priorityComment: queueEntry.priorityComment,
-  serviceUuid: queueEntry.queue.uuid,
-  serviceDisplay: queueEntry.queue.name,
-  statusUuid: queueEntry.status.uuid,
-  statusDisplay: queueEntry.status.display,
+  status: queueEntry.status,
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,

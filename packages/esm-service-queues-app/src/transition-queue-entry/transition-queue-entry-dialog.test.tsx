@@ -59,6 +59,9 @@ describe('TransitionQueueEntryModal', () => {
     queueEntryUuid: '712289ab-32c0-430f-87b6-d9c1e4e4686e',
     patientUuid: 'cc75ad73-c24b-499c-8db9-a7ef4fc0b36d',
     priorityUuid: 'f9684018-a4d3-4d6f-9dd5-b4b1e89af3e7',
+    queue: {
+      name: 'Triage Queue',
+    },
     name: 'John Doe',
   };
 

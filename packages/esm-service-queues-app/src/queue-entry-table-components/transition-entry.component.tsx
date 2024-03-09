@@ -16,7 +16,7 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
 
   const launchTransitionPriorityModal = useCallback(() => {
-    serveQueueEntry(queueEntry?.serviceDisplay, queueEntry?.visitQueueNumber, 'calling').then(
+    serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'calling').then(
       ({ status }) => {
         if (status === 200) {
           mutate(`${restBaseUrl}/queueutil/assignticket`);
