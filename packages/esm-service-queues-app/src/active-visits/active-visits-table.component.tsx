@@ -53,7 +53,7 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { formatWaitTime, timeDiffInMinutes } from '../helpers/functions';
+import { timeDiffInMinutes } from '../helpers/functions';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
@@ -77,6 +77,7 @@ import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-ce
 import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
 import QueuePriority from '../queue-entry-table-components/queue-priority.component';
 import QueueStatus from '../queue-entry-table-components/queue-status.component';
+import QueueDuration from '../queue-entry-table-components/queue-duration.component';
 
 /**
  * FIXME Temporarily moved here
@@ -248,7 +249,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
         content: <QueueStatus status={entry.status} queue={entry.queue} />,
       },
       waitTime: {
-        content: <span className={styles.statusContainer}>{formatWaitTime(entry.startedAt, t)}</span>,
+        content: <QueueDuration startedAt={entry.startedAt} endedAt={entry.endedAt} />,
       },
     }));
   }, [paginatedQueueEntries]);

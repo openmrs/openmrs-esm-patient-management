@@ -29,14 +29,12 @@ interface StatusIconProps {
 }
 
 const StatusIcon: React.FC<StatusIconProps> = ({ statusConfig }) => {
-  switch (statusConfig?.iconComponent) {
-    case 'InProgress':
-      return <InProgress size={16} />;
-    case 'Group':
-      return <Group size={16} />;
-    default:
-      return null;
-  }
+  return (
+    <span>
+      {statusConfig?.iconComponent === 'InProgress' && <InProgress size={16} />}
+      {statusConfig?.iconComponent === 'Group' && <Group size={16} />}
+    </span>
+  );
 };
 
 export default QueueStatus;

@@ -1,19 +1,6 @@
 import { type OpenmrsResource } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
-export const formatWaitTime = (startedAt: Date, t) => {
-  const waitTimeMinutes = dayjs().diff(startedAt, 'minutes');
-  const hours = waitTimeMinutes / 60;
-  const fullHours = Math.floor(hours);
-  const minutes = (hours - fullHours) * 60;
-  const fullMinutes = Math.round(minutes);
-  if (fullHours > 0) {
-    return fullHours + ' ' + `${t('hoursAnd', 'hours and ')}` + fullMinutes + ' ' + `${t('minutes', 'minutes')}`;
-  } else {
-    return fullMinutes + ' ' + `${t('minutes', 'minutes')}`;
-  }
-};
-
 export const getGender = (gender, t) => {
   switch (gender) {
     case 'M':
