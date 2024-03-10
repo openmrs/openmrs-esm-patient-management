@@ -187,8 +187,8 @@ const AppointmentsBaseTable = () => {
       sortKey: appointment.patient.identifier,
     },
     location: {
-      content: <span className={styles.statusContainer}>{appointment.location.display}</span>,
-      sortKey: appointment.location,
+      content: <span className={styles.statusContainer}>{appointment.location?.name}</span>,
+      sortKey: appointment.location?.name,
     },
     service: {
       content: <span className={styles.serviceContainer}>{appointment.service.name}</span>,
