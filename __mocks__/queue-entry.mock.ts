@@ -7,7 +7,7 @@ import {
 } from '../packages/esm-service-queues-app/src/types';
 import { mockPatientAlice, mockPatientBrian } from './patient.mock';
 
-// Priorities:
+// Services:
 export const mockServiceTriage: Concept = {
   uuid: '00000000-0000-0000-0000-000000000001',
   display: 'Triage',
