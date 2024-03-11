@@ -61,7 +61,6 @@ const ScheduledVisits: React.FC<{
   const { t } = useTranslation();
   const [visitsIndex, setVisitsIndex] = useState(0);
   const [hasPriority, setHasPriority] = useState(false);
-  const [priority, setPriority] = useState('');
   const [userLocation, setUserLocation] = useState('');
   const locations = useLocations();
   const session = useSession();
@@ -80,6 +79,11 @@ const ScheduledVisits: React.FC<{
   const { queueLocations } = useQueueLocations();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
 
+  // TODO: This needs fixing, we cannot just take the first queue and assume that is what is wanted
+  const service = head(queues)?.uuid;
+  const defaultStatus = config.concepts.defaultStatusConceptUuid;
+  const priorities = queues.find((q) => q.uuid === service)?.allowedPriorities ?? [];
+
   useEffect(() => {
     if (!userLocation && session?.sessionLocation !== null) {
       setUserLocation(session?.sessionLocation?.uuid);
@@ -89,9 +93,8 @@ const ScheduledVisits: React.FC<{
   }, [session, locations, userLocation]);
 
   const handleSubmit = useCallback(
-    (event) => {
+    (priority) => {
       setIsSubmitting(true);
-
       const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
       const visitType = [...allVisitTypes].shift().uuid;
 
@@ -105,10 +108,6 @@ const ScheduledVisits: React.FC<{
         visitType: visitType,
         location: userLocation,
       };
-
-      const service = head(queues)?.uuid;
-      const defaultStatus = config.concepts.defaultStatusConceptUuid;
-      const defaultPriority = config.concepts.defaultPriorityConceptUuid;
 
       const abortController = new AbortController();
       if (currentVisit) {
@@ -130,7 +129,7 @@ const ScheduledVisits: React.FC<{
                 addQueueEntry(
                   response.data.uuid,
                   patientId,
-                  priority ? priority : defaultPriority,
+                  priority,
                   defaultStatus,
                   service,
                   appointment,
@@ -189,7 +188,7 @@ const ScheduledVisits: React.FC<{
       config.concepts.defaultPriorityConceptUuid,
       currentVisit,
       t,
-      priority,
+      priorities,
       appointment,
       selectedQueueLocation,
       visitQueueNumberAttributeUuid,
@@ -205,7 +204,6 @@ const ScheduledVisits: React.FC<{
         {visits?.length > 0 ? (
           <TileGroup name="tile-group" defaultSelected="default-selected">
             {visits?.map((visit, ind) => {
-              const priorities = queues.find((q) => q.uuid === visit.service)?.allowedPriorities ?? [];
               return (
                 <RadioTile
                   value={visit.uuid}
@@ -237,15 +235,14 @@ const ScheduledVisits: React.FC<{
                     ) : hasPriority && ind == visitsIndex ? (
                       <ContentSwitcher
                         size="sm"
-                        selectedIndex={1}
+                        selectedIndex={null}
                         className={styles.prioritySwitcher}
                         onChange={(e) => {
-                          setPriority(e.name as any);
-                          handleSubmit(e);
+                          handleSubmit(e.name);
                         }}>
                         {priorities?.length > 0
                           ? priorities.map(({ uuid, display }) => {
-                              return <Switch name={uuid} text={display} value={uuid} />;
+                              return <Switch name={uuid} text={display} />;
                             })
                           : null}
                       </ContentSwitcher>

@@ -7,7 +7,7 @@ export function useServiceConcepts() {
   const { data: serviceConcepts, ...rest } =
     !isLoading && serviceConceptSetting ? useConceptSetMembers(serviceConceptSetting.value) : null;
   return {
-    data: serviceConcepts,
+    queueConcepts: serviceConcepts,
     ...rest,
   };
 }

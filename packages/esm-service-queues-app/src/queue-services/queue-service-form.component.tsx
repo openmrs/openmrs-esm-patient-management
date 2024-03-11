@@ -27,7 +27,7 @@ interface QueueServiceFormProps {
 const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, closePanel }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { data: queueConcepts } = useServiceConcepts();
+  const { queueConcepts } = useServiceConcepts();
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
   const [isMissingName, setMissingName] = useState(false);
