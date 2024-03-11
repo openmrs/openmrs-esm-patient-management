@@ -5,6 +5,22 @@ import biometricsConfigSchema, {
 } from './current-visit/visit-details/biometrics-config-schema';
 
 export const configSchema = {
+  priorityConfigs: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
+    },
+    _description: 'Allows customization of how specific priorities are rendered',
+    _default: [],
+  },
+  statusConfigs: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
+    },
+    _description: 'Allows customization of how specific statuses are rendered',
+    _default: [],
+  },
   concepts: {
     priorityConceptSetUuid: {
       _type: Type.ConceptUuid,
@@ -123,7 +139,7 @@ export const configSchema = {
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
       Available arguments: patientUuid, openmrsSpaBase, openBase
       (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
@@ -141,6 +157,8 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  priorityConfigs: Array<PriorityConfig>;
+  statusConfigs: Array<StatusConfig>;
   concepts: {
     priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;
@@ -174,4 +192,15 @@ export interface ConfigObject {
 
 export interface OutpatientConfig {
   visitTypeResourceUrl: string;
+}
+
+export interface PriorityConfig {
+  conceptUuid: string;
+  tagType: string;
+  tagClassName: 'priorityTag' | 'tag' | null;
+}
+
+export interface StatusConfig {
+  conceptUuid: string;
+  iconComponent: 'Group' | 'InProgress' | null;
 }
