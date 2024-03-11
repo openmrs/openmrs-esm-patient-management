@@ -43,10 +43,8 @@ export interface MappedVisitQueueEntry {
   service: string;
   status: QueueStatus;
   statusUuid: string;
-  visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
-  visitLocation: string;
   visitTypeUuid: string;
   waitTime: string;
   queueUuid: string;
@@ -158,9 +156,7 @@ export const mapVisitQueueEntryProperties = (
   status: queueEntry.status.display as QueueStatus,
   statusUuid: queueEntry.status.uuid,
   waitTime: queueEntry.startedAt ? `${dayjs().diff(dayjs(queueEntry.startedAt), 'minutes')}` : '--',
-  visitStartDateTime: queueEntry.startedAt,
   visitType: queueEntry.visit?.visitType?.display,
-  visitLocation: queueEntry.visit?.location?.uuid,
   queueLocation: (queueEntry?.queue as any)?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
