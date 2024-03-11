@@ -74,6 +74,10 @@
     {
       "name": "transition-queue-entry-modal",
       "component": "transitionQueueEntryModal"
+    },
+    {
+      "name": "edit-queue-entry-modal",
+      "component": "editQueueEntryModal"
     } 
   ]
 }

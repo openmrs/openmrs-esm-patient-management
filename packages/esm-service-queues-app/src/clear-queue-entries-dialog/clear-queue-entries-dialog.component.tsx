@@ -36,6 +36,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           isLowContrast: false,
           subtitle: error?.message,
         });
+        closeModal();
       },
     );
   }, [closeModal, mutate, t, visitQueueEntries]);
@@ -51,7 +52,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
         <p className={styles.subHeading} id="subHeading">
           {t(
             'clearAllQueueEntriesWarningMessage',
-            'Clearing all queue entries will remove  all the patients from the queues and will not allow you to fill any other encounter forms for the patients',
+            'Clearing all queue entries will remove  all the patients from the queues',
           )}
         </p>
       </ModalBody>

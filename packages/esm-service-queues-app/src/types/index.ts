@@ -17,7 +17,6 @@ export interface Attribute {
   uuid: string;
   value: string | number;
 }
-
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
@@ -77,7 +76,6 @@ export interface Note {
   };
   time: string;
 }
-
 export interface Order {
   uuid: string;
   dateActivated: string;
@@ -329,7 +327,6 @@ export interface MappedQueueEntry {
   priority: Concept;
   priorityComment: string;
   status: Concept;
-  visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
   waitTime: string;
