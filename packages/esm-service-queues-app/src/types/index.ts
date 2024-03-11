@@ -325,7 +325,6 @@ export interface MappedQueueEntry {
   service: string;
   status: string;
   statusUuid: string;
-  visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
   waitTime: string;
