@@ -42,7 +42,7 @@
   "chooseService": "Select a service",
   "chooseStatus": "Select a status",
   "clearAllQueueEntries": "Clear all queue entries?",
-  "clearAllQueueEntriesWarningMessage": "Clearing all queue entries will remove  all the patients from the queues and will not allow you to fill any other encounter forms for the patients",
+  "clearAllQueueEntriesWarningMessage": "Clearing all queue entries will remove  all the patients from the queues",
   "clearQueue": "Clear queue",
   "clinicMetrics": "Clinic metrics",
   "configurePriorities": "Please configure priorities to continue.",
