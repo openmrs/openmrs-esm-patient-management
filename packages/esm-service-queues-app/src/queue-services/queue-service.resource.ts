@@ -3,12 +3,12 @@ import { useSystemSetting } from '../hooks/useSystemSetting';
 import { useConcept } from '../hooks/useConcept';
 
 export function useServiceConcepts() {
-  const { data: serviceConceptSetting, isLoading } = useSystemSetting('queue.serviceConceptSetName');
-  const { data: serviceConcepts, ...rest } =
-    !isLoading && serviceConceptSetting ? useConcept(serviceConceptSetting.value)?.data.setMembers() : null;
+  const { systemSetting: serviceConceptSetting } = useSystemSetting('queue.serviceConceptSetName');
+  const { concept: serviceConceptSet, error, isLoading } = useConcept(serviceConceptSetting?.value);
   return {
-    queueConcepts: serviceConcepts,
-    ...rest,
+    queueConcepts: serviceConceptSet?.setMembers?.sort((c1, c2) => c1.display.localeCompare(c2.display)) || [],
+    error,
+    isLoading,
   };
 }
 
