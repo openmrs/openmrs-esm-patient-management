@@ -6,12 +6,13 @@ import { navigate } from '@openmrs/esm-framework';
 import { spaHomePage } from '../../constants';
 import styles from './calendar-header.scss';
 import SelectedDateContext from '../../hooks/selectedDateContext';
+import dayjs from 'dayjs';
 
 const CalendarHeader: React.FC = () => {
   const { t } = useTranslation();
   const { selectedDate } = useContext(SelectedDateContext);
   const backButtonOnClick = () => {
-    navigate({ to: `${spaHomePage}/appointments/${selectedDate}` });
+    navigate({ to: `${spaHomePage}/appointments/${dayjs(selectedDate).format('YYYY-MM-DD')}` });
   };
 
   return (
