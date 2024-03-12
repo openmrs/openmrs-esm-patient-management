@@ -1,11 +1,11 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../hooks/useSystemSetting';
-import { useConceptSetMembers } from '../hooks/useConceptSetMembers';
+import { useConcept } from '../hooks/useConcept';
 
 export function useServiceConcepts() {
   const { data: serviceConceptSetting, isLoading } = useSystemSetting('queue.serviceConceptSetName');
   const { data: serviceConcepts, ...rest } =
-    !isLoading && serviceConceptSetting ? useConceptSetMembers(serviceConceptSetting.value) : null;
+    !isLoading && serviceConceptSetting ? useConcept(serviceConceptSetting.value)?.data.setMembers() : null;
   return {
     queueConcepts: serviceConcepts,
     ...rest,
