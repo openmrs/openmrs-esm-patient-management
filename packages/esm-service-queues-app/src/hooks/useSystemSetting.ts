@@ -8,15 +8,10 @@ export interface SystemSetting {
 }
 
 export function useSystemSetting(setting: string) {
-  const apiUrl = `${restBaseUrl}/systemsetting?&v=custom:(value)&q=${setting}`;
-  const { data, error, isLoading } = useSWRImmutable<
-    {
-      data: { results: Array<SystemSetting> };
-    },
-    Error
-  >(apiUrl, openmrsFetch);
+  const apiUrl = `${restBaseUrl}/systemsetting/${setting}?v=custom:(value)`;
+  const { data, error, isLoading } = useSWRImmutable<{ data: SystemSetting }, Error>(apiUrl, openmrsFetch);
   return {
-    systemSetting: data?.data?.results && data.data.results.length > 0 ? data.data.results[0] : null,
+    systemSetting: data?.data,
     error: error,
     isLoading: isLoading,
   };
