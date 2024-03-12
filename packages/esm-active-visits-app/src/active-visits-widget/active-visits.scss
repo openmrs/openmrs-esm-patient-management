@@ -49,6 +49,10 @@
 
 .pagination {
   overflow: hidden;
+
+  &:global(.cds--pagination) {
+    border-top: 1px solid $ui-03;
+  }
 }
 
 .hiddenRow {
