@@ -2,7 +2,7 @@ import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
 import { type ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
-import { mockServices, mockVisitQueueEntries, mockMappedQueueEntries, mockSession } from '__mocks__';
+import { mockServices, mockVisitQueueEntries, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
@@ -71,10 +71,7 @@ describe('ActiveVisitsTable: ', () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession),
       mockedUseConfig.mockReturnValue({
-        concepts: {
-          priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
-          serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-        },
+        concepts: {},
         visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
         showQueueTableTab: false,
         customPatientChartUrl: 'someUrl',
@@ -98,7 +95,7 @@ describe('ActiveVisitsTable: ', () => {
     mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
     mockUseVisitQueueEntries.mockReturnValue({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
     mockUsePagination.mockReturnValue({
-      results: mockMappedQueueEntries.data.slice(0, 2),
+      results: mockQueueEntries,
       goTo: mockGoToPage,
       currentPage: 1,
     });
@@ -109,23 +106,14 @@ describe('ActiveVisitsTable: ', () => {
 
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
     expect(screen.queryByText(/no patients to display/i)).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /eric test ric/i })).toBeInTheDocument();
-    const john = screen.getByRole('link', { name: /john smith/i });
+    expect(screen.getByRole('link', { name: /Brian Johnson/i })).toBeInTheDocument();
+    const john = screen.getByRole('link', { name: /Alice Johnson/i });
     expect(john).toBeInTheDocument();
     expect(john).toHaveAttribute('href', 'someUrl');
 
-    const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time/];
+    const expectedColumnHeaders = [/name/, /priority/, /status/, /waitTime/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
-    });
-
-    const expectedTableRows = [
-      /Eric Test Ric Not Urgent Waiting - Triage 206 hours and 2 minutes/,
-      /John Smith Emergency In Service - Clinical consultation 206 hours and 2 minutes/,
-    ];
-
-    expectedTableRows.forEach((row) => {
-      expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
   });
 });

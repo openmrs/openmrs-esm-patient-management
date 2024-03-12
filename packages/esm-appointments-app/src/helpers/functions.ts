@@ -27,12 +27,6 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-function getAppointmentDuration(startTime = 0, endTime = 0) {
-  const diff = endTime - startTime;
-  const minutes = Math.floor(diff / 60000);
-  return minutes + 'min';
-}
-
 export const formatAMPM = (date) => {
   let hours = date.getHours();
   let minutes = date.getMinutes();
@@ -42,33 +36,6 @@ export const formatAMPM = (date) => {
   minutes = minutes < 10 ? '0' + minutes : minutes;
   const strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
-};
-
-// TODO remove?
-export const getAppointment = (appointment: Appointment) => {
-  let formattedAppointment = {
-    id: appointment.uuid,
-    name: appointment.patient?.name,
-    age: appointment.patient?.birthDate,
-    gender: appointment.patient?.gender,
-    phoneNumber: appointment.patient?.phoneNumber,
-    dob: formatDate(parseDate(appointment.patient?.birthDate), { mode: 'wide' }),
-    patientUuid: appointment.patient?.uuid,
-    dateTime: appointment.startDateTime,
-    serviceType: appointment.service ? appointment.service.name : '--',
-    serviceUuid: appointment.service ? appointment.service.uuid : null,
-    appointmentKind: appointment.appointmentKind ? appointment.appointmentKind : '--',
-    status: appointment.status,
-    provider: appointment.providers ? appointment?.providers[0]?.name : '--',
-    location: appointment.location ? appointment.location?.name : '--',
-    comments: appointment.comments ? appointment.comments : '--',
-    appointmentNumber: appointment.appointmentNumber,
-    providers: appointment.providers,
-    identifier: appointment?.patient?.identifiers?.find(
-      (identifier) => identifier.identifierName === configSchema.patientIdentifierType._default,
-    ).identifier,
-  };
-  return formattedAppointment;
 };
 
 export const isSameMonth = (cellDate: Dayjs, currentDate: Dayjs) => {
@@ -83,8 +50,8 @@ export const monthDays = (currentDate: Dayjs) => {
   const nextMonth = dayjs(currentDate).add(1, 'month');
   let days: Dayjs[] = [];
 
-  for (let i = lastMonth.daysInMonth() - monthStart.day(); i < lastMonth.daysInMonth(); i++) {
-    days.push(currentDate.date(i).month(lastMonth.month()));
+  for (let i = lastMonth.daysInMonth() - monthStart.day() + 1; i <= lastMonth.daysInMonth(); i++) {
+    days.push(dayjs().month(lastMonth.month()).date(i));
   }
 
   for (let i = 1; i <= monthDays; i++) {
@@ -94,7 +61,7 @@ export const monthDays = (currentDate: Dayjs) => {
   const dayLen = days.length > 30 ? 7 : 14;
 
   for (let i = 1; i < dayLen - monthEnd.day(); i++) {
-    days.push(currentDate.date(i).month(nextMonth.month()));
+    days.push(dayjs().month(nextMonth.month()).date(i));
   }
   return days;
 };
@@ -112,55 +79,4 @@ export const getGender = (gender, t) => {
     default:
       return gender;
   }
-};
-export const weekDays = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 1; hour++) {
-    for (let day = 0; day < 8; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
-};
-export const weekAllDays = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 24; hour++) {
-    for (let day = 0; day < 8; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
-};
-export const dailyHours = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 24; hour++) {
-    dateTime.push(dayjs(currentDate).hour(hour));
-  }
-  return dateTime;
-};
-
-export const dailyView = (currentDate: Dayjs) => {
-  const dateTime: Dayjs[] = [];
-
-  for (let hour = 0; hour < 1; hour++) {
-    for (let day = 0; day < 1; day++) {
-      dateTime.push(
-        dayjs(currentDate)
-          .day(day === 0 ? 0 : day - 1)
-          .hour(hour),
-      );
-    }
-  }
-  return dateTime;
 };

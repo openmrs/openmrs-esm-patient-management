@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -44,6 +44,7 @@ import type { Appointment, AppointmentPayload, RecurringPattern } from '../types
 import { type ConfigObject } from '../config-schema';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
 import styles from './appointments-form.scss';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -96,6 +97,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const locations = useLocations();
   const providers = useProviders();
   const session = useSession();
+  const { selectedDate } = useContext(SelectedDateContext);
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
@@ -108,16 +110,23 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const defaultStartDate = appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date();
+  // TODO can we clean this all up to be more consistent between using Date and dayjs?
+  const defaultStartDate = appointment?.startDateTime
+    ? new Date(appointment?.startDateTime)
+    : selectedDate
+      ? new Date(selectedDate)
+      : new Date();
   const defaultEndDate = recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
   const defaultEndDateText = recurringPattern?.endDate
     ? dayjs(new Date(recurringPattern.endDate)).format(dateFormat)
     : '';
   const defaultStartDateText = appointment?.startDateTime
     ? dayjs(new Date(appointment.startDateTime)).format(dateFormat)
-    : dayjs(new Date()).format(dateFormat);
+    : selectedDate
+      ? dayjs(selectedDate).format(dateFormat)
+      : dayjs(new Date()).format(dateFormat);
 
-  const defaultAppointmentStartDate = appointment?.startDateTime
+  const defaultAppointmentStartTime = appointment?.startDateTime
     ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
     : dayjs(new Date()).format('hh:mm');
 
@@ -142,7 +151,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
-      startTime: defaultAppointmentStartDate,
+      startTime: defaultAppointmentStartTime,
       duration: defaultDuration,
       timeFormat: defaultTimeFormat,
       appointmentDateTime: {

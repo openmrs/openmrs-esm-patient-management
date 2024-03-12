@@ -1,19 +1,19 @@
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import useSWR from 'swr';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { useAppointmentDate } from '../helpers';
 import { omrsDateFormat } from '../constants';
 import type { AppointmentService, AppointmentsFetchResponse } from '../types';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 export function useTodaysAppointments() {
   const { t } = useTranslation();
-  const { currentAppointmentDate } = useAppointmentDate();
+  const { selectedDate } = useContext(SelectedDateContext);
 
-  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${currentAppointmentDate}`;
+  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
-    currentAppointmentDate ? apiUrl : null,
+    selectedDate ? apiUrl : null,
     openmrsFetch,
   );
 

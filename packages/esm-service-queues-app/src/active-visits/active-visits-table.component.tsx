@@ -1,12 +1,12 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
   type DataTableHeader,
   DataTableSkeleton,
-  DefinitionTooltip,
   Dropdown,
+  Pagination,
   Tab,
   Table,
   TableBody,
@@ -21,36 +21,39 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Tabs,
-  TabPanels,
-  TabPanel,
   TabList,
-  Tag,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Tile,
-  Pagination,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
-  useLayoutType,
-  isDesktop,
-  ExtensionSlot,
-  usePagination,
-  useConfig,
-  useSession,
-  showModal,
   ConfigurableLink,
+  ExtensionSlot,
+  isDesktop,
+  showModal,
+  useConfig,
+  useFeatureFlag,
+  useLayoutType,
+  usePagination,
+  useSession,
 } from '@openmrs/esm-framework';
-import { useVisitQueueEntries, type MappedVisitQueueEntry } from './active-visits-table.resource';
-import { SearchTypes } from '../types';
+import {
+  type MappedVisitQueueEntry,
+  mapVisitQueueEntryProperties,
+  useVisitQueueEntries,
+} from './active-visits-table.resource';
+import { type QueueEntry, SearchTypes } from '../types';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
-  useSelectedServiceName,
-  useSelectedQueueLocationUuid,
   useIsPermanentProviderQueueRoom,
+  useSelectedQueueLocationUuid,
+  useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
+import { timeDiffInMinutes } from '../helpers/functions';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
@@ -59,11 +62,22 @@ import CurrentVisit from '../current-visit/current-visit-summary.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import PatientSearch from '../patient-search/patient-search.component';
 import PastVisit from '../past-visit/past-visit.component';
-import StatusIcon from '../queue-entry-table-components/status-icon.component';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import styles from './active-visits-table.scss';
 import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
+import QueueTable from '../queue-table/queue-table.component';
+import { queueTableNameColumn } from '../queue-table/cells/queue-table-name-cell.component';
+import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-coming-from-cell.component';
+import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
+import { activeVisitActionsColumn } from './active-visits-row-actions.component';
+import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
+import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
+import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
+import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
+import QueuePriority from '../queue-entry-table-components/queue-priority.component';
+import QueueStatus from '../queue-entry-table-components/queue-status.component';
+import QueueDuration from '../queue-entry-table-components/queue-duration.component';
 
 /**
  * FIXME Temporarily moved here
@@ -88,13 +102,63 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const { t } = useTranslation();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const currentServiceUuid = useSelectedServiceUuid();
   const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
+  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
+  const layout = useLayoutType();
+  const { t } = useTranslation();
+  const selectedServiceUuid = useSelectedServiceUuid();
+
+  const queueEntries = visitQueueEntries?.map((entry) => entry.queueEntry);
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  } else if (useNewActiveVisitsTable) {
+    const queueEntriesInSelectedQueue = queueEntries.filter(
+      (queueEntry) => !selectedServiceUuid || queueEntry.queue.uuid == selectedServiceUuid,
+    );
+
+    const columns = [
+      queueTableNameColumn,
+      queueTablePriorityColumn,
+      queueTableComingFromColumn,
+      queueTableStatusColumn,
+      queueTableQueueColumn,
+      queueTableWaitTimeColumn,
+      activeVisitActionsColumn,
+    ];
+    return (
+      <div className={styles.container}>
+        <div className={styles.headerContainer}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
+          </div>
+        </div>
+        <QueueTable
+          queueEntries={queueEntriesInSelectedQueue}
+          queueTableColumns={columns}
+          ExpandedRow={QueueTableExpandedRow}
+          tableFilter={<ActiveVisitsTableFilter />}
+        />
+      </div>
+    );
+  } else {
+    return <OldQueueTable queueEntries={queueEntries} />;
+  }
+}
+
+// older implementation of the ActiveVisitsTable that we plan on deprecating
+function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
+  const { t } = useTranslation();
+  const currentServiceName = useSelectedServiceName();
+  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { queues } = useQueues(currentQueueLocation);
+  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const visitQueueEntries = queueEntries.map((entry) =>
+    mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid),
+  );
+
+  const currentServiceUuid = useSelectedServiceUuid();
   const [showOverlay, setShowOverlay] = useState(false);
   const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
@@ -130,7 +194,7 @@ function ActiveVisitsTable() {
       },
       {
         id: 1,
-        header: t('queueNumber', 'QueueNumber'),
+        header: t('queueNumber', 'Queue Number'),
         key: 'queueNumber',
       },
       {
@@ -176,40 +240,16 @@ function ActiveVisitsTable() {
         content: <span className={styles.statusContainer}>{entry?.visitQueueNumber}</span>,
       },
       priority: {
-        content: (
-          <>
-            {entry?.priorityComment ? (
-              <DefinitionTooltip className={styles.tooltip} align="bottom-left" definition={entry.priorityComment}>
-                <Tag
-                  role="tooltip"
-                  className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                  type={getTagType(entry.priority as string)}>
-                  {entry.priority}
-                </Tag>
-              </DefinitionTooltip>
-            ) : (
-              <Tag
-                className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                type={getTagType(entry.priority as string)}>
-                {entry.priority}
-              </Tag>
-            )}
-          </>
-        ),
+        content: <QueuePriority priority={entry.priority} priorityComment={entry.priorityComment} />,
       },
       queueComingFrom: {
         content: <span className={styles.statusContainer}>{entry?.queueComingFrom}</span>,
       },
       status: {
-        content: (
-          <span className={styles.statusContainer}>
-            <StatusIcon status={entry.status.toLowerCase()} />
-            <span>{buildStatusString(entry.status, entry.service)}</span>
-          </span>
-        ),
+        content: <QueueStatus status={entry.status} queue={entry.queue} />,
       },
       waitTime: {
-        content: <span className={styles.statusContainer}>{formatWaitTime(entry.waitTime, t)}</span>,
+        content: <QueueDuration startedAt={entry.startedAt} endedAt={entry.endedAt} />,
       },
     }));
   }, [paginatedQueueEntries]);
@@ -265,10 +305,6 @@ function ActiveVisitsTable() {
     isPermanentProviderQueueRoom,
     launchAddProviderRoomModal,
   ]);
-
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
 
   if (visitQueueEntries?.length) {
     return (
@@ -357,13 +393,13 @@ function ActiveVisitsTable() {
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                           <TableCell className="cds--table-column-menu">
-                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <EditMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                           <TableCell className="cds--table-column-menu">
-                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
+                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} />
                           </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
@@ -513,6 +549,34 @@ function ActiveVisitsTable() {
         />
       )}
     </div>
+  );
+}
+
+function ActiveVisitsTableFilter() {
+  const { t } = useTranslation();
+  const currentQueueLocation = useSelectedQueueLocationUuid();
+  const { queues } = useQueues(currentQueueLocation);
+  const currentServiceName = useSelectedServiceName();
+  const handleServiceChange = ({ selectedItem }) => {
+    updateSelectedServiceUuid(selectedItem.uuid);
+    updateSelectedServiceName(selectedItem.display);
+  };
+
+  return (
+    <>
+      <div className={styles.filterContainer}>
+        <Dropdown
+          id="serviceFilter"
+          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
+          label={currentServiceName}
+          type="inline"
+          items={[{ display: `${t('all', 'All')}` }, ...queues]}
+          itemToString={(item) => (item ? item.display : '')}
+          onChange={handleServiceChange}
+          size="sm"
+        />
+      </div>
+    </>
   );
 }
 

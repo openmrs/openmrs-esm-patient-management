@@ -1,36 +1,36 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
 import { useClinicalMetrics, useAllAppointmentsByDate, useScheduledAppointment } from '../hooks/useClinicalMetrics';
-import { useAppointmentDate } from '../helpers';
 import { useAppointmentList } from '../hooks/useAppointmentList';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
 import styles from './appointments-metrics.scss';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 interface AppointmentMetricsProps {
-  serviceUuid: string;
+  appointmentServiceType: string;
 }
 
-const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid }) => {
+const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
 
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
   const { totalProviders } = useAllAppointmentsByDate();
-  const { totalScheduledAppointments } = useScheduledAppointment(serviceUuid);
+  const { totalScheduledAppointments } = useScheduledAppointment(appointmentServiceType);
 
-  const { currentAppointmentDate } = useAppointmentDate();
-  const formattedStartDate = formatDate(parseDate(currentAppointmentDate), { mode: 'standard', time: false });
+  const { selectedDate } = useContext(SelectedDateContext);
+  const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
   // TODO we will need rework these after we discuss the logic we want to use
   const { appointmentList: arrivedAppointments } = useAppointmentList('CheckedIn');
   const { appointmentList: pendingAppointments } = useAppointmentList('Scheduled');
 
-  const filteredArrivedAppointments = serviceUuid
-    ? arrivedAppointments.filter(({ service }) => service.uuid === serviceUuid)
+  const filteredArrivedAppointments = appointmentServiceType
+    ? arrivedAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
     : arrivedAppointments;
-  const filteredPendingAppointments = serviceUuid
-    ? pendingAppointments.filter(({ service }) => service.uuid === serviceUuid)
+  const filteredPendingAppointments = appointmentServiceType
+    ? pendingAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
     : pendingAppointments;
 
   if (clinicalMetricsError) {
@@ -48,7 +48,6 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ serviceUuid })
           value={totalScheduledAppointments}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
-          appointmentDate={currentAppointmentDate}
         />
         <MetricsCard
           label={

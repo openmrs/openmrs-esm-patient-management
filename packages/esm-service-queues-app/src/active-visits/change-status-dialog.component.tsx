@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
-import { updateQueueEntry, usePriority, useStatus, useVisitQueueEntries } from './active-visits-table.resource';
+import { updateQueueEntry, useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
 import { useQueues } from '../helpers/useQueues';
@@ -29,17 +29,17 @@ interface ChangeStatusDialogProps {
 const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
-  const [priority, setPriority] = useState(queueEntry?.priorityUuid);
+  const [priority, setPriority] = useState(queueEntry?.priority?.uuid);
   const [newQueueUuid, setNewQueueUuid] = useState('');
-  const { priorities } = usePriority();
+  const priorities = queueEntry.queue.allowedPriorities;
   const config = useConfig() as ConfigObject;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueEntry?.queueLocation);
   const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
   const [editLocation, setEditLocation] = useState(false);
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
-  const { statuses } = useStatus();
-  const [queueStatus, setQueueStatus] = useState(queueEntry?.statusUuid);
+  const statuses = queueEntry.queue.allowedStatuses;
+  const [queueStatus, setQueueStatus] = useState(queueEntry?.status?.uuid);
 
   const changeQueueStatus = useCallback(
     (event) => {
@@ -52,7 +52,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       const endDate = new Date();
       updateQueueEntry(
         queueEntry?.visitUuid,
-        queueEntry?.queueUuid,
+        queueEntry?.queue?.uuid,
         event?.target['service']?.value,
         queueEntry?.queueEntryUuid,
         queueEntry?.patientUuid,
@@ -88,7 +88,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       config.concepts.emergencyPriorityConceptUuid,
       priority,
       queueEntry?.visitUuid,
-      queueEntry?.queueUuid,
+      queueEntry?.queue?.uuid,
       queueEntry?.queueEntryUuid,
       queueEntry?.patientUuid,
       queueStatus,
@@ -148,7 +148,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                 {!newQueueUuid && editLocation === true ? (
                   <SelectItem text={t('selectService', 'Select a service')} value="" />
                 ) : null}
-                {!queueEntry.queueUuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
+                {!queueEntry.queue?.uuid ? <SelectItem text={t('selectService', 'Select a service')} value="" /> : null}
                 {queues?.length > 0 &&
                   queues.map((service) => (
                     <SelectItem key={service.uuid} text={service.display} value={service.uuid}>

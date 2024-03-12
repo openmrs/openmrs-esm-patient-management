@@ -8,15 +8,16 @@ import {
   getHighestAppointmentServiceLoad,
   flattenAppointmentSummary,
   getServiceCountByAppointmentType,
-  useAppointmentDate,
 } from '../helpers';
 import isEmpty from 'lodash-es/isEmpty';
+import SelectedDateContext from './selectedDateContext';
+import { useContext } from 'react';
 
 export const useClinicalMetrics = () => {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const endDate = dayjs(new Date(currentAppointmentDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
-  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${currentAppointmentDate}&endDate=${endDate}`;
-  const { data, error, isLoading, mutate } = useSWR<{
+  const { selectedDate } = useContext(SelectedDateContext);
+  const endDate = dayjs(new Date(selectedDate).setHours(23, 59, 59, 59)).format(omrsDateFormat);
+  const url = `${restBaseUrl}/appointment/appointmentSummary?startDate=${selectedDate}&endDate=${endDate}`;
+  const { data, error, isLoading } = useSWR<{
     data: Array<AppointmentSummary>;
   }>(url, openmrsFetch);
 
@@ -37,8 +38,8 @@ export const useClinicalMetrics = () => {
 };
 
 export function useAllAppointmentsByDate() {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${currentAppointmentDate}`;
+  const { selectedDate } = useContext(SelectedDateContext);
+  const apiUrl = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: Array<Appointment> }, Error>(
     apiUrl,
     openmrsFetch,
@@ -59,10 +60,10 @@ export function useAllAppointmentsByDate() {
 }
 
 export const useScheduledAppointment = (serviceUuid: string) => {
-  const { currentAppointmentDate } = useAppointmentDate();
-  const url = `${restBaseUrl}/appointment/all?forDate=${currentAppointmentDate}`;
+  const { selectedDate } = useContext(SelectedDateContext);
+  const url = `${restBaseUrl}/appointment/all?forDate=${selectedDate}`;
 
-  const { data, error, isLoading, mutate } = useSWR<{
+  const { data, error, isLoading } = useSWR<{
     data: Array<any>;
   }>(url, openmrsFetch);
 

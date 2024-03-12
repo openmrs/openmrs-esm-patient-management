@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -10,8 +10,8 @@ import {
   type ConnectedExtension,
   type ConfigObject,
 } from '@openmrs/esm-framework';
-import { useAppointmentDate } from '../../helpers';
 import styles from './scheduled-appointments.scss';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 dayjs.extend(isSameOrBefore);
 
@@ -25,7 +25,7 @@ const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
-  const { currentAppointmentDate: date } = useAppointmentDate();
+  const { selectedDate } = useContext(SelectedDateContext);
 
   // added to prevent auto-removal of translations for dynamic keys
   // t('checkedIn', 'Checked In');
@@ -41,7 +41,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
   );
 
   useEffect(() => {
-    const dayjsDate = dayjs(date);
+    const dayjsDate = dayjs(selectedDate);
     const now = dayjs();
     if (dayjsDate.isBefore(now, 'date')) {
       setDateType('pastDate');
@@ -50,7 +50,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
     } else {
       setDateType('today');
     }
-  }, [date]);
+  }, [selectedDate]);
 
   useEffect(() => {
     // This is intended to cover two things:
@@ -89,7 +89,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
               extension={extension}
               currentTab={currentTab}
               appointmentServiceType={appointmentServiceType}
-              date={date}
+              date={selectedDate}
               dateType={dateType}
               showExtensionTab={showExtension}
               hideExtensionTab={hideExtension}

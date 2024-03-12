@@ -5,11 +5,23 @@ import biometricsConfigSchema, {
 } from './current-visit/visit-details/biometrics-config-schema';
 
 export const configSchema = {
-  concepts: {
-    priorityConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
+  priorityConfigs: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
     },
+    _description: 'Allows customization of how specific priorities are rendered',
+    _default: [],
+  },
+  statusConfigs: {
+    _type: Type.Array,
+    _element: {
+      _type: Type.Object,
+    },
+    _description: 'Allows customization of how specific statuses are rendered',
+    _default: [],
+  },
+  concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
@@ -19,14 +31,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
       _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
-    },
-    serviceConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
-    },
-    statusConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
     },
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
@@ -123,7 +127,7 @@ export const configSchema = {
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
       Available arguments: patientUuid, openmrsSpaBase, openBase
       (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
@@ -141,11 +145,10 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  priorityConfigs: Array<PriorityConfig>;
+  statusConfigs: Array<StatusConfig>;
   concepts: {
-    priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;
-    serviceConceptSetUuid: string;
-    statusConceptSetUuid: string;
     defaultStatusConceptUuid: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
@@ -160,6 +163,7 @@ export interface ConfigObject {
     historicalObsConceptUuid: Array<string>;
   };
   contactAttributeType: Array<string>;
+  visitQueueNumberAttributeUuid: string;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
   showQueueTableTab: boolean;
@@ -173,4 +177,15 @@ export interface ConfigObject {
 
 export interface OutpatientConfig {
   visitTypeResourceUrl: string;
+}
+
+export interface PriorityConfig {
+  conceptUuid: string;
+  tagType: string;
+  tagClassName: 'priorityTag' | 'tag' | null;
+}
+
+export interface StatusConfig {
+  conceptUuid: string;
+  iconComponent: 'Group' | 'InProgress' | null;
 }

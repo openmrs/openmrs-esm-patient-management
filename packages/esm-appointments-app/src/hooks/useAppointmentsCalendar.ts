@@ -11,6 +11,7 @@ interface AppointmentCountMapEntry {
 interface AppointmentSummaryResponse {
   appointmentService: {
     name: string;
+    uuid: string;
   };
   appointmentCountMap: Map<string, AppointmentCountMapEntry>;
 }
@@ -26,14 +27,15 @@ export const useAppointmentsCalendar = (forDate: string, period: string) => {
   );
   const results: Array<DailyAppointmentsCountByService> = data?.data.reduce((acc, service) => {
     const serviceName = service.appointmentService.name;
+    const serviceUuid = service.appointmentService.uuid;
     Object.entries(service.appointmentCountMap).map(([key, value]) => {
       const existingEntry = acc.find((entry) => entry.appointmentDate === key);
       if (existingEntry) {
-        existingEntry.services.push({ serviceName, count: value.allAppointmentsCount });
+        existingEntry.services.push({ serviceName, serviceUuid, count: value.allAppointmentsCount });
       } else {
         acc.push({
           appointmentDate: key,
-          services: [{ serviceName, count: value.allAppointmentsCount }],
+          services: [{ serviceName, serviceUuid, count: value.allAppointmentsCount }],
         });
       }
     });

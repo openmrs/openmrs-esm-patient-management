@@ -13,12 +13,7 @@ import {
   RadioButton,
 } from '@carbon/react';
 import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import {
-  addQueueEntry,
-  usePriority,
-  useStatus,
-  useVisitQueueEntries,
-} from '../active-visits/active-visits-table.resource';
+import { addQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
@@ -38,8 +33,6 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const patientName = visitDetails?.name;
   const patientAge = visitDetails?.age;
   const patientSex = visitDetails?.gender;
-  const { priorities } = usePriority();
-  const { statuses, isLoading } = useStatus();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
@@ -49,6 +42,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
   const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
   const { mutateQueueEntries } = useMissingQueueEntries();
+  const priorities = queues.find((q) => q.uuid === queueUuid)?.allowedPriorities ?? [];
 
   const addVisitToQueue = useCallback(() => {
     if (!queueUuid) {

@@ -1,29 +1,21 @@
 import { formatDate } from '@openmrs/esm-framework';
 import * as XLSX from 'xlsx';
+import { type Appointment } from '../types';
 
 /**
  * Downloads the provided appointments as an Excel file.
- * @param {Array<MappedAppointment>} appointments - The list of appointments to download.
- * @param {string} [fileName] - The name of the downloaded file (default: 'Appointments {current date and time}').
+ * @param {Array<Appointment>} appointments - The list of appointments to download.
+ * @param {string} [fileName] - The name of the downloaded file
  */
-export function downloadAppointmentsAsExcel(
-  appointments,
-  fileName = `Appointments ${formatDate(new Date(appointments[0]?.dateTime ?? new Date()), {
-    year: true,
-    time: true,
-  })}`,
-) {
-  const appointmentsJSON = appointments?.map(
-    ({ name, gender, age, serviceType, dateTime, phoneNumber, identifier }) => ({
-      'Patient name': name,
-      Gender: gender === 'F' ? 'Female' : 'Male',
-      Age: age,
-      Identifier: identifier ?? '--',
-      'Appointment type': serviceType,
-      Date: formatDate(new Date(dateTime), { mode: 'wide' }),
-      'Phone Number': phoneNumber || '--',
-    }),
-  );
+export function downloadAppointmentsAsExcel(appointments: Array<Appointment>, fileName = 'Appointments') {
+  const appointmentsJSON = appointments?.map((appointment: Appointment) => ({
+    'Patient name': appointment.patient.name,
+    Gender: appointment.patient.gender === 'F' ? 'Female' : 'Male',
+    Age: appointment.patient.age,
+    Identifier: appointment.patient.identifier ?? '--',
+    'Appointment type': appointment.service?.name,
+    Date: formatDate(new Date(appointment.startDateTime), { mode: 'wide' }),
+  }));
 
   const worksheet = createWorksheet(appointmentsJSON);
   const workbook = createWorkbook(worksheet, 'Appointment list');
