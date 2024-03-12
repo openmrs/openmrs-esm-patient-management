@@ -8,12 +8,17 @@ export enum SearchTypes {
   SCHEDULED_VISITS = 'scheduled-visits',
 }
 
+export interface AppointmentLocation {
+  uuid: string;
+  name: string;
+}
+
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
   comments: string;
   endDateTime: Date | number | any;
-  location: OpenmrsResource;
+  location: AppointmentLocation;
   patient: {
     identifier: string;
     identifiers: Array<Identifier>;

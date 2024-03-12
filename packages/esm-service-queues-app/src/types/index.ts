@@ -329,7 +329,6 @@ export interface MappedQueueEntry {
   priority: Concept;
   priorityComment: string;
   status: Concept;
-  visitStartDateTime: string;
   visitType: string;
   visitUuid: string;
   waitTime: string;

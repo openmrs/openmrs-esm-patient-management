@@ -40,7 +40,6 @@ export interface MappedVisitQueueEntry {
   endedAt: Date;
   visitType: string;
   visitUuid: string;
-  visitLocation: string;
   visitTypeUuid: string;
   queueUuid: string;
   queueEntryUuid: string;
@@ -117,7 +116,6 @@ export const mapVisitQueueEntryProperties = (
   startedAt: dayjs(queueEntry.startedAt).toDate(),
   endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  visitLocation: queueEntry.visit?.location?.uuid,
   queueLocation: (queueEntry?.queue as any)?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
