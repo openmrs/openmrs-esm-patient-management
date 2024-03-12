@@ -87,37 +87,6 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-export function useStatus() {
-  const config = useConfig();
-  const {
-    concepts: { statusConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${statusConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    statuses: data ? data?.data?.setMembers : [],
-    isLoading,
-  };
-}
-
-export function usePriority() {
-  const config = useConfig();
-  const {
-    concepts: { priorityConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${priorityConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    priorities: data ? data?.data?.setMembers : [],
-    isLoading,
-    isError: error,
-  };
-}
-
 const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
   diagnoses: encounter.diagnoses,
   encounterDatetime: encounter.encounterDatetime,

@@ -16,7 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
-import { updateQueueEntry, usePriority, useStatus, useVisitQueueEntries } from './active-visits-table.resource';
+import { updateQueueEntry, useVisitQueueEntries } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
 import { useQueues } from '../helpers/useQueues';
@@ -31,14 +31,14 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
 
   const [priority, setPriority] = useState(queueEntry?.priority?.uuid);
   const [newQueueUuid, setNewQueueUuid] = useState('');
-  const { priorities } = usePriority();
+  const priorities = queueEntry.queue.allowedPriorities;
   const config = useConfig() as ConfigObject;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueEntry?.queueLocation);
   const { queues } = useQueues(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
   const [editLocation, setEditLocation] = useState(false);
   const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
-  const { statuses } = useStatus();
+  const statuses = queueEntry.queue.allowedStatuses;
   const [queueStatus, setQueueStatus] = useState(queueEntry?.status?.uuid);
 
   const changeQueueStatus = useCallback(
