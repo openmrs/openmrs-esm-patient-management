@@ -6,7 +6,7 @@ import SelectedDateContext from './selectedDateContext';
 
 /**
  * Custom hook to fetch visits from the OpenMRS REST API.
- * This fetches all visits that started on the currently selected date and are associated with the current session location.
+ * This fetches all visits that started on *or after* the currently selected date and are associated with the current session location.
  * @returns An object containing the visits, isLoading flag, and error message.
  */
 export const useVisits = () => {
