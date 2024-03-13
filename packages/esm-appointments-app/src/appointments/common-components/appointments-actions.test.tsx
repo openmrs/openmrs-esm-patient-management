@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import AppointmentActions from './appointments-actions.component';
+import { useVisits } from '../../hooks/useVisits';
 import { type Appointment } from '../../types';
 
 const appointment: Appointment = {
@@ -48,15 +49,12 @@ const appointment: Appointment = {
   extensions: [],
 };
 
-let visits;
 jest.mock('../../hooks/useVisits', () => {
   const originalModule = jest.requireActual('../../hooks/useVisits');
 
   return {
     ...originalModule,
-    useVisits: () => ({
-      visits: visits,
-    }),
+    useVisits: jest.fn(),
   };
 });
 
@@ -83,13 +81,15 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when the patient has checked out', () => {
-    visits = [
-      {
-        patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
-        startDatetime: new Date().toISOString(),
-        stopDatetime: new Date().toISOString(),
-      },
-    ];
+    useVisits.mockImplementation(() => ({
+      visits: [
+        {
+          patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+          startDatetime: new Date().toISOString(),
+          stopDatetime: new Date().toISOString(),
+        },
+      ],
+    }));
     const props = { ...defaultProps };
     const { getByText } = render(<AppointmentActions {...props} />);
     const button = getByText('Checked out');
@@ -97,13 +97,15 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when the patient has an active visit and today is the appointment date', () => {
-    visits = [
-      {
-        patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
-        startDatetime: new Date().toISOString(),
-        stopDatetime: null,
-      },
-    ];
+    useVisits.mockImplementation(() => ({
+      visits: [
+        {
+          patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+          startDatetime: new Date().toISOString(),
+          stopDatetime: null,
+        },
+      ],
+    }));
     const props = { ...defaultProps, scheduleType: 'Scheduled' };
     const { getByText } = render(<AppointmentActions {...props} />);
     const button = getByText('Check out');
