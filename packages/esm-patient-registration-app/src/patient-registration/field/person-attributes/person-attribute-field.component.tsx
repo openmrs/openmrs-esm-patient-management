@@ -6,6 +6,7 @@ import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
 import { useTranslation } from 'react-i18next';
 import styles from '../field.scss';
+import { LocationPersonAttributeField } from './location-person-attribute-field.component';
 
 export interface PersonAttributeFieldProps {
   fieldDefinition: FieldDefinition;
@@ -39,6 +40,16 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
             id={fieldDefinition?.id}
             customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
             required={fieldDefinition.validation?.required ?? false}
+          />
+        );
+      case 'org.openmrs.Location':
+        return (
+          <LocationPersonAttributeField
+            personAttributeType={personAttributeType}
+            // answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
+            label={fieldDefinition.label}
+            id={fieldDefinition?.id}
+            // customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
           />
         );
       default:
