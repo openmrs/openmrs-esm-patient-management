@@ -60,6 +60,10 @@ export interface RegistrationConfig {
     };
     phone: {
       personAttributeUuid: string;
+      validation?: {
+        required: boolean;
+        matches?: string;
+      };
     };
   };
   links: {
@@ -311,6 +315,14 @@ export const esmPatientRegistrationSchema = {
         _type: Type.UUID,
         _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
         _description: 'The UUID of the phone number person attribute type',
+      },
+      validation: {
+        required: { _type: Type.Boolean, _default: false },
+        matches: {
+          _type: Type.String,
+          _default: null,
+          _description: 'Optional RegEx for testing the validity of the input.',
+        },
       },
     },
   },
