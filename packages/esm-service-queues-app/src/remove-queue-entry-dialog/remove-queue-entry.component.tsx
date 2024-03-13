@@ -32,7 +32,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
     const endedAt = new Date();
 
     voidQueueEntry(
-      queueEntry.queueUuid,
+      queueEntry.queue.uuid,
       queueEntry.queueEntryUuid,
       endedAt,
       endCurrentVisitPayload,

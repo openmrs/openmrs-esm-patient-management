@@ -1,10 +1,10 @@
 import { Tag } from '@carbon/react';
 import React from 'react';
 import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
+import QueuePriority from '../../queue-entry-table-components/queue-priority.component';
 
-// TODO: color code the Tag based on priority
 export const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-  return <Tag>{queueEntry.priority.display}</Tag>;
+  return <QueuePriority priority={queueEntry.priority} priorityComment={queueEntry.priorityComment} />;
 };
 
 export const queueTablePriorityColumn: QueueTableColumn = {
