@@ -4,7 +4,6 @@ import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 
 import { type ConfigObject } from '../config-schema';
 import { useConfig } from '@openmrs/esm-framework';
-import { useVisits } from '../hooks/useVisits';
 import ScheduledAppointments from './scheduled/scheduled-appointments.component';
 import UnscheduledAppointments from './unscheduled/unscheduled-appointments.component';
 import styles from './appointment-tabs.scss';
@@ -16,9 +15,6 @@ interface AppointmentTabsProps {
 const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-
-  const { isLoading = false, visits = [], mutateVisit } = useVisits();
-
   const { showUnscheduledAppointmentsTab } = useConfig<ConfigObject>();
 
   const handleTabChange = ({ selectedIndex }: { selectedIndex: number }) => {
@@ -35,7 +31,7 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabList>
           <TabPanels>
             <TabPanel className={styles.tabPanel}>
-              <ScheduledAppointments {...{ visits, isLoading, appointmentServiceType, mutateVisit }} />
+              <ScheduledAppointments appointmentServiceType={appointmentServiceType} />
             </TabPanel>
             <TabPanel className={styles.tabPanel}>
               <UnscheduledAppointments />
@@ -43,7 +39,7 @@ const AppointmentTabs: React.FC<AppointmentTabsProps> = ({ appointmentServiceTyp
           </TabPanels>
         </Tabs>
       ) : (
-        <ScheduledAppointments {...{ visits, isLoading, appointmentServiceType, mutateVisit }} />
+        <ScheduledAppointments appointmentServiceType={appointmentServiceType} />
       )}
     </div>
   );

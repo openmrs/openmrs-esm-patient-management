@@ -16,14 +16,13 @@ dayjs.extend(utc);
 dayjs.extend(isToday);
 
 interface AppointmentActionsProps {
-  visits: Array<any>;
   appointment: Appointment;
   scheduleType: string;
 }
 
-const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appointment }) => {
+const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { mutateVisit } = useVisits();
+  const { visits, mutateVisit } = useVisits();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
   const isFutureAppointment = visitDate.isAfter(dayjs());

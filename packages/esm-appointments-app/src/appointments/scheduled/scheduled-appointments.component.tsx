@@ -16,8 +16,6 @@ import SelectedDateContext from '../../hooks/selectedDateContext';
 dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
-  visits: Array<any>;
-  isLoading: boolean;
   appointmentServiceType?: string;
 }
 
