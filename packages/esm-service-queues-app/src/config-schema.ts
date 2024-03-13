@@ -97,7 +97,7 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
@@ -134,7 +134,7 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: `${restBaseUrl}/kenyaemr/default-facility`,
+    _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   customPatientChartText: {
