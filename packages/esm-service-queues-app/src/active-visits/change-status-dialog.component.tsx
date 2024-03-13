@@ -218,7 +218,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               <>
                 {isSubmitting ? (
                   <div className={styles.inline}>
-                    <Loading withOverlay={false} small className={styles.loading} /> Submitting...
+ <InlineLoading status="active" iconDescription={t('submitting','Submitting')} description={t('submitting','Submitting...')} />
                   </div>
                 ) : (
                   t('moveToNextService', 'Move to next service')
