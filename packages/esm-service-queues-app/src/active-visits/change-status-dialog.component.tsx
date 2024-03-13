@@ -12,7 +12,7 @@ import {
   InlineNotification,
   RadioButton,
   RadioButtonGroup,
-  Loading,
+InlineLoading
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
