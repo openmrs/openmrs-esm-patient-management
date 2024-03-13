@@ -32,5 +32,10 @@ section {
 }
 
 .inline {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  margin-right: 5px;
 }
