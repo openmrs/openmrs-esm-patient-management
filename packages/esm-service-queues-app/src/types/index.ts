@@ -17,6 +17,7 @@ export interface Attribute {
   uuid: string;
   value: string | number;
 }
+
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
@@ -76,6 +77,7 @@ export interface Note {
   };
   time: string;
 }
+
 export interface Order {
   uuid: string;
   dateActivated: string;
@@ -230,6 +232,7 @@ export interface FormattedEncounter {
 
 export interface ObsMetaInfo {
   [_: string]: any;
+
   assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
 }
 
@@ -242,6 +245,7 @@ export type OBSERVATION_INTERPRETATION =
   | 'CRITICALLY_LOW'
   | 'OFF_SCALE_LOW'
   | '--';
+
 export interface PatientProgram {
   uuid: string;
   display: string;
@@ -263,6 +267,7 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
 export interface QueueEntryPayload {
   visit: { uuid: string };
   queueEntry: {
@@ -302,6 +307,7 @@ export enum FilterTypes {
   SHOW,
   HIDE,
 }
+
 export interface Provider {
   uuid: string;
   display: string;
@@ -319,17 +325,13 @@ export interface MappedQueueEntry {
   patientSex: string;
   patientDob: string;
   patientUuid: string;
-  priority: string;
+  queue: Queue;
+  priority: Concept;
   priorityComment: string;
-  priorityUuid: string;
-  service: string;
-  status: string;
-  statusUuid: string;
-  visitStartDateTime: string;
+  status: Concept;
   visitType: string;
   visitUuid: string;
   waitTime: string;
-  queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
   sortWeight: string;
@@ -360,6 +362,7 @@ export interface LocationResponse {
 export interface LocationEntry {
   resource: Resource;
 }
+
 export interface Resource {
   id: string;
   name: string;
@@ -445,6 +448,8 @@ export interface Queue {
   display: string;
   name: string;
   description: string;
+  location: Location;
+  service: Concept;
   allowedPriorities: Array<Concept>;
   allowedStatuses: Array<Concept>;
 }
@@ -478,7 +483,9 @@ export interface QueueEntrySearchCriteria {
 // They should be common enough to move to esm-core
 
 export interface Concept extends OpenmrsResource {}
+
 export interface Provider extends OpenmrsResource {}
+
 export interface PatientIdentifierType extends OpenmrsResource {}
 
 export interface Person {
@@ -546,6 +553,7 @@ export interface Patient {
   identifiers: PatientIdentifier[];
   person: Person;
 }
+
 export interface PatientIdentifier {
   uuid: string;
   display: string;

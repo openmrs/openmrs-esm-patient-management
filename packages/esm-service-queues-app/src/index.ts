@@ -9,6 +9,7 @@ import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
 import rootComponent from './root.component';
+import queueTableByStatusMenuComponent from './queue-table/queue-table-by-status-menu.component';
 import appointmentListComponent from './queue-patient-linelists/scheduled-appointments-table.component';
 import queueListComponent from './queue-patient-linelists/queue-services-table.component';
 import outpatientSideNavComponent from './side-menu/side-menu.component';
@@ -27,6 +28,8 @@ const options = {
 };
 
 export const root = getSyncLifecycle(rootComponent, options);
+
+export const queueTableByStatusMenu = getSyncLifecycle(queueTableByStatusMenuComponent, options);
 
 export const appointmentsList = getSyncLifecycle(appointmentListComponent, options);
 

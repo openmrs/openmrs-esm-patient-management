@@ -9,8 +9,6 @@ import {
   navigate,
   parseDate,
   showSnackbar,
-  toDateObjectStrict,
-  toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
 import {
@@ -59,14 +57,14 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       queueEntry?.queueUuid,
       queueEntry?.queueEntryUuid,
       queueEntry?.patientUuid,
-      queueEntry?.priorityUuid,
+      queueEntry?.priority?.uuid,
       defaultTransitionStatus,
       endedAt,
       queueEntry?.sortWeight,
     ).then(
       ({ status }) => {
         if (status === 201) {
-          serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
+          serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
             if (status === 200) {
               showSnackbar({
                 isLowContrast: true,

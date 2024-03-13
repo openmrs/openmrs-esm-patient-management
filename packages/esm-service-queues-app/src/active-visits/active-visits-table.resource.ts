@@ -9,18 +9,14 @@ import {
   formatDate,
   openmrsFetch,
   parseDate,
+  restBaseUrl,
   useConfig,
   type Visit,
-  restBaseUrl,
 } from '@openmrs/esm-framework';
-import { type QueueEntry, type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
 
-export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
-export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
-export type QueueService = 'Clinical consultation' | 'Triage';
-export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 dayjs.extend(isToday);
 
 export interface VisitQueueEntry {
@@ -34,21 +30,17 @@ export interface MappedVisitQueueEntry {
   encounters: Array<MappedEncounter>;
   name: string;
   patientAge: string;
-  patientSex: string;
   patientDob: string;
   patientUuid: string;
-  priority: MappedQueuePriority;
+  queue: Queue;
+  priority: Concept;
   priorityComment: string;
-  priorityUuid: string;
-  service: string;
-  status: QueueStatus;
-  statusUuid: string;
-  visitStartDateTime: string;
+  status: Concept;
+  startedAt: Date;
+  endedAt: Date;
   visitType: string;
   visitUuid: string;
-  visitLocation: string;
   visitTypeUuid: string;
-  waitTime: string;
   queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
@@ -95,37 +87,6 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-export function useStatus() {
-  const config = useConfig();
-  const {
-    concepts: { statusConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${statusConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    statuses: data ? data?.data?.setMembers : [],
-    isLoading,
-  };
-}
-
-export function usePriority() {
-  const config = useConfig();
-  const {
-    concepts: { priorityConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${priorityConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    priorities: data ? data?.data?.setMembers : [],
-    isLoading,
-    isError: error,
-  };
-}
-
 const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
   diagnoses: encounter.diagnoses,
   encounterDatetime: encounter.encounterDatetime,
@@ -145,22 +106,16 @@ export const mapVisitQueueEntryProperties = (
   name: queueEntry.display,
   patientUuid: queueEntry.patient.uuid,
   patientAge: queueEntry.patient.person?.age + '',
-  patientSex: queueEntry.patient.person?.gender === 'M' ? 'MALE' : 'FEMALE',
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
-  // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
-  // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
-  priority: queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display,
+  queue: queueEntry.queue,
+  priority: queueEntry.priority,
   priorityComment: queueEntry.priorityComment,
-  priorityUuid: queueEntry.priority.uuid,
-  service: queueEntry.queue.name,
-  status: queueEntry.status.display as QueueStatus,
-  statusUuid: queueEntry.status.uuid,
-  waitTime: queueEntry.startedAt ? `${dayjs().diff(dayjs(queueEntry.startedAt), 'minutes')}` : '--',
-  visitStartDateTime: queueEntry.startedAt,
+  status: queueEntry.status,
+  startedAt: dayjs(queueEntry.startedAt).toDate(),
+  endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  visitLocation: queueEntry.visit?.location?.uuid,
   queueLocation: (queueEntry?.queue as any)?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
