@@ -12,7 +12,7 @@ import {
   InlineNotification,
   RadioButton,
   RadioButtonGroup,
-InlineLoading
+  InlineLoading,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -218,7 +218,11 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
               <>
                 {isSubmitting ? (
                   <div className={styles.inline}>
- <InlineLoading status="active" iconDescription={t('submitting','Submitting')} description={t('submitting','Submitting...')} />
+                    <InlineLoading
+                      status="active"
+                      iconDescription={t('submitting', 'Submitting')}
+                      description={t('submitting', 'Submitting...')}
+                    />
                   </div>
                 ) : (
                   t('moveToNextService', 'Move to next service')
