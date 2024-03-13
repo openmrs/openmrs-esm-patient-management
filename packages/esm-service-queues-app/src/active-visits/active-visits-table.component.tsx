@@ -331,7 +331,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                       setShowOverlay(true);
                       setView(SearchTypes.SCHEDULED_VISITS);
                       setViewState({ selectedPatientUuid });
-                      setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
+                      setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                     },
                   }}
                 />
@@ -507,7 +507,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                     setShowOverlay(true);
                     setView(SearchTypes.SCHEDULED_VISITS);
                     setViewState({ selectedPatientUuid });
-                    setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
+                    setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                   },
                 }}
               />
@@ -533,7 +533,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                   setShowOverlay(true);
                   setView(SearchTypes.SCHEDULED_VISITS);
                   setViewState({ selectedPatientUuid });
-                  setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
+                  setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                 },
               }}
             />
