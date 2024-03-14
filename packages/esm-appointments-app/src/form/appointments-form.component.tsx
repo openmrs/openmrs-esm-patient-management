@@ -45,6 +45,7 @@ import { type ConfigObject } from '../config-schema';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import uniqBy from 'lodash-es/uniqBy';
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -318,10 +319,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  const updateLocations = [
-    ...locations,
-    { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display },
-  ];
+  const updateLocations = uniqBy(
+    [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
+    'uuid',
+  );
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
