@@ -30,7 +30,6 @@ interface ChangeStatusDialogProps {
 const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [priority, setPriority] = useState(queueEntry?.priorityUuid);
 
   const [priority, setPriority] = useState(queueEntry?.priority?.uuid);
   const [newQueueUuid, setNewQueueUuid] = useState('');
