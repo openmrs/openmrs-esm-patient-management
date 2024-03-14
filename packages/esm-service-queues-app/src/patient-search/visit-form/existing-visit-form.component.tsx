@@ -60,7 +60,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, toggleSear
             showSnackbar({
               kind: 'success',
               isLowContrast: true,
-              title: t('startAVisit', 'Start a visit'),
+              title: t('addPatientToQueue', 'Add patient to queue'),
               subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
             });
             closePanel();
