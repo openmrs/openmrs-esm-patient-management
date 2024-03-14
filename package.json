@@ -28,7 +28,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@carbon/react": "~1.37.0",
-    "@openmrs/esm-framework": "next",
+    "@openmrs/esm-framework": "^5.4.1-pre.1638",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "1.42.1",
     "@swc/core": "^1.2.165",
@@ -65,7 +65,7 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.1",
-    "openmrs": "next",
+    "openmrs": "^5.4.1-pre.1638",
     "prettier": "^3.1.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -84,8 +84,5 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "packageManager": "yarn@4.1.1",
-  "resolutions": {
-    "@openmrs/esm-styleguide": "portal:/home/brandon/Code/pih/mf/openmrs-esm-core/packages/framework/esm-styleguide"
-  }
+  "packageManager": "yarn@4.1.1"
 }
