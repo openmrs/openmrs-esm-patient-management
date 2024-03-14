@@ -147,6 +147,7 @@
   "orderIndefiniteDuration": "Indefinite duration",
   "orInProperFormat": "Or",
   "orPatientName": "OR the patient's name(s)",
+  "patientAlreadyInQueue": "Patient is already in the queue",
   "patientAttendingService": "Patient attending service",
   "patientHasActiveVisit": "The patient already has an active visit",
   "patientList": "Patient list",
