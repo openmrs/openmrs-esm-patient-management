@@ -318,6 +318,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
+  const updateLocations = [
+    ...locations,
+    { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display },
+  ];
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
@@ -337,8 +341,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   value={value}
                   ref={ref}>
                   <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
-                  {locations?.length > 0 &&
-                    locations.map((location) => (
+                  {updateLocations?.length > 0 &&
+                    updateLocations.map((location) => (
                       <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                         {location.display}
                       </SelectItem>
