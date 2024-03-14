@@ -90,6 +90,30 @@ export const configSchema = {
     _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
     _default: true,
   },
+  checkInButton: {
+    enabled: {
+      _type: Type.Boolean,
+      _description: 'Whether the check-in button on the "Appointments" list should be enabled',
+      _default: true,
+    },
+    customUrl: {
+      _type: Type.String,
+      _description: 'Custom URL to open when clicking the check-in button (instead of thes start visit form)',
+      _default: '',
+    },
+  },
+  checkOutButton: {
+    enabled: {
+      _type: Type.Boolean,
+      _description: 'Whether the check-out button on the "Appointments" list should be disabled',
+      _default: true,
+    },
+    customUrl: {
+      _type: Type.String,
+      _description: 'Custom URL to open when clicking the check-out button',
+      _default: '',
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -110,4 +134,12 @@ export interface ConfigObject {
   patientIdentifierType: string;
   showUnscheduledAppointmentsTab: boolean;
   allowAllDayAppointments: boolean;
+  checkInButton: {
+    enabled: boolean;
+    customUrl: string;
+  };
+  checkOutButton: {
+    enabled: boolean;
+    customUrl: string;
+  };
 }
