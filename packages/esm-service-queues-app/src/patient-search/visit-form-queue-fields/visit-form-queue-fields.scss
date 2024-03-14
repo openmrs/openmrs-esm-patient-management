@@ -1,5 +1,7 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/styles/scss/spacing';
+
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .sectionTitle {
@@ -9,7 +11,7 @@
 }
 
 .section {
-  margin: layout.$spacing-03;
+  margin: spacing.$spacing-02 spacing.$spacing-05 0;
 }
 
 .sectionHidden {
