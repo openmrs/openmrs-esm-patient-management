@@ -12,9 +12,10 @@ interface BaseVisitTypeProps {
   onChange: (event) => void;
   patientUuid: string;
   visitTypes: Array<VisitType>;
+  enableSearch?: boolean;
 }
 
-const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) => {
+const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes, enableSearch = false }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -39,7 +40,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
         [styles.tablet]: isTablet,
         [styles.desktop]: !isTablet,
       })}>
-      {results.length ? (
+      {enableSearch && (
         <>
           {isTablet ? (
             <Layer>
@@ -56,19 +57,21 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
               labelText=""
             />
           )}
-
-          <RadioButtonGroup
-            className={styles.radioButtonGroup}
-            defaultSelected={defaultVisitType}
-            orientation="vertical"
-            onChange={onChange}
-            name="radio-button-group"
-            valueSelected={results?.length >= 1 && results[0].uuid}>
-            {results.map(({ uuid, display, name }) => (
-              <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-            ))}
-          </RadioButtonGroup>
         </>
+      )}
+
+      {results.length ? (
+        <RadioButtonGroup
+          className={styles.radioButtonGroup}
+          defaultSelected={defaultVisitType}
+          orientation="vertical"
+          onChange={onChange}
+          name="radio-button-group"
+          valueSelected={results?.length >= 1 && results[0].uuid}>
+          {results.map(({ uuid, display, name }) => (
+            <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+          ))}
+        </RadioButtonGroup>
       ) : (
         <Layer>
           <Tile className={styles.tile}>
