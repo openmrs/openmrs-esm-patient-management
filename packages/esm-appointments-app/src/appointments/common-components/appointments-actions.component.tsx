@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { closeOverlay, launchOverlay } from '../../hooks/useOverlay';
 import { type Appointment } from '../../types';
 import { showModal } from '@openmrs/esm-framework';
-import { useVisits } from '../../hooks/useVisits';
+import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import AppointmentForm from '../../form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
 
@@ -22,13 +22,13 @@ interface AppointmentActionsProps {
 
 const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { visits, mutateVisit } = useVisits();
+  const { visits, mutateVisit } = useTodaysVisits();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
   const isFutureAppointment = visitDate.isAfter(dayjs());
   const isTodayAppointment = visitDate.isToday();
-  const hasActiveVisit = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
-  const hasCheckedOut = visits?.some(
+  const hasActiveVisitToday = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
+  const hasCheckedOutToday = visits?.some(
     (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
   );
 
@@ -50,13 +50,13 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
     const checkedOutText = t('checkedOut', 'Checked out');
 
     switch (true) {
-      case hasCheckedOut:
+      case hasCheckedOutToday && isTodayAppointment:
         return (
           <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
             {checkedOutText}
           </Button>
         );
-      case hasActiveVisit && isTodayAppointment:
+      case hasActiveVisitToday && isTodayAppointment:
         return (
           <Button onClick={handleCheckout} size="sm" kind="danger--tertiary">
             {t('checkOut', 'Check out')}
@@ -74,7 +74,7 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
-      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisit)) ? (
+      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday)) ? (
         <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
           <OverflowMenuItem
             itemText={t('editAppointments', 'Edit Appointment')}

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import AppointmentActions from './appointments-actions.component';
-import { useVisits } from '../../hooks/useVisits';
+import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 
 const appointment: Appointment = {
@@ -49,12 +49,12 @@ const appointment: Appointment = {
   extensions: [],
 };
 
-jest.mock('../../hooks/useVisits', () => {
-  const originalModule = jest.requireActual('../../hooks/useVisits');
+jest.mock('../../hooks/useTodaysVisits', () => {
+  const originalModule = jest.requireActual('../../hooks/useTodaysVisits');
 
   return {
     ...originalModule,
-    useVisits: jest.fn(),
+    useTodaysVisits: jest.fn(),
   };
 });
 
@@ -81,7 +81,7 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when the patient has checked out', () => {
-    useVisits.mockImplementation(() => ({
+    useTodaysVisits.mockImplementation(() => ({
       visits: [
         {
           patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -97,7 +97,7 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when the patient has an active visit and today is the appointment date', () => {
-    useVisits.mockImplementation(() => ({
+    useTodaysVisits.mockImplementation(() => ({
       visits: [
         {
           patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -113,6 +113,9 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
+    useTodaysVisits.mockImplementation(() => ({
+      visits: [],
+    }));
     const props = { ...defaultProps, scheduleType: 'Pending' };
     render(<AppointmentActions {...props} />);
     const button = screen.getByRole('button', { name: /check out/i });
@@ -120,6 +123,9 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
+    useTodaysVisits.mockImplementation(() => ({
+      visits: [],
+    }));
     const props = { ...defaultProps, scheduleType: 'Confirmed' };
     render(<AppointmentActions {...props} />);
     const button = screen.getByRole('button', { name: /check out/i });
