@@ -7,10 +7,11 @@ import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { closeOverlay, launchOverlay } from '../../hooks/useOverlay';
 import { type Appointment } from '../../types';
-import { showModal, useConfig } from '@openmrs/esm-framework';
+import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import AppointmentForm from '../../form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
+import { type ConfigObject } from '../../config-schema';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -22,7 +23,7 @@ interface AppointmentActionsProps {
 
 const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { checkInButton, checkOutButton } = useConfig();
+  const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
   const { visits, mutateVisit } = useTodaysVisits();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
@@ -34,13 +35,17 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
   );
 
   const handleCheckout = () => {
-    const dispose = showModal('end-visit-dialog', {
-      closeModal: () => {
-        mutateVisit();
-        dispose();
-      },
-      patientUuid,
-    });
+    if (checkOutButton.customUrl) {
+      navigate({ to: checkOutButton.customUrl, templateParams: { patientUuid, appointmentUuid: appointment.uuid } });
+    } else {
+      const dispose = showModal('end-visit-dialog', {
+        closeModal: () => {
+          mutateVisit();
+          dispose();
+        },
+        patientUuid,
+      });
+    }
   };
 
   /**
