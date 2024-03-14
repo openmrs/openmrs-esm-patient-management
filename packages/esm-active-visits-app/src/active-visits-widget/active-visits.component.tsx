@@ -232,9 +232,11 @@ const ActiveVisitsTable = () => {
 
                     return (
                       <React.Fragment key={`active-visit-row-${index}`}>
-                        <TableExpandRow {...getRowProps({ row })}>
+                        <TableExpandRow
+                          {...getRowProps({ row })}
+                          data-testid={`activeVisitRow${currentVisit.patientUuid || 'unknown'}`}>
                           {row.cells.map((cell) => (
-                            <TableCell key={`active-visit-row-${index}-cell-${cell.id}`}>
+                            <TableCell key={`active-visit-row-${index}-cell-${cell.id}`} data-testid={cell.id}>
                               {cell.info.header === 'name' && currentVisit.patientUuid ? (
                                 <ConfigurableLink
                                   to={patientChartUrl}
