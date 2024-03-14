@@ -1,44 +1,39 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { usePagination } from '@openmrs/esm-framework';
-import { useActiveVisits } from './active-visits.resource';
+import { useConfig, usePagination } from '@openmrs/esm-framework';
 import ActiveVisitsTable from './active-visits.component';
+import { useActiveVisits } from './active-visits.resource';
 
-const mockedUsePagination = usePagination as jest.Mock;
-const mockActiveVisits = useActiveVisits as jest.Mock;
-
-const mockActiveVisitsData = [{ id: '1', name: 'John Doe', visitType: 'Checkup', patientUuid: 'uuid1' }];
+const mockUseActiveVisits = useActiveVisits as jest.Mock;
 
 jest.mock('./active-visits.resource', () => ({
   ...jest.requireActual('./active-visits.resource'),
-  useActiveVisits: jest.fn(() => ({
-    activeVisits: mockActiveVisitsData,
-    isLoading: false,
-    isValidating: false,
-    error: null,
-  })),
+  useActiveVisits: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  ErrorState: jest.fn(() => (
-    <div>
-      Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site
-      administrator and quote the error code above.
-    </div>
-  )),
-  useConfig: jest.fn(() => ({ activeVisits: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
-  usePagination: jest.fn().mockImplementation((data) => ({
-    currentPage: 1,
-    goTo: () => {},
-    results: data,
-    paginated: false,
-  })),
-}));
+const mockUseConfig = useConfig as jest.Mock;
+const mockUsePagination = usePagination as jest.Mock;
 
 describe('ActiveVisitsTable', () => {
+  beforeEach(() => {
+    mockUseActiveVisits.mockReset();
+    mockUseConfig.mockImplementation(() => ({ activeVisits: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
+      mockUsePagination.mockImplementation((data) => ({
+        currentPage: 1,
+        goTo: () => {},
+        results: data,
+        paginated: false,
+      }));
+  });
+
   it('renders data table with active visits', () => {
+    mockUseActiveVisits.mockImplementation(() => ({
+      activeVisits: [{ id: '1', name: 'John Doe', visitType: 'Checkup', patientUuid: 'uuid1' }],
+      isLoading: false,
+      isValidating: false,
+      error: null,
+    }));
     render(<ActiveVisitsTable />);
 
     expect(screen.getByText('Visit Time')).toBeInTheDocument();
@@ -56,7 +51,7 @@ describe('ActiveVisitsTable', () => {
   it('filters active visits based on search input', async () => {
     const user = userEvent.setup();
 
-    mockActiveVisits.mockImplementationOnce(() => ({
+    mockUseActiveVisits.mockImplementation(() => ({
       activeVisits: [
         { id: '1', name: 'John Doe', visitType: 'Checkup', patientUuid: 'uuid1' },
         { id: '2', name: 'Some One', visitType: 'Checkup', patientUuid: 'uuid2' },
@@ -76,7 +71,7 @@ describe('ActiveVisitsTable', () => {
   });
 
   it('displays empty state when there are no active visits', () => {
-    mockActiveVisits.mockImplementationOnce(() => ({
+    mockUseActiveVisits.mockImplementation(() => ({
       activeVisits: [],
       isLoading: false,
       isValidating: false,
@@ -89,7 +84,7 @@ describe('ActiveVisitsTable', () => {
   });
 
   it('should not display the table when the data is loading', () => {
-    mockActiveVisits.mockImplementationOnce(() => ({
+    mockUseActiveVisits.mockImplementation(() => ({
       activeVisits: undefined,
       isLoading: true,
       isValidating: false,
@@ -105,7 +100,7 @@ describe('ActiveVisitsTable', () => {
   });
 
   it('should display the error state when there is error', () => {
-    mockActiveVisits.mockImplementationOnce(() => ({
+    mockUseActiveVisits.mockImplementation(() => ({
       activeVisits: undefined,
       isLoading: false,
       isValidating: false,
@@ -114,12 +109,12 @@ describe('ActiveVisitsTable', () => {
 
     render(<ActiveVisitsTable />);
 
-    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
+    expect(screen.getByText(/Error State/i)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   it('should display the pagination when pagination is true', () => {
-    mockActiveVisits.mockImplementationOnce(() => ({
+    mockUseActiveVisits.mockImplementation(() => ({
       activeVisits: [
         { id: '1', name: 'John Doe', visitType: 'Checkup' },
         { id: '2', name: 'Some One', visitType: 'Checkup' },
@@ -128,7 +123,7 @@ describe('ActiveVisitsTable', () => {
       isValidating: false,
       error: null,
     }));
-    mockedUsePagination.mockImplementationOnce((data) => ({
+    mockUsePagination.mockImplementation((data) => ({
       currentPage: 1,
       goTo: () => {},
       results: data,
