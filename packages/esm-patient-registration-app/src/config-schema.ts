@@ -69,9 +69,6 @@ export interface RegistrationConfig {
   links: {
     submitButton: string;
   };
-  concepts: {
-    patientPhotoUuid: string;
-  };
   defaultPatientIdentifierTypes: Array<string>;
   registrationObs: {
     encounterTypeUuid: string | null;
@@ -331,12 +328,6 @@ export const esmPatientRegistrationSchema = {
       _type: Type.String,
       _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
-    },
-  },
-  concepts: {
-    patientPhotoUuid: {
-      _type: Type.ConceptUuid,
-      _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
   defaultPatientIdentifierTypes: {
