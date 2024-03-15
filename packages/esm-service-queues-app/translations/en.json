@@ -246,6 +246,7 @@
   "startVisitError": "Error starting visit",
   "startVisitQueueSuccessfully": "Patient has been added to active visits list and queue.",
   "status": "Status",
+  "submitting": "Submitting...",
   "success": "Success",
   "tcaDate": "Tca date",
   "temperature": "Temperature",

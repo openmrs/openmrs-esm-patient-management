@@ -12,6 +12,7 @@ import {
   InlineNotification,
   RadioButton,
   RadioButtonGroup,
+  InlineLoading,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type ConfigObject, navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -28,6 +29,7 @@ interface ChangeStatusDialogProps {
 
 const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [priority, setPriority] = useState(queueEntry?.priority?.uuid);
   const [newQueueUuid, setNewQueueUuid] = useState('');
@@ -44,6 +46,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
   const changeQueueStatus = useCallback(
     (event) => {
       event.preventDefault();
+      setIsSubmitting(true);
       const defaultPriority = config.concepts.defaultPriorityConceptUuid;
       setEditLocation(false);
       const queuePriority = priority === '' ? defaultPriority : priority;
@@ -71,10 +74,12 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             });
             closeModal();
             mutate();
+            setIsSubmitting(false);
             navigate({ to: `${window.spaBase}/home/service-queues` });
           }
         },
         (error) => {
+          setIsSubmitting(false);
           showSnackbar({
             title: t('queueEntryStatusUpdateFailed', 'Error updating queue entry status'),
             kind: 'error',
@@ -208,7 +213,21 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             <Button kind="secondary" onClick={closeModal}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button type="submit">{t('moveToNextService', 'Move to next service')}</Button>
+            <Button disabled={isSubmitting} type="submit">
+              <>
+                {isSubmitting ? (
+                  <div className={styles.inline}>
+                    <InlineLoading
+                      status="active"
+                      iconDescription={t('submitting', 'Submitting')}
+                      description={t('submitting', 'Submitting...')}
+                    />
+                  </div>
+                ) : (
+                  t('moveToNextService', 'Move to next service')
+                )}
+              </>
+            </Button>
           </ModalFooter>
         </Form>
       </div>
