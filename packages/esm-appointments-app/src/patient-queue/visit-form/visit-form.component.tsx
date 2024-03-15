@@ -39,7 +39,7 @@ import { closeOverlay } from '../../hooks/useOverlay';
 import { saveQueueEntry } from './queue.resource';
 import { type Appointment } from '../../types';
 import { useDefaultLoginLocation } from '../../hooks/useDefaultLocation';
-import { useVisits } from '../../hooks/useVisits';
+import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import styles from './visit-form.scss';
 import { appointmentLocationTagName } from '../../constants';
 import SelectedDateContext from '../../hooks/selectedDateContext';
@@ -66,7 +66,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, appointment }) => {
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const { mutateAppointments } = useMutateAppointments();
-  const { mutateVisit } = useVisits();
+  const { mutateVisit } = useTodaysVisits();
   const { isLoading, patient } = usePatient(patientUuid);
   const config = useConfig();
   const visitQueueNumberAttributeUuid = config.concepts.visitQueueNumberAttributeUuid;
