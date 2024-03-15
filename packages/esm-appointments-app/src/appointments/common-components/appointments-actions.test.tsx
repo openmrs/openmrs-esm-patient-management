@@ -115,14 +115,14 @@ describe('AppointmentActions', () => {
   it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
     const props = { ...defaultProps, scheduleType: 'Pending' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: /actions/i });
+    const button = screen.getByRole('button', { name: /check out/i });
     expect(button).toBeInTheDocument();
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
     const props = { ...defaultProps, scheduleType: 'Confirmed' };
     render(<AppointmentActions {...props} />);
-    const button = screen.getByRole('button', { name: /actions/i });
+    const button = screen.getByRole('button', { name: /check out/i });
     expect(button).toBeInTheDocument();
   });
 });
