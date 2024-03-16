@@ -71,6 +71,8 @@ jest.mock('@openmrs/esm-framework', () => {
     openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => ({
       customPatientChartUrl: 'someUrl',
+      checkInButton: { enabled: true },
+      checkOutButton: { enabled: true },
     })),
   };
 });
