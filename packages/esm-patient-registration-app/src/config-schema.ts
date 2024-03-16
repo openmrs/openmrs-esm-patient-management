@@ -18,6 +18,7 @@ export interface FieldDefinition {
     required: boolean;
     matches?: string;
   };
+  locationTag?: string;
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
 }
@@ -153,8 +154,8 @@ export const esmPatientRegistrationSchema = {
       },
       type: {
         _type: Type.String,
-        _description: "How this field's data will be stored—a person attribute or an obs.",
-        _validators: [validators.oneOf(['person attribute', 'obs'])],
+        _description: "How this field's data will be stored—a person attribute, an obs or an address.",
+        _validators: [validators.oneOf(['person attribute', 'obs', 'address'])],
       },
       uuid: {
         _type: Type.UUID,
@@ -182,6 +183,12 @@ export const esmPatientRegistrationSchema = {
           _default: null,
           _description: 'Optional RegEx for testing the validity of the input.',
         },
+      },
+      locationTag: {
+        _type: Type.String,
+        _default: null,
+        _description:
+          'For locations questions only. A concept which has the possible responses either as answers or as set members.',
       },
       answerConceptSetUuid: {
         _type: Type.ConceptUuid,

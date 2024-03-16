@@ -46,10 +46,9 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
         return (
           <LocationPersonAttributeField
             personAttributeType={personAttributeType}
-            // answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
+            locationTag={fieldDefinition.locationTag}
             label={fieldDefinition.label}
             id={fieldDefinition?.id}
-            // customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
           />
         );
       default:
