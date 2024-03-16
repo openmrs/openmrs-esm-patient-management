@@ -28,6 +28,7 @@ import {
   useConfig,
   type ConfigObject,
 } from '@openmrs/esm-framework';
+import { ArrowLeft } from '@carbon/react/icons';
 import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
@@ -293,6 +294,16 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
 
   return (
     <div className={styles.container}>
+      <div className={styles.backButton}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          iconDescription={t('backToSearchResult', 'Back to search result')}
+          size="sm"
+          onClick={closePanel}>
+          <span>{t('backToSearchResult', 'Back to search result')}</span>
+        </Button>
+      </div>
       <ScheduledVisits
         visitType={visitType.RECENT}
         visits={appointments?.recentVisits}
