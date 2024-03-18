@@ -3,9 +3,10 @@ import { Tabs, Tab, TabPanel, TabPanels, TabList } from '@carbon/react';
 import WorkloadCard from './workload-card.component';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useCalendarDistribution } from './workload.resource';
+import { useCalendarDistribution, useMonthlyCalendarDistribution } from './workload.resource';
 import styles from './workload.scss';
 import { useAppointmentService } from '../form/appointments-form.resource';
+import MonthlyCalendarView from './monthly-view-workload/monthly-view.component';
 
 interface WorkloadProps {
   selectedService: string;
@@ -18,7 +19,11 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate })
   const { data: services } = useAppointmentService();
   const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
   const calendarWorkload = useCalendarDistribution(serviceUuid, selectedTab === 0 ? 'week' : 'month', appointmentDate);
-
+  const monthlyCalendarWorkload = useMonthlyCalendarDistribution(
+    serviceUuid,
+    selectedTab === 0 ? 'week' : 'month',
+    appointmentDate,
+  );
   return (
     <div className={styles.workLoadContainer}>
       <Tabs
@@ -36,6 +41,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate })
                 return (
                   <WorkloadCard
                     key={`${date}-${index}`}
+                    day={dayjs(date).format('ddd')}
                     date={dayjs(date).format('DD/MM')}
                     count={count}
                     isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(appointmentDate).format('DD-MM-YYYY')}
@@ -45,17 +51,13 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate })
             </div>
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
-            <div className={styles.monthlyWorkLoadCard}>
-              {calendarWorkload?.map(({ date, count }) => {
-                return (
-                  <WorkloadCard
-                    key={date}
-                    date={dayjs(date).format('DD/MM')}
-                    count={count}
-                    isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(appointmentDate).format('DD-MM-YYYY')}
-                  />
-                );
-              })}
+            <div>
+              <div>
+                <MonthlyCalendarView
+                  calendarWorkload={monthlyCalendarWorkload}
+                  dateToDisplay={appointmentDate.toISOString()}
+                />
+              </div>
             </div>
           </TabPanel>
         </TabPanels>
