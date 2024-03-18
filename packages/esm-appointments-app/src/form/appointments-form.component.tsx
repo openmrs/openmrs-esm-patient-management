@@ -422,7 +422,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             id="recurringToggle"
             labelB={t('yes', 'Yes')}
             labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appoinment?')}
+            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
             onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
           />
         </section>
