@@ -22,10 +22,6 @@ export const configSchema = {
     _default: [],
   },
   concepts: {
-    priorityConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
-    },
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
@@ -35,14 +31,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
       _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
-    },
-    serviceConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
-    },
-    statusConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
     },
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
@@ -109,7 +97,7 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
@@ -146,7 +134,7 @@ export const configSchema = {
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: `${restBaseUrl}/kenyaemr/default-facility`,
+    _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
   customPatientChartText: {
@@ -160,10 +148,7 @@ export interface ConfigObject {
   priorityConfigs: Array<PriorityConfig>;
   statusConfigs: Array<StatusConfig>;
   concepts: {
-    priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;
-    serviceConceptSetUuid: string;
-    statusConceptSetUuid: string;
     defaultStatusConceptUuid: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;

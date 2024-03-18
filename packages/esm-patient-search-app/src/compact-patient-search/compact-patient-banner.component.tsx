@@ -2,7 +2,14 @@ import React, { forwardRef, useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
-import { ConfigurableLink, ExtensionSlot, age, interpolateString, useConfig } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  ExtensionSlot,
+  PatientPhoto,
+  age,
+  interpolateString,
+  useConfig,
+} from '@openmrs/esm-framework';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
@@ -96,13 +103,10 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         return (
           <ClickablePatientContainer patient={patients[index]}>
             <div className={styles.patientAvatar} role="img">
-              <ExtensionSlot
-                name="patient-photo-slot"
-                state={{
-                  patientUuid: patient.id,
-                  patientName: `${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`,
-                  size: 'small',
-                }}
+              <PatientPhoto
+                patientUuid={patient.id}
+                patientName={`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`}
+                size="small"
               />
             </div>
             <div>

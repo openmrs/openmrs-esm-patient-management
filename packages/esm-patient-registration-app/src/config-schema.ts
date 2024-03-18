@@ -60,13 +60,14 @@ export interface RegistrationConfig {
     };
     phone: {
       personAttributeUuid: string;
+      validation?: {
+        required: boolean;
+        matches?: string;
+      };
     };
   };
   links: {
     submitButton: string;
-  };
-  concepts: {
-    patientPhotoUuid: string;
   };
   defaultPatientIdentifierTypes: Array<string>;
   registrationObs: {
@@ -312,6 +313,14 @@ export const esmPatientRegistrationSchema = {
         _default: '14d4f066-15f5-102d-96e4-000c29c2a5d7',
         _description: 'The UUID of the phone number person attribute type',
       },
+      validation: {
+        required: { _type: Type.Boolean, _default: false },
+        matches: {
+          _type: Type.String,
+          _default: null,
+          _description: 'Optional RegEx for testing the validity of the input.',
+        },
+      },
     },
   },
   links: {
@@ -319,12 +328,6 @@ export const esmPatientRegistrationSchema = {
       _type: Type.String,
       _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
-    },
-  },
-  concepts: {
-    patientPhotoUuid: {
-      _type: Type.ConceptUuid,
-      _default: '736e8771-e501-4615-bfa7-570c03f4bef5',
     },
   },
   defaultPatientIdentifierTypes: {

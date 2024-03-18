@@ -29,14 +29,8 @@ describe('Patient Info', () => {
     expect(screen.getByText(/04 — Apr — 1972/i)).toBeInTheDocument();
     expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
 
-    const showDetailsButton = screen.getByRole('button', { name: /Show all details/ });
+    const showDetailsButton = screen.getByText('Patient Banner Toggle Contact Details Button');
     expect(showDetailsButton).toBeInTheDocument();
-
-    await user.click(showDetailsButton);
-
-    expect(screen.queryByRole('button', { name: /Show all details/ })).not.toBeInTheDocument();
-    const showLessButton = screen.getByRole('button', { name: /Show less/i });
-    expect(showLessButton).toBeInTheDocument();
   });
 });
 

@@ -6,7 +6,7 @@ import { startOfDay } from '../constants';
 
 export function useServiceMetricsCount(service: string, location: string) {
   const status = 'Waiting';
-  const apiUrl = `${restBaseUrl}/queue-entry-metrics?service=${service}&status=${status}&location=${location}`;
+  const apiUrl = `${restBaseUrl}/queue-entry-metrics?service=${service}&status=${status}&location=${location}&isEnded=false`;
 
   const { data } = useSWRImmutable<
     {

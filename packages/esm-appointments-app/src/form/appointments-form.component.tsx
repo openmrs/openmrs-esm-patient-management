@@ -45,6 +45,7 @@ import { type ConfigObject } from '../config-schema';
 import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import uniqBy from 'lodash-es/uniqBy';
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -318,6 +319,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
+  const updateLocations = uniqBy(
+    [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
+    'uuid',
+  );
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
@@ -337,8 +342,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   value={value}
                   ref={ref}>
                   <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
-                  {locations?.length > 0 &&
-                    locations.map((location) => (
+                  {updateLocations?.length > 0 &&
+                    updateLocations.map((location) => (
                       <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                         {location.display}
                       </SelectItem>
@@ -417,7 +422,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             id="recurringToggle"
             labelB={t('yes', 'Yes')}
             labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appoinment?')}
+            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
             onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
           />
         </section>

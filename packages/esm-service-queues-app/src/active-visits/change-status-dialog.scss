@@ -30,3 +30,12 @@ section {
 .modalBody {
   padding-bottom: spacing.$spacing-05;
 }
+
+.inline {
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  margin-right: spacing.$spacing-02;
+}

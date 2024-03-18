@@ -342,17 +342,18 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               />
             </section>
           )}
+
+          <ExtensionSlot name="add-queue-entry-slot" />
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={closePanel}>
+              {t('discard', 'Discard')}
+            </Button>
+            <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+              {t('startVisit', 'Start visit')}
+            </Button>
+          </ButtonSet>
         </Stack>
-        <ExtensionSlot name="add-queue-entry-slot" />
       </div>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closePanel}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {t('startVisit', 'Start visit')}
-        </Button>
-      </ButtonSet>
     </Form>
   );
 };
