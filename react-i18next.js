@@ -33,7 +33,9 @@ const useMock = [(k) => k, {}];
 useMock.t = (key, defaultValue, options = {}) => {
   let translatedString = defaultValue;
   Object.keys(options).forEach((key) => {
-    translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
+    if (key != 'interpolation') {
+      translatedString = defaultValue.replace(`{{${key}}}`, `${options[key]}`);
+    }
   });
 
   return translatedString ?? key;

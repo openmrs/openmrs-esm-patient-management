@@ -156,7 +156,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
                     key={uuid}
                     text={
                       uuid == queueEntry.queue.uuid
-                        ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                        ? t('currentValueFormatted', '{{value}} (Current)', {
+                            value: display,
+                            interpolation: { escapeValue: false },
+                          })
                         : display
                     }
                     value={uuid}
@@ -187,7 +190,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
                       name={display}
                       labelText={
                         uuid == queueEntry.status.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: display,
+                              interpolation: { escapeValue: false },
+                            })
                           : display
                       }
                       value={uuid}
@@ -220,7 +226,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
                       name={uuid}
                       text={
                         uuid == queueEntry.priority.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: display,
+                              interpolation: { escapeValue: false },
+                            })
                           : display
                       }
                       key={uuid}
