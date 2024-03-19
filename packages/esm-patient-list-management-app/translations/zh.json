@@ -30,7 +30,7 @@
   "errorRemovingPatientFromList": "未能从列表中移除患者",
   "errorUpdatingList": "更新列表时出现错误",
   "home": "首页",
-  "identifier": "ID标识",
+  "identifier": "ID",
   "items": "项",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} 项",
   "listCreated": "列表创建成功",
