@@ -31,7 +31,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
               queueEntry,
             });
           }}>
-          {t('moveBack', 'Move Back')}
+          {t('moveBack', 'Move back')}
         </Button>
       )}
       <Button

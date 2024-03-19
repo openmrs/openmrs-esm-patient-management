@@ -19,9 +19,9 @@ const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, c
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('voidQueueEntry', 'Void Queue Entry'),
+        modalTitle: t('voidQueueEntry', 'Void queue entry'),
         modalInstruction,
-        submitButtonText: t('voidQueueEntry', 'Void Queue Entry'),
+        submitButtonText: t('voidQueueEntry', 'Void queue entry'),
         submitSuccessTitle: t('queueEntryVoidSuccessful', 'Queue entry voided successfully'),
         submitSuccessText: t('queueEntryVoidSuccessful', 'Queue entry voided successfully'),
         submitFailureTitle: t('queueEntryVoidFailed', 'Error voiding queue entry'),

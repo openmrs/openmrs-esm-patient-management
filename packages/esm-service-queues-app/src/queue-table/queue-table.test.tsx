@@ -49,6 +49,13 @@ describe('QueueTable: ', () => {
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
+
+      // has either a "Move back" or "Void" link, depending on whether it has a previous queue entry or not
+      if (entry.previousQueueEntry == null) {
+        expect(within(row).getByText('Void')).toBeInTheDocument();
+      } else {
+        expect(within(row).getByText('Move back')).toBeInTheDocument();
+      }
     }
   });
 });
