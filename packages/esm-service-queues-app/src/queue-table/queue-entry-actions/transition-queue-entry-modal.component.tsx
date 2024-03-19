@@ -15,7 +15,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     <QueueEntryActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
-      formParams={{
+      modalParams={{
         modalTitle: t('transitionPatient', 'Transition patient'),
         modalInstruction: t(
           'transitionPatientStatusOrQueue',

@@ -89,6 +89,14 @@
     {
       "name": "edit-queue-entry-modal",
       "component": "editQueueEntryModal"
-    } 
+    },
+    {
+      "name": "undo-transition-queue-entry-modal",
+      "component": "undoTransitionQueueEntryModal"
+    },
+    {
+      "name": "void-queue-entry-modal",
+      "component": "voidQueueEntryModal"
+    }
   ]
 }
