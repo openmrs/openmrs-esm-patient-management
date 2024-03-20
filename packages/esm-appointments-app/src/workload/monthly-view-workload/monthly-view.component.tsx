@@ -13,14 +13,13 @@ interface MonthlyCalendarViewProps {
   onDateClick?: (pickedDate: Date) => void;
 }
 const monthFormat = 'MMMM, YYYY';
-const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
   dateToDisplay = '',
   onDateClick,
 }) => {
   const { selectedDate } = useContext(SelectedDateContext);
-
+  const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
   const handleClick = (date: string) => {
     const parsedDate = new Date(date);
