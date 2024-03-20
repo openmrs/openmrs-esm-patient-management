@@ -38,7 +38,16 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   const futureAppointments = appointmentsData?.upcomingAppointments?.length
     ? appointmentsData?.upcomingAppointments
     : [];
-  const appointments = todaysAppointments.concat(futureAppointments);
+
+  // Filter out checked in appointments
+  const appointments = todaysAppointments
+    .concat(futureAppointments)
+    .filter((appointment) => appointment.status !== 'CheckedIn');
+
+  // If there is only one appointment, select it by default
+  if (appointments?.length === 1) {
+    setUpcomingAppointment(appointments[0]);
+  }
 
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
