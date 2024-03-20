@@ -1,14 +1,14 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .metricsContainer {
   display: flex;
   justify-content: space-between;
   background-color: $ui-02;
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   align-items: center;
-  padding: 0 spacing.$spacing-05;
+  padding: 0 layout.$spacing-05;
 }
 
 .metricsTitle {
@@ -20,6 +20,7 @@
   display: flex;
   column-gap: 0.5rem;
 }
-.comboBtn{
+
+.comboBtn {
   cursor: default;
 }
