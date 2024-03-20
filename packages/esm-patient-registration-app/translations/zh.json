@@ -45,7 +45,7 @@
   "givenNameLabelText": "名字",
   "givenNameRequired": "名字是必填项",
   "identifierValueRequired": "ID标识是必填项",
-  "idFieldLabelText": "ID标识",
+  "idFieldLabelText": "ID",
   "IDInstructions": "选择您想为该患者添加的ID标识：",
   "incompleteForm": "表单未填完",
   "invalidEmail": "需要提供一个有效的电子邮件地址",
