@@ -189,3 +189,10 @@
   background-color: white;
   padding-bottom: 1rem;
 }
+.headerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-06;
+}

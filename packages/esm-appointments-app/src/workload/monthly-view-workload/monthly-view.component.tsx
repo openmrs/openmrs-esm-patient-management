@@ -10,29 +10,41 @@ import MonthlyWorkloadCard from './monthlyWorkCard';
 interface MonthlyCalendarViewProps {
   calendarWorkload: Array<{ count: number; date: string }>;
   dateToDisplay?: string;
+  onDateClick?: (pickedDate: Date) => void;
 }
+const monthFormat = 'MMMM, YYYY';
 const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ calendarWorkload, dateToDisplay = '' }) => {
-  const { selectedDate, setSelectedDate } = useContext(SelectedDateContext);
+const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
+  calendarWorkload,
+  dateToDisplay = '',
+  onDateClick,
+}) => {
+  const { selectedDate } = useContext(SelectedDateContext);
 
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
-  const handleDivClick = (date) => {
-    setSelectedDate(date);
+  const handleClick = (date: string) => {
+    const parsedDate = new Date(date);
+    if (onDateClick) {
+      onDateClick(parsedDate);
+    }
   };
-
   const { t } = useTranslation();
-
+  const daysInWeeks = daysInWeek.map((day) => t(day));
   return (
     <div className={styles.calendarViewContainer}>
       <>
         <div className={styles.container}></div>
+        <span className={styles.headerContainer}>{dayjs(monthViewDate).format(monthFormat)}</span>
         <div className={styles.workLoadCard}>
-          {daysInWeek?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
+          {daysInWeeks?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
             {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
-              <div key={i} onClick={() => handleDivClick(dateTime)} className={styles.monthlyWorkloadCard}>
+              <div
+                onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))}
+                key={i}
+                className={styles.monthlyWorkloadCard}>
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
@@ -52,3 +64,4 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({ calendarWorkl
 };
 
 export default MonthlyCalendarView;
+//onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))} // Pass date on click

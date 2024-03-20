@@ -46,6 +46,7 @@ import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '.
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
 import uniqBy from 'lodash-es/uniqBy';
+import { useController, Control } from 'react-hook-form';
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -163,6 +164,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
     },
   });
+
+  const [pickedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const handleWorkloadDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   const handleMultiselectChange = (e) => {
     setValue(
@@ -576,8 +582,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       <DatePicker
                         datePickerType="single"
                         dateFormat={datePickerFormat}
-                        value={value.startDate}
-                        onChange={([date]) => onChange({ ...value, startDate: date })}>
+                        value={pickedDate || value.startDate}
+                        onChange={([date]) => {
+                          if (date) {
+                            onChange({ ...value, startDate: date });
+                          }
+                        }}>
                         <DatePickerInput
                           id="datePickerInput"
                           labelText={t('date', 'Date')}
@@ -604,6 +614,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               <Workload
                 selectedService={watch('selectedService')}
                 appointmentDate={watch('appointmentDateTime').startDate}
+                onWorkloadDateChange={handleWorkloadDateChange}
               />
             </ResponsiveWrapper>
           </section>

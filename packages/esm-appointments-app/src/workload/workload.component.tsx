@@ -11,9 +11,10 @@ import MonthlyCalendarView from './monthly-view-workload/monthly-view.component'
 interface WorkloadProps {
   selectedService: string;
   appointmentDate: Date;
+  onWorkloadDateChange: (pickedDate: Date) => void;
 }
 
-const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate }) => {
+const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, onWorkloadDateChange }) => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
   const { data: services } = useAppointmentService();
@@ -24,6 +25,10 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate })
     selectedTab === 0 ? 'week' : 'month',
     appointmentDate,
   );
+  const handleDateClick = (pickedDate: Date) => {
+    onWorkloadDateChange(pickedDate);
+  };
+
   return (
     <div className={styles.workLoadContainer}>
       <Tabs
@@ -56,6 +61,7 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate })
                 <MonthlyCalendarView
                   calendarWorkload={monthlyCalendarWorkload}
                   dateToDisplay={appointmentDate.toISOString()}
+                  onDateClick={handleDateClick}
                 />
               </div>
             </div>
