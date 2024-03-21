@@ -58,7 +58,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const [searchString, setSearchString] = useState('');
   const searchResults = useSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
-  const { customPatientChartUrl } = useConfig<ConfigObject>();
+  const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
 
   const headerData = [
     {
@@ -91,7 +91,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       </ConfigurableLink>
     ),
     nextAppointmentDate: '--',
-    identifier: appointment.patient.identifier,
+    identifier: patientIdentifierType
+      ? appointment.patient[patientIdentifierType.replaceAll(' ', '')] ?? appointment.patient.identifier
+      : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
     provider: appointment.provider,
