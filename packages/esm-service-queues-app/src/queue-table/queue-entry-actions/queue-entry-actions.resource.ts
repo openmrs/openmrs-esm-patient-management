@@ -62,8 +62,8 @@ interface UndoTransitionParams {
 }
 
 export function undoTransition(params: UndoTransitionParams, abortController?: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/queue-entry/undo-transition`, {
-    method: 'POST',
+  return openmrsFetch(`${restBaseUrl}/queue-entry/transition`, {
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },
