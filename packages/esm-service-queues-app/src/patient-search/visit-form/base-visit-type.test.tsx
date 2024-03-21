@@ -11,7 +11,14 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 describe('BaseVisitType', () => {
   it('renders visit types correctly', () => {
-    render(<BaseVisitType patientUuid={mockPatient.uuid} onChange={() => {}} visitTypes={mockVisitTypes} />);
+    render(
+      <BaseVisitType
+        patientUuid={mockPatient.uuid}
+        onChange={() => {}}
+        visitTypes={mockVisitTypes}
+        enableSearch={true}
+      />,
+    );
 
     const searchInput = screen.getByRole('searchbox');
     expect(searchInput).toBeInTheDocument();
@@ -25,7 +32,14 @@ describe('BaseVisitType', () => {
   it('handles search input correctly', async () => {
     const user = userEvent.setup();
 
-    render(<BaseVisitType patientUuid={mockPatient.uuid} onChange={() => {}} visitTypes={mockVisitTypes} />);
+    render(
+      <BaseVisitType
+        patientUuid={mockPatient.uuid}
+        onChange={() => {}}
+        visitTypes={mockVisitTypes}
+        enableSearch={true}
+      />,
+    );
 
     const searchInput: HTMLInputElement = screen.getByRole('searchbox');
     await user.type(searchInput, 'Visit Type 1');
@@ -37,7 +51,14 @@ describe('BaseVisitType', () => {
     const user = userEvent.setup();
 
     const mockOnChange = jest.fn();
-    render(<BaseVisitType patientUuid={mockPatient.uuid} onChange={mockOnChange} visitTypes={mockVisitTypes} />);
+    render(
+      <BaseVisitType
+        patientUuid={mockPatient.uuid}
+        onChange={() => {}}
+        visitTypes={mockVisitTypes}
+        enableSearch={true}
+      />,
+    );
 
     const radioButton: HTMLInputElement = screen.getByLabelText(mockVisitTypes[0].display);
     await user.click(radioButton);
