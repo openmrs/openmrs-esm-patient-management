@@ -31,43 +31,15 @@ const Workload: React.FC<WorkloadProps> = ({ selectedService, appointmentDate, o
 
   return (
     <div className={styles.workLoadContainer}>
-      <Tabs
-        selectedIndex={selectedTab}
-        onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
-        className={styles.tabs}>
-        <TabList style={{ paddingLeft: '1rem' }}>
-          <Tab>{t('weekly', 'Weekly')}</Tab>
-          <Tab>{t('monthly', 'Monthly')}</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel style={{ padding: 0 }}>
-            <div className={styles.workLoadCard}>
-              {calendarWorkload?.map(({ date, count }, index) => {
-                return (
-                  <WorkloadCard
-                    key={`${date}-${index}`}
-                    day={dayjs(date).format('ddd')}
-                    date={dayjs(date).format('DD/MM')}
-                    count={count}
-                    isActive={dayjs(date).format('DD-MM-YYYY') === dayjs(appointmentDate).format('DD-MM-YYYY')}
-                  />
-                );
-              })}
-            </div>
-          </TabPanel>
-          <TabPanel style={{ padding: 0 }}>
-            <div>
-              <div>
-                <MonthlyCalendarView
-                  calendarWorkload={monthlyCalendarWorkload}
-                  dateToDisplay={appointmentDate.toISOString()}
-                  onDateClick={handleDateClick}
-                />
-              </div>
-            </div>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <div>
+        <div>
+          <MonthlyCalendarView
+            calendarWorkload={monthlyCalendarWorkload}
+            dateToDisplay={appointmentDate.toISOString()}
+            onDateClick={handleDateClick}
+          />
+        </div>
+      </div>
     </div>
   );
 };
