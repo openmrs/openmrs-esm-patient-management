@@ -51,12 +51,6 @@ export function startupApp() {
   defineExtensionConfigSchema('cancelled-appointments-panel', cancelledAppointmentsPanelConfigSchema);
   defineExtensionConfigSchema('early-appointments-panel', earlyAppointmentsPanelConfigSchema);
 
-  registerWorkspace({
-    name: 'appointments-form-workspace',
-    load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
-    title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
-  });
-
   registerBreadcrumbs([
     {
       title: 'Appointments',
@@ -109,3 +103,9 @@ export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
   () => import('./patient-chart/patient-appointments-cancel-modal.component'),
   options,
 );
+
+registerWorkspace({
+  name: 'appointments-form-workspace',
+  load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
+  title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
+});
