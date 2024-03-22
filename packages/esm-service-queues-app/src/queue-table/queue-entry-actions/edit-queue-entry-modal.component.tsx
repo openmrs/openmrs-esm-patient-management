@@ -18,7 +18,7 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
     <QueueEntryActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
-      formParams={{
+      modalParams={{
         modalTitle: t('editQueueEntry', 'Edit queue entry'),
         modalInstruction: t('editQueueEntryInstruction', 'Edit fields of existing queue entry'),
         submitButtonText: t('editQueueEntry', 'Edit queue entry'),

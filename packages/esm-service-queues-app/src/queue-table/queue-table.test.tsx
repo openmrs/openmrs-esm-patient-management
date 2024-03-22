@@ -49,6 +49,13 @@ describe('QueueTable: ', () => {
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
+
+      // has either a "Undo transition" or "Delete" link, depending on whether it has a previous queue entry or not
+      if (entry.previousQueueEntry == null) {
+        expect(within(row).getByText('Delete')).toBeInTheDocument();
+      } else {
+        expect(within(row).getByText('Undo transition')).toBeInTheDocument();
+      }
     }
   });
 });

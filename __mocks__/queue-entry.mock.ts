@@ -95,6 +95,28 @@ export const mockQueueEntryBrian: QueueEntry = {
   } as Visit,
   sortWeight: 0,
   queueComingFrom: null,
+  previousQueueEntry: null,
+};
+
+export const mockPreviousQueueEntryAlice: QueueEntry = {
+  uuid: '00000000-8513-4a78-bcec-37173f417f18',
+  display: mockPatientAlice.display,
+  endedAt: '2024-01-02T00:00:00.000+0000',
+  locationWaitingFor: null,
+  patient: mockPatientAlice,
+  priority: mockPriorityNonUrgent,
+  priorityComment: null,
+  providerWaitingFor: null,
+  queue: mockQueueSurgery,
+  startedAt: '2024-01-01T00:00:00.000+0000',
+  status: mockStatusWaiting,
+  visit: {
+    uuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
+    display: 'Facility Visit @ Outpatient Clinic - 04/03/2022 07:22',
+  } as Visit,
+  sortWeight: 0,
+  queueComingFrom: mockQueueTriage,
+  previousQueueEntry: null,
 };
 
 export const mockQueueEntryAlice: QueueEntry = {
@@ -108,13 +130,14 @@ export const mockQueueEntryAlice: QueueEntry = {
   providerWaitingFor: null,
   queue: mockQueueSurgery,
   startedAt: '2024-01-02T00:00:00.000+0000',
-  status: mockStatusWaiting,
+  status: mockStatusInService,
   visit: {
     uuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
     display: 'Facility Visit @ Outpatient Clinic - 04/03/2022 07:22',
   } as Visit,
   sortWeight: 0,
   queueComingFrom: mockQueueTriage,
+  previousQueueEntry: mockPreviousQueueEntryAlice,
 };
 
 export const mockQueueEntries = [mockQueueEntryBrian, mockQueueEntryAlice];
@@ -131,7 +154,6 @@ export const mockMappedQueueEntry: MappedQueueEntry = {
   queueEntryUuid: '8824d1e4-8513-4a78-bcec-37173f417f18',
   queue: mockQueueTriage,
   status: mockStatusWaiting,
-  visitStartDateTime: '2020-02-01T00:00:00.000+0000',
   visitType: 'Facility Visit',
   visitUuid: 'b90d8438-a0db-4318-a57e-cda773b21433',
   waitTime: '12362',
