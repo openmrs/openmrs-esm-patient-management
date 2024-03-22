@@ -97,7 +97,6 @@
   "medications": "Medications",
   "missed": "Missed",
   "missingVisitType": "Missing visit type",
-  "monthly": "Monthly",
   "name": "Name",
   "no": "No",
   "noAppointmentsScheduledForTodayToDisplay": "There are no appointments scheduled for today to display for this location",
@@ -168,6 +167,5 @@
   "visitType": "Visit Type",
   "vitals": "Vitals",
   "week": "Week",
-  "weekly": "Weekly",
   "yes": "Yes"
 }
