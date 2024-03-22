@@ -44,7 +44,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     } else {
       launchOverlay(
         t('addAppointment', 'Add Appointment'),
-        <AppointmentForm context="creating" closeWorkspace={closeOverlay} />,
+        <AppointmentForm context="creating" closeWorkspace={closeOverlay} patientUuid={patientUuid} />,
       );
     }
   };
