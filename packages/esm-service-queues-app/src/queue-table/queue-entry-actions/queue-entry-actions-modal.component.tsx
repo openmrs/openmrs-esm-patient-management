@@ -46,7 +46,7 @@ interface ModalParams {
   disableSubmit: (queueEntry, formState) => boolean;
 }
 
-// Modal with form to provide the same UI for editting or transitioning a queue entry
+// Modal with a form to provide the same UI for editing or transitioning a queue entry
 export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   queueEntry,
   closeModal,

@@ -66,7 +66,7 @@ describe('VoidQueueEntryModal: ', () => {
     const user = userEvent.setup();
     renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
-    const submitButton = screen.getByRole('button', { name: /Void queue entry/ });
+    const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });
     expect(submitButton).not.toBeDisabled();
     await user.click(submitButton);
 

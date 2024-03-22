@@ -12,19 +12,19 @@ interface VoidQueueEntryModalProps {
 const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
-  const modalInstruction = <p>{t('confirmVoidQueueEntry', 'Are you sure you want to void this queue entry?')}</p>;
+  const modalInstruction = <p>{t('confirmDeleteQueueEntry', 'Are you sure you want to delete this queue entry?')}</p>;
 
   return (
     <QueueEntryUndoActionsModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{
-        modalTitle: t('voidQueueEntry', 'Void queue entry'),
+        modalTitle: t('deleteQueueEntry', 'Delete queue entry'),
         modalInstruction,
-        submitButtonText: t('voidQueueEntry', 'Void queue entry'),
-        submitSuccessTitle: t('queueEntryVoidSuccessful', 'Queue entry voided successfully'),
-        submitSuccessText: t('queueEntryVoidSuccessful', 'Queue entry voided successfully'),
-        submitFailureTitle: t('queueEntryVoidFailed', 'Error voiding queue entry'),
+        submitButtonText: t('deleteQueueEntry', 'Delete queue entry'),
+        submitSuccessTitle: t('queueEntryDeleteSuccessful', 'Queue entry deleted successfully'),
+        submitSuccessText: t('queueEntryDeleteSuccessful', 'Queue entry deleted successfully'),
+        submitFailureTitle: t('queueEntryDeleteFailed', 'Error deleting queue entry'),
         submitAction: (queueEntry) => voidQueueEntry(queueEntry.uuid),
       }}
     />
