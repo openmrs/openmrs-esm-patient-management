@@ -469,6 +469,7 @@ export interface QueueEntry {
   visit: Visit;
   sortWeight: number;
   queueComingFrom: Queue;
+  previousQueueEntry: QueueEntry;
 }
 
 export interface QueueEntrySearchCriteria {

@@ -25,7 +25,7 @@ import { TextArea } from '@carbon/react';
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
-  formParams: FormParams;
+  modalParams: ModalParams;
 }
 
 interface FormState {
@@ -35,7 +35,7 @@ interface FormState {
   prioritycomment: string;
 }
 
-interface FormParams {
+interface ModalParams {
   modalTitle: string;
   modalInstruction: string;
   submitButtonText: string;
@@ -46,8 +46,12 @@ interface FormParams {
   disableSubmit: (queueEntry, formState) => boolean;
 }
 
-// Modal with form to provide the same UI for editting or transitioning a queue entry
-export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ queueEntry, closeModal, formParams }) => {
+// Modal with a form to provide the same UI for editing or transitioning a queue entry
+export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
+  queueEntry,
+  closeModal,
+  modalParams,
+}) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const {
@@ -59,7 +63,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
     submitFailureTitle,
     submitAction,
     disableSubmit,
-  } = formParams;
+  } = modalParams;
 
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,

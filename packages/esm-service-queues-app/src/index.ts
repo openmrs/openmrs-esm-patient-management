@@ -117,6 +117,22 @@ export const editQueueEntryModal = getAsyncLifecycle(
   },
 );
 
+export const undoTransitionQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry-modal.component'),
+  {
+    featureName: 'undo queue entry transiion of a patient',
+    moduleName,
+  },
+);
+
+export const voidQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/void-queue-entry-modal.component'),
+  {
+    featureName: 'void queue entry of a patient',
+    moduleName,
+  },
+);
+
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
 export function startupApp() {
