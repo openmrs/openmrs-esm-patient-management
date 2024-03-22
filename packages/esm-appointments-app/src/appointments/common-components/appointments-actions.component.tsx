@@ -12,7 +12,6 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import AppointmentForm from '../../form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
 import { type ConfigObject } from '../../config-schema';
-import { spaHomePage } from '../../constants';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
