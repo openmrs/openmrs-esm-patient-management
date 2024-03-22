@@ -160,7 +160,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
 
   const currentServiceUuid = useSelectedServiceUuid();
   const [showOverlay, setShowOverlay] = useState(false);
-  const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
   const { showQueueTableTab: useQueueTableTabs, customPatientChartUrl } = useConfig<ConfigObject>();
@@ -176,7 +175,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
-  const [overlayHeader, setOverlayTitle] = useState('');
   const [providerRoomModalShown, setProviderRoomModalShown] = useState(false);
 
   const {
@@ -329,9 +327,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                     },
                     selectPatientAction: (selectedPatientUuid) => {
                       setShowOverlay(true);
-                      setView(SearchTypes.SCHEDULED_VISITS);
                       setViewState({ selectedPatientUuid });
-                      setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                     },
                   }}
                 />
@@ -470,16 +466,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && (
-          <PatientSearch
-            view={view}
-            closePanel={() => setShowOverlay(false)}
-            viewState={{
-              selectedPatientUuid: viewState.selectedPatientUuid,
-            }}
-            headerTitle={overlayHeader}
-          />
-        )}
+        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
       </div>
     );
   }
@@ -505,9 +492,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                   },
                   selectPatientAction: (selectedPatientUuid) => {
                     setShowOverlay(true);
-                    setView(SearchTypes.SCHEDULED_VISITS);
                     setViewState({ selectedPatientUuid });
-                    setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                   },
                 }}
               />
@@ -531,23 +516,14 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                 },
                 selectPatientAction: (selectedPatientUuid) => {
                   setShowOverlay(true);
-                  setView(SearchTypes.SCHEDULED_VISITS);
                   setViewState({ selectedPatientUuid });
-                  setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
                 },
               }}
             />
           </div>
         </Tile>
       </div>
-      {showOverlay && (
-        <PatientSearch
-          view={view}
-          closePanel={() => setShowOverlay(false)}
-          viewState={viewState}
-          headerTitle={overlayHeader}
-        />
-      )}
+      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }

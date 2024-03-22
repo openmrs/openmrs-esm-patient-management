@@ -12,10 +12,8 @@ import styles from './active-visits-table.scss';
 function ActiveVisitsTabs() {
   const { t } = useTranslation();
   const [showOverlay, setShowOverlay] = useState(false);
-  const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [overlayHeader, setOverlayTitle] = useState('');
 
   return (
     <div className={styles.container} data-testid="active-visits-tabs">
@@ -32,9 +30,7 @@ function ActiveVisitsTabs() {
             },
             selectPatientAction: (selectedPatientUuid) => {
               setShowOverlay(true);
-              setView(SearchTypes.SCHEDULED_VISITS);
               setViewState({ selectedPatientUuid });
-              setOverlayTitle(t('addPatientToQueue', 'Add patient to queue'));
             },
           }}
         />
@@ -56,14 +52,7 @@ function ActiveVisitsTabs() {
           </TabPanel>
         </TabPanels>
       </Tabs>
-      {showOverlay && (
-        <PatientSearch
-          view={view}
-          closePanel={() => setShowOverlay(false)}
-          viewState={viewState}
-          headerTitle={overlayHeader}
-        />
-      )}
+      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }
