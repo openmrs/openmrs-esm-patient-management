@@ -81,25 +81,19 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
-
-      <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
-        {isFutureAppointment ||
-          (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday) && (
-            <OverflowMenuItem
-              itemText={t('editAppointments', 'Edit Appointment')}
-              onClick={() =>
-                launchOverlay(
-                  t('editAppointments', 'Edit Appointment'),
-                  <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
-                )
-              }
-            />
-          ))}
-        <OverflowMenuItem
-          itemText={t('allPatientAppointments', 'Patient Appointments')}
-          onClick={() => navigate({ to: `${spaHomePage}/appointments/patient/${patientUuid}` })}
-        />
-      </OverflowMenu>
+      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday)) ? (
+        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
+          <OverflowMenuItem
+            itemText={t('editAppointments', 'Edit Appointment')}
+            onClick={() =>
+              launchOverlay(
+                t('editAppointments', 'Edit Appointment'),
+                <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
+              )
+            }
+          />
+        </OverflowMenu>
+      ) : null}
     </div>
   );
 };
