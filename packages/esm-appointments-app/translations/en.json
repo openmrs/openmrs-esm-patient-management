@@ -2,11 +2,13 @@
   "action": "Action",
   "actions": "Actions",
   "add": "Add",
+  "addAppointment": "Add Appointment",
   "addNewAppointment": "Add new appointment",
   "addPatientToQueue": "Add patient to queue",
   "age": "Age",
   "all": "All",
   "allDay": "All day",
+  "allPatientAppointments": "Patient Appointments",
   "appointment": "appointment",
   "appointmentCancelError": "Error cancelling appointment",
   "appointmentCancelled": "Appointment Cancelled",
@@ -97,7 +99,6 @@
   "medications": "Medications",
   "missed": "Missed",
   "missingVisitType": "Missing visit type",
-  "monthly": "Monthly",
   "name": "Name",
   "no": "No",
   "noAppointmentsScheduledForTodayToDisplay": "There are no appointments scheduled for today to display for this location",
@@ -168,6 +169,5 @@
   "visitType": "Visit Type",
   "vitals": "Vitals",
   "week": "Week",
-  "weekly": "Weekly",
   "yes": "Yes"
 }

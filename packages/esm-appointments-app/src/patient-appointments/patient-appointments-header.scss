@@ -1,0 +1,37 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 1rem;
+
+  & > p {
+    @include type.type-style('heading-02');
+  }
+
+  & > button {
+    color: colors.$blue-60;
+    @include type.type-style('label-02');
+  }
+}
+
+.patientBanner {
+  display: flex;
+}
+
+.patientAvatar {
+  width: 5rem;
+  height: 5rem;
+  margin: 1rem;
+  border-radius: 1px;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .titleContent {
+    margin-left: 1rem;
+  }
+}

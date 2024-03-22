@@ -12,6 +12,7 @@ import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import AppointmentForm from '../../form/appointments-form.component';
 import CheckInButton from './checkin-button.component';
 import { type ConfigObject } from '../../config-schema';
+import { spaHomePage } from '../../constants';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
@@ -80,19 +81,25 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {renderVisitStatus()}
-      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday)) ? (
-        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
-          <OverflowMenuItem
-            itemText={t('editAppointments', 'Edit Appointment')}
-            onClick={() =>
-              launchOverlay(
-                t('editAppointments', 'Edit Appointment'),
-                <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
-              )
-            }
-          />
-        </OverflowMenu>
-      ) : null}
+
+      <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
+        {isFutureAppointment ||
+          (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday) && (
+            <OverflowMenuItem
+              itemText={t('editAppointments', 'Edit Appointment')}
+              onClick={() =>
+                launchOverlay(
+                  t('editAppointments', 'Edit Appointment'),
+                  <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
+                )
+              }
+            />
+          ))}
+        <OverflowMenuItem
+          itemText={t('allPatientAppointments', 'Patient Appointments')}
+          onClick={() => navigate({ to: `${spaHomePage}/appointments/patient/${patientUuid}` })}
+        />
+      </OverflowMenu>
     </div>
   );
 };

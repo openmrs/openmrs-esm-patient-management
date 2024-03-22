@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
+import { Button, ContentSwitcher, DataTableSkeleton, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientAppointments } from './patient-appointments.resource';
 import PatientAppointmentsTable from './patient-appointments-table';
 import styles from './patient-appointments-base.scss';
+import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
+import AppointmentForm from '../form/appointments-form.component';
+import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 
 interface PatientAppointmentsBaseProps {
-  basePath?: string;
   patientUuid: string;
 }
 
@@ -24,7 +26,7 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
   const isTablet = useLayoutType() === 'tablet';
-
+  const patientAppointmentContext = useContext(PatientAppointmentContext);
   const [switchedView, setSwitchedView] = useState(false);
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
@@ -36,7 +38,16 @@ const PatientAppointmentsBase: React.FC<PatientAppointmentsBaseProps> = ({ patie
     isValidating,
   } = usePatientAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => launchPatientWorkspace('appointments-form-workspace');
+  const launchAppointmentsForm = () => {
+    if (patientAppointmentContext === PatientAppointmentContextTypes.PATIENT_CHART) {
+      launchPatientWorkspace('appointments-form-workspace');
+    } else {
+      launchOverlay(
+        t('addAppointment', 'Add Appointment'),
+        <AppointmentForm context="creating" closeWorkspace={closeOverlay} />,
+      );
+    }
+  };
 
   if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   if (isError) {
