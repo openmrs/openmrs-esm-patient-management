@@ -41,7 +41,7 @@ import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
+import { type SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
@@ -203,10 +203,10 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <Button
               kind="ghost"
               renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
+              iconDescription={t('backToSearchResult', 'Back to search result')}
               size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
+              onClick={closePanel}>
+              <span>{t('backToSearchResult', 'Back to search result')}</span>
             </Button>
           )}
         </div>
