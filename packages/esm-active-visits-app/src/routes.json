@@ -5,12 +5,6 @@
   },
   "extensions": [
     {
-      "name": "metrics-ext-id",
-      "slot": "home-dashboard-slot",
-      "component": "metricsSlot",
-      "order": 0
-    },
-    {
       "name": "home-active-visits-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeActiveVisitsTile",
