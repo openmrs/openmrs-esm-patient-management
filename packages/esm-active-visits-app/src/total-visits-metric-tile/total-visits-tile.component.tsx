@@ -34,7 +34,7 @@ const TotalVisitsTile: React.FC = () => {
         <div>
           <div className={styles.tileContent}>
             <div className={styles.tileHeader}>
-              <header>{t('headerTitle', 'Scheduled For Today')}</header>
+              <header>{t('totalVisits', 'Total Visits Today')}</header>
             </div>
             <div className={styles.displayDetails}>
               <div>Patients</div>
