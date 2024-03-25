@@ -2,7 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { configSchema } from './config-schema';
 import activeVisitsComponent from './active-visits-widget/active-visits.component';
 import visitDetailComponent from './visits-summary/visit-detail.component';
-import MetricSlot from './metrics-slot.component';
 
 const moduleName = '@openmrs/esm-active-visits-app';
 
@@ -29,5 +28,3 @@ export const homeTotalVisitsTile = getAsyncLifecycle(
   () => import('./total-visits-metric-tile/total-visits-tile.component'),
   options,
 );
-
-export const metricsSlot = getSyncLifecycle(MetricSlot, options);
