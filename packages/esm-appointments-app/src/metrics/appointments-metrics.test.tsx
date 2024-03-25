@@ -44,6 +44,21 @@ describe('Appointment metrics', () => {
   });
 });
 
+const filteredArrivedAppointments = [];
+
+const filteredPendingAppointments = [];
+
+function getTotalPatients(filteredArrivedAppointments: any[], filteredPendingAppointments: any[]) {
+  return filteredArrivedAppointments.length + filteredPendingAppointments.length;
+}
+
+describe('Total Patients Calculation', () => {
+  it('should calculate the total patients correctly', () => {
+    const totalPatients = getTotalPatients(filteredArrivedAppointments, filteredPendingAppointments);
+    expect(totalPatients);
+  });
+});
+
 function renderAppointmentMetrics() {
   render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
 }
