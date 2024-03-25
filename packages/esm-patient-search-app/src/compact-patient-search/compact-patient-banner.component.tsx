@@ -123,13 +123,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
                 {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
                 <span className={styles.middot}>&middot;</span>
                 {config.defaultIdentifierTypes.length ? (
-                  <>
-                    {patientIdentifiers.length > 1 ? (
-                      <DefaultIdentifiers identifiers={patientIdentifiers} />
-                    ) : (
-                      <FallbackIdentifier patient={patients[index]} identifierName={config.defaultIdentifier} />
-                    )}
-                  </>
+                  <DefaultIdentifiers identifiers={patientIdentifiers} />
                 ) : (
                   <>
                     <span className={styles.middot}>&middot;</span> {patients[index].identifiers?.[0]?.identifier}
