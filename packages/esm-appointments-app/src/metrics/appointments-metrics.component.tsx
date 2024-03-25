@@ -18,7 +18,6 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
   const { totalProviders } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(appointmentServiceType);
-
   const { selectedDate } = useContext(SelectedDateContext);
   const formattedStartDate = formatDate(parseDate(selectedDate), { mode: 'standard', time: false });
 
@@ -32,6 +31,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   const filteredPendingAppointments = appointmentServiceType
     ? pendingAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
     : pendingAppointments;
+  const totalPatients = filteredArrivedAppointments.length + filteredPendingAppointments.length;
 
   if (clinicalMetricsError) {
     return (
@@ -45,7 +45,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
       <div className={styles.cardContainer} data-testid="clinic-metrics">
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={totalScheduledAppointments}
+          value={totalPatients}
           headerLabel={t('scheduledAppointments', 'Scheduled appointments')}
           count={{ pendingAppointments: filteredPendingAppointments, arrivedAppointments: filteredArrivedAppointments }}
         />
