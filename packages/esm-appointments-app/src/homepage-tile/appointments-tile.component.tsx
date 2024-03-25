@@ -30,7 +30,7 @@ const AppointmentsTile: React.FC = () => {
         <div>
           <div className={styles.tileContent}>
             <div className={styles.tileHeader}>
-              <header>{t('headerTitle', 'Scheduled For Today')}</header>
+              <header>{t('scheduledForToday', 'Scheduled For Today')}</header>
             </div>
             <div className={styles.displayDetails}>
               <div>Patients</div>

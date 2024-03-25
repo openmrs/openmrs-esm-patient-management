@@ -6,7 +6,7 @@
   "extensions": [
     {
       "name": "home-appointments-tile",
-      "slot": "home-dashboard-slot",
+      "slot": "home-metrics-tiles-slot",
       "component": "homeAppointmentsTile",
       "order": 0
     },
