@@ -87,6 +87,7 @@
   "errorCreatingAppointmentService": "Error creating appointment service",
   "expected": "Expected",
   "gender": "Gender",
+  "headerTitle": "Scheduled For Today",
   "highestServiceVolume": "Highest volume service: {{time}}",
   "home": "Home",
   "identifier": "Identifier",
