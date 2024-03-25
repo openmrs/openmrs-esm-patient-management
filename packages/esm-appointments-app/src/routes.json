@@ -5,6 +5,12 @@
   },
   "extensions": [
     {
+      "name": "home-appointments-tile",
+      "slot": "home-dashboard-slot",
+      "component": "homeAppointmentsTile",
+      "order": 0
+    },
+    {
       "name": "home-appointments",
       "slot": "homepage-widgets-slot",
       "component": "homeAppointments",
