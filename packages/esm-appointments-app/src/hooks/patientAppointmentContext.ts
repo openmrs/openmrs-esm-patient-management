@@ -8,6 +8,8 @@ export enum PatientAppointmentContextTypes {
   PATIENT_CHART,
   APPOINTMENTS_APP,
 }
-const PatientAppointmentContext = createContext(PatientAppointmentContextTypes.PATIENT_CHART);
+const PatientAppointmentContext = createContext<PatientAppointmentContextTypes>(
+  PatientAppointmentContextTypes.PATIENT_CHART,
+);
 
 export default PatientAppointmentContext;
