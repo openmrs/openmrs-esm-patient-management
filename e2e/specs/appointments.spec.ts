@@ -57,7 +57,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await expect(page.getByText(/Appointment scheduled/i)).toBeVisible();
   });
 
-  await test.step('When I click the options kebab menu in the appointment', async () => {
+  await test.step('When I click the options menu in the appointments table', async () => {
     await page.getByRole('button', { name: 'Options' }).click();
   });
 
@@ -95,7 +95,8 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await expect(page.getByText(/Appointment edited/i)).toBeVisible();
   });
 
-  await test.step('When I click the options kebab menu in the appointment', async () => {
+  await test.step('When I click the options menu in the appointments table', async () => {
+    await page.getByRole('tab', { name: 'Today' }).click();
     await page.getByRole('button', { name: 'Options' }).click();
   });
 
