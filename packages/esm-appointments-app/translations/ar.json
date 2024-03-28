@@ -2,6 +2,7 @@
   "action": "الإجراء",
   "actions": "الإجراءات",
   "add": "إضافة",
+  "addAppointment": "Add Appointment",
   "addNewAppointment": "إضافة موعد جديد",
   "addPatientToQueue": "أضف المريض إلى الطابور",
   "age": "العمر",
@@ -97,7 +98,6 @@
   "medications": "الأدوية",
   "missed": "فائت",
   "missingVisitType": "نوع الزيارة مفقود",
-  "monthly": "شهري",
   "name": "اسم المريض",
   "no": "لا",
   "noAppointmentsScheduledForTodayToDisplay": "لا يوجد مواعيد مجدولة لليوم للعرض في هذا الموقع",
@@ -168,6 +168,5 @@
   "visitType": "نوع الزيارة",
   "vitals": "العلامات الحيوية",
   "week": "Week",
-  "weekly": "أسبوعي",
   "yes": "نعم"
 }

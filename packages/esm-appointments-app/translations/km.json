@@ -2,6 +2,7 @@
   "action": "សកម្មភាព",
   "actions": "សកម្មភាព",
   "add": "បន្ថែម",
+  "addAppointment": "Add Appointment",
   "addNewAppointment": "បន្ថែមការណាត់ជួបថ្មី",
   "addPatientToQueue": "បន្ថែមអ្នកជំងឺទៅក្នុងជួរ",
   "age": "Age",
@@ -97,7 +98,6 @@
   "medications": "ថ្នាំ",
   "missed": "ខកខាន",
   "missingVisitType": "បាត់ប្រភេទនៃការមកពិនិត្យជំងឺ",
-  "monthly": "ប្រចាំខែ",
   "name": "ឈ្មោះ",
   "no": "ទេ",
   "noAppointmentsScheduledForTodayToDisplay": "មិនមានការណាត់ជួបសម្រាប់ថ្ងៃនេះ ដើម្បីបង្ហាញអ្នកជំងឺនេះទេ",
@@ -168,6 +168,5 @@
   "visitType": "ប្រភេទនៃការមកពិនិត្យជំងឺ",
   "vitals": "សញ្ញាជីវិត",
   "week": "Week",
-  "weekly": "ប្រចាំសប្តាហ៍",
   "yes": "Yes"
 }
