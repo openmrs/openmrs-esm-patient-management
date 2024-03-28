@@ -33,7 +33,7 @@ import { EmptyState } from '../../empty-state/empty-state.component';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import { launchOverlay } from '../../hooks/useOverlay';
 import { type Appointment } from '../../types';
-import { getPageSizes, useSearchResults } from '../utils';
+import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import { type ConfigObject } from '../../config-schema';
 import AppointmentDetails from '../details/appointment-details.component';
 import AppointmentActions from './appointments-actions.component';
@@ -56,7 +56,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
-  const searchResults = useSearchResults(appointments, searchString);
+  const searchResults = useAppointmentSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
 
