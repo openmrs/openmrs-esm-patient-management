@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import classNames from 'classnames';
 import useSWRImmutable from 'swr/immutable';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -30,6 +30,15 @@ export default function Root() {
     () => (isOnline ? FormManager.savePatientFormOnline : FormManager.savePatientFormOffline),
     [isOnline],
   );
+
+  useEffect(() => {
+    if (isOnline) {
+      const modalsContainer = document.querySelector('.omrs-modals-container');
+      if (modalsContainer instanceof HTMLElement) {
+        modalsContainer.style.visibility = !isOnline ? 'hidden' : 'hidden';
+      }
+    }
+  }, []);
 
   return (
     <main className={classNames('omrs-main-content', styles.root)}>
