@@ -42,7 +42,13 @@ import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
+import {
+  appointmentLocationTagName,
+  dateFormat,
+  datePickerFormat,
+  datePickerPlaceHolder,
+  weekDays,
+} from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
 import uniqBy from 'lodash-es/uniqBy';
@@ -96,7 +102,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       : 'AM';
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
   const { selectedDate } = useContext(SelectedDateContext);
@@ -325,10 +331,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  const updateLocations = uniqBy(
-    [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
-    'uuid',
-  );
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
@@ -348,8 +350,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   value={value}
                   ref={ref}>
                   <SelectItem text={t('chooseLocation', 'Choose a location')} value="" />
-                  {updateLocations?.length > 0 &&
-                    updateLocations.map((location) => (
+                  {locations?.length > 0 &&
+                    locations.map((location) => (
                       <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                         {location.display}
                       </SelectItem>
