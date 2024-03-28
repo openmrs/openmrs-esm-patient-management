@@ -13,6 +13,7 @@ export interface AppointmentLocation {
   name: string;
 }
 
+// TODO: remove interface elements that aren't actually present on the Appointment object returned from the Appointment API
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
