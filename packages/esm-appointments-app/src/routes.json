@@ -91,14 +91,6 @@
       }
     },
     {
-      "name": "patient-appointments-overview-widget",
-      "component": "appointmentsOverview",
-      "order": 8,
-      "meta": {
-        "columnSpan": 4
-      }
-    },
-    {
       "name": "patient-upcoming-appointment-widget",
       "component": "patientUpcomingAppointmentsWidget",
       "slot": "upcoming-appointment-slot"
