@@ -10,6 +10,9 @@ $color-blue-10: #edf5ff;
 
 .widgetCard {
   border: 1px solid $ui-03;
+  max-width: 60rem;
+  margin: auto;
+  margin-top: spacing.$spacing-05;
 }
 
 .productiveHeading01 {
@@ -18,7 +21,6 @@ $color-blue-10: #edf5ff;
 
 .contentSwitcherWrapper {
   display: flex;
-  width: fit-content;
   justify-content: flex-end;
   align-items: center;
   width: 60%;

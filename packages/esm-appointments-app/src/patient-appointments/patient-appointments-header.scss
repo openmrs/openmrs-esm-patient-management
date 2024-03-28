@@ -13,6 +13,12 @@
   border-radius: 1px;
 }
 
+.divider {
+  border: 0;
+  border-top: 0.075rem solid colors.$gray-20;
+  width: 100%;
+}
+
 // Overriding styles for RTL support
 html[dir='rtl'] {
   .titleContent {

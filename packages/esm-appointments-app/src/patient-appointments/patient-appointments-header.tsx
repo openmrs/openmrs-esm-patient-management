@@ -17,12 +17,6 @@ const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ p
 
   return (
     <div>
-      <div className={styles.patientBanner}>
-        <div className={styles.patientAvatar} role="img">
-          <PatientPhoto patientUuid={patient.id} patientName={patientName} />
-        </div>
-        <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>
-      </div>
       <div className={styles.titleContainer}>
         <Button
           kind="ghost"
@@ -33,6 +27,14 @@ const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ p
           <span>{t('back', 'Back')}</span>
         </Button>
       </div>
+      <div className={styles.divider}></div>
+      <div className={styles.patientBanner}>
+        <div className={styles.patientAvatar} role="img">
+          <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+        </div>
+        <PatientBannerPatientInfo patient={patient}></PatientBannerPatientInfo>
+      </div>
+      <div className={styles.divider}></div>
     </div>
   );
 };
