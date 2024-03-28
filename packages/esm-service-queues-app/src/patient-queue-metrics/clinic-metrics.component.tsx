@@ -57,7 +57,7 @@ function ClinicMetrics() {
   return (
     <>
       <MetricsHeader />
-      <div className={styles.cardContainer} data-testid="clinic-metrics">
+      <div className={`${styles.cardContainer} clinic-metric`} data-testid="clinic-metrics">
         <MetricsCard
           label={t('patients', 'Patients')}
           value={loading ? '--' : activeVisitsCount}
