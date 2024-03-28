@@ -2,6 +2,7 @@
   "action": "Acción",
   "actions": "Acciones",
   "add": "Agregar",
+  "addAppointment": "Add Appointment",
   "addNewAppointment": "Agregar nueva cita",
   "addPatientToQueue": "Agregar paciente a la cola",
   "age": "Edad",
@@ -97,7 +98,6 @@
   "medications": "Medicamentos",
   "missed": "Perdida",
   "missingVisitType": "Tipo de visita faltante",
-  "monthly": "Mensual",
   "name": "Nombre",
   "no": "No",
   "noAppointmentsScheduledForTodayToDisplay": "No hay citas programadas para hoy en esta ubicación",
@@ -168,6 +168,5 @@
   "visitType": "Tipo de visita",
   "vitals": "Signos vitales",
   "week": "Week",
-  "weekly": "Semanal",
   "yes": "Sí"
 }

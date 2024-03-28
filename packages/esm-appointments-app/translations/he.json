@@ -2,6 +2,7 @@
   "action": "פעולה",
   "actions": "פעולות",
   "add": "הוסף",
+  "addAppointment": "Add Appointment",
   "addNewAppointment": "הוספת תור חדש",
   "addPatientToQueue": "הוספת מטופל לתור",
   "age": "גיל",
@@ -97,7 +98,6 @@
   "medications": "תרופות",
   "missed": "לא התקיים",
   "missingVisitType": "סוג ביקור חסר",
-  "monthly": "חודשי",
   "name": "שם",
   "no": "לא",
   "noAppointmentsScheduledForTodayToDisplay": "אין תורים מתוזמנים להצגה היום עבור מקום זה",
@@ -168,6 +168,5 @@
   "visitType": "סוג הביקור",
   "vitals": "מדדים",
   "week": "Week",
-  "weekly": "שבועי",
   "yes": "כן"
 }
