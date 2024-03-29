@@ -4,34 +4,33 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePickerInput,
   DatePicker,
+  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
   NumberInput,
+  RadioButton,
+  RadioButtonGroup,
   Select,
   SelectItem,
   Stack,
-  RadioButtonGroup,
-  RadioButton,
   TextArea,
-  TimePickerSelect,
   TimePicker,
+  TimePickerSelect,
   Toggle,
 } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
+  ResponsiveWrapper,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
   useLocations,
   useSession,
-  showSnackbar,
-  useLayoutType,
-  useConfig,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
   saveRecurringAppointments,
@@ -51,8 +50,11 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
-import uniqBy from 'lodash-es/uniqBy';
-import { useController, Control } from 'react-hook-form';
+
+const time12HourFormatRegexPattern = '(1[0-2]|0?[1-9]):[0-5][0-9]';
+function isValidTime(timeStr) {
+  return timeStr.match(new RegExp(time12HourFormatRegexPattern));
+}
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -66,7 +68,7 @@ const appointmentsFormSchema = z.object({
   recurringPatternPeriod: z.number(),
   recurringPatternDaysOfWeek: z.array(z.string()),
   selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string(),
+  startTime: z.string().refine((value) => isValidTime(value)),
   timeFormat: z.enum(['AM', 'PM']),
   appointmentDateTime: z.object({
     startDate: z.date(),
@@ -289,7 +291,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const [hours, minutes] = convertTime12to24(startTime, timeFormat);
+    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
+    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+    const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
     const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
 
@@ -725,7 +729,9 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, value } }) => (
             <TimePicker
               id="time-picker"
-              pattern="([\d]+:[\d]{2})"
+              pattern={time12HourFormatRegexPattern}
+              invalid={!isValidTime(value)}
+              invalidText={t('invalidTime', 'Invalid time')}
               onChange={(event) => onChange(event.target.value)}
               value={value}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
