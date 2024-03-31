@@ -56,6 +56,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText(/Appointment scheduled/i)).toBeVisible();
   });
+});
+
+test('Edit an appointment', async ({ page, api }) => {
+  const appointmentsPage = new AppointmentsPage(page);
+
+  await test.step('When I go to the appointment tab in the patient chart', async () => {
+    await appointmentsPage.goto(patient.uuid);
+  });
 
   await test.step('When I click the options menu in the appointments table', async () => {
     await page.getByRole('button', { name: 'Options' }).click();
@@ -93,6 +101,14 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
 
   await test.step('Then I should see a success message', async () => {
     await expect(page.getByText(/Appointment edited/i)).toBeVisible();
+  });
+});
+
+test('Delete an appointment', async ({ page, api }) => {
+  const appointmentsPage = new AppointmentsPage(page);
+
+  await test.step('When I go to the appointment tab in the patient chart', async () => {
+    await appointmentsPage.goto(patient.uuid);
   });
 
   await test.step('When I click the options menu in the appointments table', async () => {
