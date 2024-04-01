@@ -302,14 +302,16 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           )}
           <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
-            <ContentSwitcher
-              selectedIndex={contentSwitcherIndex}
-              className={styles.contentSwitcher}
-              onChange={({ index }) => setContentSwitcherIndex(index)}>
-              <Switch name="recommended" text={t('recommended', 'Recommended')} />
-              <Switch name="all" text={t('all', 'All')} />
-            </ContentSwitcher>
-            {contentSwitcherIndex === 0 && !isLoading && (
+            {config.showRecommendedVisitTypeTab && (
+              <ContentSwitcher
+                selectedIndex={contentSwitcherIndex}
+                className={styles.contentSwitcher}
+                onChange={({ index }) => setContentSwitcherIndex(index)}>
+                <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                <Switch name="all" text={t('all', 'All')} />
+              </ContentSwitcher>
+            )}
+            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && !isLoading && (
               <MemoizedRecommendedVisitType
                 onChange={(visitType) => {
                   setVisitType(visitType);
@@ -320,7 +322,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 locationUuid={selectedLocation}
               />
             )}
-            {contentSwitcherIndex === 1 && (
+            {(!config.showRecommendedVisitTypeTab || contentSwitcherIndex === 1) && (
               <BaseVisitType
                 onChange={(visitType) => {
                   setVisitType(visitType);

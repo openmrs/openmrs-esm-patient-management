@@ -77,7 +77,7 @@ export const configSchema = {
   patientIdentifierType: {
     _type: Type.String,
     _description: 'The name of the patient identifier type to be used for the patient identifier field',
-    _default: 'OpenMRS ID',
+    _default: '',
   },
   showUnscheduledAppointmentsTab: {
     _type: Type.Boolean,

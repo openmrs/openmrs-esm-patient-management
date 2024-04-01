@@ -9,9 +9,34 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
 
   return (
     <div>
+      {queueEntry.previousQueueEntry == null ? (
+        <Button
+          kind="ghost"
+          aria-label={t('actions', 'Actions')}
+          onClick={() => {
+            const dispose = showModal('void-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+            });
+          }}>
+          {t('delete', 'Delete')}
+        </Button>
+      ) : (
+        <Button
+          kind="ghost"
+          aria-label={t('actions', 'Actions')}
+          onClick={() => {
+            const dispose = showModal('undo-transition-queue-entry-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+            });
+          }}>
+          {t('undoTransition', 'Undo transition')}
+        </Button>
+      )}
       <Button
         kind="ghost"
-        aria-label="Actions"
+        aria-label={t('actions', 'Actions')}
         onClick={() => {
           const dispose = showModal('edit-queue-entry-modal', {
             closeModal: () => dispose(),
@@ -22,7 +47,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
       </Button>
       <Button
         kind="ghost"
-        aria-label="Actions"
+        aria-label={t('actions', 'Actions')}
         onClick={() => {
           const dispose = showModal('transition-queue-entry-modal', {
             closeModal: () => dispose(),

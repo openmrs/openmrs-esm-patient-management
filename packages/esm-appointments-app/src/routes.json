@@ -70,14 +70,34 @@
       "component": "earlyAppointments"
     },
     {
-      "name": "appointments-form-workspace",
-      "component": "appointmentsFormWorkspace",
+      "name": "patient-appointments-summary-dashboard",
+      "component": "patientAppointmentsSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 11,
       "meta": {
-        "title": {
-          "key": "createNewAppointment",
-          "default": "Create new appointment"
-        }
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-appointments-dashboard-slot",
+        "title": "Appointments",
+        "path": "Appointments"
       }
+    },
+    {
+      "name": "patientAppointments-details-widget",
+      "component": "patientAppointmentsDetailedSummary",
+      "slot": "patient-chart-appointments-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "patient-upcoming-appointment-widget",
+      "component": "patientUpcomingAppointmentsWidget",
+      "slot": "upcoming-appointment-slot"
+    },
+    {
+      "name": "patient-appointment-cancel-confirmation-dialog",
+      "component": "patientAppointmentsCancelConfirmationDialog"
     }
   ]
 }

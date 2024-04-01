@@ -1,0 +1,198 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.monthly-cell {
+  border-left: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  border-right: 1px solid colors.$gray-20;
+  background: colors.$white;
+  color: colors.$black;
+  cursor: pointer;
+  text-align: right;
+  @include type.type-style('body-compact-02');
+  &:nth-child(-n + 7) {
+    border-top: 1px solid colors.$gray-20;
+  }
+
+  &:nth-child(7n) {
+    border-right: 1px solid colors.$gray-20;
+  }
+
+  &-disabled {
+    border-left: 1px solid colors.$gray-20;
+    border-bottom: 1px solid colors.$gray-20;
+    border-right: 1px solid colors.$gray-20;
+    background: colors.$white;
+    color: colors.$gray-20;
+    text-align: right;
+  }
+  &-disabled:last-child {
+    border-left: 1px solid colors.$gray-20;
+    border-bottom: 1px solid colors.$gray-20;
+    border-right: 1px solid colors.$gray-20;
+    background: colors.$white;
+    color: colors.$gray-40;
+    text-align: right;
+  }
+}
+.identifiers {
+  @include type.type-style('body-compact-02');
+  color: $ui-04;
+  display: list-item;
+
+  span:not(:first-child) {
+    margin: 0rem 0.75rem;
+  }
+}
+.identifierTag {
+  display: flex;
+  align-items: center;
+}
+.weekly-cell {
+  position: relative;
+  border-right: 1px solid colors.$gray-20;
+  border-bottom: 1px solid colors.$gray-20;
+  min-height: 120px;
+  color: colors.$white;
+
+  .week-time {
+    display: none;
+  }
+
+  &:nth-child(-n + 8) {
+    border-top: 1px solid colors.$gray-20;
+  }
+
+  &:first-child {
+    border-top: none;
+  }
+
+  &:nth-child(8n + 1) {
+    border-bottom: none;
+
+    .week-time {
+      white-space: nowrap;
+      display: inline;
+      color: colors.$white;
+      position: absolute;
+      top: -11px;
+      height: layout.$spacing-06;
+      width: layout.$spacing-07;
+    }
+  }
+}
+
+.currentData {
+  margin: 2px;
+  padding-top: 2px;
+}
+
+.serviceArea {
+  padding: 0.0125rem;
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  justify-content: flex-start;
+  text-align: left;
+  margin: 0.125rem;
+  @include type.type-style('label-01');
+  color: #020f1b;
+  cursor: pointer;
+
+  & > span:first-child {
+    text-align: left;
+    text-overflow: ellipsis;
+  }
+
+  & > span:nth-child(2) {
+    text-align: right;
+  }
+}
+
+.smallDesktop {
+  height: auto;
+}
+
+.largeDesktop {
+  height: auto;
+}
+
+.red {
+  background-color: colors.$red-70;
+  color: colors.$white;
+  font-weight: bold;
+}
+
+.purple {
+  background-color: colors.$yellow-70;
+  color: colors.$white;
+  font-weight: bold;
+}
+
+.blue {
+  background-color: colors.$blue-70;
+  color: colors.$white;
+  font-weight: bold;
+}
+
+.green {
+  background-color: colors.$green-70;
+  color: colors.$white;
+  font-weight: bold;
+}
+
+.calendarDate {
+  @include type.type-style('heading-compact-01');
+}
+
+.wrapper {
+  position: relative;
+}
+.monthlyCalendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0px, 1fr));
+  grid-template-rows: repeat(6, minmax(0px, 1fr));
+}
+
+.calendarViewContainer {
+  margin: 5px;
+}
+.backgroundColor {
+  margin: 1px 0 0;
+  transition: width 0.24s ease-in-out;
+  position: relative;
+  min-height: calc(100vh - 80px);
+  background-color: colors.$white;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-06;
+}
+.workLoadCard {
+  display: flex;
+  color: colors.$black;
+}
+.activeWorkloadCard {
+  background-color: colors.$blue-10;
+
+  & label {
+    color: colors.$blue-60;
+  }
+}
+.workLoadContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding-bottom: 1rem;
+}
+.headerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: layout.$spacing-06;
+}

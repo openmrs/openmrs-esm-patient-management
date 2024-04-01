@@ -20,11 +20,10 @@ import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 
 interface QueueServiceFormProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
   closePanel: () => void;
 }
 
-const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ toggleSearchType, closePanel }) => {
+const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { queueConcepts } = useServiceConcepts();

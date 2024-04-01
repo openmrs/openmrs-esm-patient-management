@@ -25,7 +25,7 @@ import { TextArea } from '@carbon/react';
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
   closeModal: () => void;
-  formParams: FormParams;
+  modalParams: ModalParams;
 }
 
 interface FormState {
@@ -35,7 +35,7 @@ interface FormState {
   prioritycomment: string;
 }
 
-interface FormParams {
+interface ModalParams {
   modalTitle: string;
   modalInstruction: string;
   submitButtonText: string;
@@ -46,8 +46,12 @@ interface FormParams {
   disableSubmit: (queueEntry, formState) => boolean;
 }
 
-// Modal with form to provide the same UI for editting or transitioning a queue entry
-export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ queueEntry, closeModal, formParams }) => {
+// Modal with a form to provide the same UI for editing or transitioning a queue entry
+export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
+  queueEntry,
+  closeModal,
+  modalParams,
+}) => {
   const { t } = useTranslation();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const {
@@ -59,7 +63,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
     submitFailureTitle,
     submitAction,
     disableSubmit,
-  } = formParams;
+  } = modalParams;
 
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
@@ -136,122 +140,129 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({ qu
   const selectedPriorityIndex = priorities.findIndex((p) => p.uuid == formState.selectedPriority);
 
   return (
-    <div>
-      <Form onSubmit={submitForm}>
-        <ModalHeader closeModal={closeModal} title={modalTitle} />
-        <ModalBody>
-          <div className={styles.modalBody}>
-            <Stack gap={4}>
-              <h5>{queueEntry.display}</h5>
-              <p>{modalInstruction}</p>
-              <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
-                <Select
-                  labelText={t('selectQueue', 'Select a queue')}
-                  id="queue"
-                  invalidText="Required"
-                  value={formState.selectedQueue}
-                  onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                  {queues?.map(({ uuid, display }) => (
-                    <SelectItem
+    <>
+      <ModalHeader closeModal={closeModal} title={modalTitle} />
+      <ModalBody>
+        <div className={styles.queueEntryActionModalBody}>
+          <Stack gap={4}>
+            <h5>{queueEntry.display}</h5>
+            <p>{modalInstruction}</p>
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('serviceQueue', 'Service queue')}</div>
+              <Select
+                labelText={t('selectQueue', 'Select a queue')}
+                id="queue"
+                invalidText="Required"
+                value={formState.selectedQueue}
+                onChange={(event) => setSelectedQueueUuid(event.target.value)}>
+                {queues?.map(({ uuid, display }) => (
+                  <SelectItem
+                    key={uuid}
+                    text={
+                      uuid == queueEntry.queue.uuid
+                        ? t('currentValueFormatted', '{{value}} (Current)', {
+                            value: display,
+                            interpolation: { escapeValue: false },
+                          })
+                        : display
+                    }
+                    value={uuid}
+                  />
+                ))}
+              </Select>
+            </section>
+
+            <section>
+              <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
+              {hasNoStatusesConfigured ? (
+                <InlineNotification
+                  kind={'error'}
+                  lowContrast
+                  subtitle={t('configureStatus', 'Please configure status to continue.')}
+                  title={t('noStatusConfigured', 'No status configured')}
+                />
+              ) : (
+                <RadioButtonGroup
+                  name="status"
+                  valueSelected={formState.selectedStatus}
+                  onChange={(uuid) => {
+                    setSelectedStatusUuid(uuid);
+                  }}>
+                  {statuses?.map(({ uuid, display }) => (
+                    <RadioButton
                       key={uuid}
-                      text={
-                        uuid == queueEntry.queue.uuid
-                          ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
+                      name={display}
+                      labelText={
+                        uuid == queueEntry.status.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: display,
+                              interpolation: { escapeValue: false },
+                            })
                           : display
                       }
                       value={uuid}
                     />
                   ))}
-                </Select>
-              </section>
+                </RadioButtonGroup>
+              )}
+            </section>
 
-              <section>
-                <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-                {hasNoStatusesConfigured ? (
-                  <InlineNotification
-                    kind={'error'}
-                    lowContrast
-                    subtitle={t('configureStatus', 'Please configure status to continue.')}
-                    title={t('noStatusConfigured', 'No status configured')}
-                  />
-                ) : (
-                  <RadioButtonGroup
-                    name="status"
-                    valueSelected={formState.selectedStatus}
-                    onChange={(uuid) => {
-                      setSelectedStatusUuid(uuid);
-                    }}>
-                    {statuses?.map(({ uuid, display }) => (
-                      <RadioButton
-                        key={uuid}
-                        name={display}
-                        labelText={
-                          uuid == queueEntry.status.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
-                            : display
-                        }
-                        value={uuid}
-                      />
-                    ))}
-                  </RadioButtonGroup>
-                )}
-              </section>
-
-              <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
-                {hasNoPrioritiesConfigured ? (
-                  <InlineNotification
-                    className={styles.inlineNotification}
-                    kind={'error'}
-                    lowContrast
-                    subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
-                    title={t('noPrioritiesConfigured', 'No priorities configured')}
-                  />
-                ) : (
-                  <ContentSwitcher
-                    size="sm"
-                    selectedIndex={selectedPriorityIndex}
-                    onChange={(event) => {
-                      setSelectedPriorityUuid(event.name as string);
-                    }}>
-                    {priorities?.map(({ uuid, display }) => (
-                      <Switch
-                        role="radio"
-                        name={uuid}
-                        text={
-                          uuid == queueEntry.priority.uuid
-                            ? t('currentValueFormatted', '{{value}} (Current)', { value: display })
-                            : display
-                        }
-                        key={uuid}
-                        value={uuid}
-                      />
-                    ))}
-                  </ContentSwitcher>
-                )}
-              </section>
-              <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
-                <TextArea
-                  value={formState.prioritycomment}
-                  onChange={(e) => setPriorityComment(e.target.value)}
-                  placeholder={t('enterCommentHere', 'Enter comment here')}
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('queuePriority', 'Queue priority')}</div>
+              {hasNoPrioritiesConfigured ? (
+                <InlineNotification
+                  className={styles.inlineNotification}
+                  kind={'error'}
+                  lowContrast
+                  subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                  title={t('noPrioritiesConfigured', 'No priorities configured')}
                 />
-              </section>
-            </Stack>
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button kind="secondary" onClick={closeModal}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button disabled={isSubmitting || disableSubmit(queueEntry, formState)} type="submit">
-            {submitButtonText}
-          </Button>
-        </ModalFooter>
-      </Form>
-    </div>
+              ) : (
+                <ContentSwitcher
+                  size="sm"
+                  selectedIndex={selectedPriorityIndex}
+                  onChange={(event) => {
+                    setSelectedPriorityUuid(event.name as string);
+                  }}>
+                  {priorities?.map(({ uuid, display }) => (
+                    <Switch
+                      role="radio"
+                      name={uuid}
+                      text={
+                        uuid == queueEntry.priority.uuid
+                          ? t('currentValueFormatted', '{{value}} (Current)', {
+                              value: display,
+                              interpolation: { escapeValue: false },
+                            })
+                          : display
+                      }
+                      key={uuid}
+                      value={uuid}
+                    />
+                  ))}
+                </ContentSwitcher>
+              )}
+            </section>
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+              <TextArea
+                value={formState.prioritycomment}
+                onChange={(e) => setPriorityComment(e.target.value)}
+                placeholder={t('enterCommentHere', 'Enter comment here')}
+              />
+            </section>
+          </Stack>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeModal}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button disabled={isSubmitting || disableSubmit(queueEntry, formState)} onClick={submitForm}>
+          {submitButtonText}
+        </Button>
+      </ModalFooter>
+    </>
   );
 };
 

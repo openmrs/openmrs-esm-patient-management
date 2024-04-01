@@ -14,12 +14,11 @@ import { type SearchTypes } from '../../types';
 import styles from './visit-form.scss';
 
 interface ExistingVisitFormProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   visit: Visit;
   closePanel: () => void;
 }
 
-const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, toggleSearchType, closePanel }) => {
+const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);

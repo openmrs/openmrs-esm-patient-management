@@ -21,7 +21,7 @@ interface TransitionQueueEntryParams {
  * @returns
  */
 export function transitionQueueEntry(params: TransitionQueueEntryParams, abortController?: AbortController) {
-  return openmrsFetch(`${restBaseUrl}/queue-entry-transition`, {
+  return openmrsFetch(`${restBaseUrl}/queue-entry/transition`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -55,5 +55,29 @@ export function updateQueueEntry(
     },
     signal: abortController?.signal,
     body: params,
+  });
+}
+interface UndoTransitionParams {
+  queueEntry: string;
+}
+
+export function undoTransition(params: UndoTransitionParams, abortController?: AbortController) {
+  return openmrsFetch(`${restBaseUrl}/queue-entry/transition`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController?.signal,
+    body: params,
+  });
+}
+
+export function voidQueueEntry(queueEntryUuid: string, abortController?: AbortController) {
+  return openmrsFetch(`${restBaseUrl}/queue-entry/${queueEntryUuid}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController?.signal,
   });
 }
