@@ -26,9 +26,9 @@ import appointmentsDashboardComponent from './appointments.component';
 import homeAppointmentsComponent from './home';
 import appointmentStatusComponent from './appointments/scheduled/appointments-by-status.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
-import patientAppointmentsDetailedSummaryComponent from './patient-chart/patient-appointments-detailed-summary.component';
-import patientAppointmentsOverviewComponent from './patient-chart/patient-appointments-overview.component';
-import patientUpcomingAppointmentsComponent from './patient-chart/patient-upcoming-appointments-card.component';
+import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
+import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
+import patientUpcomingAppointmentsComponent from './patient-appointments/patient-upcoming-appointments-card.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -100,7 +100,7 @@ export const patientAppointmentsOverview = getSyncLifecycle(patientAppointmentsO
 export const patientUpcomingAppointmentsWidget = getSyncLifecycle(patientUpcomingAppointmentsComponent, options);
 
 export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
-  () => import('./patient-chart/patient-appointments-cancel-modal.component'),
+  () => import('./patient-appointments/patient-appointments-cancel-modal.component'),
   options,
 );
 
