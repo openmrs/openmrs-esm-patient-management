@@ -5,14 +5,20 @@
   },
   "extensions": [
     {
+      "name": "arodi",
+      "slot": "home-dashboard-slot",
+      "component": "homePageTilesSlot",
+      "order": 0
+    },
+    {
       "name": "home-active-visits-tile",
-      "slot": "home-metrics-tiles-slot",
+      "slot": "metrics-extension-slot",
       "component": "homeActiveVisitsTile",
       "order": 0
     },
     {
       "name": "home-total-visits-tile",
-      "slot": "home-metrics-tiles-slot",
+      "slot": "metrics-extension-slot",
       "component": "homeTotalVisitsTile",
       "order": 0
     },
