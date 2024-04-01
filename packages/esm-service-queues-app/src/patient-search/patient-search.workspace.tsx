@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchTypes } from '../types';
-import Overlay from '../overlay.component';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import QueueServiceForm from '../queue-services/queue-service-form.component';
-import QueueRoomForm from '../queue-rooms/queue-room-form.component';
 import VisitForm from './visit-form/visit-form.component';
-import { ExtensionSlot, usePatient, useVisit } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps, ExtensionSlot, usePatient, useVisit } from '@openmrs/esm-framework';
 import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
 
-interface PatientSearchProps {
-  closePanel: () => void;
+interface PatientSearchProps extends DefaultWorkspaceProps {
   viewState: {
     selectedPatientUuid?: string;
   };
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, viewState }) => {
+const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState }) => {
   const { t } = useTranslation();
   const { selectedPatientUuid } = viewState;
   const { patient } = usePatient(selectedPatientUuid);
@@ -31,35 +27,34 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, viewState }) 
 
   return (
     <>
-      <Overlay header={t('addPatientToQueue', 'Add patient to queue')} closePanel={closePanel}>
-        {patient && (
-          <ExtensionSlot
-            name="patient-header-slot"
-            state={{
-              patient,
-              patientUuid: selectedPatientUuid,
-              hideActionsOverflow: true,
-            }}
-          />
-        )}
-
+      {patient && (
+        <ExtensionSlot
+          name="patient-header-slot"
+          state={{
+            patient,
+            patientUuid: selectedPatientUuid,
+            hideActionsOverflow: true,
+          }}
+        />
+      )}
+      <div className="omrs-main-content">
         {activeVisit ? (
-          <ExistingVisitFormComponent visit={activeVisit} closePanel={closePanel} />
+          <ExistingVisitFormComponent visit={activeVisit} closePanel={closeWorkspace} />
         ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
           <PatientScheduledVisits
             patientUuid={selectedPatientUuid}
             toggleSearchType={toggleSearchType}
-            closePanel={closePanel}
+            closePanel={closeWorkspace}
           />
         ) : searchType === SearchTypes.VISIT_FORM ? (
           <VisitForm
             patientUuid={selectedPatientUuid}
             toggleSearchType={toggleSearchType}
-            closePanel={closePanel}
+            closePanel={closeWorkspace}
             mode={newVisitMode}
           />
         ) : null}
-      </Overlay>
+      </div>
     </>
   );
 };

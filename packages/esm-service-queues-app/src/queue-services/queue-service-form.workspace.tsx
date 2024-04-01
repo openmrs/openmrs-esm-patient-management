@@ -13,19 +13,13 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { mutate } from 'swr';
-import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { saveQueue, useServiceConcepts } from './queue-service.resource';
-import { type SearchTypes } from '../types';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './queue-service-form.scss';
 
-interface QueueServiceFormProps {
-  closePanel: () => void;
-}
-
-const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ closePanel }) => {
+const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const { queueConcepts } = useServiceConcepts();
   const [queueName, setQueueName] = useState('');
   const [queueConcept, setQueueConcept] = useState('');
@@ -64,7 +58,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ closePanel }) => {
               kind: 'success',
               subtitle: t('queueAddedSuccessfully', 'Queue addeded successfully'),
             });
-            closePanel();
+            closeWorkspace();
             mutate(`${restBaseUrl}/queue?${userLocation}`);
             mutate(`${restBaseUrl}/queue?location=${userLocation}`);
           }
@@ -79,7 +73,7 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ closePanel }) => {
         },
       );
     },
-    [queueName, queueConcept, userLocation, t, closePanel],
+    [queueName, queueConcept, userLocation, t, closeWorkspace],
   );
 
   return (
@@ -170,8 +164,8 @@ const QueueServiceForm: React.FC<QueueServiceFormProps> = ({ closePanel }) => {
           </Layer>
         </Column>
       </Stack>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closePanel()}>
+      <ButtonSet className={styles.buttonSet}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

@@ -11,6 +11,7 @@ import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
 import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
+import { registerWorkspace } from '@openmrs/esm-styleguide/src/workspaces/workspaces';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -150,4 +151,22 @@ export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
+
+  registerWorkspace({
+    name: 'service-queues-patient-search',
+    title: translateFrom('@openmrs/esm-service-queues-app', 'addPatientToQueue', 'Add patient to queue'),
+    load: getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
+      featureName: 'service-queues-patient-search',
+      moduleName,
+    }),
+  });
+
+  registerWorkspace({
+    name: 'service-queues-service-form',
+    title: translateFrom('@openmrs/esm-service-queues-app', 'addNewQueueService', 'Add new queue service'),
+    load: getAsyncLifecycle(() => import('./queue-services/queue-service-form.workspace'), {
+      featureName: 'service-queues-service-form',
+      moduleName,
+    }),
+  });
 }
