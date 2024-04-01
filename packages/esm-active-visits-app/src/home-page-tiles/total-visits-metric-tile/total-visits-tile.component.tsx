@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import dayjs from 'dayjs';
-import { type Visit } from '../types/index';
+import { type Visit } from '../../types/index';
 
 const useTotalVisits = () => {
   const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';

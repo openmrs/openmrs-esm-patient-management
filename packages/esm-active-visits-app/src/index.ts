@@ -16,15 +16,18 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
+export const homePageTilesSlot = getAsyncLifecycle(() => import('./home-page-tiles/metrics-slot.component'), options);
+
 export const activeVisits = getSyncLifecycle(activeVisitsComponent, options);
 
 export const visitDetail = getSyncLifecycle(visitDetailComponent, options);
 
 export const homeActiveVisitsTile = getAsyncLifecycle(
-  () => import('./active-visits-metric-tile/active-visits-tile.component'),
+  () => import('./home-page-tiles/active-visits-metric-tile/active-visits-tile.component'),
   options,
 );
+
 export const homeTotalVisitsTile = getAsyncLifecycle(
-  () => import('./total-visits-metric-tile/total-visits-tile.component'),
+  () => import('./home-page-tiles/total-visits-metric-tile/total-visits-tile.component'),
   options,
 );
