@@ -17,7 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
-import { updateQueueEntry, useVisitQueueEntries } from './active-visits-table.resource';
+import { updateQueueEntry } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
 import { useQueues } from '../helpers/useQueues';
@@ -25,6 +25,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ConfigObject } from '../config-schema';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;
@@ -61,7 +62,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
 
   const { queues } = useQueues(queueEntry?.queueLocation);
   const { queueLocations } = useQueueLocations();
-  const { mutate } = useVisitQueueEntries('', queueEntry?.queueLocation);
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const onSubmit = (data: ChangeStatusForm) => {
     const { priority, status, service } = data;
@@ -90,7 +91,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
             subtitle: t('queueEntryUpdateSuccessfully', 'Queue Entry Updated Successfully'),
           });
           closeModal();
-          mutate();
+          mutateQueueEntries();
           navigate({ to: `${window.spaBase}/home/service-queues` });
         }
       },

@@ -4,7 +4,8 @@ import styles from './clear-queue-entries-dialog.scss';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
-import { type MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import { type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 
 interface ClearQueueEntriesDialogProps {
   visitQueueEntries: Array<MappedVisitQueueEntry>;
@@ -13,7 +14,7 @@ interface ClearQueueEntriesDialogProps {
 
 const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visitQueueEntries, closeModal }) => {
   const { t } = useTranslation();
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClearQueueBatchRequest = useCallback(() => {
@@ -27,7 +28,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           kind: 'success',
           subtitle: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
-        mutate();
+        mutateQueueEntries();
       },
       (error) => {
         showSnackbar({
@@ -39,7 +40,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
         closeModal();
       },
     );
-  }, [closeModal, mutate, t, visitQueueEntries]);
+  }, [closeModal, mutateQueueEntries, t, visitQueueEntries]);
 
   return (
     <div>

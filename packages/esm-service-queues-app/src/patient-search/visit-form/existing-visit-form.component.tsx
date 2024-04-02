@@ -9,9 +9,9 @@ import {
   useLayoutType,
   type Visit,
 } from '@openmrs/esm-framework';
-import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
-import { type SearchTypes } from '../../types';
+import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
 import styles from './visit-form.scss';
+import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 
 interface ExistingVisitFormProps {
   visit: Visit;
@@ -25,7 +25,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
 
   const config = useConfig() as ConfigObject;
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   if (!visit) {
     return null;
@@ -64,7 +64,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
             });
             closePanel();
             setIsSubmitting(false);
-            mutate();
+            mutateQueueEntries();
           }
         },
         (error) => {
@@ -82,7 +82,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
         },
       );
     },
-    [closePanel, mutate, visit, t, visitQueueNumberAttributeUuid],
+    [closePanel, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
   );
 
   return (
