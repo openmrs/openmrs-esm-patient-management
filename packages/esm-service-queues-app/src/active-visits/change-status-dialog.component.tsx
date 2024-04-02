@@ -138,7 +138,9 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                     onChange={(event) => {
                       onChange(event.target.value);
                     }}>
-                    {!getValues()?.location && <SelectItem text={t('selectOption', 'Select an option')} value="" />}
+                    {!getValues()?.location && (
+                      <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                    )}
                     {queueLocations?.length > 0 &&
                       queueLocations.map((location) => (
                         <SelectItem key={location.id} text={location.name} value={location.id}>
