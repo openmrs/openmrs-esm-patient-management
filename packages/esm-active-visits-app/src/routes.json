@@ -5,7 +5,7 @@
   },
   "extensions": [
     {
-      "name": "arodi",
+      "name": "homepage-tiles",
       "slot": "home-dashboard-slot",
       "component": "homePageTilesSlot",
       "order": 0
