@@ -51,7 +51,7 @@ import {
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
 
-const time12HourFormatRegexPattern = '(1[0-2]|0?[1-9]):[0-5][0-9]';
+const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }

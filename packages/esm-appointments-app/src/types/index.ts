@@ -174,3 +174,7 @@ export interface RecurringAppointmentsPayload {
   appointmentRequest: AppointmentPayload;
   recurringPattern: RecurringPattern;
 }
+
+export interface PatientDetails {
+  dateOfBirth: string;
+}
