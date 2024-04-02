@@ -104,6 +104,11 @@ export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
   options,
 );
 
+export const homeAppointmentsTile = getAsyncLifecycle(
+  () => import('./homepage-tile/appointments-tile.component'),
+  options,
+);
+
 registerWorkspace({
   name: 'appointments-form-workspace',
   load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),

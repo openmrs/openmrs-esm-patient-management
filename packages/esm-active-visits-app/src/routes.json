@@ -5,6 +5,18 @@
   },
   "extensions": [
     {
+      "name": "home-active-visits-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeActiveVisitsTile",
+      "order": 0
+    },
+    {
+      "name": "home-total-visits-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeTotalVisitsTile",
+      "order": 0
+    },
+    {
       "name": "active-visits-widget",
       "slot": "homepage-widgets-slot",
       "component": "activeVisits",
