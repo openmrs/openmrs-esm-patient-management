@@ -38,8 +38,8 @@ function ClinicMetrics() {
       return true;
     }
   });
-  const { queueEntries } = useQueueEntries({
-    service: currentServiceUuid,
+  const { queueEntries, totalCount } = useQueueEntries({
+    queue: currentServiceUuid,
     location: currentQueueLocation,
     isEnded: false,
   });
@@ -68,7 +68,7 @@ function ClinicMetrics() {
         />
         <MetricsCard
           label={t('patients', 'Patients')}
-          value={initialSelectedItem ? queueEntries?.length ?? '--' : serviceCount}
+          value={initialSelectedItem ? totalCount ?? '--' : serviceCount}
           headerLabel={`${t('waitingFor', 'Waiting for')}:`}
           service={currentServiceName}
           serviceUuid={currentServiceUuid}
