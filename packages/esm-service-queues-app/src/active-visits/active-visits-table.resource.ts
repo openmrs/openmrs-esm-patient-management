@@ -129,11 +129,7 @@ export const mapVisitQueueEntryProperties = (
 });
 
 export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
-  const { queueLocations } = useQueueLocations();
-  const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-
-  const apiUrl =
-    `${restBaseUrl}/visit-queue-entry?v=full` + (queueLocationUuid ? `&location=${queueLocationUuid}` : '');
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?v=full` + (locationUuid ? `&location=${locationUuid}` : '');
   const { t } = useTranslation();
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
