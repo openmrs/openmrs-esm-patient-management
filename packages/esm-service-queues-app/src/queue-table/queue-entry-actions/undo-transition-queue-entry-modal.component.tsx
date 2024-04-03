@@ -11,9 +11,9 @@ interface UndoTransitionQueueEntryModalProps {
 
 const UndoTransitionQueueEntryModal: React.FC<UndoTransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
-  const { previousQueueEntry } = queueEntry;
+  const { previousQueueEntry, queueComingFrom } = queueEntry;
 
-  const previousEntrySameQueue = previousQueueEntry.queue.uuid == queueEntry.queue.uuid;
+  const previousEntrySameQueue = queueComingFrom.uuid == queueEntry.queue.uuid;
   const modalInstruction = previousEntrySameQueue ? (
     <p>
       {t('confirmMoveBackStatus', 'Are you sure you want to move patient back to status "{{status}}"?', {
@@ -27,7 +27,7 @@ const UndoTransitionQueueEntryModal: React.FC<UndoTransitionQueueEntryModalProps
         'confirmMoveBackQueueAndStatus',
         'Are you sure you want to move patient back to queue "{{queue}}" with status "{{status}}"?',
         {
-          queue: previousQueueEntry.queue.display,
+          queue: queueComingFrom.display,
           status: previousQueueEntry.status.display,
           interpolation: { escapeValue: false },
         },
