@@ -12,7 +12,6 @@
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
     "verify": "turbo lint typescript test --color --concurrency=2",
-    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\" --list-different",
     "test-e2e": "playwright test",
     "postinstall": "husky install",
     "extract-translations": "turbo extract-translations -- --config ../../tools/i18next-parser.config.js"
@@ -54,8 +53,6 @@
     "dayjs": "^1.8.36",
     "dotenv": "^16.0.3",
     "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "i18next": "^21.10.0",
@@ -82,7 +79,10 @@
     "webpack-dev-server": "^4.15.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --cache --fix",
+      "prettier --cache --write --ignore-unknown --list-different"
+    ]
   },
   "packageManager": "yarn@4.1.1"
 }

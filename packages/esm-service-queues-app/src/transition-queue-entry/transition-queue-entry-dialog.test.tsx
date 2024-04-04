@@ -42,9 +42,12 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 jest.mock('../active-visits/active-visits-table.resource', () => ({
-  useVisitQueueEntries: jest.fn(() => ({ mutate: jest.fn() })),
   serveQueueEntry: jest.fn(() => Promise.resolve({ status: 200 })),
   updateQueueEntry: jest.fn(() => Promise.resolve({ status: 201 })),
+}));
+
+jest.mock('../hooks/useMutateQueueEntries', () => ({
+  useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 
 jest.mock('./transition-queue-entry.resource', () => ({

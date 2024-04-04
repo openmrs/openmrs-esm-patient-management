@@ -76,6 +76,16 @@
       "component": "earlyAppointments"
     },
     {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "meta": {
+        "title": {
+          "key": "createNewAppointment",
+          "default": "Create new appointment"
+        }
+      }
+    },
+    {
       "name": "patient-appointments-summary-dashboard",
       "component": "patientAppointmentsSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
