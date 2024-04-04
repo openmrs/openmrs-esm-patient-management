@@ -242,6 +242,11 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
+      {
+        id: 6,
+        header: t('actions', 'Actions'),
+        key: 'actions',
+      },
     ],
     [t],
   );
@@ -276,6 +281,13 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
       waitTime: {
         content: <QueueDuration startedAt={entry.startedAt} endedAt={entry.endedAt} />,
       },
+      actions: (
+        <div className={styles.actionMenu}>
+          <TransitionMenu queueEntry={entry} />
+          <EditMenu queueEntry={entry} />
+          <ActionsMenu queueEntry={entry} />
+        </div>
+      ),
     }));
   }, [paginatedQueueEntries]);
 
@@ -415,15 +427,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="cds--table-column-menu">
-                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <EditMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
