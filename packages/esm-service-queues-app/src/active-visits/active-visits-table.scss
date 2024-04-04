@@ -263,3 +263,8 @@ html[dir='rtl'] {
     }
   }
 }
+.actionMenu {
+  display: flex; 
+  align-items: center;
+  padding: 0;
+}
