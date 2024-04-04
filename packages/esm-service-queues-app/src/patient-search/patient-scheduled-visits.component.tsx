@@ -32,7 +32,6 @@ import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
-import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import { addQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24, type amPm } from '../helpers/time-helpers';
@@ -40,6 +39,7 @@ import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
 import { useQueues } from '../helpers/useQueues';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
@@ -65,7 +65,7 @@ const ScheduledVisits: React.FC<{
   const locations = useLocations();
   const session = useSession();
   const { queues } = useQueues(userLocation);
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
@@ -149,7 +149,7 @@ const ScheduledVisits: React.FC<{
                       });
                       closePanel();
                       setIsSubmitting(false);
-                      mutate();
+                      mutateQueueEntries();
                     }
                   },
                   (error) => {
@@ -193,7 +193,7 @@ const ScheduledVisits: React.FC<{
       selectedQueueLocation,
       visitQueueNumberAttributeUuid,
       closePanel,
-      mutate,
+      mutateQueueEntries,
     ],
   );
 

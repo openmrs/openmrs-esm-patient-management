@@ -33,18 +33,15 @@ import {
   ExtensionSlot,
   isDesktop,
   showModal,
+  showSnackbar,
   useConfig,
   useFeatureFlag,
   useLayoutType,
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import {
-  type MappedVisitQueueEntry,
-  mapVisitQueueEntryProperties,
-  useVisitQueueEntries,
-} from './active-visits-table.resource';
-import { type QueueEntry, SearchTypes } from '../types';
+import { type MappedVisitQueueEntry, mapVisitQueueEntryProperties } from './active-visits-table.resource';
+import { type QueueEntry } from '../types';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -70,7 +67,6 @@ import QueueTable from '../queue-table/queue-table.component';
 import { queueTableNameColumn } from '../queue-table/cells/queue-table-name-cell.component';
 import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-coming-from-cell.component';
 import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
-import { activeVisitActionsColumn } from './active-visits-row-actions.component';
 import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
 import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
 import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
@@ -78,6 +74,8 @@ import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-
 import QueuePriority from '../queue-entry-table-components/queue-priority.component';
 import QueueStatus from '../queue-entry-table-components/queue-status.component';
 import QueueDuration from '../queue-entry-table-components/queue-duration.component';
+import { queueTableActionColumn } from '../queue-table/cells/queue-table-action-cell.component';
+import { useQueueEntries } from '../hooks/useQueueEntries';
 
 /**
  * FIXME Temporarily moved here
@@ -102,22 +100,32 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const currentServiceName = useSelectedServiceName();
+  const selectedQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
+  const { queueEntries, isLoading, error } = useQueueEntries({
+    queue: selectedQueueUuid,
+    location: currentLocationUuid,
+    isEnded: false,
+  });
   const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
   const layout = useLayoutType();
   const { t } = useTranslation();
-  const selectedServiceUuid = useSelectedServiceUuid();
 
-  const queueEntries = visitQueueEntries?.map((entry) => entry.queueEntry);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
+
+  useEffect(() => {
+    if (error?.message) {
+      showSnackbar({
+        title: t('errorLoadingQueueEntries', 'Error loading queue entries'),
+        kind: 'error',
+        subtitle: error?.message,
+      });
+    }
+  }, [error?.message]);
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   } else if (useNewActiveVisitsTable) {
-    const queueEntriesInSelectedQueue = queueEntries.filter(
-      (queueEntry) => !selectedServiceUuid || queueEntry.queue.uuid == selectedServiceUuid,
-    );
-
     const columns = [
       queueTableNameColumn,
       queueTablePriorityColumn,
@@ -125,7 +133,7 @@ function ActiveVisitsTable() {
       queueTableStatusColumn,
       queueTableQueueColumn,
       queueTableWaitTimeColumn,
-      activeVisitActionsColumn,
+      queueTableActionColumn,
     ];
     return (
       <div className={styles.container}>
@@ -133,13 +141,32 @@ function ActiveVisitsTable() {
           <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
             <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
           </div>
+          <div className={styles.headerButtons}>
+            <ExtensionSlot
+              name="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'secondary',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: 'sm',
+                },
+                selectPatientAction: (selectedPatientUuid) => {
+                  setShowOverlay(true);
+                  setViewState({ selectedPatientUuid });
+                },
+              }}
+            />
+          </div>
         </div>
         <QueueTable
-          queueEntries={queueEntriesInSelectedQueue}
+          queueEntries={queueEntries ?? []}
           queueTableColumns={columns}
           ExpandedRow={QueueTableExpandedRow}
           tableFilter={<ActiveVisitsTableFilter />}
         />
+        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
       </div>
     );
   } else {

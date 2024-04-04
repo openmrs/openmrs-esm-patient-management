@@ -51,15 +51,6 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-jest.mock('../active-visits/active-visits-table.resource', () => {
-  const originalModule = jest.requireActual('../active-visits/active-visits-table.resource');
-
-  return {
-    ...originalModule,
-    useVisitQueueEntries: jest.fn().mockReturnValue(5),
-  };
-});
-
 describe('Clinic metrics', () => {
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     mockedUseConfig.mockReturnValue({
