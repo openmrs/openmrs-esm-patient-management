@@ -6,7 +6,7 @@
   "extensions": [
     {
       "name": "homepage-tiles",
-      "slot": "home-dashboard-slot",
+      "slot": "home-metrics-tiles-slot",
       "component": "homePageTilesSlot",
       "order": 0
     },
