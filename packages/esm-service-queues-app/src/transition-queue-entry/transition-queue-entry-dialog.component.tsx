@@ -15,13 +15,13 @@ import {
   type MappedVisitQueueEntry,
   serveQueueEntry,
   updateQueueEntry,
-  useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import { findObsByConceptUUID } from '../helpers/functions';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { usePastVisits } from '../past-visit/past-visit.resource';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import styles from './transition-queue-entry-dialog.scss';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
@@ -47,7 +47,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
   const obsToDisplay =
     !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const launchEditPriorityModal = useCallback(() => {
     const endedAt = new Date();
@@ -73,7 +73,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                 subtitle: t('patientAttendingService', 'Patient attending service'),
               });
               closeModal();
-              mutate();
+              mutateQueueEntries();
               navigate({ to: `\${openmrsSpaBase}/patient/${queueEntry?.patientUuid}/chart` });
             }
           });
@@ -101,7 +101,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             subtitle: t('patientRequeued', 'Patient has been requeued'),
           });
           closeModal();
-          mutate();
+          mutateQueueEntries();
         }
       },
       (error) => {

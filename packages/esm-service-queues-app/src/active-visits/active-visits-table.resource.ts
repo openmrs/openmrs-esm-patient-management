@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
 import last from 'lodash-es/last';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { useTranslation } from 'react-i18next';
 import {
@@ -48,15 +48,6 @@ export interface MappedVisitQueueEntry {
   visitQueueNumber: string;
   identifiers: Array<Identifer>;
   queueComingFrom: string;
-}
-
-interface UseVisitQueueEntries {
-  visitQueueEntries: Array<VisitQueueEntry> | null;
-  visitQueueEntriesCount: number;
-  isLoading: boolean;
-  isError: Error;
-  isValidating?: boolean;
-  mutate: () => void;
 }
 
 interface ObsData {
@@ -122,37 +113,11 @@ export const mapVisitQueueEntryProperties = (
   queueUuid: queueEntry.queue.uuid,
   queueEntryUuid: queueEntry.uuid,
   sortWeight: queueEntry.sortWeight,
-  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e.attributeType.uuid === visitQueueNumberAttributeUuid)
+  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
     ?.value,
   identifiers: queueEntry.patient?.identifiers as Identifer[],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
-
-export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
-  const apiUrl = `${restBaseUrl}/visit-queue-entry?v=full` + (locationUuid ? `&location=${locationUuid}` : '');
-  const { t } = useTranslation();
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
-
-  let visitQueueEntries: VisitQueueEntry[];
-
-  if (!currServiceName || currServiceName == t('all', 'All')) {
-    visitQueueEntries = data?.data?.results;
-  } else {
-    visitQueueEntries = data?.data?.results.filter((data) => data.queueEntry.queue.name == currServiceName);
-  }
-
-  return {
-    visitQueueEntries: visitQueueEntries ?? [],
-    visitQueueEntriesCount: visitQueueEntries?.length ?? 0,
-    isLoading,
-    isError: error,
-    isValidating,
-    mutate,
-  };
-}
 
 export const getOriginFromPathName = (pathname = '') => {
   const from = pathname.split('/');
