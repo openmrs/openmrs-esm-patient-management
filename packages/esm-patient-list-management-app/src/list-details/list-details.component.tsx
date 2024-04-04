@@ -45,7 +45,7 @@ const ListDetails = () => {
               name: member?.patient?.person?.display,
               identifier: member?.patient?.identifiers[0]?.identifier ?? null,
               sex: member?.patient?.person?.gender,
-              startDate: formatDate(parseDate(member?.startDate)),
+              startDate: member?.startDate ? formatDate(parseDate(member?.startDate)) : null,
               uuid: `${member?.patient?.uuid}`,
               membershipUuid: member?.uuid,
             }))
