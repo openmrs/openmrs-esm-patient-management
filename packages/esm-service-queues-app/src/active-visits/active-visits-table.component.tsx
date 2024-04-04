@@ -123,13 +123,9 @@ function ActiveVisitsTable() {
       });
     }
   }, [error?.message]);
-
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   } else if (useNewActiveVisitsTable) {
-    const queueEntriesInSelectedQueue =
-      queueEntries?.filter((queueEntry) => !selectedQueueUuid || queueEntry.queue.uuid == selectedQueueUuid) ?? [];
-
     const columns = [
       queueTableNameColumn,
       queueTablePriorityColumn,
@@ -165,7 +161,7 @@ function ActiveVisitsTable() {
           </div>
         </div>
         <QueueTable
-          queueEntries={queueEntriesInSelectedQueue}
+          queueEntries={queueEntries ?? []}
           queueTableColumns={columns}
           ExpandedRow={QueueTableExpandedRow}
           tableFilter={<ActiveVisitsTableFilter />}
