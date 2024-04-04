@@ -37,6 +37,9 @@ export const defaultQueueTableConfig: QueueTableTabConfig = {
   ],
 };
 
+// displays the queue entries of a given queue by
+// showing a list of tabs (one tab per status), each showing
+// queue entries within that status
 const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   selectedQueue,
   selectedStatus,
