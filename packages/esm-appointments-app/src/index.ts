@@ -72,8 +72,6 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
 
 export const appointmentsDashboard = getSyncLifecycle(appointmentsDashboardComponent, options);
 
-export const checkInModal = getAsyncLifecycle(() => import('./home/check-in-modal/check-in-modal.component'), options);
-
 export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
 
 export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layer } from '@carbon/react';
 import AppointmentsList from '../appointments/scheduled/appointments-list.component';
 import dayjs from 'dayjs';
 import styles from './index.scss';
