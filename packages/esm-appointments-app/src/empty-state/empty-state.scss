@@ -51,11 +51,6 @@
   border: 1px solid $ui-03;
 }
 
-.actionText {
-  display: flex;
-  align-items: center;
-}
-
 .header4 {
   @include type.type-style('heading-compact-01');
   margin-bottom: 1rem;

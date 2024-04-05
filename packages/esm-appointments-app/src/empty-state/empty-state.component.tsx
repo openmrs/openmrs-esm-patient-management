@@ -10,10 +10,9 @@ export interface EmptyStateProps {
   displayText: string;
   headerTitle: string;
   launchForm?(): void;
-  scheduleType: string;
 }
 
-export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText, launchForm, scheduleType }) => {
+export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText, launchForm }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -27,17 +26,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({ headerTitle, displayText
         <p className={styles.content}>
           {t('emptyStateText', 'There are no {{displayText}} to display', { displayText })}
         </p>
-        {scheduleType === 'Scheduled' ? (
-          <p className={styles.action}>
-            {launchForm && (
-              <span>
-                <Button renderIcon={Add} kind="ghost" onClick={() => launchForm()}>
-                  {t('createAppointment', 'Create appointment')}
-                </Button>
-              </span>
-            )}
-          </p>
-        ) : null}
       </Tile>
     </Layer>
   );

@@ -1,0 +1,12 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.container {
+  border: 1px solid colors.$gray-20;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 95vw;
+  margin-top: layout.$spacing-09;
+  margin-bottom: layout.$spacing-12;
+}
+
