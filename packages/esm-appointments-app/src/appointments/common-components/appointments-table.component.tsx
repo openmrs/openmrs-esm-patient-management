@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DataTableSkeleton,
   DataTable,
+  Layer,
   TableContainer,
   Table,
   TableHead,
@@ -17,6 +18,7 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  Tile,
   Button,
 } from '@carbon/react';
 import {
@@ -26,6 +28,8 @@ import {
   formatDate,
   useConfig,
   parseDate,
+  isDesktop,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import startCase from 'lodash-es/startCase';
 import { Download } from '@carbon/react/icons';
@@ -39,26 +43,22 @@ import AppointmentDetails from '../details/appointment-details.component';
 import AppointmentActions from './appointments-actions.component';
 import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
+import { EmptyDataIllustration } from '../../empty-state/empty-data-illustration.component';
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
   isLoading: boolean;
   tableHeading: string;
-  scheduleType?: string;
 }
 
-const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
-  appointments,
-  isLoading,
-  tableHeading,
-  scheduleType,
-}) => {
+const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isLoading, tableHeading }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(25);
   const [searchString, setSearchString] = useState('');
   const searchResults = useAppointmentSearchResults(appointments, searchString);
   const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
   const { customPatientChartUrl, patientIdentifierType } = useConfig<ConfigObject>();
+  const layout = useLayoutType();
 
   const headerData = [
     {
@@ -68,6 +68,10 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
     {
       header: t('identifier', 'Identifier'),
       key: 'identifier',
+    },
+    {
+      header: t('location', 'Location'),
+      key: 'location',
     },
     {
       header: t('serviceType', 'Service Type'),
@@ -96,8 +100,9 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
+    location: appointment.location.name,
     provider: appointment.provider,
-    actions: <AppointmentActions appointment={appointment} scheduleType={scheduleType} />,
+    actions: <AppointmentActions appointment={appointment} />,
   }));
 
   if (isLoading) {
@@ -107,93 +112,96 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   if (!appointments?.length) {
     return (
       <EmptyState
-        headerTitle={`${tableHeading} appointments`}
-        displayText={`${tableHeading.toLowerCase()} appointments`}
+        headerTitle={`${startCase(t(tableHeading))} ${t('appointments', 'appointments')}`}
+        displayText={`${t(tableHeading).toLowerCase()} ${t('appointments', 'appointments').toLowerCase()}`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
-        scheduleType={scheduleType}
       />
     );
   }
 
   return (
-    <>
-      <DataTable rows={rowData} headers={headerData} isSortable useZebraStyles>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
-          <TableContainer
-            title={`${startCase(tableHeading)} ${t('appointment', 'appointment')}`}
-            description={`${t(`Total ${appointments.length ?? 0}`)}`}
-            {...getTableContainerProps()}>
-            <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
-              <TableToolbarContent>
-                <TableToolbarSearch
-                  style={{ backgroundColor: '#f4f4f4' }}
-                  onChange={(event) => setSearchString(event.target.value)}
-                />
-                <Button
-                  size="lg"
-                  kind="tertiary"
-                  renderIcon={Download}
-                  onClick={() => {
-                    const date = appointments[0]?.startDateTime
-                      ? formatDate(parseDate(appointments[0]?.startDateTime), {
-                          time: false,
-                          noToday: true,
-                        })
-                      : null;
-                    downloadAppointmentsAsExcel(appointments, `${tableHeading}_appointments_${date}`);
-                  }}>
-                  {t('download', 'Download')}
-                </Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+    <Layer>
+      <Tile className={styles.headerContainer}>
+        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+          <h4>{`${startCase(t(tableHeading))} ${t('appointments', 'appointments')}`}</h4>
+        </div>
+      </Tile>
+      <Tile>
+        <DataTable rows={rowData} headers={headerData} isSortable useZebraStyles>
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
+            <TableContainer title={`${t('Total')} ${appointments.length ?? 0}`} {...getTableContainerProps()}>
+              <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    style={{ backgroundColor: '#f4f4f4' }}
+                    onChange={(event) => setSearchString(event.target.value)}
+                  />
+                  <Button
+                    size="lg"
+                    kind="tertiary"
+                    renderIcon={Download}
+                    onClick={() => {
+                      const date = appointments[0]?.startDateTime
+                        ? formatDate(parseDate(appointments[0]?.startDateTime), {
+                            time: false,
+                            noToday: true,
+                          })
+                        : null;
+                      downloadAppointmentsAsExcel(appointments, `${tableHeading}_appointments_${date}`);
+                    }}>
+                    {t('download', 'Download')}
+                  </Button>
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader />
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableRow className={styles.expandedActiveVisitRow}>
+                          <th colSpan={headers.length + 2}>
+                            <AppointmentDetails appointment={appointments[row.id]} />
+                          </th>
+                        </TableRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
                   ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    {row.isExpanded ? (
-                      <TableRow className={styles.expandedActiveVisitRow}>
-                        <th colSpan={headers.length + 2}>
-                          <AppointmentDetails appointment={appointments[row.id]} />
-                        </th>
-                      </TableRow>
-                    ) : (
-                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                    )}
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
-      <Pagination
-        backwardText="Previous page"
-        forwardText="Next page"
-        itemsPerPageText="Items per page:"
-        page={currentPage}
-        pageNumberText="Page Number"
-        pageSize={pageSize}
-        onChange={({ page, pageSize }) => {
-          goTo(page);
-          setPageSize(pageSize);
-        }}
-        pageSizes={getPageSizes(appointments, pageSize) ?? []}
-        totalItems={appointments.length ?? 0}
-      />
-    </>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        <Pagination
+          backwardText="Previous page"
+          forwardText="Next page"
+          itemsPerPageText="Items per page:"
+          page={currentPage}
+          pageNumberText="Page Number"
+          pageSize={pageSize}
+          onChange={({ page, pageSize }) => {
+            goTo(page);
+            setPageSize(pageSize);
+          }}
+          pageSizes={getPageSizes(appointments, pageSize) ?? []}
+          totalItems={appointments.length ?? 0}
+        />
+      </Tile>
+    </Layer>
   );
 };
 

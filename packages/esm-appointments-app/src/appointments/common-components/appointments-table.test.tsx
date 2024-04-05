@@ -95,12 +95,6 @@ describe('AppointmentsBaseTable', () => {
 
     const emptyScreenText = screen.getByText(/There are no scheduled appointments to display/);
     expect(emptyScreenText).toBeInTheDocument();
-
-    const launchAppointmentsForm = screen.getByRole('button', { name: /Create appointment/ });
-
-    await user.click(launchAppointmentsForm);
-
-    expect(mockLaunchOverlay).toHaveBeenCalledWith('Search', <PatientSearch />);
   });
 
   it('should render loading state when loading data', () => {

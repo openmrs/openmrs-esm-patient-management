@@ -35,7 +35,7 @@ import { type Appointment } from '../types';
 import { useTodaysAppointments } from './home-appointments.resource';
 import { type ConfigObject } from '../config-schema';
 import { formatAMPM } from '../helpers';
-import styles from './appointments-base-table.scss';
+import styles from './index.scss';
 import { useMutateAppointments } from '../form/appointments-form.resource';
 
 interface PaginationData {

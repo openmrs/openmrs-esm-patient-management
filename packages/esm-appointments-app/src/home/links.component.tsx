@@ -6,7 +6,7 @@ import { useConfig, navigate } from '@openmrs/esm-framework';
 import { launchOverlay } from '../hooks/useOverlay';
 import { spaHomePage } from '../constants';
 import PatientSearch from '../patient-search/patient-search.component';
-import styles from './appointments-base-table.scss';
+import styles from './index.scss';
 
 const SeeAllAppointmentsLink = () => {
   const { useBahmniAppointmentsUI: useBahmniUI, bahmniAppointmentsUiBaseUrl } = useConfig();

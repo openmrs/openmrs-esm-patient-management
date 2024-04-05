@@ -20,7 +20,7 @@ import {
 import rootComponent from './root.component';
 import appointmentsDashboardComponent from './appointments.component';
 import homeAppointmentsComponent from './home';
-import appointmentStatusComponent from './appointments/scheduled/appointments-by-status.component';
+import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
 import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
 import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
@@ -76,7 +76,7 @@ export const checkInModal = getAsyncLifecycle(() => import('./home/check-in-moda
 
 export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
 
-export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
+export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 

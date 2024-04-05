@@ -9,7 +9,7 @@ import { launchCheckInAppointmentModal, handleUpdateStatus, handleComplete } fro
 import AppointmentForm from '../form/appointments-form.component';
 import CancelAppointment from '../appointments/forms/cancel-form/cancel-appointment.component';
 import PatientSearch from '../patient-search/patient-search.component';
-import styles from './appointments-base-table.scss';
+import styles from './index.scss';
 import { useMutateAppointments } from '../form/appointments-form.resource';
 
 interface ActionMenuProps {
