@@ -27,7 +27,6 @@ export interface VisitQueueEntry {
 
 export interface MappedVisitQueueEntry {
   id: string;
-  encounters: Array<MappedEncounter>;
   name: string;
   patientAge: string;
   patientDob: string;
@@ -93,7 +92,6 @@ export const mapVisitQueueEntryProperties = (
   visitQueueNumberAttributeUuid: string,
 ): MappedVisitQueueEntry => ({
   id: queueEntry.uuid,
-  encounters: queueEntry.visit?.encounters?.map(mapEncounterProperties),
   name: queueEntry.display,
   patientUuid: queueEntry.patient.uuid,
   patientAge: queueEntry.patient.person?.age + '',
