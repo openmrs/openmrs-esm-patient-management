@@ -4,9 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { type Appointment } from '../../types';
 import { usePagination } from '@openmrs/esm-framework';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
-import { launchOverlay } from '../../hooks/useOverlay';
 import AppointmentsTable from './appointments-table.component';
-import PatientSearch from '../../patient-search/patient-search.component';
 
 // Define mock appointments data for testing purposes
 const appointments: Appointment = [
@@ -59,7 +57,6 @@ const appointments: Appointment = [
 const mockUsePagination = usePagination as jest.Mock;
 const mockGoToPage = jest.fn();
 const mockDownloadAppointmentsAsExcel = downloadAppointmentsAsExcel as jest.Mock;
-const mockLaunchOverlay = launchOverlay as jest.Mock;
 
 jest.mock('../../helpers/excel');
 jest.mock('../../hooks/useOverlay');
@@ -87,13 +84,11 @@ describe('AppointmentsBaseTable', () => {
   };
 
   it('should render empty state if appointments are not provided', async () => {
-    const user = userEvent.setup();
-
     render(<AppointmentsTable {...props} />);
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
 
-    const emptyScreenText = screen.getByText(/There are no scheduled appointments to display/);
+    const emptyScreenText = screen.getByText(/There are no Scheduled appointments to display/);
     expect(emptyScreenText).toBeInTheDocument();
   });
 
