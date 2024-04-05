@@ -31,7 +31,6 @@ import {
   isDesktop,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import startCase from 'lodash-es/startCase';
 import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
@@ -43,7 +42,6 @@ import AppointmentDetails from '../details/appointment-details.component';
 import AppointmentActions from './appointments-actions.component';
 import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
-import { EmptyDataIllustration } from '../../empty-state/empty-data-illustration.component';
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
@@ -112,8 +110,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   if (!appointments?.length) {
     return (
       <EmptyState
-        headerTitle={`${startCase(t(tableHeading))} ${t('appointments', 'appointments')}`}
-        displayText={`${t(tableHeading).toLowerCase()} ${t('appointments', 'appointments').toLowerCase()}`}
+        headerTitle={`${t(tableHeading)} ${t('appointments', 'appointments')}`}
+        displayText={`${t(tableHeading)} ${t('appointments', 'appointments')}`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
       />
     );
@@ -123,7 +121,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
     <Layer>
       <Tile className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{`${startCase(t(tableHeading))} ${t('appointments', 'appointments')}`}</h4>
+          <h4>{`${t(tableHeading)} ${t('appointments', 'appointments')}`}</h4>
         </div>
       </Tile>
       <Tile>

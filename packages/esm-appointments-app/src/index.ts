@@ -19,7 +19,7 @@ import {
 } from './scheduled-appointments-config-schema';
 import rootComponent from './root.component';
 import appointmentsDashboardComponent from './appointments.component';
-import homeAppointmentsComponent from './home';
+import homeAppointmentsComponent from './home/home-appointments.component';
 import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
 import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
