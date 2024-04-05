@@ -18,7 +18,6 @@ dayjs.extend(isToday);
 
 interface AppointmentActionsProps {
   appointment: Appointment;
-  scheduleType: string;
 }
 
 const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) => {

@@ -19,8 +19,8 @@ import {
 } from './scheduled-appointments-config-schema';
 import rootComponent from './root.component';
 import appointmentsDashboardComponent from './appointments.component';
-import homeAppointmentsComponent from './home';
-import appointmentStatusComponent from './appointments/scheduled/appointments-by-status.component';
+import homeAppointmentsComponent from './home/home-appointments.component';
+import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
 import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
 import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
@@ -72,11 +72,9 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
 
 export const appointmentsDashboard = getSyncLifecycle(appointmentsDashboardComponent, options);
 
-export const checkInModal = getAsyncLifecycle(() => import('./home/check-in-modal/check-in-modal.component'), options);
-
 export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
 
-export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
+export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 
