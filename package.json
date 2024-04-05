@@ -79,10 +79,8 @@
     "webpack-dev-server": "^4.15.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --cache --fix",
-      "prettier --cache --write --ignore-unknown --list-different"
-    ]
+    "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
+    "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
   "packageManager": "yarn@4.1.1"
 }

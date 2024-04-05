@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/type';
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/type';
+@use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -59,7 +59,7 @@
 
 .tableContainer {
   background-color: $ui-01;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   padding: 0;
 
   a {
@@ -77,8 +77,8 @@
   .toolbarContent {
     display: flex;
     align-items: baseline;
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
+    height: layout.$spacing-07;
+    margin-bottom: layout.$spacing-02;
     z-index: 1; // prevent dropdown from getting covered by table elements
   }
 }
@@ -200,7 +200,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 
   h4:after {
     content: '';
@@ -226,13 +226,13 @@
 
 .headerBtnContainer {
   background-color: $ui-background;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   text-align: right;
 }
 
 .addPatientToListBtn {
-  margin-left: spacing.$spacing-05;
-  height: spacing.$spacing-09;
+  margin-left: layout.$spacing-05;
+  height: layout.$spacing-09;
 }
 
 // Overriding styles for RTL support
@@ -240,7 +240,7 @@ html[dir='rtl'] {
   .headerContainer {
     svg {
       margin-left: 0;
-      margin-right: spacing.$spacing-03;
+      margin-right: layout.$spacing-03;
     }
     h4 {
       text-align: right;
@@ -254,17 +254,17 @@ html[dir='rtl'] {
       text-align: right;
       .serviceColor {
         margin-right: 0;
-        margin-left: spacing.$spacing-03;
+        margin-left: layout.$spacing-03;
       }
       button {
-        padding: spacing.$spacing-03 0 spacing.$spacing-03 spacing.$spacing-05;
+        padding: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
         text-align: right;
       }
     }
   }
 }
 .actionMenu {
-  display: flex; 
+  display: flex;
   align-items: center;
   padding: 0;
 }
