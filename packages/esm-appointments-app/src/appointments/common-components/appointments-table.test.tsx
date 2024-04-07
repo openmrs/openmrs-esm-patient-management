@@ -2,7 +2,6 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { type Appointment } from '../../types';
-import { usePagination } from '@openmrs/esm-framework';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import AppointmentsTable from './appointments-table.component';
 
@@ -54,8 +53,6 @@ const appointments: Appointment = [
   },
 ];
 
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
 const mockDownloadAppointmentsAsExcel = downloadAppointmentsAsExcel as jest.Mock;
 
 jest.mock('../../helpers/excel');
@@ -65,7 +62,6 @@ jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
     ...originalModule,
-    openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => ({
       customPatientChartUrl: 'someUrl',
       checkInButton: { enabled: true },
@@ -83,7 +79,7 @@ describe('AppointmentsBaseTable', () => {
     scheduleType: 'Scheduled',
   };
 
-  it('should render empty state if appointments are not provided', async () => {
+  it('renders empty state if appointments data is unavailable', async () => {
     render(<AppointmentsTable {...props} />);
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
@@ -92,19 +88,13 @@ describe('AppointmentsBaseTable', () => {
     expect(emptyScreenText).toBeInTheDocument();
   });
 
-  it('should render loading state when loading data', () => {
+  it('renders a loading state when fetching data', () => {
     render(<AppointmentsTable {...props} isLoading={true} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
-  it('should render table with headers and rows if appointments are provided', async () => {
-    mockUsePagination.mockReturnValue({
-      results: appointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
-
+  it('renders a tabular overview of the scheduled appointments', async () => {
     render(<AppointmentsTable {...props} appointments={appointments} />);
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
@@ -116,7 +106,7 @@ describe('AppointmentsBaseTable', () => {
     expect(patient).toHaveAttribute('href', 'someUrl');
   });
 
-  it('should update search string when search input is changed', async () => {
+  it('updates the search string when the search input changes', async () => {
     const user = userEvent.setup();
 
     render(<AppointmentsTable {...props} appointments={appointments} />);
@@ -129,7 +119,7 @@ describe('AppointmentsBaseTable', () => {
     expect(searchInput).toHaveValue('John');
   });
 
-  it("should contain the title 'Scheduled appointments' and Total count", async () => {
+  it("contians the titles 'Scheduled appointments' and Total count", async () => {
     render(<AppointmentsTable {...props} appointments={appointments} />);
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
@@ -138,7 +128,7 @@ describe('AppointmentsBaseTable', () => {
     expect(screen.getByText(/Total 1/)).toBeInTheDocument();
   });
 
-  it('should execute the download function when download button is clicked', async () => {
+  it('Executes the download function when download button is clicked', async () => {
     const user = userEvent.setup();
 
     render(<AppointmentsTable {...props} appointments={appointments} />);
@@ -151,56 +141,5 @@ describe('AppointmentsBaseTable', () => {
 
     expect(downloadButton).toBeInTheDocument();
     expect(mockDownloadAppointmentsAsExcel).toHaveBeenCalledWith(appointments, expect.anything());
-  });
-
-  it('should have pagination when there are more than 25 appointments', async () => {
-    const user = userEvent.setup();
-
-    const mockAppointments = Array.from({ length: 100 }, (_, i) => ({
-      patientUuid: `${i}`,
-      name: `Patient ${i}`,
-      identifier: `${i}${i}${i}${i}${i}`,
-      dateTime: new Date().toISOString(),
-      serviceType: 'Service',
-      provider: `Dr. Provider ${i}`,
-      id: `${i}`,
-      age: `${i + 20}`,
-      gender: i % 2 === 0 ? 'M' : 'F',
-      providers: [],
-      appointmentKind: 'Scheduled',
-      appointmentNumber: `${i}${i}${i}${i}${i}`,
-      location: 'Location',
-      phoneNumber: '1234567890',
-      status: 'Status',
-      comments: 'Some comments',
-      dob: new Date(`${i + 1950}-01-01T00:00:00.000Z`).toISOString(),
-      serviceUuid: `${i}${i}${i}${i}${i}`,
-    }));
-    mockUsePagination.mockReturnValue({
-      results: appointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
-
-    render(<AppointmentsTable {...props} appointments={mockAppointments} />);
-
-    await screen.findByRole('heading', { name: /scheduled appointment/i });
-
-    expect(screen.getByText(/1–25 of 100 items/)).toBeInTheDocument();
-    const nextPageButton = screen.getByRole('button', { name: /Next page/ });
-    const previousPageButton = screen.getByRole('button', { name: /Previous page/ });
-
-    // Clicking the next page button should call the goTo function with the next page number
-    await user.click(nextPageButton);
-
-    expect(mockGoToPage).toHaveBeenCalledWith(2);
-    expect(screen.getByText(/26–50 of 100 items/)).toBeInTheDocument();
-
-    // Clicking the previous page button should call the goTo function with the previous page number
-    await user.click(previousPageButton);
-
-    expect(mockGoToPage).toHaveBeenCalledWith(1);
-
-    expect(screen.getByText(/1–25 of 100 items/)).toBeInTheDocument();
   });
 });

@@ -107,6 +107,7 @@ function ActiveVisitsTable() {
     location: currentLocationUuid,
     isEnded: false,
   });
+
   const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
   const layout = useLayoutType();
   const { t } = useTranslation();
