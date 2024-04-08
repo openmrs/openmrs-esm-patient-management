@@ -1,14 +1,12 @@
-import { defineConfigSchema, usePagination, useSession } from '@openmrs/esm-framework';
+import React from 'react';
+import { defineConfigSchema, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { mockQueueEntries, mockSession } from '__mocks__';
-import React from 'react';
 import { renderWithSwr } from 'tools';
 import { defaultQueueTableConfig } from './queue-table-by-status.component';
 import QueueTable from './queue-table.component';
 import { configSchema } from '../config-schema';
 
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
 const mockUseSession = useSession as jest.Mock;
 
 describe('QueueTable: ', () => {
@@ -35,12 +33,6 @@ describe('QueueTable: ', () => {
   });
 
   it('renders queue entries with default columns', () => {
-    mockUsePagination.mockReturnValue({
-      results: mockQueueEntries,
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
-
     renderWithSwr(<QueueTable queueEntries={mockQueueEntries} queueTableColumns={defaultQueueTableConfig.columns} />);
 
     for (const entry of mockQueueEntries) {
