@@ -1,8 +1,7 @@
 import React from 'react';
+import { filterByServiceType } from '../utils';
 import { useAppointmentList } from '../../hooks/useAppointmentList';
 import AppointmentsTable from '../common-components/appointments-table.component';
-import { filterByServiceType } from '../utils';
-import dayjs from 'dayjs';
 
 interface AppointmentsListProps {
   appointmentServiceType?: string;

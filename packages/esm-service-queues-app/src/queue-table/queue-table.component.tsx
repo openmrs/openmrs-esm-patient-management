@@ -108,7 +108,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
                 const Row = ExpandedRow ? TableExpandRow : TableRow;
 
                 return (
-                  <>
+                  <React.Fragment key={row.id}>
                     <Row {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
@@ -119,7 +119,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
                         <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                       </TableExpandedRow>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </TableBody>

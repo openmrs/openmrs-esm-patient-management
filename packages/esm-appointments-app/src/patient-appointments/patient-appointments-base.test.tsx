@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
 import AppointmentsBase from './patient-appointments-base.component';
@@ -12,20 +12,6 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    usePagination: jest.fn().mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: [],
-    })),
-  };
-});
 
 describe('AppointmensOverview', () => {
   it('renders an empty state if appointments data is unavailable', async () => {
@@ -40,8 +26,6 @@ describe('AppointmensOverview', () => {
   });
 
   it('renders an error state if there was a problem fetching appointments data', async () => {
-    const user = userEvent.setup();
-
     const error = {
       message: 'Internal server error',
       response: {
@@ -68,11 +52,6 @@ describe('AppointmensOverview', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
-    mockUsePagination.mockImplementation(() => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: mockAppointmentsData.data,
-    }));
 
     renderAppointments();
 

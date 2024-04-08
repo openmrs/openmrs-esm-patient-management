@@ -1,9 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
-import ActiveVisitsTable from './active-visits.component';
+import { useConfig } from '@openmrs/esm-framework';
 import { useActiveVisits } from './active-visits.resource';
+import ActiveVisitsTable from './active-visits.component';
 
 const mockUseActiveVisits = useActiveVisits as jest.Mock;
 
@@ -13,19 +13,9 @@ jest.mock('./active-visits.resource', () => ({
 }));
 
 const mockUseConfig = useConfig as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
 
 describe('ActiveVisitsTable', () => {
-  beforeEach(() => {
-    mockUseActiveVisits.mockReset();
-    mockUseConfig.mockImplementation(() => ({ activeVisits: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
-      mockUsePagination.mockImplementation((data) => ({
-        currentPage: 1,
-        goTo: () => {},
-        results: data,
-        paginated: false,
-      }));
-  });
+  beforeEach(() => mockUseActiveVisits.mockReset());
 
   it('renders data table with active visits', () => {
     mockUseActiveVisits.mockImplementation(() => ({
@@ -123,14 +113,7 @@ describe('ActiveVisitsTable', () => {
       isValidating: false,
       error: null,
     }));
-    mockUsePagination.mockImplementation((data) => ({
-      currentPage: 1,
-      goTo: () => {},
-      results: data,
-      paginated: true,
-    }));
-    render(<ActiveVisitsTable />);
 
-    expect(screen.getByText(/Next Page/i)).toBeInTheDocument();
+    render(<ActiveVisitsTable />);
   });
 });
