@@ -5,35 +5,21 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
   TableToolbar,
   TableToolbarContent,
-  TableToolbarSearch,
+  Tile,
 } from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
-import React, { type FC, useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './queue-table.scss';
 import { type QueueEntry, type QueueTableColumn } from '../types';
-import { TableExpandRow } from '@carbon/react';
-import { TableExpandHeader } from '@carbon/react';
-import { TableExpandedRow } from '@carbon/react';
-import { Tile } from '@carbon/react';
-
-interface DataTableHeader {
-  key: string;
-  header: React.ReactNode;
-}
-
-type FilterProps = {
-  rowIds: Array<string>;
-  headers: Array<DataTableHeader>;
-  cellsById: Record<string, any>;
-  inputValue: string;
-  getCellId: (row, key) => string;
-};
+import styles from './queue-table.scss';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
@@ -44,30 +30,27 @@ interface QueueTableProps {
   ExpandedRow?: FC<{ queueEntry: QueueEntry }>;
 
   // if provided, adds addition table toolbar elements
-  tableFilter?: React.ReactNode;
+  tableFilter?: React.ReactNode[];
+
+  showSearchBar?: boolean;
 }
 
-function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter }: QueueTableProps) {
+function QueueTable({
+  queueEntries,
+  queueTableColumns,
+  ExpandedRow,
+  tableFilter,
+  showSearchBar = true,
+}: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredQueueEntries = useMemo(() => {
-    const searchTermLowercase = searchTerm.toLowerCase();
-    return queueEntries.filter((queueEntry) => {
-      return queueTableColumns.some((column) => {
-        const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
-        return columnSearchTerm?.includes(searchTermLowercase);
-      });
-    });
-  }, [queueEntries, searchTerm]);
-
-  const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(filteredQueueEntries, currentPageSize);
+  const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
 
   useEffect(() => {
     goTo(1);
-  }, [searchTerm]);
+  }, [queueEntries]);
 
   const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
   const rowsData =
@@ -83,17 +66,11 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
     <DataTable rows={rowsData} headers={headers} useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
         <TableContainer className={styles.tableContainer}>
-          <TableToolbar {...getToolbarProps()}>
-            <TableToolbarContent className={styles.toolbarContent}>
-              {tableFilter}
-              <TableToolbarSearch
-                className={styles.search}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={t('searchThisList', 'Search this list')}
-                size="sm"
-              />
-            </TableToolbarContent>
-          </TableToolbar>
+          {tableFilter && (
+            <TableToolbar {...getToolbarProps()}>
+              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+            </TableToolbar>
+          )}
           <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
             <TableHead>
               <TableRow>
@@ -140,7 +117,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
             page={currentPage}
             pageSize={currentPageSize}
             pageSizes={pageSizes}
-            totalItems={filteredQueueEntries?.length}
+            totalItems={queueEntries?.length}
             onChange={({ pageSize, page }) => {
               if (pageSize !== currentPageSize) {
                 setPageSize(pageSize);
