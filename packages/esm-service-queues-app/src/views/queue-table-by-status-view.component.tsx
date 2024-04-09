@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useQueue } from '../hooks/useQueue';
 import QueueTableByStatus from '../queue-table/queue-table-by-status.component';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
-import QueueTablesForAllStatuses from '../queue-table/queue-tables-for-all-statuses.component';
+import QueueTablesForAllStatuses from './queue-tables-for-all-statuses.component';
 
 const QueueTableByStatusView: React.FC = () => {
   const { queueUuid, statusUuid } = useParams();
