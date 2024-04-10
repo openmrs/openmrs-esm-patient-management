@@ -6,6 +6,7 @@ import { type Appointment } from '../../types';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
 import AppointmentsTable from './appointments-table.component';
 import { configSchema } from '../../config-schema';
+import { getByTextWithMarkup } from '../../../../../tools/test-utils';
 
 defineConfigSchema('@openmrs/esm-appointments-app', configSchema);
 
@@ -66,7 +67,7 @@ describe('AppointmentsTable', () => {
   const props = {
     appointments: [],
     isLoading: false,
-    tableHeading: 'Scheduled',
+    tableHeading: 'scheduled',
     visits: [],
     scheduleType: 'Scheduled',
   };
@@ -85,8 +86,7 @@ describe('AppointmentsTable', () => {
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
 
-    const emptyScreenText = screen.getByText(/There are no Scheduled appointments to display/);
-    expect(emptyScreenText).toBeInTheDocument();
+    expect(getByTextWithMarkup('There are no scheduled appointments to display')).toBeInTheDocument();
   });
 
   it('renders a loading state when fetching data', () => {
