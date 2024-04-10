@@ -173,9 +173,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     },
   });
 
-  const [pickedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const handleWorkloadDateChange = (date: Date) => {
-    setSelectedDate(date);
+    const appointmentDate = getValues('appointmentDateTime');
+    setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
   };
 
   const handleMultiselectChange = (e) => {
@@ -217,16 +217,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   // Same for creating and editing
   const handleSaveAppointment = (data: AppointmentFormData) => {
     setIsSubmitting(true);
-
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
-
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
       appointmentRequest: appointmentPayload,
       recurringPattern: constructRecurringPattern(data),
     };
-
     const abortController = new AbortController();
     (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
@@ -237,7 +234,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           setIsSubmitting(false);
           closeWorkspace();
           mutateAppointments();
-
           showSnackbar({
             isLowContrast: true,
             kind: 'success',
@@ -330,13 +326,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     };
   };
 
+  const onError = (error) => console.error(error);
+
   if (isLoading)
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
   return (
-    <Form className={styles.formWrapper}>
+    <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
@@ -588,7 +586,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       <DatePicker
                         datePickerType="single"
                         dateFormat={datePickerFormat}
-                        value={pickedDate || value.startDate}
+                        value={value.startDate}
                         onChange={([date]) => {
                           if (date) {
                             onChange({ ...value, startDate: date });
@@ -709,7 +707,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={isSubmitting} onClick={handleSubmit(handleSaveAppointment)}>
+        <Button className={styles.button} disabled={isSubmitting} type="submit">
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>

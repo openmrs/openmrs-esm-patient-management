@@ -43,11 +43,15 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
               <div
                 onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))}
                 key={i}
-                className={styles.monthlyWorkloadCard}>
+                className={`${styles.monthlyWorkloadCard} ${
+                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
+                    ? styles.selectedDate
+                    : ''
+                }`}>
                 <MonthlyWorkloadCard
                   key={i}
                   date={dateTime}
-                  isActive={dayjs().format('DD-MM-YYYY') === dayjs().format('DD-MM-YYYY')}
+                  isActive={dayjs(dateToDisplay).format('DD-MM-YYYY') === dayjs(dateTime).format('DD-MM-YYYY')}
                   count={
                     calendarWorkload.find((calendar) => calendar.date === dayjs(dateTime).format('YYYY-MM-DD'))
                       ?.count ?? 0
@@ -63,4 +67,3 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 };
 
 export default MonthlyCalendarView;
-//onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))} // Pass date on click
