@@ -1,23 +1,26 @@
-@use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.expandedActiveVisitRow > td > div {
+.expandedRow > td > div {
   max-height: max-content !important;
 }
 
-.expandedActiveVisitRow td {
+.expandedRow td {
   padding: 0 2rem;
 }
 
-.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
+.expandedRow th[colspan] td[colspan] > div:first-child {
   padding: 0 1rem;
 }
 
 .hiddenRow {
   display: none;
+}
+
+.container {
+  border: 1px solid colors.$gray-20;
 }
 
 .headerContainer {
@@ -59,8 +62,60 @@
 .emptyStateContent {
   @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.searchbar {
+  input {
+    background-color: colors.$gray-10;
+  }
+}
+
+.link {
+  text-decoration: none;
+  max-width: 50%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
 }
 
 // Overriding styles for RTL support
