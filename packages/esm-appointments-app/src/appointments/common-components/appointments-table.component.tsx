@@ -243,12 +243,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
             </TableContainer>
             {rows.length === 0 ? (
               <div className={styles.tileContainer}>
-                <Tile className={styles.tile}>
-                  <div className={styles.tileContent}>
-                    <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
-                    <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
-                  </div>
-                </Tile>
+                <Layer>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noAppointmentsToDisplay', 'No appointments to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </Layer>
               </div>
             ) : null}
           </>
