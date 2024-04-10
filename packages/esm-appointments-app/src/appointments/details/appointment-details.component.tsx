@@ -31,19 +31,19 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
         <div>
           <p className={styles.gridTitle}>{t('patientDetails', 'Patient details')}</p>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('patientName', 'Patient name')} : </p>
+            <p className={styles.labelBold}>{t('patientName', 'Patient name')}: </p>
             <p className={styles.label}>{appointment.patient.name}</p>
           </div>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('age', 'Age')} : </p>
+            <p className={styles.labelBold}>{t('age', 'Age')}: </p>
             <p className={styles.label}>{appointment.patient.age}</p>
           </div>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('gender', 'Gender')} : </p>
+            <p className={styles.labelBold}>{t('gender', 'Gender')}: </p>
             <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
           </div>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')} : </p>
+            <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
             <p className={styles.label}>
               {patientDetails && patientDetails?.dateOfBirth
                 ? formatDate(new Date(patientDetails && patientDetails?.dateOfBirth ? patientDetails?.dateOfBirth : ''))

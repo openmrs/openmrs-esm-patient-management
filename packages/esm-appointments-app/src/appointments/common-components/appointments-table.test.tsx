@@ -62,7 +62,7 @@ const mockedUseConfig = useConfig as jest.Mock;
 jest.mock('../../helpers/excel');
 jest.mock('../../hooks/useOverlay');
 
-describe('AppointmentsBaseTable', () => {
+describe('AppointmentsTable', () => {
   const props = {
     appointments: [],
     isLoading: false,
@@ -99,8 +99,7 @@ describe('AppointmentsBaseTable', () => {
     render(<AppointmentsTable {...props} appointments={appointments} />);
 
     await screen.findByRole('heading', { name: /scheduled appointment/i });
-    expect(screen.getByRole('heading', { name: /total 1/i })).toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: /filter table/i })).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: /filter table/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /download/i })).toBeInTheDocument();
     expect(screen.getByRole('row', { name: /john wilson 100gej hiv clinic outpatient/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /john wilson/i })).toBeInTheDocument();
