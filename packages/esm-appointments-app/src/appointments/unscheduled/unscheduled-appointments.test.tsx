@@ -3,11 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
-import { usePagination } from '@openmrs/esm-framework';
 import UnscheduledAppointments from './unscheduled-appointments.component';
 
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
 const mockDownloadAppointmentsAsExcel = downloadUnscheduledAppointments as jest.Mock;
 const mockUseUnscheduledAppointments = useUnscheduledAppointments as jest.Mock;
 
@@ -19,7 +16,6 @@ jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
     ...originalModule,
-    openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => ({
       customPatientChartUrl: 'someUrl',
     })),
@@ -55,12 +51,8 @@ describe('UnscheduledAppointments component', () => {
       error: null,
     });
 
-    mockUsePagination.mockReturnValue({
-      results: mockUnscheduledAppointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
     render(<UnscheduledAppointments />);
+
     const header = screen.getByText('Unscheduled appointments 2');
     expect(header).toBeInTheDocument();
 
@@ -87,11 +79,6 @@ describe('UnscheduledAppointments component', () => {
       error: null,
     });
 
-    mockUsePagination.mockReturnValue({
-      results: mockUnscheduledAppointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
     render(<UnscheduledAppointments />);
 
     const searchInput = await screen.findByRole('searchbox');
@@ -119,11 +106,6 @@ describe('UnscheduledAppointments component', () => {
       error: null,
     });
 
-    mockUsePagination.mockReturnValue({
-      results: mockUnscheduledAppointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
     render(<UnscheduledAppointments />);
 
     const downloadButton = await screen.findByText('Download');
@@ -139,12 +121,6 @@ describe('UnscheduledAppointments component', () => {
       isLoading: false,
       data: [],
       error: null,
-    });
-
-    mockUsePagination.mockReturnValue({
-      results: mockUnscheduledAppointments.slice(0, 2),
-      goTo: mockGoToPage,
-      currentPage: 1,
     });
 
     render(<UnscheduledAppointments />);

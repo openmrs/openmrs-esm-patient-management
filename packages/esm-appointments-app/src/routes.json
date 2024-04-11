@@ -49,27 +49,27 @@
     {
       "name": "expected-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "checked-in-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "completed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "missed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "cancelled-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "early-appointments-panel",

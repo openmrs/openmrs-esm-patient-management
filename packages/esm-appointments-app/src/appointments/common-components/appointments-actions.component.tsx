@@ -2,37 +2,34 @@ import React from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { closeOverlay, launchOverlay } from '../../hooks/useOverlay';
-import { type Appointment } from '../../types';
 import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
-import { useTodaysVisits } from '../../hooks/useTodaysVisits';
-import AppointmentForm from '../../form/appointments-form.component';
-import CheckInButton from './checkin-button.component';
+import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
+import { useTodaysVisits } from '../../hooks/useTodaysVisits';
+import CheckInButton from './checkin-button.component';
+import styles from './appointments-actions.scss';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
-interface AppointmentActionsProps {
+interface AppointmentsActionsProps {
   appointment: Appointment;
-  scheduleType: string;
 }
 
-const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) => {
+const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
   const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
   const { visits, mutateVisit } = useTodaysVisits();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
-  const isFutureAppointment = visitDate.isAfter(dayjs());
-  const isTodayAppointment = visitDate.isToday();
   const hasActiveVisitToday = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
   const hasCheckedOutToday = visits?.some(
     (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
   );
+  const isTodaysAppointment = visitDate.isToday();
 
   const handleCheckout = () => {
     if (checkOutButton.customUrl) {
@@ -48,27 +45,21 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
     }
   };
 
-  /**
-   * Renders the appropriate visit status button based on the current appointment state.
-   * @returns {JSX.Element} The rendered button.
-   */
   const renderVisitStatus = () => {
-    const checkedOutText = t('checkedOut', 'Checked out');
-
     switch (true) {
-      case hasCheckedOutToday && isTodayAppointment:
+      case hasCheckedOutToday && isTodaysAppointment:
         return (
-          <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
-            {checkedOutText}
+          <Button kind="ghost" renderIcon={TaskComplete} iconDescription={t('checkedOut', 'Checked out')} size="sm">
+            {t('checkedOut', 'Checked out')}
           </Button>
         );
-      case checkOutButton.enabled && hasActiveVisitToday && isTodayAppointment:
+      case checkOutButton.enabled && hasActiveVisitToday && isTodaysAppointment:
         return (
-          <Button onClick={handleCheckout} size="sm" kind="danger--tertiary">
+          <Button onClick={handleCheckout} kind="danger--tertiary" size="sm">
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case checkInButton.enabled && !hasActiveVisitToday && isTodayAppointment: {
+      case checkInButton.enabled && !hasActiveVisitToday && isTodaysAppointment: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
 
@@ -78,23 +69,10 @@ const AppointmentActions: React.FC<AppointmentActionsProps> = ({ appointment }) 
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      {renderVisitStatus()}
-      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisitToday)) ? (
-        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
-          <OverflowMenuItem
-            itemText={t('editAppointments', 'Edit Appointment')}
-            onClick={() =>
-              launchOverlay(
-                t('editAppointments', 'Edit Appointment'),
-                <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
-              )
-            }
-          />
-        </OverflowMenu>
-      ) : null}
+    <div className={styles.container}>
+      <>{renderVisitStatus()}</>
     </div>
   );
 };
 
-export default AppointmentActions;
+export default AppointmentsActions;

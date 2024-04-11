@@ -1,31 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
   DataTableSkeleton,
   Dropdown,
   Pagination,
   Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  TabList,
-  TabPanel,
-  TabPanels,
   Tabs,
   Tile,
+  type DataTableHeader,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
@@ -40,8 +38,13 @@ import {
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import { type MappedVisitQueueEntry, mapVisitQueueEntryProperties } from './active-visits-table.resource';
-import { type QueueEntry } from '../types';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import { type ConfigObject } from '../config-schema';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
+import { timeDiffInMinutes } from '../helpers/functions';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -50,32 +53,21 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { timeDiffInMinutes } from '../helpers/functions';
-import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
-import CurrentVisit from '../current-visit/current-visit-summary.component';
-import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
-import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import styles from './active-visits-table.scss';
-import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
-import QueueTable from '../queue-table/queue-table.component';
-import { queueTableNameColumn } from '../queue-table/cells/queue-table-name-cell.component';
-import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-coming-from-cell.component';
-import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
-import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
-import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
-import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
-import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
+import { useQueueEntries } from '../hooks/useQueueEntries';
+import PastVisit from '../past-visit/past-visit.component';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import PatientSearch from '../patient-search/patient-search.component';
+import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
+import EditMenu from '../queue-entry-table-components/edit-entry.component';
+import QueueDuration from '../queue-entry-table-components/queue-duration.component';
 import QueuePriority from '../queue-entry-table-components/queue-priority.component';
 import QueueStatus from '../queue-entry-table-components/queue-status.component';
-import QueueDuration from '../queue-entry-table-components/queue-duration.component';
-import { queueTableActionColumn } from '../queue-table/cells/queue-table-action-cell.component';
-import { useQueueEntries } from '../hooks/useQueueEntries';
+import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
+import { type QueueEntry } from '../types';
+import { mapVisitQueueEntryProperties, type MappedVisitQueueEntry } from './active-visits-table.resource';
+import styles from './active-visits-table.scss';
 
 /**
  * FIXME Temporarily moved here
@@ -107,12 +99,9 @@ function ActiveVisitsTable() {
     location: currentLocationUuid,
     isEnded: false,
   });
-  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
-  const layout = useLayoutType();
-  const { t } = useTranslation();
 
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
+  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (error?.message) {
@@ -126,51 +115,9 @@ function ActiveVisitsTable() {
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   } else if (useNewActiveVisitsTable) {
-    const columns = [
-      queueTableNameColumn,
-      queueTablePriorityColumn,
-      queueTableComingFromColumn,
-      queueTableStatusColumn,
-      queueTableQueueColumn,
-      queueTableWaitTimeColumn,
-      queueTableActionColumn,
-    ];
-    return (
-      <div className={styles.container}>
-        <div className={styles.headerContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
-          </div>
-          <div className={styles.headerButtons}>
-            <ExtensionSlot
-              name="patient-search-button-slot"
-              state={{
-                buttonText: t('addPatientToQueue', 'Add patient to queue'),
-                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-                buttonProps: {
-                  kind: 'secondary',
-                  renderIcon: (props) => <Add size={16} {...props} />,
-                  size: 'sm',
-                },
-                selectPatientAction: (selectedPatientUuid) => {
-                  setShowOverlay(true);
-                  setViewState({ selectedPatientUuid });
-                },
-              }}
-            />
-          </div>
-        </div>
-        <QueueTable
-          queueEntries={queueEntries ?? []}
-          queueTableColumns={columns}
-          ExpandedRow={QueueTableExpandedRow}
-          tableFilter={<ActiveVisitsTableFilter />}
-        />
-        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
-      </div>
-    );
+    return <DefaultQueueTable queueEntries={queueEntries ?? []} />;
   } else {
-    return <OldQueueTable queueEntries={queueEntries} />;
+    return <OldQueueTable queueEntries={queueEntries ?? []} />;
   }
 }
 
@@ -555,34 +502,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
       </div>
       {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
-  );
-}
-
-function ActiveVisitsTableFilter() {
-  const { t } = useTranslation();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
-  const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
-  };
-
-  return (
-    <>
-      <div className={styles.filterContainer}>
-        <Dropdown
-          id="serviceFilter"
-          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-          label={currentServiceName}
-          type="inline"
-          items={[{ display: `${t('all', 'All')}` }, ...queues]}
-          itemToString={(item) => (item ? item.display : '')}
-          onChange={handleServiceChange}
-          size="sm"
-        />
-      </div>
-    </>
   );
 }
 
