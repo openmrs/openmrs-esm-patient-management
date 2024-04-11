@@ -39,7 +39,7 @@ function ClinicMetrics() {
     }
   });
   const { queueEntries, totalCount } = useQueueEntries({
-    queue: currentServiceUuid,
+    service: currentServiceUuid,
     location: currentQueueLocation,
     isEnded: false,
   });
@@ -47,7 +47,7 @@ function ClinicMetrics() {
   const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
 
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
+    updateSelectedServiceUuid(selectedItem?.service?.uuid);
     updateSelectedServiceName(selectedItem.display);
     if (selectedItem.uuid == undefined) {
       setInitialSelectItem(true);

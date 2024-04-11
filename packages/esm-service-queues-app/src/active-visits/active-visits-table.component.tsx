@@ -92,10 +92,10 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const selectedQueueUuid = useSelectedServiceUuid();
+  const selectedServiceQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const { queueEntries, isLoading, error } = useQueueEntries({
-    queue: selectedQueueUuid,
+    service: selectedServiceQueueUuid,
     location: currentLocationUuid,
     isEnded: false,
   });
@@ -128,11 +128,11 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queues } = useQueues(currentQueueLocation);
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
-  const visitQueueEntries = queueEntries.map((entry) =>
-    mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid),
-  );
-
   const currentServiceUuid = useSelectedServiceUuid();
+  const visitQueueEntries = queueEntries
+    .map((entry) => mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid))
+    .filter((entry) => (currentServiceUuid ? entry.queue.service.uuid === currentServiceUuid : true));
+
   const [showOverlay, setShowOverlay] = useState(false);
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
@@ -144,7 +144,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
     new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
   );
   const { queueLocations } = useQueueLocations();
-  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
+  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentQueueLocation);
 
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const pageSizes = [10, 20, 30, 40, 50];
