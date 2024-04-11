@@ -42,7 +42,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
   return (
     <>
       <MetricsHeader />
-      <div className={styles.cardContainer} data-testid="clinic-metrics">
+      <section className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
@@ -61,7 +61,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
           value={totalProviders}
           headerLabel={t('providersBooked', 'Providers booked: {{time}}', { time: formattedStartDate })}
         />
-      </div>
+      </section>
     </>
   );
 };
