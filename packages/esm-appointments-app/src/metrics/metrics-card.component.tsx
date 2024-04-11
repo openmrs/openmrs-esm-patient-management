@@ -5,7 +5,6 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 dayjs.extend(isSameOrBefore);
 import isEmpty from 'lodash-es/isEmpty';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import { Tile, Layer } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { basePath, spaHomePage } from '../constants';
 import styles from './metrics-card.scss';
@@ -39,8 +38,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   };
 
   return (
-    <Layer className={styles.container}>
-      <Tile className={styles.tileContainer}>
+    <article className={styles.container}>
+      <div className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
             <label className={styles.headerLabel}>{headerLabel}</label>
@@ -69,8 +68,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
             </div>
           )}
         </div>
-      </Tile>
-    </Layer>
+      </div>
+    </article>
   );
 };
 
