@@ -118,8 +118,12 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   if (!appointments?.length) {
     return (
       <EmptyState
-        headerTitle={`${t(tableHeading)} ${t('appointments', 'appointments')}`}
-        displayText={`${t(tableHeading)} ${t('appointments', 'appointments')}`}
+        headerTitle={`${t(tableHeading)} ${t('appointments_lower', 'appointments')}`}
+        displayText={`${
+          tableHeading?.match(/today/i)
+            ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
+            : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
+        }`}
         launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
       />
     );

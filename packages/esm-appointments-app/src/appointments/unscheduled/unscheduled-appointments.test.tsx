@@ -1,6 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { getByTextWithMarkup } from '../../../../../tools/test-utils';
 import { useUnscheduledAppointments } from '../../hooks/useUnscheduledAppointments';
 import { downloadUnscheduledAppointments } from '../../helpers/excel';
 import UnscheduledAppointments from './unscheduled-appointments.component';
@@ -125,7 +126,6 @@ describe('UnscheduledAppointments component', () => {
 
     render(<UnscheduledAppointments />);
 
-    const emptyState = await screen.findByText('There are no unscheduled appointments to display');
-    expect(emptyState).toBeInTheDocument();
+    expect(getByTextWithMarkup('There are no unscheduled appointments to display')).toBeInTheDocument();
   });
 });
