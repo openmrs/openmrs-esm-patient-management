@@ -1,7 +1,7 @@
 import { Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import React, { useMemo, useState } from 'react';
+import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../active-visits/active-visits-table.scss';
 import {
@@ -9,6 +9,7 @@ import {
   updateSelectedServiceUuid,
   useSelectedQueueLocationUuid,
   useSelectedServiceName,
+  useSelectedServiceUuid,
 } from '../helpers/helpers';
 import { useQueues } from '../helpers/useQueues';
 import PatientSearch from '../patient-search/patient-search.component';
@@ -22,14 +23,34 @@ import { queueTableStatusColumn } from './cells/queue-table-status-cell.componen
 import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
+import { useQueueEntries } from '../hooks/useQueueEntries';
+import { DataTableSkeleton } from '@carbon/react';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
 This is used in the main dashboard of the queues app. (Currently behind a feature flag)
 */
-function DefaultQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
-  const layout = useLayoutType();
+function DefaultQueueTable() {
+  const selectedQueueUuid = useSelectedServiceUuid();
+  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { queueEntries, isLoading, error } = useQueueEntries({
+    queue: selectedQueueUuid,
+    location: currentLocationUuid,
+    isEnded: false,
+  });
+
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (error?.message) {
+      showSnackbar({
+        title: t('errorLoadingQueueEntries', 'Error loading queue entries'),
+        kind: 'error',
+        subtitle: error?.message,
+      });
+    }
+  }, [error?.message]);
+  const layout = useLayoutType();
 
   const [showOverlay, setShowOverlay] = useState(false);
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
@@ -48,13 +69,17 @@ function DefaultQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
 
   const filteredQueueEntries = useMemo(() => {
     const searchTermLowercase = searchTerm.toLowerCase();
-    return queueEntries.filter((queueEntry) => {
+    return queueEntries?.filter((queueEntry) => {
       return columns.some((column) => {
         const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
     });
   }, [queueEntries, searchTerm]);
+
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
   return (
     <div className={styles.container}>

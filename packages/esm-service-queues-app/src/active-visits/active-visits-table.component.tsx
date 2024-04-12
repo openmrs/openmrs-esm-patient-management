@@ -99,8 +99,6 @@ function ActiveVisitsTable() {
     location: currentLocationUuid,
     isEnded: false,
   });
-
-  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -114,11 +112,9 @@ function ActiveVisitsTable() {
   }, [error?.message]);
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
-  } else if (useNewActiveVisitsTable) {
-    return <DefaultQueueTable queueEntries={queueEntries ?? []} />;
-  } else {
-    return <OldQueueTable queueEntries={queueEntries ?? []} />;
   }
+
+  return <OldQueueTable queueEntries={queueEntries ?? []} />;
 }
 
 // older implementation of the ActiveVisitsTable that we plan on deprecating

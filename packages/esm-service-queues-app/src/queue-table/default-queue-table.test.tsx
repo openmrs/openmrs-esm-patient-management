@@ -7,7 +7,7 @@ import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActiveVisitsTable from './active-visits-table.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUseQueueEntries = useQueueEntries as jest.Mock;
@@ -65,7 +65,7 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-describe('ActiveVisitsTable: ', () => {
+describe('DefaultQueueTable: ', () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession),
       mockedUseConfig.mockReturnValue({
@@ -82,6 +82,8 @@ describe('ActiveVisitsTable: ', () => {
     mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
 
     renderActiveVisitsTable();
+
+    await screen.findByRole('table');
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
@@ -104,7 +106,7 @@ describe('ActiveVisitsTable: ', () => {
     expect(john).toBeInTheDocument();
     expect(john).toHaveAttribute('href', 'someUrl');
 
-    const expectedColumnHeaders = [/name/, /priority/, /status/, /wait time/];
+    const expectedColumnHeaders = [/name/, /priority/, /status/, /waitTime/];
     expectedColumnHeaders.forEach((header) => {
       expect(
         screen.getByRole('columnheader', {
@@ -116,5 +118,5 @@ describe('ActiveVisitsTable: ', () => {
 });
 
 function renderActiveVisitsTable() {
-  renderWithSwr(<ActiveVisitsTable />);
+  renderWithSwr(<DefaultQueueTable />);
 }
