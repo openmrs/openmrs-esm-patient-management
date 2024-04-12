@@ -15,7 +15,7 @@ import {
   TableToolbarContent,
   Tile,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import React, { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
@@ -31,22 +31,16 @@ interface QueueTableProps {
 
   // if provided, adds addition table toolbar elements
   tableFilter?: React.ReactNode[];
-
-  showSearchBar?: boolean;
 }
 
-function QueueTable({
-  queueEntries,
-  queueTableColumns,
-  ExpandedRow,
-  tableFilter,
-  showSearchBar = true,
-}: QueueTableProps) {
+function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
   useEffect(() => {
     goTo(1);
@@ -63,8 +57,14 @@ function QueueTable({
     }) ?? [];
 
   return (
-    <DataTable rows={rowsData} headers={headers} useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
+    <DataTable
+      data-floating-menu-container
+      overflowMenuOnHover={isDesktop(layout)}
+      rows={rowsData}
+      headers={headers}
+      size={responsiveSize}
+      useZebraStyles>
+      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
         <TableContainer className={styles.tableContainer}>
           {tableFilter && (
             <TableToolbar {...getToolbarProps()}>
@@ -74,7 +74,7 @@ function QueueTable({
           <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
             <TableHead>
               <TableRow>
-                {ExpandedRow && <TableExpandHeader />}
+                {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
                 {headers.map((header) => (
                   <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                 ))}
