@@ -139,10 +139,4 @@ export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
-
-  registerFeatureFlag(
-    'new-queue-table',
-    'New Queue Table',
-    'Use a newer implementation of the queue table in the home dashboard of the queues app.',
-  );
 }

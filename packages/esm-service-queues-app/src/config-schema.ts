@@ -74,14 +74,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    generalPatientNoteUuid: {
-      _type: Type.ConceptUuid,
-      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    midUpperArmCircumferenceUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
@@ -142,6 +134,11 @@ export const configSchema = {
     _default: '',
     _description: 'Custom label for patient chart button',
   },
+  useActiveVisitsTable: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'If true, renders the ActiveVisitsTable instead of the default queue table',
+  },
 };
 
 export interface ConfigObject {
@@ -158,7 +155,6 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
-    midUpperArmCircumferenceUuid: string;
     emergencyPriorityConceptUuid: string;
     historicalObsConceptUuid: Array<string>;
   };
@@ -173,6 +169,7 @@ export interface ConfigObject {
   customPatientChartUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
+  useActiveVisitsTable: boolean;
 }
 
 export interface OutpatientConfig {

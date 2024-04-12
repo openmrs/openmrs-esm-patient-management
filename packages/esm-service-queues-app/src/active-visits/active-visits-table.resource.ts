@@ -119,11 +119,6 @@ export const mapVisitQueueEntryProperties = (
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
 
-export const getOriginFromPathName = (pathname = '') => {
-  const from = pathname.split('/');
-  return last(from);
-};
-
 export async function updateQueueEntry(
   visitUuid: string,
   previousQueueUuid: string,

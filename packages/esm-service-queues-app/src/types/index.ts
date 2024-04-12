@@ -1,5 +1,6 @@
 import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type ConfigObject } from '../config-schema';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -433,7 +434,7 @@ export interface QueueTableColumn {
 
   // function to extract from the queue entry a searchable string representing the its value within this column.
   // May be null to make this column's content unsearchable
-  getFilterableValue: (queueEntry: QueueEntry) => string | null;
+  getFilterableValue: (queueEntry: QueueEntry, config?: ConfigObject) => string | null;
 }
 
 export interface QueueTableTabConfig {

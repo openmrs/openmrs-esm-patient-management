@@ -7,7 +7,7 @@ import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActiveVisitsTable from './active-visits-table.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUseQueueEntries = useQueueEntries as jest.Mock;
@@ -65,7 +65,7 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-describe('ActiveVisitsTable: ', () => {
+describe('DefaultQueueTable: ', () => {
   beforeEach(() => {
     mockUseSession.mockReturnValue(mockSession),
       mockedUseConfig.mockReturnValue({
@@ -118,5 +118,5 @@ describe('ActiveVisitsTable: ', () => {
 });
 
 function renderActiveVisitsTable() {
-  renderWithSwr(<ActiveVisitsTable />);
+  renderWithSwr(<DefaultQueueTable />);
 }

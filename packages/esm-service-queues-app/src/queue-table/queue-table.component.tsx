@@ -92,7 +92,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
                           <TableCell key={cell.id}>{cell.value}</TableCell>
                         ))}
                       </Row>
-                      {ExpandedRow && (
+                      {ExpandedRow && row.isExpanded && (
                         <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
                           <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
                         </TableExpandedRow>
