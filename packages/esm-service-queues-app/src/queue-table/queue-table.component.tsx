@@ -65,42 +65,44 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
       size={responsiveSize}
       useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
-        <TableContainer className={styles.tableContainer}>
-          {tableFilter && (
-            <TableToolbar {...getToolbarProps()}>
-              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-            </TableToolbar>
-          )}
-          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
-            <TableHead>
-              <TableRow>
-                {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
-                {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => {
-                const Row = ExpandedRow ? TableExpandRow : TableRow;
+        <>
+          <TableContainer className={styles.tableContainer}>
+            {tableFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, i) => {
+                  const Row = ExpandedRow ? TableExpandRow : TableRow;
 
-                return (
-                  <React.Fragment key={row.id}>
-                    <Row {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </Row>
-                    {ExpandedRow && (
-                      <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
-                        <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
-                      </TableExpandedRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+                  return (
+                    <React.Fragment key={row.id}>
+                      <Row {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </Row>
+                      {ExpandedRow && (
+                        <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                          <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
+                        </TableExpandedRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
           {rows.length === 0 && (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
@@ -127,7 +129,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
               }
             }}
           />
-        </TableContainer>
+        </>
       )}
     </DataTable>
   );
