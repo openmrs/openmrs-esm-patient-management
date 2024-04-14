@@ -177,7 +177,11 @@ export const RelationshipsSection = () => {
           uuid: type.uuid,
           direction: 'bIsToA',
         };
-        aIsToB.display === bIsToA.display ? tmp.push(aIsToB) : tmp.push(aIsToB, bIsToA);
+        aIsToB.display === bIsToA.display
+          ? tmp.push(aIsToB)
+          : bIsToA.display === 'Patient'
+            ? tmp.push(aIsToB, { display: `Patient (${aIsToB.display})`, uuid: type.uuid, direction: 'bIsToA' })
+            : tmp.push(aIsToB, bIsToA);
       });
       setDisplayRelationshipTypes(tmp);
     }
