@@ -43,27 +43,27 @@
     {
       "name": "expected-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "checked-in-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "completed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "missed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "cancelled-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "early-appointments-panel",
@@ -78,6 +78,36 @@
           "default": "Create new appointment"
         }
       }
+    },
+    {
+      "name": "patient-appointments-summary-dashboard",
+      "component": "patientAppointmentsSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 11,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-appointments-dashboard-slot",
+        "title": "Appointments",
+        "path": "Appointments"
+      }
+    },
+    {
+      "name": "patientAppointments-details-widget",
+      "component": "patientAppointmentsDetailedSummary",
+      "slot": "patient-chart-appointments-dashboard-slot",
+      "meta": {
+        "columnSpan": 1
+      }
+    },
+    {
+      "name": "patient-upcoming-appointment-widget",
+      "component": "patientUpcomingAppointmentsWidget",
+      "slot": "upcoming-appointment-slot"
+    },
+    {
+      "name": "patient-appointment-cancel-confirmation-dialog",
+      "component": "patientAppointmentsCancelConfirmationDialog"
     }
   ]
 }

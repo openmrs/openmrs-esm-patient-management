@@ -1,8 +1,15 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
 import rootComponent from './root.component';
+import queueTableByStatusMenuComponent from './queue-table/queue-table-by-status-menu.component';
 import appointmentListComponent from './queue-patient-linelists/scheduled-appointments-table.component';
 import queueListComponent from './queue-patient-linelists/queue-services-table.component';
 import outpatientSideNavComponent from './side-menu/side-menu.component';
@@ -21,6 +28,8 @@ const options = {
 };
 
 export const root = getSyncLifecycle(rootComponent, options);
+
+export const queueTableByStatusMenu = getSyncLifecycle(queueTableByStatusMenuComponent, options);
 
 export const appointmentsList = getSyncLifecycle(appointmentListComponent, options);
 
@@ -93,9 +102,33 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/transitions/transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/transition-queue-entry-modal.component'),
   {
     featureName: 'transfer patient to a different queue',
+    moduleName,
+  },
+);
+
+export const editQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/edit-queue-entry-modal.component'),
+  {
+    featureName: 'edit queue entry of a patient',
+    moduleName,
+  },
+);
+
+export const undoTransitionQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry-modal.component'),
+  {
+    featureName: 'undo queue entry transiion of a patient',
+    moduleName,
+  },
+);
+
+export const voidQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/void-queue-entry-modal.component'),
+  {
+    featureName: 'void queue entry of a patient',
     moduleName,
   },
 );
@@ -106,4 +139,10 @@ export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
+
+  registerFeatureFlag(
+    'new-queue-table',
+    'New Queue Table',
+    'Use a newer implementation of the queue table in the home dashboard of the queues app.',
+  );
 }

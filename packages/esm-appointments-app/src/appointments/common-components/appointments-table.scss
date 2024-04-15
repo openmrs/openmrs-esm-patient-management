@@ -1,18 +1,133 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
-.expandedActiveVisitRow > td > div {
+.expandedRow > td > div {
   max-height: max-content !important;
 }
 
-.expandedActiveVisitRow td {
+.expandedRow td {
   padding: 0 2rem;
 }
 
-.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
+.expandedRow th[colspan] td[colspan] > div:first-child {
   padding: 0 1rem;
 }
 
 .hiddenRow {
   display: none;
+}
+
+.container {
+  border: 1px solid colors.$gray-20;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
+  background-color: colors.$white-0;
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: colors.$gray-70;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  text-transform: capitalize;
+
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: colors.$gray-70;
+
+    &:after {
+      content: '';
+      display: block;
+      width: 2rem;
+      padding-top: 3px;
+      border-bottom: 0.375rem solid var(--brand-03);
+    }
+  }
+}
+
+.emptyStateContent {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.searchbar {
+  input {
+    background-color: colors.$gray-10;
+  }
+}
+
+.link {
+  text-decoration: none;
+  max-width: 50%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .headerContainer {
+    padding: layout.$spacing-04 layout.$spacing-05 layout.$spacing-04 0;
+    svg {
+      margin-left: 0;
+      margin-right: layout.$spacing-03;
+    }
+    h4 {
+      text-align: right;
+    }
+  }
 }

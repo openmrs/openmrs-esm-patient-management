@@ -4,8 +4,7 @@
 @import '../root.scss';
 
 .appointmentList {
-  height: 100%;
-  width: 100%;
+  margin: 1rem;
 
   & > div {
     background-color: $ui-02;
@@ -13,7 +12,7 @@
 }
 
 .tabs {
-  grid-column: 'span 2';
+  grid-column: span 2;
 }
 
 .tab {

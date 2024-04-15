@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 
 import { useTranslation } from 'react-i18next';
 import { Calendar, Hospital } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
-import { ExtensionSlot, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { spaHomePage } from '../constants';
 import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import styles from './metrics-header.scss';
 import AppointmentsForm from '../form/appointments-form.component';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 dayjs.extend(isToday);
 
 const MetricsHeader: React.FC = () => {
   const { t } = useTranslation();
+  const { selectedDate } = useContext(SelectedDateContext);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
   const launchCreateAppointmentForm = (patientUuid) => {
     const props = {
@@ -34,7 +38,10 @@ const MetricsHeader: React.FC = () => {
         <Button
           kind="tertiary"
           renderIcon={Calendar}
-          onClick={() => navigate({ to: `${spaHomePage}/appointments/calendar` })}>
+          size={responsiveSize}
+          onClick={() =>
+            navigate({ to: `${spaHomePage}/appointments/calendar/${dayjs(selectedDate).format('YYYY-MM-DD')}` })
+          }>
           {t('appointmentsCalendar', 'Appointments Calendar')}
         </Button>
         <ExtensionSlot
@@ -46,7 +53,7 @@ const MetricsHeader: React.FC = () => {
             buttonProps: {
               kind: 'primary',
               renderIcon: (props) => <Hospital size={32} {...props} />,
-              size: 'lg',
+              size: responsiveSize,
             },
           }}
         />

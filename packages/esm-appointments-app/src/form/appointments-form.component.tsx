@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePickerInput,
   DatePicker,
+  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
   NumberInput,
+  RadioButton,
+  RadioButtonGroup,
   Select,
   SelectItem,
   Stack,
-  RadioButtonGroup,
-  RadioButton,
   TextArea,
-  TimePickerSelect,
   TimePicker,
+  TimePickerSelect,
   Toggle,
 } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
@@ -32,8 +32,8 @@ import {
   ResponsiveWrapper,
   type FetchResponse,
 } from '@openmrs/esm-framework';
-import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
+  checkAppointmentConflict,
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
@@ -43,9 +43,20 @@ import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
+import {
+  appointmentLocationTagName,
+  dateFormat,
+  datePickerFormat,
+  datePickerPlaceHolder,
+  weekDays,
+} from '../constants';
 import styles from './appointments-form.scss';
-import { checkAppointmentConflict } from '../appointments/forms/forms.resource';
+import SelectedDateContext from '../hooks/selectedDateContext';
+
+const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+function isValidTime(timeStr) {
+  return timeStr.match(new RegExp(time12HourFormatRegexPattern));
+}
 
 const appointmentsFormSchema = z.object({
   duration: z.number(),
@@ -59,7 +70,7 @@ const appointmentsFormSchema = z.object({
   recurringPatternPeriod: z.number(),
   recurringPatternDaysOfWeek: z.array(z.string()),
   selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string(),
+  startTime: z.string().refine((value) => isValidTime(value)),
   timeFormat: z.enum(['AM', 'PM']),
   appointmentDateTime: z.object({
     startDate: z.date(),
@@ -95,9 +106,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       : 'AM';
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
+  const { selectedDate } = useContext(SelectedDateContext);
   const { data: services, isLoading } = useAppointmentService();
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
@@ -110,16 +122,23 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const defaultStartDate = appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date();
+  // TODO can we clean this all up to be more consistent between using Date and dayjs?
+  const defaultStartDate = appointment?.startDateTime
+    ? new Date(appointment?.startDateTime)
+    : selectedDate
+      ? new Date(selectedDate)
+      : new Date();
   const defaultEndDate = recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null;
   const defaultEndDateText = recurringPattern?.endDate
     ? dayjs(new Date(recurringPattern.endDate)).format(dateFormat)
     : '';
   const defaultStartDateText = appointment?.startDateTime
     ? dayjs(new Date(appointment.startDateTime)).format(dateFormat)
-    : dayjs(new Date()).format(dateFormat);
+    : selectedDate
+      ? dayjs(selectedDate).format(dateFormat)
+      : dayjs(new Date()).format(dateFormat);
 
-  const defaultAppointmentStartDate = appointment?.startDateTime
+  const defaultAppointmentStartTime = appointment?.startDateTime
     ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
     : dayjs(new Date()).format('hh:mm');
 
@@ -144,7 +163,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       recurringPatternType: defaultRecurringPatternType,
       recurringPatternPeriod: defaultRecurringPatternPeriod,
       recurringPatternDaysOfWeek: defaultRecurringPatternDaysOfWeek,
-      startTime: defaultAppointmentStartDate,
+      startTime: defaultAppointmentStartTime,
       duration: defaultDuration,
       timeFormat: defaultTimeFormat,
       appointmentDateTime: {
@@ -155,6 +174,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       },
     },
   });
+
+  const [pickedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const handleWorkloadDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   const handleMultiselectChange = (e) => {
     setValue(
@@ -281,7 +305,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const [hours, minutes] = convertTime12to24(startTime, timeFormat);
+    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
+    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+    const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
     const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
 
@@ -422,7 +448,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             id="recurringToggle"
             labelB={t('yes', 'Yes')}
             labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appoinment?')}
+            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
             onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
           />
         </section>
@@ -576,8 +602,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       <DatePicker
                         datePickerType="single"
                         dateFormat={datePickerFormat}
-                        value={value.startDate}
-                        onChange={([date]) => onChange({ ...value, startDate: date })}>
+                        value={pickedDate || value.startDate}
+                        onChange={([date]) => {
+                          if (date) {
+                            onChange({ ...value, startDate: date });
+                          }
+                        }}>
                         <DatePickerInput
                           id="datePickerInput"
                           labelText={t('date', 'Date')}
@@ -604,6 +634,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               <Workload
                 selectedService={watch('selectedService')}
                 appointmentDate={watch('appointmentDateTime').startDate}
+                onWorkloadDateChange={handleWorkloadDateChange}
               />
             </ResponsiveWrapper>
           </section>
@@ -712,7 +743,9 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, value } }) => (
             <TimePicker
               id="time-picker"
-              pattern="([\d]+:[\d]{2})"
+              pattern={time12HourFormatRegexPattern}
+              invalid={!isValidTime(value)}
+              invalidText={t('invalidTime', 'Invalid time')}
               onChange={(event) => onChange(event.target.value)}
               value={value}
               style={{ marginLeft: '0.125rem', flex: 'none' }}

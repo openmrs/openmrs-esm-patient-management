@@ -9,21 +9,19 @@ import {
   navigate,
   parseDate,
   showSnackbar,
-  toDateObjectStrict,
-  toOmrsIsoString,
   useConfig,
 } from '@openmrs/esm-framework';
 import {
   type MappedVisitQueueEntry,
   serveQueueEntry,
   updateQueueEntry,
-  useVisitQueueEntries,
 } from '../active-visits/active-visits-table.resource';
 import { findObsByConceptUUID } from '../helpers/functions';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { usePastVisits } from '../past-visit/past-visit.resource';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import styles from './transition-queue-entry-dialog.scss';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
@@ -49,7 +47,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
   const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
   const obsToDisplay =
     !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const launchEditPriorityModal = useCallback(() => {
     const endedAt = new Date();
@@ -59,14 +57,14 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
       queueEntry?.queueUuid,
       queueEntry?.queueEntryUuid,
       queueEntry?.patientUuid,
-      queueEntry?.priorityUuid,
+      queueEntry?.priority?.uuid,
       defaultTransitionStatus,
       endedAt,
       queueEntry?.sortWeight,
     ).then(
       ({ status }) => {
         if (status === 201) {
-          serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
+          serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'serving').then(({ status }) => {
             if (status === 200) {
               showSnackbar({
                 isLowContrast: true,
@@ -75,7 +73,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                 subtitle: t('patientAttendingService', 'Patient attending service'),
               });
               closeModal();
-              mutate();
+              mutateQueueEntries();
               navigate({ to: `\${openmrsSpaBase}/patient/${queueEntry?.patientUuid}/chart` });
             }
           });
@@ -103,7 +101,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             subtitle: t('patientRequeued', 'Patient has been requeued'),
           });
           closeModal();
-          mutate();
+          mutateQueueEntries();
         }
       },
       (error) => {

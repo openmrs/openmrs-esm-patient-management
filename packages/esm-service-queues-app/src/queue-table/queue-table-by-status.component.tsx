@@ -13,7 +13,7 @@ import { queueTableStatusColumn } from './cells/queue-table-status-cell.componen
 import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
 import QueueTable from './queue-table.component';
-import { queueTableTransitionColumn } from './cells/queue-table-transition-cell.component';
+import { queueTableActionColumn } from './cells/queue-table-action-cell.component';
 
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue
@@ -33,10 +33,13 @@ export const defaultQueueTableConfig: QueueTableTabConfig = {
     queueTablePriorityColumn,
     queueTableStatusColumn,
     queueTableWaitTimeColumn,
-    queueTableTransitionColumn,
+    queueTableActionColumn,
   ],
 };
 
+// displays the queue entries of a given queue by
+// showing a list of tabs (one tab per status), each showing
+// queue entries within that status
 const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   selectedQueue,
   selectedStatus,

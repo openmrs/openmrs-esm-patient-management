@@ -1,13 +1,15 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
 
 .cardContainer {
   background-color: colors.$white;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0rem;
-  flex-flow: row wrap;
-  margin-top: -(spacing.$spacing-03);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr));
+  gap: layout.$spacing-05;
+  margin: layout.$spacing-05;
+}
+
+.errorContainer {
+  margin: layout.$spacing-05;
 }

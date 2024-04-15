@@ -4,11 +4,6 @@ import BaseVisitType from './base-visit-type.component';
 import { render, screen } from '@testing-library/react';
 import { mockPatient, mockVisitTypes } from '__mocks__';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useLayoutType: () => 'desktop',
-  usePagination: jest.fn(() => ({ results: mockVisitTypes, currentPage: 1, goTo: jest.fn() })),
-}));
-
 describe('BaseVisitType', () => {
   it('renders visit types correctly', () => {
     render(<BaseVisitType patientUuid={mockPatient.uuid} onChange={() => {}} visitTypes={mockVisitTypes} />);

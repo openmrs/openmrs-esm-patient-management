@@ -7,9 +7,8 @@ import styles from './edit-entry.scss';
 
 interface EditMenuProps {
   queueEntry: MappedVisitQueueEntry;
-  closeModal: () => void;
 }
-const EditMenu: React.FC<EditMenuProps> = ({ queueEntry, closeModal }) => {
+const EditMenu: React.FC<EditMenuProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
   const launchEditPriorityModal = useCallback(() => {
     const dispose = showModal('edit-queue-entry-status-modal', {

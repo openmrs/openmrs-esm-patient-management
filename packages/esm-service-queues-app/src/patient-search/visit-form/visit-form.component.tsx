@@ -37,7 +37,7 @@ import {
   type ConfigObject,
 } from '@openmrs/esm-framework';
 import BaseVisitType from './base-visit-type.component';
-import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
+import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
@@ -45,6 +45,7 @@ import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../ty
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
+import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -72,7 +73,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [selectedLocation, setSelectedLocation] = useState('');
   const [visitType, setVisitType] = useState('');
@@ -150,7 +151,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                       ),
                     });
                     closePanel();
-                    mutate();
+                    mutateQueueEntries();
                   }
                 },
                 (error) => {
@@ -174,7 +175,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     },
     [
       closePanel,
-      mutate,
+      mutateQueueEntries,
       patientUuid,
       selectedLocation,
       t,
@@ -302,14 +303,16 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           )}
           <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
-            <ContentSwitcher
-              selectedIndex={contentSwitcherIndex}
-              className={styles.contentSwitcher}
-              onChange={({ index }) => setContentSwitcherIndex(index)}>
-              <Switch name="recommended" text={t('recommended', 'Recommended')} />
-              <Switch name="all" text={t('all', 'All')} />
-            </ContentSwitcher>
-            {contentSwitcherIndex === 0 && !isLoading && (
+            {config.showRecommendedVisitTypeTab && (
+              <ContentSwitcher
+                selectedIndex={contentSwitcherIndex}
+                className={styles.contentSwitcher}
+                onChange={({ index }) => setContentSwitcherIndex(index)}>
+                <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                <Switch name="all" text={t('all', 'All')} />
+              </ContentSwitcher>
+            )}
+            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && !isLoading && (
               <MemoizedRecommendedVisitType
                 onChange={(visitType) => {
                   setVisitType(visitType);
@@ -320,7 +323,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 locationUuid={selectedLocation}
               />
             )}
-            {contentSwitcherIndex === 1 && (
+            {(!config.showRecommendedVisitTypeTab || contentSwitcherIndex === 1) && (
               <BaseVisitType
                 onChange={(visitType) => {
                   setVisitType(visitType);
@@ -342,17 +345,18 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
               />
             </section>
           )}
+
+          <ExtensionSlot name="add-queue-entry-slot" />
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={closePanel}>
+              {t('discard', 'Discard')}
+            </Button>
+            <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+              {t('startVisit', 'Start visit')}
+            </Button>
+          </ButtonSet>
         </Stack>
-        <ExtensionSlot name="add-queue-entry-slot" />
       </div>
-      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closePanel}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-          {t('startVisit', 'Start visit')}
-        </Button>
-      </ButtonSet>
     </Form>
   );
 };

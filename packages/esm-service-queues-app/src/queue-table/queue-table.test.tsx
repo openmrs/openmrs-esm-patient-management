@@ -1,14 +1,12 @@
-import { defineConfigSchema, usePagination, useSession } from '@openmrs/esm-framework';
+import React from 'react';
+import { defineConfigSchema, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { mockQueueEntries, mockSession } from '__mocks__';
-import React from 'react';
 import { renderWithSwr } from 'tools';
 import { defaultQueueTableConfig } from './queue-table-by-status.component';
 import QueueTable from './queue-table.component';
 import { configSchema } from '../config-schema';
 
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
 const mockUseSession = useSession as jest.Mock;
 
 describe('QueueTable: ', () => {
@@ -35,12 +33,6 @@ describe('QueueTable: ', () => {
   });
 
   it('renders queue entries with default columns', () => {
-    mockUsePagination.mockReturnValue({
-      results: mockQueueEntries,
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
-
     renderWithSwr(<QueueTable queueEntries={mockQueueEntries} queueTableColumns={defaultQueueTableConfig.columns} />);
 
     for (const entry of mockQueueEntries) {
@@ -49,6 +41,13 @@ describe('QueueTable: ', () => {
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
+
+      // has either a "Undo transition" or "Delete" link, depending on whether it has a previous queue entry or not
+      if (entry.previousQueueEntry == null) {
+        expect(within(row).getByText('Delete')).toBeInTheDocument();
+      } else {
+        expect(within(row).getByText('Undo transition')).toBeInTheDocument();
+      }
     }
   });
 });

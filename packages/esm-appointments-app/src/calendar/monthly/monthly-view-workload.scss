@@ -8,6 +8,7 @@
   border-bottom: 1px solid colors.$gray-20;
   background: colors.$white;
   color: colors.$black;
+  cursor: pointer;
   padding: layout.$spacing-01;
   text-align: right;
   @include type.type-style('body-compact-02');

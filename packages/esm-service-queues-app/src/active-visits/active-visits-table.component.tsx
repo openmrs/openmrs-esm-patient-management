@@ -1,20 +1,20 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
   DataTableSkeleton,
-  DefinitionTooltip,
   Dropdown,
+  Pagination,
   Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -22,48 +22,52 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tabs,
-  TabPanels,
-  TabPanel,
-  TabList,
-  Tag,
   Tile,
-  Pagination,
+  type DataTableHeader,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
-  useLayoutType,
-  isDesktop,
-  ExtensionSlot,
-  usePagination,
-  useConfig,
-  useSession,
-  showModal,
   ConfigurableLink,
+  ExtensionSlot,
+  isDesktop,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useFeatureFlag,
+  useLayoutType,
+  usePagination,
+  useSession,
 } from '@openmrs/esm-framework';
-import { useVisitQueueEntries, type MappedVisitQueueEntry } from './active-visits-table.resource';
-import { SearchTypes } from '../types';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import { type ConfigObject } from '../config-schema';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
+import { timeDiffInMinutes } from '../helpers/functions';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
-  useSelectedServiceName,
-  useSelectedQueueLocationUuid,
   useIsPermanentProviderQueueRoom,
+  useSelectedQueueLocationUuid,
+  useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { buildStatusString, formatWaitTime, getTagType, timeDiffInMinutes } from '../helpers/functions';
-import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
-import CurrentVisit from '../current-visit/current-visit-summary.component';
-import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
-import StatusIcon from '../queue-entry-table-components/status-icon.component';
-import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import styles from './active-visits-table.scss';
-import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
+import { useQueueEntries } from '../hooks/useQueueEntries';
+import PastVisit from '../past-visit/past-visit.component';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import PatientSearch from '../patient-search/patient-search.component';
+import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
+import EditMenu from '../queue-entry-table-components/edit-entry.component';
+import QueueDuration from '../queue-entry-table-components/queue-duration.component';
+import QueuePriority from '../queue-entry-table-components/queue-priority.component';
+import QueueStatus from '../queue-entry-table-components/queue-status.component';
+import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
+import { type QueueEntry } from '../types';
+import { mapVisitQueueEntryProperties, type MappedVisitQueueEntry } from './active-visits-table.resource';
+import styles from './active-visits-table.scss';
 
 /**
  * FIXME Temporarily moved here
@@ -88,15 +92,48 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
+  const selectedQueueUuid = useSelectedServiceUuid();
+  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { queueEntries, isLoading, error } = useQueueEntries({
+    queue: selectedQueueUuid,
+    location: currentLocationUuid,
+    isEnded: false,
+  });
+
+  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (error?.message) {
+      showSnackbar({
+        title: t('errorLoadingQueueEntries', 'Error loading queue entries'),
+        kind: 'error',
+        subtitle: error?.message,
+      });
+    }
+  }, [error?.message]);
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  } else if (useNewActiveVisitsTable) {
+    return <DefaultQueueTable queueEntries={queueEntries ?? []} />;
+  } else {
+    return <OldQueueTable queueEntries={queueEntries ?? []} />;
+  }
+}
+
+// older implementation of the ActiveVisitsTable that we plan on deprecating
+function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
+  const { t } = useTranslation();
+  const currentServiceName = useSelectedServiceName();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queues } = useQueues(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
-  const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const visitQueueEntries = queueEntries.map((entry) =>
+    mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid),
+  );
+
   const currentServiceUuid = useSelectedServiceUuid();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [view, setView] = useState('');
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
   const { showQueueTableTab: useQueueTableTabs, customPatientChartUrl } = useConfig<ConfigObject>();
@@ -112,7 +149,6 @@ function ActiveVisitsTable() {
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
-  const [overlayHeader, setOverlayTitle] = useState('');
   const [providerRoomModalShown, setProviderRoomModalShown] = useState(false);
 
   const {
@@ -130,7 +166,7 @@ function ActiveVisitsTable() {
       },
       {
         id: 1,
-        header: t('queueNumber', 'QueueNumber'),
+        header: t('queueNumber', 'Queue Number'),
         key: 'queueNumber',
       },
       {
@@ -152,6 +188,11 @@ function ActiveVisitsTable() {
         id: 5,
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
+      },
+      {
+        id: 6,
+        header: t('actions', 'Actions'),
+        key: 'actions',
       },
     ],
     [t],
@@ -176,41 +217,24 @@ function ActiveVisitsTable() {
         content: <span className={styles.statusContainer}>{entry?.visitQueueNumber}</span>,
       },
       priority: {
-        content: (
-          <>
-            {entry?.priorityComment ? (
-              <DefinitionTooltip className={styles.tooltip} align="bottom-left" definition={entry.priorityComment}>
-                <Tag
-                  role="tooltip"
-                  className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                  type={getTagType(entry.priority as string)}>
-                  {entry.priority}
-                </Tag>
-              </DefinitionTooltip>
-            ) : (
-              <Tag
-                className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
-                type={getTagType(entry.priority as string)}>
-                {entry.priority}
-              </Tag>
-            )}
-          </>
-        ),
+        content: <QueuePriority priority={entry.priority} priorityComment={entry.priorityComment} />,
       },
       queueComingFrom: {
         content: <span className={styles.statusContainer}>{entry?.queueComingFrom}</span>,
       },
       status: {
-        content: (
-          <span className={styles.statusContainer}>
-            <StatusIcon status={entry.status.toLowerCase()} />
-            <span>{buildStatusString(entry.status, entry.service)}</span>
-          </span>
-        ),
+        content: <QueueStatus status={entry.status} queue={entry.queue} />,
       },
       waitTime: {
-        content: <span className={styles.statusContainer}>{formatWaitTime(entry.waitTime, t)}</span>,
+        content: <QueueDuration startedAt={entry.startedAt} endedAt={entry.endedAt} />,
       },
+      actions: (
+        <div className={styles.actionMenu}>
+          <TransitionMenu queueEntry={entry} />
+          <EditMenu queueEntry={entry} />
+          <ActionsMenu queueEntry={entry} />
+        </div>
+      ),
     }));
   }, [paginatedQueueEntries]);
 
@@ -266,10 +290,6 @@ function ActiveVisitsTable() {
     launchAddProviderRoomModal,
   ]);
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
   if (visitQueueEntries?.length) {
     return (
       <div className={styles.container}>
@@ -293,9 +313,7 @@ function ActiveVisitsTable() {
                     },
                     selectPatientAction: (selectedPatientUuid) => {
                       setShowOverlay(true);
-                      setView(SearchTypes.SCHEDULED_VISITS);
                       setViewState({ selectedPatientUuid });
-                      setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                     },
                   }}
                 />
@@ -356,15 +374,6 @@ function ActiveVisitsTable() {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="cds--table-column-menu">
-                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <EditMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} closeModal={() => true} />
-                          </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
@@ -434,16 +443,7 @@ function ActiveVisitsTable() {
             </TableContainer>
           )}
         </DataTable>
-        {showOverlay && (
-          <PatientSearch
-            view={view}
-            closePanel={() => setShowOverlay(false)}
-            viewState={{
-              selectedPatientUuid: viewState.selectedPatientUuid,
-            }}
-            headerTitle={overlayHeader}
-          />
-        )}
+        {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
       </div>
     );
   }
@@ -469,9 +469,7 @@ function ActiveVisitsTable() {
                   },
                   selectPatientAction: (selectedPatientUuid) => {
                     setShowOverlay(true);
-                    setView(SearchTypes.SCHEDULED_VISITS);
                     setViewState({ selectedPatientUuid });
-                    setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                   },
                 }}
               />
@@ -495,23 +493,14 @@ function ActiveVisitsTable() {
                 },
                 selectPatientAction: (selectedPatientUuid) => {
                   setShowOverlay(true);
-                  setView(SearchTypes.SCHEDULED_VISITS);
                   setViewState({ selectedPatientUuid });
-                  setOverlayTitle(t('addPatientWithAppointmentToQueue', 'Add patient with appointment to queue'));
                 },
               }}
             />
           </div>
         </Tile>
       </div>
-      {showOverlay && (
-        <PatientSearch
-          view={view}
-          closePanel={() => setShowOverlay(false)}
-          viewState={viewState}
-          headerTitle={overlayHeader}
-        />
-      )}
+      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }

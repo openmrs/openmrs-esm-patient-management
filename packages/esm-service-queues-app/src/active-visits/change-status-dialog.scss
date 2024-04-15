@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
 
 .radioButtonGroup {
   display: flex;
@@ -23,10 +23,25 @@ section {
 
 .sectionTitle {
   @include type.type-style('heading-compact-02');
-  color: $text-02;
+  color: colors.$gray-70;
   margin-bottom: spacing.$spacing-04;
 }
 
 .modalBody {
   padding-bottom: spacing.$spacing-05;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  margin-right: spacing.$spacing-02;
+}
+
+.error {
+  margin-top: spacing.$spacing-03;
+  color: colors.$red-60;
+  @include type.type-style('label-01');
 }

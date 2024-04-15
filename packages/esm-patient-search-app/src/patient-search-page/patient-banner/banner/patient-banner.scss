@@ -28,14 +28,8 @@
   }
 
   .demographics,
-  .identifiers,
-  .contactDetails .heading {
+  .identifiers {
     color: $ui-02;
-  }
-
-  .actionsButtonText,
-  .toggleContactDetailsButton {
-    color: colors.$blue-40;
   }
 
   .menu {

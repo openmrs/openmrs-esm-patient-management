@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -9,15 +9,15 @@ import {
   useConnectedExtensions,
   type ConnectedExtension,
   type ConfigObject,
+  useLayoutType,
+  isDesktop,
 } from '@openmrs/esm-framework';
-import { useAppointmentDate } from '../../helpers';
 import styles from './scheduled-appointments.scss';
+import SelectedDateContext from '../../hooks/selectedDateContext';
 
 dayjs.extend(isSameOrBefore);
 
 interface ScheduledAppointmentsProps {
-  visits: Array<any>;
-  isLoading: boolean;
   appointmentServiceType?: string;
 }
 
@@ -25,9 +25,11 @@ type DateType = 'pastDate' | 'today' | 'futureDate';
 
 const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 
-const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, appointmentServiceType }) => {
+const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
-  const { currentAppointmentDate: date } = useAppointmentDate();
+  const { selectedDate } = useContext(SelectedDateContext);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
   // added to prevent auto-removal of translations for dynamic keys
   // t('checkedIn', 'Checked In');
@@ -43,7 +45,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
   );
 
   useEffect(() => {
-    const dayjsDate = dayjs(date);
+    const dayjsDate = dayjs(selectedDate);
     const now = dayjs();
     if (dayjsDate.isBefore(now, 'date')) {
       setDateType('pastDate');
@@ -52,7 +54,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     } else {
       setDateType('today');
     }
-  }, [date]);
+  }, [selectedDate]);
 
   useEffect(() => {
     // This is intended to cover two things:
@@ -75,7 +77,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
     <>
       <ContentSwitcher
         className={styles.switcher}
-        size="sm"
+        size={responsiveSize}
         onChange={({ name }) => setCurrentTab(name)}
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">
@@ -91,7 +93,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ visits, a
               extension={extension}
               currentTab={currentTab}
               appointmentServiceType={appointmentServiceType}
-              date={date}
+              date={selectedDate}
               dateType={dateType}
               showExtensionTab={showExtension}
               hideExtensionTab={hideExtension}

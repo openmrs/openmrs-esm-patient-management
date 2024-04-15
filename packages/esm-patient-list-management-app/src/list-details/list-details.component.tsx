@@ -4,11 +4,10 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem, Modal } from '@carbon/react';
 import { OverflowMenuVertical } from '@carbon/react/icons';
-import { navigate, formatDate, parseDate, showSnackbar } from '@openmrs/esm-framework';
+import { navigate, formatDate, parseDate, showSnackbar, CustomOverflowMenu } from '@openmrs/esm-framework';
 import { deletePatientList } from '../api/api-remote';
 import { usePatientListDetails, usePatientListMembers } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
-import CustomOverflowMenuComponent from '../overflow-menu/overflow-menu.component';
 import ListDetailsTable from '../list-details-table/list-details-table.component';
 import styles from './list-details.scss';
 
@@ -46,7 +45,7 @@ const ListDetails = () => {
               name: member?.patient?.person?.display,
               identifier: member?.patient?.identifiers[0]?.identifier ?? null,
               sex: member?.patient?.person?.gender,
-              startDate: formatDate(parseDate(member?.startDate)),
+              startDate: member?.startDate ? formatDate(parseDate(member.startDate)) : null,
               uuid: `${member?.patient?.uuid}`,
               membershipUuid: member?.uuid,
             }))
@@ -120,7 +119,7 @@ const ListDetails = () => {
           </div>
         </div>
         <div className={styles.overflowMenu}>
-          <CustomOverflowMenuComponent
+          <CustomOverflowMenu
             menuTitle={
               <>
                 <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
@@ -138,7 +137,7 @@ const ListDetails = () => {
               onClick={handleDelete}
               isDelete
             />
-          </CustomOverflowMenuComponent>
+          </CustomOverflowMenu>
         </div>
       </section>
       <section>

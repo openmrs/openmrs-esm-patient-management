@@ -45,5 +45,5 @@ describe('Appointment metrics', () => {
 });
 
 function renderAppointmentMetrics() {
-  render(<AppointmentsMetrics serviceUuid="consultation-service-uuid" />);
+  render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
 }

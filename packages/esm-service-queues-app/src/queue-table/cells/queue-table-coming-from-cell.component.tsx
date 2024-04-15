@@ -8,4 +8,5 @@ export const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponent
 export const queueTableComingFromColumn: QueueTableColumn = {
   headerI18nKey: 'queueComingFrom',
   CellComponent: QueueTableComingFromCell,
+  getFilterableValue: (queueEntry) => queueEntry.queueComingFrom?.display,
 };
