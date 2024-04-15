@@ -13,8 +13,9 @@ import {
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
 import styles from './clinic-metrics.scss';
-import { useQueues } from '../helpers/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import unionBy from 'lodash/unionBy';
+import { useQueues } from '../hooks/useQueues';
 
 export interface Service {
   uuid: string;
@@ -26,6 +27,7 @@ function ClinicMetrics() {
 
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queues } = useQueues(currentQueueLocation);
+  const uniqueQueues = unionBy(queues ?? [], ({ service }) => service?.uuid);
   const currentServiceUuid = useSelectedServiceUuid();
   const currentServiceName = useSelectedServiceName();
   const { serviceCount } = useServiceMetricsCount(currentServiceUuid, currentQueueLocation);
@@ -39,7 +41,7 @@ function ClinicMetrics() {
     }
   });
   const { queueEntries, totalCount } = useQueueEntries({
-    queue: currentServiceUuid,
+    service: currentServiceUuid,
     location: currentQueueLocation,
     isEnded: false,
   });
@@ -47,7 +49,7 @@ function ClinicMetrics() {
   const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
 
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
+    updateSelectedServiceUuid(selectedItem?.service?.uuid);
     updateSelectedServiceName(selectedItem.display);
     if (selectedItem.uuid == undefined) {
       setInitialSelectItem(true);
@@ -77,7 +79,7 @@ function ClinicMetrics() {
             id="inline"
             type="inline"
             label={currentServiceName ?? `${t('all', 'All')}`}
-            items={[{ display: `${t('all', 'All')}` }, ...queues]}
+            items={[{ display: `${t('all', 'All')}` }, ...uniqueQueues]}
             itemToString={(item) => (item ? item.display : '')}
             onChange={handleServiceChange}
           />

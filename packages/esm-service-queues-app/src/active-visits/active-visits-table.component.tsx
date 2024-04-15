@@ -68,6 +68,7 @@ import DefaultQueueTable from '../queue-table/default-queue-table.component';
 import { type QueueEntry } from '../types';
 import { mapVisitQueueEntryProperties, type MappedVisitQueueEntry } from './active-visits-table.resource';
 import styles from './active-visits-table.scss';
+import uniqBy from 'lodash-es/uniqBy';
 
 /**
  * FIXME Temporarily moved here
@@ -92,10 +93,10 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const selectedQueueUuid = useSelectedServiceUuid();
+  const selectedServiceUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const { queueEntries, isLoading, error } = useQueueEntries({
-    queue: selectedQueueUuid,
+    service: selectedServiceUuid,
     location: currentLocationUuid,
     isEnded: false,
   });
@@ -126,13 +127,13 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   const { t } = useTranslation();
   const currentServiceName = useSelectedServiceName();
   const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+  const currentServiceUuid = useSelectedServiceUuid();
   const visitQueueEntries = queueEntries.map((entry) =>
     mapVisitQueueEntryProperties(entry, visitQueueNumberAttributeUuid),
   );
+  const queues = uniqBy(queueEntries?.flatMap((entry) => entry.queue) ?? [], 'uuid');
 
-  const currentServiceUuid = useSelectedServiceUuid();
   const [showOverlay, setShowOverlay] = useState(false);
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const layout = useLayoutType();
@@ -144,7 +145,7 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
     new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
   );
   const { queueLocations } = useQueueLocations();
-  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
+  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentQueueLocation);
 
   const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const pageSizes = [10, 20, 30, 40, 50];
@@ -199,8 +200,11 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
   );
 
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
+    const {
+      service: { display, uuid },
+    } = selectedItem ?? {};
+    updateSelectedServiceUuid(uuid);
+    updateSelectedServiceName(display);
   };
 
   const tableRows = useMemo(() => {
