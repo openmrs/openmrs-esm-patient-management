@@ -61,7 +61,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
 
   const { mutate } = useProvidersQueueRoom(providerUuid);
   const { queues } = useQueues(currentLocationUuid);
-  const { rooms } = useQueueRooms(currentLocationUuid, currentLocationUuid);
+  const { rooms } = useQueueRooms(currentLocationUuid);
   const { queueLocations } = useQueueLocations();
   const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
 
