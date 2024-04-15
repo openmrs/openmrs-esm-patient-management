@@ -1,31 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
-  type DataTableHeader,
   DataTableSkeleton,
   Dropdown,
   Pagination,
   Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
+  TableExpandedRow,
   TableHead,
   TableHeader,
   TableRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  TabList,
-  TabPanel,
-  TabPanels,
   Tabs,
   Tile,
+  type DataTableHeader,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
@@ -33,18 +31,20 @@ import {
   ExtensionSlot,
   isDesktop,
   showModal,
+  showSnackbar,
   useConfig,
   useFeatureFlag,
   useLayoutType,
   usePagination,
   useSession,
 } from '@openmrs/esm-framework';
-import {
-  type MappedVisitQueueEntry,
-  mapVisitQueueEntryProperties,
-  useVisitQueueEntries,
-} from './active-visits-table.resource';
-import { type QueueEntry, SearchTypes } from '../types';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import { type ConfigObject } from '../config-schema';
+import CurrentVisit from '../current-visit/current-visit-summary.component';
+import { timeDiffInMinutes } from '../helpers/functions';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -53,31 +53,21 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { timeDiffInMinutes } from '../helpers/functions';
-import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
-import CurrentVisit from '../current-visit/current-visit-summary.component';
-import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import PatientSearch from '../patient-search/patient-search.component';
-import PastVisit from '../past-visit/past-visit.component';
-import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import styles from './active-visits-table.scss';
-import { type ConfigObject } from '../config-schema';
 import { useQueues } from '../helpers/useQueues';
-import QueueTable from '../queue-table/queue-table.component';
-import { queueTableNameColumn } from '../queue-table/cells/queue-table-name-cell.component';
-import { queueTableComingFromColumn } from '../queue-table/cells/queue-table-coming-from-cell.component';
-import { queueTablePriorityColumn } from '../queue-table/cells/queue-table-priority-cell.component';
-import { activeVisitActionsColumn } from './active-visits-row-actions.component';
-import { queueTableStatusColumn } from '../queue-table/cells/queue-table-status-cell.component';
-import QueueTableExpandedRow from '../queue-table/queue-table-expanded-row.component';
-import { queueTableQueueColumn } from '../queue-table/cells/queue-table-queue-cell.component';
-import { queueTableWaitTimeColumn } from '../queue-table/cells/queue-table-wait-time-cell.component';
+import { useQueueEntries } from '../hooks/useQueueEntries';
+import PastVisit from '../past-visit/past-visit.component';
+import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
+import PatientSearch from '../patient-search/patient-search.component';
+import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
+import EditMenu from '../queue-entry-table-components/edit-entry.component';
+import QueueDuration from '../queue-entry-table-components/queue-duration.component';
 import QueuePriority from '../queue-entry-table-components/queue-priority.component';
 import QueueStatus from '../queue-entry-table-components/queue-status.component';
-import QueueDuration from '../queue-entry-table-components/queue-duration.component';
+import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
+import { type QueueEntry } from '../types';
+import { mapVisitQueueEntryProperties, type MappedVisitQueueEntry } from './active-visits-table.resource';
+import styles from './active-visits-table.scss';
 
 /**
  * FIXME Temporarily moved here
@@ -102,48 +92,32 @@ interface PaginationData {
 }
 
 function ActiveVisitsTable() {
-  const currentServiceName = useSelectedServiceName();
+  const selectedQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries(currentServiceName, currentLocationUuid);
-  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
-  const layout = useLayoutType();
-  const { t } = useTranslation();
-  const selectedServiceUuid = useSelectedServiceUuid();
+  const { queueEntries, isLoading, error } = useQueueEntries({
+    queue: selectedQueueUuid,
+    location: currentLocationUuid,
+    isEnded: false,
+  });
 
-  const queueEntries = visitQueueEntries?.map((entry) => entry.queueEntry);
+  const useNewActiveVisitsTable = useFeatureFlag('new-queue-table');
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (error?.message) {
+      showSnackbar({
+        title: t('errorLoadingQueueEntries', 'Error loading queue entries'),
+        kind: 'error',
+        subtitle: error?.message,
+      });
+    }
+  }, [error?.message]);
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
   } else if (useNewActiveVisitsTable) {
-    const queueEntriesInSelectedQueue = queueEntries.filter(
-      (queueEntry) => !selectedServiceUuid || queueEntry.queue.uuid == selectedServiceUuid,
-    );
-
-    const columns = [
-      queueTableNameColumn,
-      queueTablePriorityColumn,
-      queueTableComingFromColumn,
-      queueTableStatusColumn,
-      queueTableQueueColumn,
-      queueTableWaitTimeColumn,
-      activeVisitActionsColumn,
-    ];
-    return (
-      <div className={styles.container}>
-        <div className={styles.headerContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('patientsCurrentlyInQueue', 'Patients currently in queue')}</h4>
-          </div>
-        </div>
-        <QueueTable
-          queueEntries={queueEntriesInSelectedQueue}
-          queueTableColumns={columns}
-          ExpandedRow={QueueTableExpandedRow}
-          tableFilter={<ActiveVisitsTableFilter />}
-        />
-      </div>
-    );
+    return <DefaultQueueTable queueEntries={queueEntries ?? []} />;
   } else {
-    return <OldQueueTable queueEntries={queueEntries} />;
+    return <OldQueueTable queueEntries={queueEntries ?? []} />;
   }
 }
 
@@ -215,6 +189,11 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
         header: t('waitTime', 'Wait time'),
         key: 'waitTime',
       },
+      {
+        id: 6,
+        header: t('actions', 'Actions'),
+        key: 'actions',
+      },
     ],
     [t],
   );
@@ -249,6 +228,13 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
       waitTime: {
         content: <QueueDuration startedAt={entry.startedAt} endedAt={entry.endedAt} />,
       },
+      actions: (
+        <div className={styles.actionMenu}>
+          <TransitionMenu queueEntry={entry} />
+          <EditMenu queueEntry={entry} />
+          <ActionsMenu queueEntry={entry} />
+        </div>
+      ),
     }));
   }, [paginatedQueueEntries]);
 
@@ -388,15 +374,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
-                          <TableCell className="cds--table-column-menu">
-                            <TransitionMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <EditMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
-                          <TableCell className="cds--table-column-menu">
-                            <ActionsMenu queueEntry={visitQueueEntries?.[index]} />
-                          </TableCell>
                         </TableExpandRow>
                         {row.isExpanded ? (
                           <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 2}>
@@ -525,34 +502,6 @@ function OldQueueTable({ queueEntries }: { queueEntries: QueueEntry[] }) {
       </div>
       {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
-  );
-}
-
-function ActiveVisitsTableFilter() {
-  const { t } = useTranslation();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
-  const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
-  };
-
-  return (
-    <>
-      <div className={styles.filterContainer}>
-        <Dropdown
-          id="serviceFilter"
-          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-          label={currentServiceName}
-          type="inline"
-          items={[{ display: `${t('all', 'All')}` }, ...queues]}
-          itemToString={(item) => (item ? item.display : '')}
-          onChange={handleServiceChange}
-          size="sm"
-        />
-      </div>
-    </>
   );
 }
 

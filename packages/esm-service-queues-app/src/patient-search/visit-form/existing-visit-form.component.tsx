@@ -3,19 +3,19 @@ import { Button, ButtonSet, Form, Row, Stack } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
+  type Visit,
   ExtensionSlot,
   showSnackbar,
   useConfig,
   useLayoutType,
-  type Visit,
 } from '@openmrs/esm-framework';
-import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
-import { type SearchTypes } from '../../types';
+import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
+import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import styles from './visit-form.scss';
 
 interface ExistingVisitFormProps {
-  visit: Visit;
   closePanel: () => void;
+  visit: Visit;
 }
 
 const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel }) => {
@@ -23,13 +23,9 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const { mutate } = useVisitQueueEntries('', '');
-
-  if (!visit) {
-    return null;
-  }
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const handleSubmit = useCallback(
     (event) => {
@@ -64,7 +60,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
             });
             closePanel();
             setIsSubmitting(false);
-            mutate();
+            mutateQueueEntries();
           }
         },
         (error) => {
@@ -82,10 +78,10 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
         },
       );
     },
-    [closePanel, mutate, visit, t, visitQueueNumberAttributeUuid],
+    [closePanel, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
   );
 
-  return (
+  return visit ? (
     <div>
       {isTablet && (
         <Row className={styles.headerGridRow}>
@@ -112,7 +108,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
         </Form>
       </Stack>
     </div>
-  );
+  ) : null;
 };
 
 export default ExistingVisitForm;

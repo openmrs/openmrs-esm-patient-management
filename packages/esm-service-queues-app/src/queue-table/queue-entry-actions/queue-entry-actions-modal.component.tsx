@@ -1,7 +1,6 @@
 import {
   Button,
   ContentSwitcher,
-  Form,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -12,6 +11,7 @@ import {
   SelectItem,
   Stack,
   Switch,
+  TextArea,
 } from '@carbon/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
@@ -20,7 +20,6 @@ import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
 import styles from './queue-entry-actons-modal.scss';
-import { TextArea } from '@carbon/react';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -246,6 +245,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
               <TextArea
+                labelText=""
                 value={formState.prioritycomment}
                 onChange={(e) => setPriorityComment(e.target.value)}
                 placeholder={t('enterCommentHere', 'Enter comment here')}

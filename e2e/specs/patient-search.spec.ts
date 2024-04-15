@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '../core';
 import { HomePage } from '../pages';
-import { generateRandomPatient, deletePatient, Patient } from '../commands';
+import { generateRandomPatient, deletePatient, type Patient } from '../commands';
 
 let patient: Patient;
 
@@ -76,7 +76,7 @@ test('Search patient by full name', async ({ page, api }) => {
   });
 
   await test.step('When I click on the `Close` button', async () => {
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Close', exact: true }).click();
   });
 
   await test.step('Then I should be redirected to the home page', async () => {

@@ -77,7 +77,6 @@ const UnscheduledAppointments: React.FC = () => {
       <EmptyState
         displayText={t('unscheduledAppointments_lower', 'unscheduled appointments')}
         headerTitle={t('unscheduledAppointments', 'Unscheduled appointments')}
-        scheduleType="Unscheduled"
       />
     );
   }

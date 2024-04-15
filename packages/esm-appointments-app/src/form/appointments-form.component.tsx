@@ -335,12 +335,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  const updateLocations = uniqBy(
-    [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
-    'uuid',
-  );
+const updateLocations = uniqBy(
+  [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
+  'uuid',
+);
 
-  const minAllowedDate = new Date();
+const minAllowedDate = new Date();
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>

@@ -15,7 +15,7 @@ interface AppointmentMetricsProps {
 const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
 
-  const { highestServiceLoad, error: clinicalMetricsError } = useClinicalMetrics();
+  const { highestServiceLoad, error } = useClinicalMetrics();
   const { totalProviders } = useAllAppointmentsByDate();
   const { totalScheduledAppointments } = useScheduledAppointment(appointmentServiceType);
 
@@ -33,16 +33,18 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
     ? pendingAppointments.filter(({ service }) => service.uuid === appointmentServiceType)
     : pendingAppointments;
 
-  if (clinicalMetricsError) {
+  if (error) {
     return (
-      <ErrorState headerTitle={t('appointmentMetricsLoadError', 'Metrics load error')} error={clinicalMetricsError} />
+      <div className={styles.errorContainer}>
+        <ErrorState headerTitle={t('appointmentMetricsLoadError', 'Metrics load error')} error={error} />
+      </div>
     );
   }
 
   return (
     <>
       <MetricsHeader />
-      <div className={styles.cardContainer} data-testid="clinic-metrics">
+      <section className={styles.cardContainer}>
         <MetricsCard
           label={t('patients', 'Patients')}
           value={totalScheduledAppointments}
@@ -61,7 +63,7 @@ const AppointmentsMetrics: React.FC<AppointmentMetricsProps> = ({ appointmentSer
           value={totalProviders}
           headerLabel={t('providersBooked', 'Providers booked: {{time}}', { time: formattedStartDate })}
         />
-      </div>
+      </section>
     </>
   );
 };

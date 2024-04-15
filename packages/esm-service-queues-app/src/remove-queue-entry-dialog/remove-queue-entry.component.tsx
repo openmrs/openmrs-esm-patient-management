@@ -5,8 +5,8 @@ import { parseDate, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { type MappedQueueEntry } from '../types';
 import { startOfDay } from '../constants';
 import { useCheckedInAppointments, endQueueEntry } from './remove-queue-entry.resource';
-import { useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
 import styles from './remove-queue-entry.scss';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 
 interface RemoveQueueEntryDialogProps {
   queueEntry: MappedQueueEntry;
@@ -16,8 +16,7 @@ interface RemoveQueueEntryDialogProps {
 const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(queueEntry.patientUuid);
-  const { mutate } = useVisitQueueEntries('', '');
-  const abortController = new AbortController();
+  const { mutateQueueEntries } = useMutateQueueEntries();
 
   const { data: appointments } = useCheckedInAppointments(queueEntry.patientUuid, startOfDay);
 
@@ -40,7 +39,7 @@ const RemoveQueueEntryDialog: React.FC<RemoveQueueEntryDialogProps> = ({ queueEn
       appointments,
     ).then((response) => {
       closeModal();
-      mutate();
+      mutateQueueEntries();
       showSnackbar({
         isLowContrast: true,
         kind: 'success',

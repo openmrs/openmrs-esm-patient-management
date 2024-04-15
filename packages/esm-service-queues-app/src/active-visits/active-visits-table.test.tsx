@@ -1,18 +1,16 @@
 import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
-import { type ConfigObject, useConfig, usePagination, useSession } from '@openmrs/esm-framework';
-import { mockServices, mockVisitQueueEntries, mockSession, mockQueueEntries } from '__mocks__';
+import { type ConfigObject, useConfig, useSession } from '@openmrs/esm-framework';
+import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import { useVisitQueueEntries } from './active-visits-table.resource';
+import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import ActiveVisitsTable from './active-visits-table.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
-const mockUseVisitQueueEntries = useVisitQueueEntries as jest.Mock;
+const mockUseQueueEntries = useQueueEntries as jest.Mock;
 const mockQueueLocations = useQueueLocations as jest.Mock;
 const mockUseQueueRooms = useQueueRooms as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
@@ -22,15 +20,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-  };
-});
-
-jest.mock('./active-visits-table.resource', () => {
-  const originalModule = jest.requireActual('./active-visits-table.resource');
-
-  return {
-    ...originalModule,
-    useVisitQueueEntries: jest.fn(),
   };
 });
 
@@ -58,6 +47,15 @@ jest.mock('../add-provider-queue-room/add-provider-queue-room.resource', () => {
   };
 });
 
+jest.mock('../hooks/useQueueEntries', () => {
+  const originalModule = jest.requireActual('../hooks/useQueueEntries');
+
+  return {
+    ...originalModule,
+    useQueueEntries: jest.fn(),
+  };
+});
+
 jest.mock('../helpers/helpers', () => {
   const originalModule = jest.requireActual('../helpers/helpers');
 
@@ -81,9 +79,11 @@ describe('ActiveVisitsTable: ', () => {
   it('renders an empty state view if data is unavailable', async () => {
     mockQueueLocations.mockReturnValueOnce({ queueLocations: [] });
     mockUseQueueRooms.mockReturnValue({ rooms: [] });
-    mockUseVisitQueueEntries.mockReturnValueOnce({ visitQueueEntries: [], isLoading: false });
+    mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
 
     renderActiveVisitsTable();
+
+    await screen.findByRole('table');
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
@@ -91,14 +91,9 @@ describe('ActiveVisitsTable: ', () => {
   });
 
   it('renders a tabular overview of visit queue entry data when available', async () => {
-    mockQueueLocations.mockReturnValueOnce({ queueLocations: mockQueueLocations });
+    mockQueueLocations.mockReturnValue({ queueLocations: mockQueueLocations });
     mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
-    mockUseVisitQueueEntries.mockReturnValue({ visitQueueEntries: mockVisitQueueEntries, isLoading: false });
-    mockUsePagination.mockReturnValue({
-      results: mockQueueEntries,
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
+    mockUseQueueEntries.mockReturnValue({ queueEntries: mockQueueEntries, isLoading: false });
 
     renderActiveVisitsTable();
 
@@ -113,7 +108,11 @@ describe('ActiveVisitsTable: ', () => {
 
     const expectedColumnHeaders = [/name/, /priority/, /status/, /waitTime/];
     expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('columnheader', {
+          name: new RegExp(header, 'i'),
+        }),
+      ).toBeInTheDocument();
     });
   });
 });

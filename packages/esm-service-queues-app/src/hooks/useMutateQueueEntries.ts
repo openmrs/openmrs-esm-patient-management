@@ -5,7 +5,10 @@ export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
   const mutateQueueEntries = () =>
     mutate((key) => {
-      return typeof key === 'string' && key.startsWith(`${restBaseUrl}/queue-entry`);
+      return (
+        typeof key === 'string' &&
+        (key.startsWith(`${restBaseUrl}/queue-entry`) || key.startsWith(`${restBaseUrl}/visit-queue-entry`))
+      );
     });
 
   return {

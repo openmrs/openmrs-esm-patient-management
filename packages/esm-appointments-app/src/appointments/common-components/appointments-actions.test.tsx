@@ -87,7 +87,7 @@ describe('AppointmentActions', () => {
     }));
     const props = { ...defaultProps };
     const { getByText } = render(<AppointmentActions {...props} />);
-    const button = getByText('Check In');
+    const button = getByText(/check in/i);
     expect(button).toBeInTheDocument();
   });
 

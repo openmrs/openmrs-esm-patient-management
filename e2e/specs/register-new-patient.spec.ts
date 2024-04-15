@@ -55,6 +55,51 @@ test('Register a new patient', async ({ page, api }) => {
   });
 });
 
+test('Register an unknown patient', async ({ api, page }) => {
+  const patientRegistrationPage = new RegistrationAndEditPage(page);
+
+  await test.step('When I visit the patient registration page', async () => {
+    await patientRegistrationPage.goto();
+    await patientRegistrationPage.waitUntilTheFormIsLoaded();
+  });
+
+  await test.step(`And I click on the unknown 'patient's name' tab`, async () => {
+    await page.getByRole('tab', { name: /no/i }).first().click();
+  });
+
+  await test.step('And I select `female` as the patient gender', async () => {
+    await page
+      .locator('label')
+      .filter({ hasText: /female/i })
+      .locator('span')
+      .first()
+      .click();
+  });
+
+  await test.step('And I click on the unknown `Date of Birth` tab', async () => {
+    await page.getByRole('tab', { name: /no/i }).nth(1).click();
+  });
+
+  await test.step('And I fill the field for estimated age in years', async () => {
+    const estimatedAgeField = await page.getByLabel(/estimated age in years/i);
+    await estimatedAgeField.clear();
+    await estimatedAgeField.fill('25');
+  });
+
+  await test.step('And I click on the submit button', async () => {
+    await page.getByRole('button', { name: /register patient/i }).click();
+  });
+
+  await test.step('Then I should see a success toast notification', async () => {
+    await expect(page.getByText(/new patient created/i)).toBeVisible();
+  });
+
+  await test.step('And I should see the newly recorded unknown patient dispalyed on the dashboard', async () => {
+    const patient = await getPatient(api, /patient\/(.+)\/chart/.exec(page.url())?.[1]);
+    await expect(patient?.person?.display).toBe('UNKNOWN UNKNOWN');
+  });
+});
+
 test.afterEach(async ({ api }) => {
   await deletePatient(api, patientUuid);
 });
