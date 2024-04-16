@@ -7,20 +7,17 @@
     {
       "name": "homepage-tiles",
       "slot": "home-metrics-tiles-slot",
-      "component": "homePageTilesSlot",
-      "order": 0
+      "component": "homePageTilesSlot"
     },
     {
       "name": "home-active-visits-tile",
       "slot": "metrics-extension-slot",
-      "component": "homeActiveVisitsTile",
-      "order": 0
+      "component": "homeActiveVisitsTile"
     },
     {
       "name": "home-total-visits-tile",
       "slot": "metrics-extension-slot",
-      "component": "homeTotalVisitsTile",
-      "order": 0
+      "component": "homeTotalVisitsTile"
     },
     {
       "name": "active-visits-widget",

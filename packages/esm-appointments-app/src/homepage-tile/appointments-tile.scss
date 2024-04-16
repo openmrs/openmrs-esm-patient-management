@@ -1,3 +1,7 @@
+@use '@carbon/type';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
 .tileContent {
   display: flex;
   flex-direction: column;
@@ -30,4 +34,9 @@
   line-height: 1.28572;
   letter-spacing: 0;
   color: #161616;
+}
+
+.countLabel {
+  @include type.type-style('label-01');
+  color: $text-02;
 }

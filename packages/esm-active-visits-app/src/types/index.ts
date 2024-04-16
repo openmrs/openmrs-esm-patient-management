@@ -34,22 +34,10 @@ export interface Visit {
   display?: string;
   encounters: Array<OpenmrsResource>;
   patient?: OpenmrsResource;
-  visitType: VisitType;
-  location?: Location;
+  visitType: OpenmrsResource;
+  location?: OpenmrsResource;
   startDatetime: string;
   stopDatetime?: string;
   attributes?: Array<OpenmrsResource>;
   [anythingElse: string]: any;
-}
-
-export interface Location {
-  uuid: string;
-  display?: string;
-  name?: string;
-}
-
-export interface VisitType {
-  uuid: string;
-  display: string;
-  name?: string;
 }
