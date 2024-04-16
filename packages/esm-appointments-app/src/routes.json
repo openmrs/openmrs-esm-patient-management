@@ -13,8 +13,7 @@
     {
       "name": "home-appointments-tile",
       "slot": "metrics-extension-slot",
-      "component": "homeAppointmentsTile",
-      "order": 0
+      "component": "homeAppointmentsTile"
     },
     {
       "name": "home-appointments",
