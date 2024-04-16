@@ -39,5 +39,4 @@ export interface Visit {
   startDatetime: string;
   stopDatetime?: string;
   attributes?: Array<OpenmrsResource>;
-  [anythingElse: string]: any;
 }

@@ -10,21 +10,17 @@ const AppointmentsTile: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       <Tile className={styles.tileContainer}>
-        <div>
-          <div className={styles.tileContent}>
-            <div className={styles.tileHeader}>
-              <header>{t('scheduledForToday', 'Scheduled For Today')}</header>
-            </div>
-            <div className={styles.displayDetails}>
-              <div className={styles.countLabel}>Patients</div>
-              <div className={styles.displayData}>{appointmentsData?.length ?? 0}</div>
-            </div>
+        <div className={styles.tileContent}>
+          <header className={styles.tileHeader}>{t('scheduledForToday', 'Scheduled For Today')}</header>
+          <div className={styles.displayDetails}>
+            <div className={styles.countLabel}>{t('patients', 'Patients')}</div>
+            <div className={styles.displayData}>{appointmentsData?.length ?? 0}</div>
           </div>
         </div>
       </Tile>
-    </React.Fragment>
+    </>
   );
 };
 
