@@ -9,6 +9,8 @@ import {
   useConnectedExtensions,
   type ConnectedExtension,
   type ConfigObject,
+  useLayoutType,
+  isDesktop,
 } from '@openmrs/esm-framework';
 import styles from './scheduled-appointments.scss';
 import SelectedDateContext from '../../hooks/selectedDateContext';
@@ -26,6 +28,8 @@ const scheduledAppointmentsPanelsSlot = 'scheduled-appointments-panels-slot';
 const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointmentServiceType }) => {
   const { t } = useTranslation();
   const { selectedDate } = useContext(SelectedDateContext);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
   // added to prevent auto-removal of translations for dynamic keys
   // t('checkedIn', 'Checked In');
@@ -73,7 +77,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
     <>
       <ContentSwitcher
         className={styles.switcher}
-        size="sm"
+        size={responsiveSize}
         onChange={({ name }) => setCurrentTab(name)}
         selectedIndex={panelsToShow.findIndex((panel) => panel.name == currentTab) ?? 0}
         selectionMode="manual">

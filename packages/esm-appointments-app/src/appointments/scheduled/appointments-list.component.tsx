@@ -12,12 +12,10 @@ interface AppointmentsListProps {
 const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceType, status, title, date }) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
-  const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment, index) => {
-    return {
-      id: `${index}`,
-      ...appointment,
-    };
-  });
+  const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment) => ({
+    id: appointment.uuid,
+    ...appointment,
+  }));
 
   return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={title} />;
 };
