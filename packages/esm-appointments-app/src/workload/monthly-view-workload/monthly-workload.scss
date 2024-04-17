@@ -2,7 +2,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
-
 .monthly-cell {
   border-left: 1px solid colors.$gray-20;
   border-bottom: 1px solid colors.$gray-20;
@@ -20,23 +19,38 @@
     border-right: 1px solid colors.$gray-20;
   }
 
-  &-disabled {
-    border-left: 1px solid colors.$gray-20;
-    border-bottom: 1px solid colors.$gray-20;
-    border-right: 1px solid colors.$gray-20;
-    background: colors.$white;
-    color: colors.$gray-20;
-    text-align: right;
+  &-today {
+    background-color: colors.$blue-70;
+    color: colors.$white;
   }
-  &-disabled:last-child {
-    border-left: 1px solid colors.$gray-20;
-    border-bottom: 1px solid colors.$gray-20;
-    border-right: 1px solid colors.$gray-20;
-    background: colors.$white;
-    color: colors.$gray-40;
-    text-align: right;
+
+  &-selected {
+    background-color: colors.$gray-10;
+    color: colors.$white;
+  }
+
+  &-current {
+    color: colors.$black;
+  }
+  &:hover {
+    background-color: colors.$blue-30-hover;
+    color: colors.$white;
+  }
+  &-active {
+    background-color: colors.$magenta-30;
+    color: colors.$white;
   }
 }
+
+.monthly-cell-disabled {
+  background: colors.$white;
+  color: colors.$gray-20;
+}
+
+.monthly-cell-disabled:last-child {
+  display: none;
+}
+
 .identifiers {
   @include type.type-style('body-compact-02');
   color: $ui-04;
@@ -131,8 +145,11 @@
 }
 
 .blue {
-  background-color: colors.$blue-70;
-  color: colors.$white;
+  color: colors.$blue-70;
+  font-weight: bold;
+}
+.black {
+  color: colors.$black;
   font-weight: bold;
 }
 
@@ -153,6 +170,9 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(0px, 1fr));
   grid-template-rows: repeat(6, minmax(0px, 1fr));
+}
+.selectedDate {
+  background-color: red;
 }
 
 .calendarViewContainer {
