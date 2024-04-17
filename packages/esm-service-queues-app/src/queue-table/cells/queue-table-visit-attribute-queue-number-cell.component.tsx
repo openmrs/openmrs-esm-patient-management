@@ -1,4 +1,4 @@
-import { useConfig } from '@openmrs/esm-framework';
+import { translateFrom, useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { type ConfigObject } from '../../config-schema';
 import { type QueueTableColumn, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
@@ -11,7 +11,7 @@ export const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTab
 };
 
 export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumn = {
-  headerI18nKey: 'queueNumber',
+  header: translateFrom('@openmrs/esm-service-queues-app', 'queueNumber', 'Queue number'),
   CellComponent: QueueTableVisitAttributeQueueNumberCell,
   getFilterableValue: (queueEntry, conceptsConfig) =>
     getVisitQueueNumber(queueEntry, conceptsConfig?.visitQueueNumberAttributeUuid),

@@ -46,12 +46,12 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
     goTo(1);
   }, [queueEntries]);
 
-  const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
+  const headers = queueTableColumns.map((column) => ({ header: column.header, key: column.header }));
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      queueTableColumns.forEach(({ headerI18nKey, CellComponent }) => {
-        row[headerI18nKey] = <CellComponent queueEntry={queueEntry} />;
+      queueTableColumns.forEach(({ header, CellComponent }) => {
+        row[header] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];

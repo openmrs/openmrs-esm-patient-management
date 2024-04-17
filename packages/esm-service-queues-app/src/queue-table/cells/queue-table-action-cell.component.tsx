@@ -1,5 +1,5 @@
 import { Button } from '@carbon/react';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, translateFrom } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
@@ -61,7 +61,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
 }
 
 export const queueTableActionColumn: QueueTableColumn = {
-  headerI18nKey: '',
+  header: translateFrom('@openmrs/esm-service-queues-app', 'actions', 'Actions'),
   CellComponent: QueueTableActionCell,
   getFilterableValue: null,
 };

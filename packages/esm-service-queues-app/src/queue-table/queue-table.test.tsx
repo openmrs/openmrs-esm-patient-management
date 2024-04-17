@@ -26,9 +26,7 @@ describe('QueueTable: ', () => {
 
     const headerRow = rows[0];
     for (const column of defaultQueueTableConfig.columns) {
-      if (column.headerI18nKey) {
-        expect(within(headerRow).getByText(column.headerI18nKey)).toBeInTheDocument();
-      }
+      expect(within(headerRow).getByText(column.header)).toBeInTheDocument();
     }
   });
 

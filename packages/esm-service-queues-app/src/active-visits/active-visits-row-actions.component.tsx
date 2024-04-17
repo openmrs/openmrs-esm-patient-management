@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React from 'react';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import { useConfig } from '@openmrs/esm-framework';
+import { translateFrom, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import styles from './active-visits-row-actions.scss';
@@ -26,7 +26,7 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
 };
 
 export const activeVisitActionsColumn: QueueTableColumn = {
-  headerI18nKey: '',
+  header: translateFrom('@openmrs/esm-service-queues-app', 'actions', 'Actions'),
   CellComponent: ActiveVisitRowActionsCell,
   getFilterableValue: null,
 };
