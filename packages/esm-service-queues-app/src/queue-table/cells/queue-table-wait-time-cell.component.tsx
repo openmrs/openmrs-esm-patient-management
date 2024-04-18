@@ -14,7 +14,7 @@ export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentPr
 export const queueTableWaitTimeColumn: QueueTableColumn = {
   HeaderComponent: () => {
     const { t } = useTranslation();
-    return t('waitTime', 'Name');
+    return t('waitTime', 'Wait time');
   },
   key: 'waitTime',
   CellComponent: QueueTableWaitTimeCell,

@@ -20,6 +20,7 @@ import React, { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
+import { Header } from '@carbon/react';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
@@ -56,28 +57,35 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
     }) ?? [];
 
   return (
-    <DataTable rows={rowsData} headers={queueTableColumns} useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
-        <TableContainer className={styles.tableContainer}>
-          {tableFilter && (
-            <TableToolbar {...getToolbarProps()}>
-              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-            </TableToolbar>
-          )}
-          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
-            <TableHead>
-              <TableRow>
-                {ExpandedRow && <TableExpandHeader />}
-                {headers.map((header: QueueTableColumn) => (
-                  <TableHeader {...getHeaderProps({ header })}>
-                    <header.HeaderComponent />
-                  </TableHeader>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => {
-                const Row = ExpandedRow ? TableExpandRow : TableRow;
+    <DataTable
+      data-floating-menu-container
+      overflowMenuOnHover={isDesktop(layout)}
+      rows={rowsData}
+      headers={queueTableColumns.map((column) => ({ header: column.key, ...column }))}
+      size={responsiveSize}
+      useZebraStyles>
+      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
+        <>
+          <TableContainer className={styles.tableContainer}>
+            {tableFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
+                  {headers.map((header: QueueTableColumn) => (
+                    <TableHeader {...getHeaderProps({ header })}>
+                      <header.HeaderComponent />
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, i) => {
+                  const Row = ExpandedRow ? TableExpandRow : TableRow;
 
                   return (
                     <React.Fragment key={row.id}>

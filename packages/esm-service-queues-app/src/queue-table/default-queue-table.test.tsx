@@ -1,6 +1,6 @@
 import React from 'react';
 import { of } from 'rxjs';
-import { screen } from '@testing-library/react';
+import { prettyDOM, screen } from '@testing-library/react';
 import { type ConfigObject, useConfig, useSession } from '@openmrs/esm-framework';
 import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';
@@ -81,7 +81,7 @@ describe('DefaultQueueTable: ', () => {
     mockUseQueueRooms.mockReturnValue({ rooms: [] });
     mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
 
-    renderActiveVisitsTable();
+    rendeDefaultQueueTable();
 
     await screen.findByRole('table');
 
@@ -95,7 +95,7 @@ describe('DefaultQueueTable: ', () => {
     mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
     mockUseQueueEntries.mockReturnValue({ queueEntries: mockQueueEntries, isLoading: false });
 
-    renderActiveVisitsTable();
+    rendeDefaultQueueTable();
 
     await screen.findByRole('table');
 
@@ -106,17 +106,17 @@ describe('DefaultQueueTable: ', () => {
     expect(john).toBeInTheDocument();
     expect(john).toHaveAttribute('href', 'someUrl');
 
-    const expectedColumnHeaders = [/name/, /priority/, /status/, /waitTime/];
+    const expectedColumnHeaders = ['Name', 'Priority', 'Coming from', 'Status', 'Queue', 'Wait time', 'Actions'];
     expectedColumnHeaders.forEach((header) => {
       expect(
         screen.getByRole('columnheader', {
-          name: new RegExp(header, 'i'),
+          name: header,
         }),
       ).toBeInTheDocument();
     });
   });
 });
 
-function renderActiveVisitsTable() {
+function rendeDefaultQueueTable() {
   renderWithSwr(<DefaultQueueTable />);
 }

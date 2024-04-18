@@ -10,7 +10,7 @@ export const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponent
 export const queueTableComingFromColumn: QueueTableColumn = {
   HeaderComponent: () => {
     const { t } = useTranslation();
-    return t('queueComingFrom', 'Coming From');
+    return t('queueComingFrom', 'Coming from');
   },
   key: 'queueComingFrom',
   CellComponent: QueueTableComingFromCell,
