@@ -28,6 +28,7 @@ import { type ConfigObject } from '../config-schema';
 import { queueTableVisitAttributeQueueNumberColumn } from './cells/queue-table-visit-attribute-queue-number-cell.component';
 import { activeVisitActionsColumn } from '../active-visits/active-visits-row-actions.component';
 import { useShowProviderQueueRoomModal } from '../add-provider-queue-room/add-provider-queue-room.resource';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -128,6 +129,7 @@ function DefaultQueueTable() {
             placeholder={t('searchThisList', 'Search this list')}
             size="sm"
           />,
+          <ClearQueueEntries queueEntries={filteredQueueEntries} />,
         ]}
       />
       {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
