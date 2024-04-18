@@ -116,12 +116,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
         return (
           <div className={styles.statusTableContainer}>
             <h5 className={styles.statusTableHeader}>{status.display}</h5>
-            <QueueTable
-              key={uuid}
-              queueEntries={filteredQueueEntries}
-              queueTableColumns={tableConfig.columns}
-              showSearchBar={false}
-            />
+            <QueueTable key={uuid} queueEntries={filteredQueueEntries} queueTableColumns={tableConfig.columns} />
           </div>
         );
       })}
