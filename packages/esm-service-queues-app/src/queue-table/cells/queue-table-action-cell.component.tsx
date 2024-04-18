@@ -61,7 +61,11 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
 }
 
 export const queueTableActionColumn: QueueTableColumn = {
-  header: translateFrom('@openmrs/esm-service-queues-app', 'actions', 'Actions'),
+  HeaderComponent: () => {
+    const { t } = useTranslation();
+    return t('actions', 'Actions');
+  },
+  key: 'actions',
   CellComponent: QueueTableActionCell,
   getFilterableValue: null,
 };

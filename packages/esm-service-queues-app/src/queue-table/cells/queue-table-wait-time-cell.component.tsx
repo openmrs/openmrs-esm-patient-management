@@ -3,6 +3,7 @@ import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../
 import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
 import dayjs from 'dayjs';
 import { translateFrom } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 
 export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const startedAt = dayjs(queueEntry.startedAt).toDate();
@@ -11,7 +12,11 @@ export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentPr
 };
 
 export const queueTableWaitTimeColumn: QueueTableColumn = {
-  header: translateFrom('@openmrs/esm-service-queues-app', 'waitTime', 'Wait time'),
+  HeaderComponent: () => {
+    const { t } = useTranslation();
+    return t('waitTime', 'Name');
+  },
+  key: 'waitTime',
   CellComponent: QueueTableWaitTimeCell,
   getFilterableValue: null,
 };

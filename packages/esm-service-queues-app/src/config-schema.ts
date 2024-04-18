@@ -134,11 +134,6 @@ export const configSchema = {
     _default: '',
     _description: 'Custom label for patient chart button',
   },
-  useActiveVisitsTable: {
-    _type: Type.Boolean,
-    _default: false,
-    _description: 'If true, renders the ActiveVisitsTable instead of the default queue table',
-  },
 };
 
 export interface ConfigObject {
@@ -169,7 +164,6 @@ export interface ConfigObject {
   customPatientChartUrl: string;
   defaultFacilityUrl: string;
   customPatientChartText: string;
-  useActiveVisitsTable: boolean;
 }
 
 export interface OutpatientConfig {

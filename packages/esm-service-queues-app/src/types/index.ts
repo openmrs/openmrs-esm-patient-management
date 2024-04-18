@@ -429,7 +429,8 @@ export interface QueueTableCellComponentProps {
 }
 
 export interface QueueTableColumn {
-  header: string; //  the column header. MUST be unique for each column in the queue table
+  HeaderComponent: React.FC<{}>;
+  key: string; // MUST be unique for each column in the queue table
   CellComponent: React.FC<QueueTableCellComponentProps>;
 
   // function to extract from the queue entry a searchable string representing the its value within this column.

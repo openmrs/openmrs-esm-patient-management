@@ -7,6 +7,7 @@ import { translateFrom, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import styles from './active-visits-row-actions.scss';
+import { useTranslation } from 'react-i18next';
 
 // table column definition containing actions user can perform to each row.
 export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
@@ -26,7 +27,11 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
 };
 
 export const activeVisitActionsColumn: QueueTableColumn = {
-  header: translateFrom('@openmrs/esm-service-queues-app', 'actions', 'Actions'),
+  HeaderComponent: () => {
+    const { t } = useTranslation();
+    return t('actions', 'Actions');
+  },
+  key: 'actions',
   CellComponent: ActiveVisitRowActionsCell,
   getFilterableValue: null,
 };

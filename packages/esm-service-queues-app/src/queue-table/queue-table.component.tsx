@@ -46,44 +46,38 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
     goTo(1);
   }, [queueEntries]);
 
-  const headers = queueTableColumns.map((column) => ({ header: column.header, key: column.header }));
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      queueTableColumns.forEach(({ header, CellComponent }) => {
-        row[header] = <CellComponent queueEntry={queueEntry} />;
+      queueTableColumns.forEach(({ key, CellComponent }) => {
+        row[key] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
 
   return (
-    <DataTable
-      data-floating-menu-container
-      overflowMenuOnHover={isDesktop(layout)}
-      rows={rowsData}
-      headers={headers}
-      size={responsiveSize}
-      useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
-        <>
-          <TableContainer className={styles.tableContainer}>
-            {tableFilter && (
-              <TableToolbar {...getToolbarProps()}>
-                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-              </TableToolbar>
-            )}
-            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
-              <TableHead>
-                <TableRow>
-                  {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, i) => {
-                  const Row = ExpandedRow ? TableExpandRow : TableRow;
+    <DataTable rows={rowsData} headers={queueTableColumns} useZebraStyles>
+      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
+        <TableContainer className={styles.tableContainer}>
+          {tableFilter && (
+            <TableToolbar {...getToolbarProps()}>
+              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+            </TableToolbar>
+          )}
+          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+            <TableHead>
+              <TableRow>
+                {ExpandedRow && <TableExpandHeader />}
+                {headers.map((header: QueueTableColumn) => (
+                  <TableHeader {...getHeaderProps({ header })}>
+                    <header.HeaderComponent />
+                  </TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, i) => {
+                const Row = ExpandedRow ? TableExpandRow : TableRow;
 
                   return (
                     <React.Fragment key={row.id}>
