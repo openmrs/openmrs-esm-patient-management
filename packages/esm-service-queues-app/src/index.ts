@@ -136,6 +136,14 @@ export const endQueueEntryModal = getAsyncLifecycle(
   },
 );
 
+export const addnewQueueServiceWorkspace = getAsyncLifecycle(
+  () => import('./queue-services/queue-service-form.workspace'),
+  {
+    featureName: 'service-queues-service-form',
+    moduleName,
+  },
+);
+
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
 export const activeVisitsRowActions = getAsyncLifecycle(
@@ -151,22 +159,4 @@ export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
-
-  registerWorkspace({
-    name: 'service-queues-patient-search',
-    title: translateFrom('@openmrs/esm-service-queues-app', 'addPatientToQueue', 'Add patient to queue'),
-    load: getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
-      featureName: 'service-queues-patient-search',
-      moduleName,
-    }),
-  });
-
-  registerWorkspace({
-    name: 'service-queues-service-form',
-    title: translateFrom('@openmrs/esm-service-queues-app', 'addNewQueueService', 'Add new queue service'),
-    load: getAsyncLifecycle(() => import('./queue-services/queue-service-form.workspace'), {
-      featureName: 'service-queues-service-form',
-      moduleName,
-    }),
-  });
 }
