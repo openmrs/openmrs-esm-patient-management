@@ -12,7 +12,7 @@ interface ClearQueueEntriesProps {
 
 /**
  * Button to nd queue entries of all patients in a queue table and end their visits.
- * Slated for removal once we have a better way to end queue entries.
+ * TODO: Remove this button once we have a better way to end queue entries.
  * @param param0
  * @returns
  * @deprecated

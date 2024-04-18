@@ -63,6 +63,9 @@ function DefaultQueueTable() {
 
   const config = useConfig<ConfigObject>();
   const { visitQueueNumberAttributeUuid, concepts } = config;
+
+  // TODO: these two configs are here for backwards compatibility with the actions we show in each row.
+  // There might be futher changes pending future design of the config schema.
   const { defaultStatusConceptUuid, defaultTransitionStatus } = concepts ?? ({} as any);
 
   const columns = [
