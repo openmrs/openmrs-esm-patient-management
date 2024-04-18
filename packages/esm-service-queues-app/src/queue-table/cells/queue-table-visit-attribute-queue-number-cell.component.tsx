@@ -1,8 +1,8 @@
-import { translateFrom, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
-import { type ConfigObject } from '../../config-schema';
-import { type QueueTableColumn, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
 import { useTranslation } from 'react-i18next';
+import { type ConfigObject } from '../../config-schema';
+import { type QueueEntry, type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 export const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();

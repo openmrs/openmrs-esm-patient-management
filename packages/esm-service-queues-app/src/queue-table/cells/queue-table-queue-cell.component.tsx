@@ -1,7 +1,6 @@
 import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
-import { translateFrom } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 // reprevents a column showing which queue a queue entry belongs to
 export const QueueTableQueueCell = ({ queueEntry }: QueueTableCellComponentProps) => {

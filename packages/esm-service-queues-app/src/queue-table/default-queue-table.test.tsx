@@ -1,6 +1,6 @@
 import React from 'react';
 import { of } from 'rxjs';
-import { prettyDOM, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { type ConfigObject, useConfig, useSession } from '@openmrs/esm-framework';
 import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';

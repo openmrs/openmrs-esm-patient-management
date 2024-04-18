@@ -1,8 +1,7 @@
 import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
-import QueueStatus from '../../queue-entry-table-components/queue-status.component';
-import { translateFrom } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import QueueStatus from '../../queue-entry-table-components/queue-status.component';
+import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 export const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <QueueStatus status={queueEntry.status} />; // Do not pass queue into status, as we do not want to render it

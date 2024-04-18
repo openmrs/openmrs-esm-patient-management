@@ -1,5 +1,5 @@
 import { Button } from '@carbon/react';
-import { showModal, translateFrom } from '@openmrs/esm-framework';
+import { showModal } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';

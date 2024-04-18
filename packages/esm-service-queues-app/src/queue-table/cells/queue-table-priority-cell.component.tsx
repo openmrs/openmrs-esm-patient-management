@@ -1,8 +1,7 @@
 import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
-import QueuePriority from '../../queue-entry-table-components/queue-priority.component';
-import { translateFrom } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import QueuePriority from '../../queue-entry-table-components/queue-priority.component';
+import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 export const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <QueuePriority priority={queueEntry.priority} priorityComment={queueEntry.priorityComment} />;

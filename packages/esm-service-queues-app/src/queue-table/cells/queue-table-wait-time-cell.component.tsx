@@ -1,9 +1,8 @@
-import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
-import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
 import dayjs from 'dayjs';
-import { translateFrom } from '@openmrs/esm-framework';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
+import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const startedAt = dayjs(queueEntry.startedAt).toDate();
