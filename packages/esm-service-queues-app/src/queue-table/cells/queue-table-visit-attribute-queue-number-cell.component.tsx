@@ -1,6 +1,5 @@
-import { useConfig } from '@openmrs/esm-framework';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
 import { type QueueEntry, type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
@@ -11,16 +10,12 @@ export const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTab
   return <span>{visitQueueNumber}</span>;
 };
 
-export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumn = {
-  HeaderComponent: () => {
-    const { t } = useTranslation();
-    return t('queueNumber', 'Queue number');
-  },
-  key: 'queueNumber',
+export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumn = (t) => ({
+  header: t('queueNumber', 'Queue number'),
   CellComponent: QueueTableVisitAttributeQueueNumberCell,
   getFilterableValue: (queueEntry, conceptsConfig) =>
     getVisitQueueNumber(queueEntry, conceptsConfig?.visitQueueNumberAttributeUuid),
-};
+});
 
 function getVisitQueueNumber(queueEntry: QueueEntry, visitQueueNumberAttributeUuid: string) {
   return queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)?.value;

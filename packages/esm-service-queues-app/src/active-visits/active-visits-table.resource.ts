@@ -1,21 +1,9 @@
+import { formatDate, openmrsFetch, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash-es/isEmpty';
-import last from 'lodash-es/last';
-import useSWR, { useSWRConfig } from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { useTranslation } from 'react-i18next';
-import {
-  type FetchResponse,
-  formatDate,
-  openmrsFetch,
-  parseDate,
-  restBaseUrl,
-  useConfig,
-  type Visit,
-} from '@openmrs/esm-framework';
-import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
+import isEmpty from 'lodash-es/isEmpty';
+import useSWR from 'swr';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
 
 dayjs.extend(isToday);
 

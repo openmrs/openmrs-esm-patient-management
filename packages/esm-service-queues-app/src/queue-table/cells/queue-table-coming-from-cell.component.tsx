@@ -1,17 +1,12 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
 
 export const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <>{queueEntry.queueComingFrom?.display}</>;
 };
 
-export const queueTableComingFromColumn: QueueTableColumn = {
-  HeaderComponent: () => {
-    const { t } = useTranslation();
-    return t('queueComingFrom', 'Coming from');
-  },
-  key: 'queueComingFrom',
+export const queueTableComingFromColumn: QueueTableColumn = (t) => ({
+  header: t('queueComingFrom', 'Coming from'),
   CellComponent: QueueTableComingFromCell,
   getFilterableValue: (queueEntry) => queueEntry.queueComingFrom?.display,
-};
+});

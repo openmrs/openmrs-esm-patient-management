@@ -1,6 +1,6 @@
+import React, { useCallback, useState } from 'react';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 import { type QueueEntry } from '../types';

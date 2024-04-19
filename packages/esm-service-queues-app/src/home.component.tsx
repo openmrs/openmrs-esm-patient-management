@@ -1,5 +1,5 @@
 import React from 'react';
-import { useConfig, useFeatureFlag } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import ActiveVisitsTabs from './active-visits/active-visits-tab.component';
 import ClinicMetrics from './patient-queue-metrics/clinic-metrics.component';
 import PatientQueueHeader from './patient-queue-header/patient-queue-header.component';

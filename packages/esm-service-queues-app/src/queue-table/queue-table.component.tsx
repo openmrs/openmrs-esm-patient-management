@@ -1,3 +1,4 @@
+import React, { useEffect, useState, type FC } from 'react';
 import {
   DataTable,
   Pagination,
@@ -16,7 +17,6 @@ import {
   Tile,
 } from '@carbon/react';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import React, { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
@@ -43,6 +43,11 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
+  const columns = queueTableColumns.map((columnFunction) => {
+    const column = columnFunction(t);
+    return { key: column.header, ...column };
+  });
+
   useEffect(() => {
     goTo(1);
   }, [queueEntries]);
@@ -50,8 +55,8 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      queueTableColumns.forEach(({ key, CellComponent }) => {
-        row[key] = <CellComponent queueEntry={queueEntry} />;
+      columns.forEach(({ header, CellComponent }) => {
+        row[header] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
@@ -61,7 +66,7 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
       data-floating-menu-container
       overflowMenuOnHover={isDesktop(layout)}
       rows={rowsData}
-      headers={queueTableColumns.map((column) => ({ header: column.key, ...column }))}
+      headers={columns}
       size={responsiveSize}
       useZebraStyles>
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
@@ -76,10 +81,8 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
-                  {headers.map((header: QueueTableColumn) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      <header.HeaderComponent />
-                    </TableHeader>
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                   ))}
                 </TableRow>
               </TableHead>

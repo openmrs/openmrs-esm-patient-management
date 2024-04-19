@@ -1,7 +1,7 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot, isDesktop, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './queue-table.scss';
 import {
@@ -85,7 +85,7 @@ function DefaultQueueTable() {
     const searchTermLowercase = searchTerm.toLowerCase();
     return queueEntries?.filter((queueEntry) => {
       return columns.some((column) => {
-        const columnSearchTerm = column.getFilterableValue?.(queueEntry, config)?.toLocaleLowerCase();
+        const columnSearchTerm = column(t).getFilterableValue?.(queueEntry, config)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
     });

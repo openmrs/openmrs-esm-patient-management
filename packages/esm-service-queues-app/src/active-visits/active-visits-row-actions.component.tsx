@@ -3,11 +3,10 @@ import TransitionMenu from '../queue-entry-table-components/transition-entry.com
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
-import { translateFrom, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import styles from './active-visits-row-actions.scss';
-import { useTranslation } from 'react-i18next';
 
 // table column definition containing actions user can perform to each row.
 export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
@@ -26,12 +25,8 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
   );
 };
 
-export const activeVisitActionsColumn: QueueTableColumn = {
-  HeaderComponent: () => {
-    const { t } = useTranslation();
-    return t('actions', 'Actions');
-  },
-  key: 'actions',
+export const activeVisitActionsColumn: QueueTableColumn = (t) => ({
+  header: t('actions', 'Actions'),
   CellComponent: ActiveVisitRowActionsCell,
   getFilterableValue: null,
-};
+});

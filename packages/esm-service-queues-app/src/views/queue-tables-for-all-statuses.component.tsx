@@ -1,6 +1,6 @@
+import React, { useCallback, useState } from 'react';
 import { InlineNotification } from '@carbon/react';
 import { ExtensionSlot, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../queue-table/queue-table.scss';
 import { useQueueEntries } from '../hooks/useQueueEntries';
@@ -54,7 +54,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
       const searchTermLowercase = searchTerm.toLowerCase();
       return queueEntries.filter((queueEntry) => {
         const match = columns.some((column) => {
-          const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
+          const columnSearchTerm = column(t).getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
           return columnSearchTerm?.includes(searchTermLowercase);
         });
         return queueEntry.status.uuid == statucUuid && match;
