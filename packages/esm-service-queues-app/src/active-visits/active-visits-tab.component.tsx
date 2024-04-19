@@ -3,11 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabPanels, TabPanel, TabList } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { SearchTypes } from '../types';
 import PatientSearch from '../patient-search/patient-search.component';
 import MissingQueueEntries from '../visits-missing-inqueue/visits-missing-inqueue.component';
-import ActiveVisitsTable from './active-visits-table.component';
-import styles from './active-visits-table.scss';
+import styles from './active-visits-tab.scss';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
 
 function ActiveVisitsTabs() {
   const { t } = useTranslation();
@@ -35,17 +34,14 @@ function ActiveVisitsTabs() {
           }}
         />
       </div>
-      <Tabs
-        selectedIndex={selectedTab}
-        onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}
-        className={styles.tabs}>
+      <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}>
         <TabList style={{ paddingLeft: '1rem' }} aria-label="Outpatient tabs" contained>
           <Tab>{t('InQueue', 'In Queue')}</Tab>
           <Tab>{t('NotInQueue', 'Not In Queue')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel style={{ padding: 0 }}>
-            <ActiveVisitsTable />
+            <DefaultQueueTable />
           </TabPanel>
           <TabPanel style={{ padding: 0 }}>
             <MissingQueueEntries />

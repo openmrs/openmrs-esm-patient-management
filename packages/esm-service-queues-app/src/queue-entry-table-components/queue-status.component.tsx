@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, InProgress } from '@carbon/react/icons';
-import styles from '../active-visits/active-visits-table.scss';
+import styles from '../queue-table/queue-table.scss';
 import { type Concept, type Queue } from '../types';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject, type StatusConfig } from '../config-schema';
