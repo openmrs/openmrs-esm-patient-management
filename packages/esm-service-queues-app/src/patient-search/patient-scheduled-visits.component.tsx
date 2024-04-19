@@ -26,7 +26,6 @@ import {
   useVisitTypes,
   useVisit,
   useConfig,
-  type ConfigObject,
 } from '@openmrs/esm-framework';
 import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
@@ -40,6 +39,7 @@ import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
 import { useQueues } from '../helpers/useQueues';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { type ConfigObject } from '../config-schema';
 interface PatientScheduledVisitsProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
@@ -74,7 +74,7 @@ const ScheduledVisits: React.FC<{
   const [patientId, setPatientId] = useState('');
   const allVisitTypes = useVisitTypes();
   const { currentVisit } = useVisit(patientUuid);
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { queueLocations } = useQueueLocations();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
