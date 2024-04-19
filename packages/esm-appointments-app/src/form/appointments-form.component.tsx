@@ -56,30 +56,6 @@ function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
-const appointmentsFormSchema = z.object({
-  duration: z.number(),
-  location: z.string().refine((value) => value !== ''),
-  provider: z.string().refine((value) => value !== ''),
-  appointmentStatus: z.string().optional(),
-  appointmentNote: z.string(),
-  appointmentType: z.string().refine((value) => value !== ''),
-  selectedService: z.string().refine((value) => value !== ''),
-  recurringPatternType: z.enum(['DAY', 'WEEK']),
-  recurringPatternPeriod: z.number(),
-  recurringPatternDaysOfWeek: z.array(z.string()),
-  selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string().refine((value) => isValidTime(value)),
-  timeFormat: z.enum(['AM', 'PM']),
-  appointmentDateTime: z.object({
-    startDate: z.date(),
-    startDateText: z.string(),
-    recurringPatternEndDate: z.date().nullable(),
-    recurringPatternEndDateText: z.string().nullable(),
-  }),
-});
-
-type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
-
 interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
@@ -112,7 +88,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const { appointmentStatuses, appointmentTypes, allowAllDayAppointments } = useConfig<ConfigObject>();
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
-  const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
+  const [isAllDayAppointment, setIsAllDayAppointment] = useState(true);
 
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
@@ -144,6 +120,30 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     appointment?.startDateTime && appointment?.endDateTime
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
       : null;
+
+  const appointmentsFormSchema = z.object({
+    duration: allowAllDayAppointments ? z.number().optional().nullable() : z.number(),
+    location: z.string().refine((value) => value !== ''),
+    provider: z.string().refine((value) => value !== ''),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== ''),
+    selectedService: z.string().refine((value) => value !== ''),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value)),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+  });
+
+  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
