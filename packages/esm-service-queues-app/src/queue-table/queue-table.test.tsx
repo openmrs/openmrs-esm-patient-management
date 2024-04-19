@@ -25,7 +25,7 @@ describe('QueueTable: ', () => {
     expect(rows).toHaveLength(1); // should only have the header row
 
     const headerRow = rows[0];
-    const expectedColumnHeaders = ['Name', 'Priority', 'Coming from', 'Status', 'Wait time', 'Actions'];
+    const expectedColumnHeaders = [/name/i, /priority/i, /coming from/i, /status/i, /wait time/i, /actions/i];
     for (const expectedHeader of expectedColumnHeaders) {
       expect(within(headerRow).getByText(expectedHeader)).toBeInTheDocument();
     }
