@@ -27,5 +27,5 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           minimum-change-threshold: 10000 # 10 KB
-          build-script: "turbo build --color --concurrency=5"
+          build-script: "turbo build --concurrency=5"
 
