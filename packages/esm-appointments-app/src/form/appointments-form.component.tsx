@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -76,6 +76,7 @@ const appointmentsFormSchema = z.object({
     recurringPatternEndDate: z.date().nullable(),
     recurringPatternEndDateText: z.string().nullable(),
   }),
+  formIsRecurringAppointment: z.boolean(),
 });
 
 type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
@@ -170,8 +171,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDate: defaultEndDate,
         recurringPatternEndDateText: defaultEndDateText,
       },
+      formIsRecurringAppointment: isRecurringAppointment,
     },
   });
+
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
