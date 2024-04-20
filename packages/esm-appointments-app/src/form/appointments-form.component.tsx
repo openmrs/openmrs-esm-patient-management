@@ -57,7 +57,7 @@ function isValidTime(timeStr) {
 }
 
 const appointmentsFormSchema = z.object({
-  duration: z.number(),
+  duration: z.number().refine((duration) => duration > 0),
   location: z.string().refine((value) => value !== ''),
   provider: z.string().refine((value) => value !== ''),
   appointmentStatus: z.string().optional(),
