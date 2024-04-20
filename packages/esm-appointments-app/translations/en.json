@@ -77,6 +77,7 @@
   "errorCreatingAppointmentService": "Error creating appointment service",
   "expected": "Expected",
   "filterTable": "Filter table",
+  "durationErrorMessage": "Duration should be greater than zero",
   "gender": "Gender",
   "highestServiceVolume": "Highest volume service: {{time}}",
   "home": "Home",
