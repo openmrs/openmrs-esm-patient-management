@@ -57,7 +57,7 @@ function isValidTime(timeStr) {
 }
 
 const appointmentsFormSchema = z.object({
-  duration: z.number(),
+  duration: z.number().positive(),,
   location: z.string().refine((value) => value !== ''),
   provider: z.string().refine((value) => value !== ''),
   appointmentStatus: z.string().optional(),
@@ -761,13 +761,13 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
             <NumberInput
               hideSteppers
               id="duration"
-              min={0}
+              min={1}  // Ensure the minimum value is 1
               max={1440}
               label={t('durationInMinutes', 'Duration (minutes)')}
               invalidText={t('invalidNumber', 'Number is not valid')}
               size="md"
               onBlur={onBlur}
-              onChange={(event) => onChange(Number(event.target.value))}
+              onChange={(event) => onChange(Math.max(1, Number(event.target.value)))} // This ensures the value is at least 1
               value={value}
               ref={ref}
             />
