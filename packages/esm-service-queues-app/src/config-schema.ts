@@ -74,14 +74,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    generalPatientNoteUuid: {
-      _type: Type.ConceptUuid,
-      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    midUpperArmCircumferenceUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
@@ -150,6 +142,7 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
+    defaultTransitionStatus: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
     pulseUuid: string;
@@ -158,7 +151,6 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
-    midUpperArmCircumferenceUuid: string;
     emergencyPriorityConceptUuid: string;
     historicalObsConceptUuid: Array<string>;
   };

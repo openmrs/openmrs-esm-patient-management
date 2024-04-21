@@ -1,24 +1,31 @@
-import React, { useCallback } from 'react';
-import { showModal } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { type MappedVisitQueueEntry } from '../active-visits/active-visits-table.resource';
 import { Button } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
+import { showModal } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { type QueueEntry } from '../types';
 import styles from './clear-queue-entries-dialog.scss';
 
 interface ClearQueueEntriesProps {
-  visitQueueEntries: Array<MappedVisitQueueEntry>;
+  queueEntries: Array<QueueEntry>;
 }
 
-const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ visitQueueEntries }) => {
+/**
+ * Button to end queue entries of all patients in a queue table and end their visits.
+ * TODO: Remove this button once we have a better way to end queue entries.
+ * @param param0
+ * @returns
+ * @deprecated
+ */
+const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) => {
   const { t } = useTranslation();
 
   const launchClearAllQueueEntriesModal = useCallback(() => {
     const dispose = showModal('clear-all-queue-entries', {
       closeModal: () => dispose(),
-      visitQueueEntries,
+      queueEntries,
     });
-  }, [visitQueueEntries]);
+  }, [queueEntries]);
 
   return (
     <Button
