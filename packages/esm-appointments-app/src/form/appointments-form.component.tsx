@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -56,27 +56,41 @@ function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
-const appointmentsFormSchema = z.object({
-  duration: z.number(),
-  location: z.string().refine((value) => value !== ''),
-  provider: z.string().refine((value) => value !== ''),
-  appointmentStatus: z.string().optional(),
-  appointmentNote: z.string(),
-  appointmentType: z.string().refine((value) => value !== ''),
-  selectedService: z.string().refine((value) => value !== ''),
-  recurringPatternType: z.enum(['DAY', 'WEEK']),
-  recurringPatternPeriod: z.number(),
-  recurringPatternDaysOfWeek: z.array(z.string()),
-  selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string().refine((value) => isValidTime(value)),
-  timeFormat: z.enum(['AM', 'PM']),
-  appointmentDateTime: z.object({
-    startDate: z.date(),
-    startDateText: z.string(),
-    recurringPatternEndDate: z.date().nullable(),
-    recurringPatternEndDateText: z.string().nullable(),
-  }),
-});
+const appointmentsFormSchema = z
+  .object({
+    duration: z.number(),
+    location: z.string().refine((value) => value !== ''),
+    provider: z.string().refine((value) => value !== ''),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== ''),
+    selectedService: z.string().refine((value) => value !== ''),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value)),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+    formIsRecurringAppointment: z.boolean(),
+  })
+  .refine(
+    (formValues) => {
+      if (formValues.formIsRecurringAppointment === true) {
+        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+      }
+      return true;
+    },
+    {
+      path: ['appointmentDateTime[]'],
+      message: 'A recurring appointment should have an end date',
+    },
+  );
 
 type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -170,8 +184,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDate: defaultEndDate,
         recurringPatternEndDateText: defaultEndDateText,
       },
+      formIsRecurringAppointment: isRecurringAppointment,
     },
   });
+
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
