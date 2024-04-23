@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
 import { usePatientDetails } from '../../hooks/usePatientDetails';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime } from '@openmrs/esm-framework';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   return (
     <div className={styles.appointmentDetailsContainer}>
       <p className={styles.title}>{appointment.service.name}</p>
-      <p className={styles.subTitle}>{formatDate(new Date(appointment.startDateTime))}</p>
+      <p className={styles.subTitle}>{formatDatetime(new Date(appointment.startDateTime))}</p>
 
       <div className={styles.patientInfoGrid}>
         <div>
