@@ -781,6 +781,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
               hideSteppers
+              disableWheel
               id="duration"
               min={0}
               max={1440}

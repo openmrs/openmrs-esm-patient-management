@@ -12,7 +12,7 @@ const appointment: Appointment = {
     name: 'John Wilson',
     uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e',
     gender: 'M',
-    age: '35',
+    age: '34',
   },
   service: {
     appointmentServiceId: 1,
@@ -70,7 +70,7 @@ test('renders appointment details correctly', () => {
   expect(getByText(/Patient name/i)).toBeInTheDocument();
   expect(getByText(/John Wilson/i)).toBeInTheDocument();
   expect(getByText(/Age/i)).toBeInTheDocument();
-  expect(getByText(/35/i)).toBeInTheDocument();
+  expect(getByText(/34/i)).toBeInTheDocument();
   expect(getByText(/Gender/i)).toBeInTheDocument();
   expect(getByText(/Male/i)).toBeInTheDocument();
   expect(getByText(/Date of birth/i)).toBeInTheDocument();
