@@ -14,6 +14,34 @@
   background-color: $ui-background;
 }
 
+.headerButtons {
+  display: flex;
+  flex-flow: column;
+}
+
+.filterContainer {
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: 1rem;
+  }
+
+  :global(.cds--dropdown--inline) :global(.cds--list-box__field) {
+    min-width: 12rem;
+  }
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 0.5rem;
+  }
+}
+
 .search {
   max-width: 16rem;
   display: inline;
@@ -33,6 +61,7 @@
 
 .tableContainer {
   background-color: $ui-01;
+  margin: 0 spacing.$spacing-05;
   padding: 0;
 
   a {
@@ -94,6 +123,25 @@
     width: 2rem;
     padding-top: 3px;
     border-bottom: 0.375rem solid var(--brand-03);
+  }
+}
+
+.expandedActiveVisitRow {
+  :global(.cds--tab-content) {
+    padding: 0.5rem 0;
+  }
+
+  td {
+    padding: 0.5rem;
+
+    > div {
+      max-height: max-content !important;
+      background-color: $ui-02;
+    }
+  }
+
+  th[colspan] td[colspan] > div:first-child {
+    padding: 0 1rem;
   }
 }
 

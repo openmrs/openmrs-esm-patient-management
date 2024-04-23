@@ -1,3 +1,4 @@
+import React, { useEffect, useState, type FC } from 'react';
 import {
   DataTable,
   Pagination,
@@ -15,11 +16,11 @@ import {
   TableToolbarContent,
   Tile,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
-import React, { useEffect, useState, type FC } from 'react';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
+import { Header } from '@carbon/react';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
@@ -31,76 +32,82 @@ interface QueueTableProps {
 
   // if provided, adds addition table toolbar elements
   tableFilter?: React.ReactNode[];
-
-  showSearchBar?: boolean;
 }
 
-function QueueTable({
-  queueEntries,
-  queueTableColumns,
-  ExpandedRow,
-  tableFilter,
-  showSearchBar = true,
-}: QueueTableProps) {
+function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+
+  const columns = queueTableColumns.map((columnFunction) => {
+    const column = columnFunction(t);
+    return { key: column.header, ...column };
+  });
 
   useEffect(() => {
     goTo(1);
   }, [queueEntries]);
 
-  const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      queueTableColumns.forEach(({ headerI18nKey, CellComponent }) => {
-        row[headerI18nKey] = <CellComponent queueEntry={queueEntry} />;
+      columns.forEach(({ header, CellComponent }) => {
+        row[header] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
 
   return (
-    <DataTable rows={rowsData} headers={headers} useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
-        <TableContainer className={styles.tableContainer}>
-          {tableFilter && (
-            <TableToolbar {...getToolbarProps()}>
-              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-            </TableToolbar>
-          )}
-          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
-            <TableHead>
-              <TableRow>
-                {ExpandedRow && <TableExpandHeader />}
-                {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => {
-                const Row = ExpandedRow ? TableExpandRow : TableRow;
+    <DataTable
+      data-floating-menu-container
+      overflowMenuOnHover={isDesktop(layout)}
+      rows={rowsData}
+      headers={columns}
+      size={responsiveSize}
+      useZebraStyles>
+      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
+        <>
+          <TableContainer className={styles.tableContainer}>
+            {tableFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, i) => {
+                  const Row = ExpandedRow ? TableExpandRow : TableRow;
 
-                return (
-                  <React.Fragment key={row.id}>
-                    <Row {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </Row>
-                    {ExpandedRow && (
-                      <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
-                        <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
-                      </TableExpandedRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+                  return (
+                    <React.Fragment key={row.id}>
+                      <Row {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </Row>
+                      {ExpandedRow && row.isExpanded && (
+                        <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                          <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
+                        </TableExpandedRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
           {rows.length === 0 && (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
@@ -127,7 +134,7 @@ function QueueTable({
               }
             }}
           />
-        </TableContainer>
+        </>
       )}
     </DataTable>
   );
