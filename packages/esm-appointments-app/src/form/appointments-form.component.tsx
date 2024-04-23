@@ -50,6 +50,7 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import uniqBy from 'lodash/uniqBy';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 function isValidTime(timeStr) {
@@ -131,6 +132,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
+  const [pickedDate, setPickedDate] = useState<Date | null>(null); // Added state for pickedDate
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -350,12 +352,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-const updateLocations = uniqBy(
-  [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
-  'uuid',
-);
+  const updateLocations = uniqBy(
+    [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
+    'uuid',
+  );
 
-const minAllowedDate = new Date();
+  const minAllowedDate = new Date();
+
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
