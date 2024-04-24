@@ -58,6 +58,7 @@ function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
+// t('durationErrorMessage', 'Duration should be greater than zero')
 const appointmentsFormSchema = z
   .object({
     duration: z.number().refine((duration) => duration > 0, {
