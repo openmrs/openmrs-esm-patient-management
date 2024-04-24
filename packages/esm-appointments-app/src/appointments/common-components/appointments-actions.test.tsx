@@ -48,15 +48,6 @@ let appointment: Appointment = {
   extensions: [],
 };
 
-/*jest.mock('../../hooks/useTodaysVisits', () => {
-  const originalModule = jest.requireActual('../../hooks/useTodaysVisits');
-
-  return {
-    ...originalModule,
-    useTodaysVisits: jest.fn(),
-  };
-});*/
-
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
   return {
