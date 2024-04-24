@@ -6,7 +6,7 @@ import { Button } from '@carbon/react';
 import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
-import { type Appointment } from '../../types';
+import { type Appointment, AppointmentStatus } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import CheckInButton from './checkin-button.component';
@@ -22,13 +22,9 @@ interface AppointmentsActionsProps {
 const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
   const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
-  const { visits, mutateVisit } = useTodaysVisits();
+  const { mutateVisit } = useTodaysVisits();
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
-  const hasActiveVisitToday = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
-  const hasCheckedOutToday = visits?.some(
-    (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
-  );
   const isTodaysAppointment = visitDate.isToday();
 
   const handleCheckout = () => {
@@ -47,19 +43,19 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
 
   const renderVisitStatus = () => {
     switch (true) {
-      case hasCheckedOutToday && isTodaysAppointment:
+      case isTodaysAppointment && appointment.status === AppointmentStatus.COMPLETED:
         return (
           <Button kind="ghost" renderIcon={TaskComplete} iconDescription={t('checkedOut', 'Checked out')} size="sm">
             {t('checkedOut', 'Checked out')}
           </Button>
         );
-      case checkOutButton.enabled && hasActiveVisitToday && isTodaysAppointment:
+      case checkOutButton.enabled && isTodaysAppointment && appointment.status === AppointmentStatus.CHECKEDIN:
         return (
           <Button onClick={handleCheckout} kind="danger--tertiary" size="sm">
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case checkInButton.enabled && !hasActiveVisitToday && isTodaysAppointment: {
+      case checkInButton.enabled && isTodaysAppointment && appointment.status === AppointmentStatus.SCHEDULED: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
 
