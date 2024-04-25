@@ -26,6 +26,7 @@ import { z } from 'zod';
 import {
   ResponsiveWrapper,
   showSnackbar,
+  translateFrom,
   useConfig,
   useLayoutType,
   useLocations,
@@ -50,16 +51,22 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+
 import uniqBy from 'lodash/uniqBy';
+import { moduleName } from '../constants';
+ 
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
+// t('durationErrorMessage', 'Duration should be greater than zero')
 const appointmentsFormSchema = z
   .object({
-    duration: z.number(),
+    duration: z.number().refine((duration) => duration > 0, {
+      message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+    }),
     location: z.string().refine((value) => value !== ''),
     provider: z.string().refine((value) => value !== ''),
     appointmentStatus: z.string().optional(),
