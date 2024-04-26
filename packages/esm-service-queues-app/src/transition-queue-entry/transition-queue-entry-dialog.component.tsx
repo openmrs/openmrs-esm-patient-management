@@ -2,15 +2,7 @@ import React, { useCallback } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import {
-  type ConfigObject,
-  ExtensionSlot,
-  formatDatetime,
-  navigate,
-  parseDate,
-  showSnackbar,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDatetime, navigate, parseDate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   type MappedVisitQueueEntry,
   serveQueueEntry,
@@ -22,6 +14,7 @@ import { usePastVisits } from '../past-visit/past-visit.resource';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import styles from './transition-queue-entry-dialog.scss';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { type ConfigObject } from '../config-schema';
 
 interface TransitionQueueEntryModalProps {
   queueEntry: MappedVisitQueueEntry;
@@ -35,7 +28,7 @@ enum priorityComment {
 const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
 
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const defaultTransitionStatus = config.concepts.defaultTransitionStatus;
 
   const preferredIdentifiers = queueEntry?.identifiers.filter((identifier) =>
