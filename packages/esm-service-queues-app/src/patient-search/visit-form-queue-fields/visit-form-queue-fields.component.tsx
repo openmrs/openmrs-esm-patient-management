@@ -3,15 +3,16 @@ import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import styles from './visit-form-queue-fields.scss';
-import { type ConfigObject, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../helpers/useQueues';
+import { type ConfigObject } from '../../config-schema';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { queueLocations } = useQueueLocations();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const defaultPriority = config.concepts.defaultPriorityConceptUuid;
   const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;

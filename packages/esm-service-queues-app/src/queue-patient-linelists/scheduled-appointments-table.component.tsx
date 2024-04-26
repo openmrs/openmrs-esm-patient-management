@@ -23,7 +23,6 @@ import {
 } from '@carbon/react';
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
 import {
-  type ConfigObject,
   ExtensionSlot,
   formatDatetime,
   useConfig,
@@ -36,6 +35,7 @@ import QueueLinelist from './queue-linelist.component';
 import { updateSelectedAppointmentStatus, useSelectedAppointmentStatus } from '../helpers/helpers';
 import { useAppointments } from './queue-linelist.resource';
 import { getGender } from '../helpers/functions';
+import { type ConfigObject } from '../config-schema';
 
 /**
  * FIXME Temporarily moved here
@@ -56,7 +56,7 @@ type FilterProps = {
 const AppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
   const [showOverlay, setShowOverlay] = useState(false);
-  const { appointmentStatuses } = useConfig() as ConfigObject;
+  const { appointmentStatuses } = useConfig<ConfigObject>();
   const currentAppointmentStatus = useSelectedAppointmentStatus();
   const { appointmentQueueEntries, isLoading } = useAppointments();
   const [filteredRows, setFilteredRows] = useState(appointmentQueueEntries);
