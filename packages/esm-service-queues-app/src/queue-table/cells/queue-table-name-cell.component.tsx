@@ -1,7 +1,7 @@
 import React from 'react';
 import { ConfigurableLink, useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../../config-schema';
-import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTableNameCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { customPatientChartUrl } = useConfig<ConfigObject>();
@@ -12,8 +12,9 @@ export const QueueTableNameCell = ({ queueEntry }: QueueTableCellComponentProps)
   );
 };
 
-export const queueTableNameColumn: QueueTableColumn = (t) => ({
-  header: t('name', 'Name'),
+export const queueTableNameColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: QueueTableNameCell,
   getFilterableValue: (queueEntry) => queueEntry.patient.person.display,
 });

@@ -18,24 +18,8 @@ import { queueTableActionColumn } from './cells/queue-table-action-cell.componen
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue
   selectedStatus: Concept; // the selected status
-
-  // Table configuration for each status, keyed by status uuid
-  // If not provided, defaults to defaultQueueTableConfig
-  configByStatus?: Map<string, QueueTableTabConfig>;
-
   allStatusTabConfig?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
 }
-
-export const defaultQueueTableConfig: QueueTableTabConfig = {
-  columns: [
-    queueTableNameColumn,
-    queueTableComingFromColumn,
-    queueTablePriorityColumn,
-    queueTableStatusColumn,
-    queueTableWaitTimeColumn,
-    queueTableActionColumn,
-  ],
-};
 
 // displays the queue entries of a given queue by
 // showing a list of tabs (one tab per status), each showing
@@ -43,7 +27,6 @@ export const defaultQueueTableConfig: QueueTableTabConfig = {
 const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   selectedQueue,
   selectedStatus,
-  configByStatus,
   allStatusTabConfig,
 }) => {
   const layout = useLayoutType();
@@ -71,7 +54,6 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   }
 
   const queueEntriesForCurrentStatus = queueEntries?.filter((entry) => entry.status.uuid == currentStatusUuid);
-  const tableConfig = configByStatus?.get(currentStatusUuid) ?? defaultQueueTableConfig;
 
   return (
     <div className={styles.container}>
@@ -94,12 +76,20 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
         <TabPanels>
           {allowedStatuses?.map((s) => (
             <TabPanel key={s.uuid}>
-              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={tableConfig.columns} />
+              <QueueTable
+                queueEntries={queueEntriesForCurrentStatus}
+                queueUuid={selectedQueue.uuid}
+                statusUuid={s.uuid}
+              />
             </TabPanel>
           ))}
           {allStatusTabConfig && (
             <TabPanel>
-              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={allStatusTabConfig.columns} />
+              <QueueTable
+                queueEntries={queueEntriesForCurrentStatus}
+                queueUuid={selectedQueue.uuid}
+                statusUuid={null}
+              />
             </TabPanel>
           )}
         </TabPanels>

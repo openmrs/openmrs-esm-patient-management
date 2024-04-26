@@ -3,9 +3,9 @@ import { defineConfigSchema, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { mockQueueEntries, mockSession } from '__mocks__';
 import { renderWithSwr } from 'tools';
-import { defaultQueueTableConfig } from './queue-table-by-status.component';
 import QueueTable from './queue-table.component';
-import { configSchema } from '../config-schema';
+import { configSchema, defaultTablesConfig } from '../config-schema';
+import { useColumns } from './cells/columns.resource';
 
 const mockUseSession = useSession as jest.Mock;
 
@@ -19,7 +19,7 @@ describe('QueueTable: ', () => {
   });
 
   it('renders an empty table with default columns when there are no queue entries', () => {
-    renderWithSwr(<QueueTable queueEntries={[]} queueTableColumns={defaultQueueTableConfig.columns} />);
+    renderWithSwr(<QueueTable queueEntries={[]} statusUuid={null} queueUuid={null} />);
 
     const rows = screen.queryAllByRole('row');
     expect(rows).toHaveLength(1); // should only have the header row
@@ -32,7 +32,7 @@ describe('QueueTable: ', () => {
   });
 
   it('renders queue entries with default columns', () => {
-    renderWithSwr(<QueueTable queueEntries={mockQueueEntries} queueTableColumns={defaultQueueTableConfig.columns} />);
+    renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={null} />);
 
     for (const entry of mockQueueEntries) {
       const patientName = entry.patient.display;
@@ -40,13 +40,6 @@ describe('QueueTable: ', () => {
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();
       expect(within(row).getByText(entry.priority.display)).toBeInTheDocument();
-
-      // has either a "Undo transition" or "Delete" link, depending on whether it has a previous queue entry or not
-      if (entry.previousQueueEntry == null) {
-        expect(within(row).getByText('Delete')).toBeInTheDocument();
-      } else {
-        expect(within(row).getByText('Undo transition')).toBeInTheDocument();
-      }
     }
   });
 });

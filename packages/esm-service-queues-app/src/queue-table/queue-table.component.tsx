@@ -20,11 +20,22 @@ import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework'
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
-import { Header } from '@carbon/react';
+import { useColumns } from './cells/columns.resource';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
-  queueTableColumns: QueueTableColumn[];
+
+  // the queueUuid and statusUuid are used to determine the columns
+  // to display based on the tablesConfig configuration.
+  // For a table displaying entries of a particular queue (across all statuses)
+  // statusUuid param should be null.
+  // For a table displaying entries from multiple quueues
+  // both queueUuid and statusUuid params should be null
+  queueUuid: string;
+  statusUuid: string;
+
+  // If provided, overides the columns specified by the tablesConfig configuration.
+  queueTableColumnsOverride?: QueueTableColumn[];
 
   // if provided, a queue entry row can be expanded with the
   // provided component rendering more info about the row
@@ -34,7 +45,14 @@ interface QueueTableProps {
   tableFilter?: React.ReactNode[];
 }
 
-function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter }: QueueTableProps) {
+function QueueTable({
+  queueEntries,
+  queueUuid,
+  statusUuid,
+  queueTableColumnsOverride,
+  ExpandedRow,
+  tableFilter,
+}: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
@@ -43,10 +61,8 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
-  const columns = queueTableColumns.map((columnFunction) => {
-    const column = columnFunction(t);
-    return { key: column.header, ...column };
-  });
+  const columnsFromConfig = useColumns(queueUuid, statusUuid);
+  const columns = queueTableColumnsOverride ?? columnsFromConfig ?? [];
 
   useEffect(() => {
     goTo(1);
@@ -55,11 +71,15 @@ function QueueTable({ queueEntries, queueTableColumns, ExpandedRow, tableFilter 
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      columns.forEach(({ header, CellComponent }) => {
-        row[header] = <CellComponent queueEntry={queueEntry} />;
+      columns.forEach(({ key, CellComponent }) => {
+        row[key] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
+
+  if (columns.length == 0) {
+    return <p>No table columns defined. Check Configuration</p>;
+  }
 
   return (
     <DataTable

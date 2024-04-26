@@ -1,7 +1,6 @@
 import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
 import type React from 'react';
 import { type ConfigObject } from '../config-schema';
-import { type TFunction } from 'react-i18next';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -429,14 +428,21 @@ export interface QueueTableCellComponentProps {
   queueEntry: QueueEntry;
 }
 
-export type QueueTableColumn = (t: TFunction) => {
-  header: string; // header of the column, MUST be unique for each column in the queue table
+export type QueueTableColumn = {
+  key: string; // key used by DataTable, MUST be unique for each column in the queue table
+  header: string; // header of the column
   CellComponent: React.FC<QueueTableCellComponentProps>;
 
   // function to extract from the queue entry a searchable string representing the its value within this column.
   // May be null to make this column's content unsearchable
-  getFilterableValue: (queueEntry: QueueEntry, config?: ConfigObject) => string | null;
+  getFilterableValue: (queueEntry: QueueEntry) => string | null;
 };
+
+export type QueueTableColumnFunction = (
+  key: string, // a unique key for the column
+  header?: string,
+  config?: any,
+) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];

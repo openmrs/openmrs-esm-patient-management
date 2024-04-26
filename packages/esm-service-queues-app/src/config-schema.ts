@@ -1,8 +1,59 @@
-import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
+
+export const defaultTablesConfig: TablesConfig = {
+  columnDefinitions: [
+    {
+      id: 'patient-name',
+      columnType: 'patient-name-column',
+    },
+    {
+      id: 'patient-id',
+      columnType: 'patient-id-column',
+      config: {
+        identifierType: 'openmrs-id-uuid',
+      },
+    },
+    {
+      id: 'priority',
+      columnType: 'priority-column',
+      config: [],
+    },
+    {
+      id: 'comingFrom',
+      columnType: 'queue-coming-from-column',
+    },
+    {
+      id: 'status',
+      columnType: 'status-column',
+      config: [],
+    },
+    {
+      id: 'queue',
+      columnType: 'current-queue-column',
+    },
+    {
+      id: 'wait-time',
+      columnType: 'wait-time-column',
+    },
+    {
+      id: 'actions',
+      columnType: 'active-visits-actions-column',
+    },
+  ],
+  tableDefinitions: [
+    {
+      columns: ['patient-name', 'priority', 'comingFrom', 'status', 'wait-time', 'actions'],
+      appliedTo: { queue: '3113f164-68f0-11ee-ab8d-0242ac120002' },
+    },
+    {
+      columns: ['patient-name', 'patient-id', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+    },
+  ],
+};
 
 export const configSchema = {
   priorityConfigs: {
@@ -129,6 +180,11 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  tablesConfig: {
+    _type: Type.Object,
+    _description: 'TODO',
+    _default: defaultTablesConfig,
+  },
 };
 
 export interface ConfigObject {
@@ -157,17 +213,63 @@ export interface ConfigObject {
   defaultIdentifierTypes: Array<string>;
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
-  defaultFacilityUrl: string;
   visitTypeResourceUrl: string;
+  tablesConfig: TablesConfig;
 }
 
+interface TablesConfig {
+  columnDefinitions: ColumnDefinition[];
+
+  /*
+    A list of table definitions. A queue table (whether it is displaying entries from a
+    particular queue+status combination, from a particular queue, or from multiple queues)
+    will determine what columns to show based on these definitions. If multiple TableDefinitions
+    have matching appliedTo criteria, the first one will be used.       
+  */
+  tableDefinitions: TableDefinitions[];
+}
+
+export type ColumnDefinition = {
+  id: string;
+  header?: string; // custom translation key for the column's header; overrides the default one
+} & (
+  | { columnType: 'patient-name-column' }
+  | { columnType: 'patient-id-column'; config: PatientIdColumnConfig }
+  | { columnType: 'patient-age-column' }
+  | { columnType: 'priority-column'; config: PriorityColumnConfig }
+  | { columnType: 'status-column'; config: StatusColumnConfig }
+  | { columnType: 'queue-coming-from-column' }
+  | { columnType: 'current-queue-column' }
+  | { columnType: 'wait-time-column' }
+  | { columnType: 'visit-start-time-column' }
+  | { columnType: 'actions-column' }
+  | { columnType: 'active-visits-actions-column' }
+  | { columnType: 'extension-column'; config: object }
+);
+
+export interface VisitAttributeQueueNumberColmnConfig {
+  visitQueueNumberAttributeUuid: string;
+}
+
+export interface PatientIdColumnConfig {
+  identifierType: string; // uuid of the identifier type
+}
 export interface PriorityConfig {
   conceptUuid: string;
   tagType: string;
   tagClassName: 'priorityTag' | 'tag' | null;
 }
 
+export type PriorityColumnConfig = PriorityConfig[];
+
 export interface StatusConfig {
   conceptUuid: string;
   iconComponent: 'Group' | 'InProgress' | null;
+}
+
+export type StatusColumnConfig = StatusConfig[];
+
+export interface TableDefinitions {
+  columns: string[]; // a list of columnIds
+  appliedTo?: { queue?: string; status?: string };
 }

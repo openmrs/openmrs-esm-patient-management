@@ -1,13 +1,14 @@
 import React from 'react';
 import QueuePriority from '../../queue-entry-table-components/queue-priority.component';
-import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTablePriorityCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <QueuePriority priority={queueEntry.priority} priorityComment={queueEntry.priorityComment} />;
 };
 
-export const queueTablePriorityColumn: QueueTableColumn = (t) => ({
-  header: t('priority', 'Priority'),
+export const queueTablePriorityColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: QueueTablePriorityCell,
   getFilterableValue: (queueEntry) => queueEntry.priority.display,
 });

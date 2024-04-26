@@ -1,6 +1,6 @@
 import React from 'react';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import { type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import { useConfig } from '@openmrs/esm-framework';
@@ -25,8 +25,9 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
   );
 };
 
-export const activeVisitActionsColumn: QueueTableColumn = (t) => ({
-  header: t('actions', 'Actions'),
+export const activeVisitActionsColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: ActiveVisitRowActionsCell,
   getFilterableValue: null,
 });
