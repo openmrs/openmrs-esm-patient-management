@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { Dropdown } from '@carbon/react';
@@ -22,6 +22,12 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
+
+  const locationDropdownOptions = useMemo(() => {
+    const locations =
+      queueLocations?.length > 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations;
+    return locations;
+  }, [queueLocations]);
 
   const handleQueueLocationChange = useCallback(({ selectedItem }) => {
     if (selectedItem.id === 'all') {
@@ -58,7 +64,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
               className={styles.dropdown}
               id="queueLocationDropdown"
               label={currentQueueLocationName ?? t('all', 'All')}
-              items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
+              items={locationDropdownOptions}
               itemToString={(item) => (item ? item.name : '')}
               titleText={t('view', 'View')}
               type="inline"
