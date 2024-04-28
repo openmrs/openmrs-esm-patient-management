@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { Dropdown } from '@carbon/react';
 import { formatDate, useConfig, useSession } from '@openmrs/esm-framework';
+import sortBy from 'lodash/sortBy';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
@@ -26,7 +27,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const locationDropdownOptions = useMemo(() => {
     const locations =
       queueLocations?.length > 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations;
-    return locations;
+    return sortBy(locations, ['name']);
   }, [queueLocations]);
 
   const handleQueueLocationChange = useCallback(({ selectedItem }) => {
@@ -66,7 +67,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
               label={currentQueueLocationName ?? t('all', 'All')}
               items={locationDropdownOptions}
               itemToString={(item) => (item ? item.name : '')}
-              titleText={t('view', 'View')}
+              titleText={t('location', 'Location')}
               type="inline"
               onChange={handleQueueLocationChange}
             />
