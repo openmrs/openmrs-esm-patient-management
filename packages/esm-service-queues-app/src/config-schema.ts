@@ -5,6 +5,11 @@ import biometricsConfigSchema, {
 } from './current-visit/visit-details/biometrics-config-schema';
 
 export const configSchema = {
+  limitQueueLocationToSessionLocation: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to limit the queue locations to the session location and its children location',
+  },
   priorityConfigs: {
     _type: Type.Array,
     _element: {
@@ -132,6 +137,7 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  limitQueueLocationToSessionLocation: boolean;
   priorityConfigs: Array<PriorityConfig>;
   statusConfigs: Array<StatusConfig>;
   concepts: {
