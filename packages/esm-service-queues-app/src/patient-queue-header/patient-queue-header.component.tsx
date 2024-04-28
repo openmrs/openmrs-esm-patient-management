@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { Dropdown } from '@carbon/react';
-import { formatDate, useSession } from '@openmrs/esm-framework';
+import { formatDate, useConfig, useSession } from '@openmrs/esm-framework';
 import PatientQueueIllustration from './patient-queue-illustration.component';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
@@ -13,10 +13,12 @@ import {
   useSelectedQueueLocationName,
 } from '../helpers/helpers';
 import styles from './patient-queue-header.scss';
+import { type ConfigObject } from '../config-schema';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
-  const { queueLocations, isLoading, error } = useQueueLocations();
+  const { limitQueueLocationToSessionLocation } = useConfig() as ConfigObject;
+  const { queueLocations, isLoading, error } = useQueueLocations(limitQueueLocationToSessionLocation);
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
