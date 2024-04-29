@@ -13,7 +13,6 @@ interface PatientSearchProps extends DefaultWorkspaceProps {
 }
 
 const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState }) => {
-  const { t } = useTranslation();
   const { selectedPatientUuid } = viewState;
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
@@ -28,6 +27,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
   return (
     <>
       {patient && (
+        // TODO: Replace this with the patient header component
         <ExtensionSlot
           name="patient-header-slot"
           state={{

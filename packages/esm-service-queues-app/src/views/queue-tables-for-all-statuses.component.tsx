@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { InlineNotification, Search } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, launchWorkspace, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import PatientSearch from '../patient-search/patient-search.component';
 import { useColumns } from '../queue-table/cells/columns.resource';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
 import QueueTable from '../queue-table/queue-table.component';
@@ -25,8 +24,6 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
 
   const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
   const allowedStatuses = selectedQueue.allowedStatuses;
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const noStatuses = !allowedStatuses?.length;
@@ -64,8 +61,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                setShowOverlay(true);
-                setViewState({ selectedPatientUuid });
+                launchWorkspace('patient-search', { viewState: { selectedPatientUuid } });
               },
             }}
           />
@@ -86,7 +82,6 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
           status={status}
         />
       ))}
-      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 };

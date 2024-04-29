@@ -114,6 +114,11 @@
       "name": "service-queues-service-form",
       "title": "addNewQueueService",
       "component": "addnewQueueServiceWorkspace"
+    },
+    {
+      "name": "service-queues-patient-search",
+      "title": "searchPatient",
+      "component": "patientSearchWorkspace"
     }
   ]
 }

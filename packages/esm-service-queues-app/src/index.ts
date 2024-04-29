@@ -11,7 +11,6 @@ import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
 import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
-import { registerWorkspace } from '@openmrs/esm-styleguide/src/workspaces/workspaces';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -136,6 +135,7 @@ export const endQueueEntryModal = getAsyncLifecycle(
   },
 );
 
+// t('addNewQueueService', 'Add New Queue Service')
 export const addnewQueueServiceWorkspace = getAsyncLifecycle(
   () => import('./queue-services/queue-service-form.workspace'),
   {
@@ -143,6 +143,12 @@ export const addnewQueueServiceWorkspace = getAsyncLifecycle(
     moduleName,
   },
 );
+
+// t('searchPatient', 'Search Patient')
+export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
+  featureName: 'service-queues-patient-search',
+  moduleName,
+});
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
