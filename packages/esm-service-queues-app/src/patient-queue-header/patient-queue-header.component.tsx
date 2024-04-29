@@ -12,9 +12,11 @@ import {
   updateSelectedQueueLocationName,
   updateSelectedServiceName,
   useSelectedQueueLocationName,
+  useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 import styles from './patient-queue-header.scss';
 import { type ConfigObject } from '../config-schema';
+import { useIsQueueLocation } from '../hooks/useIsQueueLocation';
 
 const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { t } = useTranslation();
@@ -23,6 +25,8 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
+  const currentQueueLocationUuid = useSelectedQueueLocationUuid();
+  const { isQueueLocation: isCurrentLocationAQueueLocation } = useIsQueueLocation(currentQueueLocationUuid);
 
   const locationDropdownOptions = useMemo(() => {
     const locations =
@@ -34,10 +38,14 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
     if (selectedItem.id === 'all') {
       updateSelectedQueueLocationUuid(null);
       updateSelectedQueueLocationName(null);
+      sessionStorage.setItem('queueLocationName', null);
+      sessionStorage.setItem('queueLocationUuid', null);
     } else {
       updateSelectedQueueLocationUuid(selectedItem.id);
       updateSelectedQueueLocationName(selectedItem.name);
       updateSelectedServiceName('All');
+      sessionStorage.setItem('queueLocationName', selectedItem.name);
+      sessionStorage.setItem('queueLocationUuid', selectedItem.id);
     }
   }, []);
 
@@ -64,7 +72,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
               aria-label="Select queue location"
               className={styles.dropdown}
               id="queueLocationDropdown"
-              label={currentQueueLocationName ?? t('all', 'All')}
+              label={isCurrentLocationAQueueLocation ? currentQueueLocationName : t('all', 'All')}
               items={locationDropdownOptions}
               itemToString={(item) => (item ? item.name : '')}
               titleText={t('location', 'Location')}

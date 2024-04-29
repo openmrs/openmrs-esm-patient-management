@@ -18,8 +18,8 @@ export const getServiceCountByAppointmentType = (
 const initialServiceNameState = { serviceName: localStorage.getItem('queueServiceName') };
 const initialServiceUuidState = { serviceUuid: localStorage.getItem('queueServiceUuid') };
 const intialStatusNameState = { status: '' };
-const initialQueueLocationNameState = { queueLocationName: localStorage.getItem('queueLocationName') };
-const initialQueueLocationUuidState = { queueLocationUuid: localStorage.getItem('queueLocationUuid') };
+const initialQueueLocationNameState = { queueLocationName: sessionStorage.getItem('queueLocationName') };
+const initialQueueLocationUuidState = { queueLocationUuid: sessionStorage.getItem('queueLocationUuid') };
 const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
 const initialPermanentProviderQueueRoomState = {
   isPermanentProviderQueueRoom: localStorage.getItem('isPermanentProviderQueueRoom'),
