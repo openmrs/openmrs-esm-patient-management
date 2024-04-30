@@ -28,6 +28,10 @@
   margin-bottom: spacing.$spacing-03;
 }
 
+.centerValue {
+  text-align: center;
+}
+
 .headerLabel {
   @include type.type-style('heading-compact-01');
   color: $text-02;

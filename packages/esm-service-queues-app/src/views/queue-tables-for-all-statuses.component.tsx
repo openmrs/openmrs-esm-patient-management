@@ -16,6 +16,7 @@ import { queueTableActionColumn } from '../queue-table/cells/queue-table-action-
 import PatientSearch from '../patient-search/patient-search.component';
 import { Add } from '@carbon/react/icons';
 import { Search } from '@carbon/react';
+import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
@@ -82,6 +83,9 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
       <div className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
           <h3>{selectedQueue.display}</h3>
+        </div>
+        <div>
+          <QueueTableMetrics />
         </div>
         <div className={styles.headerButtons}>
           <ExtensionSlot
