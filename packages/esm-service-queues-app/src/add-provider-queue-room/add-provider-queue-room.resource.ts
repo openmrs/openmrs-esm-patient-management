@@ -1,10 +1,6 @@
-import { openmrsFetch, restBaseUrl, showModal, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type ProvidersQueueRoom, type QueueRoom } from '../types';
-import { useIsPermanentProviderQueueRoom, useSelectedServiceUuid } from '../helpers/helpers';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { timeDiffInMinutes } from '../helpers/functions';
-import { useEffect } from 'react';
 
 export function useQueueRooms(location: string, queueUuid: string) {
   const apiUrl = queueUuid
@@ -77,32 +73,4 @@ export function useProvidersQueueRoom(providerUuid: string) {
     isLoading,
     mutate,
   };
-}
-
-// show the modal dialog if one is not configured
-export function useShowProviderQueueRoomModal() {
-  const currentServiceUuid = useSelectedServiceUuid();
-  const { queueLocations } = useQueueLocations();
-  const { rooms, isLoading: loading } = useQueueRooms(queueLocations[0]?.id, currentServiceUuid);
-  const isPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
-  const currentUserSession = useSession();
-  const providerUuid = currentUserSession?.currentProvider?.uuid;
-  const differenceInTime = timeDiffInMinutes(
-    new Date(),
-    new Date(localStorage.getItem('lastUpdatedQueueRoomTimestamp')),
-  );
-
-  useEffect(() => {
-    if (
-      !loading &&
-      rooms?.length > 0 &&
-      differenceInTime >= 1 &&
-      (isPermanentProviderQueueRoom == 'false' || isPermanentProviderQueueRoom === null)
-    ) {
-      const dispose = showModal('add-provider-to-room-modal', {
-        closeModal: () => dispose(),
-        providerUuid,
-      });
-    }
-  }, [rooms, isPermanentProviderQueueRoom]);
 }
