@@ -4,6 +4,9 @@ import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
 
+// Not all of the columnDefinitions are used below, but they are defined anyway
+// for demonstration purpose. Implementors can copy this JSON as a starting point
+// to configure the queue tables
 export const defaultTablesConfig: TablesConfig = {
   columnDefinitions: [
     {
@@ -11,25 +14,48 @@ export const defaultTablesConfig: TablesConfig = {
       columnType: 'patient-name-column',
     },
     {
-      id: 'patient-id',
-      columnType: 'patient-id-column',
+      id: 'patient-age',
+      columnType: 'patient-age-column',
+    },
+    {
+      id: 'patient-identifier',
+      columnType: 'patient-identifier-column',
       config: {
-        identifierType: 'openmrs-id-uuid',
+        identifierType: 'patient-identifier-uuid',
       },
     },
     {
       id: 'priority',
       columnType: 'priority-column',
-      config: [],
-    },
-    {
-      id: 'comingFrom',
-      columnType: 'queue-coming-from-column',
+      config: {
+        priorities: [
+          {
+            conceptUuid: 'priority-concept-uuid',
+            tagClassName: 'tag',
+            tagType: 'red',
+          },
+        ],
+      },
     },
     {
       id: 'status',
       columnType: 'status-column',
-      config: [],
+      config: {
+        statuses: [
+          {
+            conceptUuid: 'status-concept-uuid',
+            iconComponent: 'InProgress',
+          },
+        ],
+      },
+    },
+    {
+      id: 'visit-start-time',
+      columnType: 'visit-start-time-column',
+    },
+    {
+      id: 'comingFrom',
+      columnType: 'queue-coming-from-column',
     },
     {
       id: 'queue',
@@ -41,37 +67,19 @@ export const defaultTablesConfig: TablesConfig = {
     },
     {
       id: 'actions',
-      columnType: 'active-visits-actions-column',
+      columnType: 'extension-column',
+      header: 'Actions',
     },
   ],
   tableDefinitions: [
     {
-      columns: ['patient-name', 'priority', 'comingFrom', 'status', 'wait-time', 'actions'],
-      appliedTo: { queue: '3113f164-68f0-11ee-ab8d-0242ac120002' },
-    },
-    {
-      columns: ['patient-name', 'patient-id', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+      columns: ['patient-name', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+      appliedTo: [{ queue: null, status: null }],
     },
   ],
 };
 
 export const configSchema = {
-  priorityConfigs: {
-    _type: Type.Array,
-    _element: {
-      _type: Type.Object,
-    },
-    _description: 'Allows customization of how specific priorities are rendered',
-    _default: [],
-  },
-  statusConfigs: {
-    _type: Type.Array,
-    _element: {
-      _type: Type.Object,
-    },
-    _description: 'Allows customization of how specific statuses are rendered',
-    _default: [],
-  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -182,14 +190,19 @@ export const configSchema = {
   },
   tablesConfig: {
     _type: Type.Object,
-    _description: 'TODO',
+    _description: `Configurations of columns to show for the queue table.
+      Multiple configurations can be provided, each can be applied generally, or to tables 
+      for a particular queue, particular status, or even particular queue+status combination.
+      If multiple configs are defined, the first config with matching appliedTo condition
+      is used.
+      See https://github.com/openmrs/openmrs-esm-patient-management/blob/main/packages/esm-service-queues-app/src/config-schema.ts
+      for full schema definition and example.
+    `,
     _default: defaultTablesConfig,
   },
 };
 
 export interface ConfigObject {
-  priorityConfigs: Array<PriorityConfig>;
-  statusConfigs: Array<StatusConfig>;
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
@@ -231,27 +244,27 @@ interface TablesConfig {
 
 export type ColumnDefinition = {
   id: string;
-  header?: string; // custom translation key for the column's header; overrides the default one
+  header?: string; // optional custom i18n translation key for the column's header; overrides the default one
+  headerModule?: string; // optional custom i18n translation module for the column's header. Must be used with the header option
 } & (
   | { columnType: 'patient-name-column' }
-  | { columnType: 'patient-id-column'; config: PatientIdColumnConfig }
+  | { columnType: 'patient-identifier-column'; config: PatientIdentifierColumnConfig }
   | { columnType: 'patient-age-column' }
-  | { columnType: 'priority-column'; config: PriorityColumnConfig }
-  | { columnType: 'status-column'; config: StatusColumnConfig }
+  | { columnType: 'priority-column'; config?: PriorityColumnConfig }
+  | { columnType: 'status-column'; config?: StatusColumnConfig }
   | { columnType: 'queue-coming-from-column' }
   | { columnType: 'current-queue-column' }
   | { columnType: 'wait-time-column' }
   | { columnType: 'visit-start-time-column' }
   | { columnType: 'actions-column' }
-  | { columnType: 'active-visits-actions-column' }
-  | { columnType: 'extension-column'; config: object }
+  | { columnType: 'extension-column'; config?: object } // column that contains the extension slot queue-table-extension-column-slot
 );
 
-export interface VisitAttributeQueueNumberColmnConfig {
+export interface VisitAttributeQueueNumberColumnConfig {
   visitQueueNumberAttributeUuid: string;
 }
 
-export interface PatientIdColumnConfig {
+export interface PatientIdentifierColumnConfig {
   identifierType: string; // uuid of the identifier type
 }
 export interface PriorityConfig {
@@ -260,16 +273,28 @@ export interface PriorityConfig {
   tagClassName: 'priorityTag' | 'tag' | null;
 }
 
-export type PriorityColumnConfig = PriorityConfig[];
+export interface PriorityColumnConfig {
+  priorities: PriorityConfig[];
+}
 
 export interface StatusConfig {
   conceptUuid: string;
   iconComponent: 'Group' | 'InProgress' | null;
 }
 
-export type StatusColumnConfig = StatusConfig[];
+export interface StatusColumnConfig {
+  statuses: StatusConfig[];
+}
+
+export interface ExtensionColumnConfig {
+  state: any; // state to pass into the extension
+}
 
 export interface TableDefinitions {
-  columns: string[]; // a list of columnIds
-  appliedTo?: { queue?: string; status?: string };
+  // a list of column ids defined in columnDefinitions
+  columns: string[];
+
+  // apply the columns to tables of any of the specified queue and status
+  // (if appliedTo is null, apply to all tables, including the one in the service queue app home page)
+  appliedTo?: Array<{ queue?: string; status?: string }>;
 }

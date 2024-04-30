@@ -1,11 +1,11 @@
 import React from 'react';
-import { type VisitAttributeQueueNumberColmnConfig } from '../../config-schema';
+import { type VisitAttributeQueueNumberColumnConfig } from '../../config-schema';
 import { type QueueTableColumnFunction, type QueueEntry, type QueueTableCellComponentProps } from '../../types';
 
 export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction = (
   key,
   header,
-  config: VisitAttributeQueueNumberColmnConfig,
+  config: VisitAttributeQueueNumberColumnConfig,
 ) => {
   const { visitQueueNumberAttributeUuid } = config;
   function getVisitQueueNumber(queueEntry: QueueEntry) {

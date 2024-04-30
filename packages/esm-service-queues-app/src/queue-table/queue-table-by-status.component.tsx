@@ -6,14 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import styles from './queue-table.scss';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { type Concept, type Queue, type QueueTableTabConfig } from '../types';
-import { queueTableComingFromColumn } from './cells/queue-table-coming-from-cell.component';
-import { queueTableNameColumn } from './cells/queue-table-name-cell.component';
-import { queueTablePriorityColumn } from './cells/queue-table-priority-cell.component';
-import { queueTableStatusColumn } from './cells/queue-table-status-cell.component';
-import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
 import QueueTable from './queue-table.component';
-import { queueTableActionColumn } from './cells/queue-table-action-cell.component';
 
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue

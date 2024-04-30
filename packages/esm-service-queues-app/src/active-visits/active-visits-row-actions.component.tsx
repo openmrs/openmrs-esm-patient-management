@@ -1,18 +1,28 @@
 import React from 'react';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
-import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
+import { type QueueEntry } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
 import EditMenu from '../queue-entry-table-components/edit-entry.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { mapVisitQueueEntryProperties } from './active-visits-table.resource';
 import styles from './active-visits-row-actions.scss';
+interface ActiveVisitRowActionsCellProps {
+  state: {
+    queueEntry: QueueEntry;
+  };
+}
 
-// table column definition containing actions user can perform to each row.
-export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+// This component is meant to be mounted as an extension in the queue-table-extension-column-slot.
+// Defines the following actions the user can perform on a queue entry:
+// - queue / requeue (to the in-service status)
+// - transfer to a different queue
+// - Overflow menu action to edit patient detail
+// - Overflow menu action to end patient visit
+const ActiveVisitRowActionsCell = ({ state: { queueEntry } }: ActiveVisitRowActionsCellProps) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
 
-  const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
+  const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry as QueueEntry, visitQueueNumberAttributeUuid);
 
   return (
     <>
@@ -25,9 +35,4 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
   );
 };
 
-export const activeVisitActionsColumn: QueueTableColumnFunction = (key, header) => ({
-  key,
-  header,
-  CellComponent: ActiveVisitRowActionsCell,
-  getFilterableValue: null,
-});
+export default ActiveVisitRowActionsCell;

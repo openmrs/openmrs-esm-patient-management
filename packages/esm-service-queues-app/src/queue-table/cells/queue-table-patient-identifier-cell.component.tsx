@@ -1,8 +1,12 @@
 import React from 'react';
-import { type PatientIdColumnConfig } from '../../config-schema';
+import { type PatientIdentifierColumnConfig } from '../../config-schema';
 import { type QueueEntry, type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
-export const queueTablePatientIdColumn: QueueTableColumnFunction = (key, header, config: PatientIdColumnConfig) => {
+export const queueTablePatientIdentifierColumn: QueueTableColumnFunction = (
+  key,
+  header,
+  config: PatientIdentifierColumnConfig,
+) => {
   const { identifierType } = config;
 
   const getPatientId = (queueEntry: QueueEntry) => {
