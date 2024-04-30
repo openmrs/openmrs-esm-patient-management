@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueueEntries } from '../hooks/useQueueEntries';
 import QueueTableMetricsCard from './queue-table-metrics-card.component';
 import styles from '../patient-queue-metrics/clinic-metrics.scss';
+import { type Queue } from '../types';
 
-function QueueTableMetrics() {
+interface QueueTableMetricsProps {
+  selectedQueue: Queue;
+}
+
+function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
   const { t } = useTranslation();
 
+  const allowedStatuses = selectedQueue.allowedStatuses;
+  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+
   return (
-    <>
-      <div className={styles.cardContainer} data-testid="clinic-metrics">
-        <QueueTableMetricsCard value={'38'} headerLabel={'Total Patients'} />
-        <QueueTableMetricsCard value={'3'} headerLabel={'Waiting for Service'} />
-        <QueueTableMetricsCard value={'4'} headerLabel={'In Service'} />
-        <QueueTableMetricsCard value={'5'} headerLabel={'Waiting for Transfer'} />
-      </div>
-    </>
+    <div className={styles.cardContainer}>
+      <QueueTableMetricsCard value={queueEntries.length} headerLabel={t('totalPatients', 'Total Patients')} />
+      {allowedStatuses?.map((status) => {
+        const filteredQueueEntries = queueEntries.filter((queueEntry) => {
+          return queueEntry.status.uuid === status.uuid;
+        });
+        return <QueueTableMetricsCard value={filteredQueueEntries.length} headerLabel={status.display} />;
+      })}
+    </div>
   );
 }
 

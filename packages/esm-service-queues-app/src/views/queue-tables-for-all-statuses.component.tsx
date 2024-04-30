@@ -85,7 +85,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
           <h3>{selectedQueue.display}</h3>
         </div>
         <div>
-          <QueueTableMetrics />
+          <QueueTableMetrics selectedQueue={selectedQueue} />
         </div>
         <div className={styles.headerButtons}>
           <ExtensionSlot
