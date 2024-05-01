@@ -7,81 +7,81 @@ import biometricsConfigSchema, {
 // Not all of the columnDefinitions are used below, but they are defined anyway
 // for demonstration purpose. Implementors can copy this JSON as a starting point
 // to configure the queue tables
-// eslint-disable-next-line
+// prettier-ignore
 export const defaultTablesConfig: TablesConfig = {
-  columnDefinitions: [
+  "columnDefinitions": [
     {
-      id: 'patient-name',
-      columnType: 'patient-name-column',
+      "id": "patient-name",
+      "columnType": "patient-name-column"
     },
     {
-      id: 'patient-age',
-      columnType: 'patient-age-column',
+      "id": "patient-age",
+      "columnType": "patient-age-column"
     },
     {
-      id: 'queue-number',
-      columnType: 'visit-attribute-queue-number-column',
+      "id": "queue-number",
+      "columnType": "visit-attribute-queue-number-column"
     },
     {
-      id: 'patient-identifier',
-      columnType: 'patient-identifier-column',
-      config: {
-        identifierType: 'patient-identifier-uuid',
-      },
+      "id": "patient-identifier",
+      "columnType": "patient-identifier-column",
+      "config": {
+        "identifierType": "patient-identifier-uuid"
+      }
     },
     {
-      id: 'priority',
-      columnType: 'priority-column',
-      config: {
-        priorities: [
+      "id": "priority",
+      "columnType": "priority-column",
+      "config": {
+        "priorities": [
           {
-            conceptUuid: 'priority-concept-uuid',
-            tagClassName: 'tag',
-            tagType: 'red',
-          },
-        ],
-      },
+            "conceptUuid": "priority-concept-uuid",
+            "tagClassName": "tag",
+            "tagType": "red"
+          }
+        ]
+      }
     },
     {
-      id: 'status',
-      columnType: 'status-column',
-      config: {
-        statuses: [
+      "id": "status",
+      "columnType": "status-column",
+      "config": {
+        "statuses": [
           {
-            conceptUuid: 'status-concept-uuid',
-            iconComponent: 'InProgress',
-          },
-        ],
-      },
+            "conceptUuid": "status-concept-uuid",
+            "iconComponent": "InProgress"
+          }
+        ]
+      }
     },
     {
-      id: 'visit-start-time',
-      columnType: 'visit-start-time-column',
+      "id": "visit-start-time",
+      "columnType": "visit-start-time-column"
     },
     {
-      id: 'comingFrom',
-      columnType: 'queue-coming-from-column',
+      "id": "comingFrom",
+      "columnType": "queue-coming-from-column"
     },
     {
-      id: 'queue',
-      columnType: 'current-queue-column',
+      "id": "queue",
+      "columnType": "current-queue-column"
     },
     {
-      id: 'wait-time',
-      columnType: 'wait-time-column',
+      "id": "wait-time",
+      "columnType": "wait-time-column"
     },
     {
-      id: 'actions',
-      columnType: 'extension-column',
-      header: 'Actions',
-    },
+      "id": "actions",
+      "columnType": "extension-column",
+      "header": "Actions"
+    }
   ],
-  tableDefinitions: [
+  "tableDefinitions": [
     {
-      columns: ['patient-name', 'queue-number', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
-      appliedTo: [{ queue: null, status: null }],
-    },
-  ],
+      "columns": ["patient-name", "queue-number", "comingFrom", "priority", "status", "queue", "wait-time", "actions"],
+      "appliedTo": [{ "queue": null, "status": null }]
+    }
+  ]
 };
 
 export const configSchema = {
