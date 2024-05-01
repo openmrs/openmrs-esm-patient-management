@@ -14,18 +14,14 @@
   }
 }
 
-.tileContainer {
-  border: 0.0625rem solid $ui-03;
-  height: 7.875rem;
-  padding: spacing.$spacing-05;
-  margin: spacing.$spacing-03 spacing.$spacing-03;
+.tileContainerWithoutBorder {
+  height: 4.875rem;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: spacing.$spacing-03;
 }
 
 .headerLabel {
@@ -33,14 +29,8 @@
   color: $text-02;
 }
 
-.totalsLabel {
-  @include type.type-style('label-01');
-  color: $text-02;
-}
-
-.totalsValue {
-  @include type.type-style('heading-04');
-  color: $ui-05;
+.valueLabel {
+  font-size: x-large;
 }
 
 .headerLabelContainer {
@@ -54,27 +44,5 @@
 
   :global(.cds--list-box__menu-icon) {
     height: 1rem;
-  }
-}
-
-.link {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  color: $interactive-01;
-
-  svg {
-    margin-left: spacing.$spacing-03;
-  }
-}
-
-// Overriding styles for RTL support
-html[dir='rtl'] {
-  .link {
-    svg {
-      margin-right: spacing.$spacing-03;
-      margin-left: unset;
-      transform: scale(-1, 1);
-    }
   }
 }
