@@ -7,6 +7,7 @@ import biometricsConfigSchema, {
 // Not all of the columnDefinitions are used below, but they are defined anyway
 // for demonstration purpose. Implementors can copy this JSON as a starting point
 // to configure the queue tables
+// eslint-disable-next-line
 export const defaultTablesConfig: TablesConfig = {
   columnDefinitions: [
     {
@@ -16,6 +17,10 @@ export const defaultTablesConfig: TablesConfig = {
     {
       id: 'patient-age',
       columnType: 'patient-age-column',
+    },
+    {
+      id: 'queue-number',
+      columnType: 'visit-attribute-queue-number-column',
     },
     {
       id: 'patient-identifier',
@@ -73,7 +78,7 @@ export const defaultTablesConfig: TablesConfig = {
   ],
   tableDefinitions: [
     {
-      columns: ['patient-name', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+      columns: ['patient-name', 'queue-number', 'comingFrom', 'priority', 'status', 'queue', 'wait-time', 'actions'],
       appliedTo: [{ queue: null, status: null }],
     },
   ],
@@ -249,6 +254,7 @@ export type ColumnDefinition = {
 } & (
   | { columnType: 'patient-name-column' }
   | { columnType: 'patient-identifier-column'; config: PatientIdentifierColumnConfig }
+  | { columnType: 'visit-attribute-queue-number-column' }
   | { columnType: 'patient-age-column' }
   | { columnType: 'priority-column'; config?: PriorityColumnConfig }
   | { columnType: 'status-column'; config?: StatusColumnConfig }

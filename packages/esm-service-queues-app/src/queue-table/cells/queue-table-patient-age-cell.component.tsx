@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
-export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+export const QueueTablePatientAgeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const birthdate = dayjs(queueEntry.patient.person.birthdate);
   const todaydate = dayjs();
   const age = todaydate.diff(birthdate, 'years');
@@ -13,6 +13,6 @@ export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentPr
 export const queueTablePatientAgeColumn: QueueTableColumnFunction = (key, header) => ({
   key,
   header,
-  CellComponent: QueueTableWaitTimeCell,
+  CellComponent: QueueTablePatientAgeCell,
   getFilterableValue: null,
 });

@@ -5,7 +5,7 @@ import { queueTablePatientIdentifierColumn } from './queue-table-patient-identif
 import { queueTablePriorityColumn } from './queue-table-priority-cell.component';
 import { queueTableStatusColumn } from './queue-table-status-cell.component';
 import { queueTableComingFromColumn } from './queue-table-coming-from-cell.component';
-import { queueTableQueueColumn } from './queue-table-queue-cell.component';
+import { queueTableQueueNameColumn } from './queue-table-queue-name-cell.component';
 import { queueTableWaitTimeColumn } from './queue-table-wait-time-cell.component';
 import { useMemo } from 'react';
 import { type ColumnDefinition, type ConfigObject } from '../../config-schema';
@@ -13,6 +13,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { queueTablePatientAgeColumn } from './queue-table-patient-age-cell.component';
 import { queueTableExtensionColumn } from './queue-table-extension-cell.component';
 import { queueTableVisitStartTimeColumn } from './queue-table-visit-start-time-cell.component';
+import { queueTableVisitAttributeQueueNumberColumn } from './queue-table-visit-attribute-queue-number-cell.component';
 
 // returns the columns to display for a queue table of a particular queue + status.
 // For a table displaying all entries of a particular queue, the status param should be null
@@ -20,13 +21,13 @@ import { queueTableVisitStartTimeColumn } from './queue-table-visit-start-time-c
 export function useColumns(queue: string, status: string): QueueTableColumn[] {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { tablesConfig } = config;
+  const { tablesConfig, visitQueueNumberAttributeUuid } = config;
   const { columnDefinitions, tableDefinitions } = tablesConfig;
 
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
     for (const columnDef of columnDefinitions) {
-      map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
+      map.set(columnDef.id, getColumnFromDefinition(t, columnDef, visitQueueNumberAttributeUuid));
     }
     return map;
   }, [columnDefinitions, t]);
@@ -52,7 +53,11 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
   return columns;
 }
 
-function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): QueueTableColumn {
+function getColumnFromDefinition(
+  t: TFunction,
+  columnDef: ColumnDefinition,
+  visitQueueNumberAttributeUuid: string,
+): QueueTableColumn {
   const { id, header, columnType } = columnDef;
 
   // TODO: make it possible to use header translation key from another module O3-3138
@@ -64,6 +69,13 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
     }
     case 'patient-identifier-column': {
       return queueTablePatientIdentifierColumn(id, translatedHeader ?? t('patientId', 'Patient Id'), columnDef.config);
+    }
+    case 'visit-attribute-queue-number-column': {
+      // use visitQueueNumberAttributeUuid from ConfigObject for now to keep backward compatibility
+      // TODO: change it to use the value passed in from columnDef.config instead when ready
+      return queueTableVisitAttributeQueueNumberColumn(id, translatedHeader ?? t('queueNumber', 'Queue Number'), {
+        visitQueueNumberAttributeUuid,
+      });
     }
     case 'patient-age-column': {
       return queueTablePatientAgeColumn(id, translatedHeader ?? t('age', 'Age'));
@@ -78,7 +90,7 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTableComingFromColumn(id, translatedHeader ?? t('comingFrom', 'Coming from'));
     }
     case 'current-queue-column': {
-      return queueTableQueueColumn(id, translatedHeader ?? t('queue', 'Queue'));
+      return queueTableQueueNameColumn(id, translatedHeader ?? t('queue', 'Queue'));
     }
     case 'wait-time-column': {
       return queueTableWaitTimeColumn(id, translatedHeader ?? t('waitTime', 'Wait time'));

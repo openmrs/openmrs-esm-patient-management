@@ -197,6 +197,7 @@
   "queueLocation": "Queue Location",
   "queueLocationRequired": "Queue location is required",
   "queueName": "Queue name",
+  "queueNumber": "Queue Number",
   "queuePriority": "Queue priority",
   "queueRoom": "Queue room",
   "queueRoomAddedSuccessfully": "Queue room addeded successfully",

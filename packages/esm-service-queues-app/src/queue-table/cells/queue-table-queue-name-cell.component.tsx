@@ -2,13 +2,13 @@ import React from 'react';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 // reprevents a column showing which queue a queue entry belongs to
-export const QueueTableQueueCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+export const QueueTableQueueNameCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <>{queueEntry.queue.display}</>;
 };
 
-export const queueTableQueueColumn: QueueTableColumnFunction = (key, header) => ({
+export const queueTableQueueNameColumn: QueueTableColumnFunction = (key, header) => ({
   key,
   header,
-  CellComponent: QueueTableQueueCell,
+  CellComponent: QueueTableQueueNameCell,
   getFilterableValue: (queueEntry) => queueEntry.queue.display,
 });

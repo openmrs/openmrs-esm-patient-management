@@ -5,9 +5,8 @@ import { type QueueTableColumnFunction, type QueueEntry, type QueueTableCellComp
 export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction = (
   key,
   header,
-  config: VisitAttributeQueueNumberColumnConfig,
+  { visitQueueNumberAttributeUuid }: VisitAttributeQueueNumberColumnConfig,
 ) => {
-  const { visitQueueNumberAttributeUuid } = config;
   function getVisitQueueNumber(queueEntry: QueueEntry) {
     return queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)?.value;
   }

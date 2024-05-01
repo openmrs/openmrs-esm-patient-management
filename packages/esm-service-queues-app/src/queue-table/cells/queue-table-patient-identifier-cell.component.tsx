@@ -9,7 +9,7 @@ export const queueTablePatientIdentifierColumn: QueueTableColumnFunction = (
 ) => {
   const { identifierType } = config;
 
-  const getPatientId = (queueEntry: QueueEntry) => {
+  const getPatientIdentifier = (queueEntry: QueueEntry) => {
     for (const identifier of queueEntry.patient.identifiers) {
       if (identifier.identifierType?.uuid == identifierType) {
         return identifier.identifier;
@@ -18,14 +18,14 @@ export const queueTablePatientIdentifierColumn: QueueTableColumnFunction = (
     return null;
   };
 
-  const QueueTablePatientIdCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-    return <span>{getPatientId(queueEntry)}</span>;
+  const QueueTablePatientIdentifierCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+    return <span>{getPatientIdentifier(queueEntry)}</span>;
   };
 
   return {
     key,
     header,
-    CellComponent: QueueTablePatientIdCell,
-    getFilterableValue: getPatientId,
+    CellComponent: QueueTablePatientIdentifierCell,
+    getFilterableValue: getPatientIdentifier,
   };
 };
