@@ -74,14 +74,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    generalPatientNoteUuid: {
-      _type: Type.ConceptUuid,
-      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    midUpperArmCircumferenceUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
@@ -101,11 +93,6 @@ export const configSchema = {
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
-  showQueueTableTab: {
-    _type: Type.Boolean,
-    _default: false,
-    _description: 'Disable outpatient table tabs',
-  },
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
@@ -124,6 +111,11 @@ export const configSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
   },
+  visitTypeResourceUrl: {
+    _type: Type.String,
+    _description: 'The `visitTypeResourceUrl`',
+    _default: null,
+  },
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
@@ -137,11 +129,6 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
-  customPatientChartText: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Custom label for patient chart button',
-  },
 };
 
 export interface ConfigObject {
@@ -150,6 +137,7 @@ export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
+    defaultTransitionStatus: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
     pulseUuid: string;
@@ -158,7 +146,6 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
-    midUpperArmCircumferenceUuid: string;
     emergencyPriorityConceptUuid: string;
     historicalObsConceptUuid: Array<string>;
   };
@@ -166,16 +153,11 @@ export interface ConfigObject {
   visitQueueNumberAttributeUuid: string;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
-  showQueueTableTab: boolean;
   appointmentStatuses: Array<string>;
   defaultIdentifierTypes: Array<string>;
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
   defaultFacilityUrl: string;
-  customPatientChartText: string;
-}
-
-export interface OutpatientConfig {
   visitTypeResourceUrl: string;
 }
 

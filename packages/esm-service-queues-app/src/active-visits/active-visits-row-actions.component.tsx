@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import TransitionMenu from '../queue-entry-table-components/transition-entry.component';
 import { type QueueTableCellComponentProps, type QueueTableColumn } from '../types';
 import ActionsMenu from '../queue-entry-table-components/actions-menu.component';
@@ -25,8 +25,8 @@ export const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponen
   );
 };
 
-export const activeVisitActionsColumn: QueueTableColumn = {
-  headerI18nKey: '',
+export const activeVisitActionsColumn: QueueTableColumn = (t) => ({
+  header: t('actions', 'Actions'),
   CellComponent: ActiveVisitRowActionsCell,
   getFilterableValue: null,
-};
+});

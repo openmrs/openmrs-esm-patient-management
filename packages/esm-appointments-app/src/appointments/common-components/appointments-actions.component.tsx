@@ -30,6 +30,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
     (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
   );
   const isTodaysAppointment = visitDate.isToday();
+  const isCancelled = appointment.status === 'Cancelled';
 
   const handleCheckout = () => {
     if (checkOutButton.customUrl) {
@@ -47,6 +48,12 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
 
   const renderVisitStatus = () => {
     switch (true) {
+      case isCancelled:
+        return (
+          <Button kind="danger--ghost" iconDescription={t('cancelled', 'Cancelled')} size="sm">
+            {t('cancelled', 'Cancelled')}
+          </Button>
+        );
       case hasCheckedOutToday && isTodaysAppointment:
         return (
           <Button kind="ghost" renderIcon={TaskComplete} iconDescription={t('checkedOut', 'Checked out')} size="sm">
@@ -62,7 +69,6 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
       case checkInButton.enabled && !hasActiveVisitToday && isTodaysAppointment: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
-
       default:
         return null;
     }
