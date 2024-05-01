@@ -27,7 +27,6 @@ import { DataTableSkeleton } from '@carbon/react';
 import { type ConfigObject } from '../config-schema';
 import { queueTableVisitAttributeQueueNumberColumn } from './cells/queue-table-visit-attribute-queue-number-cell.component';
 import { activeVisitActionsColumn } from '../active-visits/active-visits-row-actions.component';
-import { useShowProviderQueueRoomModal } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 
 /*
@@ -58,8 +57,6 @@ function DefaultQueueTable() {
 
   const [showOverlay, setShowOverlay] = useState(false);
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
-
-  useShowProviderQueueRoomModal();
 
   const config = useConfig<ConfigObject>();
   const { visitQueueNumberAttributeUuid, concepts } = config;
