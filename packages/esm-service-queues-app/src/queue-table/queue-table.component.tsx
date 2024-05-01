@@ -78,7 +78,7 @@ function QueueTable({
     }) ?? [];
 
   if (columns.length == 0) {
-    return <p>No table columns defined. Check Configuration</p>;
+    return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
   }
 
   return (

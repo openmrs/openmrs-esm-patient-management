@@ -1,6 +1,5 @@
 import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
 import type React from 'react';
-import { type ConfigObject } from '../config-schema';
 
 export enum SearchTypes {
   BASIC = 'basic',

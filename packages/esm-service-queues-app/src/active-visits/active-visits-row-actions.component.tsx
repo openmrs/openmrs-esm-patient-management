@@ -17,7 +17,7 @@ import styles from './active-visits-row-actions.scss';
 const ActiveVisitRowActionsCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
 
-  const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry as QueueEntry, visitQueueNumberAttributeUuid);
+  const mappedQueueEntry = mapVisitQueueEntryProperties(queueEntry, visitQueueNumberAttributeUuid);
 
   return (
     <>

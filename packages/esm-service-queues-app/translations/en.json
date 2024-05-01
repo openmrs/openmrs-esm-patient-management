@@ -123,6 +123,7 @@
   "nextPage": "Next page",
   "noActiveVisitsForLocation": "There are no active visits to display for this location.",
   "noAppointmentsFound": "No appointments found",
+  "noColumnsDefined": "No table columns defined. Check Configuration",
   "noEncountersFound": "No encounters found",
   "noLastEncounter": "There is no last encounter to display for this patient",
   "noLocationsAvailable": "No locations available",
