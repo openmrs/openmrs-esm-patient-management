@@ -13,11 +13,11 @@ function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
   const { t } = useTranslation();
 
   const allowedStatuses = selectedQueue.allowedStatuses;
-  const { queueEntries } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const { queueEntries, totalCount } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
 
   return (
     <div className={styles.metricsBorder}>
-      <QueueTableMetricsCard value={queueEntries.length} headerLabel={t('totalPatients', 'Total Patients')} />
+      <QueueTableMetricsCard value={totalCount} headerLabel={t('totalPatients', 'Total Patients')} />
       {allowedStatuses?.map((status) => {
         const filteredQueueEntries = queueEntries.filter((queueEntry) => {
           return queueEntry.status.uuid === status.uuid;
