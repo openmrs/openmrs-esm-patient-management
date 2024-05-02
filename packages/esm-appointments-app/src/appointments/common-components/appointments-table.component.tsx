@@ -66,7 +66,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   const { visits } = useTodaysVisits();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-
   const headerData = [
     {
       header: t('patientName', 'Patient name'),
@@ -89,8 +88,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       key: 'status',
     },
   ];
-
-  const rowData = results?.map((appointment) => ({
+  const activeAppointments = results?.filter((appointment) => appointment.status !== 'Cancelled');
+  const rowData = activeAppointments?.map((appointment) => ({
     id: appointment.uuid,
     patientName: (
       <ConfigurableLink
