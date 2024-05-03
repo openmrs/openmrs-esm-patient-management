@@ -1,19 +1,26 @@
 import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
-import { type ConfigObject, useConfig, useSession } from '@openmrs/esm-framework';
+import { useConfig, useSession, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import DefaultQueueTable from '../queue-table/default-queue-table.component';
+import { configSchema } from '../config-schema';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUseQueueEntries = useQueueEntries as jest.Mock;
 const mockQueueLocations = useQueueLocations as jest.Mock;
 const mockUseQueueRooms = useQueueRooms as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
+
+mockedUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  customPatientChartUrl: 'someUrl',
+});
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -67,16 +74,11 @@ jest.mock('../helpers/helpers', () => {
 
 describe('DefaultQueueTable: ', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue(mockSession),
-      mockedUseConfig.mockReturnValue({
-        concepts: {},
-        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-        customPatientChartUrl: 'someUrl',
-      } as ConfigObject);
+    mockUseSession.mockReturnValue(mockSession);
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    mockQueueLocations.mockReturnValueOnce({ queueLocations: [] });
+    mockQueueLocations.mockReturnValue({ queueLocations: [] });
     mockUseQueueRooms.mockReturnValue({ rooms: [] });
     mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
 
