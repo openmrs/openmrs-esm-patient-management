@@ -1,18 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Home from './home.component';
-import { useConfig } from '@openmrs/esm-framework';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { configSchema } from './config-schema';
 
 const mockedUseConfig = useConfig as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(() => ({
-    concepts: {
-      visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
-  })),
-}));
+mockedUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  concepts: {
+    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  },
+});
 
 jest.mock('./helpers/helpers', () => ({
   ...jest.requireActual('./helpers/helpers'),

@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dropdown, TableToolbarSearch } from '@carbon/react';
+import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import styles from './queue-table.scss';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
   updateSelectedServiceName,
   updateSelectedServiceUuid,
@@ -12,22 +12,12 @@ import {
   useSelectedServiceUuid,
 } from '../helpers/helpers';
 import { useQueues } from '../helpers/useQueues';
+import { useQueueEntries } from '../hooks/useQueueEntries';
 import PatientSearch from '../patient-search/patient-search.component';
-import { queueTableActionColumn } from './cells/queue-table-action-cell.component';
-import { queueTableComingFromColumn } from './cells/queue-table-coming-from-cell.component';
-import { queueTableNameColumn } from './cells/queue-table-name-cell.component';
-import { queueTablePriorityColumn } from './cells/queue-table-priority-cell.component';
-import { queueTableQueueColumn } from './cells/queue-table-queue-cell.component';
-import { queueTableStatusColumn } from './cells/queue-table-status-cell.component';
-import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
-import { useQueueEntries } from '../hooks/useQueueEntries';
-import { DataTableSkeleton } from '@carbon/react';
-import { type ConfigObject } from '../config-schema';
-import { queueTableVisitAttributeQueueNumberColumn } from './cells/queue-table-visit-attribute-queue-number-cell.component';
-import { activeVisitActionsColumn } from '../active-visits/active-visits-row-actions.component';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
+import styles from './queue-table.scss';
+import { useColumns } from './cells/columns.resource';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -58,23 +48,7 @@ function DefaultQueueTable() {
   const [showOverlay, setShowOverlay] = useState(false);
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
 
-  const config = useConfig<ConfigObject>();
-  const { visitQueueNumberAttributeUuid, concepts } = config;
-
-  // TODO: these two configs are here for backwards compatibility with the actions we show in each row.
-  // There might be futher changes pending future design of the config schema.
-  const { defaultStatusConceptUuid, defaultTransitionStatus } = concepts ?? ({} as any);
-
-  const columns = [
-    queueTableNameColumn,
-    ...(visitQueueNumberAttributeUuid ? [queueTableVisitAttributeQueueNumberColumn] : []),
-    queueTablePriorityColumn,
-    queueTableComingFromColumn,
-    queueTableStatusColumn,
-    queueTableQueueColumn,
-    queueTableWaitTimeColumn,
-    defaultStatusConceptUuid && defaultTransitionStatus ? activeVisitActionsColumn : queueTableActionColumn,
-  ];
+  const columns = useColumns(null, null);
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -82,7 +56,7 @@ function DefaultQueueTable() {
     const searchTermLowercase = searchTerm.toLowerCase();
     return queueEntries?.filter((queueEntry) => {
       return columns.some((column) => {
-        const columnSearchTerm = column(t).getFilterableValue?.(queueEntry, config)?.toLocaleLowerCase();
+        const columnSearchTerm = column.getFilterableValue?.(queueEntry)?.toLocaleLowerCase();
         return columnSearchTerm?.includes(searchTermLowercase);
       });
     });
@@ -119,7 +93,8 @@ function DefaultQueueTable() {
       </div>
       <QueueTable
         queueEntries={filteredQueueEntries ?? []}
-        queueTableColumns={columns}
+        queueUuid={null}
+        statusUuid={null}
         ExpandedRow={QueueTableExpandedRow}
         tableFilter={[
           <QueueDropdownFilter />,
