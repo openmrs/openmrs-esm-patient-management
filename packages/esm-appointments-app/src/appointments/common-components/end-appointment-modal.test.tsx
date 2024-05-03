@@ -31,7 +31,7 @@ describe('EndAppointmentModal', () => {
     expect(closeModal).toHaveBeenCalled();
   });
 
-  it('should update appointment status but not visits on commit if no active visit', async () => {
+  it('should update appointment status but not visit on submit if no active visit', async () => {
     useVisit.mockReturnValue({});
     const user = userEvent.setup();
 
@@ -53,7 +53,7 @@ describe('EndAppointmentModal', () => {
     });
   });
 
-  it('should update appointment status and visit on commit if active visit', async () => {
+  it('should update appointment status and visit on submit if active visit', async () => {
     useVisit.mockReturnValue({
       mutate: jest.fn(),
       activeVisit: { location: { uuid: 'def' }, visitType: { uuid: 'ghi' }, startDatetime: new Date() },
