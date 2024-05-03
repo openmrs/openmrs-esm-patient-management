@@ -88,8 +88,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       key: 'status',
     },
   ];
-  const activeAppointments = results?.filter((appointment) => appointment.status !== 'Cancelled');
-  const rowData = activeAppointments?.map((appointment) => ({
+
+  const rowData = results?.map((appointment) => ({
     id: appointment.uuid,
     patientName: (
       <ConfigurableLink
