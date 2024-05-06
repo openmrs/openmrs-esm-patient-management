@@ -102,7 +102,7 @@ function DefaultQueueTable() {
             className={styles.search}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('searchThisList', 'Search this list')}
-            size="sm"
+            size={isDesktop(layout) ? 'sm' : 'lg'}
           />,
           <ClearQueueEntries queueEntries={filteredQueueEntries} />,
         ]}
@@ -114,6 +114,7 @@ function DefaultQueueTable() {
 
 function QueueDropdownFilter() {
   const { t } = useTranslation();
+  const layout = useLayoutType();
   const currentQueueLocation = useSelectedQueueLocationUuid();
   const { queues } = useQueues(currentQueueLocation);
   const currentServiceName = useSelectedServiceName();
@@ -133,7 +134,7 @@ function QueueDropdownFilter() {
           items={[{ display: `${t('all', 'All')}` }, ...queues]}
           itemToString={(item) => (item ? item.display : '')}
           onChange={handleServiceChange}
-          size="sm"
+          size={isDesktop(layout) ? 'sm' : 'lg'}
         />
       </div>
     </>
