@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { cancelAppointment, usePatientAppointments } from './patient-appointments.resource';
+import { changeAppointmentStatus, usePatientAppointments } from './patient-appointments.resource';
 
 interface PatientCancelAppointmentModalProps {
   closeCancelModal: () => void;
@@ -22,7 +22,7 @@ const PatientCancelAppointmentModal: React.FC<PatientCancelAppointmentModalProps
   const handleCancel = async () => {
     setIsSubmitting(true);
 
-    cancelAppointment('Cancelled', appointmentUuid)
+    changeAppointmentStatus('Cancelled', appointmentUuid)
       .then(({ status }) => {
         if (status === 200) {
           mutate();

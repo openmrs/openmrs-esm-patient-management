@@ -98,6 +98,11 @@
     {
       "name": "void-queue-entry-modal",
       "component": "voidQueueEntryModal"
+    },
+    {
+      "name": "active-visits-row-actions",
+      "component": "activeVisitsRowActions",
+      "slot": "queue-table-extension-column-slot"
     }
   ]
 }
