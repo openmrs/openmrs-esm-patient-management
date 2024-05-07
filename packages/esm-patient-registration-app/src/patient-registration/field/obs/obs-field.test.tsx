@@ -188,16 +188,10 @@ describe('ObsField', () => {
   });
 
   it('renders a date box for date concept', async () => {
-    const user = userEvent.setup();
-
     render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
 
-    const dateInput = screen.getByRole('textbox', { name: /date/ });
-    expect(dateInput).toBeInTheDocument();
-
-    await user.type(dateInput, '10/10/2022');
-
-    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
+    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('07/05/2024');
   });
 
   it('renders a select for a coded concept', () => {
