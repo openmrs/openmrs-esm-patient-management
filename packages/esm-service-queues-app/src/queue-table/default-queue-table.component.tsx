@@ -11,7 +11,7 @@ import {
   useSelectedServiceName,
   useSelectedServiceUuid,
 } from '../helpers/helpers';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import PatientSearch from '../patient-search/patient-search.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
