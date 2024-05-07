@@ -107,21 +107,25 @@ const StartVisitQueueFields: React.FC = () => {
 
       <section className={classNames(styles.section, styles.sectionHidden)}>
         <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-        <Select
-          labelText={t('selectStatus', 'Select a status')}
-          id="status"
-          name="status"
-          invalidText="Required"
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}>
-          {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-          {statuses?.length > 0 &&
-            statuses.map((status) => (
-              <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
-                {status.display}
-              </SelectItem>
-            ))}
-        </Select>
+        {isLoadingQueues ? (
+          <SelectSkeleton />
+        ) : (
+          <Select
+            labelText={t('selectStatus', 'Select a status')}
+            id="status"
+            name="status"
+            invalidText="Required"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}>
+            {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
+            {statuses?.length > 0 &&
+              statuses.map((status) => (
+                <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
+                  {status.display}
+                </SelectItem>
+              ))}
+          </Select>
+        )}
       </section>
 
       <section className={styles.section}>
