@@ -53,6 +53,8 @@
   "chooseProvider": "Choose a provider",
   "chooseService": "Select service",
   "completed": "Completed",
+  "countMore_one": "{{count}} more",
+  "countMore_other": "{{count}} more",
   "createAppointmentService": "Create appointment services",
   "createNewAppointment": "Create new appointment",
   "date": "Date",
