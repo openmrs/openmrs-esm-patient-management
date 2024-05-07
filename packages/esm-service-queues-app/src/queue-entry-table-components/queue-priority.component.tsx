@@ -1,17 +1,16 @@
 import React from 'react';
 import { DefinitionTooltip, Tag } from '@carbon/react';
 import styles from './queue-priority.scss';
-import { type ConfigObject } from '../config-schema';
+import { type PriorityConfig } from '../config-schema';
 import { type Concept } from '../types';
-import { useConfig } from '@openmrs/esm-framework';
 
 interface QueuePriorityProps {
   priority: Concept;
   priorityComment?: string;
+  priorityConfigs: PriorityConfig[];
 }
 
-const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment }) => {
-  const { priorityConfigs } = useConfig<ConfigObject>();
+const QueuePriority: React.FC<QueuePriorityProps> = ({ priority, priorityComment, priorityConfigs }) => {
   const priorityConfig = priorityConfigs?.find((c) => c.conceptUuid === priority.uuid);
   return (
     <>

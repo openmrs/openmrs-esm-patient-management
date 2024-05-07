@@ -3,7 +3,7 @@ import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
 
 const repString =
-  'custom:(uuid,display,queue,status,patient,visit:(uuid,display,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
+  'custom:(uuid,display,queue,status,patient,visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
   const searchParam = new URLSearchParams();

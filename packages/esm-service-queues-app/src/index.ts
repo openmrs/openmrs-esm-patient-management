@@ -129,6 +129,15 @@ export const voidQueueEntryModal = getAsyncLifecycle(
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
+export const activeVisitsRowActions = getAsyncLifecycle(
+  () => import('./active-visits/active-visits-row-actions.component'),
+  {
+    featureName:
+      'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
+    moduleName,
+  },
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
 
