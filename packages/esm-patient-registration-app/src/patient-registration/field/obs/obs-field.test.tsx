@@ -191,7 +191,7 @@ describe('ObsField', () => {
     render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
 
-    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('07/05/2024');
+    expect(screen.getByRole('textbox')).toHaveValue('07/05/2024');
   });
 
   it('renders a select for a coded concept', () => {
