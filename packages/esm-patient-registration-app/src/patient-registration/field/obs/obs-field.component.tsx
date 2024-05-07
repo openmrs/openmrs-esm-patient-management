@@ -10,7 +10,6 @@ import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 import { generateFormatting } from '../../date-util';
-import { PatientRegistrationContext } from '../../patient-registration-context';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -20,7 +19,6 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
   const [date, dateMeta] = useField('date');
-  const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const { format, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
 
@@ -66,7 +64,6 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           dateFormat={dateFormat}
           date={date}
           dateMeta={dateMeta}
-          setFieldValue={setFieldValue}
           format={format}
         />
       );
@@ -171,26 +168,12 @@ interface DateObsFieldProps {
   dateFormat: string;
   date: any;
   dateMeta: any;
-  setFieldValue: any;
   format: any;
 }
 
-function DateObsField({
-  concept,
-  label,
-  required,
-  dateFormat,
-  date,
-  dateMeta,
-  setFieldValue,
-  format,
-}: DateObsFieldProps) {
+function DateObsField({ concept, label, required, dateFormat, date, dateMeta, format }: DateObsFieldProps) {
   const { t } = useTranslation();
   const today = new Date();
-
-  function onDateChange(selectedDate) {
-    setFieldValue('date', selectedDate);
-  }
 
   const fieldName = `obs.${concept.uuid}`;
   return (
@@ -198,7 +181,7 @@ function DateObsField({
       <Field name={fieldName}>
         {({ field, form: { touched, errors }, meta }) => {
           return (
-            <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
+            <DatePicker dateFormat={dateFormat} datePickerType="single" maxDate={format(today)}>
               <DatePickerInput
                 id={fieldName}
                 labelText={label ?? concept.display}
