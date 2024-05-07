@@ -46,7 +46,7 @@ export const generateFormatting = (order: Array<string>, separator: string) => {
   };
 
   const placeHolder = order.map((x) => (x === 'Y' ? 'YYYY' : x + x)).join(separator);
-  const dateFormat = order.join(separator);
+  const dateFormat = order.join(separator).replace('YYYY', 'yyyy');
 
   return { parse, format, placeHolder, dateFormat };
 };
