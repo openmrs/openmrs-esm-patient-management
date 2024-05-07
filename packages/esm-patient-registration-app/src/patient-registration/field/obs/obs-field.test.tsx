@@ -192,7 +192,7 @@ describe('ObsField', () => {
 
     render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
 
-    const dateInput = screen.getByRole('textbox', { name: /date/i });
+    const dateInput = screen.getByRole('textbox', { name: /date/ });
     expect(dateInput).toBeInTheDocument();
 
     await user.type(dateInput, '10/10/2022');
