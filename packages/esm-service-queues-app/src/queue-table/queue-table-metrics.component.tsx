@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueueEntries } from '../hooks/useQueueEntries';
+import { useQueueEntries, useQueueEntriesMetrics } from '../hooks/useQueueEntries';
 import QueueTableMetricsCard from './queue-table-metrics-card.component';
 import styles from './queue-table-metrics.scss';
 import { type Queue } from '../types';
@@ -13,16 +13,20 @@ function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
   const { t } = useTranslation();
 
   const allowedStatuses = selectedQueue.allowedStatuses;
-  const { queueEntries, totalCount } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const { totalCount } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
 
   return (
     <div className={styles.metricsBorder}>
       <QueueTableMetricsCard value={totalCount} headerLabel={t('totalPatients', 'Total Patients')} />
       {allowedStatuses?.map((status) => {
-        const filteredQueueEntries = queueEntries.filter((queueEntry) => {
-          return queueEntry.status.uuid === status.uuid;
-        });
-        return <QueueTableMetricsCard value={filteredQueueEntries.length} headerLabel={status.display} />;
+        return (
+          <QueueTableMetricsCard
+            queueUuid={selectedQueue.uuid}
+            serviceUuid={selectedQueue.service.uuid}
+            status={status.display}
+            headerLabel={status.display}
+          />
+        );
       })}
     </div>
   );
