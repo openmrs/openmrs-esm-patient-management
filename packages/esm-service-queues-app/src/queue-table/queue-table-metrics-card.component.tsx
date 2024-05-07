@@ -8,7 +8,6 @@ import styles from './queue-table-metrics-card.scss';
 interface QueueTableMetricsCardProps {
   value?: number;
   queueUuid?: string;
-  serviceUuid?: string;
   status?: string;
   headerLabel: string;
   children?: React.ReactNode;
@@ -17,7 +16,6 @@ interface QueueTableMetricsCardProps {
 const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
   value,
   queueUuid,
-  serviceUuid,
   status,
   headerLabel,
   children,
@@ -25,7 +23,6 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
   const { t } = useTranslation();
   const { count } = useQueueEntriesMetrics({
     queue: queueUuid,
-    service: serviceUuid,
     status: status,
     isEnded: false,
   });
