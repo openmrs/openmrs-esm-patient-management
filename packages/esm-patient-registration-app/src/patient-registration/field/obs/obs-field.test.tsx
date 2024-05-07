@@ -42,6 +42,14 @@ const useConceptMockImpl = (uuid: string) => {
       ],
       setMembers: [],
     };
+  } else if (uuid == 'date-uuid') {
+    data = {
+      uuid: 'date-uuid',
+      display: 'Date',
+      datatype: { display: 'Date', uuid: 'dt' },
+      answers: [],
+      setMembers: [],
+    };
   } else {
     throw Error(`Programming error, you probably didn't mean to do this: unknown concept uuid '${uuid}'`);
   }
@@ -118,6 +126,21 @@ const numberFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
+const dateFieldDefFieldDef: FieldDefinition = {
+  id: 'date',
+  type: 'obs',
+  label: '',
+  placeholder: '',
+  showHeading: false,
+  uuid: 'date-uuid',
+  validation: {
+    required: false,
+    matches: null,
+  },
+  answerConceptSetUuid: null,
+  customConceptAnswers: [],
+};
+
 const codedFieldDef: FieldDefinition = {
   id: 'nationality',
   type: 'obs',
@@ -161,6 +184,19 @@ describe('ObsField', () => {
     render(<ObsField fieldDefinition={numberFieldDef} />);
     // expect(screen.getByLabelText("Weight (kg)")).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+  });
+
+  it('renders a date box for date concept', async () => {
+    const user = userEvent.setup();
+
+    render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
+
+    const dateInput = screen.getByRole('textbox', { name: /date/i });
+    expect(dateInput).toBeInTheDocument();
+
+    await user.type(dateInput, '10/10/2022');
+
+    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
   });
 
   it('renders a select for a coded concept', () => {
