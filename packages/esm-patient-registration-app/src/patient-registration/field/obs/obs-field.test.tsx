@@ -5,6 +5,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
+import '@testing-library/jest-dom';
 
 const mockUseConfig = useConfig as jest.Mock;
 
