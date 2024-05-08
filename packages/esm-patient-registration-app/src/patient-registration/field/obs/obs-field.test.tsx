@@ -200,7 +200,7 @@ describe('ObsField', () => {
 
     await user.type(datePickerInput, '10/10/2022');
 
-    expect(screen).toHaveValue('10/10/2022');
+    expect(datePickerInput).toHaveValue('10/10/2022');
   });
 
   it('renders a select for a coded concept', () => {
