@@ -198,7 +198,6 @@ describe('ObsField', () => {
     userEvent.clear(datePickerInput);
     userEvent.type(datePickerInput, '05/08/2024');
     const expectedDate = '05/08/2024';
-
     await waitFor(() => {
       expect(datePickerInput).toHaveValue(expectedDate);
     });
