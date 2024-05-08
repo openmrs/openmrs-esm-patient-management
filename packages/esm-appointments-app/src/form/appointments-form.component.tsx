@@ -92,7 +92,7 @@ const appointmentsFormSchema = z
       return true;
     },
     {
-      path: ['appointmentDateTime[]'],
+      path: ['appointmentDateTime.recurringPatternEndDate'],
       message: 'A recurring appointment should have an end date',
     },
   );
