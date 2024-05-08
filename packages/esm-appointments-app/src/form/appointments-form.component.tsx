@@ -20,7 +20,7 @@ import {
   TimePickerSelect,
   Toggle,
 } from '@carbon/react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -194,6 +194,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
+  const {
+    field: { ref: startDateRef },
+  } = useController({ name: 'appointmentDateTime.startDate', control });
+  const {
+    field: { ref: endDateRef },
+  } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
+
+  useEffect(() => {
+    const startDateElement = document.querySelector('#startDatePickerInput');
+    const endDateElement = document.querySelector('#endDatePickerInput');
+    startDateRef(startDateElement);
+    endDateRef(endDateElement);
+  }, [startDateRef, endDateRef]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
