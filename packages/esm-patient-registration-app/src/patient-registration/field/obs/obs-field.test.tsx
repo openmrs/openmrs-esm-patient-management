@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
@@ -202,12 +202,14 @@ describe('ObsField', () => {
     expect(datePickerInput).toHaveValue('08/05/2024');
   });
 
-  it('renders a select for a coded concept', () => {
-    render(<ObsField fieldDefinition={codedFieldDef} />);
-    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
-    expect(select).toHaveDisplayValue('Select an option');
+  it('handles user input in the date picker', async () => {
+    render(<ObsField fieldDefinition={dateFieldDef} />);
+    const datePickerInput = screen.getByRole('textbox');
+    expect(datePickerInput).toBeInTheDocument();
+
+    fireEvent.change(datePickerInput, { target: { value: '08/05/2024' } });
+
+    expect(datePickerInput).toHaveValue('08/05/2024');
   });
 
   it('select uses answerConcept for answers when it is provided', async () => {
