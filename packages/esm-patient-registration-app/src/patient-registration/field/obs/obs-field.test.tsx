@@ -192,6 +192,17 @@ describe('ObsField', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
+  it('typing in the date picker input sets the date', async () => {
+    render(<ObsField fieldDefinition={dateFieldDef} />);
+    const user = userEvent.setup();
+    const datePickerInput = screen.getByRole('textbox');
+    expect(datePickerInput).toBeInTheDocument();
+
+    await user.type(datePickerInput, '10/10/2022');
+
+    expect(screen).toHaveValue('10/10/2022');
+  });
+
   it('handles user input in the date picker', async () => {
     render(<ObsField fieldDefinition={dateFieldDef} />);
     const datePickerInput = screen.getByRole('textbox');
