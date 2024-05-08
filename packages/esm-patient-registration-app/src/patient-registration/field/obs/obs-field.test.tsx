@@ -193,6 +193,14 @@ describe('ObsField', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
+  it('renders a select for a coded concept', () => {
+    render(<ObsField fieldDefinition={codedFieldDef} />);
+    // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
+    const select = screen.getByRole('combobox');
+    expect(select).toBeInTheDocument();
+    expect(select).toHaveDisplayValue('Select an option');
+  });
+
   it('select uses answerConcept for answers when it is provided', async () => {
     const user = userEvent.setup();
 
