@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
@@ -198,7 +198,10 @@ describe('ObsField', () => {
     userEvent.clear(datePickerInput);
     userEvent.type(datePickerInput, '05/08/2024');
     const expectedDate = '05/08/2024';
-    expect(datePickerInput).toHaveValue(expectedDate);
+
+    await waitFor(() => {
+      expect(datePickerInput).toHaveValue(expectedDate);
+    });
   });
 
   it('renders a select for a coded concept', () => {
