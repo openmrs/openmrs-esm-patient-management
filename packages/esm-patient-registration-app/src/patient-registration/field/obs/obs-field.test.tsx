@@ -198,9 +198,9 @@ describe('ObsField', () => {
     const datePickerInput = screen.getByRole('textbox');
     expect(datePickerInput).toBeInTheDocument();
 
-    await user.type(datePickerInput, '10/10/2022');
+    await user.type(datePickerInput, '08/05/2024');
 
-    expect(datePickerInput).toHaveValue('10/10/2022');
+    expect(datePickerInput).toHaveValue('08/05/2024');
   });
 
   it('renders a select for a coded concept', () => {
