@@ -150,6 +150,7 @@
   "startTime": "Start Time",
   "startVisitError": "Error starting visit",
   "status": "Status",
+  "Telephone": "Phone {{index}}",
   "time": "Time",
   "today": "Today",
   "todays": "Today's",
