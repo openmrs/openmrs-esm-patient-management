@@ -492,13 +492,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value, ref } }) => (
+                    render={({ field: { onChange, value } }) => (
                       <ResponsiveWrapper>
                         <DatePicker
                           datePickerType="range"
                           dateFormat={datePickerFormat}
                           value={[value.startDate, value.recurringPatternEndDate]}
-                          ref={ref}
                           onChange={([startDate, endDate]) => {
                             onChange({
                               startDate: new Date(startDate),
