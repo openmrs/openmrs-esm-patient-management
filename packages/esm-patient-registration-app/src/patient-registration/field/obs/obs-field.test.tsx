@@ -189,6 +189,7 @@ describe('ObsField', () => {
 
   it('renders a date picker for date concept', async () => {
     render(<ObsField fieldDefinition={dateFieldDef} />);
+    // expect(screen.getByLabelText("Date")).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
