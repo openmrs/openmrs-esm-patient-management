@@ -1,22 +1,24 @@
 import React from 'react';
-import { useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../../config-schema';
-import { type QueueEntry, type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
+import { type VisitAttributeQueueNumberColumnConfig } from '../../config-schema';
+import { type QueueTableColumnFunction, type QueueEntry, type QueueTableCellComponentProps } from '../../types';
 
-export const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-  const { visitQueueNumberAttributeUuid } = useConfig<ConfigObject>();
+export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction = (
+  key,
+  header,
+  { visitQueueNumberAttributeUuid }: VisitAttributeQueueNumberColumnConfig,
+) => {
+  function getVisitQueueNumber(queueEntry: QueueEntry) {
+    return queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)?.value;
+  }
 
-  const visitQueueNumber = getVisitQueueNumber(queueEntry, visitQueueNumberAttributeUuid);
-  return <span>{visitQueueNumber}</span>;
+  const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+    return <span>{getVisitQueueNumber(queueEntry)}</span>;
+  };
+
+  return {
+    key,
+    header,
+    CellComponent: QueueTableVisitAttributeQueueNumberCell,
+    getFilterableValue: getVisitQueueNumber,
+  };
 };
-
-export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumn = (t) => ({
-  header: t('queueNumber', 'Queue number'),
-  CellComponent: QueueTableVisitAttributeQueueNumberCell,
-  getFilterableValue: (queueEntry, conceptsConfig) =>
-    getVisitQueueNumber(queueEntry, conceptsConfig?.visitQueueNumberAttributeUuid),
-});
-
-function getVisitQueueNumber(queueEntry: QueueEntry, visitQueueNumberAttributeUuid: string) {
-  return queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)?.value;
-}

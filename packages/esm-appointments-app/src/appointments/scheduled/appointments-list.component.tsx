@@ -8,8 +8,15 @@ interface AppointmentsListProps {
   status?: string;
   title: string;
   date: string;
+  filterCancelled?: boolean;
 }
-const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceType, status, title, date }) => {
+const AppointmentsList: React.FC<AppointmentsListProps> = ({
+  appointmentServiceType,
+  status,
+  title,
+  date,
+  filterCancelled = false,
+}) => {
   const { appointmentList, isLoading } = useAppointmentList(status, date);
 
   const appointments = filterByServiceType(appointmentList, appointmentServiceType).map((appointment) => ({
@@ -17,7 +24,10 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointmentServiceT
     ...appointment,
   }));
 
-  return <AppointmentsTable appointments={appointments} isLoading={isLoading} tableHeading={title} />;
+  const activeAppointments = filterCancelled
+    ? appointments.filter((appointment) => appointment.status !== 'Cancelled')
+    : appointments;
+  return <AppointmentsTable appointments={activeAppointments} isLoading={isLoading} tableHeading={title} />;
 };
 
 export default AppointmentsList;

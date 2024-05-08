@@ -66,7 +66,6 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
   const { visits } = useTodaysVisits();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-
   const headerData = [
     {
       header: t('patientName', 'Patient name'),
