@@ -127,7 +127,7 @@ const numberFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
-const dateFieldDefFieldDef: FieldDefinition = {
+const dateFieldDef: FieldDefinition = {
   id: 'date',
   type: 'obs',
   label: '',
@@ -187,12 +187,23 @@ describe('ObsField', () => {
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
   });
 
-  it('renders a date box for date concept', async () => {
-    render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
-
+  it('renders a date picker for date concept', async () => {
+    render(<ObsField fieldDefinition={dateFieldDef} />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
 
-    expect(screen.getByRole('textbox')).toHaveValue('07/05/2024');
+  it('handles user input in the date picker', async () => {
+    render(<ObsField fieldDefinition={dateFieldDef} />);
+    const datePickerInput = screen.getByRole('textbox');
+    userEvent.type(datePickerInput, '05/08/2024');
+    expect(datePickerInput).toHaveValue('05/08/2024');
+  });
+
+  it('displays error message when invalid date is entered', async () => {
+    render(<ObsField fieldDefinition={dateFieldDef} />);
+    const datePickerInput = screen.getByRole('textbox');
+    userEvent.type(datePickerInput, 'invalid date');
+    expect(await screen.findByText('Invalid date')).toBeInTheDocument();
   });
 
   it('renders a select for a coded concept', () => {
