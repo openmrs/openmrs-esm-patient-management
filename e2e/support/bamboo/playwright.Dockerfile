@@ -1,5 +1,5 @@
 # The image version should match the Playwright version specified in the package.json file
-FROM mcr.microsoft.com/playwright:v1.42.1-jammy
+FROM mcr.microsoft.com/playwright:v1.44.0-jammy
 
 ARG USER_ID
 ARG GROUP_ID

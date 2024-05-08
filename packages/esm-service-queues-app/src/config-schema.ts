@@ -1,15 +1,91 @@
-import { Type, restBaseUrl, validators } from '@openmrs/esm-framework';
+import { Type, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
 
+// Not all of the columnDefinitions are used below, but they are defined anyway
+// for demonstration purpose. Implementors can copy this JSON as a starting point
+// to configure the queue tables
+// prettier-ignore
+export const defaultTablesConfig: TablesConfig = {
+  "columnDefinitions": [
+    {
+      "id": "patient-name",
+      "columnType": "patient-name-column"
+    },
+    {
+      "id": "patient-age",
+      "columnType": "patient-age-column"
+    },
+    {
+      "id": "queue-number",
+      "columnType": "visit-attribute-queue-number-column"
+    },
+    {
+      "id": "patient-identifier",
+      "columnType": "patient-identifier-column",
+      "config": {
+        "identifierType": "patient-identifier-uuid"
+      }
+    },
+    {
+      "id": "priority",
+      "columnType": "priority-column",
+      "config": {
+        "priorities": [
+          {
+            "conceptUuid": "priority-concept-uuid",
+            "tagClassName": "tag",
+            "tagType": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": "status",
+      "columnType": "status-column",
+      "config": {
+        "statuses": [
+          {
+            "conceptUuid": "status-concept-uuid",
+            "iconComponent": "InProgress"
+          }
+        ]
+      }
+    },
+    {
+      "id": "visit-start-time",
+      "columnType": "visit-start-time-column"
+    },
+    {
+      "id": "comingFrom",
+      "columnType": "queue-coming-from-column"
+    },
+    {
+      "id": "queue",
+      "columnType": "current-queue-column"
+    },
+    {
+      "id": "wait-time",
+      "columnType": "wait-time-column"
+    },
+    {
+      "id": "actions",
+      "columnType": "extension-column",
+      "header": "Actions"
+    }
+  ],
+  "tableDefinitions": [
+    {
+      "columns": ["patient-name", "queue-number", "comingFrom", "priority", "status", "queue", "wait-time", "actions"],
+      "appliedTo": [{ "queue": null, "status": null }]
+    }
+  ]
+};
+
 export const configSchema = {
   concepts: {
-    priorityConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: '78063dec-b6d8-40c1-9483-dd4d3c3ca434',
-    },
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
@@ -19,14 +95,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
       _default: '04f6f7e0-e3cb-4e13-a133-4479f759574e',
-    },
-    serviceConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'a8f3f64a-11d5-4a09-b0fb-c8118fa349f3',
-    },
-    statusConceptSetUuid: {
-      _type: Type.ConceptUuid,
-      _default: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
     },
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
@@ -70,14 +138,6 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    generalPatientNoteUuid: {
-      _type: Type.ConceptUuid,
-      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    midUpperArmCircumferenceUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
     historicalObsConceptUuid: {
       _type: Type.Array,
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
@@ -93,15 +153,10 @@ export const configSchema = {
   visitQueueNumberAttributeUuid: {
     _type: Type.UUID,
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
-  showQueueTableTab: {
-    _type: Type.Boolean,
-    _default: false,
-    _description: 'Disable outpatient table tabs',
-  },
   appointmentStatuses: {
     _type: Type.Array,
     _description: 'Configurable appointment status (status of appointments)',
@@ -120,33 +175,43 @@ export const configSchema = {
     _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
   },
+  visitTypeResourceUrl: {
+    _type: Type.String,
+    _description: 'The `visitTypeResourceUrl`',
+    _default: null,
+  },
   customPatientChartUrl: {
     _type: Type.String,
     _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
-    _description: `Template URL that will be used when clicking on the patient name in the queues table. 
+    _description: `Template URL that will be used when clicking on the patient name in the queues table.
       Available arguments: patientUuid, openmrsSpaBase, openBase
       (openmrsSpaBase and openBase are available to any <ConfigurableLink>)`,
     _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
   },
   defaultFacilityUrl: {
     _type: Type.String,
-    _default: `${restBaseUrl}/kenyaemr/default-facility`,
+    _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
-  customPatientChartText: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Custom label for patient chart button',
+  tablesConfig: {
+    _type: Type.Object,
+    _description: `Configurations of columns to show for the queue table.
+      Multiple configurations can be provided, each can be applied generally, or to tables 
+      for a particular queue, particular status, or even particular queue+status combination.
+      If multiple configs are defined, the first config with matching appliedTo condition
+      is used.
+      See https://github.com/openmrs/openmrs-esm-patient-management/blob/main/packages/esm-service-queues-app/src/config-schema.ts
+      for full schema definition and example.
+    `,
+    _default: defaultTablesConfig,
   },
 };
 
 export interface ConfigObject {
   concepts: {
-    priorityConceptSetUuid: string;
     defaultPriorityConceptUuid: string;
-    serviceConceptSetUuid: string;
-    statusConceptSetUuid: string;
     defaultStatusConceptUuid: string;
+    defaultTransitionStatus: string;
     systolicBloodPressureUuid: string;
     diastolicBloodPressureUuid: string;
     pulseUuid: string;
@@ -155,7 +220,6 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
-    midUpperArmCircumferenceUuid: string;
     emergencyPriorityConceptUuid: string;
     historicalObsConceptUuid: Array<string>;
   };
@@ -163,15 +227,80 @@ export interface ConfigObject {
   visitQueueNumberAttributeUuid: string;
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;
-  showQueueTableTab: boolean;
   appointmentStatuses: Array<string>;
   defaultIdentifierTypes: Array<string>;
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
-  defaultFacilityUrl: string;
-  customPatientChartText: string;
+  visitTypeResourceUrl: string;
+  tablesConfig: TablesConfig;
 }
 
-export interface OutpatientConfig {
-  visitTypeResourceUrl: string;
+interface TablesConfig {
+  columnDefinitions: ColumnDefinition[];
+
+  /*
+    A list of table definitions. A queue table (whether it is displaying entries from a
+    particular queue+status combination, from a particular queue, or from multiple queues)
+    will determine what columns to show based on these definitions. If multiple TableDefinitions
+    have matching appliedTo criteria, the first one will be used.       
+  */
+  tableDefinitions: TableDefinitions[];
+}
+
+export type ColumnDefinition = {
+  id: string;
+  header?: string; // optional custom i18n translation key for the column's header; overrides the default one
+  headerModule?: string; // optional custom i18n translation module for the column's header. Must be used with the header option
+} & (
+  | { columnType: 'patient-name-column' }
+  | { columnType: 'patient-identifier-column'; config: PatientIdentifierColumnConfig }
+  | { columnType: 'visit-attribute-queue-number-column' }
+  | { columnType: 'patient-age-column' }
+  | { columnType: 'priority-column'; config?: PriorityColumnConfig }
+  | { columnType: 'status-column'; config?: StatusColumnConfig }
+  | { columnType: 'queue-coming-from-column' }
+  | { columnType: 'current-queue-column' }
+  | { columnType: 'wait-time-column' }
+  | { columnType: 'visit-start-time-column' }
+  | { columnType: 'actions-column' }
+  | { columnType: 'extension-column'; config?: object } // column that contains the extension slot queue-table-extension-column-slot
+);
+
+export interface VisitAttributeQueueNumberColumnConfig {
+  visitQueueNumberAttributeUuid: string;
+}
+
+export interface PatientIdentifierColumnConfig {
+  identifierType: string; // uuid of the identifier type
+}
+export interface PriorityConfig {
+  conceptUuid: string;
+  tagType: string;
+  tagClassName: 'priorityTag' | 'tag' | null;
+}
+
+export interface PriorityColumnConfig {
+  priorities: PriorityConfig[];
+}
+
+export interface StatusConfig {
+  conceptUuid: string;
+  iconComponent: 'Group' | 'InProgress' | null;
+}
+
+export interface StatusColumnConfig {
+  statuses: StatusConfig[];
+}
+
+export interface ExtensionColumnConfig {
+  state: any; // state to pass into the extension
+}
+
+export interface TableDefinitions {
+  // a list of column ids defined in columnDefinitions
+  columns: string[];
+
+  // apply the columns to tables of any of the specified queue and status
+  // (if appliedTo is null, apply to all tables, including the one in the service queue app home page)
+  appliedTo?: Array<{ queue?: string; status?: string }>;
 }

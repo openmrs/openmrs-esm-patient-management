@@ -7,14 +7,16 @@ import { Notification } from '@carbon/react/icons';
 import { restBaseUrl, showModal, showNotification } from '@openmrs/esm-framework';
 import { type MappedVisitQueueEntry, serveQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './transition-entry.scss';
+
 interface TransitionMenuProps {
   queueEntry: MappedVisitQueueEntry;
 }
+
 const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry }) => {
   const { t } = useTranslation();
 
   const launchTransitionPriorityModal = useCallback(() => {
-    serveQueueEntry(queueEntry?.service, queueEntry?.visitQueueNumber, 'calling').then(
+    serveQueueEntry(queueEntry?.queue.name, queueEntry?.visitQueueNumber, 'calling').then(
       ({ status }) => {
         if (status === 200) {
           mutate(`${restBaseUrl}/queueutil/assignticket`);

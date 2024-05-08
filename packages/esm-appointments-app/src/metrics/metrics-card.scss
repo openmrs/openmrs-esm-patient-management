@@ -8,10 +8,12 @@
 }
 
 .tileContainer {
-  border: 0.0625rem solid $ui-03;
+  border: 1px solid $ui-03;
   height: 7.875rem;
   padding: spacing.$spacing-05;
-  margin: spacing.$spacing-03 spacing.$spacing-03;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .tileHeader {
@@ -39,7 +41,6 @@
 .headerLabelContainer {
   display: flex;
   align-items: center;
-  height: spacing.$spacing-07;
   justify-content: space-between;
   width: 100%;
 }

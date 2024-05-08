@@ -27,11 +27,7 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('ScheduledVisits', () => {
   beforeEach(() =>
     mockedUseConfig.mockReturnValue({
-      concepts: {
-        priorityConceptSetUuid: '96105db1-abbf-48d2-8a52-a1d561fd8c90',
-        serviceConceptSetUuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
-        statusConceptSetUuid: 'd60ffa60-fca6-4c60-aea9-a79469ae65c7',
-      },
+      concepts: {},
     } as ConfigObject),
   );
   it('should display recent and future scheduled visits', async () => {

@@ -155,6 +155,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
             <Dropdown
               id="queueLocation"
               aria-label={t('selectQueueLocation', 'Select a queue location')}
+              label=""
               type="default"
               items={queueLocations}
               itemToString={(item) => (item ? item.name : '')}
@@ -170,6 +171,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               id="service"
               aria-label={t('selectService', 'Select a service')}
               type="default"
+              label=""
               items={queues}
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}

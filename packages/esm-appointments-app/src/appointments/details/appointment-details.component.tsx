@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
-import { formatDate } from '@openmrs/esm-framework';
+import { usePatientDetails } from '../../hooks/usePatientDetails';
+import { formatDate, formatDatetime } from '@openmrs/esm-framework';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
 import { useTranslation } from 'react-i18next';
@@ -12,27 +13,42 @@ interface AppointmentDetailsProps {
 
 const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { appointmentsCount } = usePatientAppointmentHistory(appointment.patient.uuid);
+  const [isEnabledQuery, setIsEnabledQuery] = useState(false);
+  const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
+  const { patientDetails } = usePatientDetails(appointment.patient.uuid, isEnabledQuery);
 
+  useEffect(() => {
+    if (!isLoading) {
+      setIsEnabledQuery(true);
+    }
+  }, [appointmentsCount, isLoading]);
   return (
     <div className={styles.appointmentDetailsContainer}>
       <p className={styles.title}>{appointment.service.name}</p>
-      <p className={styles.subTitle}>{formatDate(new Date(appointment.startDateTime))}</p>
+      <p className={styles.subTitle}>{formatDatetime(new Date(appointment.startDateTime))}</p>
 
       <div className={styles.patientInfoGrid}>
         <div>
           <p className={styles.gridTitle}>{t('patientDetails', 'Patient details')}</p>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('patientName', 'Patient name')} : </p>
+            <p className={styles.labelBold}>{t('patientName', 'Patient name')}: </p>
             <p className={styles.label}>{appointment.patient.name}</p>
           </div>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('age', 'Age')} : </p>
+            <p className={styles.labelBold}>{t('age', 'Age')}: </p>
             <p className={styles.label}>{appointment.patient.age}</p>
           </div>
           <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('gender', 'Gender')} : </p>
+            <p className={styles.labelBold}>{t('gender', 'Gender')}: </p>
             <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
+          </div>
+          <div className={styles.labelContainer}>
+            <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
+            <p className={styles.label}>
+              {patientDetails && patientDetails?.dateOfBirth
+                ? formatDate(new Date(patientDetails && patientDetails?.dateOfBirth ? patientDetails?.dateOfBirth : ''))
+                : ''}
+            </p>
           </div>
         </div>
         <div>

@@ -1,24 +1,25 @@
 import React, { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './clear-queue-entries-dialog.scss';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { type QueueEntry } from '../types';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
-import { type MappedVisitQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import styles from './clear-queue-entries-dialog.scss';
 
 interface ClearQueueEntriesDialogProps {
-  visitQueueEntries: Array<MappedVisitQueueEntry>;
+  queueEntries: Array<QueueEntry>;
   closeModal: () => void;
 }
 
-const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visitQueueEntries, closeModal }) => {
+const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queueEntries, closeModal }) => {
   const { t } = useTranslation();
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClearQueueBatchRequest = useCallback(() => {
     setIsSubmitting(true);
-    batchClearQueueEntries(visitQueueEntries).then(
+    batchClearQueueEntries(queueEntries).then(
       (response) => {
         closeModal();
         showSnackbar({
@@ -27,7 +28,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           kind: 'success',
           subtitle: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
-        mutate();
+        mutateQueueEntries();
       },
       (error) => {
         showSnackbar({
@@ -36,9 +37,10 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
           isLowContrast: false,
           subtitle: error?.message,
         });
+        closeModal();
       },
     );
-  }, [closeModal, mutate, t, visitQueueEntries]);
+  }, [closeModal, mutateQueueEntries, t, queueEntries]);
 
   return (
     <div>
@@ -51,7 +53,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ visit
         <p className={styles.subHeading} id="subHeading">
           {t(
             'clearAllQueueEntriesWarningMessage',
-            'Clearing all queue entries will remove  all the patients from the queues and will not allow you to fill any other encounter forms for the patients',
+            'Clearing all queue entries will remove  all the patients from the queues',
           )}
         </p>
       </ModalBody>

@@ -1,0 +1,11 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.metricsBorder {
+  border: 0.0625rem solid $ui-03;
+  background-color: $ui-02;
+  display: flex;
+  justify-content: space-between;
+  flex-flow: row wrap;
+  margin-top: -(spacing.$spacing-03);
+}

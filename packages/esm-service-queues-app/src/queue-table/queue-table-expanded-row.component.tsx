@@ -10,7 +10,7 @@ const QueueTableExpandedRow: FC<{ queueEntry: QueueEntry }> = ({ queueEntry }) =
   const { t } = useTranslation();
   return (
     <Tabs>
-      <TabList>
+      <TabList aria-label={t('visitTabs', 'Visit tabs')}>
         <Tab>{t('currentVisit', 'Current visit')}</Tab>
         <Tab>{t('previousVisit', 'Previous visit')} </Tab>
       </TabList>

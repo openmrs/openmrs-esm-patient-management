@@ -1,37 +1,37 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePickerInput,
   DatePicker,
+  DatePickerInput,
   Form,
   InlineLoading,
   MultiSelect,
   NumberInput,
+  RadioButton,
+  RadioButtonGroup,
   Select,
   SelectItem,
   Stack,
-  RadioButtonGroup,
-  RadioButton,
   TextArea,
-  TimePickerSelect,
   TimePicker,
+  TimePickerSelect,
   Toggle,
 } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
+  ResponsiveWrapper,
+  showSnackbar,
+  translateFrom,
+  useConfig,
+  useLayoutType,
   useLocations,
   useSession,
-  showSnackbar,
-  useLayoutType,
-  useConfig,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import { convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import {
   saveAppointment,
   saveRecurringAppointments,
@@ -42,31 +42,60 @@ import { useProviders } from '../hooks/useProviders';
 import Workload from '../workload/workload.component';
 import type { Appointment, AppointmentPayload, RecurringPattern } from '../types';
 import { type ConfigObject } from '../config-schema';
-import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
+import {
+  appointmentLocationTagName,
+  dateFormat,
+  datePickerFormat,
+  datePickerPlaceHolder,
+  weekDays,
+} from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import { moduleName } from '../constants';
 
-const appointmentsFormSchema = z.object({
-  duration: z.number(),
-  location: z.string().refine((value) => value !== ''),
-  provider: z.string().refine((value) => value !== ''),
-  appointmentStatus: z.string().optional(),
-  appointmentNote: z.string(),
-  appointmentType: z.string().refine((value) => value !== ''),
-  selectedService: z.string().refine((value) => value !== ''),
-  recurringPatternType: z.enum(['DAY', 'WEEK']),
-  recurringPatternPeriod: z.number(),
-  recurringPatternDaysOfWeek: z.array(z.string()),
-  selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string(),
-  timeFormat: z.enum(['AM', 'PM']),
-  appointmentDateTime: z.object({
-    startDate: z.date(),
-    startDateText: z.string(),
-    recurringPatternEndDate: z.date().nullable(),
-    recurringPatternEndDateText: z.string().nullable(),
-  }),
-});
+const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+function isValidTime(timeStr) {
+  return timeStr.match(new RegExp(time12HourFormatRegexPattern));
+}
+
+// t('durationErrorMessage', 'Duration should be greater than zero')
+const appointmentsFormSchema = z
+  .object({
+    duration: z.number().refine((duration) => duration > 0, {
+      message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+    }),
+    location: z.string().refine((value) => value !== ''),
+    provider: z.string().refine((value) => value !== ''),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== ''),
+    selectedService: z.string().refine((value) => value !== ''),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value)),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+    formIsRecurringAppointment: z.boolean(),
+  })
+  .refine(
+    (formValues) => {
+      if (formValues.formIsRecurringAppointment === true) {
+        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+      }
+      return true;
+    },
+    {
+      path: ['appointmentDateTime[]'],
+      message: 'A recurring appointment should have an end date',
+    },
+  );
 
 type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -94,7 +123,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       : 'AM';
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
+  const locations = useLocations(appointmentLocationTagName);
   const providers = useProviders();
   const session = useSession();
   const { selectedDate } = useContext(SelectedDateContext);
@@ -160,8 +189,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDate: defaultEndDate,
         recurringPatternEndDateText: defaultEndDateText,
       },
+      formIsRecurringAppointment: isRecurringAppointment,
     },
   });
+
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
+  const handleWorkloadDateChange = (date: Date) => {
+    const appointmentDate = getValues('appointmentDateTime');
+    setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
+  };
 
   const handleMultiselectChange = (e) => {
     setValue(
@@ -202,16 +239,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   // Same for creating and editing
   const handleSaveAppointment = (data: AppointmentFormData) => {
     setIsSubmitting(true);
-
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
-
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
       appointmentRequest: appointmentPayload,
       recurringPattern: constructRecurringPattern(data),
     };
-
     const abortController = new AbortController();
     (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
@@ -222,7 +256,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           setIsSubmitting(false);
           closeWorkspace();
           mutateAppointments();
-
           showSnackbar({
             isLowContrast: true,
             kind: 'success',
@@ -276,7 +309,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
-    const [hours, minutes] = convertTime12to24(startTime, timeFormat);
+    const hoursAndMinutes = startTime.split(':').map((item) => parseInt(item, 10));
+    const hours = (hoursAndMinutes[0] % 12) + (timeFormat === 'PM' ? 12 : 0);
+    const minutes = hoursAndMinutes[1];
     const startDatetime = startDate.setHours(hours, minutes);
     const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
 
@@ -313,13 +348,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     };
   };
 
+  const onError = (error) => console.error(error);
+
   if (isLoading)
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
   return (
-    <Form className={styles.formWrapper}>
+    <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
@@ -417,7 +454,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             id="recurringToggle"
             labelB={t('yes', 'Yes')}
             labelA={t('no', 'No')}
-            labelText={t('isRecurringAppointment', 'Is this a recurring appoinment?')}
+            labelText={t('isRecurringAppointment', 'Is this a recurring appointment?')}
             onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
           />
         </section>
@@ -572,7 +609,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                         datePickerType="single"
                         dateFormat={datePickerFormat}
                         value={value.startDate}
-                        onChange={([date]) => onChange({ ...value, startDate: date })}>
+                        onChange={([date]) => {
+                          if (date) {
+                            onChange({ ...value, startDate: date });
+                          }
+                        }}>
                         <DatePickerInput
                           id="datePickerInput"
                           labelText={t('date', 'Date')}
@@ -599,6 +640,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               <Workload
                 selectedService={watch('selectedService')}
                 appointmentDate={watch('appointmentDateTime').startDate}
+                onWorkloadDateChange={handleWorkloadDateChange}
               />
             </ResponsiveWrapper>
           </section>
@@ -687,7 +729,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={isSubmitting} onClick={handleSubmit(handleSaveAppointment)}>
+        <Button className={styles.button} disabled={isSubmitting} type="submit">
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
@@ -707,7 +749,9 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, value } }) => (
             <TimePicker
               id="time-picker"
-              pattern="([\d]+:[\d]{2})"
+              pattern={time12HourFormatRegexPattern}
+              invalid={!isValidTime(value)}
+              invalidText={t('invalidTime', 'Invalid time')}
               onChange={(event) => onChange(event.target.value)}
               value={value}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
@@ -738,6 +782,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
               hideSteppers
+              disableWheel
               id="duration"
               min={0}
               max={1440}

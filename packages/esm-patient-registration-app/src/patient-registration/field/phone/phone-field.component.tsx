@@ -10,6 +10,7 @@ export function PhoneField() {
     id: 'phone',
     type: 'person attribute',
     uuid: config.fieldConfigurations.phone.personAttributeUuid,
+    validation: config.fieldConfigurations.phone.validation,
     showHeading: false,
   };
   return <PersonAttributeField fieldDefinition={fieldDefinition} />;

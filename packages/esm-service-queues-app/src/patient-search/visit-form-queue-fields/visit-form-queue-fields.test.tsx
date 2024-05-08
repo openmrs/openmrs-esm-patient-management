@@ -20,20 +20,18 @@ jest.mock('../hooks/useQueueLocations', () => ({
   })),
 }));
 
-jest.mock('../../active-visits/active-visits-table.resource', () => ({
-  usePriority: jest.fn(() => ({
-    priorities: [{ uuid: '197852c7-5fd4-4b33-89cc-7bae6848c65a', display: 'High' }],
-  })),
-  useStatus: jest.fn(() => ({
-    statuses: [{ uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'In Progress' }],
-  })),
-}));
-
 jest.mock('../../helpers/useQueues', () => {
   return {
-    useQueues: jest
-      .fn()
-      .mockReturnValue({ queues: [{ uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90', name: 'Service 1' }] }),
+    useQueues: jest.fn().mockReturnValue({
+      queues: [
+        {
+          uuid: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+          name: 'Service 1',
+          allowedPriorities: [{ uuid: '197852c7-5fd4-4b33-89cc-7bae6848c65a', display: 'High' }],
+          allowedStatuses: [{ uuid: '176052c7-5fd4-4b33-89cc-7bae6848c65a', display: 'In Progress' }],
+        },
+      ],
+    }),
   };
 });
 

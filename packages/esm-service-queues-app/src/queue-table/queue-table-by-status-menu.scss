@@ -1,0 +1,11 @@
+.queueTableByStatusNavMenu {
+  // override `li` element styles from <SideNavMenu>
+  // (since none of the items in side nav is `li`)
+  line-height: 0px;
+  display: block;
+
+  :global(.active-left-nav-link) {
+    // override padding for sub-menu items
+    padding-left: 1.75rem !important;
+  }
+}

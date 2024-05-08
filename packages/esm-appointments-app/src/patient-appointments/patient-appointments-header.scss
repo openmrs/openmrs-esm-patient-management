@@ -1,0 +1,27 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.patientBanner {
+  display: flex;
+}
+
+.patientAvatar {
+  width: 5rem;
+  height: 5rem;
+  margin: 1rem;
+  border-radius: 1px;
+}
+
+.divider {
+  border: 0;
+  border-top: 0.075rem solid colors.$gray-20;
+  width: 100%;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .titleContent {
+    margin-left: 1rem;
+  }
+}

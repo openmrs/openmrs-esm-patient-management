@@ -13,12 +13,6 @@ jest.mock('@openmrs/esm-framework', () => ({
   useConfig: jest.fn(() => ({
     patientListsToShow: 10,
   })),
-  usePagination: jest.fn().mockImplementation((data, pageSize) => ({
-    currentPage: 1,
-    goTo: () => {},
-    results: data.slice(0, pageSize),
-    paginated: true,
-  })),
   isDesktop: jest.fn(() => true),
 }));
 

@@ -1,7 +1,7 @@
 import { DataTableSkeleton, SkeletonText, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
-import styles from '../active-visits/active-visits-table.scss';
+import styles from './queue-table.scss';
 
 export const QueueTableByStatusSkeleton = () => {
   const layout = useLayoutType();

@@ -1,0 +1,15 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.tag {
+  margin: 0.25rem 0;
+  white-space: nowrap;
+}
+
+.priorityTag {
+  @extend .tag;
+  @include type.type-style('label-01');
+  color: #943d00;
+  background-color: #ffc9a3;
+}

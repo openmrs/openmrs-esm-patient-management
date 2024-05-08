@@ -231,12 +231,12 @@ const ActiveVisitsTable = () => {
                     const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
                     return (
-                      <React.Fragment key={index}>
+                      <React.Fragment key={`active-visit-row-${index}`}>
                         <TableExpandRow
                           {...getRowProps({ row })}
                           data-testid={`activeVisitRow${currentVisit.patientUuid || 'unknown'}`}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id} data-testid={cell.id}>
+                            <TableCell key={`active-visit-row-${index}-cell-${cell.id}`} data-testid={cell.id}>
                               {cell.info.header === 'name' && currentVisit.patientUuid ? (
                                 <ConfigurableLink
                                   to={patientChartUrl}

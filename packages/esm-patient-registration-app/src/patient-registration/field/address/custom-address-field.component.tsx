@@ -21,6 +21,7 @@ export const AddressField: React.FC<AddressFieldProps> = ({ fieldDefinition }) =
             <Input
               id={fieldDefinition.id}
               labelText={t(`${fieldDefinition.label}`, `${fieldDefinition.label}`)}
+              required={fieldDefinition?.validation?.required ?? false}
               {...field}
             />
           );

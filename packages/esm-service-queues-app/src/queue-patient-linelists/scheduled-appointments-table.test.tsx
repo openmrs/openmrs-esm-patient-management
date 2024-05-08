@@ -9,11 +9,6 @@ jest.mock('@openmrs/esm-framework', () => ({
   useConfig: () => ({
     appointmentStatuses: ['All', 'Scheduled', 'Completed'],
   }),
-  usePagination: () => ({
-    goTo: jest.fn(),
-    results: mockAppointmentsData.data,
-    currentPage: 1,
-  }),
 }));
 
 jest.mock('./queue-linelist.resource', () => ({

@@ -50,7 +50,7 @@ interface VitalsConceptMetadataResponse {
 }
 
 export const useVitalsFromObs = (encounter) => {
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
 
   const vitals: Array<PatientVitals> = [];
 

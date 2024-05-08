@@ -8,7 +8,7 @@ import { first } from 'rxjs/operators';
 
 const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
 
-export async function voidQueueEntry(
+export async function endQueueEntry(
   queueUuid: string,
 
   queueEntryUuid: string,

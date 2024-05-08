@@ -13,10 +13,8 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 jest.mock('./clear-queue-entries-dialog.resource');
 
-jest.mock('../active-visits/active-visits-table.resource', () => ({
-  useVisitQueueEntries: () => ({
-    mutate: jest.fn(),
-  }),
+jest.mock('../hooks/useMutateQueueEntries', () => ({
+  useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 
 describe('ClearQueueEntriesDialog Component', () => {

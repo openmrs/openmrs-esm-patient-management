@@ -90,4 +90,13 @@ const mockPatientWithLongName = {
   ],
 };
 
-export { renderWithSwr, waitForLoadingToFinish, getByTextWithMarkup, mockPatient, mockPatientWithLongName };
+const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
+
+export {
+  renderWithSwr,
+  waitForLoadingToFinish,
+  getByTextWithMarkup,
+  mockPatient,
+  mockPatientWithLongName,
+  patientChartBasePath,
+};

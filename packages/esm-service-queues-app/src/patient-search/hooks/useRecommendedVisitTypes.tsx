@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject, type OutpatientConfig } from '../../config-schema';
+import { type ConfigObject } from '../../config-schema';
 import { useMemo } from 'react';
 
 interface EnrollmentVisitType {
@@ -17,8 +17,7 @@ export const useRecommendedVisitTypes = (
   programUuid: string,
   locationUuid: string,
 ) => {
-  const { visitTypeResourceUrl } = useConfig() as OutpatientConfig;
-  const { showRecommendedVisitTypeTab } = useConfig() as ConfigObject;
+  const { visitTypeResourceUrl, showRecommendedVisitTypeTab } = useConfig<ConfigObject>();
 
   const apiUrl = `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`;
 

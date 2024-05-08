@@ -2,94 +2,84 @@ import React from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { TaskComplete } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { closeOverlay, launchOverlay } from '../../hooks/useOverlay';
-import { type Appointment } from '../../types';
-import { showModal } from '@openmrs/esm-framework';
-import { useVisits } from '../../hooks/useVisits';
-import AppointmentForm from '../../form/appointments-form.component';
+import { navigate, showModal, useConfig } from '@openmrs/esm-framework';
+import { type Appointment, AppointmentStatus } from '../../types';
+import { type ConfigObject } from '../../config-schema';
+import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import CheckInButton from './checkin-button.component';
+import styles from './appointments-actions.scss';
 
 dayjs.extend(utc);
 dayjs.extend(isToday);
 
-interface AppointmentActionsProps {
-  visits: Array<any>;
+interface AppointmentsActionsProps {
   appointment: Appointment;
-  scheduleType: string;
 }
 
-const AppointmentActions: React.FC<AppointmentActionsProps> = ({ visits, appointment }) => {
+const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }) => {
   const { t } = useTranslation();
-  const { mutateVisit } = useVisits();
+  const { checkInButton, checkOutButton } = useConfig<ConfigObject>();
+  const { visits, mutateVisit } = useTodaysVisits(); // TODO doesn't work if visit didn't start today?  what about inpatient?
   const patientUuid = appointment.patient.uuid;
   const visitDate = dayjs(appointment.startDateTime);
-  const isFutureAppointment = visitDate.isAfter(dayjs());
-  const isTodayAppointment = visitDate.isToday();
-  const hasActiveVisit = visits?.some((visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime);
-  const hasCheckedOut = visits?.some(
-    (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && visit?.stopDatetime,
+  const hasActiveVisitToday = visits?.some(
+    (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && !visit?.stopDatetime,
   );
+  const isTodaysAppointment = visitDate.isToday();
+  const isCompleted = appointment.status === AppointmentStatus.COMPLETED;
+  const isCancelled = appointment.status === AppointmentStatus.CANCELLED;
 
   const handleCheckout = () => {
-    const dispose = showModal('end-visit-dialog', {
-      closeModal: () => {
-        mutateVisit();
-        dispose();
-      },
-      patientUuid,
-    });
+    if (checkOutButton.customUrl) {
+      navigate({ to: checkOutButton.customUrl, templateParams: { patientUuid, appointmentUuid: appointment.uuid } });
+    } else {
+      const dispose = showModal('end-appointment-modal', {
+        closeModal: () => {
+          mutateVisit();
+          dispose();
+        },
+        patientUuid,
+        appointmentUuid: appointment.uuid,
+      });
+    }
   };
 
-  /**
-   * Renders the appropriate visit status button based on the current appointment state.
-   * @returns {JSX.Element} The rendered button.
-   */
   const renderVisitStatus = () => {
-    const checkedOutText = t('checkedOut', 'Checked out');
-
     switch (true) {
-      case hasCheckedOut:
+      case isCancelled:
         return (
-          <Button size="sm" kind="ghost" renderIcon={TaskComplete} iconDescription="Add">
-            {checkedOutText}
+          <Button kind="danger--ghost" iconDescription={t('cancelled', 'Cancelled')} size="sm">
+            {t('cancelled', 'Cancelled')}
           </Button>
         );
-      case hasActiveVisit && isTodayAppointment:
+      case isCompleted:
         return (
-          <Button onClick={handleCheckout} size="sm" kind="danger--tertiary">
+          <Button kind="ghost" renderIcon={TaskComplete} iconDescription={t('checkedOut', 'Checked out')} size="sm">
+            {t('checkedOut', 'Checked out')}
+          </Button>
+        );
+      case checkOutButton.enabled && hasActiveVisitToday && isTodaysAppointment:
+        return (
+          <Button onClick={handleCheckout} kind="danger--tertiary" size="sm">
             {t('checkOut', 'Check out')}
           </Button>
         );
-      case isTodayAppointment: {
+      case checkInButton.enabled && !hasActiveVisitToday && isTodaysAppointment: {
         return <CheckInButton patientUuid={patientUuid} appointment={appointment} />;
       }
-
       default:
         return null;
     }
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      {renderVisitStatus()}
-      {isFutureAppointment || (isTodayAppointment && (!handleCheckout || !hasActiveVisit)) ? (
-        <OverflowMenu aria-label="Actions" iconDescription={t('actions', 'Actions')} size="sm" flipped>
-          <OverflowMenuItem
-            itemText={t('editAppointments', 'Edit Appointment')}
-            onClick={() =>
-              launchOverlay(
-                t('editAppointments', 'Edit Appointment'),
-                <AppointmentForm appointment={appointment} context="editing" closeWorkspace={closeOverlay} />,
-              )
-            }
-          />
-        </OverflowMenu>
-      ) : null}
+    <div className={styles.container}>
+      <>{renderVisitStatus()}</>
     </div>
   );
 };
 
-export default AppointmentActions;
+export default AppointmentsActions;

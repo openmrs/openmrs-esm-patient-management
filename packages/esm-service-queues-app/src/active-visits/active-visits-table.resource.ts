@@ -1,26 +1,10 @@
+import { formatDate, openmrsFetch, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash-es/isEmpty';
-import last from 'lodash-es/last';
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { useTranslation } from 'react-i18next';
-import {
-  type FetchResponse,
-  formatDate,
-  openmrsFetch,
-  parseDate,
-  useConfig,
-  type Visit,
-  restBaseUrl,
-} from '@openmrs/esm-framework';
-import { type QueueEntry, type Identifer, type MappedServiceQueueEntry, type QueueServiceInfo } from '../types';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
+import isEmpty from 'lodash-es/isEmpty';
+import useSWR from 'swr';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
 
-export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
-export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
-export type QueueService = 'Clinical consultation' | 'Triage';
-export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 dayjs.extend(isToday);
 
 export interface VisitQueueEntry {
@@ -34,21 +18,17 @@ export interface MappedVisitQueueEntry {
   encounters: Array<MappedEncounter>;
   name: string;
   patientAge: string;
-  patientSex: string;
   patientDob: string;
   patientUuid: string;
-  priority: MappedQueuePriority;
+  queue: Queue;
+  priority: Concept;
   priorityComment: string;
-  priorityUuid: string;
-  service: string;
-  status: QueueStatus;
-  statusUuid: string;
-  visitStartDateTime: string;
+  status: Concept;
+  startedAt: Date;
+  endedAt: Date;
   visitType: string;
   visitUuid: string;
-  visitLocation: string;
   visitTypeUuid: string;
-  waitTime: string;
   queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
@@ -56,15 +36,6 @@ export interface MappedVisitQueueEntry {
   visitQueueNumber: string;
   identifiers: Array<Identifer>;
   queueComingFrom: string;
-}
-
-interface UseVisitQueueEntries {
-  visitQueueEntries: Array<VisitQueueEntry> | null;
-  visitQueueEntriesCount: number;
-  isLoading: boolean;
-  isError: Error;
-  isValidating?: boolean;
-  mutate: () => void;
 }
 
 interface ObsData {
@@ -95,37 +66,6 @@ interface MappedEncounter extends Omit<Encounter, 'encounterType' | 'provider'> 
   provider: string;
 }
 
-export function useStatus() {
-  const config = useConfig();
-  const {
-    concepts: { statusConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${statusConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    statuses: data ? data?.data?.setMembers : [],
-    isLoading,
-  };
-}
-
-export function usePriority() {
-  const config = useConfig();
-  const {
-    concepts: { priorityConceptSetUuid },
-  } = config;
-
-  const apiUrl = `${restBaseUrl}/concept/${priorityConceptSetUuid}`;
-  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
-
-  return {
-    priorities: data ? data?.data?.setMembers : [],
-    isLoading,
-    isError: error,
-  };
-}
-
 const mapEncounterProperties = (encounter: Encounter): MappedEncounter => ({
   diagnoses: encounter.diagnoses,
   encounterDatetime: encounter.encounterDatetime,
@@ -145,68 +85,27 @@ export const mapVisitQueueEntryProperties = (
   name: queueEntry.display,
   patientUuid: queueEntry.patient.uuid,
   patientAge: queueEntry.patient.person?.age + '',
-  patientSex: queueEntry.patient.person?.gender === 'M' ? 'MALE' : 'FEMALE',
   patientDob: queueEntry?.patient?.person?.birthdate
     ? formatDate(parseDate(queueEntry.patient.person.birthdate), { time: false })
     : '--',
-  // Map `Urgent` to `Priority` because it's easier to distinguish between tags named
-  // `Priority` and `Not Urgent` rather than `Urgent` vs `Not Urgent`
-  priority: queueEntry.priority.display === 'Urgent' ? 'Priority' : queueEntry.priority.display,
+  queue: queueEntry.queue,
+  priority: queueEntry.priority,
   priorityComment: queueEntry.priorityComment,
-  priorityUuid: queueEntry.priority.uuid,
-  service: queueEntry.queue.name,
-  status: queueEntry.status.display as QueueStatus,
-  statusUuid: queueEntry.status.uuid,
-  waitTime: queueEntry.startedAt ? `${dayjs().diff(dayjs(queueEntry.startedAt), 'minutes')}` : '--',
-  visitStartDateTime: queueEntry.startedAt,
+  status: queueEntry.status,
+  startedAt: dayjs(queueEntry.startedAt).toDate(),
+  endedAt: queueEntry.endedAt ? dayjs(queueEntry.endedAt).toDate() : null,
   visitType: queueEntry.visit?.visitType?.display,
-  visitLocation: queueEntry.visit?.location?.uuid,
   queueLocation: (queueEntry?.queue as any)?.location?.uuid,
   visitTypeUuid: queueEntry.visit?.visitType?.uuid,
   visitUuid: queueEntry.visit?.uuid,
   queueUuid: queueEntry.queue.uuid,
   queueEntryUuid: queueEntry.uuid,
   sortWeight: queueEntry.sortWeight,
-  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e.attributeType.uuid === visitQueueNumberAttributeUuid)
+  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
     ?.value,
   identifiers: queueEntry.patient?.identifiers as Identifer[],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
-
-export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
-  const { queueLocations } = useQueueLocations();
-  const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-
-  const apiUrl =
-    `${restBaseUrl}/visit-queue-entry?v=full` + (queueLocationUuid ? `&location=${queueLocationUuid}` : '');
-  const { t } = useTranslation();
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
-
-  let visitQueueEntries: VisitQueueEntry[];
-
-  if (!currServiceName || currServiceName == t('all', 'All')) {
-    visitQueueEntries = data?.data?.results;
-  } else {
-    visitQueueEntries = data?.data?.results.filter((data) => data.queueEntry.queue.name == currServiceName);
-  }
-
-  return {
-    visitQueueEntries: visitQueueEntries ?? [],
-    visitQueueEntriesCount: visitQueueEntries?.length ?? 0,
-    isLoading,
-    isError: error,
-    isValidating,
-    mutate,
-  };
-}
-
-export const getOriginFromPathName = (pathname = '') => {
-  const from = pathname.split('/');
-  return last(from);
-};
 
 export async function updateQueueEntry(
   visitUuid: string,

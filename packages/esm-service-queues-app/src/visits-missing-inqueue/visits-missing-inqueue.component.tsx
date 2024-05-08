@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './visits-missing-inqueue.scss';
 import { type ActiveVisit, useMissingQueueEntries } from './visits-missing-inqueue.resource';
 import { Add } from '@carbon/react/icons';
+import { type ConfigObject } from '../config-schema';
 
 interface PaginationData {
   goTo: (page: number) => void;
@@ -66,11 +67,11 @@ function AddMenu({ visitDetails }: { visitDetails: ActiveVisit }) {
 
 const MissingQueueEntries = () => {
   const { t } = useTranslation();
-  const config = useConfig();
+  const config = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const { activeVisits, isLoading, visitsIsValidating } = useMissingQueueEntries();
-  const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [currentPageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
+  const pageSizes = [10, 20, 30, 40, 50];
+  const [currentPageSize, setPageSize] = useState(10);
   const [searchString, setSearchString] = useState('');
 
   const headerData = useMemo(

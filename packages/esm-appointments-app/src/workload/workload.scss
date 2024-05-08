@@ -5,8 +5,7 @@
 
 .workLoadCard {
   display: flex;
-  margin: 0 1rem;
-  color: #525252;
+  color: colors.$black;
 }
 
 .monthlyWorkLoadCard {
@@ -51,6 +50,12 @@
   display: flex;
   justify-content: space-between;
   padding-bottom: layout.$spacing-05;
+}
+.dayLabel {
+  @include type.type-style('heading-compact-01');
+  color: colors.$blue-30;
+  text-decoration: underline;
+  border-bottom: 5px;
 }
 
 .headerLabel {

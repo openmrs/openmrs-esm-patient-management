@@ -1,12 +1,16 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .content {
   @include type.type-style('heading-compact-01');
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.displayText {
+  text-transform: lowercase;
 }
 
 .desktopHeading {
@@ -27,7 +31,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 
   h4:after {
     content: '';
@@ -49,11 +53,6 @@
 .tile {
   text-align: center;
   border: 1px solid $ui-03;
-}
-
-.actionText {
-  display: flex;
-  align-items: center;
 }
 
 .header4 {

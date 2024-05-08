@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useQueue } from '../hooks/useQueue';
 import QueueTableByStatus from '../queue-table/queue-table-by-status.component';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
+import QueueTablesForAllStatuses from './queue-tables-for-all-statuses.component';
 
 const QueueTableByStatusView: React.FC = () => {
   const { queueUuid, statusUuid } = useParams();
@@ -17,7 +18,7 @@ const QueueTableByStatusView: React.FC = () => {
   } else if (!queue) {
     return <InlineNotification kind="error" title={t('invalidQueue', 'Invalid Queue')} />;
   } else {
-    return <QueueTableByStatus selectedQueue={queue} selectedStatus={status} />;
+    return <QueueTablesForAllStatuses selectedQueue={queue} />;
   }
 };
 

@@ -4,8 +4,8 @@ import { moduleName, patientRegistration } from './constants';
 import { setupOffline } from './offline';
 import rootComponent from './root.component';
 import addPatientLinkComponent from './add-patient-link';
-import patientPhotoComponent from './widgets/display-photo.component';
 import editPatientDetailsButtonComponent from './widgets/edit-patient-details-button.component';
+import { PatientPhotoExtension } from './patient-photo.extension';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -55,7 +55,7 @@ export const cancelPatientEditModal = getAsyncLifecycle(
   options,
 );
 
-export const patientPhoto = getSyncLifecycle(patientPhotoComponent, options);
+export const patientPhotoExtension = getSyncLifecycle(PatientPhotoExtension, options);
 
 export const editPatientDetailsButton = getSyncLifecycle(editPatientDetailsButtonComponent, {
   featureName: 'edit-patient-details',

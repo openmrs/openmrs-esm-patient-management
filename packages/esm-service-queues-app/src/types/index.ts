@@ -7,8 +7,6 @@ export enum SearchTypes {
   SEARCH_RESULTS = 'search_results',
   SCHEDULED_VISITS = 'scheduled-visits',
   VISIT_FORM = 'visit_form',
-  QUEUE_SERVICE_FORM = 'queue_service_form',
-  QUEUE_ROOM_FORM = 'queue_room_form',
 }
 
 export interface Attribute {
@@ -17,6 +15,7 @@ export interface Attribute {
   uuid: string;
   value: string | number;
 }
+
 export interface AppointmentsFetchResponse {
   data: Array<Appointment>;
 }
@@ -76,6 +75,7 @@ export interface Note {
   };
   time: string;
 }
+
 export interface Order {
   uuid: string;
   dateActivated: string;
@@ -230,6 +230,7 @@ export interface FormattedEncounter {
 
 export interface ObsMetaInfo {
   [_: string]: any;
+
   assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
 }
 
@@ -242,6 +243,7 @@ export type OBSERVATION_INTERPRETATION =
   | 'CRITICALLY_LOW'
   | 'OFF_SCALE_LOW'
   | '--';
+
 export interface PatientProgram {
   uuid: string;
   display: string;
@@ -263,6 +265,7 @@ export interface AppointmentSummary {
   appointmentService: { name: string };
   appointmentCountMap: Record<string, AppointmentCountMap>;
 }
+
 export interface QueueEntryPayload {
   visit: { uuid: string };
   queueEntry: {
@@ -302,6 +305,7 @@ export enum FilterTypes {
   SHOW,
   HIDE,
 }
+
 export interface Provider {
   uuid: string;
   display: string;
@@ -319,17 +323,13 @@ export interface MappedQueueEntry {
   patientSex: string;
   patientDob: string;
   patientUuid: string;
-  priority: string;
+  queue: Queue;
+  priority: Concept;
   priorityComment: string;
-  priorityUuid: string;
-  service: string;
-  status: string;
-  statusUuid: string;
-  visitStartDateTime: string;
+  status: Concept;
   visitType: string;
   visitUuid: string;
   waitTime: string;
-  queueUuid: string;
   queueEntryUuid: string;
   queueLocation: string;
   sortWeight: string;
@@ -360,6 +360,7 @@ export interface LocationResponse {
 export interface LocationEntry {
   resource: Resource;
 }
+
 export interface Resource {
   id: string;
   name: string;
@@ -426,14 +427,21 @@ export interface QueueTableCellComponentProps {
   queueEntry: QueueEntry;
 }
 
-export interface QueueTableColumn {
-  headerI18nKey: string; // i18n key for the column header. Must be unique for each column in the queue table
+export type QueueTableColumn = {
+  key: string; // key used by DataTable, MUST be unique for each column in the queue table
+  header: string; // header of the column
   CellComponent: React.FC<QueueTableCellComponentProps>;
 
   // function to extract from the queue entry a searchable string representing the its value within this column.
   // May be null to make this column's content unsearchable
   getFilterableValue: (queueEntry: QueueEntry) => string | null;
-}
+};
+
+export type QueueTableColumnFunction = (
+  key: string, // a unique key for the column
+  header?: string,
+  config?: any,
+) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];
@@ -445,6 +453,8 @@ export interface Queue {
   display: string;
   name: string;
   description: string;
+  location: Location;
+  service: Concept;
   allowedPriorities: Array<Concept>;
   allowedStatuses: Array<Concept>;
 }
@@ -464,6 +474,7 @@ export interface QueueEntry {
   visit: Visit;
   sortWeight: number;
   queueComingFrom: Queue;
+  previousQueueEntry: QueueEntry;
 }
 
 export interface QueueEntrySearchCriteria {
@@ -478,7 +489,9 @@ export interface QueueEntrySearchCriteria {
 // They should be common enough to move to esm-core
 
 export interface Concept extends OpenmrsResource {}
+
 export interface Provider extends OpenmrsResource {}
+
 export interface PatientIdentifierType extends OpenmrsResource {}
 
 export interface Person {
@@ -546,6 +559,7 @@ export interface Patient {
   identifiers: PatientIdentifier[];
   person: Person;
 }
+
 export interface PatientIdentifier {
   uuid: string;
   display: string;

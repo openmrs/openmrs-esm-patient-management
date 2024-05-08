@@ -13,7 +13,6 @@ import {
   InlineNotification,
 } from '@carbon/react';
 import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import { type SearchTypes } from '../types';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { saveQueueRoom } from './queue-room.resource';
@@ -21,11 +20,10 @@ import styles from './queue-room-form.scss';
 import { useQueues } from '../helpers/useQueues';
 
 interface QueueRoomFormProps {
-  toggleSearchType: (searchMode: SearchTypes) => void;
   closePanel: () => void;
 }
 
-const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ toggleSearchType, closePanel }) => {
+const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ closePanel }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [queueRoomName, setQueueRoomName] = useState('');

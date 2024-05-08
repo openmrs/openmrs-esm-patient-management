@@ -2,19 +2,17 @@ import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
-import { usePriority, useStatus } from '../../active-visits/active-visits-table.resource';
 import styles from './visit-form-queue-fields.scss';
-import { type ConfigObject, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../helpers/useQueues';
+import { type ConfigObject } from '../../config-schema';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { priorities } = usePriority();
-  const { statuses } = useStatus();
   const { queueLocations } = useQueueLocations();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const defaultPriority = config.concepts.defaultPriorityConceptUuid;
   const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
@@ -24,6 +22,8 @@ const StartVisitQueueFields: React.FC = () => {
   const [status, setStatus] = useState(defaultStatus);
   const [sortWeight, setSortWeight] = useState(0);
   const [service, setSelectedService] = useState('');
+  const priorities = queues.find((q) => q.uuid === service)?.allowedPriorities ?? [];
+  const statuses = queues.find((q) => q.uuid === service)?.allowedStatuses ?? [];
 
   useEffect(() => {
     if (priority === emergencyPriorityConceptUuid) {

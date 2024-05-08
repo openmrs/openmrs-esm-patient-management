@@ -9,7 +9,6 @@ export async function addQueueEntry(
   status: string,
   queueServiceUuid: string,
   appointment: Appointment,
-
   locationUuid: string,
   visitQueueNumberAttributeUuid: string,
 ) {
@@ -27,20 +26,12 @@ export async function addQueueEntry(
     },
     signal: abortController.signal,
     body: {
-      visit: { uuid: visitUuid },
+      visit: visitUuid,
       queueEntry: {
-        status: {
-          uuid: status,
-        },
-        priority: {
-          uuid: priority,
-        },
-        queue: {
-          uuid: queueServiceUuid,
-        },
-        patient: {
-          uuid: patientUuid,
-        },
+        status: status,
+        priority: priority,
+        queue: queueServiceUuid,
+        patient: patientUuid,
         startedAt: new Date(),
       },
     },

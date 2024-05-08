@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ClinicalAppointments from './appointments.component';
+import Appointments from './appointments.component';
 
-describe('Clinical Appointments', () => {
+describe('Appointments', () => {
   it('should render correctly', () => {
-    render(<ClinicalAppointments />);
+    render(<Appointments />);
 
     expect(screen.getByTitle(/patient queue illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/^appointments$/i)).toBeInTheDocument();

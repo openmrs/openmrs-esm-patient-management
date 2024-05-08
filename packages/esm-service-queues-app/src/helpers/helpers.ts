@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getGlobalStore } from '@openmrs/esm-framework';
 import type { AppointmentSummary } from '../types';
+import { useTranslation } from 'react-i18next';
 
 export const getServiceCountByAppointmentType = (
   appointmentSummary: Array<AppointmentSummary>,
@@ -94,7 +95,8 @@ export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQue
 };
 
 export const useSelectedServiceName = () => {
-  const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName ?? '');
+  const { t } = useTranslation();
+  const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName ?? t('all', 'All'));
 
   useEffect(() => {
     getSelectedServiceName().subscribe(({ serviceName }) => setCurrentServiceName(serviceName));

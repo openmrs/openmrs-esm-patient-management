@@ -18,7 +18,7 @@ interface VitalsComponentProps {
 
 const Vitals: React.FC<VitalsComponentProps> = ({ vitals, patientUuid, visitType }) => {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
 
   const vitalsToDisplay = vitals.reduce(
