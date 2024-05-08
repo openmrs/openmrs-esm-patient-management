@@ -190,8 +190,6 @@ describe('ObsField', () => {
   it('renders a date box for date concept', async () => {
     render(<ObsField fieldDefinition={dateFieldDefFieldDef} />);
 
-    await screen.findByDisplayValue('07/05/2024');
-
     expect(screen.getByRole('textbox')).toBeInTheDocument();
 
     expect(screen.getByRole('textbox')).toHaveValue('07/05/2024');
