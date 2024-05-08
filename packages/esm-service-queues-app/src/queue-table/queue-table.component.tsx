@@ -1,3 +1,4 @@
+import React, { useEffect, useState, type FC } from 'react';
 import {
   DataTable,
   Pagination,
@@ -15,15 +16,26 @@ import {
   TableToolbarContent,
   Tile,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
-import React, { useEffect, useState, type FC } from 'react';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
+import { useColumns } from './cells/columns.resource';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
-  queueTableColumns: QueueTableColumn[];
+
+  // the queueUuid and statusUuid are used to determine the columns
+  // to display based on the tablesConfig configuration.
+  // For a table displaying entries of a particular queue (across all statuses)
+  // statusUuid param should be null.
+  // For a table displaying entries from multiple quueues
+  // both queueUuid and statusUuid params should be null
+  queueUuid: string;
+  statusUuid: string;
+
+  // If provided, overides the columns specified by the tablesConfig configuration.
+  queueTableColumnsOverride?: QueueTableColumn[];
 
   // if provided, a queue entry row can be expanded with the
   // provided component rendering more info about the row
@@ -31,76 +43,91 @@ interface QueueTableProps {
 
   // if provided, adds addition table toolbar elements
   tableFilter?: React.ReactNode[];
-
-  showSearchBar?: boolean;
 }
 
 function QueueTable({
   queueEntries,
-  queueTableColumns,
+  queueUuid,
+  statusUuid,
+  queueTableColumnsOverride,
   ExpandedRow,
   tableFilter,
-  showSearchBar = true,
 }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
   const pageSizes = [10, 20, 30, 40, 50];
 
   const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+
+  const columnsFromConfig = useColumns(queueUuid, statusUuid);
+  const columns = queueTableColumnsOverride ?? columnsFromConfig ?? [];
 
   useEffect(() => {
     goTo(1);
   }, [queueEntries]);
 
-  const headers = queueTableColumns.map((column) => ({ header: t(column.headerI18nKey), key: column.headerI18nKey }));
   const rowsData =
     paginatedQueueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
-      queueTableColumns.forEach(({ headerI18nKey, CellComponent }) => {
-        row[headerI18nKey] = <CellComponent queueEntry={queueEntry} />;
+      columns.forEach(({ key, CellComponent }) => {
+        row[key] = <CellComponent queueEntry={queueEntry} />;
       });
       return row;
     }) ?? [];
 
-  return (
-    <DataTable rows={rowsData} headers={headers} useZebraStyles>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
-        <TableContainer className={styles.tableContainer}>
-          {tableFilter && (
-            <TableToolbar {...getToolbarProps()}>
-              <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-            </TableToolbar>
-          )}
-          <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
-            <TableHead>
-              <TableRow>
-                {ExpandedRow && <TableExpandHeader />}
-                {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => {
-                const Row = ExpandedRow ? TableExpandRow : TableRow;
+  if (columns.length == 0) {
+    return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
+  }
 
-                return (
-                  <React.Fragment key={row.id}>
-                    <Row {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </Row>
-                    {ExpandedRow && (
-                      <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
-                        <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
-                      </TableExpandedRow>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </TableBody>
-          </Table>
+  return (
+    <DataTable
+      data-floating-menu-container
+      overflowMenuOnHover={isDesktop(layout)}
+      rows={rowsData}
+      headers={columns}
+      size={responsiveSize}
+      useZebraStyles>
+      {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
+        <>
+          <TableContainer className={styles.tableContainer}>
+            {tableFilter && (
+              <TableToolbar {...getToolbarProps()}>
+                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+              </TableToolbar>
+            )}
+            <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
+              <TableHead>
+                <TableRow>
+                  {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
+                  {headers.map((header) => (
+                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, i) => {
+                  const Row = ExpandedRow ? TableExpandRow : TableRow;
+
+                  return (
+                    <React.Fragment key={row.id}>
+                      <Row {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </Row>
+                      {ExpandedRow && row.isExpanded && (
+                        <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
+                          <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
+                        </TableExpandedRow>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
           {rows.length === 0 && (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
@@ -127,7 +154,7 @@ function QueueTable({
               }
             }}
           />
-        </TableContainer>
+        </>
       )}
     </DataTable>
   );

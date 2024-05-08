@@ -59,7 +59,7 @@ export function usePatientAppointments(patientUuid: string, startDate: string, a
 }
 
 // TODO: move?
-export const cancelAppointment = async (toStatus: string, appointmentUuid: string) => {
+export const changeAppointmentStatus = async (toStatus: string, appointmentUuid: string) => {
   const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);

@@ -30,7 +30,7 @@ export const usePatientAttributes = (patientUuid: string) => {
  * @returns Object containing `contactAttribute` {@link Attribute} loading status
  */
 export const usePatientContactAttributes = (patientUuid: string) => {
-  const { contactAttributeType } = useConfig() as ConfigObject;
+  const { contactAttributeType } = useConfig<ConfigObject>();
   const { attributes, isLoading } = usePatientAttributes(patientUuid);
   const contactAttributes = attributes.filter(
     ({ attributeType }) => contactAttributeType?.some((uuid) => attributeType.uuid === uuid),
