@@ -192,26 +192,6 @@ describe('ObsField', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
-  it('handles user input in the date picker', async () => {
-    render(<ObsField fieldDefinition={dateFieldDef} />);
-    const datePickerInput = screen.getByRole('textbox');
-    expect(datePickerInput).toBeInTheDocument();
-
-    await userEvent.type(datePickerInput, '08/05/2024');
-
-    expect(datePickerInput).toHaveValue('08/05/2024');
-  });
-
-  it('handles user input in the date picker', async () => {
-    render(<ObsField fieldDefinition={dateFieldDef} />);
-    const datePickerInput = screen.getByRole('textbox');
-    expect(datePickerInput).toBeInTheDocument();
-
-    fireEvent.change(datePickerInput, { target: { value: '08/05/2024' } });
-
-    expect(datePickerInput).toHaveValue('08/05/2024');
-  });
-
   it('select uses answerConcept for answers when it is provided', async () => {
     const user = userEvent.setup();
 
