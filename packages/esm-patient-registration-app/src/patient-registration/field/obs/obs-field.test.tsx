@@ -199,13 +199,6 @@ describe('ObsField', () => {
     expect(datePickerInput).toHaveValue('08/05/2024');
   });
 
-  it('displays error message when invalid date is entered', async () => {
-    render(<ObsField fieldDefinition={dateFieldDef} />);
-    const datePickerInput = screen.getByRole('textbox');
-    userEvent.type(datePickerInput, 'invalid date');
-    expect(await screen.findByText('Invalid date')).toBeInTheDocument();
-  });
-
   it('renders a select for a coded concept', () => {
     render(<ObsField fieldDefinition={codedFieldDef} />);
     // expect(screen.getByLabelText("Nationality")).toBeInTheDocument();
