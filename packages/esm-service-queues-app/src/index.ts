@@ -1,10 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  registerBreadcrumbs,
-  registerFeatureFlag,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
 import { dashboardMeta } from './dashboard.meta';
@@ -135,14 +129,17 @@ export const voidQueueEntryModal = getAsyncLifecycle(
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
+export const activeVisitsRowActions = getAsyncLifecycle(
+  () => import('./active-visits/active-visits-row-actions.component'),
+  {
+    featureName:
+      'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
+    moduleName,
+  },
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
-
-  registerFeatureFlag(
-    'new-queue-table',
-    'New Queue Table',
-    'Use a newer implementation of the queue table in the home dashboard of the queues app.',
-  );
 }

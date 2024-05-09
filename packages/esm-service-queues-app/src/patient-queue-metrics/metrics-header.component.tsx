@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PatientBannerActionsMenu } from '@openmrs/esm-framework';
+import { PatientBannerActionsMenu, showModal, useSession } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { MessageQueue, ArrowRight } from '@carbon/react/icons';
 import { Button, ComboButton, MenuItem } from '@carbon/react';
@@ -12,12 +12,12 @@ import QueueServiceForm from '../queue-services/queue-service-form.component';
 
 const MetricsHeader = () => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
-  const isPhone = useLayoutType() == 'phone';
   const metricsTitle = t('clinicMetrics', 'Clinic metrics');
   const queueScreenText = t('queueScreen', 'Queue screen');
   const [showQueueServiceFormOverlay, setShowQueueServiceFormOverlay] = useState(false);
   const [showQueueRoomFormOverlay, setShowQueueRoomFormOverlay] = useState(false);
+  const currentUserSession = useSession();
+  const providerUuid = currentUserSession?.currentProvider?.uuid;
 
   const navigateToQueueScreen = () => {
     navigate({ to: `${spaBasePath}/service-queues/screen` });
@@ -26,65 +26,35 @@ const MetricsHeader = () => {
     setShowQueueServiceFormOverlay(false);
     setShowQueueRoomFormOverlay(false);
   };
-  if (isTablet || isPhone) {
-    return (
-      <div className={styles.metricsContainer}>
-        <span className={styles.metricsTitle}>{metricsTitle}</span>
-        <UserHasAccess privilege="Emr: View Legacy Interface">
-          <ComboButton label={t('actions', 'Actions')} menuAlignment="bottom-end" className={styles.comboBtn}>
-            <MenuItem
-              label={t('addNewService', 'Add new service')}
-              onClick={() => setShowQueueServiceFormOverlay(true)}
-            />
-
-            <MenuItem
-              label={t('addNewServiceRoom', 'Add new service room')}
-              onClick={() => setShowQueueRoomFormOverlay(true)}
-            />
-            <MenuItem label={queueScreenText} onClick={navigateToQueueScreen} />
-          </ComboButton>
-        </UserHasAccess>
-        {showQueueServiceFormOverlay && (
-          <Overlay header={t('addNewQueueService', 'Add new queue service')} closePanel={closeOverlays}>
-            <QueueServiceForm closePanel={closeOverlays} />
-          </Overlay>
-        )}
-        {showQueueRoomFormOverlay && (
-          <Overlay header={t('addNewQueueServiceRoom', 'Add new queue service room')} closePanel={closeOverlays}>
-            <QueueRoomForm closePanel={closeOverlays} />
-          </Overlay>
-        )}
-      </div>
-    );
-  }
   return (
     <div className={styles.metricsContainer}>
       <span className={styles.metricsTitle}>{metricsTitle}</span>
-      <div className={styles.actionBtn}>
+      <ComboButton
+        label={queueScreenText}
+        menuAlignment="bottom-end"
+        className={styles.comboBtn}
+        tooltipAlignment="top-right"
+        onClick={navigateToQueueScreen}>
         <UserHasAccess privilege="Emr: View Legacy Interface">
-          <Button
-            kind="tertiary"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          <MenuItem
+            label={t('addNewService', 'Add new service')}
             onClick={() => setShowQueueServiceFormOverlay(true)}
-            iconDescription={t('addNewQueueService', 'Add new queue service')}>
-            {t('addNewService', 'Add new service')}
-          </Button>
-          <Button
-            kind="tertiary"
-            renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          />
+          <MenuItem
+            label={t('addNewServiceRoom', 'Add new service room')}
             onClick={() => setShowQueueRoomFormOverlay(true)}
-            iconDescription={t('addNewQueueServiceRoom', 'Add new queue service room')}>
-            {t('addNewServiceRoom', 'Add new service room')}
-          </Button>
+          />
         </UserHasAccess>
-        <Button
-          onClick={navigateToQueueScreen}
-          kind="tertiary"
-          renderIcon={(props) => <MessageQueue size={16} {...props} />}
-          iconDescription={queueScreenText}>
-          {queueScreenText}
-        </Button>
-      </div>
+        <MenuItem
+          label={t('addProviderQueueRoom', 'Add provider queue room')}
+          onClick={() => {
+            const dispose = showModal('add-provider-to-room-modal', {
+              closeModal: () => dispose(),
+              providerUuid,
+            });
+          }}
+        />
+      </ComboButton>
       {showQueueServiceFormOverlay && (
         <Overlay header={t('addNewQueueService', 'Add new queue service')} closePanel={closeOverlays}>
           <QueueServiceForm closePanel={closeOverlays} />

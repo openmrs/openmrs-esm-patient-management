@@ -1,19 +1,26 @@
 import React from 'react';
 import { of } from 'rxjs';
 import { screen } from '@testing-library/react';
-import { type ConfigObject, useConfig, useSession } from '@openmrs/esm-framework';
+import { useConfig, useSession, getDefaultsFromConfigSchema } from '@openmrs/esm-framework';
 import { mockServices, mockSession, mockQueueEntries } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { useQueueRooms } from '../add-provider-queue-room/add-provider-queue-room.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import ActiveVisitsTable from './active-visits-table.component';
+import DefaultQueueTable from '../queue-table/default-queue-table.component';
+import { configSchema } from '../config-schema';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockUseQueueEntries = useQueueEntries as jest.Mock;
 const mockQueueLocations = useQueueLocations as jest.Mock;
 const mockUseQueueRooms = useQueueRooms as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
+
+mockedUseConfig.mockReturnValue({
+  ...getDefaultsFromConfigSchema(configSchema),
+  visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  customPatientChartUrl: 'someUrl',
+});
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -65,23 +72,17 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-describe('ActiveVisitsTable: ', () => {
+describe('DefaultQueueTable: ', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue(mockSession),
-      mockedUseConfig.mockReturnValue({
-        concepts: {},
-        visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-        showQueueTableTab: false,
-        customPatientChartUrl: 'someUrl',
-      } as ConfigObject);
+    mockUseSession.mockReturnValue(mockSession);
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    mockQueueLocations.mockReturnValueOnce({ queueLocations: [] });
+    mockQueueLocations.mockReturnValue({ queueLocations: [] });
     mockUseQueueRooms.mockReturnValue({ rooms: [] });
     mockUseQueueEntries.mockReturnValue({ queueEntries: [], isLoading: false });
 
-    renderActiveVisitsTable();
+    rendeDefaultQueueTable();
 
     await screen.findByRole('table');
 
@@ -95,7 +96,7 @@ describe('ActiveVisitsTable: ', () => {
     mockUseQueueRooms.mockReturnValue({ rooms: mockUseQueueRooms });
     mockUseQueueEntries.mockReturnValue({ queueEntries: mockQueueEntries, isLoading: false });
 
-    renderActiveVisitsTable();
+    rendeDefaultQueueTable();
 
     await screen.findByRole('table');
 
@@ -106,17 +107,25 @@ describe('ActiveVisitsTable: ', () => {
     expect(john).toBeInTheDocument();
     expect(john).toHaveAttribute('href', 'someUrl');
 
-    const expectedColumnHeaders = [/name/, /priority/, /status/, /waitTime/];
+    const expectedColumnHeaders = [
+      /name/i,
+      /priority/i,
+      /coming from/i,
+      /status/i,
+      /^queue$/i,
+      /wait time/i,
+      /actions/i,
+    ];
     expectedColumnHeaders.forEach((header) => {
       expect(
         screen.getByRole('columnheader', {
-          name: new RegExp(header, 'i'),
+          name: header,
         }),
       ).toBeInTheDocument();
     });
   });
 });
 
-function renderActiveVisitsTable() {
-  renderWithSwr(<ActiveVisitsTable />);
+function rendeDefaultQueueTable() {
+  renderWithSwr(<DefaultQueueTable />);
 }

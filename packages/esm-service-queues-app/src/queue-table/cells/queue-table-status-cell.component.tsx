@@ -1,13 +1,18 @@
 import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
 import QueueStatus from '../../queue-entry-table-components/queue-status.component';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
+import { type StatusColumnConfig } from '../../config-schema';
 
-export const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-  return <QueueStatus status={queueEntry.status} />; // Do not pass queue into status, as we do not want to render it
-};
+export const queueTableStatusColumn: QueueTableColumnFunction = (key, header, config: StatusColumnConfig) => {
+  const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProps) => {
+    // Do not pass queue into status, as we do not want to render it
+    return <QueueStatus status={queueEntry.status} statusConfigs={config?.statuses} />;
+  };
 
-export const queueTableStatusColumn: QueueTableColumn = {
-  headerI18nKey: 'status',
-  CellComponent: QueueTableStatusCell,
-  getFilterableValue: (queueEntry) => queueEntry.status.display,
+  return {
+    key,
+    header,
+    CellComponent: QueueTableStatusCell,
+    getFilterableValue: (queueEntry) => queueEntry.status.display,
+  };
 };

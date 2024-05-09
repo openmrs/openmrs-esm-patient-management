@@ -1,8 +1,8 @@
+import React from 'react';
 import { Button } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProps) {
   const { t } = useTranslation();
@@ -60,8 +60,9 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
   );
 }
 
-export const queueTableActionColumn: QueueTableColumn = {
-  headerI18nKey: '',
+export const queueTableActionColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: QueueTableActionCell,
   getFilterableValue: null,
-};
+});

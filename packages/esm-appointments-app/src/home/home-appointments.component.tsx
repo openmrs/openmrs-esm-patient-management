@@ -11,7 +11,11 @@ const HomeAppointments = () => {
 
   return (
     <div className={styles.container}>
-      <AppointmentsList date={toOmrsIsoString(dayjs().startOf('day').toDate())} title={t('todays', "Today's")} />
+      <AppointmentsList
+        date={toOmrsIsoString(dayjs().startOf('day').toDate())}
+        title={t('todays', "Today's")}
+        filterCancelled={true}
+      />
       <Overlay />
     </div>
   );

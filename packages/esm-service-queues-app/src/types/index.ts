@@ -427,14 +427,21 @@ export interface QueueTableCellComponentProps {
   queueEntry: QueueEntry;
 }
 
-export interface QueueTableColumn {
-  headerI18nKey: string; // i18n key for the column header. Must be unique for each column in the queue table
+export type QueueTableColumn = {
+  key: string; // key used by DataTable, MUST be unique for each column in the queue table
+  header: string; // header of the column
   CellComponent: React.FC<QueueTableCellComponentProps>;
 
   // function to extract from the queue entry a searchable string representing the its value within this column.
   // May be null to make this column's content unsearchable
   getFilterableValue: (queueEntry: QueueEntry) => string | null;
-}
+};
+
+export type QueueTableColumnFunction = (
+  key: string, // a unique key for the column
+  header?: string,
+  config?: any,
+) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];

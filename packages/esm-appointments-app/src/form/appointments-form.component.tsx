@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -24,12 +24,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
+  ResponsiveWrapper,
+  showSnackbar,
+  translateFrom,
+  useConfig,
+  useLayoutType,
   useLocations,
   useSession,
-  showSnackbar,
-  useLayoutType,
-  useConfig,
-  ResponsiveWrapper,
   type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
@@ -52,33 +53,51 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import { moduleName } from '../constants';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
-const appointmentsFormSchema = z.object({
-  duration: z.number(),
-  location: z.string().refine((value) => value !== ''),
-  provider: z.string().refine((value) => value !== ''),
-  appointmentStatus: z.string().optional(),
-  appointmentNote: z.string(),
-  appointmentType: z.string().refine((value) => value !== ''),
-  selectedService: z.string().refine((value) => value !== ''),
-  recurringPatternType: z.enum(['DAY', 'WEEK']),
-  recurringPatternPeriod: z.number(),
-  recurringPatternDaysOfWeek: z.array(z.string()),
-  selectedDaysOfWeekText: z.string().optional(),
-  startTime: z.string().refine((value) => isValidTime(value)),
-  timeFormat: z.enum(['AM', 'PM']),
-  appointmentDateTime: z.object({
-    startDate: z.date(),
-    startDateText: z.string(),
-    recurringPatternEndDate: z.date().nullable(),
-    recurringPatternEndDateText: z.string().nullable(),
-  }),
-});
+// t('durationErrorMessage', 'Duration should be greater than zero')
+const appointmentsFormSchema = z
+  .object({
+    duration: z.number().refine((duration) => duration > 0, {
+      message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+    }),
+    location: z.string().refine((value) => value !== ''),
+    provider: z.string().refine((value) => value !== ''),
+    appointmentStatus: z.string().optional(),
+    appointmentNote: z.string(),
+    appointmentType: z.string().refine((value) => value !== ''),
+    selectedService: z.string().refine((value) => value !== ''),
+    recurringPatternType: z.enum(['DAY', 'WEEK']),
+    recurringPatternPeriod: z.number(),
+    recurringPatternDaysOfWeek: z.array(z.string()),
+    selectedDaysOfWeekText: z.string().optional(),
+    startTime: z.string().refine((value) => isValidTime(value)),
+    timeFormat: z.enum(['AM', 'PM']),
+    appointmentDateTime: z.object({
+      startDate: z.date(),
+      startDateText: z.string(),
+      recurringPatternEndDate: z.date().nullable(),
+      recurringPatternEndDateText: z.string().nullable(),
+    }),
+    formIsRecurringAppointment: z.boolean(),
+  })
+  .refine(
+    (formValues) => {
+      if (formValues.formIsRecurringAppointment === true) {
+        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+      }
+      return true;
+    },
+    {
+      path: ['appointmentDateTime[]'],
+      message: 'A recurring appointment should have an end date',
+    },
+  );
 
 type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
@@ -172,12 +191,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDate: defaultEndDate,
         recurringPatternEndDateText: defaultEndDateText,
       },
+      formIsRecurringAppointment: isRecurringAppointment,
     },
   });
 
-  const [pickedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
   const handleWorkloadDateChange = (date: Date) => {
-    setSelectedDate(date);
+    const appointmentDate = getValues('appointmentDateTime');
+    setValue('appointmentDateTime', { ...appointmentDate, startDate: date });
   };
 
   const handleMultiselectChange = (e) => {
@@ -219,7 +241,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   // Same for creating and editing
   const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
-
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
 
@@ -240,7 +261,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       appointmentRequest: appointmentPayload,
       recurringPattern: constructRecurringPattern(data),
     };
-
     const abortController = new AbortController();
     (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
@@ -251,7 +271,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           setIsSubmitting(false);
           closeWorkspace();
           mutateAppointments();
-
           showSnackbar({
             isLowContrast: true,
             kind: 'success',
@@ -344,13 +363,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     };
   };
 
+  const onError = (error) => console.error(error);
+
   if (isLoading)
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
   return (
-    <Form className={styles.formWrapper}>
+    <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
@@ -602,7 +623,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       <DatePicker
                         datePickerType="single"
                         dateFormat={datePickerFormat}
-                        value={pickedDate || value.startDate}
+                        value={value.startDate}
                         onChange={([date]) => {
                           if (date) {
                             onChange({ ...value, startDate: date });
@@ -723,7 +744,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={isSubmitting} onClick={handleSubmit(handleSaveAppointment)}>
+        <Button className={styles.button} disabled={isSubmitting} type="submit">
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
@@ -776,6 +797,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           render={({ field: { onChange, onBlur, value, ref } }) => (
             <NumberInput
               hideSteppers
+              disableWheel
               id="duration"
               min={0}
               max={1440}
