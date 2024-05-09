@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -49,6 +49,13 @@ function DefaultQueueTable() {
   const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
 
   const columns = useColumns(null, null);
+  if (!columns) {
+    showToast({
+      title: t('notableConfig', 'No table configuration'),
+      kind: 'warning',
+      description: 'No table configuration defined for queue: null and status: null',
+    });
+  }
 
   const [searchTerm, setSearchTerm] = useState('');
 
