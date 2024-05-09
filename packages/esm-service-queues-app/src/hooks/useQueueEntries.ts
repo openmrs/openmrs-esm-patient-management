@@ -28,3 +28,28 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     ...rest,
   };
 }
+
+export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {
+  const searchParam = new URLSearchParams();
+  for (let [key, value] of Object.entries(searchCriteria)) {
+    if (value != null) {
+      searchParam.append(key, value?.toString());
+    }
+  }
+  const apiUrl = `${restBaseUrl}/queue-entry-metrics?` + searchParam.toString();
+
+  const { data } = useSWR<
+    {
+      data: {
+        count: number;
+        averageWaitTime: number;
+      };
+    },
+    Error
+  >(apiUrl, openmrsFetch);
+
+  return {
+    count: data ? data?.data?.count : 0,
+    averageWaitTime: data?.data?.averageWaitTime,
+  };
+}

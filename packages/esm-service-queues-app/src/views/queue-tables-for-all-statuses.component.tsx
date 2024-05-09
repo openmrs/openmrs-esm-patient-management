@@ -8,8 +8,10 @@ import PatientSearch from '../patient-search/patient-search.component';
 import { useColumns } from '../queue-table/cells/columns.resource';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
 import QueueTable from '../queue-table/queue-table.component';
+import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
 import type { Concept, Queue, QueueEntry, QueueTableColumn, QueueTableTabConfig } from '../types';
+
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
@@ -46,6 +48,9 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
       <div className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
           <h3>{selectedQueue.display}</h3>
+        </div>
+        <div>
+          <QueueTableMetrics selectedQueue={selectedQueue} />
         </div>
         <div className={styles.headerButtons}>
           <ExtensionSlot
