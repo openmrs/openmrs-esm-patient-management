@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
-dayjs.extend(isToday);
 import {
   Button,
   DataTable,
@@ -28,27 +26,29 @@ import {
 } from '@carbon/react';
 import {
   ConfigurableLink,
-  formatDatetime,
-  usePagination,
   formatDate,
-  useConfig,
-  parseDate,
+  formatDatetime,
   isDesktop,
+  parseDate,
+  useConfig,
   useLayoutType,
+  launchWorkspace,
+  usePagination,
 } from '@openmrs/esm-framework';
 import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
 import { downloadAppointmentsAsExcel } from '../../helpers/excel';
-import { closeOverlay, launchOverlay } from '../../hooks/useOverlay';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment } from '../../types';
 import { type ConfigObject } from '../../config-schema';
 import { getPageSizes, useAppointmentSearchResults } from '../utils';
 import AppointmentActions from './appointments-actions.component';
 import AppointmentDetails from '../details/appointment-details.component';
-import AppointmentsForm from '../../form/appointments-form.component';
 import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
+
+dayjs.extend(utc);
+dayjs.extend(isToday);
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
@@ -105,7 +105,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
-    location: appointment.location.name,
+    location: appointment.location?.name,
     provider: appointment.provider,
     status: <AppointmentActions appointment={appointment} />,
   }));
@@ -123,7 +123,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
             ? t('appointmentsScheduledForToday', 'appointments scheduled for today')
             : `${t(tableHeading)} ${t('appointments_lower', 'appointments')}`
         }`}
-        launchForm={() => launchOverlay(t('search', 'Search'), <PatientSearch />)}
+        launchForm={() => launchWorkspace('search-patient')}
       />
     );
   }
@@ -217,14 +217,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                                   itemText={t('editAppointments', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
-                                    launchOverlay(
-                                      t('editAppointments', 'Edit appointment'),
-                                      <AppointmentsForm
-                                        appointment={matchingAppointment}
-                                        context="editing"
-                                        closeWorkspace={closeOverlay}
-                                      />,
-                                    )
+                                    launchWorkspace('edit-appointments-form', {
+                                      patientUuid: matchingAppointment.patient.uuid,
+                                      appointment: matchingAppointment,
+                                      context: 'editing',
+                                    })
                                   }
                                 />
                               </OverflowMenu>
