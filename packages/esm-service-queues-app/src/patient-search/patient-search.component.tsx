@@ -42,24 +42,23 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closePanel, viewState }) 
             }}
           />
         )}
-        <div className="omrs-main-content">
-          {activeVisit ? (
-            <ExistingVisitFormComponent visit={activeVisit} closePanel={closePanel} />
-          ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
-            <PatientScheduledVisits
-              patientUuid={selectedPatientUuid}
-              toggleSearchType={toggleSearchType}
-              closePanel={closePanel}
-            />
-          ) : searchType === SearchTypes.VISIT_FORM ? (
-            <VisitForm
-              patientUuid={selectedPatientUuid}
-              toggleSearchType={toggleSearchType}
-              closePanel={closePanel}
-              mode={newVisitMode}
-            />
-          ) : null}
-        </div>
+
+        {activeVisit ? (
+          <ExistingVisitFormComponent visit={activeVisit} closePanel={closePanel} />
+        ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
+          <PatientScheduledVisits
+            patientUuid={selectedPatientUuid}
+            toggleSearchType={toggleSearchType}
+            closePanel={closePanel}
+          />
+        ) : searchType === SearchTypes.VISIT_FORM ? (
+          <VisitForm
+            patientUuid={selectedPatientUuid}
+            toggleSearchType={toggleSearchType}
+            closePanel={closePanel}
+            mode={newVisitMode}
+          />
+        ) : null}
       </Overlay>
     </>
   );

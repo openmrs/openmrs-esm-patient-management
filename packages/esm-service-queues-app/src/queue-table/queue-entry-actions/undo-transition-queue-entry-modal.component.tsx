@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../../types';
 import { undoTransition } from './queue-entry-actions.resource';
-import QueueEntryUndoActionsModal from './queue-entry-undo-actions-modal.component';
+import QueueEntryConfirmActionModal from './queue-entry-confirm-action-modal.component';
 
 interface UndoTransitionQueueEntryModalProps {
   queueEntry: QueueEntry;
@@ -36,7 +36,7 @@ const UndoTransitionQueueEntryModal: React.FC<UndoTransitionQueueEntryModalProps
   );
 
   return (
-    <QueueEntryUndoActionsModal
+    <QueueEntryConfirmActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{

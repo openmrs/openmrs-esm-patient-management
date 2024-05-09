@@ -17,7 +17,7 @@ import { addQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 import { type ConfigObject } from '../config-schema';
 

@@ -127,6 +127,14 @@ export const voidQueueEntryModal = getAsyncLifecycle(
   },
 );
 
+export const endQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/end-queue-entry-modal.component'),
+  {
+    featureName: 'end queue entry of a patient',
+    moduleName,
+  },
+);
+
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
 export const activeVisitsRowActions = getAsyncLifecycle(

@@ -37,7 +37,7 @@ import { convertTime12to24, type amPm } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 import { type ConfigObject } from '../config-schema';
 interface PatientScheduledVisitsProps {
