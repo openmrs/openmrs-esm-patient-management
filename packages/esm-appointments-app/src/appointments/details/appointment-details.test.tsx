@@ -87,7 +87,7 @@ test('renders appointment details correctly', async () => {
   expect(getByText(/Date of birth/i)).toBeInTheDocument();
   expect(getByText(/Date of birth/i)).toBeInTheDocument();
   expect(getByText(/22-Mar-2020/i)).toBeInTheDocument();
-  expect(getByText(/Phone 1/i)).toBeInTheDocument();
+  expect(getByText(/Contact 1/i)).toBeInTheDocument();
   expect(getByText(/0899129989932/i)).toBeInTheDocument();
   expect(getByText(/Appointment Notes/i)).toBeInTheDocument();
   expect(getByText(/Some comments/i)).toBeInTheDocument();
