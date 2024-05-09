@@ -72,8 +72,11 @@ export const defaultTablesConfig: TablesConfig = {
     },
     {
       "id": "actions",
-      "columnType": "extension-column",
-      "header": "Actions"
+      "columnType": "actions-column"
+    },
+    {
+      "id": "active-visit-actions",
+      "columnType": "extension-column"
     }
   ],
   "tableDefinitions": [
