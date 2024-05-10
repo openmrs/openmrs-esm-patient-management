@@ -1,9 +1,10 @@
 import React from 'react';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type QueueEntry } from '../../types';
+import { formatDatetime } from '@openmrs/esm-framework';
 
 export const queueTableVisitStartTimeColumn: QueueTableColumnFunction = (key, header) => {
   function getVisitStartTime(queueEntry: QueueEntry) {
-    return queueEntry.visit?.startDatetime;
+    return formatDatetime(new Date(queueEntry.visit?.startDatetime));
   }
 
   const QueueTableVisitStartTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
