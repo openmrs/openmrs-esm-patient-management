@@ -3,6 +3,12 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "modals": [
+    {
+      "name": "end-appointment-modal",
+      "component": "endAppointmentModal"
+    }
+  ],
   "extensions": [
     {
       "name": "home-appointments",

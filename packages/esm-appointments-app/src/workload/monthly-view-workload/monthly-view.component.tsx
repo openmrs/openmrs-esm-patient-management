@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DaysOfWeekCard from '../../calendar/monthly/days-of-week.component';
 import { monthDays } from '../../helpers';
@@ -12,6 +12,7 @@ interface MonthlyCalendarViewProps {
   dateToDisplay?: string;
   onDateClick?: (pickedDate: Date) => void;
 }
+
 const monthFormat = 'MMMM, YYYY';
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
@@ -19,32 +20,64 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   onDateClick,
 }) => {
   const { selectedDate } = useContext(SelectedDateContext);
+  const [currentMonth, setCurrentMonth] = useState(dayjs(dateToDisplay === '' ? selectedDate : dateToDisplay));
+  const [selectedDateState, setSelectedDateState] = useState<Date | null>(null); // Rename selectedDate to selectedDateState
+
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
-  const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
+
   const handleClick = (date: string) => {
-    const parsedDate = new Date(date);
-    if (onDateClick) {
-      onDateClick(parsedDate);
+    const pickedDate = dayjs(date);
+    const today = dayjs();
+    if ((pickedDate.isSame(today, 'day') || pickedDate.isAfter(today, 'day')) && onDateClick) {
+      onDateClick(pickedDate.toDate());
+    }
+    setSelectedDateState(pickedDate.toDate()); // Update selectedDate to selectedDateState
+    // Check if the selected date belongs to a different month
+    if (pickedDate.month() !== currentMonth.month()) {
+      setCurrentMonth(pickedDate);
     }
   };
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(currentMonth.subtract(1, 'month'));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(currentMonth.add(1, 'month'));
+  };
+
   const { t } = useTranslation();
   const daysInWeeks = daysInWeek.map((day) => t(day));
+
   return (
     <div className={styles.calendarViewContainer}>
       <>
-        <div className={styles.container}></div>
-        <span className={styles.headerContainer}>{dayjs(monthViewDate).format(monthFormat)}</span>
+        <div className={styles.container}>
+          <button
+            style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontSize: '25px' }}
+            type="button"
+            onClick={handlePrevMonth}>
+            «
+          </button>
+          <span className={styles.headerContainer}>{currentMonth.format(monthFormat)}</span>
+          <button
+            style={{ backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontSize: '25px' }}
+            type="button"
+            onClick={handleNextMonth}>
+            »
+          </button>
+        </div>
         <div className={styles.workLoadCard}>
           {daysInWeeks?.map((day, i) => <DaysOfWeekCard key={`${day}-${i}`} dayOfWeek={day} />)}
         </div>
         <div className={styles.wrapper}>
           <div className={styles.monthlyCalendar}>
-            {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
+            {monthDays(currentMonth).map((dateTime, i) => (
               <div
-                onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))}
+                onClick={() => handleClick(dateTime.format('YYYY-MM-DD'))}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
-                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
+                  dayjs(dateTime).format('YYYY-MM-DD') === dayjs(currentMonth).format('YYYY-MM-DD')
                     ? styles.selectedDate
                     : ''
                 }`}>
@@ -67,3 +100,4 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 };
 
 export default MonthlyCalendarView;
+

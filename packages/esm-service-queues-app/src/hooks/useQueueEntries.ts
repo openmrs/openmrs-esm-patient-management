@@ -13,7 +13,7 @@ type QueueEntryResponse = FetchResponse<{
 }>;
 
 const repString =
-  'custom:(uuid,display,queue,status,patient,visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
+  'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
   const [totalCount, setTotalCount] = useState<number>();
@@ -72,5 +72,30 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     queueEntries: allResults,
     totalCount,
     ...rest,
+  };
+}
+
+export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {
+  const searchParam = new URLSearchParams();
+  for (let [key, value] of Object.entries(searchCriteria)) {
+    if (value != null) {
+      searchParam.append(key, value?.toString());
+    }
+  }
+  const apiUrl = `${restBaseUrl}/queue-entry-metrics?` + searchParam.toString();
+
+  const { data } = useSWR<
+    {
+      data: {
+        count: number;
+        averageWaitTime: number;
+      };
+    },
+    Error
+  >(apiUrl, openmrsFetch);
+
+  return {
+    count: data ? data?.data?.count : 0,
+    averageWaitTime: data?.data?.averageWaitTime,
   };
 }

@@ -99,3 +99,8 @@ export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
 );
 
 export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
+
+export const endAppointmentModal = getAsyncLifecycle(
+  () => import('./appointments/common-components/end-appointment-modal.component'),
+  options,
+);
