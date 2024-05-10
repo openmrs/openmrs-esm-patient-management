@@ -1,14 +1,15 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { Field } from 'formik';
+import { Field, useField } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
+import { InlineNotification, Layer, Select, SelectItem, DatePicker, DatePickerInput } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
+import { generateFormatting } from '../../date-util';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -17,6 +18,9 @@ export interface ObsFieldProps {
 export function ObsField({ fieldDefinition }: ObsFieldProps) {
   const { t } = useTranslation();
   const { data: concept, isLoading } = useConcept(fieldDefinition.uuid);
+  const [date, dateMeta] = useField('date');
+
+  const { format, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
 
   const config = useConfig<RegistrationConfig>();
 
@@ -49,6 +53,18 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
+        />
+      );
+    case 'Date':
+      return (
+        <DateObsField
+          concept={concept}
+          label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
+          dateFormat={dateFormat}
+          date={date}
+          dateMeta={dateMeta}
+          format={format}
         />
       );
     case 'Coded':
@@ -138,6 +154,44 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
               type="number"
               {...field}
             />
+          );
+        }}
+      </Field>
+    </div>
+  );
+}
+
+interface DateObsFieldProps {
+  concept: ConceptResponse;
+  label: string;
+  required?: boolean;
+  dateFormat: string;
+  date: any;
+  dateMeta: any;
+  format: any;
+}
+
+function DateObsField({ concept, label, required, dateFormat, date, dateMeta, format }: DateObsFieldProps) {
+  const { t } = useTranslation();
+  const today = new Date();
+
+  const fieldName = `obs.${concept.uuid}`;
+  return (
+    <div className={classNames(styles.customField, styles.halfWidthInDesktopView)}>
+      <Field name={fieldName}>
+        {({ field, form: { touched, errors }, meta }) => {
+          return (
+            <DatePicker dateFormat={dateFormat} datePickerType="single" maxDate={format(today)}>
+              <DatePickerInput
+                id={fieldName}
+                labelText={label ?? concept.display}
+                required={required}
+                invalid={errors[fieldName] && touched[fieldName]}
+                invalidText={dateMeta.error && t(dateMeta.error)}
+                value={format(date.value)}
+                {...field}
+              />
+            </DatePicker>
           );
         }}
       </Field>
