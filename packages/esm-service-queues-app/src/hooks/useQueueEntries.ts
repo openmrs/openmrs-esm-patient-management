@@ -1,6 +1,7 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWRInfinite from 'swr/infinite';
+import useSWR from 'swr';
 import { useCallback, useEffect, useState } from 'react';
 
 type QueueEntryResponse = FetchResponse<{
