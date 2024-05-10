@@ -3,7 +3,7 @@ import { type QueueTableColumnFunction, type QueueTableCellComponentProps, type 
 
 export const queueTableVisitStartTimeColumn: QueueTableColumnFunction = (key, header) => {
   function getVisitStartTime(queueEntry: QueueEntry) {
-    return queueEntry.visit?.startDatetime;
+    return new Date(queueEntry.visit?.startDatetime).toLocaleString();
   }
 
   const QueueTableVisitStartTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
