@@ -370,7 +370,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
-        {/*<AppointmentsFormPatientBanner patientUuid={patientUuid} />*/}
         {patient && (
           <ExtensionSlot
             name="patient-header-slot"
