@@ -78,15 +78,11 @@
 
   .toolbarContent {
     display: flex;
-    align-items: baseline;
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
     z-index: 1; // prevent dropdown from getting covered by table elements
   }
 
   :global(.cds--table-toolbar) {
     position: static;
-    height: 3rem;
     overflow: visible;
   }
 }
