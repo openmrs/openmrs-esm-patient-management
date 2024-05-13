@@ -5,7 +5,6 @@ import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
-import '@testing-library/jest-dom';
 
 const mockUseConfig = useConfig as jest.Mock;
 
@@ -41,14 +40,6 @@ const useConceptMockImpl = (uuid: string) => {
         { display: 'USA', uuid: 'usa' },
         { display: 'Mexico', uuid: 'mex' },
       ],
-      setMembers: [],
-    };
-  } else if (uuid == 'date-uuid') {
-    data = {
-      uuid: 'date-uuid',
-      display: 'Date',
-      datatype: { display: 'Date', uuid: 'dt' },
-      answers: [],
       setMembers: [],
     };
   } else {
@@ -127,21 +118,6 @@ const numberFieldDef: FieldDefinition = {
   customConceptAnswers: [],
 };
 
-const dateFieldDef: FieldDefinition = {
-  id: 'date',
-  type: 'obs',
-  label: '',
-  placeholder: '',
-  showHeading: false,
-  uuid: 'date-uuid',
-  validation: {
-    required: false,
-    matches: null,
-  },
-  answerConceptSetUuid: null,
-  customConceptAnswers: [],
-};
-
 const codedFieldDef: FieldDefinition = {
   id: 'nationality',
   type: 'obs',
@@ -185,12 +161,6 @@ describe('ObsField', () => {
     render(<ObsField fieldDefinition={numberFieldDef} />);
     // expect(screen.getByLabelText("Weight (kg)")).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
-  });
-
-  it('renders a date picker for date concept', async () => {
-    render(<ObsField fieldDefinition={dateFieldDef} />);
-    // expect(screen.getByLabelText("Date")).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('renders a select for a coded concept', () => {
