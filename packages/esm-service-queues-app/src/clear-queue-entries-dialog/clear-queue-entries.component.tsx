@@ -1,6 +1,6 @@
 import { Button } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
-import { showModal } from '@openmrs/esm-framework';
+import { isDesktop, showModal, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../types';
@@ -19,6 +19,7 @@ interface ClearQueueEntriesProps {
  */
 const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
 
   const launchClearAllQueueEntriesModal = useCallback(() => {
     const dispose = showModal('clear-all-queue-entries', {
@@ -29,9 +30,8 @@ const ClearQueueEntries: React.FC<ClearQueueEntriesProps> = ({ queueEntries }) =
 
   return (
     <Button
-      size="sm"
+      size={isDesktop(layout) ? 'sm' : 'lg'}
       kind="danger--tertiary"
-      className={styles.clearBtn}
       renderIcon={(props) => <TrashCan size={16} {...props} />}
       onClick={launchClearAllQueueEntriesModal}
       iconDescription={t('clearQueue', 'Clear queue')}>
