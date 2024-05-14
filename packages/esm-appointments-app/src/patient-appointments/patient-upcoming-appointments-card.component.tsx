@@ -44,9 +44,18 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
     .concat(futureAppointments)
     .filter((appointment) => appointment.status !== 'CheckedIn');
 
-  // If there is only one appointment, select it by default
-  if (appointments?.length === 1) {
-    setUpcomingAppointment(appointments[0]);
+  const defaultAppointment = ((appointments) => {
+    // if there's only one appointment today, select it by default, otherwise no default
+    const appts = appointments?.filter((appointment) =>
+      dayjs(new Date(appointment.startDateTime).toISOString()).isToday(),
+    );
+    if (appts?.length === 1) {
+      return appts[0];
+    }
+  })(appointments);
+
+  if (defaultAppointment) {
+    setUpcomingAppointment(defaultAppointment);
   }
 
   if (isError) {
@@ -69,7 +78,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
               className={styles.checkbox}
               key={i}
               labelText=""
-              defaultChecked={dayjs(new Date(appointment.startDateTime).toISOString()).isToday()}
+              defaultChecked={appointment.uuid === defaultAppointment?.uuid}
               id={appointment.uuid}
               onChange={(e) => (e.target.checked ? setUpcomingAppointment(appointment) : '')}
             />
@@ -100,6 +109,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
       </div>
     );
   }
+
   return (
     <InlineNotification
       kind={'info'}

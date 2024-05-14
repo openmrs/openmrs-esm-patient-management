@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
-dayjs.extend(isToday);
 import {
   Button,
   DataTable,
@@ -28,13 +26,13 @@ import {
 } from '@carbon/react';
 import {
   ConfigurableLink,
-  formatDatetime,
-  usePagination,
   formatDate,
-  useConfig,
-  parseDate,
+  formatDatetime,
   isDesktop,
+  parseDate,
+  useConfig,
   useLayoutType,
+  usePagination,
 } from '@openmrs/esm-framework';
 import { Download } from '@carbon/react/icons';
 import { EmptyState } from '../../empty-state/empty-state.component';
@@ -49,6 +47,9 @@ import AppointmentDetails from '../details/appointment-details.component';
 import AppointmentsForm from '../../form/appointments-form.component';
 import PatientSearch from '../../patient-search/patient-search.component';
 import styles from './appointments-table.scss';
+
+dayjs.extend(utc);
+dayjs.extend(isToday);
 
 interface AppointmentsTableProps {
   appointments: Array<Appointment>;
@@ -105,7 +106,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
       : appointment.patient.identifier,
     dateTime: formatDatetime(new Date(appointment.startDateTime)),
     serviceType: appointment.service.name,
-    location: appointment.location.name,
+    location: appointment.location?.name,
     provider: appointment.provider,
     status: <AppointmentActions appointment={appointment} />,
   }));
@@ -220,6 +221,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                                     launchOverlay(
                                       t('editAppointments', 'Edit appointment'),
                                       <AppointmentsForm
+                                        patientUuid={matchingAppointment.patient.uuid}
                                         appointment={matchingAppointment}
                                         context="editing"
                                         closeWorkspace={closeOverlay}

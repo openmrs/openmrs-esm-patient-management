@@ -3057,8 +3057,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/esm-patient-common-lib@npm:next":
-  version: 6.1.1-pre.3580
-  resolution: "@openmrs/esm-patient-common-lib@npm:6.1.1-pre.3580"
+  version: 7.1.1-pre.4516
+  resolution: "@openmrs/esm-patient-common-lib@npm:7.1.1-pre.4516"
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     lodash-es: "npm:^4.17.21"
@@ -3066,8 +3066,8 @@ __metadata:
   peerDependencies:
     "@openmrs/esm-framework": 5.x
     react: 18.x
-    single-spa: 5.x
-  checksum: 10/6e8926a7b693e0f299ef49ee77a74607f78e9e8f5cbf6a160862521d18954988ae7b44b82e6bbe0e3c26a2e547e60a90e67fe48c82ff2eea2f754aec3a4c7230
+    single-spa: 6.x
+  checksum: 10/8d3745c3cf71e2476a0d04f879b5905061d1a5a102f28ab114a1f4545c53b6484d1cc77963faf112ae2f090602f4ce7a0961fd54923a820c9ac4541f1595da56
   languageName: node
   linkType: hard
 
@@ -3098,7 +3098,7 @@ __metadata:
     "@hookform/resolvers": "npm:^3.3.1"
     "@openmrs/esm-framework": "npm:next"
     "@openmrs/esm-patient-common-lib": "npm:next"
-    "@playwright/test": "npm:1.43.0"
+    "@playwright/test": "npm:1.44.0"
     "@swc/core": "npm:^1.2.165"
     "@swc/jest": "npm:^0.2.29"
     "@testing-library/dom": "npm:^9.3.3"
@@ -3328,14 +3328,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.43.0":
-  version: 1.43.0
-  resolution: "@playwright/test@npm:1.43.0"
+"@playwright/test@npm:1.44.0":
+  version: 1.44.0
+  resolution: "@playwright/test@npm:1.44.0"
   dependencies:
-    playwright: "npm:1.43.0"
+    playwright: "npm:1.44.0"
   bin:
     playwright: cli.js
-  checksum: 10/a30b5a9f51ae35c16a6c56d239a1e3abfbc5b8d84abf709914b9f3b02fa3afd5590cb7e01e479adafcb8282a8325c8b8afa4d70ca992502053490889f3dc714b
+  checksum: 10/bd34b3c3f90f3cb5ceb2e47715c36bf7f6f57f0eb2bb4e47f17be4ecfecf58833a3722b200f3fcd0f97320a9ea08aee3ed58a61fe245591fedae3c6db171743c
   languageName: node
   linkType: hard
 
@@ -6751,9 +6751,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001400, caniuse-lite@npm:^1.0.30001426":
-  version: 1.0.30001551
-  resolution: "caniuse-lite@npm:1.0.30001551"
-  checksum: 10/3ab880797f2a47ce5e2db38700283219faacbddb4382a730883657b2155240aedda1931aac456bc957f61a41c99e15b42f452e5f68e62272def026fd3bf474a7
+  version: 1.0.30001612
+  resolution: "caniuse-lite@npm:1.0.30001612"
+  checksum: 10/8fb95102aade9147694541a9e576ec16d8d455f37e1456f497403af45f1ddd24465a62057d619d57c052e9634e090e5115e383ab066f8f9f9b87d14f738f81df
   languageName: node
   linkType: hard
 
@@ -13642,27 +13642,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.43.0":
-  version: 1.43.0
-  resolution: "playwright-core@npm:1.43.0"
+"playwright-core@npm:1.44.0":
+  version: 1.44.0
+  resolution: "playwright-core@npm:1.44.0"
   bin:
     playwright-core: cli.js
-  checksum: 10/f34c8c5b94c7ddd59b462b8f5dd0f9a8204ed14f470a151d46384c6854c78f5624d80a80a7873a335e2b0c15d54d0d92da2f97422ee708bf5e5693b81bb33a09
+  checksum: 10/50b1741b8e4e5f053f9756846e1064d796e8e54ee0c13d4d026926338d76969fa528bddf1e563a2f30e17b92f301b06895044d1080179f2d3b5b5f68fe01387f
   languageName: node
   linkType: hard
 
-"playwright@npm:1.43.0":
-  version: 1.43.0
-  resolution: "playwright@npm:1.43.0"
+"playwright@npm:1.44.0":
+  version: 1.44.0
+  resolution: "playwright@npm:1.44.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.43.0"
+    playwright-core: "npm:1.44.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10/481b0d13bc990b8118a02396f03577748a3d64c2ca7635a238688ffbe399e3d6c92e05bdd074ad095f5d2d56e6648b213b5debe84815820a55b13c9a6fdf2108
+  checksum: 10/a7d8d6c0dee6262f97ab7fe52ec80ddeff7ad21178a9b90eefae56779fb573e8a3987f27619de6e98d8b9b78e9bb66b94f3caf9fbd51c0f1964dcd744dcb3cae
   languageName: node
   linkType: hard
 
