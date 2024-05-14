@@ -195,6 +195,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
 
+  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
   const {
     field: { ref: startDateRef },
   } = useController({ name: 'appointmentDateTime.startDate', control });
@@ -202,6 +203,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     field: { ref: endDateRef },
   } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
 
+  // Manually call ref callback from 'react-hook-form' with the element(s) we want to be focused
   useEffect(() => {
     const startDateElement = document.querySelector('#startDatePickerInput');
     const endDateElement = document.querySelector('#endDatePickerInput');
