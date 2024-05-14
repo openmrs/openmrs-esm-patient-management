@@ -18,6 +18,7 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { SearchTypes } from '../types';
 import styles from './advanced-search.scss';
+import { datePickerFormat, datePickerPlaceHolder } from '../constants';
 
 interface PatientSearchProps {
   toggleSearchType: (searchMode: SearchTypes) => void;
@@ -127,10 +128,10 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
               </ContentSwitcher>
             </FormGroup>
             <Layer>
-              <DatePicker datePickerType="single">
+              <DatePicker datePickerType="single" dateFormat={datePickerFormat}>
                 <DatePickerInput
                   id="dateOfBirth"
-                  placeholder="mm/dd/yyyy"
+                  placeholder={datePickerPlaceHolder}
                   labelText={t('dateOfBirth', 'Date of birth')}
                   onChange={(event) => setDateOfBirth(event.target.value)}
                   type="date"
@@ -161,10 +162,10 @@ const AdvancedSearch: React.FC<PatientSearchProps> = ({ toggleSearchType }) => {
           <Column>
             <h3 className={styles.heading}>{t('lastVisit', 'Last visit')}</h3>
             <Layer>
-              <DatePicker datePickerType="single">
+              <DatePicker datePickerType="single" dateFormat={datePickerFormat}>
                 <DatePickerInput
                   id="lastVisitDate"
-                  placeholder="mm/dd/yyyy"
+                  placeholder={datePickerPlaceHolder}
                   labelText={t('lastVisitDate', 'Date')}
                   onChange={(event) => setLastVisitDate(event.target.value)}
                   type="date"

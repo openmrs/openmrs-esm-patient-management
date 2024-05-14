@@ -274,6 +274,8 @@
   "temperature": "Temperature",
   "ticketNumber": "Ticket Number",
   "time": "Time",
+  "timeCannotBeInFuture": "Time cannot be in the future",
+  "timeOfTransition": "Time of transition",
   "tirageNotYetCompleted": "Triage has not yet been completed",
   "today": "Today",
   "totalPatients": "Total Patients",

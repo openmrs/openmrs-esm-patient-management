@@ -1,6 +1,8 @@
 import {
   Button,
   ContentSwitcher,
+  DatePicker,
+  DatePickerInput,
   InlineNotification,
   ModalBody,
   ModalFooter,
@@ -12,10 +14,15 @@ import {
   Stack,
   Switch,
   TextArea,
+  TimePicker,
+  TimePickerSelect,
 } from '@carbon/react';
-import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
+import { showSnackbar, type FetchResponse } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
+import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
@@ -32,6 +39,9 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
+  transitionDate: Date;
+  transitionTime: string;
+  transitionTimeFormat: amPm;
 }
 
 interface ModalParams {
@@ -43,9 +53,11 @@ interface ModalParams {
   submitFailureTitle: string;
   submitAction: (queueEntry: QueueEntry, formState: FormState) => Promise<FetchResponse<any>>;
   disableSubmit: (queueEntry, formState) => boolean;
+  isTransition: boolean; // is transition or edit?
 }
 
-// Modal with a form to provide the same UI for editing or transitioning a queue entry
+// Modal for performing a queue entry action that requires additional form fields / inputs from user
+// Used by EditQueueEntryModal and TransitionQueueEntryModal
 export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   queueEntry,
   closeModal,
@@ -62,13 +74,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     submitFailureTitle,
     submitAction,
     disableSubmit,
+    isTransition,
   } = modalParams;
 
+  const initialTransitionDate = isTransition ? new Date() : new Date(queueEntry.startedAt);
   const [formState, setFormState] = useState<FormState>({
     selectedQueue: queueEntry.queue.uuid,
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
+    transitionDate: initialTransitionDate,
+    transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
+    transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
   });
   const { queues } = useQueues();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,10 +103,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     const newQueueHasCurrentStatus = allowedStatuses.find((s) => s.uuid == formState.selectedStatus);
     const newQueueHasCurrentPriority = allowedPriorities.find((s) => s.uuid == formState.selectedPriority);
     setFormState({
+      ...formState,
       selectedQueue: selectedQueueUuid,
       selectedStatus: newQueueHasCurrentStatus ? formState.selectedStatus : allowedStatuses[0]?.uuid,
       selectedPriority: newQueueHasCurrentPriority ? formState.selectedPriority : allowedPriorities[0]?.uuid,
-      prioritycomment: formState.prioritycomment,
     });
   };
 
@@ -103,6 +120,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
 
   const setPriorityComment = (prioritycomment: string) => {
     setFormState({ ...formState, prioritycomment });
+  };
+
+  const setTransitionDate = (transitionDate: Date) => {
+    setFormState({ ...formState, transitionDate });
+  };
+
+  const setTransitionTime = (transitionTime: string) => {
+    setFormState({ ...formState, transitionTime });
+  };
+
+  const setTransitionTimeFormat = (transitionTimeFormat: amPm) => {
+    setFormState({ ...formState, transitionTimeFormat });
   };
 
   const submitForm = (e) => {
@@ -135,6 +164,14 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
         setIsSubmitting(false);
       });
   };
+
+  const isTimeInvalid = useMemo(() => {
+    const now = new Date();
+    const startAtDate = new Date(formState.transitionDate);
+    const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
+    startAtDate.setHours(hour, minute);
+    return startAtDate > now;
+  }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat]);
 
   const selectedPriorityIndex = priorities.findIndex((p) => p.uuid == formState.selectedPriority);
 
@@ -242,6 +279,46 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 </ContentSwitcher>
               )}
             </section>
+
+            <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
+              <div className={styles.dateTimeFields}>
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={formState.transitionDate}
+                  maxDate={new Date().setHours(23, 59, 59, 59)}
+                  onChange={([date]) => {
+                    setTransitionDate(date);
+                  }}>
+                  <DatePickerInput
+                    id="datePickerInput"
+                    labelText={t('date', 'Date')}
+                    placeholder={datePickerPlaceHolder}
+                  />
+                </DatePicker>
+
+                <TimePicker
+                  id="visitStartTime"
+                  labelText={t('time', 'Time')}
+                  onChange={(event) => setTransitionTime(event.target.value)}
+                  pattern={time12HourFormatRegexPattern}
+                  value={formState.transitionTime}
+                  invalid={isTimeInvalid}
+                  invalidText={t('timeCannotBeInFuture', 'Time cannot be in the future')}>
+                  <TimePickerSelect
+                    id="visitStartTimeSelect"
+                    onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
+                    value={formState.transitionTimeFormat}
+                    labelText={t('time', 'Time')}
+                    aria-label={t('time', 'Time')}>
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                </TimePicker>
+              </div>
+            </section>
+
             <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
               <TextArea

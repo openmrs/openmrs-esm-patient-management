@@ -28,8 +28,11 @@ function DurationString({ startedAt, endedAt }: { startedAt: Date; endedAt: Date
 
   return (
     <span>
-      {hours > 0
-        ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', { hours, minutes })
+      {Math.abs(hours) > 0
+        ? t('hourAndMinuteFormatted', '{{hours}} hour(s) and {{minutes}} minute(s)', {
+            hours,
+            minutes: Math.abs(minutes),
+          })
         : t('minuteFormatted', '{{minutes}} minute(s)', { minutes })}
     </span>
   );

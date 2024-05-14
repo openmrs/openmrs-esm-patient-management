@@ -4,6 +4,7 @@ import { type QueueEntry } from '../../types';
 import QueueEntryActionModal from './queue-entry-actions-modal.component';
 import { updateQueueEntry } from './queue-entry-actions.resource';
 import { useQueues } from '../../hooks/useQueues';
+import { convertTime12to24 } from '../../helpers/time-helpers';
 
 interface EditQueueEntryModalProps {
   queueEntry: QueueEntry;
@@ -30,13 +31,19 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
           const statuses = selectedQueue?.allowedStatuses;
           const priorities = selectedQueue?.allowedPriorities;
 
+          const startAtDate = new Date(formState.transitionDate);
+          const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
+          startAtDate.setHours(hour, minute);
+
           return updateQueueEntry(queueEntry.uuid, {
             status: statuses.find((s) => s.uuid == formState.selectedStatus),
             priority: priorities.find((p) => p.uuid == formState.selectedPriority),
             priorityComment: formState.prioritycomment,
+            startedAt: startAtDate.toISOString(),
           });
         },
         disableSubmit: () => false,
+        isTransition: false,
       }}
     />
   );
