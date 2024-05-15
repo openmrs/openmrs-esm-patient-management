@@ -83,13 +83,11 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
   const allIdentifierSources = identifierSourcesResponse.data.results;
 
   for (let i = 0; i < identifierTypes?.length; i++) {
-    identifierTypes[i].identifierSources = allIdentifierSources
-      .filter((source) => source.identifierTypeUuid === identifierTypes[i].uuid)
-      .map((source) => {
-        const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
-        source.autoGenerationOption = option;
-        return source;
-      });
+    identifierTypes[i].identifierSources = allIdentifierSources.map((source) => {
+      const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
+      source.autoGenerationOption = option;
+      return source;
+    });
   }
 
   return identifierTypes;
