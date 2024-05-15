@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   ContentSwitcher,
   DatePicker,
   DatePickerInput,
@@ -39,6 +40,7 @@ interface FormState {
   selectedPriority: string;
   selectedStatus: string;
   prioritycomment: string;
+  modifyDefaultTransitionDateTime: boolean;
   transitionDate: Date;
   transitionTime: string;
   transitionTimeFormat: amPm;
@@ -83,6 +85,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     selectedPriority: queueEntry.priority.uuid,
     selectedStatus: queueEntry.status.uuid,
     prioritycomment: queueEntry.priorityComment ?? '',
+    modifyDefaultTransitionDateTime: false,
     transitionDate: initialTransitionDate,
     transitionTime: dayjs(initialTransitionDate).format('hh:mm'),
     transitionTimeFormat: dayjs(initialTransitionDate).hour() < 12 ? 'AM' : 'PM',
@@ -134,6 +137,10 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     setFormState({ ...formState, transitionTimeFormat });
   };
 
+  const setModifyDefaultTransitionDateTime = (modifyDefaultTransitionDateTime) => {
+    setFormState({ ...formState, modifyDefaultTransitionDateTime });
+  };
+
   const submitForm = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -169,7 +176,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     const now = new Date();
     const startAtDate = new Date(formState.transitionDate);
     const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
-    startAtDate.setHours(hour, minute);
+    startAtDate.setHours(hour, minute, 0, 0);
     return startAtDate > now;
   }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat]);
 
@@ -281,7 +288,25 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             </section>
 
             <section className={styles.section}>
+              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
+              <TextArea
+                labelText=""
+                value={formState.prioritycomment}
+                onChange={(e) => setPriorityComment(e.target.value)}
+                placeholder={t('enterCommentHere', 'Enter comment here')}
+              />
+            </section>
+
+            <section className={styles.section}>
               <div className={styles.sectionTitle}>{t('timeOfTransition', 'Time of transition')}</div>
+              <Checkbox
+                labelText={t('modifyDefaultValue', 'Modify default value')}
+                id={'modifyTransitionTime'}
+                checked={formState.modifyDefaultTransitionDateTime}
+                onChange={(_, { checked }) => {
+                  setModifyDefaultTransitionDateTime(checked);
+                }}
+              />
               <div className={styles.dateTimeFields}>
                 <DatePicker
                   datePickerType="single"
@@ -295,17 +320,18 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                     id="datePickerInput"
                     labelText={t('date', 'Date')}
                     placeholder={datePickerPlaceHolder}
+                    disabled={!formState.modifyDefaultTransitionDateTime}
                   />
                 </DatePicker>
 
                 <TimePicker
-                  id="visitStartTime"
                   labelText={t('time', 'Time')}
                   onChange={(event) => setTransitionTime(event.target.value)}
                   pattern={time12HourFormatRegexPattern}
                   value={formState.transitionTime}
                   invalid={isTimeInvalid}
-                  invalidText={t('timeCannotBeInFuture', 'Time cannot be in the future')}>
+                  invalidText={t('timeCannotBeInFuture', 'Time cannot be in the future')}
+                  disabled={!formState.modifyDefaultTransitionDateTime}>
                   <TimePickerSelect
                     id="visitStartTimeSelect"
                     onChange={(event) => setTransitionTimeFormat(event.target.value as amPm)}
@@ -317,16 +343,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                   </TimePickerSelect>
                 </TimePicker>
               </div>
-            </section>
-
-            <section className={styles.section}>
-              <div className={styles.sectionTitle}>{t('priorityComment', 'Priority comment')}</div>
-              <TextArea
-                labelText=""
-                value={formState.prioritycomment}
-                onChange={(e) => setPriorityComment(e.target.value)}
-                placeholder={t('enterCommentHere', 'Enter comment here')}
-              />
             </section>
           </Stack>
         </div>

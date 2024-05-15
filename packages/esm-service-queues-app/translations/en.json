@@ -120,6 +120,7 @@
   "missingQueueRoomService": "Missing queue room service",
   "missingService": "Missing service type",
   "missingVisitType": "Missing visit type",
+  "modifyDefaultValue": "Modify default value",
   "movePatientToNextService": "Move patient to the next service?",
   "moveToNextService": "Move to next service",
   "name": "Name",

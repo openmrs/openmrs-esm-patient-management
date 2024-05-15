@@ -29,7 +29,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
         submitAction: (queueEntry, formState) => {
           const transitionDate = new Date(formState.transitionDate);
           const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
-          transitionDate.setHours(hour, minute);
+          transitionDate.setHours(hour, minute, 0, 0);
 
           return transitionQueueEntry({
             queueEntryToTransition: queueEntry.uuid,
@@ -37,7 +37,7 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
             newStatus: formState.selectedStatus,
             newPriority: formState.selectedPriority,
             newPriorityComment: formState.prioritycomment,
-            transitionDate: transitionDate.toISOString(),
+            ...(formState.modifyDefaultTransitionDateTime ? { transitionDate: transitionDate.toISOString() } : {}),
           });
         },
         disableSubmit: (queueEntry, formState) =>

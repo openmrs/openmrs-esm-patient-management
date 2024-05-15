@@ -33,13 +33,13 @@ const EditQueueEntryModal: React.FC<EditQueueEntryModalProps> = ({ queueEntry, c
 
           const startAtDate = new Date(formState.transitionDate);
           const [hour, minute] = convertTime12to24(formState.transitionTime, formState.transitionTimeFormat);
-          startAtDate.setHours(hour, minute);
+          startAtDate.setHours(hour, minute, 0, 0);
 
           return updateQueueEntry(queueEntry.uuid, {
             status: statuses.find((s) => s.uuid == formState.selectedStatus),
             priority: priorities.find((p) => p.uuid == formState.selectedPriority),
             priorityComment: formState.prioritycomment,
-            startedAt: startAtDate.toISOString(),
+            ...(formState.modifyDefaultTransitionDateTime ? { startedAt: startAtDate.toISOString() } : {}),
           });
         },
         disableSubmit: () => false,
