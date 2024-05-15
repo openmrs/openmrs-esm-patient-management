@@ -72,7 +72,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
       <div>
         <div>
           <p className={styles.sectionTitle}>{headerTitle}</p>
-          <span className={styles.headerLabel}>{t('appointmentToFulfill', 'Select appointment(s) to fulfill')}</span>
+          <span className={styles.headerLabel}>{t('appointmentToFulfill', 'Select appointment to fulfill')}</span>
         </div>
         <StructuredListWrapper>
           <StructuredListHead>
