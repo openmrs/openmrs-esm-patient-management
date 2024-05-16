@@ -13,8 +13,24 @@ export interface AppointmentLocation {
   name: string;
 }
 
+// note that the API supports two other statuses that we are not currently supporting: "Requested" and "WaitList"
+export enum AppointmentStatus {
+  SCHEDULED = 'Scheduled',
+  CANCELLED = 'Cancelled',
+  MISSED = 'Missed',
+  CHECKEDIN = 'CheckedIn',
+  COMPLETED = 'Completed',
+}
+
+export enum AppointmentKind {
+  SCHEDULED = 'Scheduled',
+  WALKIN = 'WalkIn',
+  VIRTUAL = 'Virtual',
+}
+
+// TODO: remove interface elements that aren't actually present on the Appointment object returned from the Appointment API
 export interface Appointment {
-  appointmentKind: string;
+  appointmentKind: AppointmentKind;
   appointmentNumber: string;
   comments: string;
   endDateTime: Date | number | any;
@@ -32,7 +48,7 @@ export interface Appointment {
   recurring: boolean;
   service: AppointmentService;
   startDateTime: string | any;
-  status: string;
+  status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
   serviceTypes?: Array<ServiceTypes> | null;
@@ -140,15 +156,6 @@ export enum DurationPeriod {
   weekly,
   daily,
 }
-
-export enum AppointmentTypes {
-  SCHEDULED = 'scheduled',
-  CANCELLED = 'cancelled',
-  MISSED = 'missed',
-  CHECKEDIN = 'checkedin',
-  COMPLETED = 'completed',
-}
-
 export interface Identifier {
   identifier: string;
   identifierName?: string;
@@ -173,4 +180,8 @@ export interface RecurringPattern {
 export interface RecurringAppointmentsPayload {
   appointmentRequest: AppointmentPayload;
   recurringPattern: RecurringPattern;
+}
+
+export interface PatientDetails {
+  dateOfBirth: string;
 }

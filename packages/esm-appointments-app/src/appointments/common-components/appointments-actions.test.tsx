@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import AppointmentActions from './appointments-actions.component';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
-import { type Appointment } from '../../types';
+import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
 import { useConfig } from '@openmrs/esm-framework';
 
 const appointment: Appointment = {
@@ -37,8 +37,8 @@ const appointment: Appointment = {
   },
   location: { name: 'HIV Clinic', uuid: '2131aff8-2e2a-480a-b7ab-4ac53250262b' },
   startDateTime: new Date().toISOString(),
-  appointmentKind: 'WalkIn',
-  status: 'Scheduled',
+  appointmentKind: AppointmentKind.WALKIN,
+  status: null,
   comments: 'Some comments',
   additionalInfo: null,
   providers: [{ uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' }],
@@ -78,6 +78,7 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the check in button when appointment is today and the patient has not checked in and check in button enabled', () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
     useConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
@@ -87,11 +88,12 @@ describe('AppointmentActions', () => {
     }));
     const props = { ...defaultProps };
     const { getByText } = render(<AppointmentActions {...props} />);
-    const button = getByText('Check In');
+    const button = getByText(/check in/i);
     expect(button).toBeInTheDocument();
   });
 
   it('does not renders the check in button when appointment is today and the patient has not checked in but the check-in button is disabled', () => {
+    appointment.status = AppointmentStatus.SCHEDULED;
     useConfig.mockImplementation(() => ({
       checkInButton: { enabled: false },
       checkOutButton: { enabled: true },
@@ -106,6 +108,7 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the checked out button when the patient has checked out', () => {
+    appointment.status = AppointmentStatus.COMPLETED;
     useConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
@@ -126,6 +129,7 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the check out button when the patient has an active visit and today is the appointment date and the check out button enabled', () => {
+    appointment.status = AppointmentStatus.CHECKEDIN;
     useConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
@@ -146,6 +150,7 @@ describe('AppointmentActions', () => {
   });
 
   it('does not render check out button when the patient has an active visit and today is the appointment date but the check out button is disabled', () => {
+    appointment.status = AppointmentStatus.CHECKEDIN;
     useConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: false },

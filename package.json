@@ -11,11 +11,9 @@
     "ci:publish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag latest",
     "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @openmrs/esm-patient-management npm publish --access public --tag next",
     "release": "yarn workspaces foreach --all --topological version",
-    "verify": "turbo lint typescript test --color --concurrency=2",
-    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\" --list-different",
+    "verify": "turbo lint typescript test --concurrency=1",
     "test-e2e": "playwright test",
-    "postinstall": "husky install",
-    "extract-translations": "turbo extract-translations -- --config ../../tools/i18next-parser.config.js"
+    "postinstall": "husky install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
@@ -30,7 +28,7 @@
     "@carbon/react": "~1.37.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
-    "@playwright/test": "1.42.1",
+    "@playwright/test": "1.44.0",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
     "@testing-library/dom": "^9.3.3",
@@ -54,8 +52,6 @@
     "dayjs": "^1.8.36",
     "dotenv": "^16.0.3",
     "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "i18next": "^21.10.0",
@@ -74,7 +70,7 @@
     "sass": "^1.29.0",
     "sass-loader": "^10.1.0",
     "swc-loader": "^0.2.3",
-    "turbo": "^1.6.3",
+    "turbo": "^1.13.2",
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0",
@@ -82,7 +78,8 @@
     "webpack-dev-server": "^4.15.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
+    "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
+    "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
   "packageManager": "yarn@4.1.1"
 }

@@ -3,20 +3,23 @@ import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import styles from './visit-form-queue-fields.scss';
-import { type ConfigObject, useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useQueues } from '../../helpers/useQueues';
+import { useQueues } from '../../hooks/useQueues';
+import { type ConfigObject } from '../../config-schema';
+import { SelectSkeleton } from '@carbon/react';
+import { RadioButtonSkeleton } from '@carbon/react';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { queueLocations } = useQueueLocations();
-  const config = useConfig() as ConfigObject;
+  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const config = useConfig<ConfigObject>();
   const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const defaultPriority = config.concepts.defaultPriorityConceptUuid;
   const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
-  const { queues } = useQueues(selectedQueueLocation);
+  const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
   const [priority, setPriority] = useState(defaultPriority);
   const [status, setStatus] = useState(defaultStatus);
   const [sortWeight, setSortWeight] = useState(0);
@@ -47,29 +50,35 @@ const StartVisitQueueFields: React.FC = () => {
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper>
-          <Select
-            labelText={t('selectQueueLocation', 'Select a queue location')}
-            id="queueLocation"
-            name="queueLocation"
-            invalidText="Required"
-            value={selectedQueueLocation}
-            onChange={(event) => setSelectedQueueLocation(event.target.value)}>
-            {!selectedQueueLocation ? (
-              <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-            ) : null}
-            {queueLocations?.length > 0 &&
-              queueLocations.map((location) => (
-                <SelectItem key={location.id} text={location.name} value={location.id}>
-                  {location.name}
-                </SelectItem>
-              ))}
-          </Select>
+          {isLoadingQueueLocations ? (
+            <SelectSkeleton />
+          ) : (
+            <Select
+              labelText={t('selectQueueLocation', 'Select a queue location')}
+              id="queueLocation"
+              name="queueLocation"
+              invalidText="Required"
+              value={selectedQueueLocation}
+              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+              {!selectedQueueLocation ? (
+                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+              ) : null}
+              {queueLocations?.length > 0 &&
+                queueLocations.map((location) => (
+                  <SelectItem key={location.id} text={location.name} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          )}
         </ResponsiveWrapper>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-        {!queues?.length ? (
+        {isLoadingQueues ? (
+          <SelectSkeleton />
+        ) : !queues?.length ? (
           <InlineNotification
             className={styles.inlineNotification}
             kind={'error'}
@@ -98,26 +107,36 @@ const StartVisitQueueFields: React.FC = () => {
 
       <section className={classNames(styles.section, styles.sectionHidden)}>
         <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-        <Select
-          labelText={t('selectStatus', 'Select a status')}
-          id="status"
-          name="status"
-          invalidText="Required"
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}>
-          {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-          {statuses?.length > 0 &&
-            statuses.map((status) => (
-              <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
-                {status.display}
-              </SelectItem>
-            ))}
-        </Select>
+        {isLoadingQueues ? (
+          <SelectSkeleton />
+        ) : (
+          <Select
+            labelText={t('selectStatus', 'Select a status')}
+            id="status"
+            name="status"
+            invalidText="Required"
+            value={status}
+            onChange={(event) => setStatus(event.target.value)}>
+            {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
+            {statuses?.length > 0 &&
+              statuses.map((status) => (
+                <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
+                  {status.display}
+                </SelectItem>
+              ))}
+          </Select>
+        )}
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-        {!priorities?.length ? (
+        {isLoadingQueues ? (
+          <RadioButtonGroup>
+            <RadioButtonSkeleton />
+            <RadioButtonSkeleton />
+            <RadioButtonSkeleton />
+          </RadioButtonGroup>
+        ) : !priorities?.length ? (
           <InlineNotification
             className={styles.inlineNotification}
             kind={'error'}

@@ -6,41 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import styles from './queue-table.scss';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import { type Concept, type Queue, type QueueTableTabConfig } from '../types';
-import { queueTableComingFromColumn } from './cells/queue-table-coming-from-cell.component';
-import { queueTableNameColumn } from './cells/queue-table-name-cell.component';
-import { queueTablePriorityColumn } from './cells/queue-table-priority-cell.component';
-import { queueTableStatusColumn } from './cells/queue-table-status-cell.component';
-import { queueTableWaitTimeColumn } from './cells/queue-table-wait-time-cell.component';
 import { QueueTableByStatusSkeleton } from './queue-table-by-status-skeleton.component';
 import QueueTable from './queue-table.component';
-import { queueTableActionColumn } from './cells/queue-table-action-cell.component';
 
 interface QueueTableByStatusProps {
   selectedQueue: Queue; // the selected queue
   selectedStatus: Concept; // the selected status
-
-  // Table configuration for each status, keyed by status uuid
-  // If not provided, defaults to defaultQueueTableConfig
-  configByStatus?: Map<string, QueueTableTabConfig>;
-
   allStatusTabConfig?: QueueTableTabConfig; // If provided, we display an additional tab for *all* statuses with the given config
 }
 
-export const defaultQueueTableConfig: QueueTableTabConfig = {
-  columns: [
-    queueTableNameColumn,
-    queueTableComingFromColumn,
-    queueTablePriorityColumn,
-    queueTableStatusColumn,
-    queueTableWaitTimeColumn,
-    queueTableActionColumn,
-  ],
-};
-
+// displays the queue entries of a given queue by
+// showing a list of tabs (one tab per status), each showing
+// queue entries within that status
 const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   selectedQueue,
   selectedStatus,
-  configByStatus,
   allStatusTabConfig,
 }) => {
   const layout = useLayoutType();
@@ -68,7 +48,6 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   }
 
   const queueEntriesForCurrentStatus = queueEntries?.filter((entry) => entry.status.uuid == currentStatusUuid);
-  const tableConfig = configByStatus?.get(currentStatusUuid) ?? defaultQueueTableConfig;
 
   return (
     <div className={styles.container}>
@@ -91,12 +70,20 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
         <TabPanels>
           {allowedStatuses?.map((s) => (
             <TabPanel key={s.uuid}>
-              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={tableConfig.columns} />
+              <QueueTable
+                queueEntries={queueEntriesForCurrentStatus}
+                queueUuid={selectedQueue.uuid}
+                statusUuid={s.uuid}
+              />
             </TabPanel>
           ))}
           {allStatusTabConfig && (
             <TabPanel>
-              <QueueTable queueEntries={queueEntriesForCurrentStatus} queueTableColumns={allStatusTabConfig.columns} />
+              <QueueTable
+                queueEntries={queueEntriesForCurrentStatus}
+                queueUuid={selectedQueue.uuid}
+                statusUuid={null}
+              />
             </TabPanel>
           )}
         </TabPanels>

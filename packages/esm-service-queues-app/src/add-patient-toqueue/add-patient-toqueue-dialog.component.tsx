@@ -12,12 +12,14 @@ import {
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
-import { type ConfigObject, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { addQueueEntry, useVisitQueueEntries } from '../active-visits/active-visits-table.resource';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { addQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
+import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { type ConfigObject } from '../config-schema';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;
@@ -38,10 +40,9 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const { queueLocations } = useQueueLocations();
   const [isMissingPriority, setIsMissingPriority] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
-  const config = useConfig() as ConfigObject;
-  const { mutate } = useVisitQueueEntries('', selectedQueueLocation);
+  const config = useConfig<ConfigObject>();
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
-  const { mutateQueueEntries } = useMissingQueueEntries();
   const priorities = queues.find((q) => q.uuid === queueUuid)?.allowedPriorities ?? [];
 
   const addVisitToQueue = useCallback(() => {
@@ -80,7 +81,6 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             subtitle: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
           });
           closeModal();
-          mutate();
           mutateQueueEntries();
         }
       },
@@ -104,7 +104,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     selectedQueueLocation,
     t,
     closeModal,
-    mutate,
+    mutateQueueEntries,
   ]);
 
   return (

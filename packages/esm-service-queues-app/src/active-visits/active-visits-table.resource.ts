@@ -1,21 +1,9 @@
+import { formatDate, openmrsFetch, parseDate, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash-es/isEmpty';
-import last from 'lodash-es/last';
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { useTranslation } from 'react-i18next';
-import {
-  type FetchResponse,
-  formatDate,
-  openmrsFetch,
-  parseDate,
-  restBaseUrl,
-  useConfig,
-  type Visit,
-} from '@openmrs/esm-framework';
-import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
-import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import isToday from 'dayjs/plugin/isToday';
+import isEmpty from 'lodash-es/isEmpty';
+import useSWR from 'swr';
+import { type Concept, type Identifer, type MappedServiceQueueEntry, type Queue, type QueueEntry } from '../types';
 
 dayjs.extend(isToday);
 
@@ -48,15 +36,6 @@ export interface MappedVisitQueueEntry {
   visitQueueNumber: string;
   identifiers: Array<Identifer>;
   queueComingFrom: string;
-}
-
-interface UseVisitQueueEntries {
-  visitQueueEntries: Array<VisitQueueEntry> | null;
-  visitQueueEntriesCount: number;
-  isLoading: boolean;
-  isError: Error;
-  isValidating?: boolean;
-  mutate: () => void;
 }
 
 interface ObsData {
@@ -122,46 +101,11 @@ export const mapVisitQueueEntryProperties = (
   queueUuid: queueEntry.queue.uuid,
   queueEntryUuid: queueEntry.uuid,
   sortWeight: queueEntry.sortWeight,
-  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e.attributeType.uuid === visitQueueNumberAttributeUuid)
+  visitQueueNumber: queueEntry.visit?.attributes?.find((e) => e?.attributeType?.uuid === visitQueueNumberAttributeUuid)
     ?.value,
   identifiers: queueEntry.patient?.identifiers as Identifer[],
   queueComingFrom: queueEntry?.queueComingFrom?.name,
 });
-
-export function useVisitQueueEntries(currServiceName: string, locationUuid: string): UseVisitQueueEntries {
-  const { queueLocations } = useQueueLocations();
-  const queueLocationUuid = locationUuid ? locationUuid : queueLocations[0]?.id;
-
-  const apiUrl =
-    `${restBaseUrl}/visit-queue-entry?v=full` + (queueLocationUuid ? `&location=${queueLocationUuid}` : '');
-  const { t } = useTranslation();
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
-    apiUrl,
-    openmrsFetch,
-  );
-
-  let visitQueueEntries: VisitQueueEntry[];
-
-  if (!currServiceName || currServiceName == t('all', 'All')) {
-    visitQueueEntries = data?.data?.results;
-  } else {
-    visitQueueEntries = data?.data?.results.filter((data) => data.queueEntry.queue.name == currServiceName);
-  }
-
-  return {
-    visitQueueEntries: visitQueueEntries ?? [],
-    visitQueueEntriesCount: visitQueueEntries?.length ?? 0,
-    isLoading,
-    isError: error,
-    isValidating,
-    mutate,
-  };
-}
-
-export const getOriginFromPathName = (pathname = '') => {
-  const from = pathname.split('/');
-  return last(from);
-};
 
 export async function updateQueueEntry(
   visitUuid: string,

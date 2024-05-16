@@ -34,10 +34,9 @@ import {
   showSnackbar,
   useConfig,
   ResponsiveWrapper,
-  type ConfigObject,
 } from '@openmrs/esm-framework';
 import BaseVisitType from './base-visit-type.component';
-import { addQueueEntry, useVisitQueueEntries } from '../../active-visits/active-visits-table.resource';
+import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
@@ -45,6 +44,8 @@ import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../ty
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
+import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { type ConfigObject } from '../../config-schema';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -60,7 +61,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const sessionUser = useSession();
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
-  const config = useConfig() as ConfigObject;
+  const config = useConfig<ConfigObject>();
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,7 +73,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
-  const { mutate } = useVisitQueueEntries('', '');
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [selectedLocation, setSelectedLocation] = useState('');
   const [visitType, setVisitType] = useState('');
@@ -150,7 +151,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                       ),
                     });
                     closePanel();
-                    mutate();
+                    mutateQueueEntries();
                   }
                 },
                 (error) => {
@@ -174,7 +175,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
     },
     [
       closePanel,
-      mutate,
+      mutateQueueEntries,
       patientUuid,
       selectedLocation,
       t,

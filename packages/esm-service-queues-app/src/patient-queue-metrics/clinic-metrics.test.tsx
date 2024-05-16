@@ -16,7 +16,7 @@ jest.mock('./queue-metrics.resource', () => {
   };
 });
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({ queues: mockServiceTypes.data }),
   };
@@ -51,15 +51,6 @@ jest.mock('../helpers/helpers', () => {
   };
 });
 
-jest.mock('../active-visits/active-visits-table.resource', () => {
-  const originalModule = jest.requireActual('../active-visits/active-visits-table.resource');
-
-  return {
-    ...originalModule,
-    useVisitQueueEntries: jest.fn().mockReturnValue(5),
-  };
-});
-
 describe('Clinic metrics', () => {
   it('renders a dashboard outlining metrics from the outpatient clinic', async () => {
     mockedUseConfig.mockReturnValue({
@@ -76,8 +67,6 @@ describe('Clinic metrics', () => {
     expect(screen.getByText(/Average wait time today/i)).toBeInTheDocument();
     expect(screen.getByText(/minutes/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /queue screen/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add new service$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add new service room/i })).toBeInTheDocument();
     expect(screen.getByText(/69/i)).toBeInTheDocument();
   });
 });

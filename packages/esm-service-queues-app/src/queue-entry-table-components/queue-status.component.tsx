@@ -1,17 +1,16 @@
 import React from 'react';
 import { Group, InProgress } from '@carbon/react/icons';
-import styles from '../active-visits/active-visits-table.scss';
+import styles from '../queue-table/queue-table.scss';
 import { type Concept, type Queue } from '../types';
-import { useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject, type StatusConfig } from '../config-schema';
+import { type StatusConfig } from '../config-schema';
 
 interface QueueStatusProps {
   status: Concept;
   queue?: Queue;
+  statusConfigs: StatusConfig[];
 }
 
-const QueueStatus: React.FC<QueueStatusProps> = ({ status, queue }) => {
-  const { statusConfigs } = useConfig<ConfigObject>();
+const QueueStatus: React.FC<QueueStatusProps> = ({ status, queue, statusConfigs }) => {
   const statusConfig = statusConfigs?.find((c) => c.conceptUuid === status.uuid);
   return (
     <span className={styles.statusContainer}>

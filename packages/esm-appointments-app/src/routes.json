@@ -3,6 +3,12 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "modals": [
+    {
+      "name": "end-appointment-modal",
+      "component": "endAppointmentModal"
+    }
+  ],
   "extensions": [
     {
       "name": "home-appointments",
@@ -43,31 +49,41 @@
     {
       "name": "expected-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "checked-in-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "completed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "missed-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "cancelled-appointments-panel",
       "slot": "scheduled-appointments-panels-slot",
-      "component": "appointmentsByStatus"
+      "component": "appointmentsList"
     },
     {
       "name": "early-appointments-panel",
       "component": "earlyAppointments"
+    },
+    {
+      "name": "appointments-form-workspace",
+      "component": "appointmentsFormWorkspace",
+      "meta": {
+        "title": {
+          "key": "createNewAppointment",
+          "default": "Create new appointment"
+        }
+      }
     },
     {
       "name": "patient-appointments-summary-dashboard",
@@ -88,14 +104,6 @@
       "slot": "patient-chart-appointments-dashboard-slot",
       "meta": {
         "columnSpan": 1
-      }
-    },
-    {
-      "name": "patient-appointments-overview-widget",
-      "component": "appointmentsOverview",
-      "order": 8,
-      "meta": {
-        "columnSpan": 4
       }
     },
     {

@@ -22,9 +22,14 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const currentQueueLocationName = useSelectedQueueLocationName();
 
   const handleQueueLocationChange = useCallback(({ selectedItem }) => {
-    updateSelectedQueueLocationUuid(selectedItem.id);
-    updateSelectedQueueLocationName(selectedItem.name);
-    updateSelectedServiceName('All');
+    if (selectedItem.id === 'all') {
+      updateSelectedQueueLocationUuid(null);
+      updateSelectedQueueLocationName(null);
+    } else {
+      updateSelectedQueueLocationUuid(selectedItem.id);
+      updateSelectedQueueLocationName(selectedItem.name);
+      updateSelectedServiceName('All');
+    }
   }, []);
 
   return (

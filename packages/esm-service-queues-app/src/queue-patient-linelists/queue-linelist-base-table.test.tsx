@@ -1,13 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { usePagination } from '@openmrs/esm-framework';
 import { mockMappedAppointmentsData } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import QueuePatientBaseTable from './queue-linelist-base-table.component';
-
-const mockUsePagination = usePagination as jest.Mock;
-const mockGoToPage = jest.fn();
 
 const tableHeaders = [
   {
@@ -50,24 +46,9 @@ const testProps = {
   isLoading: false,
 };
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    openmrsFetch: jest.fn(),
-    usePagination: jest.fn(),
-  };
-});
-
 describe('QueuePatientBaseTable: ', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
-
-    mockUsePagination.mockReturnValue({
-      results: testProps.patientData,
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
 
     renderQueueBaseTable();
 
@@ -99,12 +80,7 @@ describe('QueuePatientBaseTable: ', () => {
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    mockUsePagination.mockReturnValue({
-      results: [],
-      goTo: mockGoToPage,
-      currentPage: 1,
-    });
-
+    testProps.patientData = [];
     renderQueueBaseTable();
 
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();

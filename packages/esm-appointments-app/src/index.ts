@@ -4,14 +4,10 @@ import {
   getAsyncLifecycle,
   getSyncLifecycle,
   registerBreadcrumbs,
-  translateFrom,
 } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createDashboardLink } from './createDashboardLink.component';
-import {
-  createDashboardLink as createPatientChartDashboardLink,
-  registerWorkspace,
-} from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink as createPatientChartDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta, appointmentCalendarDashboardMeta, patientChartDashboardMeta } from './dashboard.meta';
 import {
   cancelledAppointmentsPanelConfigSchema,
@@ -23,12 +19,12 @@ import {
 } from './scheduled-appointments-config-schema';
 import rootComponent from './root.component';
 import appointmentsDashboardComponent from './appointments.component';
-import homeAppointmentsComponent from './home';
-import appointmentStatusComponent from './appointments/scheduled/appointments-by-status.component';
+import homeAppointmentsComponent from './home/home-appointments.component';
+import appointmentsListComponent from './appointments/scheduled/appointments-list.component';
 import earlyAppointmentsComponent from './appointments/scheduled/early-appointments.component';
-import patientAppointmentsDetailedSummaryComponent from './patient-chart/patient-appointments-detailed-summary.component';
-import patientAppointmentsOverviewComponent from './patient-chart/patient-appointments-overview.component';
-import patientUpcomingAppointmentsComponent from './patient-chart/patient-upcoming-appointments-card.component';
+import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
+import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
+import patientUpcomingAppointmentsComponent from './patient-appointments/patient-upcoming-appointments-card.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -76,11 +72,9 @@ export const appointmentsCalendarDashboardLink = getSyncLifecycle(
 
 export const appointmentsDashboard = getSyncLifecycle(appointmentsDashboardComponent, options);
 
-export const checkInModal = getAsyncLifecycle(() => import('./home/check-in-modal/check-in-modal.component'), options);
-
 export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, options);
 
-export const appointmentsByStatus = getSyncLifecycle(appointmentStatusComponent, options);
+export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
 
@@ -100,12 +94,13 @@ export const patientAppointmentsOverview = getSyncLifecycle(patientAppointmentsO
 export const patientUpcomingAppointmentsWidget = getSyncLifecycle(patientUpcomingAppointmentsComponent, options);
 
 export const patientAppointmentsCancelConfirmationDialog = getAsyncLifecycle(
-  () => import('./patient-chart/patient-appointments-cancel-modal.component'),
+  () => import('./patient-appointments/patient-appointments-cancel-modal.component'),
   options,
 );
 
-registerWorkspace({
-  name: 'appointments-form-workspace',
-  load: getAsyncLifecycle(() => import('./form/appointments-form.component'), options),
-  title: translateFrom(moduleName, 'createNewAppointment', 'Create new appointment'),
-});
+export const appointmentsFormWorkspace = getAsyncLifecycle(() => import('./form/appointments-form.component'), options);
+
+export const endAppointmentModal = getAsyncLifecycle(
+  () => import('./appointments/common-components/end-appointment-modal.component'),
+  options,
+);

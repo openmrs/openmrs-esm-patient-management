@@ -1,7 +1,7 @@
 import React from 'react';
-import { type QueueTableColumn, type QueueTableCellComponentProps } from '../../types';
-import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
 import dayjs from 'dayjs';
+import QueueDuration from '../../queue-entry-table-components/queue-duration.component';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   const startedAt = dayjs(queueEntry.startedAt).toDate();
@@ -9,8 +9,9 @@ export const QueueTableWaitTimeCell = ({ queueEntry }: QueueTableCellComponentPr
   return <QueueDuration startedAt={startedAt} endedAt={endedAt} />;
 };
 
-export const queueTableWaitTimeColumn: QueueTableColumn = {
-  headerI18nKey: 'waitTime',
+export const queueTableWaitTimeColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: QueueTableWaitTimeCell,
   getFilterableValue: null,
-};
+});
