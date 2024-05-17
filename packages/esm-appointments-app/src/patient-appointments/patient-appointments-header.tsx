@@ -13,7 +13,8 @@ interface PatientAppointmentsHeaderProps {
 const PatientAppointmentsHeader: React.FC<PatientAppointmentsHeaderProps> = ({ patient }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName =
+    patient?.name?.[0]?.text ?? `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
 
   return (
     <div>
