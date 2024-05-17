@@ -191,3 +191,23 @@ html[dir='rtl'] {
   justify-content: center;
   align-items: center;
 }
+
+.popOver {
+  padding: spacing.$spacing-05;
+  background-color: $ui-02;
+
+  & > div {
+    margin-bottom: spacing.$spacing-05;
+  }
+}
+
+.whiteBackground {
+  background-color: $ui-02;
+}
+
+.buttonSet {
+  width: inherit;
+  button {
+    flex: 1;
+  }
+}

@@ -24,6 +24,8 @@ const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date
 const initialPermanentProviderQueueRoomState = {
   isPermanentProviderQueueRoom: localStorage.getItem('isPermanentProviderQueueRoom'),
 };
+const initialSelectedPriorityState = { priorityUuid: null };
+const initialSelectedStatusState = { statusUuid: null };
 
 export function getSelectedServiceName() {
   return getGlobalStore<{ serviceName: string }>('queueSelectedServiceName', initialServiceNameState);
@@ -57,6 +59,24 @@ export function getIsPermanentProviderQueueRoom() {
     'isPermanentProviderQueueRoom',
     initialPermanentProviderQueueRoomState,
   );
+}
+
+function getQueuePriorityStore() {
+  return getGlobalStore<{ priorityUuid: string }>('selectedQueuePriorityUuid', initialSelectedPriorityState);
+}
+
+function getQueueStatusStore() {
+  return getGlobalStore<{ statusUuid: string }>('selectedQueueStatusUuid', initialSelectedStatusState);
+}
+
+export function updateSelectedQueuePriority(priorityUuid: string) {
+  const store = getQueuePriorityStore();
+  store.setState({ priorityUuid });
+}
+
+export function updateSelectedQueueStatus(statusUuid: string) {
+  const store = getQueueStatusStore();
+  store.setState({ statusUuid });
 }
 
 export const updateSelectedServiceName = (currentServiceName: string) => {
@@ -104,6 +124,29 @@ export const useSelectedServiceName = () => {
 
   return currentServiceName;
 };
+
+export function useSelectedPriority() {
+  const queuePriorityGlobalState = getQueuePriorityStore().getState();
+  const [priorityState, setPriorityState] = useState(queuePriorityGlobalState);
+
+  useEffect(() => {
+    getQueuePriorityStore().subscribe((updatedState) => setPriorityState(updatedState));
+  }, []);
+
+  return priorityState;
+}
+
+export function useSelectedStatus() {
+  const { t } = useTranslation();
+  const queueStatusGlobalState = getQueueStatusStore().getState();
+  const [statusState, setStatusState] = useState(queueStatusGlobalState);
+
+  useEffect(() => {
+    getQueueStatusStore().subscribe((updatedState) => setStatusState(updatedState));
+  }, []);
+
+  return statusState;
+}
 
 export const useSelectedServiceUuid = () => {
   const [currentServiceUuid, setCurrentServiceUuid] = useState(initialServiceUuidState.serviceUuid);

@@ -1,10 +1,15 @@
-import { useQueues } from './useQueues';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import { type Queue } from '../types';
 
-export function useQueue(queueUuid?: string) {
-  const { queues, ...rest } = useQueues();
+export function useQueue(queueUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,display,name,description,service:(uuid,display),allowedPriorities:(uuid,display),allowedStatuses:(uuid,display),location:(uuid,display))';
+  const apiUrl = `${restBaseUrl}/queue/${queueUuid}?v=${customRepresentation}`;
+  const { data, ...rest } = useSWRImmutable<{ data: Queue }, Error>(apiUrl, openmrsFetch);
 
   return {
-    queue: queues.find((q) => q.uuid == queueUuid),
+    queue: data?.data,
     ...rest,
   };
 }

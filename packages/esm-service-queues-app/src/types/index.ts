@@ -483,12 +483,15 @@ export interface QueueEntrySearchCriteria {
   service?: Array<string> | string;
   status?: Array<string> | string;
   isEnded: boolean;
+  priority?: Array<string> | string;
 }
 
 // TODO: The follow types match the types from backend.
 // They should be common enough to move to esm-core
 
-export interface Concept extends OpenmrsResource {}
+export interface Concept extends OpenmrsResource {
+  setMembers?: Array<Concept>;
+}
 
 export interface Provider extends OpenmrsResource {}
 
