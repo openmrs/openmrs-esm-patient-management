@@ -23,7 +23,7 @@ interface PatientInfoProps {
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoClick }) => {
   const { t } = useTranslation();
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
-  const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = patient.name?.[0]?.text ?? `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
 
   const toggleShowMore = (e: React.MouseEvent) => {
     e.stopPropagation();
