@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker } from '@openmrs/esm-styleguide/src/public';
 import { Field } from './field.component';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { type Resources, ResourcesContext } from '../../offline.resources';
@@ -10,6 +11,18 @@ import { PatientRegistrationContext } from '../patient-registration-context';
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(),
+  getLocale: jest.fn().mockReturnValue('en'),
+  OpenmrsDatePicker: (datePickerProps) => (
+    <OpenmrsDatePicker
+      id={datePickerProps.id}
+      dateFormat={datePickerProps.dateFormat}
+      onChange={datePickerProps.onChange}
+      maxDate={datePickerProps.maxDate}
+      labelText={datePickerProps.labelText}
+      value={datePickerProps.value}
+      carbonOptions={datePickerProps.carbonOptions}
+    />
+  ),
 }));
 
 const predefinedAddressTemplate = {
