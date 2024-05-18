@@ -6,6 +6,7 @@ import { DobField } from './dob.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
+import { OpenmrsDatePicker } from '@openmrs/esm-styleguide/src/public';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -19,6 +20,18 @@ jest.mock('@openmrs/esm-framework', () => {
         },
       },
     })),
+    getLocale: jest.fn().mockReturnValue('en'),
+    OpenmrsDatePicker: (datePickerProps) => (
+      <OpenmrsDatePicker
+        id={datePickerProps.id}
+        dateFormat={datePickerProps.dateFormat}
+        onChange={datePickerProps.onChange}
+        maxDate={datePickerProps.maxDate}
+        labelText={datePickerProps.labelText}
+        value={datePickerProps.value}
+        carbonOptions={datePickerProps.carbonOptions}
+      />
+    ),
   };
 });
 
