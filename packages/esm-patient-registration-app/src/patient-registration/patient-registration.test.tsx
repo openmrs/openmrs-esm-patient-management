@@ -11,7 +11,6 @@ import { PatientRegistration } from './patient-registration.component';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
-import { OpenmrsDatePicker } from '@openmrs/esm-styleguide/src/public';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
@@ -102,17 +101,6 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     validator: jest.fn(),
     getLocale: jest.fn().mockReturnValue('en'),
-    OpenmrsDatePicker: (datePickerProps) => (
-      <OpenmrsDatePicker
-        id={datePickerProps.id}
-        dateFormat={datePickerProps.dateFormat}
-        onChange={datePickerProps.onChange}
-        maxDate={datePickerProps.maxDate}
-        labelText={datePickerProps.labelText}
-        value={datePickerProps.value}
-        carbonOptions={datePickerProps.carbonOptions}
-      />
-    ),
   };
 });
 
