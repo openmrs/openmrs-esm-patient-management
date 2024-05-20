@@ -3583,6 +3583,11 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
+"@openmrs/webpack-config@npm:5.5.1-pre.1756":
+  version: 5.5.1-pre.1756
+  resolution: "@openmrs/webpack-config@npm:5.5.1-pre.1756"
+=======
 "@openmrs/esm-ward-app@workspace:packages/esm-ward-app":
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-ward-app@workspace:packages/esm-ward-app"
@@ -3599,9 +3604,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openmrs/webpack-config@npm:5.5.1-pre.1756":
-  version: 5.5.1-pre.1756
-  resolution: "@openmrs/webpack-config@npm:5.5.1-pre.1756"
+"@openmrs/webpack-config@npm:5.5.1-pre.1771":
+  version: 5.5.1-pre.1771
+  resolution: "@openmrs/webpack-config@npm:5.5.1-pre.1771"
+>>>>>>> fec16de7 ((feat) - O3-3197 - initial ward app)
   dependencies:
     "@swc/core": "npm:^1.3.58"
     clean-webpack-plugin: "npm:^4.0.0"
