@@ -127,7 +127,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       : 'AM';
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations(appointmentLocationTagName);
+  const locations = useLocations();
   const providers = useProviders();
   const session = useSession();
   const { selectedDate } = useContext(SelectedDateContext);
