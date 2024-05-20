@@ -18,7 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { type OpenmrsResource, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { useQueues } from '../hooks/useQueues';
-import { Filter, FilterEdit } from '@carbon/react/icons';
+import { Filter, FilterEdit, FilterRemove } from '@carbon/react/icons';
 
 function QueuePriorityFilter({
   selectedItem,
@@ -91,6 +91,7 @@ export function QueueFilterPopOver() {
 
   const { priorityUuid } = useSelectedPriority();
   const { statusUuid } = useSelectedStatus();
+  const isFilterApplied = priorityUuid || statusUuid;
 
   useEffect(() => {
     setFormState({
@@ -127,42 +128,55 @@ export function QueueFilterPopOver() {
   };
 
   return (
-    <Popover open={open} align="bottom-right" caret={false} isTabTip>
-      <Button
-        hasIconOnly
-        renderIcon={priorityUuid || statusUuid ? FilterEdit : Filter}
-        iconDescription={t('filter', 'Filter')}
-        className={classNames({
-          [styles.whiteBackground]: open,
-        })}
-        type="button"
-        onClick={() => {
-          setOpen(!open);
-        }}
-        kind="ghost"
-        size={isDesktop(layout) ? 'sm' : 'lg'}
-      />
-      <PopoverContent>
-        <div className={styles.popOver}>
-          <QueuePriorityFilter
-            selectedItem={formState['priority']}
-            onChange={({ selectedItem }) => handleChange('priority', selectedItem)}
-          />
-          <QueueStatusFilter
-            selectedItem={formState['status']}
-            onChange={({ selectedItem }) => handleChange('status', selectedItem)}
-          />
-        </div>
-        <ButtonSet className={styles.buttonSet}>
-          <Button size={isDesktop(layout) ? 'sm' : 'lg'} kind="secondary" onClick={resetFilters}>
-            {t('resetFilters', 'Reset')}
-          </Button>
-          <Button size={isDesktop(layout) ? 'sm' : 'lg'} kind="primary" onClick={handleApplyFilters}>
-            {t('apply', 'Apply')}
-          </Button>
-        </ButtonSet>
-      </PopoverContent>
-    </Popover>
+    <>
+      <Popover open={open} align="bottom-right" caret={false} isTabTip>
+        <Button
+          hasIconOnly
+          renderIcon={isFilterApplied ? FilterEdit : Filter}
+          iconDescription={isFilterApplied ? t('editFilters', 'Edit filters') : t('filters', 'Filters')}
+          className={classNames({
+            [styles.whiteBackground]: open,
+          })}
+          type="button"
+          onClick={() => {
+            setOpen(!open);
+          }}
+          kind="ghost"
+          size={isDesktop(layout) ? 'sm' : 'lg'}>
+          {isFilterApplied ? t('editFilters', 'Edit filters') : t('filters', 'Filters')}
+        </Button>
+        <PopoverContent>
+          <div className={styles.popOver}>
+            <QueuePriorityFilter
+              selectedItem={formState['priority']}
+              onChange={({ selectedItem }) => handleChange('priority', selectedItem)}
+            />
+            <QueueStatusFilter
+              selectedItem={formState['status']}
+              onChange={({ selectedItem }) => handleChange('status', selectedItem)}
+            />
+          </div>
+          <ButtonSet className={styles.buttonSet}>
+            <Button size={isDesktop(layout) ? 'sm' : 'lg'} kind="secondary" onClick={resetFilters}>
+              {t('resetFilters', 'Reset')}
+            </Button>
+            <Button size={isDesktop(layout) ? 'sm' : 'lg'} kind="primary" onClick={handleApplyFilters}>
+              {t('apply', 'Apply')}
+            </Button>
+          </ButtonSet>
+        </PopoverContent>
+      </Popover>
+      {isFilterApplied && (
+        <Button
+          renderIcon={FilterRemove}
+          type="button"
+          onClick={resetFilters}
+          kind="ghost"
+          size={isDesktop(layout) ? 'sm' : 'lg'}>
+          {t('clearFilters', 'Clear filters')}
+        </Button>
+      )}
+    </>
   );
 }
 
