@@ -64,7 +64,7 @@ const ScheduledVisits: React.FC<{
   const [userLocation, setUserLocation] = useState('');
   const locations = useLocations();
   const session = useSession();
-  const { queues } = useQueues(userLocation);
+  const { queues, isLoading: isLoadingQueues } = useQueues(userLocation);
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
@@ -224,7 +224,7 @@ const ScheduledVisits: React.FC<{
 
                     {!visit.service ? (
                       <DataTableSkeleton />
-                    ) : !priorities?.length ? (
+                    ) : isLoadingQueues ? null : !priorities?.length ? (
                       <InlineNotification
                         className={styles.inlineNotification}
                         kind={'error'}
