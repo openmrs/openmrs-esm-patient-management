@@ -61,7 +61,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('patient-search', { viewState: { selectedPatientUuid } });
+                launchWorkspace('service-queues-patient-search', { viewState: { selectedPatientUuid } });
               },
             }}
           />
