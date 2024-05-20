@@ -4,21 +4,6 @@
     "webservices.rest": "^2.2.0"
   },
   "extensions": [
-    {
-      "component": "root",
-      "name": "ward-dashboard",
-      "slot": "ward-dashboard-slot"
-    },
-    {
-      "name": "ward-dashboard-link",
-      "component": "wardViewDashboardLink",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "ward",
-        "slot": "ward-dashboard-slot",
-        "title": "Ward"
-      }
-    }
   ],
   "pages": [
     {

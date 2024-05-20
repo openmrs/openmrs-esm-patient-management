@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './home.comonent';
+import WardView from './ward-view/ward-view.component';
 
 const Root: React.FC = () => {
   const wardViewBasename = window.getOpenmrsSpaBase() + 'ward';
@@ -9,7 +9,8 @@ const Root: React.FC = () => {
     <main>
       <BrowserRouter basename={wardViewBasename}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<WardView />} />
+          <Route path="/:locationUuid" element={<WardView />} />
         </Routes>
       </BrowserRouter>
     </main>
