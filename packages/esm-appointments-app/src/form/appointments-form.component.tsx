@@ -205,8 +205,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   // Manually call ref callback from 'react-hook-form' with the element(s) we want to be focused
   useEffect(() => {
-    const startDateElement = document.querySelector('#startDatePickerInput');
-    const endDateElement = document.querySelector('#endDatePickerInput');
+    const startDateElement = document.getElementById('startDatePickerInput');
+    const endDateElement = document.getElementById('endDatePickerInput');
     startDateRef(startDateElement);
     endDateRef(endDateElement);
   }, [startDateRef, endDateRef]);
