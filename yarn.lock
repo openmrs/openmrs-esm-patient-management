@@ -3583,6 +3583,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openmrs/esm-ward-app@workspace:packages/esm-ward-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-ward-app@workspace:packages/esm-ward-app"
+  dependencies:
+    "@carbon/react": "npm:~1.37.0"
+    lodash-es: "npm:^4.17.15"
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/webpack-config@npm:5.5.1-pre.1756":
   version: 5.5.1-pre.1756
   resolution: "@openmrs/webpack-config@npm:5.5.1-pre.1756"
