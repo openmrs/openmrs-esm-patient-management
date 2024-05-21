@@ -14,17 +14,17 @@ const WardView = () => {
     showToast({
       title: t('invalidLocationSpecified', 'Invalid location specified'),
       kind: 'warning',
-      description: 'Unknown location uuid: ' + locationUuidFromUrl,
+      description: t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', { locationUuidFromUrl }),
     });
 
     return <></>;
   }
 
-  const location = locationFromUrl || sessionLocation;
+  const location = locationFromUrl ?? sessionLocation;
 
   return (
     <div>
-      <h1>{location?.display}</h1>
+      <h1 id="ward-location">{location?.display}</h1>
     </div>
   );
 };

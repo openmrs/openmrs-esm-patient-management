@@ -1,3 +1,4 @@
 {
-  "ward": "Ward"
+  "invalidLocationSpecified": "Invalid location specified",
+  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}"
 }

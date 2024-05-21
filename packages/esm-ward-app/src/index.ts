@@ -1,5 +1,6 @@
-import { getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import rootComponent from './root.component';
+import { configSchema } from './config-schema';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -11,3 +12,9 @@ const options = {
 };
 
 export const root = getSyncLifecycle(rootComponent, options);
+
+export function startupApp() {
+  registerBreadcrumbs([]);
+
+  defineConfigSchema(moduleName, configSchema);
+}
