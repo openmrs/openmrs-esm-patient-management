@@ -10,6 +10,7 @@ import {
   interpolateString,
   useConfig,
 } from '@openmrs/esm-framework';
+import { displayName } from '@openmrs/esm-utils';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
@@ -100,8 +101,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         const patientIdentifiers = patients[index].identifiers.filter((identifier) =>
           config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
         );
-        const patientName =
-          patient.name?.[0]?.text ?? `${patient.name?.[0]?.given?.join(' ')} ${patient?.name?.[0]?.family}`;
+        const patientName = displayName(patient);
 
         return (
           <ClickablePatientContainer key={patient.id} patient={patients[index]}>
