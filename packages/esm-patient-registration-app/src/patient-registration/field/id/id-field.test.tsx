@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { type AddressTemplate, type IdentifierSource } from '../../patient-registration.types';
+import { type AddressTemplate, type IdentifierSource, type NameTemplate } from '../../patient-registration.types';
 import { mockIdentifierTypes, mockOpenmrsId, mockPatient, mockSession } from '__mocks__';
 import { esmPatientRegistrationSchema, type RegistrationConfig } from '../../../config-schema';
 import { ResourcesContext, type Resources } from '../../../offline.resources';
@@ -14,6 +14,7 @@ const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
 const mockResourcesContextValue = {
   addressTemplate: null as unknown as AddressTemplate,
+  nameTemplate: null as unknown as NameTemplate,
   currentSession: mockSession.data,
   identifierTypes: [],
   relationshipTypes: [],

@@ -7,11 +7,13 @@ import type {
   PatientIdentifierType,
   FetchedPatientIdentifierType,
   AddressTemplate,
+  NameTemplate,
 } from './patient-registration/patient-registration.types';
 import { cacheForOfflineHeaders, moduleName } from './constants';
 
 export interface Resources {
   addressTemplate: AddressTemplate;
+  nameTemplate: NameTemplate;
   currentSession: Session;
   relationshipTypes: any;
   identifierTypes: Array<PatientIdentifierType>;
@@ -26,6 +28,11 @@ export async function fetchCurrentSession(): Promise<Session> {
 
 export async function fetchAddressTemplate() {
   const { data } = await cacheAndFetch<AddressTemplate>(`${restBaseUrl}/addresstemplate`);
+  return data;
+}
+
+export async function fetchNameTemplate() {
+  const { data } = await cacheAndFetch<NameTemplate>(`${restBaseUrl}/nametemplate`);
   return data;
 }
 
