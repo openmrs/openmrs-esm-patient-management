@@ -108,5 +108,13 @@
       "component": "activeVisitsRowActions",
       "slot": "queue-table-extension-column-slot"
     }
+  ],
+  "workspaces": [
+    {
+      "name": "service-queues-filter-workspace",
+      "title": "Filter queue entries",
+      "component": "serviceQueuesFilterWorkspace",
+      "type": "form"
+    }
   ]
 }

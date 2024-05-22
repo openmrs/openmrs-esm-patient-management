@@ -16,7 +16,7 @@ import {
   useSelectedStatus,
 } from '../helpers/helpers';
 import { useTranslation } from 'react-i18next';
-import { type OpenmrsResource, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { type OpenmrsResource, isDesktop, useLayoutType, launchWorkspace } from '@openmrs/esm-framework';
 import { useQueues } from '../hooks/useQueues';
 import { Filter, FilterEdit, FilterRemove } from '@carbon/react/icons';
 
@@ -176,35 +176,6 @@ export function QueueFilterPopOver() {
           {t('clearFilters', 'Clear filters')}
         </Button>
       )}
-    </>
-  );
-}
-
-export function QueueLocationFilter() {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
-  const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
-  };
-
-  return (
-    <>
-      <div className={styles.filterContainer}>
-        <Dropdown
-          id="serviceFilter"
-          titleText={t('showPatientsWaitingFor', 'Show patients waiting for:')}
-          label={currentServiceName}
-          type="inline"
-          items={[{ display: `${t('all', 'All')}` }, ...queues]}
-          itemToString={(item) => (item ? item.display : '')}
-          onChange={handleServiceChange}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
-        />
-      </div>
     </>
   );
 }

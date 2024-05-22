@@ -3,6 +3,7 @@ import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWRInfinite from 'swr/infinite';
 import useSWR from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getQueryParamsForSearch } from '../queue-table/queue-table.resource';
 
 type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
@@ -16,78 +17,45 @@ type QueueEntryResponse = FetchResponse<{
 const repString =
   'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
-export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
-  const [fetchUrl, setFetchUrl] = useState<string>(null);
-
+export function useQueueEntries({
+  searchCriteria,
+  rep = repString,
+  currentPage = 1,
+  pageSize = 50,
+}: {
+  searchCriteria?: QueueEntrySearchCriteria;
+  rep?: string;
+  currentPage?: number;
+  pageSize?: number;
+}) {
   const url = useMemo(() => {
     const apiUrl = `${restBaseUrl}/queue-entry`;
-    const searchParam = new URLSearchParams();
-    searchParam.append('v', rep);
-    searchParam.append('totalCount', 'true');
-
-    for (let [key, value] of Object.entries(searchCriteria)) {
-      if (value != null) {
-        searchParam.append(key, value?.toString());
-      }
+    const searchParams = getQueryParamsForSearch(searchCriteria);
+    searchParams.append('v', rep);
+    searchParams.append('totalCount', 'true');
+    if (currentPage) {
+      searchParams.append('startIndex', `${(currentPage - 1) * pageSize}`);
+    }
+    if (pageSize) {
+      searchParams.append('limit', `${pageSize}`);
     }
 
-    return `${apiUrl}?${searchParam.toString()}`;
-  }, [searchCriteria, rep]);
+    return `${apiUrl}?${searchParams.toString()}`;
+  }, [searchCriteria, rep, currentPage, pageSize]);
 
-  useEffect(() => {
-    if (url) {
-      setFetchUrl(url);
-    }
-  }, [url]);
-
-  const { data, ...rest } = useSWR<QueueEntryResponse, Error>(fetchUrl, openmrsFetch);
-
-  const fetchPrevPage = useCallback(() => {
-    if (!data?.data?.links?.some((link) => link.rel === 'prev')) {
-      return;
-    }
-
-    const prevUrl = new URL(data?.data?.links?.find((link) => link.rel === 'prev')?.uri);
-
-    setFetchUrl(
-      prevUrl.origin === window.location.origin
-        ? prevUrl.toString()
-        : new URL(`${prevUrl.pathname}${prevUrl.search ? prevUrl.search : ''}`, window.location.origin).toString(),
-    );
-  }, [setFetchUrl, data]);
-
-  const fetchNextPage = useCallback(() => {
-    if (!data?.data?.links?.some((link) => link.rel === 'next')) {
-      return;
-    }
-
-    const nextUrl = new URL(data?.data?.links?.find((link) => link.rel === 'next')?.uri);
-
-    setFetchUrl(
-      nextUrl.origin === window.location.origin
-        ? nextUrl.toString()
-        : new URL(`${nextUrl.pathname}${nextUrl.search ? nextUrl.search : ''}`, window.location.origin).toString(),
-    );
-  }, [setFetchUrl, data]);
+  const { data, ...rest } = useSWR<QueueEntryResponse, Error>(url, openmrsFetch);
 
   return {
     queueEntries: data?.data?.results ?? [],
     totalCount: data?.data?.totalCount ?? 0,
     hasPrevPage: data?.data?.links?.some((link) => link.rel === 'prev'),
-    fetchPrevPage,
     hasNextPage: data?.data?.links?.some((link) => link.rel === 'next'),
-    fetchNextPage,
     ...rest,
   };
 }
 
 export function useQueueEntriesMetrics(searchCriteria?: QueueEntrySearchCriteria) {
-  const searchParam = new URLSearchParams();
-  for (let [key, value] of Object.entries(searchCriteria)) {
-    if (value != null) {
-      searchParam.append(key, value?.toString());
-    }
-  }
+  const searchParam = getQueryParamsForSearch(searchCriteria);
   const apiUrl = `${restBaseUrl}/queue-entry-metrics?` + searchParam.toString();
 
   const { data } = useSWR<

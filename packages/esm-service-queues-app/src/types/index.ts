@@ -477,13 +477,28 @@ export interface QueueEntry {
   previousQueueEntry: QueueEntry;
 }
 
+// Referenced from https://github.com/openmrs/openmrs-module-queue/blob/main/api/src/main/java/org/openmrs/module/queue/api/search/QueueEntrySearchCriteria.java
 export interface QueueEntrySearchCriteria {
-  queue?: Array<string> | string;
-  location?: Array<string> | string;
-  service?: Array<string> | string;
-  status?: Array<string> | string;
-  isEnded: boolean;
-  priority?: Array<string> | string;
+  // queue?: Array<string> | string;
+  // location?: Array<string> | string;
+  // service?: Array<string> | string;
+  // status?: Array<string> | string;
+  // isEnded: boolean;
+  // priority?: Array<string> | string;
+
+  patient: string;
+  queue: Array<string> | null;
+  priority: Array<string> | null;
+  status: Array<string> | null;
+  location: Array<string> | null;
+  service: Array<string> | null;
+  queues: Array<string> | null;
+  hasVisit: boolean;
+  queueComingFrom: Array<string> | null;
+  startedOnOrAfter: Date | null;
+  startedOnOrBefore: Date | null;
+  endedOnOrAfter: Date | null;
+  endedOnOrBefore: Date | null;
 }
 
 // TODO: The follow types match the types from backend.

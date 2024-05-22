@@ -1,0 +1,21 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.queueFilterWorkspaceContainer {
+  padding: spacing.$spacing-05 spacing.$spacing-05 0;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .queueFilterWorkspaceContainer {
+    background-color: $ui-01;
+    height: var(--tablet-workspace-window-height);
+  }
+}
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .queueFilterWorkspaceContainer {
+    background-color: $ui-02;
+    height: var(--desktop-workspace-window-height);
+  }
+}
