@@ -2,6 +2,10 @@ import React from 'react';
 import { showToast, useLocations, useSession } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import WardBed from './ward-bed.component';
+import styles from './ward-view.scss';
+import { useBeds } from '../hooks/useBeds';
+import { type Location } from '@openmrs/esm-framework';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -20,11 +24,24 @@ const WardView = () => {
     return <></>;
   }
 
-  const location = locationFromUrl ?? sessionLocation;
+  const location = (locationFromUrl ?? sessionLocation) as any as Location;
+  return <WardViewByLocation location={location} />;
+};
+
+const WardViewByLocation = ({ location }: { location: Location }) => {
+  const { beds } = useBeds({ locationUuid: location.uuid });
 
   return (
-    <div>
-      <h1 id="ward-location">{location?.display}</h1>
+    <div className={styles.wardView}>
+      <div className={styles.wardViewHeader}>
+        <div className={styles.wardViewHeaderLocation}>{location?.display}</div>
+      </div>
+      <div className={styles.wardViewMain}>
+        {beds.map((bed, i) => {
+          // TODO: fetch patients from server
+          return <WardBed key={bed.uuid} bed={bed} patients={null} />;
+        })}
+      </div>
     </div>
   );
 };

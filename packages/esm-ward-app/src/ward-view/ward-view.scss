@@ -1,0 +1,39 @@
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.wardView {
+  background-color: #e4e4e4;
+  position: absolute;
+  top: var(--omrs-topnav-height);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+}
+
+.wardViewHeader {
+  margin: 14px 0 18px;
+}
+
+.wardViewHeaderLocation {
+  font-size: 20px;
+}
+
+.wardViewMain {
+  flex: 1;
+  column-width: 340px;
+  column-fill: auto;
+  column-gap: 16px;
+  overflow-x: scroll;
+  // multicol container required to have a height defined
+  // see: https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill#browser_compatibility
+  height: 0px;
+}
+
+.wardBed {
+  background-color: #ffffff;
+  margin-bottom: 16px;
+  break-inside: avoid-column;
+}
