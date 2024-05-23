@@ -7,10 +7,10 @@ import {
   ExtensionSlot,
   PatientPhoto,
   age,
+  displayName,
   interpolateString,
   useConfig,
 } from '@openmrs/esm-framework';
-import { displayName } from '@openmrs/esm-utils';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';
