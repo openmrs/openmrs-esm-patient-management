@@ -10,6 +10,7 @@ import { PatientRegistrationContext } from '../patient-registration-context';
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(),
+  getLocale: jest.fn().mockReturnValue('en'),
 }));
 
 const predefinedAddressTemplate = {

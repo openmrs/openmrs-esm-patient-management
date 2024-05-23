@@ -1,14 +1,12 @@
+import { ComboButton, MenuItem } from '@carbon/react';
+import { UserHasAccess, isDesktop, navigate, showModal, useLayoutType, useSession } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
-import { PatientBannerActionsMenu, showModal, useSession } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { MessageQueue, ArrowRight } from '@carbon/react/icons';
-import { Button, ComboButton, MenuItem } from '@carbon/react';
-import { navigate, UserHasAccess, useLayoutType } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
-import styles from './metrics-header.scss';
 import Overlay from '../overlay.component';
 import QueueRoomForm from '../queue-rooms/queue-room-form.component';
 import QueueServiceForm from '../queue-services/queue-service-form.component';
+import styles from './metrics-header.scss';
 
 const MetricsHeader = () => {
   const { t } = useTranslation();
@@ -18,6 +16,7 @@ const MetricsHeader = () => {
   const [showQueueRoomFormOverlay, setShowQueueRoomFormOverlay] = useState(false);
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
+  const layout = useLayoutType();
 
   const navigateToQueueScreen = () => {
     navigate({ to: `${spaBasePath}/service-queues/screen` });
@@ -31,6 +30,7 @@ const MetricsHeader = () => {
       <span className={styles.metricsTitle}>{metricsTitle}</span>
       <ComboButton
         label={queueScreenText}
+        size={isDesktop(layout) ? 'sm' : 'lg'}
         menuAlignment="bottom-end"
         className={styles.comboBtn}
         tooltipAlignment="top-right"

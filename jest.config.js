@@ -15,6 +15,7 @@ module.exports = {
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
     '^dexie$': require.resolve('dexie'),
     '^lodash-es/(.*)$': 'lodash/$1',
+    'lodash-es': 'lodash',
     '^react-i18next$': path.resolve(__dirname, 'react-i18next.js'),
     '^uuid$': path.resolve(__dirname, 'node_modules', 'uuid', 'dist', 'index.js'),
   },

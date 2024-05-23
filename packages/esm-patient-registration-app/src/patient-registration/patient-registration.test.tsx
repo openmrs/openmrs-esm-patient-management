@@ -405,7 +405,7 @@ describe('Updating an existing patient record', () => {
     expect(givenNameInput.value).toBe('John');
     expect(familyNameInput.value).toBe('Wilson');
     expect(middleNameInput.value).toBeFalsy();
-    expect(dateOfBirthInput.value).toBe('4/4/1972');
+    expect(dateOfBirthInput.value).toBe('04/04/1972');
     expect(genderInput.value).toBe('male');
 
     // do some edits

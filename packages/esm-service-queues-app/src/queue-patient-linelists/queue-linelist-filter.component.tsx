@@ -18,6 +18,7 @@ import {
 import dayjs from 'dayjs';
 import { toDateObjectStrict, toOmrsIsoString, useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
 import styles from './queue-linelist-filter.scss';
+import { datePickerFormat, datePickerPlaceHolder } from '../constants';
 
 interface QueueLinelistFilterProps {
   closePanel: () => void;
@@ -125,8 +126,17 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
             <Column md={2}>
               <p className={styles.heading}> {t('returnDate', 'Return Date')}</p>
               <Layer>
-                <DatePicker datePickerType="single" value={returnDate} onChange={([date]) => setReturnDate(date)}>
-                  <DatePickerInput id="returnDate" placeholder="mm/dd/yyyy" labelText={t('date', 'Date')} type="date" />
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={returnDate}
+                  onChange={([date]) => setReturnDate(date)}>
+                  <DatePickerInput
+                    id="returnDate"
+                    placeholder={datePickerPlaceHolder}
+                    labelText={t('date', 'Date')}
+                    type="date"
+                  />
                 </DatePicker>
               </Layer>
               <Button
