@@ -44,7 +44,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     return false;
   }, [layout, currentData, currentData]);
 
-  const onClick = (serviceUuid: string) => {
+  const navigateToAppointmentsByDate = (serviceUuid: string) => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
   };
 
@@ -61,7 +61,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       )}>
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <p>
-          <div className={classNames(styles.totals)}>
+          <div className={classNames(styles.totals)} onClick={() => navigateToAppointmentsByDate('')}>
             {currentData?.services ? (
               <div role="button" tabIndex={0}>
                 <User size={16} />
@@ -81,7 +81,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onClick(serviceUuid);
+                    navigateToAppointmentsByDate(serviceUuid);
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>
