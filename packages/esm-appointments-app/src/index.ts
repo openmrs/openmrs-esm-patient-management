@@ -25,7 +25,8 @@ import earlyAppointmentsComponent from './appointments/scheduled/early-appointme
 import patientAppointmentsDetailedSummaryComponent from './patient-appointments/patient-appointments-detailed-summary.component';
 import patientAppointmentsOverviewComponent from './patient-appointments/patient-appointments-overview.component';
 import patientUpcomingAppointmentsComponent from './patient-appointments/patient-upcoming-appointments-card.component';
-
+import appointementsForm from './form/appointments-form.component';
+import patientSearch from './patient-search/patient-search.component';
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const moduleName = '@openmrs/esm-appointments-app';
@@ -77,6 +78,10 @@ export const homeAppointments = getSyncLifecycle(homeAppointmentsComponent, opti
 export const appointmentsList = getSyncLifecycle(appointmentsListComponent, options);
 
 export const earlyAppointments = getSyncLifecycle(earlyAppointmentsComponent, options);
+
+export const appointementForm = getSyncLifecycle(appointementsForm, options);
+
+export const searchPatient = getSyncLifecycle(patientSearch, options);
 
 // t('Appointments', 'Appointments')
 export const patientAppointmentsSummaryDashboardLink = getSyncLifecycle(
