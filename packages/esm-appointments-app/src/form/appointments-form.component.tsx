@@ -420,7 +420,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   labelText={t('selectService', 'Select a service')}
                   onChange={(event) => {
                     onChange(event);
-                    if (!appointment) {
+                    if (context === 'creating') {
                       setValue(
                         'duration',
                         services?.find((service) => service.name === event.target.value)?.durationMins,
