@@ -78,15 +78,11 @@
 
   .toolbarContent {
     display: flex;
-    align-items: baseline;
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
     z-index: 1; // prevent dropdown from getting covered by table elements
   }
 
   :global(.cds--table-toolbar) {
     position: static;
-    height: 3rem;
     overflow: visible;
   }
 }
@@ -182,6 +178,7 @@ html[dir='rtl'] {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
   padding: 5rem 0;
+  margin: 0 spacing.$spacing-05;
 }
 
 .tile {

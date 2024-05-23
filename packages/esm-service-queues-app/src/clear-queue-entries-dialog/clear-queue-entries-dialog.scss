@@ -6,9 +6,3 @@
   @include type.type-style('heading-compact-01');
   color: $ui-05;
 }
-
-.clearBtn {
-  margin-left: spacing.$spacing-05;
-  height: spacing.$spacing-09;
-  border: 0.063rem solid #a2191f;
-}
