@@ -5,6 +5,7 @@ import { ClickableTile } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import {
   age,
+  displayName,
   formatDate,
   parseDate,
   ConfigurableLink,
@@ -12,7 +13,6 @@ import {
   PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
 } from '@openmrs/esm-framework';
-import { displayName } from '@openmrs/esm-utils';
 import AppointmentDetails from './appointment-details.component';
 import styles from './patient-info.scss';
 
