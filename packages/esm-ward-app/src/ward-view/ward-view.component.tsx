@@ -2,6 +2,7 @@ import React from 'react';
 import { showToast, useLocations, useSession } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import WardBed from '../ward-beds/ward-bed.component';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -25,6 +26,7 @@ const WardView = () => {
   return (
     <div>
       <h1 id="ward-location">{location?.display}</h1>
+      <WardBed />
     </div>
   );
 };
