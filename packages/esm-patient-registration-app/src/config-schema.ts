@@ -20,6 +20,11 @@ export interface FieldDefinition {
   };
   answerConceptSetUuid?: string;
   customConceptAnswers?: Array<CustomConceptAnswer>;
+  showWhenExpression?: {
+    field: string;
+    value: string;
+  };
+  renderType?: string;
 }
 export interface CustomConceptAnswer {
   uuid: string;

@@ -6,6 +6,7 @@ import { usePersonAttributeType } from './person-attributes.resource';
 import { TextPersonAttributeField } from './text-person-attribute-field.component';
 import { useTranslation } from 'react-i18next';
 import styles from '../field.scss';
+import CustomPersonAttributeField from './custom-person-attribute-field.component';
 
 export interface PersonAttributeFieldProps {
   fieldDefinition: FieldDefinition;
@@ -22,13 +23,26 @@ export function PersonAttributeField({ fieldDefinition }: PersonAttributeFieldPr
     switch (personAttributeType.format) {
       case 'java.lang.String':
         return (
-          <TextPersonAttributeField
-            personAttributeType={personAttributeType}
-            validationRegex={fieldDefinition.validation?.matches ?? ''}
-            label={fieldDefinition.label}
-            required={fieldDefinition.validation?.required ?? false}
-            id={fieldDefinition?.id}
-          />
+          <>
+            {fieldDefinition.renderType === 'select' ? (
+              <CustomPersonAttributeField
+                personAttributeType={personAttributeType}
+                answerConceptSetUuid={fieldDefinition.answerConceptSetUuid}
+                label={fieldDefinition.label}
+                id={fieldDefinition?.id}
+                customConceptAnswers={fieldDefinition.customConceptAnswers ?? []}
+                required={fieldDefinition.validation?.required ?? false}
+              />
+            ) : (
+              <TextPersonAttributeField
+                personAttributeType={personAttributeType}
+                validationRegex={fieldDefinition.validation?.matches ?? ''}
+                label={fieldDefinition.label}
+                required={fieldDefinition.validation?.required ?? false}
+                id={fieldDefinition?.id}
+              />
+            )}
+          </>
         );
       case 'org.openmrs.Concept':
         return (
