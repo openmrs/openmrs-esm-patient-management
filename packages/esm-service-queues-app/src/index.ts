@@ -144,6 +144,24 @@ export const addnewQueueServiceWorkspace = getAsyncLifecycle(
   },
 );
 
+// t('addNewQueueServiceRoom', 'Add new queue service room')
+export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
+  () => import('./queue-rooms/queue-room-form.workspace'),
+  {
+    featureName: 'service-queues-queue-room-form',
+    moduleName,
+  },
+);
+
+// t('filters', 'Filters')
+export const queueLinelistFilterWorkspace = getAsyncLifecycle(
+  () => import('./queue-patient-linelists/queue-linelist-filter.workspace'),
+  {
+    featureName: 'service-queues-linelist-filters',
+    moduleName,
+  },
+);
+
 // t('searchPatient', 'Search Patient')
 export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
   featureName: 'service-queues-patient-search',

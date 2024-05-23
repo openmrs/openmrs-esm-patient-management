@@ -9,16 +9,12 @@ const MetricsHeader = () => {
   const { t } = useTranslation();
   const metricsTitle = t('clinicMetrics', 'Clinic metrics');
   const queueScreenText = t('queueScreen', 'Queue screen');
-  const [showQueueRoomFormOverlay, setShowQueueRoomFormOverlay] = useState(false);
   const currentUserSession = useSession();
   const providerUuid = currentUserSession?.currentProvider?.uuid;
   const layout = useLayoutType();
 
   const navigateToQueueScreen = () => {
     navigate({ to: `${spaBasePath}/service-queues/screen` });
-  };
-  const closeOverlays = () => {
-    setShowQueueRoomFormOverlay(false);
   };
   return (
     <div className={styles.metricsContainer}>

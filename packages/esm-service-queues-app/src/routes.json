@@ -116,6 +116,16 @@
       "component": "addnewQueueServiceWorkspace"
     },
     {
+      "name": "service-queues-room-form",
+      "title": "addNewQueueServiceRoom",
+      "component": "addnewQueueServiceRoomWorkspace"
+    },
+    {
+      "name": "service-queues-linelist-filter",
+      "title": "filter",
+      "component": "queueLinelistFilterWorkspace"
+    },
+    {
       "name": "service-queues-patient-search",
       "title": "searchPatient",
       "component": "patientSearchWorkspace"
