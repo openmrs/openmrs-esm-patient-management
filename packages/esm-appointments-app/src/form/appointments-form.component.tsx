@@ -140,7 +140,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
-  const [pickedDate, setPickedDate] = useState<Date | null>(null); // Added state for pickedDate
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -360,13 +359,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  // const updateLocations = uniqBy(
-  //   [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
-  //   'uuid',
-  // );
-
-  const minAllowedDate = new Date();
-
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
@@ -502,31 +494,33 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     control={control}
                     render={({ field: { onChange, value, ref } }) => (
                       <ResponsiveWrapper>
-                        <Controller
-                          name="appointmentDateTime"
-                          control={control}
-                          render={({ field: { onChange, value, ref } }) => (
-                            <DatePicker
-                              datePickerType="single"
-                              dateFormat={datePickerFormat}
-                              value={pickedDate || value.startDate}
-                              onChange={([date]) => {
-                                if (date) {
-                                  onChange({ ...value, startDate: date });
-                                }
-                              }}
-                              minDate={minAllowedDate} // Set the minimum allowed date
-                            >
-                              <DatePickerInput
-                                id="datePickerInput"
-                                labelText={t('date', 'Date')}
-                                style={{ width: '100%' }}
-                                placeholder={datePickerPlaceHolder}
-                                ref={ref}
-                              />
-                            </DatePicker>
-                          )}
-                        />
+                        <DatePicker
+                          datePickerType="range"
+                          dateFormat={datePickerFormat}
+                          value={[value.startDate, value.recurringPatternEndDate]}
+                          ref={ref}
+                          onChange={([startDate, endDate]) => {
+                            onChange({
+                              startDate: new Date(startDate),
+                              recurringPatternEndDate: new Date(endDate),
+                              recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
+                              startDateText: dayjs(new Date(startDate)).format(dateFormat),
+                            });
+                          }}>
+                          <DatePickerInput
+                            id="startDatePickerInput"
+                            labelText={t('startDate', 'Start date')}
+                            style={{ width: '100%' }}
+                            value={watch('appointmentDateTime').startDateText}
+                          />
+                          <DatePickerInput
+                            id="endDatePickerInput"
+                            labelText={t('endDate', 'End date')}
+                            style={{ width: '100%' }}
+                            placeholder={datePickerPlaceHolder}
+                            value={watch('appointmentDateTime').recurringPatternEndDateText}
+                          />
+                        </DatePicker>
                       </ResponsiveWrapper>
                     )}
                   />
