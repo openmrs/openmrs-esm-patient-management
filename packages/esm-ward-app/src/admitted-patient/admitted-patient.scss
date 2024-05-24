@@ -5,11 +5,12 @@
   padding: spacing.$spacing-04;
   background-color: $ui-02;
   cursor: pointer;
+  border: 2px solid transparent;
   &:hover {
-    box-shadow: inset 0px 0px 0px 2px $color-blue-60-2;
+    border: 2px solid $color-blue-60-2;
     > div:nth-child(2) {
-      width: calc(100% + (2 * spacing.$spacing-04) - (2 * 2px));
-      margin-left: calc(-1 * spacing.$spacing-04 + 2px);
+      width: calc(100% + (2 * spacing.$spacing-04));
+      margin-left: calc(-1 * spacing.$spacing-04);
     }
   }
 }
