@@ -6,7 +6,7 @@ export interface AdmissionLocation {
   totalBeds: number;
   occupiedBeds: number;
   ward: Location;
-  bedLayouts: BedLayout[];
+  bedLayouts: Array<BedLayout>;
 }
 export interface Bed {
   id: number;

@@ -16,7 +16,7 @@ export function useBeds(searchCriteria?: BedSearchCriteria) {
     }
   }
 
-  const apiUrl = `${restBaseUrl}/bed?` + searchParam.toString();
+  const apiUrl = `${restBaseUrl}/bed?${searchParam}`;
   const { data, ...rest } = useSWR<{ data: { results: Array<Bed> } }, Error>(apiUrl, openmrsFetch);
 
   return {
