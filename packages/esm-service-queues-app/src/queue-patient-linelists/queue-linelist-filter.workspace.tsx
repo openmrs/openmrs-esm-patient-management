@@ -16,15 +16,17 @@ import {
   Toggle,
 } from '@carbon/react';
 import dayjs from 'dayjs';
-import { toDateObjectStrict, toOmrsIsoString, useLayoutType, useVisitTypes } from '@openmrs/esm-framework';
+import {
+  type DefaultWorkspaceProps,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useLayoutType,
+  useVisitTypes,
+} from '@openmrs/esm-framework';
 import styles from './queue-linelist-filter.scss';
 import { datePickerFormat, datePickerPlaceHolder } from '../constants';
 
-interface QueueLinelistFilterProps {
-  closePanel: () => void;
-}
-
-const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel }) => {
+const QueueLinelistFilter: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const [gender, setGender] = useState('');
   const [startAge, setStartAge] = useState<number>();
@@ -168,7 +170,7 @@ const QueueLinelistFilter: React.FC<QueueLinelistFilterProps> = ({ closePanel })
         </div>
 
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={closePanel}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit">
