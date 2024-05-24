@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .wardView {
@@ -22,18 +23,18 @@
 }
 
 .wardViewMain {
-  flex: 1;
-  column-width: 340px;
-  column-fill: auto;
-  column-gap: 16px;
-  overflow-x: scroll;
-  // multicol container required to have a height defined
-  // see: https://developer.mozilla.org/en-US/docs/Web/CSS/column-fill#browser_compatibility
-  height: 0px;
+  grid-template-columns: repeat(4, 1fr);
+  display: grid;
+  gap: spacing.$spacing-05;
+  padding: spacing.$spacing-05;
+}
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .wardViewMain {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .wardBed {
-  background-color: #ffffff;
-  margin-bottom: 16px;
   break-inside: avoid-column;
 }

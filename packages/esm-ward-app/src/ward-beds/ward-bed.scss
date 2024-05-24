@@ -1,8 +1,0 @@
-@use '@carbon/styles/scss/spacing';
-
-.bedsContainer {
-  grid-template-columns: repeat(4, 1fr);
-  display: grid;
-  gap: spacing.$spacing-05;
-  padding: spacing.$spacing-05;
-}

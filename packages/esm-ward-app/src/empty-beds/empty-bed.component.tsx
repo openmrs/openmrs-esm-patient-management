@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './empty-bed.scss';
 
 interface EmptyBedProps {
-  bedNum: number;
+  bedNum: string;
 }
 
 const EmptyBed: React.FC<EmptyBedProps> = ({ bedNum }) => {

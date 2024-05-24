@@ -1,0 +1,33 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.divider {
+  height: 2px;
+  width: calc(100% + 2 * spacing.$spacing-04);
+  background-color: $color-gray-30;
+  margin: spacing.$spacing-02 0;
+  margin-left: calc(-1 * spacing.$spacing-04);
+}
+.admittedPatientDescription {
+  display: flex;
+  justify-content: space-between;
+  padding-top: spacing.$spacing-02;
+  flex-wrap: wrap;
+}
+
+.admittedPatientTimeSpent {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  span {
+    @include type.type-style('label-02');
+  }
+}
+
+.admittedPatientGravity {
+  @include type.type-style('helper-text-01');
+  color: $text-02;
+  span {
+    @include type.type-style('label-02');
+  }
+}

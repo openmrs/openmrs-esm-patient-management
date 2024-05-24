@@ -9,14 +9,26 @@
   align-items: center;
   border: 1px dashed $ui-04;
   padding: spacing.$spacing-03 spacing.$spacing-04;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.container:hover {
+  border: 1px solid transparent;
+  box-shadow: inset 0px 0px 0px 2px $color-blue-60-2;
 }
 
 .bedNumber {
+  @include type.type-style('heading-compact-01');
   border-radius: 50%;
   background-color: $color-blue-10;
   color: $color-blue-60-2;
-  @include type.type-style('heading-compact-01');
-  padding: spacing.$spacing-02;
+  padding: spacing.$spacing-04;
+  width: spacing.$spacing-03;
+  height: spacing.$spacing-03;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .emptyBed {

@@ -8,6 +8,7 @@ import { type Location } from '@openmrs/esm-framework';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import { Bed } from '../types';
 import { bedLayoutToBed } from './ward-view.resource';
+import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -32,7 +33,9 @@ const WardView = () => {
 
 const WardViewByLocation = ({ location }: { location: Location }) => {
   const blah = useAdmissionLocation(location.uuid);
-  const { admissionLocations, isLoading, error } = blah;
+  // const { admissionLocations, isLoading, error } = blah;
+  const { isLoading, error } = { isLoading: false, error: false };
+  const admissionLocations = [mockAdmissionLocation];
 
   if (admissionLocations?.length > 0) {
     const { bedLayouts } = admissionLocations[0];
