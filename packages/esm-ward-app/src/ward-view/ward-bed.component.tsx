@@ -1,8 +1,7 @@
 import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import styles from './ward-view.scss';
-import { type Bed } from '../types';
 import EmptyBed from '../empty-beds/empty-bed.component';
+import { type Bed } from '../types';
 
 interface WardBedProps {
   bed: Bed;
@@ -10,9 +9,7 @@ interface WardBedProps {
 }
 
 const WardBed = ({ bed, patients }: WardBedProps) => {
-  const { bedNumber } = bed;
-
-  return <>{patients?.length > 0 ? <div></div> : <EmptyBed bedNumber={bedNumber} />}</>;
+  return <>{patients?.length > 0 ? <div></div> : <EmptyBed bed={bed} />}</>;
 };
 
 export default WardBed;

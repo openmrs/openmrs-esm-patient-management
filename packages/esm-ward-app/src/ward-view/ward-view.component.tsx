@@ -8,6 +8,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
+import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -16,10 +17,16 @@ const WardView = () => {
   const { t } = useTranslation();
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
 
-  if (locationUuidFromUrl && !locationFromUrl) {
-    return (
-      <div className={styles.wardView}>
-        <div className={styles.wardViewMain}>
+  const invalidLocation = locationUuidFromUrl && !locationFromUrl;
+  const location = (locationFromUrl ?? sessionLocation) as any as Location;
+
+  return (
+    <div className={styles.wardView}>
+      <div className={styles.wardViewHeader}>
+        <h4>{location?.display}</h4>
+      </div>
+      <div className={styles.wardViewMain}>
+        {invalidLocation ? (
           <InlineNotification
             kind="error"
             lowContrast={true}
@@ -28,13 +35,12 @@ const WardView = () => {
               locationUuidFromUrl,
             })}
           />
-        </div>
+        ) : (
+          <WardViewByLocation location={location} />
+        )}
       </div>
-    );
-  }
-
-  const location = (locationFromUrl ?? sessionLocation) as any as Location;
-  return <WardViewByLocation location={location} />;
+    </div>
+  );
 };
 
 const WardViewByLocation = ({ location }: { location: Location }) => {
@@ -44,47 +50,48 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
   if (admissionLocation) {
     // admissionLocation.bedLayouts can contain row+column positions with no bed,
     // filter out layout positions with no real bed
-    const bedLayouts = admissionLocation.bedLayouts.filter((bl) => bl.bedId);
+    let collator = new Intl.Collator([], { numeric: true });
+    const bedLayouts = admissionLocation.bedLayouts
+      .filter((bl) => bl.bedId)
+      .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
 
     return (
-      <div className={styles.wardView}>
-        <div className={styles.wardViewHeader}>
-          <h4>{location?.display}</h4>
-        </div>
-        <div className={styles.wardViewMain}>
-          {bedLayouts.map((bedLayout, i) => {
-            const { patient } = bedLayout;
-            const bed = bedLayoutToBed(bedLayout);
-            return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
-          })}
-          {bedLayouts.length == 0 && (
-            <InlineNotification
-              kind="warning"
-              lowContrast={true}
-              title={t('noBedsConfigured', 'No beds configured for this location')}
-            />
-          )}
-        </div>
-      </div>
+      <>
+        {bedLayouts.map((bedLayout, i) => {
+          const { patient } = bedLayout;
+          const bed = bedLayoutToBed(bedLayout);
+          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
+        })}
+        {bedLayouts.length == 0 && (
+          <InlineNotification
+            kind="warning"
+            lowContrast={true}
+            title={t('noBedsConfigured', 'No beds configured for this location')}
+          />
+        )}
+      </>
     );
   } else if (isLoading) {
-    // TODO: add WardBedSkeleton
-    return <>Loading...</>;
+    return (
+      <>
+        {Array(20)
+          .fill(0)
+          .map((_, i) => (
+            <EmptyBedSkeleton key={i} />
+          ))}
+      </>
+    );
   } else {
     return (
-      <div className={styles.wardView}>
-        <div className={styles.wardViewMain}>
-          <InlineNotification
-            kind="error"
-            lowContrast={true}
-            title={t('errorLoadingWardLocation', 'Error loading ward location')}
-            subtitle={
-              error?.message ??
-              t('invalidWardLocation', 'Invalid ward location: {{location}}', { location: location.display })
-            }
-          />
-        </div>
-      </div>
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorLoadingWardLocation', 'Error loading ward location')}
+        subtitle={
+          error?.message ??
+          t('invalidWardLocation', 'Invalid ward location: {{location}}', { location: location.display })
+        }
+      />
     );
   }
 };

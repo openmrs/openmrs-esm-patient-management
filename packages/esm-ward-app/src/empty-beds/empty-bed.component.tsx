@@ -1,14 +1,16 @@
 import React from 'react';
 import styles from './empty-bed.scss';
+import admittedPatientHeaderStyles from '../admitted-patient/admitted-patient-header.scss';
+import { type Bed } from '../types';
 
 interface EmptyBedProps {
-  bedNumber: string;
+  bed: Bed;
 }
 
-const EmptyBed: React.FC<EmptyBedProps> = ({ bedNumber }) => {
+const EmptyBed: React.FC<EmptyBedProps> = ({ bed }) => {
   return (
     <div className={styles.container}>
-      <span className={styles.bedNumber}>{bedNumber}</span>
+      <span className={admittedPatientHeaderStyles.bedNumber}>{bed.bedNumber}</span>
       <p className={styles.emptyBed}>Empty Bed</p>
     </div>
   );
