@@ -1,0 +1,33 @@
+.admittedPatientHeader {
+  padding: 12px;
+}
+
+.admittedPatientHeader > div {
+  display: inline-block;
+}
+
+.admittedPatientBedNumber {
+  font-size: 14px;
+  border-radius: 1000px;
+  color: #fff;
+  padding: 4px 8px 4px;
+  background-color: #0f62fe;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.admittedPatientName {
+  margin-left: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.admittedPatientField::before {
+  content: '·';
+  padding: 0 4px;
+}
+
+.admittedPatientFooter {
+  padding: 8px 12px;
+  border-top: 1px black solid;
+}
