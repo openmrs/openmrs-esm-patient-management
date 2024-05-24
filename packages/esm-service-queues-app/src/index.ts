@@ -148,15 +148,6 @@ export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
   },
 );
 
-// t('filters', 'Filters')
-export const queueLinelistFilterWorkspace = getAsyncLifecycle(
-  () => import('./queue-patient-linelists/queue-linelist-filter.workspace'),
-  {
-    featureName: 'service-queues-linelist-filters',
-    moduleName,
-  },
-);
-
 // t('searchPatient', 'Search Patient')
 export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
   featureName: 'service-queues-patient-search',
