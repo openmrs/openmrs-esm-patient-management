@@ -1,4 +1,14 @@
-interface Bed {
+import { type Location, type Patient } from '@openmrs/esm-framework';
+
+// server-side types defined in openmrs-module-bedmanagement:
+
+export interface AdmissionLocation {
+  totalBeds: number;
+  occupiedBeds: number;
+  ward: Location;
+  bedLayouts: BedLayout[];
+}
+export interface Bed {
   id: number;
   uuid: string;
   bedNumber: string;
@@ -8,7 +18,20 @@ interface Bed {
   status: BedStatus;
 }
 
-interface BedType {
+export interface BedLayout {
+  rowNumber: number;
+  columnNumber: number;
+  bedNumber: string;
+  bedId: number;
+  bedUuid: string;
+  status: BedStatus;
+  bedType: BedType;
+  location: string;
+  patient: Patient;
+  bedTagMaps: BedTagMap[];
+}
+
+export interface BedType {
   uuid: string;
   name: string;
   displayName: string;
@@ -16,4 +39,14 @@ interface BedType {
   resourceVersion: string;
 }
 
-type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+interface BedTagMap {
+  uuid: string;
+  bedTag: {
+    id: number;
+    name: string;
+    uuid: string;
+    resourceVersion: string;
+  };
+}
+
+export type BedStatus = 'AVAILABLE' | 'OCCUPIED';

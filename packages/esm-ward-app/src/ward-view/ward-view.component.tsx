@@ -4,8 +4,10 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import WardBed from './ward-bed.component';
 import styles from './ward-view.scss';
-import { useBeds } from '../hooks/useBeds';
 import { type Location } from '@openmrs/esm-framework';
+import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
+import { Bed } from '../types';
+import { bedLayoutToBed } from './ward-view.resource';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -29,21 +31,36 @@ const WardView = () => {
 };
 
 const WardViewByLocation = ({ location }: { location: Location }) => {
-  const { beds } = useBeds({ locationUuid: location.uuid });
+  const blah = useAdmissionLocation(location.uuid);
+  const { admissionLocations, isLoading, error } = blah;
 
-  return (
-    <div className={styles.wardView}>
-      <div className={styles.wardViewHeader}>
-        <div className={styles.wardViewHeaderLocation}>{location?.display}</div>
+  if (admissionLocations?.length > 0) {
+    const { bedLayouts } = admissionLocations[0];
+
+    return (
+      <div className={styles.wardView}>
+        <div className={styles.wardViewHeader}>
+          <div className={styles.wardViewHeaderLocation}>{location?.display}</div>
+        </div>
+        <div className={styles.wardViewMain}>
+          {bedLayouts.map((bedLayout, i) => {
+            const { patient } = bedLayout;
+            const bed = bedLayoutToBed(bedLayout);
+            return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
+          })}
+          {bedLayouts.length == 0 && <>No beds configured for this location</>}
+        </div>
       </div>
-      <div className={styles.wardViewMain}>
-        {beds.map((bed, i) => {
-          // TODO: fetch patients from server
-          return <WardBed key={bed.uuid} bed={bed} patients={null} />;
-        })}
-      </div>
-    </div>
-  );
+    );
+  } else if (isLoading) {
+    return <>Loading...</>;
+  } else {
+    if (error) {
+      return <>{error}</>;
+    } else {
+      return <>No bed location found</>;
+    }
+  }
 };
 
 export default WardView;

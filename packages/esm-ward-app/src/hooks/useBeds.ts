@@ -1,5 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { type Bed, type BedStatus } from '../types/index';
 
 interface BedSearchCriteria {
   locationUuid?: string;

@@ -1,6 +1,7 @@
 import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 import styles from './admitted-patient.scss';
+import { type Bed } from '../types';
 
 interface AdmittedPatientHeaderProps {
   bed: Bed;

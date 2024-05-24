@@ -2,6 +2,7 @@ import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 import styles from './ward-view.scss';
 import AdmittedPatientHeader from '../admitted-patient/admitted-patient-header.component';
+import { type Bed } from '../types';
 
 interface WardBedProps {
   bed: Bed;
@@ -16,9 +17,9 @@ const WardBed = (props: WardBedProps) => {
     return (
       <div className={styles.wardBed}>
         {patients.map((patient) => (
-          <>
+          <div key={patient.uuid}>
             <AdmittedPatientHeader bed={bed} patient={patient} />
-          </>
+          </div>
         ))}
       </div>
     );

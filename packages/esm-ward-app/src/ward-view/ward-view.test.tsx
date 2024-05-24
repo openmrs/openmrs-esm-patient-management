@@ -1,10 +1,12 @@
-import React from 'react';
 import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { mockLocations } from '../../../../__mocks__/locations.mock';
+import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
+import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
 
 jest.mocked(useConfig).mockReturnValue({
@@ -31,6 +33,18 @@ jest.mock('react-router-dom', () => ({
 }));
 const mockedUseParams = useParams as jest.Mock;
 
+jest.mock('../hooks/useAdmissionLocation', () => ({
+  useAdmissionLocation: jest.fn(),
+}));
+const mockUseAdmissionLocation = useAdmissionLocation as jest.Mock;
+mockUseAdmissionLocation.mockReturnValue({
+  error: null,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  admissionLocations: [mockAdmissionLocation],
+});
+
 describe('WardView:', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);
@@ -44,5 +58,11 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const header = screen.getByText(locationToUse.display);
     expect(header).toBeInTheDocument();
+  });
+
+  it('renders the correct number of occupied and empty beds', async () => {
+    renderWithSwr(<WardView />);
+    const emptyBedCards = await screen.findAllByText(/empty bed/i);
+    expect(emptyBedCards).toHaveLength(3);
   });
 });
