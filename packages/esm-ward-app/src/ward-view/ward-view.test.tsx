@@ -36,19 +36,18 @@ const mockedUseParams = useParams as jest.Mock;
 jest.mock('../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
 }));
-const mockUseAdmissionLocation = useAdmissionLocation as jest.Mock;
-mockUseAdmissionLocation.mockReturnValue({
-  error: null,
+jest.mocked(useAdmissionLocation).mockReturnValue({
+  error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  admissionLocations: [mockAdmissionLocation],
+  admissionLocation: mockAdmissionLocation,
 });
 
 describe('WardView:', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);
-    const header = screen.getByText(mockedSessionLocation.display);
+    const header = screen.getByRole('heading', { name: mockedSessionLocation.display });
     expect(header).toBeInTheDocument();
   });
 
@@ -56,7 +55,7 @@ describe('WardView:', () => {
     const locationToUse = mockLocations.data.results[0];
     mockedUseParams.mockReturnValueOnce({ locationUuid: locationToUse.uuid });
     renderWithSwr(<WardView />);
-    const header = screen.getByText(locationToUse.display);
+    const header = screen.getByRole('heading', { name: locationToUse.display });
     expect(header).toBeInTheDocument();
   });
 

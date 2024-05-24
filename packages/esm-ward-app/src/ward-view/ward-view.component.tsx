@@ -1,14 +1,13 @@
 import React from 'react';
-import { showToast, useLocations, useSession } from '@openmrs/esm-framework';
-import { useParams } from 'react-router-dom';
+import { InlineNotification } from '@carbon/react';
+import { useLocations, useSession, type Location } from '@openmrs/esm-framework';
+
 import { useTranslation } from 'react-i18next';
-import WardBed from './ward-bed.component';
-import styles from './ward-view.scss';
-import { type Location } from '@openmrs/esm-framework';
+import { useParams } from 'react-router-dom';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { Bed } from '../types';
+import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
-import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
+import styles from './ward-view.scss';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -18,13 +17,20 @@ const WardView = () => {
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
 
   if (locationUuidFromUrl && !locationFromUrl) {
-    showToast({
-      title: t('invalidLocationSpecified', 'Invalid location specified'),
-      kind: 'warning',
-      description: t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', { locationUuidFromUrl }),
-    });
-
-    return <></>;
+    return (
+      <div className={styles.wardView}>
+        <div className={styles.wardViewMain}>
+          <InlineNotification
+            kind="error"
+            lowContrast={true}
+            title={t('invalidLocationSpecified', 'Invalid location specified')}
+            subtitle={t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', {
+              locationUuidFromUrl,
+            })}
+          />
+        </div>
+      </div>
+    );
   }
 
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
@@ -32,18 +38,18 @@ const WardView = () => {
 };
 
 const WardViewByLocation = ({ location }: { location: Location }) => {
-  const blah = useAdmissionLocation(location.uuid);
-  // const { admissionLocations, isLoading, error } = blah;
-  const { isLoading, error } = { isLoading: false, error: false };
-  const admissionLocations = [mockAdmissionLocation];
+  const { admissionLocation, isLoading, error } = useAdmissionLocation(location.uuid);
+  const { t } = useTranslation();
 
-  if (admissionLocations?.length > 0) {
-    const { bedLayouts } = admissionLocations[0];
+  if (admissionLocation) {
+    // admissionLocation.bedLayouts can contain row+column positions with no bed,
+    // filter out layout positions with no real bed
+    const bedLayouts = admissionLocation.bedLayouts.filter((bl) => bl.bedId);
 
     return (
       <div className={styles.wardView}>
         <div className={styles.wardViewHeader}>
-          <div className={styles.wardViewHeaderLocation}>{location?.display}</div>
+          <h4>{location?.display}</h4>
         </div>
         <div className={styles.wardViewMain}>
           {bedLayouts.map((bedLayout, i) => {
@@ -51,18 +57,35 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
             const bed = bedLayoutToBed(bedLayout);
             return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
           })}
-          {bedLayouts.length == 0 && <>No beds configured for this location</>}
+          {bedLayouts.length == 0 && (
+            <InlineNotification
+              kind="warning"
+              lowContrast={true}
+              title={t('noBedsConfigured', 'No beds configured for this location')}
+            />
+          )}
         </div>
       </div>
     );
   } else if (isLoading) {
+    // TODO: add WardBedSkeleton
     return <>Loading...</>;
   } else {
-    if (error) {
-      return <>{error}</>;
-    } else {
-      return <>No bed location found</>;
-    }
+    return (
+      <div className={styles.wardView}>
+        <div className={styles.wardViewMain}>
+          <InlineNotification
+            kind="error"
+            lowContrast={true}
+            title={t('errorLoadingWardLocation', 'Error loading ward location')}
+            subtitle={
+              error?.message ??
+              t('invalidWardLocation', 'Invalid ward location: {{location}}', { location: location.display })
+            }
+          />
+        </div>
+      </div>
+    );
   }
 };
 

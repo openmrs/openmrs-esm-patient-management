@@ -11,30 +11,17 @@
   right: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 16px;
+  padding: 0 spacing.$spacing-05;
 }
 
 .wardViewHeader {
-  margin: 14px 0 18px;
-}
-
-.wardViewHeaderLocation {
-  font-size: 20px;
+  margin: spacing.$spacing-05 0;
 }
 
 .wardViewMain {
-  grid-template-columns: repeat(4, 1fr);
+  background-color: #e4e4e4;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   display: grid;
   gap: spacing.$spacing-05;
   padding: spacing.$spacing-05;
-}
-
-:global(.omrs-breakpoint-gt-tablet) {
-  .wardViewMain {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.wardBed {
-  break-inside: avoid-column;
 }

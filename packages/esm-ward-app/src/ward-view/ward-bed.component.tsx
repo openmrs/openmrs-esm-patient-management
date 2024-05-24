@@ -10,22 +10,19 @@ interface WardBedProps {
   patients: Patient[];
 }
 
-const WardBed = (props: WardBedProps) => {
-  const { bed, patients } = props;
+const WardBed = ({ bed, patients }: WardBedProps) => {
   const { bedNumber } = bed;
 
   return (
     <>
-      {patients && patients.length > 0 ? (
+      {patients?.length > 0 ? (
         patients.map((patient) => (
-          <div className={styles.wardBed}>
-            <div key={patient.uuid}>
-              <AdmittedPatient bed={bed} patient={patient} />
-            </div>
+          <div key={patient.uuid} className={styles.wardBed}>
+            <AdmittedPatient bed={bed} patient={patient} />
           </div>
         ))
       ) : (
-        <EmptyBed bedNum={bedNumber.slice(3)} />
+        <EmptyBed bedNumber={bedNumber} />
       )}
     </>
   );
