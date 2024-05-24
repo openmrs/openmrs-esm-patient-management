@@ -1,3 +1,5 @@
+import { type OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface SearchedPatient {
   patientId: number;
   uuid: string;
@@ -25,4 +27,16 @@ export interface Identifier {
   };
   preferred: boolean;
   voided: boolean;
+}
+
+export interface Visit {
+  uuid: string;
+  display?: string;
+  encounters: Array<OpenmrsResource>;
+  patient?: OpenmrsResource;
+  visitType: OpenmrsResource;
+  location?: OpenmrsResource;
+  startDatetime: string;
+  stopDatetime?: string;
+  attributes?: Array<OpenmrsResource>;
 }

@@ -5,6 +5,21 @@
   },
   "extensions": [
     {
+      "name": "homepage-tiles",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homePageTilesSlot"
+    },
+    {
+      "name": "home-active-visits-tile",
+      "slot": "metrics-extension-slot",
+      "component": "homeActiveVisitsTile"
+    },
+    {
+      "name": "home-total-visits-tile",
+      "slot": "metrics-extension-slot",
+      "component": "homeTotalVisitsTile"
+    },
+    {
       "name": "active-visits-widget",
       "slot": "homepage-widgets-slot",
       "component": "activeVisits",
