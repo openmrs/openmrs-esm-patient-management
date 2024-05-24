@@ -48,11 +48,6 @@ export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotCompo
   moduleName,
 });
 
-export const addPatientToQueue = getAsyncLifecycle(() => import('./patient-search/visit-form/visit-form.component'), {
-  featureName: 'patient info slot',
-  moduleName,
-});
-
 export const removeQueueEntry = getAsyncLifecycle(
   () => import('./remove-queue-entry-dialog/remove-queue-entry.component'),
   {

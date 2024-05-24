@@ -49,11 +49,6 @@
       "component": "patientInfoBannerSlot"
     },
     {
-      "name": "add-patient-to-queue",
-      "component": "addPatientToQueue",
-      "slot": "add-patient-to-queue-slot"
-    },
-    {
       "name": "remove-queue-entry",
       "component": "removeQueueEntry"
     },
