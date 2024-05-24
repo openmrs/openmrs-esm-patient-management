@@ -1,5 +1,13 @@
 import { ComboButton, MenuItem } from '@carbon/react';
-import { UserHasAccess, isDesktop, launchWorkspace, navigate, showModal, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  UserHasAccess,
+  isDesktop,
+  launchWorkspace,
+  navigate,
+  showModal,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { spaBasePath } from '../constants';
@@ -29,11 +37,11 @@ const MetricsHeader = () => {
         <UserHasAccess privilege="Emr: View Legacy Interface">
           <MenuItem
             label={t('addNewService', 'Add new service')}
-            onClick={() => launchWorkspace("service-queues-service-form")}
+            onClick={() => launchWorkspace('service-queues-service-form')}
           />
           <MenuItem
             label={t('addNewServiceRoom', 'Add new service room')}
-            onClick={() => launchWorkspace("service-queues-service-room-form")}
+            onClick={() => launchWorkspace('service-queues-room-form')}
           />
         </UserHasAccess>
         <MenuItem
