@@ -83,7 +83,7 @@ describe('PatientSearch', () => {
           deathDate: null,
           gender: 'M',
           personName: {
-            display: 'John Doe Smith',
+            display: 'Smith, John Doe',
             givenName: 'John',
             middleName: 'Doe',
             familyName: 'Smith',
@@ -101,13 +101,13 @@ describe('PatientSearch', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: /John Doe Smith Male · 34 yrs · OpenMRS ID 1000NLY/i }),
+      screen.getByRole('link', { name: /Smith, John Doe Male · 34 yrs · OpenMRS ID 1000NLY/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       `/openmrs/spa/patient/${mockSearchResults[0].uuid}/chart/`,
     );
-    expect(screen.getByRole('heading', { name: /John Doe Smith/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Smith, John Doe/ })).toBeInTheDocument();
     expect(screen.getByRole('img')).toBeInTheDocument();
   });
 });
