@@ -87,9 +87,15 @@
   }
 }
 
-.queueTable tr:last-of-type {
-  td {
-    border-bottom: none;
+.queueTable {
+  display: block;
+  height: 70vh;
+  overflow: auto;
+
+  tr:last-of-type {
+    td {
+      border-bottom: none;
+    }
   }
 }
 
