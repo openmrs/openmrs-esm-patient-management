@@ -9,7 +9,7 @@ import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import {
   updateSelectedQueueLocationUuid,
   updateSelectedQueueLocationName,
-  updateSelectedServiceName,
+  updateSelectedService,
   useSelectedQueueLocationName,
   useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
@@ -38,7 +38,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
     } else {
       updateSelectedQueueLocationUuid(selectedItem.id);
       updateSelectedQueueLocationName(selectedItem.name);
-      updateSelectedServiceName('All');
+      updateSelectedService(null, t('all', 'All'));
     }
   }, []);
 

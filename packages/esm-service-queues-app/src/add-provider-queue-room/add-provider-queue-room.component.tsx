@@ -25,12 +25,11 @@ import {
   updateIsPermanentProviderQueueRoom,
   updateSelectedQueueLocationName,
   updateSelectedQueueLocationUuid,
-  updateSelectedServiceName,
-  updateSelectedServiceUuid,
+  updateSelectedService,
   useIsPermanentProviderQueueRoom,
+  useSelectedQueueLocationName,
   useSelectedQueueLocationUuid,
-  useSelectedServiceName,
-  useSelectedServiceUuid,
+  useSelectedService,
 } from '../helpers/helpers';
 import styles from './add-provider-queue-room.scss';
 import { useQueues } from '../hooks/useQueues';
@@ -43,10 +42,9 @@ interface AddProviderQueueRoomProps {
 const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUuid, closeModal }) => {
   const { t } = useTranslation();
 
-  const currentLocationName = useSelectedServiceName();
+  const currentLocationName = useSelectedQueueLocationName();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const currentServiceUuid = useSelectedServiceUuid();
-  const currentServiceName = useSelectedServiceName();
+  const currentService = useSelectedService();
   const currentIsPermanentProviderQueueRoom = useIsPermanentProviderQueueRoom();
   const { providerRoom, isLoading: loading } = useProvidersQueueRoom(providerUuid);
   const [queueRoomUuid, setQueueRoomUuid] = useState('');
@@ -61,15 +59,14 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
 
   const { mutate } = useProvidersQueueRoom(providerUuid);
   const { queues } = useQueues(currentLocationUuid);
-  const { rooms } = useQueueRooms(currentLocationUuid, currentServiceUuid);
+  const { rooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
   const { queueLocations } = useQueueLocations();
   const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
 
   const handleServiceChange = ({ selectedItem }) => {
     localStorage.setItem('queueServiceName', selectedItem.name);
-    localStorage.setItem('queueServiceUuid', selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.name);
-    updateSelectedServiceUuid(selectedItem.uuid);
+    localStorage.setItem('queueService', selectedItem.uuid);
+    updateSelectedService(selectedItem.uuid, selectedItem.name);
   };
 
   const handleQueueLocationChange = ({ selectedItem }) => {
@@ -176,7 +173,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}
               size="md"
-              initialSelectedItem={{ uuid: currentServiceUuid, display: currentServiceName }}
+              initialSelectedItem={{ uuid: currentService, display: currentService?.serviceDisplay }}
             />
           </section>
 
