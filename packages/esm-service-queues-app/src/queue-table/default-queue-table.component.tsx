@@ -162,7 +162,7 @@ function QueueDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="serviceFilter"
-          titleText={t('queueFilter', 'Queue :')}
+          titleText={t('filterByService', 'Filter by service :')}
           label={selectedService?.serviceDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
@@ -189,7 +189,7 @@ function StatusDropdownFilter() {
       <div className={styles.filterContainer}>
         <Dropdown
           id="statusFilter"
-          titleText={t('statusFilter', 'Status :')}
+          titleText={t('filterByStatus', 'Filter by status :')}
           label={queueStatus?.statusDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}

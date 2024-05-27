@@ -32,7 +32,7 @@ import {
   useSelectedService,
 } from '../helpers/helpers';
 import styles from './add-provider-queue-room.scss';
-import { useQueues } from '../hooks/useQueues';
+import useQueueServices from '../hooks/useQueueService';
 
 interface AddProviderQueueRoomProps {
   providerUuid: string;
@@ -58,7 +58,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
   }, [providerRoom]);
 
   const { mutate } = useProvidersQueueRoom(providerUuid);
-  const { queues } = useQueues(currentLocationUuid);
+  const { services } = useQueueServices();
   const { rooms } = useQueueRooms(currentLocationUuid, currentService?.serviceUuid);
   const { queueLocations } = useQueueLocations();
   const [isMissingQueueRoom, setIsMissingQueueRoom] = useState(false);
@@ -169,7 +169,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               aria-label={t('selectService', 'Select a service')}
               type="default"
               label=""
-              items={queues}
+              items={services ?? []}
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}
               size="md"
