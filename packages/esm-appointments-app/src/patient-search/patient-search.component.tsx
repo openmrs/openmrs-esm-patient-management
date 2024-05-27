@@ -1,9 +1,7 @@
 import React from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace } from '@openmrs/esm-framework';
 import styles from './patient-search.scss';
-import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
 import { useTranslation } from 'react-i18next';
-import AppointmentsForm from '../form/appointments-form.component';
 
 const PatientSearch: React.FC = () => {
   const { t } = useTranslation();
@@ -11,12 +9,9 @@ const PatientSearch: React.FC = () => {
     const props = {
       patientUuid: patient.uuid,
       context: 'creating',
-      closeWorkspace: closeOverlay,
       mutate: () => {}, // TODO get this to mutate properly
     };
-
-    closeOverlay();
-    launchOverlay(t('appointmentForm', 'Create Appointment'), <AppointmentsForm {...props} />);
+    launchWorkspace('create-appointment', { ...props });
   };
 
   return (
