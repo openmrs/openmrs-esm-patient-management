@@ -146,6 +146,14 @@ export const activeVisitsRowActions = getAsyncLifecycle(
   },
 );
 
+export const serviceQueuesFilterWorkspace = getAsyncLifecycle(
+  () => import('./queue-table/filter/queue-table-filter.workspace'),
+  {
+    featureName: 'service queues filter workspace',
+    moduleName,
+  },
+);
+
 export function startupApp() {
   registerBreadcrumbs([]);
 

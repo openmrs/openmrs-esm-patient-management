@@ -1,15 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { DataTableSkeleton, Dropdown, TableToolbarSearch, Popover, PopoverContent, Button } from '@carbon/react';
+import { Add, Filter } from '@carbon/react/icons';
 import { ExtensionSlot, isDesktop, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
+  updateSelectedQueuePriority,
+  updateSelectedQueueStatus,
   updateSelectedServiceName,
   updateSelectedServiceUuid,
+  useSelectedPriority,
   useSelectedQueueLocationUuid,
   useSelectedServiceName,
   useSelectedServiceUuid,
+  useSelectedStatus,
 } from '../helpers/helpers';
 import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
@@ -18,6 +22,14 @@ import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
+import { Concept } from '../types';
+import { useServiceConcepts } from '../queue-services/queue-service.resource';
+import { useQueue } from '../hooks/useQueue';
+import { useQueuePriorities } from '../hooks/useQueuePriorities';
+import { useQueueStatuses } from '../hooks/useQueueStatus';
+import classNames from 'classnames';
+import { ButtonSet } from '@carbon/react';
+import { QueueFilterPopOver, QueueLocationFilter } from './default-queue-table-filter.component';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -26,10 +38,14 @@ This is used in the main dashboard of the queues app. (Currently behind a featur
 function DefaultQueueTable() {
   const selectedQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
+  const { priorityUuid } = useSelectedPriority();
+  const { statusUuid } = useSelectedStatus();
   const { queueEntries, isLoading, error } = useQueueEntries({
     queue: selectedQueueUuid,
     location: currentLocationUuid,
     isEnded: false,
+    priority: priorityUuid,
+    status: statusUuid,
   });
 
   const { t } = useTranslation();
@@ -69,10 +85,6 @@ function DefaultQueueTable() {
     });
   }, [queueEntries, searchTerm]);
 
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.headerContainer}>
@@ -98,53 +110,30 @@ function DefaultQueueTable() {
           />
         </div>
       </div>
-      <QueueTable
-        queueEntries={filteredQueueEntries ?? []}
-        queueUuid={null}
-        statusUuid={null}
-        ExpandedRow={QueueTableExpandedRow}
-        tableFilter={[
-          <QueueDropdownFilter />,
-          <TableToolbarSearch
-            className={styles.search}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('searchThisList', 'Search this list')}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-          />,
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-        ]}
-      />
+      {isLoading ? (
+        <DataTableSkeleton role="progressbar" showHeader={false} />
+      ) : (
+        <QueueTable
+          queueEntries={filteredQueueEntries ?? []}
+          queueUuid={null}
+          statusUuid={null}
+          ExpandedRow={QueueTableExpandedRow}
+          tableFilter={[
+            <QueueLocationFilter />,
+            <QueueFilterPopOver />,
+
+            <TableToolbarSearch
+              className={styles.search}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+            />,
+            <ClearQueueEntries queueEntries={filteredQueueEntries} />,
+          ]}
+        />
+      )}
       {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
-  );
-}
-
-function QueueDropdownFilter() {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
-  const currentServiceName = useSelectedServiceName();
-  const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
-  };
-
-  return (
-    <>
-      <div className={styles.filterContainer}>
-        <Dropdown
-          id="serviceFilter"
-          titleText={t('showPatientsWaitingFor', 'Show patients waiting for') + ':'}
-          label={currentServiceName}
-          type="inline"
-          items={[{ display: `${t('all', 'All')}` }, ...queues]}
-          itemToString={(item) => (item ? item.display : '')}
-          onChange={handleServiceChange}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
-        />
-      </div>
-    </>
   );
 }
 

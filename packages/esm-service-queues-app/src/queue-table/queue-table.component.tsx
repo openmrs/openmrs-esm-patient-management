@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type FC } from 'react';
+import React, { useState, type FC } from 'react';
 import {
   DataTable,
   Pagination,
@@ -16,14 +16,20 @@ import {
   TableToolbarContent,
   Tile,
 } from '@carbon/react';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
+import { resetQueueFilterStore, useQueueFilterStore } from './queue-table.resource';
+import { useQueueEntries } from '../hooks/useQueueEntries';
+import { Button } from '@carbon/react';
+import { Filter, FilterRemove, FilterEdit } from '@carbon/react/icons';
+import { DataTableSkeleton } from '@carbon/react';
 
 interface QueueTableProps {
-  queueEntries: QueueEntry[];
+  queueTableName: string;
+  // queueEntries: QueueEntry[];
 
   // the queueUuid and statusUuid are used to determine the columns
   // to display based on the tablesConfig configuration.
@@ -46,7 +52,8 @@ interface QueueTableProps {
 }
 
 function QueueTable({
-  queueEntries,
+  queueTableName,
+  // queueEntries,
   queueUuid,
   statusUuid,
   queueTableColumnsOverride,
@@ -55,21 +62,23 @@ function QueueTable({
 }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
+  const { searchCriteria, isFilterApplied } = useQueueFilterStore(queueTableName);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { queueEntries, totalCount, hasNextPage, isLoading, isValidating } = useQueueEntries({
+    searchCriteria,
+    currentPage,
+    pageSize: currentPageSize,
+  });
   const pageSizes = [10, 20, 30, 40, 50];
 
-  const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(queueEntries, currentPageSize);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
   const columnsFromConfig = useColumns(queueUuid, statusUuid);
   const columns = queueTableColumnsOverride ?? columnsFromConfig ?? [];
 
-  useEffect(() => {
-    goTo(1);
-  }, [queueEntries]);
-
   const rowsData =
-    paginatedQueueEntries?.map((queueEntry) => {
+    queueEntries?.map((queueEntry) => {
       const row: Record<string, JSX.Element | string> = { id: queueEntry.uuid };
       columns.forEach(({ key, CellComponent }) => {
         row[key] = <CellComponent queueEntry={queueEntry} />;
@@ -81,6 +90,9 @@ function QueueTable({
     return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
   }
 
+  if (isLoading) {
+    return <DataTableSkeleton />;
+  }
   return (
     <DataTable
       data-floating-menu-container
@@ -94,7 +106,31 @@ function QueueTable({
           <TableContainer className={styles.tableContainer}>
             {tableFilter && (
               <TableToolbar {...getToolbarProps()}>
-                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+                <TableToolbarContent className={styles.toolbarContent}>
+                  <>{tableFilter}</>
+                  <Button
+                    kind="ghost"
+                    size={isDesktop(layout) ? 'sm' : 'lg'}
+                    renderIcon={isFilterApplied ? FilterEdit : Filter}
+                    onClick={() => {
+                      launchWorkspace('service-queues-filter-workspace', {
+                        queueTableName,
+                      });
+                    }}>
+                    {t('filters', 'Filters')}
+                  </Button>
+                  {isFilterApplied && (
+                    <Button
+                      kind="danger--ghost"
+                      size={isDesktop(layout) ? 'sm' : 'lg'}
+                      renderIcon={FilterRemove}
+                      onClick={() => {
+                        resetQueueFilterStore(queueTableName);
+                      }}>
+                      {t('filters', 'Filters')}
+                    </Button>
+                  )}
+                </TableToolbarContent>
               </TableToolbar>
             )}
             <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
@@ -119,7 +155,7 @@ function QueueTable({
                       </Row>
                       {ExpandedRow && row.isExpanded && (
                         <TableExpandedRow className={styles.expandedActiveVisitRow} colSpan={headers.length + 1}>
-                          <ExpandedRow queueEntry={paginatedQueueEntries[i]} />
+                          <ExpandedRow queueEntry={queueEntries[i]} />
                         </TableExpandedRow>
                       )}
                     </React.Fragment>
@@ -144,13 +180,14 @@ function QueueTable({
             page={currentPage}
             pageSize={currentPageSize}
             pageSizes={pageSizes}
-            totalItems={queueEntries?.length}
+            totalItems={totalCount}
+            isLastPage={!hasNextPage}
             onChange={({ pageSize, page }) => {
               if (pageSize !== currentPageSize) {
                 setPageSize(pageSize);
               }
               if (page !== currentPage) {
-                goTo(page);
+                setCurrentPage(page);
               }
             }}
           />
