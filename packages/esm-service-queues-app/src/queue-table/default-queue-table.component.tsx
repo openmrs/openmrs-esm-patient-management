@@ -13,10 +13,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
-  updateSelectedQueueStatusUuid,
+  updateSelectedQueueStatus,
   updateSelectedService,
   useSelectedQueueLocationUuid,
-  useSelectedQueueStatusUuid,
+  useSelectedQueueStatus,
   useSelectedService,
 } from '../helpers/helpers';
 import { useQueueEntries } from '../hooks/useQueueEntries';
@@ -36,12 +36,12 @@ This is used in the main dashboard of the queues app. (Currently behind a featur
 function DefaultQueueTable() {
   const selectedService = useSelectedService();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const selectedQueueStatus = useSelectedQueueStatusUuid();
+  const selectedQueueStatus = useSelectedQueueStatus();
   const { queueEntries, isLoading, error, isValidating } = useQueueEntries({
     service: selectedService?.serviceUuid,
     location: currentLocationUuid,
     isEnded: false,
-    status: selectedQueueStatus,
+    status: selectedQueueStatus?.statusUuid,
   });
 
   const { t } = useTranslation();
@@ -179,12 +179,9 @@ function StatusDropdownFilter() {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { statuses } = useQueueStatuses();
-  const queueStatusUuid = useSelectedQueueStatusUuid();
-  const queueStatusName = !queueStatusUuid
-    ? t('all', 'All')
-    : statuses?.find(({ uuid }) => uuid === queueStatusUuid)?.display;
+  const queueStatus = useSelectedQueueStatus();
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedQueueStatusUuid(selectedItem.uuid);
+    updateSelectedQueueStatus(selectedItem.uuid, selectedItem?.display);
   };
 
   return (
@@ -193,7 +190,7 @@ function StatusDropdownFilter() {
         <Dropdown
           id="statusFilter"
           titleText={t('statusFilter', 'Status :')}
-          label={queueStatusName}
+          label={queueStatus?.statusDisplay ?? t('all', 'All')}
           type="inline"
           items={[{ display: `${t('all', 'All')}` }, ...(statuses ?? [])]}
           itemToString={(item) => (item ? item.display : '')}

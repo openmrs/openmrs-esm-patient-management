@@ -21,7 +21,7 @@ const initialServiceUuidState = {
   serviceDisplay: sessionStorage.getItem('queueServiceDisplay'),
 };
 const intialStatusNameState = { status: '' };
-const initialQueueStatusUuidState = { queueStatusUuid: null };
+const initialQueueStatusState = { statusUuid: null, statusDisplay: null };
 const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
 const initialPermanentProviderQueueRoomState = {
   isPermanentProviderQueueRoom: sessionStorage.getItem('isPermanentProviderQueueRoom'),
@@ -46,8 +46,11 @@ export function getSelectedQueueLocationUuid() {
   return getGlobalStore<{ queueLocationUuid: string }>('queueLocationUuidSelected', initialQueueLocationUuidState);
 }
 
-export function getSelectedQueueStatusUuid() {
-  return getGlobalStore<{ queueStatusUuid: string }>('queueStatusUuidSelected', initialQueueStatusUuidState);
+export function getSelectedQueueStatus() {
+  return getGlobalStore<{ statusUuid: string; statusDisplay: string }>(
+    'queueStatusUuidSelected',
+    initialQueueStatusState,
+  );
 }
 
 export function getSelectedQueueRoomTimestamp() {
@@ -99,9 +102,9 @@ export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQue
   store.setState({ isPermanentProviderQueueRoom: currentIsPermanentProviderQueueRoom });
 };
 
-export const updateSelectedQueueStatusUuid = (currentQueueStatusUuid: string) => {
-  const store = getSelectedQueueStatusUuid();
-  store.setState({ queueStatusUuid: currentQueueStatusUuid });
+export const updateSelectedQueueStatus = (currentQueueStatusUuid: string, currentQueueStatusDisplay: string) => {
+  const store = getSelectedQueueStatus();
+  store.setState({ statusUuid: currentQueueStatusUuid, statusDisplay: currentQueueStatusDisplay });
 };
 
 export const useSelectedService = () => {
@@ -170,13 +173,11 @@ export const useIsPermanentProviderQueueRoom = () => {
   return currentIsPermanentProviderQueueRoom;
 };
 
-export const useSelectedQueueStatusUuid = () => {
-  const [currentQueueStatusUuid, setCurrentQueueStatusUuid] = useState(
-    getSelectedQueueStatusUuid()?.getState()?.queueStatusUuid ?? initialQueueStatusUuidState.queueStatusUuid,
-  );
+export const useSelectedQueueStatus = () => {
+  const [currentQueueStatus, setCurrentQueueStatus] = useState(getSelectedQueueStatus()?.getState());
 
   useEffect(() => {
-    getSelectedQueueStatusUuid().subscribe(({ queueStatusUuid }) => setCurrentQueueStatusUuid(queueStatusUuid));
+    getSelectedQueueStatus().subscribe((newStatus) => setCurrentQueueStatus(newStatus));
   }, []);
-  return currentQueueStatusUuid;
+  return currentQueueStatus;
 };
