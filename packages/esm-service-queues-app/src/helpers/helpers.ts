@@ -24,6 +24,7 @@ const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date
 const initialPermanentProviderQueueRoomState = {
   isPermanentProviderQueueRoom: localStorage.getItem('isPermanentProviderQueueRoom'),
 };
+const initialOnboardingState = { isOnboardingCompleted: false }; //initially the onboarding is set to false
 
 export function getSelectedServiceName() {
   return getGlobalStore<{ serviceName: string }>('queueSelectedServiceName', initialServiceNameState);
@@ -59,6 +60,10 @@ export function getIsPermanentProviderQueueRoom() {
   );
 }
 
+export function getOnboardingState() {
+  return getGlobalStore<{ isOnboardingCompleted: boolean }>('onboardingState', initialOnboardingState);
+}
+
 export const updateSelectedServiceName = (currentServiceName: string) => {
   const store = getSelectedServiceName();
   store.setState({ serviceName: currentServiceName });
@@ -92,6 +97,11 @@ export const updatedSelectedQueueRoomTimestamp = (currentProviderRoomTimestamp: 
 export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQueueRoom) => {
   const store = getIsPermanentProviderQueueRoom();
   store.setState({ isPermanentProviderQueueRoom: currentIsPermanentProviderQueueRoom });
+};
+
+export const updateOnboardingState = (isOnboardingCompleted: boolean) => {
+  const store = getOnboardingState();
+  store.setState({ isOnboardingCompleted });
 };
 
 export const useSelectedServiceName = () => {
@@ -169,4 +179,12 @@ export const useIsPermanentProviderQueueRoom = () => {
     );
   }, []);
   return currentIsPermanentProviderQueueRoom;
+};
+
+export const useOnboardingState = () => {
+  const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(initialOnboardingState.isOnboardingCompleted);
+  useEffect(() => {
+    getOnboardingState().subscribe(({ isOnboardingCompleted }) => setIsOnboardingCompleted(isOnboardingCompleted));
+  }, []);
+  return isOnboardingCompleted;
 };
