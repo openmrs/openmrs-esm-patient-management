@@ -20,7 +20,7 @@ import {
   TimePickerSelect,
   Toggle,
 } from '@carbon/react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -95,7 +95,7 @@ const appointmentsFormSchema = z
       return true;
     },
     {
-      path: ['appointmentDateTime[]'],
+      path: ['appointmentDateTime.recurringPatternEndDate'],
       message: 'A recurring appointment should have an end date',
     },
   );
@@ -198,6 +198,22 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
+  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  const {
+    field: { ref: startDateRef },
+  } = useController({ name: 'appointmentDateTime.startDate', control });
+  const {
+    field: { ref: endDateRef },
+  } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
+
+  // Manually call ref callback from 'react-hook-form' with the element(s) we want to be focused
+  useEffect(() => {
+    const startDateElement = document.getElementById('startDatePickerInput');
+    const endDateElement = document.getElementById('endDatePickerInput');
+    startDateRef(startDateElement);
+    endDateRef(endDateElement);
+  }, [startDateRef, endDateRef]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
@@ -492,13 +508,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value, ref } }) => (
+                    render={({ field: { onChange, value } }) => (
                       <ResponsiveWrapper>
                         <DatePicker
                           datePickerType="range"
                           dateFormat={datePickerFormat}
                           value={[value.startDate, value.recurringPatternEndDate]}
-                          ref={ref}
                           onChange={([startDate, endDate]) => {
                             onChange({
                               startDate: new Date(startDate),

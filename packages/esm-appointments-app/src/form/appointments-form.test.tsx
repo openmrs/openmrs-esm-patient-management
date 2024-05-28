@@ -84,6 +84,9 @@ jest.mock('react-hook-form', () => ({
   useSubscribe: () => ({
     r: { current: { subject: { subscribe: () => jest.fn() } } },
   }),
+  useController: () => ({
+    field: { ref: jest.fn() },
+  }),
 }));
 
 jest.mock('./appointments-form.resource', () => {
