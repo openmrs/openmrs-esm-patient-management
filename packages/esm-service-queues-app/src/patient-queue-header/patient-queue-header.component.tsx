@@ -15,7 +15,10 @@ import {
 } from '../helpers/helpers';
 import styles from './patient-queue-header.scss';
 
-const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
+const PatientQueueHeader: React.FC<{ title?: string; hideLocationDropdown?: boolean }> = ({
+  title,
+  hideLocationDropdown,
+}) => {
   const { t } = useTranslation();
   const { queueLocations, isLoading, error } = useQueueLocations();
   const userSession = useSession();
@@ -76,19 +79,23 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
             <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
           </div>
           <div className={styles.dropdownContainer}>
-            <Dropdown
-              aria-label="Select queue location"
-              className={styles.dropdown}
-              id="queueLocationDropdown"
-              label={currentQueueLocationName ?? t('all', 'All')}
-              items={
-                queueLocations.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations
-              }
-              itemToString={(item) => (item ? item.name : '')}
-              titleText={t('location', 'Location')}
-              type="inline"
-              onChange={handleQueueLocationChange}
-            />
+            {!hideLocationDropdown && (
+              <Dropdown
+                aria-label="Select queue location"
+                className={styles.dropdown}
+                id="queueLocationDropdown"
+                label={currentQueueLocationName ?? t('all', 'All')}
+                items={
+                  queueLocations.length !== 1
+                    ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations]
+                    : queueLocations
+                }
+                itemToString={(item) => (item ? item.name : '')}
+                titleText={t('location', 'Location')}
+                type="inline"
+                onChange={handleQueueLocationChange}
+              />
+            )}
           </div>
         </div>
       </div>
