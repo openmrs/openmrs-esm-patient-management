@@ -43,7 +43,6 @@ function DefaultQueueTable() {
     }
   }, [error?.message]);
   const layout = useLayoutType();
-
   const columns = useColumns(null, null);
   if (!columns) {
     showToast({
@@ -87,7 +86,7 @@ function DefaultQueueTable() {
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', { viewState: { selectedPatientUuid } });
+                launchWorkspace('service-queues-patient-search', { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid });
               },
             }}
           />

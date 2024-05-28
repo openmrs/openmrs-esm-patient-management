@@ -4,7 +4,6 @@ import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
   type DefaultWorkspaceProps,
-  ExtensionSlot,
   usePatient,
   useVisit,
   PatientBannerPatientInfo,
@@ -17,13 +16,11 @@ import ExistingVisitFormComponent from './visit-form/existing-visit-form.compone
 import styles from './patient-search.scss';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
-  viewState: {
-    selectedPatientUuid?: string;
-  };
+  selectedPatientUuid: string;
+  currentServiceQueueUuid?: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState }) => {
-  const { selectedPatientUuid } = viewState;
+const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace,  selectedPatientUuid, currentServiceQueueUuid }) => {
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
@@ -55,7 +52,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
       </div>
       <div>
         {activeVisit ? (
-          <ExistingVisitFormComponent visit={activeVisit} closePanel={closeWorkspace} />
+          <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
         ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
           <PatientScheduledVisits
             patientUuid={selectedPatientUuid}
@@ -66,7 +63,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
           <VisitForm
             patientUuid={selectedPatientUuid}
             toggleSearchType={toggleSearchType}
-            closePanel={closeWorkspace}
+            closeWorkspace={closeWorkspace}
             mode={newVisitMode}
           />
         ) : null}

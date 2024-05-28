@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import styles from './visit-form-queue-fields.scss';
-import { useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useQueues';
 import { type ConfigObject } from '../../config-schema';
@@ -12,8 +12,8 @@ import { RadioButtonSkeleton } from '@carbon/react';
 
 const StartVisitQueueFields: React.FC = () => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const { sessionLocation } = useSession();
   const config = useConfig<ConfigObject>();
   const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const defaultPriority = config.concepts.defaultPriorityConceptUuid;
@@ -23,9 +23,9 @@ const StartVisitQueueFields: React.FC = () => {
   const [priority, setPriority] = useState(defaultPriority);
   const [status, setStatus] = useState(defaultStatus);
   const [sortWeight, setSortWeight] = useState(0);
-  const [service, setSelectedService] = useState('');
-  const priorities = queues.find((q) => q.uuid === service)?.allowedPriorities ?? [];
-  const statuses = queues.find((q) => q.uuid === service)?.allowedStatuses ?? [];
+  const [selectedService, setSelectedService] = useState('');
+  const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
+  const statuses = queues.find((q) => q.uuid === selectedService)?.allowedStatuses ?? [];
 
   useEffect(() => {
     if (priority === emergencyPriorityConceptUuid) {
@@ -41,7 +41,11 @@ const StartVisitQueueFields: React.FC = () => {
 
   useEffect(() => {
     if (queueLocations?.length > 0) {
-      setSelectedQueueLocation(queueLocations[0].id);
+      if (queueLocations.map(l => l.id).includes(sessionLocation.uuid)) {
+        setSelectedQueueLocation(sessionLocation.uuid);  
+      } else {
+        setSelectedQueueLocation(queueLocations[0].id);
+      }
     }
   }, [queueLocations]);
 
@@ -92,9 +96,9 @@ const StartVisitQueueFields: React.FC = () => {
             id="service"
             name="service"
             invalidText="Required"
-            value={service}
+            value={selectedService}
             onChange={(event) => setSelectedService(event.target.value)}>
-            {!service ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
+            {!selectedService ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
             {queues?.length > 0 &&
               queues.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
