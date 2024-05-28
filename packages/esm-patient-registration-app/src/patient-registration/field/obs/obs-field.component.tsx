@@ -173,7 +173,6 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
 
   const onDateChange = useCallback(
     (date: Date) => {
-      //const refinedDate = date instanceof Date ? new Date(date.setHours(0, 0, 0, 0)) : date;
       setFieldValue(fieldName, date);
     },
     [setFieldValue],
