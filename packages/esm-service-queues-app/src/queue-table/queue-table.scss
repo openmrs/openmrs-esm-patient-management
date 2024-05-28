@@ -16,7 +16,10 @@
 
 .headerButtons {
   display: flex;
-  flex-flow: column;
+  justify-content: space-between;
+  .filterSearch {
+    margin-left: spacing.$spacing-05;
+  }
 }
 
 .filterContainer {

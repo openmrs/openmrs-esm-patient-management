@@ -9,7 +9,10 @@ import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
-import type { Concept, Queue, QueueEntry } from '../types';
+import type { Concept, Queue, QueueEntry, QueueTableColumn, QueueTableTabConfig } from '../types';
+import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
+import ClinicMetrics from '../patient-queue-metrics/clinic-metrics.component';
+import MetricsHeader from '../patient-queue-metrics/metrics-header.component';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
@@ -40,51 +43,57 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h3>{selectedQueue.display}</h3>
+    <>
+      <PatientQueueHeader title={selectedQueue?.display} hideLocationDropdown />
+      <QueueTableMetrics selectedQueue={selectedQueue} />
+
+      {/* <MetricsHeader /> */}
+      <div className={styles.container}>
+        <div className={styles.headerContainer}>
+          <div className={styles.headerButtons}>
+            <ExtensionSlot
+              name="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'secondary',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: 'sm',
+                },
+                selectPatientAction: (selectedPatientUuid) => {
+                  launchWorkspace('service-queues-patient-search', {
+                    selectedPatientUuid,
+                    currentServiceQueueUuid: selectedQueue.uuid,
+                  });
+                },
+              }}
+            />
+            <div className={styles.filterSearch}>
+              <Search
+                labelText=""
+                placeholder={t('filterTable', 'Filter table')}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size={isDesktop(layout) ? 'sm' : 'lg'}
+              />
+            </div>
+          </div>
         </div>
         <div>
           <QueueTableMetrics selectedQueue={selectedQueue} />
         </div>
-        <div className={styles.headerButtons}>
-          <ExtensionSlot
-            name="patient-search-button-slot"
-            state={{
-              buttonText: t('addPatientToQueue', 'Add patient to queue'),
-              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-              buttonProps: {
-                kind: 'secondary',
-                renderIcon: (props) => <Add size={16} {...props} />,
-                size: 'sm',
-              },
-              selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', {
-                  selectedPatientUuid,
-                  currentServiceQueueUuid: selectedQueue.uuid,
-                });
-              },
-            }}
+
+        {allowedStatuses?.map((status) => (
+          <QueueTableForQueueAndStatus
+            key={status.uuid}
+            queueEntries={queueEntries}
+            searchTerm={searchTerm}
+            queue={selectedQueue}
+            status={status}
           />
-          <Search
-            labelText=""
-            placeholder={t('filterTable', 'Filter table')}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-          />
-        </div>
+        ))}
       </div>
-      {allowedStatuses?.map((status) => (
-        <QueueTableForQueueAndStatus
-          key={status.uuid}
-          queueEntries={queueEntries}
-          searchTerm={searchTerm}
-          queue={selectedQueue}
-          status={status}
-        />
-      ))}
-    </div>
+    </>
   );
 };
 

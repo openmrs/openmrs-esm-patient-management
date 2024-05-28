@@ -13,7 +13,7 @@ function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
   const { t } = useTranslation();
 
   const allowedStatuses = selectedQueue.allowedStatuses;
-  const { count } = useQueueEntriesMetrics({ queue: selectedQueue.uuid, isEnded: false });
+  const { count, averageWaitTime } = useQueueEntriesMetrics({ queue: selectedQueue.uuid, isEnded: false });
 
   return (
     <div className={styles.metricsBorder}>
@@ -23,6 +23,12 @@ function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
           <QueueTableMetricsCard queueUuid={selectedQueue.uuid} status={status.uuid} headerLabel={status.display} />
         );
       })}
+      <QueueTableMetricsCard
+        queueUuid={selectedQueue.uuid}
+        status={null}
+        headerLabel={t('averageWaitingTimeTitle', 'Average waiting time')}
+        value={!isNaN(averageWaitTime) ? averageWaitTime : 0}
+      />
     </div>
   );
 }
