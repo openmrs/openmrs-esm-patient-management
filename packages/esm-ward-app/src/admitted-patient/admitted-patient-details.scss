@@ -1,0 +1,42 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.admittedPatientBedNumber {
+  @include type.type-style('heading-compact-01');
+  border-radius: 50%;
+  color: $ui-02;
+  background-color: $color-blue-60-2;
+  padding: spacing.$spacing-04;
+  width: spacing.$spacing-04;
+  height: spacing.$spacing-04;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.admittedPatientName {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+}
+
+.admittedPatientField {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.admittedPatientCity {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.timeLapsed {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.bedNumberBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

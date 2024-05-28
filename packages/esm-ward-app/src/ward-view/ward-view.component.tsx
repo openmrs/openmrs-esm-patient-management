@@ -9,6 +9,7 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
 import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
+import AdmittedPatient from '../admitted-patient/admitted-patient';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -46,7 +47,7 @@ const WardView = () => {
 const WardViewByLocation = ({ location }: { location: Location }) => {
   const { admissionLocation, isLoading, error } = useAdmissionLocation(location.uuid);
   const { t } = useTranslation();
-
+  return <AdmittedPatient />;
   if (admissionLocation) {
     // admissionLocation.bedLayouts can contain row+column positions with no bed,
     // filter out layout positions with no real bed

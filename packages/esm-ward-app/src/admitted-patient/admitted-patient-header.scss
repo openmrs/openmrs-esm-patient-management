@@ -2,15 +2,15 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.bedNumber {
-  @include type.type-style('heading-compact-01');
-  border-radius: 50%;
-  background-color: $color-blue-10;
-  color: $color-blue-60-2;
-  padding: spacing.$spacing-04;
-  width: spacing.$spacing-03;
-  height: spacing.$spacing-03;
+.admittedPatientHeader {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   align-items: center;
+  gap: spacing.$spacing-02;
+  background-color: $ui-02;
+  padding: spacing.$spacing-04;
+  > div:not(div:first-of-type)::before {
+    content: '·';
+    padding: 0 spacing.$spacing-02;
+  }
 }
