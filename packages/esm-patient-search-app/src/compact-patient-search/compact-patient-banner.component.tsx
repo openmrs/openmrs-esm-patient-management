@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
 import {
+  age,
   ConfigurableLink,
   ExtensionSlot,
-  PatientPhoto,
-  age,
   interpolateString,
+  PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
 import { PatientSearchContext } from '../patient-search-context';
@@ -96,9 +96,16 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
   return (
     <div ref={ref}>
       {fhirPatients.map((patient, index) => {
-        const patientIdentifiers = patients[index].identifiers.filter((identifier) =>
-          config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
+        const preferredIdentifier = patients[index].identifiers.find((identifier) => identifier.preferred);
+
+        const configuredIdentifiers = patients[index].identifiers.filter(
+          (identifier) =>
+            !identifier.preferred && config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
         );
+
+        const patientIdentifiers = preferredIdentifier
+          ? [preferredIdentifier, ...configuredIdentifiers]
+          : configuredIdentifiers;
 
         return (
           <ClickablePatientContainer key={patient.id} patient={patients[index]}>
@@ -122,13 +129,9 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
               <div className={styles.demographics}>
                 {getGender(patient.gender)} <span className={styles.middot}>&middot;</span> {age(patient.birthDate)}
                 <span className={styles.middot}>&middot;</span>
-                {config.defaultIdentifierTypes.length ? (
-                  <DefaultIdentifiers identifiers={patientIdentifiers} />
-                ) : (
-                  <>
-                    <span className={styles.middot}>&middot;</span> {patients[index].identifiers?.[0]?.identifier}
-                  </>
-                )}
+                {patientIdentifiers.map((identifier) => (
+                  <IdentifierTag identifier={identifier} />
+                ))}
               </div>
             </div>
           </ClickablePatientContainer>
@@ -183,22 +186,6 @@ const IdentifierTag: React.FC<IdentifierTagProps> = ({ identifier }) => {
       <span className={styles.configuredLabel}>{identifier.identifier}</span>
     </>
   );
-};
-
-const DefaultIdentifiers: React.FC<IdentifiersProps> = ({ identifiers }) => {
-  return (
-    <>
-      {identifiers.map((identifier) => (
-        <IdentifierTag identifier={identifier} />
-      ))}
-    </>
-  );
-};
-
-const FallbackIdentifier: React.FC<CustomIdentifierProps> = ({ patient, identifierName }) => {
-  const identifier = patient.identifiers.find((identifier) => identifier.identifierType.display === identifierName);
-
-  return identifier ? <IdentifierTag identifier={identifier} /> : null;
 };
 
 export default CompactPatientBanner;
