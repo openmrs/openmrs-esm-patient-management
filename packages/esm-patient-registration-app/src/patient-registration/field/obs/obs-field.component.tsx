@@ -1,14 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import classNames from 'classnames';
 import { Field } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { InlineNotification, Layer, Select, SelectItem } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, parseDate, useConfig } from '@openmrs/esm-framework';
 import { type ConceptResponse } from '../../patient-registration.types';
 import { type FieldDefinition, type RegistrationConfig } from '../../../config-schema';
 import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import { generateFormatting } from '../../date-util';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -49,6 +51,16 @@ export function ObsField({ fieldDefinition }: ObsFieldProps) {
           concept={concept}
           label={fieldDefinition.label}
           required={fieldDefinition.validation.required}
+        />
+      );
+    case 'Date':
+      return (
+        <DateObsField
+          concept={concept}
+          label={fieldDefinition.label}
+          required={fieldDefinition.validation.required}
+          dateFormat={fieldDefinition.dateFormat}
+          placeholder={fieldDefinition.placeholder}
         />
       );
     case 'Coded':
@@ -142,6 +154,56 @@ function NumericObsField({ concept, label, required }: NumericObsFieldProps) {
         }}
       </Field>
     </div>
+  );
+}
+
+interface DateObsFieldProps {
+  concept: ConceptResponse;
+  label: string;
+  required?: boolean;
+  dateFormat?: string;
+  placeholder?: string;
+}
+
+function DateObsField({ concept, label, required, placeholder }: DateObsFieldProps) {
+  const { t } = useTranslation();
+  const fieldName = `obs.${concept.uuid}`;
+  const { setFieldValue } = useContext(PatientRegistrationContext);
+  const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
+
+  const onDateChange = useCallback(
+    (date: Date) => {
+      setFieldValue(fieldName, date);
+    },
+    [setFieldValue],
+  );
+
+  return (
+    <Layer>
+      <div className={styles.dobField}>
+        <Field name={fieldName}>
+          {({ field, form: { touched, errors }, meta }) => {
+            const dateValue = field.value ? parseDate(field.value) : field.value;
+            return (
+              <OpenmrsDatePicker
+                id={fieldName}
+                {...field}
+                required={required}
+                dateFormat={dateFormat}
+                onChange={onDateChange}
+                labelText={label ?? concept.display}
+                invalid={errors[fieldName] && touched[fieldName]}
+                invalidText={meta.error && t(meta.error)}
+                value={dateValue}
+                carbonOptions={{
+                  placeholder: placeholder ?? placeHolder,
+                }}
+              />
+            );
+          }}
+        </Field>
+      </div>
+    </Layer>
   );
 }
 
