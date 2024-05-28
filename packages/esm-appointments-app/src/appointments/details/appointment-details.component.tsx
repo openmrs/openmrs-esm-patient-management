@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './appointment-details.scss';
 import { usePatientAppointmentHistory } from '../../hooks/usePatientAppointmentHistory';
-import { usePatientDetails } from '../../hooks/usePatientDetails';
-import { formatDate, formatDatetime } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, usePatient } from '@openmrs/esm-framework';
 import { getGender } from '../../helpers';
 import { type Appointment } from '../../types';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,7 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
   const { t } = useTranslation();
   const [isEnabledQuery, setIsEnabledQuery] = useState(false);
   const { appointmentsCount, isLoading } = usePatientAppointmentHistory(appointment.patient.uuid);
-  const { patientDetails } = usePatientDetails(appointment.patient.uuid, isEnabledQuery);
+  const { patient } = usePatient(appointment.patient.uuid);
 
   useEffect(() => {
     if (!isLoading) {
@@ -42,14 +41,22 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({ appointment }) 
             <p className={styles.labelBold}>{t('gender', 'Gender')}: </p>
             <p className={styles.label}>{getGender(appointment.patient.gender, t)}</p>
           </div>
-          <div className={styles.labelContainer}>
-            <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
-            <p className={styles.label}>
-              {patientDetails && patientDetails?.dateOfBirth
-                ? formatDate(new Date(patientDetails && patientDetails?.dateOfBirth ? patientDetails?.dateOfBirth : ''))
-                : ''}
-            </p>
-          </div>
+          {patient && patient?.birthDate ? (
+            <div className={styles.labelContainer}>
+              <p className={styles.labelBold}>{t('dateOfBirth', 'Date of birth')}: </p>
+              <p className={styles.label}>{formatDate(new Date(patient.birthDate))}</p>
+            </div>
+          ) : (
+            ''
+          )}
+          {patient && patient?.telecom
+            ? patient.telecom.map((contact, i) => (
+                <div className={styles.labelContainer}>
+                  <p className={styles.labelBold}>{t('Contact', 'Contact {{index}}', { index: i + 1 })}: </p>
+                  <p className={styles.label}>{contact.value}</p>
+                </div>
+              ))
+            : ''}
         </div>
         <div>
           <p className={styles.gridTitle}>{t('appointmentNotes', 'Appointment Notes')}</p>

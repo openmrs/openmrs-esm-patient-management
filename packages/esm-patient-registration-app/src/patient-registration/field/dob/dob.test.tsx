@@ -19,6 +19,7 @@ jest.mock('@openmrs/esm-framework', () => {
         },
       },
     })),
+    getLocale: jest.fn().mockReturnValue('en'),
   };
 });
 

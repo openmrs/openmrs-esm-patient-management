@@ -3,11 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { showModal, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, useLayoutType } from '@openmrs/esm-framework';
 import type { Appointment } from '../types';
 import styles from './patient-appointments-action-menu.scss';
-import { closeOverlay, launchOverlay } from '../hooks/useOverlay';
-import AppointmentForm from '../form/appointments-form.component';
+
 import PatientAppointmentContext, { PatientAppointmentContextTypes } from '../hooks/patientAppointmentContext';
 
 interface appointmentsActionMenuProps {
@@ -28,10 +27,10 @@ export const PatientAppointmentsActionMenu = ({ appointment, patientUuid }: appo
         context: 'editing',
       });
     } else {
-      launchOverlay(
-        t('editAppointment', 'Edit Appointment'),
-        <AppointmentForm context="editing" appointment={appointment} closeWorkspace={closeOverlay} />,
-      );
+      launchWorkspace('edit-appointments-form', {
+        context: 'editing',
+        appointment,
+      });
     }
   }, [appointment, t]);
 

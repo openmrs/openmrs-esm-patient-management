@@ -4,11 +4,10 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
-  margin: spacing.$spacing-05 0rem;
-  background-color: $ui-background;
+  flex: 1;
 
   & section {
-    margin: spacing.$spacing-02 spacing.$spacing-05 0;
+    margin: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
   }
 }
 
@@ -44,7 +43,6 @@
 }
 
 .form {
-  background-color: $ui-background;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -56,7 +54,6 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
-  margin-top: layout.$spacing-05;
 }
 
 .tablet {

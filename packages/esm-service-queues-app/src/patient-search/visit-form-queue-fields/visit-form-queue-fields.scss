@@ -7,11 +7,11 @@
 .sectionTitle {
   @include type.type-style('heading-compact-02');
   color: $text-02;
-  margin-bottom: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }
 
 .section {
-  margin: spacing.$spacing-02 spacing.$spacing-05 0;
+  margin: layout.$spacing-07 layout.$spacing-05 0;
 }
 
 .sectionHidden {

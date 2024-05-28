@@ -9,10 +9,16 @@
   right: 0;
   bottom: 0;
   border-left: 1px solid $text-03;
-  background-color: $ui-01;
+  background-color: $ui-02;
   overflow-y: auto;
   height: calc(100vh - 3rem);
   z-index: 3;
+
+  .overlayContent {
+    // 1px is the bottom border of the header
+    height: calc(100vh - 6rem - 1px);
+    background-color: $ui-02;
+  }
 }
 
 .desktopOverlay::after {
@@ -34,6 +40,12 @@
   grid-template-rows: 1fr auto;
   overflow-y: auto;
   height: 100vh;
+
+  .overlayContent {
+    // 1px is the bottom border of the header
+    height: calc(100vh - 3rem - 1px);
+    background-color: $ui-01;
+  }
 }
 
 .tabletOverlayHeader {
@@ -48,7 +60,6 @@
 
 .desktopHeader {
   display: flex;
-  height: 2.5rem;
   justify-content: space-between;
   align-items: center;
   background-color: $ui-03;
@@ -69,6 +80,11 @@
   background-color: $ui-background;
   color: $ui-05;
   fill: $ui-05;
+}
+
+.overlayContent {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Desktop */

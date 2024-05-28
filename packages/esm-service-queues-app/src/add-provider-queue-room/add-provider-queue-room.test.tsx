@@ -31,7 +31,7 @@ jest.mock('./add-provider-queue-room.resource', () => ({
   })),
 }));
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({
       queues: [

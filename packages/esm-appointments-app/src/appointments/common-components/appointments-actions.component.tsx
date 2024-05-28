@@ -29,6 +29,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
     (visit) => visit?.patient?.uuid === patientUuid && visit?.startDatetime && !visit?.stopDatetime,
   );
   const isTodaysAppointment = visitDate.isToday();
+  const isCheckedIn = appointment.status === AppointmentStatus.CHECKEDIN;
   const isCompleted = appointment.status === AppointmentStatus.COMPLETED;
   const isCancelled = appointment.status === AppointmentStatus.CANCELLED;
 
@@ -61,7 +62,7 @@ const AppointmentsActions: React.FC<AppointmentsActionsProps> = ({ appointment }
             {t('checkedOut', 'Checked out')}
           </Button>
         );
-      case checkOutButton.enabled && hasActiveVisitToday && isTodaysAppointment:
+      case checkOutButton.enabled && isCheckedIn:
         return (
           <Button onClick={handleCheckout} kind="danger--tertiary" size="sm">
             {t('checkOut', 'Check out')}

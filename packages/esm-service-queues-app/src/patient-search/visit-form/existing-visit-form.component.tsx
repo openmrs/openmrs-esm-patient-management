@@ -12,6 +12,7 @@ import {
 import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import styles from './visit-form.scss';
+import classNames from 'classnames';
 
 interface ExistingVisitFormProps {
   closePanel: () => void;
@@ -82,7 +83,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
   );
 
   return visit ? (
-    <div>
+    <>
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot
@@ -92,22 +93,18 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
           />
         </Row>
       )}
-      <Stack gap={8} className={styles.container}>
-        <Form className={styles.form} onSubmit={handleSubmit}>
-          <ExtensionSlot name="add-queue-entry-slot" />
-          <section className={styles.buttonSet}>
-            <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-              <Button className={styles.button} kind="secondary" onClick={closePanel}>
-                {t('discard', 'Discard')}
-              </Button>
-              <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-                {t('addPatientToQueue', 'Add patient to queue')}
-              </Button>
-            </ButtonSet>
-          </section>
-        </Form>
-      </Stack>
-    </div>
+      <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
+        <ExtensionSlot name="add-queue-entry-slot" />
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button className={styles.button} kind="secondary" onClick={closePanel}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+            {t('addPatientToQueue', 'Add patient to queue')}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </>
   ) : null;
 };
 

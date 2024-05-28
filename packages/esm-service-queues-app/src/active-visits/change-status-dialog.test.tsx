@@ -27,7 +27,7 @@ jest.mock('../patient-search/hooks/useQueueLocations', () => {
   };
 });
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({ queues: mockServices }),
   };

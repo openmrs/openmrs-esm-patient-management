@@ -12,6 +12,7 @@ This repository contains frontend modules for the OpenMRS SPA. These modules rel
 - [Patient search](packages/esm-patient-search-app)
 - [Patient registration](packages/esm-patient-registration-app)
 - [Patient list management](packages/esm-patient-list-management-app)
+- [Ward](packages/esm-ward-app)
 
 ## Setup
 

@@ -20,7 +20,7 @@ import { type MappedQueueEntry } from '../types';
 import { updateQueueEntry } from './active-visits-table.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import styles from './change-status-dialog.scss';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

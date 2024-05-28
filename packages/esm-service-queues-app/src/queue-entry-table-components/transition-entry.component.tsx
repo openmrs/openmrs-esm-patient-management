@@ -48,7 +48,6 @@ const TransitionMenu: React.FC<TransitionMenuProps> = ({ queueEntry }) => {
       iconDescription={t('call', 'Call')}
       hasIconOnly
       tooltipAlignment="end"
-      tooltipPosition="bottom"
     />
   );
 };

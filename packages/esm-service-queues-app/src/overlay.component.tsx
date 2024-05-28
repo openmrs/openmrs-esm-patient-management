@@ -43,7 +43,7 @@ const Overlay: React.FC<OverlayProps> = ({ closePanel, children, header }) => {
           <div className={styles.headerContent}>{header}</div>
         </Header>
       )}
-      <div>{children}</div>
+      <div className={styles.overlayContent}>{children}</div>
     </div>
   );
 };

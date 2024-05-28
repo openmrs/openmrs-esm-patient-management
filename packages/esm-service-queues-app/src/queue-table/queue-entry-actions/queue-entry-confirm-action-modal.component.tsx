@@ -20,8 +20,9 @@ interface ModalParams {
   submitFailureTitle: string;
   submitAction: (queueEntry: QueueEntry) => Promise<FetchResponse<any>>;
 }
-// Modal with the same UI for undoing a queue entry transition and voiding a queue entry
-export const QueueEntryUndoActionsModal: React.FC<QueueEntryUndoActionsModalProps> = ({
+// Modal for confirming a queue entry action that does not require additional form fields / inputs from user
+// Used by UndoTransitionQueueEntryModal, VoidQueueEntryModal and EndQueueEntryModal
+export const QueueEntryConfirmActionModal: React.FC<QueueEntryUndoActionsModalProps> = ({
   queueEntry,
   closeModal,
   modalParams,
@@ -93,4 +94,4 @@ export const QueueEntryUndoActionsModal: React.FC<QueueEntryUndoActionsModalProp
   );
 };
 
-export default QueueEntryUndoActionsModal;
+export default QueueEntryConfirmActionModal;

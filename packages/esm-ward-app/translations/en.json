@@ -1,0 +1,7 @@
+{
+  "errorLoadingWardLocation": "Error loading ward location",
+  "invalidLocationSpecified": "Invalid location specified",
+  "invalidWardLocation": "Invalid ward location: {{location}}",
+  "noBedsConfigured": "No beds configured for this location",
+  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}"
+}

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { useConfig } from '@openmrs/esm-framework';
+import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
 import styles from '../field.scss';
 
@@ -46,8 +46,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: Date[]) => {
-      setFieldValue('birthdate', birthdate[0]);
+    (birthdate: Date) => {
+      setFieldValue('birthdate', birthdate);
     },
     [setFieldValue],
   );
@@ -101,17 +101,20 @@ export const DobField: React.FC = () => {
       <Layer>
         {!dobUnknown ? (
           <div className={styles.dobField}>
-            <DatePicker dateFormat={dateFormat} datePickerType="single" onChange={onDateChange} maxDate={format(today)}>
-              <DatePickerInput
-                id="birthdate"
-                {...birthdate}
-                placeholder={placeHolder}
-                labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-                invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-                invalidText={birthdateMeta.error && t(birthdateMeta.error)}
-                value={format(birthdate.value)}
-              />
-            </DatePicker>
+            <OpenmrsDatePicker
+              id="birthdate"
+              {...birthdate}
+              dateFormat={dateFormat}
+              onChange={onDateChange}
+              maxDate={today}
+              labelText={t('dateOfBirthLabelText', 'Date of Birth')}
+              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
+              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+              value={birthdate.value}
+              carbonOptions={{
+                placeholder: placeHolder,
+              }}
+            />
           </div>
         ) : (
           <div className={styles.grid}>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../../types';
 import { voidQueueEntry } from './queue-entry-actions.resource';
-import QueueEntryUndoActionsModal from './queue-entry-undo-actions-modal.component';
+import QueueEntryConfirmActionModal from './queue-entry-confirm-action-modal.component';
 
 interface VoidQueueEntryModalProps {
   queueEntry: QueueEntry;
@@ -15,7 +15,7 @@ const VoidQueueEntryModal: React.FC<VoidQueueEntryModalProps> = ({ queueEntry, c
   const modalInstruction = <p>{t('confirmDeleteQueueEntry', 'Are you sure you want to delete this queue entry?')}</p>;
 
   return (
-    <QueueEntryUndoActionsModal
+    <QueueEntryConfirmActionModal
       queueEntry={queueEntry}
       closeModal={closeModal}
       modalParams={{

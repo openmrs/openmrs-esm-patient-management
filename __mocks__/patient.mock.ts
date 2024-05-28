@@ -1,4 +1,4 @@
-import { type Patient, type PersonAddress } from '../packages/esm-service-queues-app/src/types';
+import { type Patient, type PersonAddress } from '@openmrs/esm-framework';
 import { mockAddress } from './address.mock';
 
 export const mockPatientAlice: Patient = {

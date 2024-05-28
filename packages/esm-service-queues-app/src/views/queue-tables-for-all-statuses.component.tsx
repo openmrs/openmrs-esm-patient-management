@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { InlineNotification, Search } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 import PatientSearch from '../patient-search/patient-search.component';
@@ -102,6 +102,15 @@ interface QueueTableForQueueAndStatus {
 function QueueTableForQueueAndStatus({ queueEntries, searchTerm, queue, status }: QueueTableForQueueAndStatus) {
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
+  const { t } = useTranslation();
+
+  if (!columns) {
+    showToast({
+      title: t('invalidtableConfig', 'Invalid table configuration'),
+      kind: 'warning',
+      description: 'No table columns defined by queue ' + queue.uuid + ' and status ' + statusUuid,
+    });
+  }
 
   // filters queue entries based on which status table we want to show and search term inputted by user
   const filterQueueEntries = useCallback(

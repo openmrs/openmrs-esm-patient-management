@@ -16,7 +16,7 @@ jest.mock('./queue-metrics.resource', () => {
   };
 });
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({ queues: mockServiceTypes.data }),
   };

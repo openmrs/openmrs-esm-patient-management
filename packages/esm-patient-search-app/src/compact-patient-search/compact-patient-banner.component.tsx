@@ -7,6 +7,7 @@ import {
   ExtensionSlot,
   PatientPhoto,
   age,
+  displayName,
   interpolateString,
   useConfig,
 } from '@openmrs/esm-framework';
@@ -69,6 +70,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
             id: String(Math.random()), // not used
             given: [patient.person.personName.givenName, patient.person.personName.middleName],
             family: patient.person.personName.familyName,
+            text: patient.person.personName.display,
           },
         ],
         gender: patient.person.gender,
@@ -99,20 +101,16 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
         const patientIdentifiers = patients[index].identifiers.filter((identifier) =>
           config.defaultIdentifierTypes.includes(identifier.identifierType.uuid),
         );
+        const patientName = displayName(patient);
 
         return (
           <ClickablePatientContainer key={patient.id} patient={patients[index]}>
             <div className={styles.patientAvatar} role="img">
-              <PatientPhoto
-                patientUuid={patient.id}
-                patientName={`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]?.family}`}
-                size="small"
-              />
+              <PatientPhoto patientUuid={patient.id} patientName={patientName} size="small" />
             </div>
             <div>
               <div className={styles.flexRow}>
-                <h2 className={styles.patientName}>{`${patient.name?.[0]?.given?.join(' ')} ${patient.name?.[0]
-                  ?.family}`}</h2>
+                <h2 className={styles.patientName}>{patientName}</h2>
                 <ExtensionSlot
                   name="patient-banner-tags-slot"
                   state={{ patient, patientUuid: patient.id }}

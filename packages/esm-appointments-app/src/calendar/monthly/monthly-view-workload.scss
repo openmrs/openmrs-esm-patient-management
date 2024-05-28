@@ -25,10 +25,12 @@
     border-left: 1px solid colors.$gray-20;
     border-bottom: 1px solid colors.$gray-20;
   }
+
   &-disabled:last-child {
     border-right: 1px solid colors.$gray-20;
   }
 }
+
 .identifiers {
   @include type.type-style('body-compact-02');
   color: $ui-04;
@@ -38,10 +40,12 @@
     margin: 0rem 0.75rem;
   }
 }
+
 .identifierTag {
   display: flex;
   align-items: center;
 }
+
 .weekly-cell {
   position: relative;
   border-right: 1px solid colors.$gray-20;
@@ -77,9 +81,10 @@
 }
 
 .currentData {
-  margin: 2px;
-  padding-top: 2px;
-  background-color: colors.$gray-10;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin: 0.1rem 0.1rem 0.5rem 0.1rem;
 
   & > span {
     @include type.type-style('label-02');
@@ -87,19 +92,21 @@
 }
 
 .serviceArea {
-  padding: 0.0125rem;
+  width: 100%;
+  padding: 0.125rem;
+  margin-right: 0.5rem;
   display: grid;
   grid-template-columns: 4fr 1fr;
   justify-content: flex-start;
-  text-align: left;
-  margin: 0.125rem;
-  @include type.type-style('label-01');
   color: #020f1b;
   cursor: pointer;
+  @include type.type-style('label-01');
 
   & > span:first-child {
     text-align: left;
     text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   & > span:nth-child(2) {
@@ -108,8 +115,31 @@
 }
 
 .serviceArea:hover {
-  opacity: 0.8;
-  border: 1px solid grey;
+  background-color: colors.$gray-10;
+}
+
+.totals {
+  padding: 0.125rem;
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  justify-content: flex-start;
+  background-color: colors.$gray-10;
+
+  & > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    font-weight: lighter;
+  }
+
+  & > span:nth-child(2) {
+    color: #020f1b;
+    font-weight: bold;
+    text-align: right;
+    @include type.type-style('heading-compact-01');
+  }
 }
 
 .smallDesktop {
@@ -144,6 +174,15 @@
   font-weight: bold;
 }
 
-.calendarDate {
+.showMoreItems {
+  margin-top: 0.1rem;
+  padding: 0;
   @include type.type-style('heading-compact-01');
+  text-decoration: underline;
+  color: colors.$blue-50;
+  background-color: colors.$white;
+  font-weight: lighter;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
