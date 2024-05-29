@@ -4,6 +4,11 @@
     "webservices.rest": "^2.2.0"
   },
   "extensions": [
+    {
+      "name": "admitted-patient-header-address",
+      "component": "admittedPatientHeaderAddress",
+      "slot": "ward-admitted-patient-header-slot"
+    }
   ],
   "pages": [
     {

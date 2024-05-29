@@ -9,9 +9,10 @@ interface WardBedProps {
   patients: Patient[];
 }
 
-const WardBed = ({ bed, patients }: WardBedProps) => {
-  // return <>{patients?.length > 0 ? <div></div> : <EmptyBed bed={bed} />}</>;
-  return <AdmittedPatient />;
+const WardBed: React.FC<WardBedProps> = ({ bed, patients }) => {
+  return patients?.length > 0 ? 
+    <AdmittedPatient bed={bed} patients={patients} />
+    : <EmptyBed bed={bed} />;
 };
 
 export default WardBed;
