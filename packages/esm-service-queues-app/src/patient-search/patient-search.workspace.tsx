@@ -35,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
     setNewVisitMode(mode);
   };
 
-  const patientName = displayName(patient);
+  const patientName = patient && displayName(patient);
   return patient ? (
     <>
       <div className={styles.patientBannerContainer}>
