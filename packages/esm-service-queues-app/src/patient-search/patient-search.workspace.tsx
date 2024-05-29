@@ -11,6 +11,7 @@ import {
   PatientPhoto,
   PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
+  displayName,
 } from '@openmrs/esm-framework';
 import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
 import styles from './patient-search.scss';
@@ -34,7 +35,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
     setNewVisitMode(mode);
   };
 
-  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = displayName(patient);
   return patient ? (
     <>
       <div className={styles.patientBannerContainer}>

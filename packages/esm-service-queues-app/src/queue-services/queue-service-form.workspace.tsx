@@ -56,7 +56,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
             showSnackbar({
               title: t('addQueue', 'Add queue'),
               kind: 'success',
-              subtitle: t('queueAddedSuccessfully', 'Queue addeded successfully'),
+              subtitle: t('queueAddedSuccessfully', 'Queue added successfully'),
             });
             closeWorkspace();
             mutate(`${restBaseUrl}/queue?${userLocation}`);
@@ -165,7 +165,7 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
         </Column>
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

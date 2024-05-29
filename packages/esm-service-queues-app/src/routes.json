@@ -108,22 +108,26 @@
     {
       "name": "service-queues-service-form",
       "title": "addNewQueueService",
-      "component": "addnewQueueServiceWorkspace"
+      "component": "addNewQueueServiceWorkspace",
+      "type": "service-queues"
     },
     {
       "name": "service-queues-room-form",
       "title": "addNewQueueServiceRoom",
-      "component": "addnewQueueServiceRoomWorkspace"
+      "component": "addNewQueueServiceRoomWorkspace",
+      "type": "service-queues"
     },
     {
       "name": "service-queues-linelist-filter",
       "title": "filter",
-      "component": "queueLinelistFilterWorkspace"
+      "component": "queueLinelistFilterWorkspace",
+      "type": "service-queues"
     },
     {
       "name": "service-queues-patient-search",
       "title": "searchPatient",
-      "component": "patientSearchWorkspace"
+      "component": "patientSearchWorkspace",
+      "type": "service-queues"
     }
   ]
 }
