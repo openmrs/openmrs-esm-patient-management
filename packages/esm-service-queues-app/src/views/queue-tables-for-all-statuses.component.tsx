@@ -44,7 +44,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
 
   return (
     <>
-      <PatientQueueHeader title={selectedQueue?.display} hideLocationDropdown />
+      <PatientQueueHeader title={selectedQueue?.display} showLocationDropdown={false} />
       <QueueTableMetrics selectedQueue={selectedQueue} />
 
       {/* <MetricsHeader /> */}
