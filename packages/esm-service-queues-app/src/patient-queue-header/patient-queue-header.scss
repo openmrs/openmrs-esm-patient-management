@@ -5,12 +5,12 @@
 .header {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  height: spacing.$spacing-12;
   background-color: $ui-02;
   border: 1px solid $ui-03;
   border-left: 0px;
   display: flex;
   justify-content: space-between;
+  padding-right: 1rem;
 }
 
 .left-justified-items {

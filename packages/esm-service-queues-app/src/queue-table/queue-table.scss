@@ -64,7 +64,7 @@
 
 .tableContainer {
   background-color: $ui-01;
-  margin: 0 spacing.$spacing-05;
+  // margin: 0 spacing.$spacing-05;
   padding: 0;
 
   a {
@@ -174,8 +174,8 @@ html[dir='rtl'] {
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
-  margin: 0 spacing.$spacing-05;
+  padding: 2rem 0;
+  // margin: 0 spacing.$spacing-05;
 }
 
 .tile {
@@ -188,4 +188,8 @@ html[dir='rtl'] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.paddedQueueTable {
+  padding: 0 spacing.$spacing-05;
 }

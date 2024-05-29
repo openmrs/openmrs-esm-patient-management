@@ -25,7 +25,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
   const { t } = useTranslation();
 
   const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses;
+  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
   const [searchTerm, setSearchTerm] = useState('');
 
   const noStatuses = !allowedStatuses?.length;
@@ -44,12 +44,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
 
   return (
     <>
-      <PatientQueueHeader title={selectedQueue?.display} showLocationDropdown={false} />
-      <QueueTableMetrics selectedQueue={selectedQueue} />
-
-      {/* <MetricsHeader /> */}
-      <div className={styles.container}>
-        <div className={styles.headerContainer}>
+      <PatientQueueHeader
+        title={selectedQueue?.display}
+        showLocationDropdown={false}
+        actions={
           <div className={styles.headerButtons}>
             <ExtensionSlot
               name="patient-search-button-slot"
@@ -59,7 +57,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 buttonProps: {
                   kind: 'secondary',
                   renderIcon: (props) => <Add size={16} {...props} />,
-                  size: 'sm',
+                  size: isDesktop(layout) ? 'sm' : 'lg',
                 },
                 selectPatientAction: (selectedPatientUuid) => {
                   launchWorkspace('service-queues-patient-search', {
@@ -78,11 +76,12 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
               />
             </div>
           </div>
-        </div>
-        <div>
-          <QueueTableMetrics selectedQueue={selectedQueue} />
-        </div>
+        }
+      />
+      <QueueTableMetrics selectedQueue={selectedQueue} />
 
+      {/* <MetricsHeader /> */}
+      <div className={styles.container}>
         {allowedStatuses?.map((status) => (
           <QueueTableForQueueAndStatus
             key={status.uuid}
