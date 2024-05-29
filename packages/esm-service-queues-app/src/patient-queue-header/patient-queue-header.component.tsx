@@ -15,9 +15,9 @@ import {
 } from '../helpers/helpers';
 import styles from './patient-queue-header.scss';
 
-const PatientQueueHeader: React.FC<{ title?: string; hideLocationDropdown?: boolean }> = ({
+const PatientQueueHeader: React.FC<{ title?: string; showLocationDropdown: boolean }> = ({
   title,
-  hideLocationDropdown,
+  showLocationDropdown,
 }) => {
   const { t } = useTranslation();
   const { queueLocations, isLoading, error } = useQueueLocations();
@@ -79,7 +79,7 @@ const PatientQueueHeader: React.FC<{ title?: string; hideLocationDropdown?: bool
             <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
           </div>
           <div className={styles.dropdownContainer}>
-            {!hideLocationDropdown && (
+            {showLocationDropdown && (
               <Dropdown
                 aria-label="Select queue location"
                 className={styles.dropdown}
