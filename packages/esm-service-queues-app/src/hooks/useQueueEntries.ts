@@ -29,7 +29,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
         const nextUrl = new URL(previousPageData.data.links.find((link) => link.rel === 'next')?.uri);
         // default for production
         if (nextUrl.origin === window.location.origin) {
-          return nextUrl;
+          return nextUrl.toString();
         }
 
         // in development, the request should be funnelled through the local proxy
