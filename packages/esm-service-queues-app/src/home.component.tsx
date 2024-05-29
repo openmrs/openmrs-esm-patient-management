@@ -6,7 +6,7 @@ import DefaultQueueTable from './queue-table/default-queue-table.component';
 const Home: React.FC = () => {
   return (
     <>
-      <PatientQueueHeader />
+      <PatientQueueHeader showLocationDropdown />
       <ClinicMetrics />
       <DefaultQueueTable />
     </>
