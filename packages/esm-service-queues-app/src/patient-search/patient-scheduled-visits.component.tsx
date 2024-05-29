@@ -31,7 +31,7 @@ import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
-import { addQueueEntry } from './visit-form/queue.resource';
+import { postQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24 } from '../helpers/time-helpers';
 import dayjs from 'dayjs';
@@ -120,7 +120,7 @@ const ScheduledVisitsForVisitType: React.FC<{
           .subscribe(
             (response) => {
               if (response.status === 201) {
-                addQueueEntry(
+                postQueueEntry(
                   response.data.uuid,
                   patientId,
                   priority,

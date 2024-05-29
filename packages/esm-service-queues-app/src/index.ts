@@ -10,7 +10,6 @@ import outpatientSideNavComponent from './side-menu/side-menu.component';
 import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -153,8 +152,6 @@ export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-
   featureName: 'service-queues-patient-search',
   moduleName,
 });
-
-export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 
 export const activeVisitsRowActions = getAsyncLifecycle(
   () => import('./active-visits/active-visits-row-actions.component'),

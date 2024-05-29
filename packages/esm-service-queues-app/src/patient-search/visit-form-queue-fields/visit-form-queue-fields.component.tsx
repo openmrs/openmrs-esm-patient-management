@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
@@ -9,8 +9,9 @@ import { useQueues } from '../../hooks/useQueues';
 import { type ConfigObject } from '../../config-schema';
 import { SelectSkeleton } from '@carbon/react';
 import { RadioButtonSkeleton } from '@carbon/react';
+import { AddPatientToQueueContext } from '../patient-search.workspace';
 
-const StartVisitQueueFields: React.FC = () => {
+const VisitFormQueueFields: React.FC = () => {
   const { t } = useTranslation();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
@@ -26,6 +27,7 @@ const StartVisitQueueFields: React.FC = () => {
   const [selectedService, setSelectedService] = useState('');
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
   const statuses = queues.find((q) => q.uuid === selectedService)?.allowedStatuses ?? [];
+  const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
 
   useEffect(() => {
     if (priority === emergencyPriorityConceptUuid) {
@@ -35,14 +37,18 @@ const StartVisitQueueFields: React.FC = () => {
 
   useEffect(() => {
     if (queues?.length > 0) {
-      setSelectedService(queues[0].uuid);
+      if (currentServiceQueueUuid) {
+        setSelectedService(currentServiceQueueUuid);
+      } else {
+        setSelectedService(queues[0].uuid);
+      }
     }
   }, [queues]);
 
   useEffect(() => {
     if (queueLocations?.length > 0) {
-      if (queueLocations.map(l => l.id).includes(sessionLocation.uuid)) {
-        setSelectedQueueLocation(sessionLocation.uuid);  
+      if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
+        setSelectedQueueLocation(sessionLocation.uuid);
       } else {
         setSelectedQueueLocation(queueLocations[0].id);
       }
@@ -176,4 +182,4 @@ const StartVisitQueueFields: React.FC = () => {
   );
 };
 
-export default StartVisitQueueFields;
+export default VisitFormQueueFields;

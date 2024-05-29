@@ -20,7 +20,15 @@ interface PatientSearchProps extends DefaultWorkspaceProps {
   currentServiceQueueUuid?: string;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace,  selectedPatientUuid, currentServiceQueueUuid }) => {
+export const AddPatientToQueueContext = React.createContext({
+  currentServiceQueueUuid: '',
+});
+
+const PatientSearch: React.FC<PatientSearchProps> = ({
+  closeWorkspace,
+  selectedPatientUuid,
+  currentServiceQueueUuid,
+}) => {
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
@@ -34,7 +42,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace,  selected
 
   const patientName = patient && displayName(patient);
   return patient ? (
-    <>
+    <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
       <div className={styles.patientBannerContainer}>
         <div className={styles.patientBanner}>
           <div className={styles.patientPhoto}>
@@ -68,7 +76,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace,  selected
           />
         ) : null}
       </div>
-    </>
+    </AddPatientToQueueContext.Provider>
   ) : null;
 };
 
