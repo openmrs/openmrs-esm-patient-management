@@ -16,13 +16,10 @@ const VisitFormQueueFields: React.FC = () => {
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
   const config = useConfig<ConfigObject>();
-  const defaultStatus = config.concepts.defaultStatusConceptUuid;
-  const defaultPriority = config.concepts.defaultPriorityConceptUuid;
-  const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
-  const [priority, setPriority] = useState(defaultPriority);
-  const [status, setStatus] = useState(defaultStatus);
+  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
+  const [status, setStatus] = useState(config.concepts.defaultStatusConceptUuid);
   const [sortWeight, setSortWeight] = useState(0);
   const [selectedService, setSelectedService] = useState('');
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
@@ -30,7 +27,7 @@ const VisitFormQueueFields: React.FC = () => {
   const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
 
   useEffect(() => {
-    if (priority === emergencyPriorityConceptUuid) {
+    if (priority === config.concepts.emergencyPriorityConceptUuid) {
       setSortWeight(1);
     }
   }, [priority]);
@@ -159,7 +156,7 @@ const VisitFormQueueFields: React.FC = () => {
             className={styles.radioButtonWrapper}
             name="priority"
             id="priority"
-            defaultSelected={defaultPriority}
+            defaultSelected={config.concepts.defaultPriorityConceptUuid}
             onChange={(uuid) => {
               setPriority(uuid);
             }}>

@@ -1,19 +1,18 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@testing-library/react';
-import StartVisitQueueFields from './visit-form-queue-fields.component';
+import VisitFormQueueFields from './visit-form-queue-fields.component';
+import { defineConfigSchema, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { configSchema } from '../../config-schema';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: () => 'desktop',
-  showSnackbar: jest.fn(),
-  useConfig: jest.fn(() => ({
-    concepts: {
-      defaultStatusConceptUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
-    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  })),
-}));
+defineConfigSchema('@openmrs/esm-service-queues-app', configSchema);
+
+const mockUseLayoutType = useLayoutType as jest.Mock;
+mockUseLayoutType.mockReturnValue('small-desktop');
+
+const mockUseSession = useSession as jest.Mock;
+mockUseSession.mockReturnValue({ sessionLocation: { uuid: '1' } });
+
 jest.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({
     queueLocations: [{ id: '1', name: 'Location 1' }],
@@ -35,9 +34,9 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('StartVisitQueueFields', () => {
+describe('VisitFormQueueFields', () => {
   it('renders the form fields', () => {
-    const { getByLabelText, getByText } = render(<StartVisitQueueFields />);
+    const { getByLabelText, getByText } = render(<VisitFormQueueFields />);
 
     expect(getByLabelText('Select a queue location')).toBeInTheDocument();
     expect(getByLabelText('Select a service')).toBeInTheDocument();
@@ -48,7 +47,7 @@ describe('StartVisitQueueFields', () => {
 
   it('updates the selected queue location', async () => {
     const user = userEvent.setup();
-    const { getByLabelText } = render(<StartVisitQueueFields />);
+    const { getByLabelText } = render(<VisitFormQueueFields />);
 
     const selectQueueLocation = getByLabelText('Select a queue location') as HTMLInputElement;
     await user.type(selectQueueLocation, '1');
@@ -58,7 +57,7 @@ describe('StartVisitQueueFields', () => {
 
   it('updates the selected service', async () => {
     const user = userEvent.setup();
-    const { getByLabelText } = render(<StartVisitQueueFields />);
+    const { getByLabelText } = render(<VisitFormQueueFields />);
 
     const selectService = getByLabelText('Select a service') as HTMLInputElement;
     await user.type(selectService, 'service-1');
