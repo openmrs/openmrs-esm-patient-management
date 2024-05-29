@@ -173,7 +173,7 @@ const AddProviderQueueRoom: React.FC<AddProviderQueueRoomProps> = ({ providerUui
               itemToString={(item) => (item ? item.display : '')}
               onChange={handleServiceChange}
               size="md"
-              initialSelectedItem={{ uuid: currentService, display: currentService?.serviceDisplay }}
+              initialSelectedItem={{ uuid: currentService?.serviceUuid, display: currentService?.serviceDisplay }}
             />
           </section>
 
