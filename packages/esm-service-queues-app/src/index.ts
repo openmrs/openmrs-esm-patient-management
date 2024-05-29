@@ -48,11 +48,6 @@ export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotCompo
   moduleName,
 });
 
-export const addPatientToQueue = getAsyncLifecycle(() => import('./patient-search/visit-form/visit-form.component'), {
-  featureName: 'patient info slot',
-  moduleName,
-});
-
 export const removeQueueEntry = getAsyncLifecycle(
   () => import('./remove-queue-entry-dialog/remove-queue-entry.component'),
   {
@@ -134,6 +129,30 @@ export const endQueueEntryModal = getAsyncLifecycle(
     moduleName,
   },
 );
+
+// t('addNewQueueService', 'Add New Queue Service')
+export const addnewQueueServiceWorkspace = getAsyncLifecycle(
+  () => import('./queue-services/queue-service-form.workspace'),
+  {
+    featureName: 'service-queues-service-form',
+    moduleName,
+  },
+);
+
+// t('addNewQueueServiceRoom', 'Add new queue service room')
+export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
+  () => import('./queue-rooms/queue-room-form.workspace'),
+  {
+    featureName: 'service-queues-queue-room-form',
+    moduleName,
+  },
+);
+
+// t('searchPatient', 'Search Patient')
+export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
+  featureName: 'service-queues-patient-search',
+  moduleName,
+});
 
 export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
 

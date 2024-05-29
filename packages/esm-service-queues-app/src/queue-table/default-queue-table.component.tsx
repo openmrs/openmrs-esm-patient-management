@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, launchWorkspace, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -13,7 +13,6 @@ import {
 } from '../helpers/helpers';
 import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import PatientSearch from '../patient-search/patient-search.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
@@ -44,9 +43,6 @@ function DefaultQueueTable() {
     }
   }, [error?.message]);
   const layout = useLayoutType();
-
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
 
   const columns = useColumns(null, null);
   if (!columns) {
@@ -91,8 +87,7 @@ function DefaultQueueTable() {
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                setShowOverlay(true);
-                setViewState({ selectedPatientUuid });
+                launchWorkspace('service-queues-patient-search', { viewState: { selectedPatientUuid } });
               },
             }}
           />
@@ -114,7 +109,6 @@ function DefaultQueueTable() {
           <ClearQueueEntries queueEntries={filteredQueueEntries} />,
         ]}
       />
-      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }
