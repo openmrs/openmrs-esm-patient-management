@@ -29,9 +29,9 @@ import {
   usePagination,
   ConfigurableLink,
   formatDate,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
-import QueueLinelist from './queue-linelist.component';
 import { updateSelectedAppointmentStatus, useSelectedAppointmentStatus } from '../helpers/helpers';
 import { useAppointments } from './queue-linelist.resource';
 import { getGender } from '../helpers/functions';
@@ -55,7 +55,6 @@ type FilterProps = {
 
 const AppointmentsTable: React.FC = () => {
   const { t } = useTranslation();
-  const [showOverlay, setShowOverlay] = useState(false);
   const { appointmentStatuses } = useConfig<ConfigObject>();
   const currentAppointmentStatus = useSelectedAppointmentStatus();
   const { appointmentQueueEntries, isLoading } = useAppointments();
@@ -202,10 +201,10 @@ const AppointmentsTable: React.FC = () => {
             <Button
               kind="ghost"
               renderIcon={(props) => <Filter size={16} {...props} />}
-              iconDescription={t('filter', 'Filter (1)')}
-              onClick={() => setShowOverlay(true)}
+              iconDescription={t('filter', 'Filter')}
+              onClick={() => launchWorkspace('service-queues-linelist-filter')}
               size="sm">
-              {t('filter', 'Filter (1)')}
+              {t('filter', 'Filter')}
             </Button>
           </div>
         </Tile>
@@ -299,8 +298,6 @@ const AppointmentsTable: React.FC = () => {
         pageSizes={pageSizes?.length > 0 ? pageSizes : [100]}
         totalItems={appointmentQueueEntries?.length ?? 0}
       />
-
-      {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 };
