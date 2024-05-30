@@ -48,6 +48,7 @@ export interface Appointment {
   recurring: boolean;
   service: AppointmentService;
   startDateTime: string | any;
+  dateAppointmentScheduled: string | any;
   status: AppointmentStatus;
   uuid: string;
   additionalInfo?: string | null;
@@ -120,6 +121,7 @@ export interface Observation {
 export interface AppointmentPayload {
   patientUuid: string;
   serviceUuid: string;
+  dateAppointmentScheduled: string;
   startDateTime: string;
   endDateTime: string;
   appointmentKind: string;
