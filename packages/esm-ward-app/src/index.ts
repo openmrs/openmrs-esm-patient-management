@@ -79,3 +79,12 @@ export const admittedPatientHeaderTime = getAsyncLifecycle(
     moduleName,
   },
 );
+
+// workspaces:
+export const pendingAdmissionRequestsWorkspace = getAsyncLifecycle(
+  () => import('./admission-requests/pending-admission-requests.workspace'),
+  {
+    featureName: 'pending-admission-requests-workspace', 
+    moduleName,
+  }
+)

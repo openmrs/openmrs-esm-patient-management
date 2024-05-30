@@ -1,4 +1,16 @@
-import { type Location, type Patient } from '@openmrs/esm-framework';
+import { OpenmrsResource, OpenmrsResourceStrict, Person, Visit, type Location, type Patient } from '@openmrs/esm-framework';
+
+type DispositionType = "ADMISSION"|"TRANSFER"|"DISCHARGE"
+
+interface Disposition {
+  patient:Patient
+  visit:Visit;
+  type:DispositionType;
+  encounter?:Encounter;
+  dispositionObs?:Observation;
+  dispositionLocation?:Location
+  dispositionDate?:Date
+}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -50,3 +62,51 @@ interface BedTagMap {
 }
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+// TODO: Move these types to esm-core
+export interface Observation extends OpenmrsResourceStrict {
+  concept: OpenmrsResource;
+  person: Person;
+  obsDatetime: string;
+  accessionNumber: string;
+  obsGroup: Observation;
+  valueCodedName: OpenmrsResource; // ConceptName
+  groupMembers: Array<Observation>;
+  comment: string;
+  location: Location;
+  order: OpenmrsResource; // Order
+  encounter: Encounter;
+  voided: boolean;
+}
+
+export interface Encounter extends OpenmrsResourceStrict {
+  encounterDatetime?: string;
+  patient?: Patient;
+  location?: Location;
+  form?: OpenmrsResource;
+  encounterType?: EncounterType;
+  obs?: Observation;
+  orders?: any;
+  voided?: boolean;
+  visit?: Visit;
+  encounterProviders?: Array<EncounterProvider>;
+  diagnoses?: any;
+}
+
+export interface EncounterProvider extends OpenmrsResourceStrict {
+  provider?: OpenmrsResource;
+  encounterRole?: EncounterRole;
+  voided?: boolean;
+}
+
+export interface EncounterType extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}
+
+export interface EncounterRole extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}

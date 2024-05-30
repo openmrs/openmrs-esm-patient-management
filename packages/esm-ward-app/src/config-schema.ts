@@ -65,3 +65,28 @@ interface PatientDetail {
   id: string;
   fieldType: string;
 }
+
+
+interface WardPatientCardConfig {
+  slotElementDefinitions: SlotElementDefinition[];
+  slotDefinitions: SlotDefinition[],
+  cardDefinitions: CardDefinition[];
+}
+
+type SlotElementDefinition = {
+  id: string;
+} & (
+  | { slotElementType: 'patient-name-slot-element' }
+  | { slotElementType: 'bed-number-slot-element' }
+  | { slotElementType: 'patient-age-slot-element' }
+  | { slotElementType: 'patient-address-slot-element' }
+  | { slotElementType: 'admission-time-slot-element' }
+)
+interface SlotDefinition {
+
+}
+
+interface CardDefinition {
+  slots: string[];
+  appliedTo: Array<any>;
+}

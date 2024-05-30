@@ -38,6 +38,14 @@
       "slot":"ward-admitted-patient-header-slot"
     }
   ],
+  "workspaces": [
+    {
+      "name": "pending-admission-requests-workspace",
+      "title": "admissionRequests",
+      "component": "pendingAdmissionRequestsWorkspace",
+      "type": "ward"
+    }
+  ],
   "pages": [
     {
       "component": "root",

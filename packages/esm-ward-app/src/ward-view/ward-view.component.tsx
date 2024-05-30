@@ -1,6 +1,6 @@
 import React from 'react';
 import { InlineNotification } from '@carbon/react';
-import { useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import { launchWorkspace, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -9,7 +9,7 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
 import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
-import AdmittedPatient from '../admitted-patient/admitted-patient';
+import { Button } from '@carbon/react';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -24,7 +24,19 @@ const WardView = () => {
   return (
     <div className={styles.wardView}>
       <div className={styles.wardViewHeader}>
-        <h4>{location?.display}</h4>
+        <div className={styles.wardViewHeaderLocationDisplay}>
+          <h4>{location?.display}</h4>
+        </div>
+        <div className={styles.wardViewHeaderAdmissionRequestMenuBar}>
+          3 admission requests
+          <Button
+            size="sm"
+            onClick={() => {
+              launchWorkspace('pending-admission-requests-workspace', {})
+            }}>
+            Manage
+          </Button>
+        </div>
       </div>
       <div className={styles.wardViewMain}>
         {invalidLocation ? (
