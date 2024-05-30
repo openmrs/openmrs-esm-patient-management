@@ -154,6 +154,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDateText: z.string().nullable(),
       }),
       formIsRecurringAppointment: z.boolean(),
+      dateAppointmentScheduled: z.date().optional(),
     })
     .refine(
       (formValues) => {
@@ -169,6 +170,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     );
 
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
+
+  const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
+    ? new Date(appointment?.dateAppointmentScheduled)
+    : new Date();
 
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
@@ -196,6 +201,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDateText: defaultEndDateText,
       },
       formIsRecurringAppointment: isRecurringAppointment,
+      dateAppointmentScheduled: defaultDateAppointmentScheduled,
     },
   });
 
@@ -328,6 +334,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       provider,
       appointmentNote,
       appointmentStatus,
+      dateAppointmentScheduled,
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
@@ -348,6 +355,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       patientUuid: patientUuid,
       comments: appointmentNote,
       uuid: context === 'editing' ? appointment.uuid : undefined,
+      dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
 
@@ -413,6 +421,31 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       </SelectItem>
                     ))}
                 </Select>
+              )}
+            />
+          </ResponsiveWrapper>
+        </section>
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+          <ResponsiveWrapper>
+            <Controller
+              name="dateAppointmentScheduled"
+              control={control}
+              render={({ field: { onChange, value, ref } }) => (
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={value}
+                  maxDate={new Date()}
+                  onChange={([date]) => onChange(date)}>
+                  <DatePickerInput
+                    id="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    style={{ width: '100%' }}
+                    placeholder={datePickerPlaceHolder}
+                    ref={ref}
+                  />
+                </DatePicker>
               )}
             />
           </ResponsiveWrapper>
