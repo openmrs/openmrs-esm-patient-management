@@ -8,6 +8,34 @@
       "name": "admitted-patient-header-address",
       "component": "admittedPatientHeaderAddress",
       "slot": "ward-admitted-patient-header-slot"
+    },
+    {
+      "name":"admitted-patient-header-name",
+      "component":"admittedPatientHeaderName",
+      "slot":"ward-admitted-patient-header-slot",
+      "order":1
+    
+    },
+    {
+      "name":"admitted-patient-bed-number",
+      "component":"admittedPatientHeaderBedNumber",
+      "slot":"ward-admitted-patient-header-slot",
+      "order":0
+    },
+    {
+       "name":"admitted-patient-header-age",
+       "component":"admittedPatientHeaderAge",
+       "slot":"ward-admitted-patient-header-slot"
+    },
+    {
+       "name":"admitted-patient-header-reason",
+       "component":"admittedPatientHeaderReason",
+       "slot":"ward-admitted-patient-header-slot"
+    },
+    {
+      "name":"admitted-patient-header-time",
+      "component":"admittedPatientHeaderTime",
+      "slot":"ward-admitted-patient-header-slot"
     }
   ],
   "pages": [

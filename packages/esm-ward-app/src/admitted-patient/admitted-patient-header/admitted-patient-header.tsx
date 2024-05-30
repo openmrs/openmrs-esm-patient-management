@@ -1,6 +1,6 @@
-import { ExtensionSlot, Patient } from '@openmrs/esm-framework';
+import { ExtensionSlot, type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import { Bed } from '../../types';
+import { type Bed } from '../../types';
 import styles from './admitted-patient-header.scss';
 
 export interface AdmittedPatientHeaderProps {
@@ -11,10 +11,7 @@ export interface AdmittedPatientHeaderProps {
 const AdmittedPatientHeader: React.FC<AdmittedPatientHeaderProps> = ({ patient, bed }) => {
   return (
     <div className={styles.admittedPatientHeader}>
-      <ExtensionSlot 
-        name="ward-admitted-patient-header-slot" 
-        state={{patient, bed}}
-      />
+      <ExtensionSlot name="ward-admitted-patient-header-slot" state={{ patient, bed }} />
     </div>
   );
 };

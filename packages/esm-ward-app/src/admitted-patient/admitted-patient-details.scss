@@ -40,3 +40,24 @@
   justify-content: center;
   align-items: center;
 }
+
+.admittedPatientAddress {
+  @include type.type-style('body-compact-01');
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: spacing.$spacing-02;
+  color: $text-02;
+  > div:not(div:first-of-type) {
+    display: flex;
+    align-items: center;
+    &::before {
+      content: '·';
+      padding: 0 spacing.$spacing-02;
+    }
+  }
+}
+
+.admittedPatientFields{
+  @include type.type-style('body-compact-01');
+}

@@ -1,4 +1,4 @@
-import { PersonAddress, Type } from '@openmrs/esm-framework';
+import { type PersonAddress, Type } from '@openmrs/esm-framework';
 
 export const admittedPatientHeaderAddressConfigSchema = {
   addressType: {
@@ -8,12 +8,24 @@ export const admittedPatientHeaderAddressConfigSchema = {
   },
   fields: {
     _type: Type.Array,
-    _description: "The list of PersonAddress fields to display",
-    _default: ['stateProvince', 'country']
-  }
+    _description: 'The list of PersonAddress fields to display',
+    _default: ['stateProvince', 'country'],
+  },
+};
+
+export const admittedPatientHeaderNameConfigSchema = {
+  displayName: {
+    _type: Type.String,
+    _description: 'Specifies how to display name. Supports "normal" or "reverse"',
+    _default: 'reverse',
+  },
 };
 
 export interface AdmittedPatientHeaderAddressConfigObject {
-  addressType?: "preferred" | "all",
-  fields: Array<keyof PersonAddress>
+  addressType?: 'preferred' | 'all';
+  fields: Array<keyof PersonAddress>;
+}
+
+export interface AdmittedPatientHeaderNameConfigObject {
+  displayName: 'normal' | 'reverse';
 }

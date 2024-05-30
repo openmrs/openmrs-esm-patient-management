@@ -47,7 +47,7 @@ const WardView = () => {
 const WardViewByLocation = ({ location }: { location: Location }) => {
   const { admissionLocation, isLoading, error } = useAdmissionLocation(location.uuid);
   const { t } = useTranslation();
-  
+
   if (admissionLocation) {
     // admissionLocation.bedLayouts can contain row+column positions with no bed,
     // filter out layout positions with no real bed
@@ -61,7 +61,7 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
         {bedLayouts.map((bedLayout, i) => {
           const { patient } = bedLayout;
           const bed = bedLayoutToBed(bedLayout);
-          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
+          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient, patient] : null} />;
         })}
         {bedLayouts.length == 0 && (
           <InlineNotification
