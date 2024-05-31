@@ -96,6 +96,11 @@ export const configSchema = {
       _description: 'Whether the check-in button on the "Appointments" list should be enabled',
       _default: true,
     },
+    showIfActiveVisit: {
+      _type: Type.Boolean,
+      _description: 'Whether to show the check-in button if the patient currently has an active visit',
+      _default: false,
+    },
     customUrl: {
       _type: Type.String,
       _description: 'Custom URL to open when clicking the check-in button (instead of thes start visit form)',
@@ -136,6 +141,7 @@ export interface ConfigObject {
   allowAllDayAppointments: boolean;
   checkInButton: {
     enabled: boolean;
+    showIfActiveVisit: boolean;
     customUrl: string;
   };
   checkOutButton: {
