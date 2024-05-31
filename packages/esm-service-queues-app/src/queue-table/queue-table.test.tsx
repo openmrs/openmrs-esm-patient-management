@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineConfigSchema, getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
-import { mockQueueEntries, mockSession } from '__mocks__';
+import { mockPriorityNonUrgent, mockQueueEntries, mockSession } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import QueueTable from './queue-table.component';
 import { type ConfigObject, configSchema } from '../config-schema';
@@ -168,5 +168,67 @@ describe('QueueTable', () => {
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
     }
+  });
+
+  it('supports custom styles for priority tags at column level', () => {
+    mockUseConfig.mockReturnValue({
+      ...configDefaults,
+      queueTables: {
+        columnDefinitions: [
+          {
+            id: 'priority',
+            config: {
+              priorityConfigs: [
+                {
+                  conceptUuid: mockPriorityNonUrgent.uuid,
+                  color: 'blue',
+                  style: 'bold',
+                },
+              ],
+            },
+          },
+        ],
+        tableDefinitions: [
+          {
+            columns: ['patient-name', 'priority'],
+          },
+        ],
+      },
+    } as ConfigObject);
+
+    renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={'triage-queue-uuid'} />);
+
+    const rows = screen.queryAllByRole('row');
+    const firstRow = rows[1];
+    const cells = within(firstRow).getAllByRole('cell');
+    expect(cells[1].childNodes[0]).toHaveClass('bold');
+  });
+
+  it('supports custom styles for priority tags at top level', () => {
+    mockUseConfig.mockReturnValue({
+      ...configDefaults,
+      priorityConfigs: [
+        {
+          conceptUuid: mockPriorityNonUrgent.uuid,
+          color: 'blue',
+          style: 'bold',
+        },
+      ],
+      queueTables: {
+        columnDefinitions: [],
+        tableDefinitions: [
+          {
+            columns: ['patient-name', 'priority'],
+          },
+        ],
+      },
+    } as ConfigObject);
+
+    renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={'triage-queue-uuid'} />);
+
+    const rows = screen.queryAllByRole('row');
+    const firstRow = rows[1];
+    const cells = within(firstRow).getAllByRole('cell');
+    expect(cells[1].childNodes[0]).toHaveClass('bold');
   });
 });
