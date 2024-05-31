@@ -7,9 +7,6 @@
   white-space: nowrap;
 }
 
-.priorityTag {
-  @extend .tag;
+.bold {
   @include type.type-style('label-01');
-  color: #943d00;
-  background-color: #ffc9a3;
 }

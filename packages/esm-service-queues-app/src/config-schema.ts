@@ -1,90 +1,61 @@
-import { Type, validators } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/visit-details/vitals-config-schema';
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
 
-// Not all of the columnDefinitions are used below, but they are defined anyway
-// for demonstration purpose. Implementors can copy this JSON as a starting point
-// to configure the queue tables
-// prettier-ignore
-export const defaultTablesConfig: TablesConfig = {
-  "columnDefinitions": [
-    {
-      "id": "patient-name",
-      "columnType": "patient-name-column"
-    },
-    {
-      "id": "patient-age",
-      "columnType": "patient-age-column"
-    },
-    {
-      "id": "queue-number",
-      "columnType": "visit-attribute-queue-number-column"
-    },
-    {
-      "id": "patient-identifier",
-      "columnType": "patient-identifier-column",
-      "config": {
-        "identifierType": "patient-identifier-uuid"
-      }
-    },
-    {
-      "id": "priority",
-      "columnType": "priority-column",
-      "config": {
-        "priorities": [
-          {
-            "conceptUuid": "priority-concept-uuid",
-            "tagClassName": "tag",
-            "tagType": "red"
-          }
-        ]
-      }
-    },
-    {
-      "id": "status",
-      "columnType": "status-column",
-      "config": {
-        "statuses": [
-          {
-            "conceptUuid": "status-concept-uuid",
-            "iconComponent": "InProgress"
-          }
-        ]
-      }
-    },
-    {
-      "id": "visit-start-time",
-      "columnType": "visit-start-time-column"
-    },
-    {
-      "id": "comingFrom",
-      "columnType": "queue-coming-from-column"
-    },
-    {
-      "id": "queue",
-      "columnType": "current-queue-column"
-    },
-    {
-      "id": "wait-time",
-      "columnType": "wait-time-column"
-    },
-    {
-      "id": "actions",
-      "columnType": "actions-column"
-    },
-    {
-      "id": "active-visit-actions",
-      "columnType": "extension-column"
-    }
-  ],
-  "tableDefinitions": [
-    {
-      "columns": ["patient-name", "queue-number", "comingFrom", "priority", "status", "queue", "wait-time", "actions"],
-      "appliedTo": [{ "queue": null, "status": null }]
-    }
-  ]
+const columnTypes = [
+  'patient-name',
+  'patient-age',
+  'queue-number',
+  'patient-identifier',
+  'priority',
+  'status',
+  'visit-start-time',
+  'coming-from',
+  'queue',
+  'wait-time',
+  'actions',
+  'extension',
+] as const;
+type ColumnType = (typeof columnTypes)[number];
+
+const statusIcons = ['Group', 'InProgress'] as const;
+type StatusIcon = (typeof statusIcons)[number];
+
+// Options from https://react.carbondesignsystem.com/?path=/docs/components-tag--overview
+const carbonTagColors = [
+  'red',
+  'magenta',
+  'purple',
+  'blue',
+  'teal',
+  'cyan',
+  'gray',
+  'green',
+  'warm-gray',
+  'cool-gray',
+  'high-contrast',
+  'outline',
+] as const;
+type CarbonTagColor = (typeof carbonTagColors)[number];
+
+const tagStyles = ['bold'] as const;
+type TagStyle = (typeof tagStyles)[number];
+
+// equal to columnTypes but without extension
+export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
+const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
+
+export const defaultColumnConfig = {
+  identifierTypeUuid: defaultIdentifierTypeUuid,
+  priorities: [],
+  statuses: [],
+};
+
+export const defaultQueueTable = {
+  columns: ['patient-name', 'queue-number', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+  appliedTo: [{ queue: null, status: null }],
 };
 
 export const configSchema = {
@@ -196,17 +167,148 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
-  tablesConfig: {
-    _type: Type.Object,
-    _description: `Configurations of columns to show for the queue table.
-      Multiple configurations can be provided, each can be applied generally, or to tables 
-      for a particular queue, particular status, or even particular queue+status combination.
-      If multiple configs are defined, the first config with matching appliedTo condition
-      is used.
-      See https://github.com/openmrs/openmrs-esm-patient-management/blob/main/packages/esm-service-queues-app/src/config-schema.ts
-      for full schema definition and example.
-    `,
-    _default: defaultTablesConfig,
+  queueTables: {
+    columnDefinitions: {
+      _type: Type.Array,
+      _default: [],
+      _description:
+        "Here you can provide definitions for custom columns that you can use in queue tables. They will be referred to by `id` in the tableDefinitions columns config. If the ID provided matches one of the built-in columns, then the config provided here will override the built-in colum's config.",
+      _elements: {
+        _validators: [
+          validator(
+            (columnDfn) => {
+              if (!columnDfn.columnType) {
+                return columnTypes.includes(columnDfn.id);
+              }
+            },
+            (columnDfn) =>
+              `No columnType provided for column with ID '${
+                columnDfn.id
+              }', and the ID is not a valid columnType. Valid column types are: ${columnTypes.join(', ')}.`,
+          ),
+          validator(
+            (columnDfn) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              if (columnDfn.config.identifierType != defaultIdentifierTypeUuid && colType != 'patient-identifier') {
+                return false;
+              }
+            },
+            (columnDfn) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              return `Identifier type can only be set for patient-identifier column type. Column ${columnDfn.id} has type '${colType}.`;
+            },
+          ),
+          // TODO: Same thing for the other column configs
+        ],
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for the column you are defining',
+        },
+        columnType: {
+          _type: Type.String,
+          _description: 'The type of column, if different from the ID',
+          _validators: [validators.oneOf(columnTypes)],
+          _default: null,
+        },
+        header: {
+          _type: Type.String,
+          _description:
+            'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
+          _default: null,
+        },
+        headerI18nModule: {
+          _type: Type.String,
+          _description: 'The module to use for translation of the header.',
+          _default: '@openmrs/esm-service-queues-app',
+        },
+        config: {
+          identifierTypeUuid: {
+            _type: Type.UUID,
+            _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
+            _default: defaultIdentifierTypeUuid,
+          },
+          priorities: {
+            _type: Type.Array,
+            _default: [],
+            _description:
+              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
+            _elements: {
+              conceptUuid: {
+                _type: Type.UUID,
+                _description: 'The UUID of the priority concept to configure',
+              },
+              color: {
+                _type: Type.String,
+                _description:
+                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
+                _validators: [validators.oneOf(carbonTagColors)],
+                _default: 'gray',
+              },
+              style: {
+                _type: Type.String,
+                _description: 'Style to apply to the tag',
+                _validators: [validators.oneOf(tagStyles)],
+                _default: null,
+              },
+            },
+            statuses: {
+              _type: Type.Array,
+              _default: [],
+              _description: 'For columnType "status". Configures the icons for each status.',
+              _elements: {
+                conceptUuid: {
+                  _type: Type.UUID,
+                  _description: 'The UUID of the status concept to configure',
+                },
+                iconComponent: {
+                  _type: Type.String,
+                  _description: 'The icon component to display for the status',
+                  _validators: [validators.oneOf(statusIcons)],
+                  _default: null,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    tableDefinitions: {
+      _type: Type.Array,
+      _default: [defaultQueueTable],
+      _elements: {
+        columns: {
+          _type: Type.Array,
+          _elements: {
+            _type: Type.String,
+          },
+        },
+        appliedTo: {
+          _type: Type.Array,
+          _elements: {
+            queue: {
+              _type: Type.String,
+              _description: 'The UUID of the queue. If not provided, applies to all queues.',
+              _default: null,
+            },
+            status: {
+              _type: Type.String,
+              _description: 'The UUID of the status. If not provided, applies to all statuses.',
+              _default: null,
+            },
+          },
+        },
+      },
+    },
+    _validators: [
+      validator((queueConfig) => {
+        return queueConfig.tableDefinitions.every((t) =>
+          t.columns.every((c) =>
+            [...builtInColumns, ...queueConfig.columnDefinitions.map((colDef) => colDef.id)].includes(c),
+          ),
+        );
+        // TODO: better error message
+      }, 'Invalid table definition'),
+    ],
   },
 };
 
@@ -235,7 +337,7 @@ export interface ConfigObject {
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
   visitTypeResourceUrl: string;
-  tablesConfig: TablesConfig;
+  queueTables: TablesConfig;
 }
 
 interface TablesConfig {
@@ -252,34 +354,23 @@ interface TablesConfig {
 
 export type ColumnDefinition = {
   id: string;
-  header?: string; // optional custom i18n translation key for the column's header; overrides the default one
-  headerModule?: string; // optional custom i18n translation module for the column's header. Must be used with the header option
-} & (
-  | { columnType: 'patient-name-column' }
-  | { columnType: 'patient-identifier-column'; config: PatientIdentifierColumnConfig }
-  | { columnType: 'visit-attribute-queue-number-column' }
-  | { columnType: 'patient-age-column' }
-  | { columnType: 'priority-column'; config?: PriorityColumnConfig }
-  | { columnType: 'status-column'; config?: StatusColumnConfig }
-  | { columnType: 'queue-coming-from-column' }
-  | { columnType: 'current-queue-column' }
-  | { columnType: 'wait-time-column' }
-  | { columnType: 'visit-start-time-column' }
-  | { columnType: 'actions-column' }
-  | { columnType: 'extension-column'; config?: object } // column that contains the extension slot queue-table-extension-column-slot
-);
+  columnType?: ColumnType;
+  header?: string;
+  headerI18nModule?: string;
+  config: ColumnConfig;
+};
 
 export interface VisitAttributeQueueNumberColumnConfig {
   visitQueueNumberAttributeUuid: string;
 }
 
 export interface PatientIdentifierColumnConfig {
-  identifierType: string; // uuid of the identifier type
+  identifierTypeUuid: string; // uuid of the identifier type
 }
 export interface PriorityConfig {
   conceptUuid: string;
-  tagType: string;
-  tagClassName: 'priorityTag' | 'tag' | null;
+  color: CarbonTagColor;
+  style: TagStyle;
 }
 
 export interface PriorityColumnConfig {
@@ -288,20 +379,18 @@ export interface PriorityColumnConfig {
 
 export interface StatusConfig {
   conceptUuid: string;
-  iconComponent: 'Group' | 'InProgress' | null;
+  iconComponent: StatusIcon;
 }
 
 export interface StatusColumnConfig {
   statuses: StatusConfig[];
 }
 
-export interface ExtensionColumnConfig {
-  state: any; // state to pass into the extension
-}
+export type ColumnConfig = PatientIdentifierColumnConfig & PriorityColumnConfig & StatusColumnConfig;
 
 export interface TableDefinitions {
-  // a list of column ids defined in columnDefinitions
-  columns: string[];
+  // Column IDs defined either in columnDefinitions or in builtInColumns
+  columns: Array<string>;
 
   // apply the columns to tables of any of the specified queue and status
   // (if appliedTo is null, apply to all tables, including the one in the service queue app home page)
