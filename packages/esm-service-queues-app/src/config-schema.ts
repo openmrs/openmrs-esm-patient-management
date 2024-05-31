@@ -176,29 +176,45 @@ export const configSchema = {
       _elements: {
         _validators: [
           validator(
-            (columnDfn) => {
-              if (!columnDfn.columnType) {
-                return columnTypes.includes(columnDfn.id);
-              }
-            },
+            (columnDfn: ColumnDefinition) =>
+              Boolean(columnDfn.columnType || columnTypes.some((c) => c == columnDfn.id)),
             (columnDfn) =>
               `No columnType provided for column with ID '${
                 columnDfn.id
               }', and the ID is not a valid columnType. Valid column types are: ${columnTypes.join(', ')}.`,
           ),
           validator(
-            (columnDfn) => {
+            (columnDfn: ColumnDefinition) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
-              if (columnDfn.config.identifierType != defaultIdentifierTypeUuid && colType != 'patient-identifier') {
-                return false;
-              }
+              return (
+                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid || colType == 'patient-identifier'
+              );
             },
             (columnDfn) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
-              return `Identifier type can only be set for patient-identifier column type. Column ${columnDfn.id} has type '${colType}.`;
+              return `Identifier type can only be set for 'patient-identifier' column type. Column ${columnDfn.id} has type '${colType}.`;
             },
           ),
-          // TODO: Same thing for the other column configs
+          validator(
+            (columnDfn: ColumnDefinition) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              return !columnDfn.config.priorities || columnDfn.config.priorities.length == 0 || colType == 'priority';
+            },
+            (columnDfn) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${colType}.`;
+            },
+          ),
+          validator(
+            (columnDfn: ColumnDefinition) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              return !columnDfn.config.statuses || columnDfn.config.statuses.length == 0 || colType == 'status';
+            },
+            (columnDfn) => {
+              const colType = columnDfn.columnType ?? columnDfn.id;
+              return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${colType}.`;
+            },
+          ),
         ],
         id: {
           _type: Type.String,
@@ -300,14 +316,21 @@ export const configSchema = {
       },
     },
     _validators: [
-      validator((queueConfig) => {
-        return queueConfig.tableDefinitions.every((t) =>
-          t.columns.every((c) =>
-            [...builtInColumns, ...queueConfig.columnDefinitions.map((colDef) => colDef.id)].includes(c),
-          ),
-        );
-        // TODO: better error message
-      }, 'Invalid table definition'),
+      validator(
+        (queueConfig: TablesConfig) => {
+          const validColumnIds = [...builtInColumns, ...queueConfig.columnDefinitions.map((colDef) => colDef.id)];
+          return queueConfig.tableDefinitions.every((t) => t.columns.every((c) => validColumnIds.includes(c)));
+        },
+        (queueConfig: TablesConfig) => {
+          const validColumnIds = [...builtInColumns, ...queueConfig.columnDefinitions.map((colDef) => colDef.id)];
+          return `A table definition references a column that is not defined. You can define additional columns in 'columnDefinitions'.\n\nCurrently defined column IDs are ${validColumnIds.join(
+            ', ',
+          )}.\n\nInvalid columns: ${queueConfig.tableDefinitions
+            .map((t) => t.columns.filter((c) => !validColumnIds.includes(c)))
+            .flat()
+            .join(', ')}`;
+        },
+      ),
     ],
   },
 };
