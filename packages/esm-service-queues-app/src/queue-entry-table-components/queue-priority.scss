@@ -8,5 +8,5 @@
 }
 
 .bold {
-  @include type.type-style('label-01');
+  font-weight: bold;
 }

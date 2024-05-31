@@ -47,10 +47,11 @@ type TagStyle = (typeof tagStyles)[number];
 export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
 
-export const defaultColumnConfig = {
+export const defaultColumnConfig: ColumnConfig = {
   identifierTypeUuid: defaultIdentifierTypeUuid,
-  priorities: [],
-  statuses: [],
+  priorityConfigs: [],
+  statusConfigs: [],
+  visitQueueNumberAttributeUuid: null,
 };
 
 export const defaultQueueTable = {
@@ -198,7 +199,11 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
-              return !columnDfn.config.priorities || columnDfn.config.priorities.length == 0 || colType == 'priority';
+              return (
+                !columnDfn.config.priorityConfigs ||
+                columnDfn.config.priorityConfigs.length == 0 ||
+                colType == 'priority'
+              );
             },
             (columnDfn) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
@@ -208,7 +213,9 @@ export const configSchema = {
           validator(
             (columnDfn: ColumnDefinition) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
-              return !columnDfn.config.statuses || columnDfn.config.statuses.length == 0 || colType == 'status';
+              return (
+                !columnDfn.config.statusConfigs || columnDfn.config.statusConfigs.length == 0 || colType == 'status'
+              );
             },
             (columnDfn) => {
               const colType = columnDfn.columnType ?? columnDfn.id;
@@ -243,7 +250,7 @@ export const configSchema = {
             _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
             _default: defaultIdentifierTypeUuid,
           },
-          priorities: {
+          priorityConfigs: {
             _type: Type.Array,
             _default: [],
             _description:
@@ -267,7 +274,7 @@ export const configSchema = {
                 _default: null,
               },
             },
-            statuses: {
+            statusConfigs: {
               _type: Type.Array,
               _default: [],
               _description: 'For columnType "status". Configures the icons for each status.',
@@ -283,6 +290,12 @@ export const configSchema = {
                   _default: null,
                 },
               },
+            },
+            visitQueueNumberAttributeUuid: {
+              _type: Type.String,
+              _description:
+                'The UUID of the visit attribute that contains the visit queue number. This must be set in order to use the queue-number column, if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+              _default: null,
             },
           },
         },
@@ -333,6 +346,22 @@ export const configSchema = {
       ),
     ],
   },
+  _validators: [
+    validator((config: ConfigObject) => {
+      const queueNumberColumns = [
+        'queue-number',
+        ...config.queueTables.columnDefinitions.filter((colDef) => colDef.columnType == 'queue-number'),
+      ];
+      const queueNumberColumnIsUsed = config.queueTables.tableDefinitions.some((t) =>
+        t.columns.some((c) => queueNumberColumns.includes(c)),
+      );
+      return Boolean(
+        !queueNumberColumnIsUsed ||
+          config.visitQueueNumberAttributeUuid ||
+          config.queueTables.columnDefinitions.some((colDef) => colDef.config.visitQueueNumberAttributeUuid),
+      );
+    }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
+  ],
 };
 
 export interface ConfigObject {
@@ -397,7 +426,7 @@ export interface PriorityConfig {
 }
 
 export interface PriorityColumnConfig {
-  priorities: PriorityConfig[];
+  priorityConfigs: PriorityConfig[];
 }
 
 export interface StatusConfig {
@@ -406,10 +435,13 @@ export interface StatusConfig {
 }
 
 export interface StatusColumnConfig {
-  statuses: StatusConfig[];
+  statusConfigs: StatusConfig[];
 }
 
-export type ColumnConfig = PatientIdentifierColumnConfig & PriorityColumnConfig & StatusColumnConfig;
+export type ColumnConfig = PatientIdentifierColumnConfig &
+  PriorityColumnConfig &
+  StatusColumnConfig &
+  VisitAttributeQueueNumberColumnConfig;
 
 export interface TableDefinitions {
   // Column IDs defined either in columnDefinitions or in builtInColumns

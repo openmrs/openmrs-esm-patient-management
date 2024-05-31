@@ -98,6 +98,7 @@ function getColumnFromDefinition(
       // TODO: change it to use the value passed in from columnDef.config instead when ready
       return queueTableVisitAttributeQueueNumberColumn(id, translatedHeader ?? t('queueNumber', 'Queue Number'), {
         visitQueueNumberAttributeUuid,
+        ...columnDef.config,
       });
     }
     case 'patient-age': {
