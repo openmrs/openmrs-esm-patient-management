@@ -136,7 +136,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -491,7 +490,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
-          <div>
+          <div className={styles.dateTimeFields}>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
