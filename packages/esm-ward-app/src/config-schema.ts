@@ -1,92 +1,89 @@
-import { Type, type ConfigSchema } from '@openmrs/esm-framework';
+import { PersonAddress, Type, type ConfigSchema } from '@openmrs/esm-framework';
 
-export const defaultPatientDetailsConfig = {
-  admittedPatientDetails: [
-    { id: 'patient-bed-number', fieldType: 'patient-bed-number-field' },
+const defaultWardPatientCardConfig : WardPatientCardConfig = {
+  slotElementDefinitions: [
+    {id: "bed-number-element", slotElementType: "bed-number-slot-element"},
+    {id: "name-element", slotElementType: "patient-name-slot-element"},
+    {id: "age-element", slotElementType: "patient-age-slot-element"},
     {
-      id: 'patient-name',
-      fieldType: 'patient-name-field',
+      id: "address-element", 
+      slotElementType: "patient-address-slot-element",
+      config: {
+        fields: ["stateProvince", "country"]
+      }
     },
-    {
-      id: 'patient-age',
-      fieldType: 'patient-age-field',
-    },
-    {
-      id: 'patient-city',
-      fieldType: 'patient-city-field',
-    },
-    {
-      id: 'patient-admitted-reason',
-      fieldType: 'patient-admitted-reason-field',
-    },
-    {
-      id: 'patient-time-lapse',
-      fieldType: 'patient-time-lapse-field',
-    },
+    {id: "admission-time-element", slotElementType: "admission-time-slot-element"},
+    // {id: "ward-time-element", slotElementType: "time-on-ward-slot-element"},
   ],
-  admittedPatientDefinitions: {
-    fields: [
-      'patient-bed-number',
-      'patient-name',
-      'patient-age',
-      'patient-city',
-      'patient-admitted-reason',
-      'patient-time-lapse',
-    ],
-  },
-};
+  slotDefinitions: [
+    {id: "header-slot", slotType: "bento-slot", 
+      elements: [
+        "bed-number-element", 
+        "name-element", 
+        "age-element", 
+        "address-element", 
+        "admission-time-element"
+      ]},
+    {id: "footer-slot", slotType: "bento-slot",
+      elements: [
+        // "ward-time-element"
+      ]
+    }
+  ],
+  cardDefinitions: [
+    {
+      slots: ["header-slot", "footer-slot"],
+      // appliedTo: {}
+    }
+  ]
+}
 
 export const configSchema: ConfigSchema = {
-  admittedPatientConfig: {
+  wardPatientCardConfig: {
     _Type: Type.Object,
     _description: 'Configuring admitted patient details',
-    _default: defaultPatientDetailsConfig,
+    _default: defaultWardPatientCardConfig,
   },
 };
 
 export interface ConfigObject {
-  admittedPatientConfig: AdmittedPatientConfig;
+  wardPatientCardConfig: WardPatientCardConfig;
 }
 
-export interface AdmittedPatientConfig {
-  _Type: Type.Object;
-  _description: string;
-  _default: PatientDetailsConfig;
-}
-
-export interface PatientDetailsConfig {
-  admittedPatientDetails: PatientDetail[];
-  admittedPatientDefinitions: {
-    fields: string[];
-  };
-}
-
-interface PatientDetail {
-  id: string;
-  fieldType: string;
-}
-
-
-interface WardPatientCardConfig {
+export interface WardPatientCardConfig {
   slotElementDefinitions: SlotElementDefinition[];
   slotDefinitions: SlotDefinition[],
   cardDefinitions: CardDefinition[];
 }
 
-type SlotElementDefinition = {
+export type SlotElementDefinition = {
   id: string;
 } & (
   | { slotElementType: 'patient-name-slot-element' }
   | { slotElementType: 'bed-number-slot-element' }
   | { slotElementType: 'patient-age-slot-element' }
-  | { slotElementType: 'patient-address-slot-element' }
+  | { 
+      slotElementType: 'patient-address-slot-element',
+      config: PatientAddressConfig
+    }
   | { slotElementType: 'admission-time-slot-element' }
+  | { slotElementType: 'time-on-ward-slot-element' }
 )
-interface SlotDefinition {
 
+export interface PatientAddressConfig {
+  fields: Array<keyof PersonAddress>;
 }
 
-interface CardDefinition {
+export type SlotDefinition = {
+  id: string;
+} & (
+  | { slotType: 'bento-slot', elements: string[]}
+)
+
+export interface CardDefinition {
   slots: string[];
-  appliedTo: Array<any>;
+  appliedTo?: Array<{
+    location?: string, // locationUuid. If given, only applies to patients at the specified ward location. (If not provided, applies to all locations)
+    status?: "admitted" | "pending" // admission status. If given, only applies to patients with the specified status. (If not provided, applies to all statuses) 
+  }>;
 }

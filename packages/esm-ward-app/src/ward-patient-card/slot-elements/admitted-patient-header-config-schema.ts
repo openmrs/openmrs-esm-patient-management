@@ -20,12 +20,3 @@ export const admittedPatientHeaderNameConfigSchema = {
     _default: 'reverse',
   },
 };
-
-export interface AdmittedPatientHeaderAddressConfigObject {
-  addressType?: 'preferred' | 'all';
-  fields: Array<keyof PersonAddress>;
-}
-
-export interface AdmittedPatientHeaderNameConfigObject {
-  displayName: 'normal' | 'reverse';
-}

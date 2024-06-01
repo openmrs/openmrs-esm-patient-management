@@ -1,4 +1,16 @@
 import { OpenmrsResource, OpenmrsResourceStrict, Person, Visit, type Location, type Patient } from '@openmrs/esm-framework';
+import React from 'react';
+
+export interface WardPatientCardSlotProps {
+  patient: Patient;
+  bed: Bed;
+}
+export type WardPatientCardSlot = React.FC<WardPatientCardSlotProps>;
+export type WardPatientCardSlotFunction = (config?: any) => WardPatientCardSlot;
+
+export type WardPatientCardSlotElementProps = WardPatientCardSlotProps;
+export type WardPatientCardSlotElement = WardPatientCardSlot;
+export type WardPatientCardSlotElementFunction = WardPatientCardSlotFunction;
 
 type DispositionType = "ADMISSION"|"TRANSFER"|"DISCHARGE"
 

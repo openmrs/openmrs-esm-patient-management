@@ -1,6 +1,6 @@
 import { Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import AdmittedPatientHeader from '../admitted-patient/admitted-patient-header/admitted-patient-header';
+import WardPatientCard from '../ward-patient-card/ward-pateint-card.component';
 
 interface PendingAdmissionPatientCardProps {
   patient: Patient;
@@ -9,7 +9,7 @@ const PendingAdmissionPatientCard: React.FC<PendingAdmissionPatientCardProps> = 
 
   return (
     <div>
-      <AdmittedPatientHeader patient={patient} bed={null} />
+      <WardPatientCard patient={patient} bed={null} status={"pending"} />
       <div>
         Assign Bed
       </div>

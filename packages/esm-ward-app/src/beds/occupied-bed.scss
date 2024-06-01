@@ -2,9 +2,10 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.admittedPatients {
+.occuipedBed {
   display: flex;
   flex-direction: column;
+  background-color: $ui-02;
 }
 
 .bedDivider {
@@ -16,8 +17,7 @@
   justify-content: space-between;
 }
 
-.line1,
-.line2 {
+.bedDividerLine {
   height: 1px;
   background-color: $ui-03;
   width: 30%;

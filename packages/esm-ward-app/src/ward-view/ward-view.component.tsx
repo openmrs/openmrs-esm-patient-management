@@ -8,7 +8,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
-import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
+import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { Button } from '@carbon/react';
 
 const WardView = () => {
