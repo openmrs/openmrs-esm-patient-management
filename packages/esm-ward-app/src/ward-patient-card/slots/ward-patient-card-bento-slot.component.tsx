@@ -1,5 +1,5 @@
 import React from 'react';
-import { WardPatientCardSlot, WardPatientCardSlotElement } from '../../types';
+import type { WardPatientCardSlot, WardPatientCardSlotElement } from '../../types';
 import styles from "./ward-patient-card-ben-slot.scss";
 
 const wardPatientCardBentoSlot = (slotElements : WardPatientCardSlotElement[]) => {

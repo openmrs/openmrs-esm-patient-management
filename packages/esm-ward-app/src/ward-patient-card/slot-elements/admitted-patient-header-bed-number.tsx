@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from "../admitted-patient-details.scss"
-import { AdmittedPatientHeaderProps } from './admitted-patient-header';
+import type { AdmittedPatientHeaderProps } from './admitted-patient-header';
 
 const AdmittedPatientHeaderBedNumber: React.FC<AdmittedPatientHeaderProps> = ({bed}) => {
   return (
