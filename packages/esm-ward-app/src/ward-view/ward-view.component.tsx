@@ -73,7 +73,7 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
         {bedLayouts.map((bedLayout, i) => {
           const { patient } = bedLayout;
           const bed = bedLayoutToBed(bedLayout);
-          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient, patient] : null} />;
+          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
         })}
         {bedLayouts.length == 0 && (
           <InlineNotification

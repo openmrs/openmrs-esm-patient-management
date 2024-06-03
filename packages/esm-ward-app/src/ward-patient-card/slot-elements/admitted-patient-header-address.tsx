@@ -11,7 +11,7 @@ const admittedPatientAddress = (config: PatientAddressConfig) => {
 
     return (
       <div className={styles.admittedPatientAddress}>
-        {fields?.map((field) => <div>{preferredAddress?.[field] as string}</div>)}
+        {fields?.map((field, i) => <div key={i}>{preferredAddress?.[field] as string}</div>)}
       </div>
     );
   };

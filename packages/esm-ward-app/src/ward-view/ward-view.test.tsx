@@ -8,6 +8,16 @@ import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
+import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
+
+jest.replaceProperty(mockPatientAlice, 'person', {
+  ...mockPatientAlice.person,
+  preferredName: {
+    uuid: '',
+    givenName: 'Alice',
+    familyName: 'Johnson',
+  },
+});
 
 jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema(configSchema),

@@ -139,7 +139,7 @@ export const configSchema = {
     },
     slotDefinitions: {
       _type: Type.Array,
-      _default: [...defaultSlotDefinitions],
+      _default: defaultSlotDefinitions,
       _elements: {
         id: {
           _type: Type.String,
