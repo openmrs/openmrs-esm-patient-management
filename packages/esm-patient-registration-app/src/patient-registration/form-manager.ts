@@ -1,10 +1,11 @@
 import {
   type FetchResponse,
+  type Session,
+  type StyleguideConfigObject,
+  getConfig,
   openmrsFetch,
   queueSynchronizationItem,
-  type Session,
   restBaseUrl,
-  getConfig,
 } from '@openmrs/esm-framework';
 import { patientRegistration } from '../constants';
 import {
@@ -131,7 +132,7 @@ export class FormManager {
 
       await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
 
-      const { patientPhotoConceptUuid } = await getConfig('@openmrs/esm-styleguide');
+      const { patientPhotoConceptUuid } = await getConfig<StyleguideConfigObject>('@openmrs/esm-styleguide');
 
       if (patientPhotoConceptUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
