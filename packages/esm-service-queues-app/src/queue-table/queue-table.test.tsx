@@ -6,8 +6,8 @@ import { renderWithSwr } from 'tools';
 import QueueTable from './queue-table.component';
 import { type ConfigObject, configSchema } from '../config-schema';
 
-const mockUseSession = useSession as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
+const mockUseSession = jest.mocked(useSession);
+const mockUseConfig = jest.mocked(useConfig);
 const configDefaults = getDefaultsFromConfigSchema<ConfigObject>(configSchema);
 
 const configWithCustomColumns = {
