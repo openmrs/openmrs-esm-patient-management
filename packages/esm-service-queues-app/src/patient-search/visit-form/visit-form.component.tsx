@@ -308,7 +308,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
                 <Switch name="all" text={t('all', 'All')} />
               </ContentSwitcher>
             )}
-            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && !isLoading && (
+            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && (
               <RecommendedVisitTypeSelector
                 onChange={(visitType) => {
                   setVisitType(visitType);
