@@ -44,4 +44,14 @@ export const mockVisitTypes = [
     name: 'HIV Initial Visit',
     display: 'HIV Initial Visit',
   },
+  {
+    uuid: 'some-uuid5',
+    name: 'Mental Health Visit',
+    display: 'Mental Health Visit',
+  },
+  {
+    uuid: 'some-uuid6',
+    name: 'TB Clinic Visit',
+    display: 'TB Clinic Visit',
+  },
 ];

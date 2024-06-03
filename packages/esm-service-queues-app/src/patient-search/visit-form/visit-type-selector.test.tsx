@@ -7,18 +7,30 @@ import { useVisitTypes } from '@openmrs/esm-framework';
 
 const mockUseVisitTypes = jest.mocked(useVisitTypes);
 
-describe('BaseVisitType', () => {
+describe('VisitTypeSelector', () => {
   beforeEach(() => {
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
   });
 
-  it('renders visit types', () => {
+  it('renders visit types with no search bar if there are 5 or fewer', () => {
+    const fewVisitTypes = mockVisitTypes.slice(0, 3);
+    mockUseVisitTypes.mockReturnValue(fewVisitTypes);
     render(<VisitTypeSelector onChange={() => {}} />);
 
-    const searchInput = screen.getByRole('searchbox');
-    expect(searchInput).toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
 
-    mockVisitTypes.forEach((visitType) => {
+    fewVisitTypes.forEach((visitType) => {
+      const radioButton = screen.getByLabelText(visitType.display);
+      expect(radioButton).toBeInTheDocument();
+    });
+  });
+
+  it('renders the first 5 visit types with a search bar if there are more than 5', () => {
+    render(<VisitTypeSelector onChange={() => {}} />);
+
+    expect(screen.queryByRole('searchbox')).toBeInTheDocument();
+
+    mockVisitTypes.slice(0, 5).forEach((visitType) => {
       const radioButton = screen.getByLabelText(visitType.display);
       expect(radioButton).toBeInTheDocument();
     });

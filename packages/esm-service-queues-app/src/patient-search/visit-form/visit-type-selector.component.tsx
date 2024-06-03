@@ -111,13 +111,15 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
         [styles.tablet]: isTablet,
         [styles.desktop]: !isTablet,
       })}>
-      <ResponsiveWrapper>
-        <Search
-          onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder={t('searchForAVisitType', 'Search for a visit type')}
-          labelText=""
-        />
-      </ResponsiveWrapper>
+      {truncatedResults.length < visitTypes.length ? (
+        <ResponsiveWrapper>
+          <Search
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder={t('searchForAVisitType', 'Search for a visit type')}
+            labelText=""
+          />
+        </ResponsiveWrapper>
+      ) : null}
       {truncatedResults.length ? (
         <RadioButtonGroup
           className={styles.radioButtonGroup}
