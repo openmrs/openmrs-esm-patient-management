@@ -194,7 +194,7 @@ describe('QueueTable', () => {
           },
         ],
       },
-    } as ConfigObject);
+    });
 
     renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={'triage-queue-uuid'} />);
 
