@@ -68,16 +68,7 @@ describe('QueueTable', () => {
     expect(rows).toHaveLength(1); // should only have the header row
 
     const headerRow = rows[0];
-    const expectedHeaders = [
-      /name/i,
-      /queue number/i,
-      /coming from/i,
-      /priority/i,
-      /status/i,
-      /queue/i,
-      /wait time/i,
-      /actions/i,
-    ];
+    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
@@ -131,16 +122,7 @@ describe('QueueTable', () => {
 
     const rows = screen.queryAllByRole('row');
     const headerRow = rows[0];
-    const expectedHeaders = [
-      /name/i,
-      /queue number/i,
-      /coming from/i,
-      /priority/i,
-      /status/i,
-      /queue/i,
-      /wait time/i,
-      /actions/i,
-    ];
+    const expectedHeaders = [/name/i, /coming from/i, /priority/i, /status/i, /queue/i, /wait time/i, /actions/i];
     const headers = within(headerRow).getAllByRole('columnheader');
     for (let i = 0; i < headers.length; i++) {
       expect(headers[i]).toHaveTextContent(expectedHeaders[i]);
@@ -188,34 +170,6 @@ describe('QueueTable', () => {
             },
           },
         ],
-        tableDefinitions: [
-          {
-            columns: ['patient-name', 'priority'],
-          },
-        ],
-      },
-    });
-
-    renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={'triage-queue-uuid'} />);
-
-    const rows = screen.queryAllByRole('row');
-    const firstRow = rows[1];
-    const cells = within(firstRow).getAllByRole('cell');
-    expect(cells[1].childNodes[0]).toHaveClass('bold');
-  });
-
-  it('supports custom styles for priority tags at top level', () => {
-    mockUseConfig.mockReturnValue({
-      ...configDefaults,
-      priorityConfigs: [
-        {
-          conceptUuid: mockPriorityNonUrgent.uuid,
-          color: 'blue',
-          style: 'bold',
-        },
-      ],
-      queueTables: {
-        columnDefinitions: [],
         tableDefinitions: [
           {
             columns: ['patient-name', 'priority'],

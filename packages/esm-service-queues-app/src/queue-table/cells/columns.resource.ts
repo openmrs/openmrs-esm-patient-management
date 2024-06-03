@@ -1,7 +1,13 @@
 import { showToast, translateFrom, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import { useTranslation, type TFunction } from 'react-i18next';
-import { builtInColumns, defaultQueueTable, type ColumnDefinition, type ConfigObject } from '../../config-schema';
+import {
+  builtInColumns,
+  defaultColumnConfig,
+  defaultQueueTable,
+  type ColumnDefinition,
+  type ConfigObject,
+} from '../../config-schema';
 import { type QueueTableColumn } from '../../types';
 import { queueTableComingFromColumn } from './queue-table-coming-from-cell.component';
 import { queueTableExtensionColumn } from './queue-table-extension-cell.component';
@@ -22,29 +28,14 @@ import { queueTableActionColumn } from './queue-table-action-cell.component';
 export function useColumns(queue: string, status: string): QueueTableColumn[] {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { queueTables, priorityConfigs, statusConfigs, identifierTypeUuid, visitQueueNumberAttributeUuid } = config;
+  const { queueTables } = config;
   const { columnDefinitions } = queueTables;
   const tableDefinitions = [...queueTables.tableDefinitions, defaultQueueTable];
-  const globalColumnConfig = {
-    priorityConfigs,
-    statusConfigs,
-    identifierTypeUuid,
-    visitQueueNumberAttributeUuid,
-  };
-
-  columnDefinitions.forEach((columnDef) => {
-    columnDef.config = {
-      priorityConfigs: columnDef.config?.priorityConfigs?.length ? columnDef.config.priorityConfigs : priorityConfigs,
-      statusConfigs: columnDef.config?.statusConfigs?.length ? columnDef.config.statusConfigs : statusConfigs,
-      identifierTypeUuid: columnDef.config?.identifierTypeUuid ?? identifierTypeUuid,
-      visitQueueNumberAttributeUuid: columnDef.config?.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid,
-    };
-  });
 
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
     for (const column of builtInColumns) {
-      map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
+      map.set(column, getColumnFromDefinition(t, { id: column, config: defaultColumnConfig }));
     }
     for (const columnDef of columnDefinitions) {
       map.set(columnDef.id, getColumnFromDefinition(t, columnDef));

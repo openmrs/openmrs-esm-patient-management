@@ -43,8 +43,8 @@ type CarbonTagColor = (typeof carbonTagColors)[number];
 const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
 
-// equal to columnTypes but without extension
-export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
+// equal to columnTypes but without extension and queue-number (which requires configuration)
+export const builtInColumns = columnTypes.filter((columnType) => !['extension', 'queue-number'].includes(columnType));
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
 
 export const defaultColumnConfig: ColumnConfig = {
@@ -55,63 +55,8 @@ export const defaultColumnConfig: ColumnConfig = {
 };
 
 export const defaultQueueTable = {
-  columns: ['patient-name', 'queue-number', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
+  columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
   appliedTo: [{ queue: null, status: null }],
-};
-
-const columnConfigSchemaFragment = {
-  identifierTypeUuid: {
-    _type: Type.UUID,
-    _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
-    _default: defaultIdentifierTypeUuid,
-  },
-  priorityConfigs: {
-    _type: Type.Array,
-    _default: [],
-    _description: 'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
-    _elements: {
-      conceptUuid: {
-        _type: Type.UUID,
-        _description: 'The UUID of the priority concept to configure',
-      },
-      color: {
-        _type: Type.String,
-        _description:
-          'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
-        _validators: [validators.oneOf(carbonTagColors)],
-        _default: 'gray',
-      },
-      style: {
-        _type: Type.String,
-        _description: 'Style to apply to the tag',
-        _validators: [validators.oneOf(tagStyles)],
-        _default: null,
-      },
-    },
-  },
-  statusConfigs: {
-    _type: Type.Array,
-    _default: [],
-    _description: 'For columnType "status". Configures the icons for each status.',
-    _elements: {
-      conceptUuid: {
-        _type: Type.UUID,
-        _description: 'The UUID of the status concept to configure',
-      },
-      iconComponent: {
-        _type: Type.String,
-        _description: 'The icon component to display for the status',
-        _validators: [validators.oneOf(statusIcons)],
-        _default: null,
-      },
-    },
-    visitQueueNumberAttributeUuid: {
-      _type: Type.String,
-      _description:
-        'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
-      _default: null,
-    },
-  },
 };
 
 export const configSchema = {
@@ -218,7 +163,6 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
-  ...columnConfigSchemaFragment,
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -273,6 +217,10 @@ export const configSchema = {
               return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${colType}.`;
             },
           ),
+          validator((columnDfn: ColumnDefinition) => {
+            const colType = columnDfn.columnType ?? columnDfn.id;
+            return Boolean(colType != 'queue-number' || columnDfn.config.visitQueueNumberAttributeUuid);
+          }, `Columns with type 'queue-number' must have 'visitQueueNumberAttributeUuid' configured.`),
         ],
         id: {
           _type: Type.String,
@@ -295,7 +243,61 @@ export const configSchema = {
           _description: 'The module to use for translation of the header.',
           _default: '@openmrs/esm-service-queues-app',
         },
-        config: columnConfigSchemaFragment,
+        config: {
+          identifierTypeUuid: {
+            _type: Type.UUID,
+            _description: "For columnType 'patient-identifier'. The UUID of the identifier type to display",
+            _default: defaultIdentifierTypeUuid,
+          },
+          priorityConfigs: {
+            _type: Type.Array,
+            _default: [],
+            _description:
+              'For columnType "priority". Add entries here to configure the styling for specific priority tags.',
+            _elements: {
+              conceptUuid: {
+                _type: Type.UUID,
+                _description: 'The UUID of the priority concept to configure',
+              },
+              color: {
+                _type: Type.String,
+                _description:
+                  'The color of the tag. This is based on the "type" field of the Carbon Design System "Tag" component.',
+                _validators: [validators.oneOf(carbonTagColors)],
+                _default: 'gray',
+              },
+              style: {
+                _type: Type.String,
+                _description: 'Style to apply to the tag',
+                _validators: [validators.oneOf(tagStyles)],
+                _default: null,
+              },
+            },
+          },
+          statusConfigs: {
+            _type: Type.Array,
+            _default: [],
+            _description: 'For columnType "status". Configures the icons for each status.',
+            _elements: {
+              conceptUuid: {
+                _type: Type.UUID,
+                _description: 'The UUID of the status concept to configure',
+              },
+              iconComponent: {
+                _type: Type.String,
+                _description: 'The icon component to display for the status',
+                _validators: [validators.oneOf(statusIcons)],
+                _default: null,
+              },
+            },
+            visitQueueNumberAttributeUuid: {
+              _type: Type.String,
+              _description:
+                'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+              _default: null,
+            },
+          },
+        },
       },
     },
     tableDefinitions: {
@@ -343,25 +345,9 @@ export const configSchema = {
       ),
     ],
   },
-  _validators: [
-    validator((config: ConfigObject) => {
-      const queueNumberColumns = [
-        'queue-number',
-        ...config.queueTables.columnDefinitions.filter((colDef) => colDef.columnType == 'queue-number'),
-      ];
-      const queueNumberColumnIsUsed = config.queueTables.tableDefinitions.some((t) =>
-        t.columns.some((c) => queueNumberColumns.includes(c)),
-      );
-      return Boolean(
-        !queueNumberColumnIsUsed ||
-          config.visitQueueNumberAttributeUuid ||
-          config.queueTables.columnDefinitions.some((colDef) => colDef.config.visitQueueNumberAttributeUuid),
-      );
-    }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
-  ],
 };
 
-export interface ConfigObject extends ColumnConfig {
+export interface ConfigObject {
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
