@@ -224,7 +224,7 @@ export const configSchema = {
       _type: Type.Array,
       _default: [],
       _description:
-        "Here you can provide definitions for custom columns that you can use in queue tables. They will be referred to by `id` in the tableDefinitions columns config. If the ID provided matches one of the built-in columns, then the config provided here will override the built-in colum's config.",
+        "You can define custom columns for queue tables here. These columns will be referenced by their `id` in the `tableDefinitions` columns configuration. If the provided `id` matches a built-in column, the custom configuration will override the built-in column's configuration."
       _elements: {
         _validators: [
           validator(
