@@ -80,6 +80,8 @@ interface VisitTypeSelectorPresentationProps {
   visitTypes: VisitType[];
 }
 
+const MAX_RESULTS = 5;
+
 const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps> = ({ visitTypes, onChange }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -97,10 +99,11 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
     }
   }, [debouncedSearchTerm, visitTypes]);
 
-  const truncatedResults = results.slice(0, 5);
+  const truncatedResults = results.slice(0, MAX_RESULTS);
 
   useEffect(() => {
     if (results.length > 0) {
+      onChange(results[0].uuid);
       setSelectedVisitType(results[0].uuid);
     }
   }, [results]);
@@ -134,8 +137,8 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
           {truncatedResults.map(({ uuid, display, name }) => (
             <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
           ))}
-          {/* TODO: should have some visual indication that there are more results
-                if truncatedResults.length < results.length */}
+          {/* TODO: This is supposed to paginate. Right now it just shows the user a truncated list
+                with no indication that the list is truncated. */}
         </RadioButtonGroup>
       ) : (
         <Layer>

@@ -36,12 +36,13 @@ describe('VisitTypeSelector', () => {
     });
   });
 
-  it('filters by search input', async () => {
+  it('filters by search input and calls onChange', async () => {
     const user = userEvent.setup();
 
-    render(<VisitTypeSelector onChange={() => {}} />);
+    const mockOnChange = jest.fn();
+    render(<VisitTypeSelector onChange={mockOnChange} />);
 
-    const searchInput: HTMLInputElement = screen.getByRole('searchbox');
+    const searchInput = screen.getByRole('searchbox').closest('input');
     await user.type(searchInput, 'hiv');
 
     expect(searchInput.value).toBe('hiv');
@@ -49,6 +50,10 @@ describe('VisitTypeSelector', () => {
     expect(screen.getByLabelText('HIV Initial Visit')).toBeInTheDocument();
     expect(screen.queryByLabelText('Outpatient Visit')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Diabetes Clinic Visit')).not.toBeInTheDocument();
+
+    expect(mockOnChange).toHaveBeenLastCalledWith(
+      mockVisitTypes.filter((vt) => vt.display == 'HIV Return Visit')[0].uuid,
+    );
   });
 
   it('calls onChange when a visit type is selected', async () => {
@@ -60,7 +65,7 @@ describe('VisitTypeSelector', () => {
     const radioButton = screen.getByLabelText(mockVisitTypes[1].display).closest('input');
     await user.click(radioButton);
     expect(radioButton).toBeChecked();
-    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    expect(mockOnChange).toHaveBeenLastCalledWith(mockVisitTypes[1].uuid);
   });
 
   it('allows changing the search input if no results are returned from a search', async () => {
