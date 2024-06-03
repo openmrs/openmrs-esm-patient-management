@@ -1,15 +1,15 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { renderWithSwr, waitForLoadingToFinish } from 'tools';
-import { mockPatientsVisits, mockLocations, mockSession, mockPatient } from '__mocks__';
-import { type ConfigObject, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { renderWithSwr } from 'tools';
+import { mockLocations, mockPatient, mockPatientsVisits, mockSession } from '__mocks__';
+import { type ConfigObject, useConfig } from '@openmrs/esm-framework';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockToggleSearchType = jest.fn();
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
 const testProps = {
+  appointments: { recentVisits: mockPatientsVisits.recentVisits, futureVisits: [] },
   toggleSearchType: mockToggleSearchType,
   patientUuid: mockPatient.uuid,
   closePanel: () => false,
@@ -31,11 +31,7 @@ describe('ScheduledVisits', () => {
     } as ConfigObject),
   );
   it('should display recent and future scheduled visits', async () => {
-    mockedOpenmrsFetch.mockReturnValueOnce({ data: mockPatientsVisits.recentVisits });
-
     renderPatientScheduledVisits();
-
-    await waitForLoadingToFinish();
 
     expect(screen.getByText(/Cardiology Consultation 1/i)).toBeInTheDocument();
     expect(screen.getByText(/08-Aug-2022, 02:56 PM · 10 Engineer VCT/i)).toBeInTheDocument();

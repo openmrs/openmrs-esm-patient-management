@@ -3,34 +3,31 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
-  Switch,
   ContentSwitcher,
-  RadioTile,
-  TileGroup,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
+  RadioTile,
+  Switch,
+  TileGroup,
 } from '@carbon/react';
 import {
   formatDatetime,
-  useLayoutType,
-  parseDate,
-  ErrorState,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  useSession,
-  useLocations,
   type NewVisitPayload,
+  parseDate,
   saveVisit,
-  useVisitTypes,
-  useVisit,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
   useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+  useVisit,
+  useVisitTypes,
 } from '@openmrs/esm-framework';
 import { type Appointment, SearchTypes } from '../types';
 import styles from './patient-scheduled-visits.scss';
-import { useScheduledVisits } from './hooks/useScheduledVisits';
-import isNil from 'lodash-es/isNil';
 import { postQueueEntry } from './visit-form/queue.resource';
 import { first } from 'rxjs/operators';
 import { convertTime12to24 } from '../helpers/time-helpers';
@@ -265,31 +262,19 @@ const ScheduledVisitsForVisitType: React.FC<{
 };
 
 interface PatientScheduledVisitsProps {
+  appointments: { recentVisits: Appointment[]; futureVisits: Appointment[] };
   toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
   patientUuid: string;
   closeWorkspace: () => void;
 }
 
 const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
-  toggleSearchType,
+  appointments,                                                                      toggleSearchType,
   patientUuid,
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { appointments, isLoading, isError } = useScheduledVisits(patientUuid);
-
-  if (isError) {
-    return <ErrorState headerTitle={t('errorFetchingAppoinments', 'Error fetching appointments')} error={isError} />;
-  }
-
-  if (isLoading) {
-    return <DataTableSkeleton role="progressbar" />;
-  }
-
-  if (isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits)) {
-    toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, true);
-  }
 
   return (
     <div className={styles.container}>
@@ -318,16 +303,13 @@ const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
         <Button
           kind="ghost"
           iconDescription="Start another visit type"
-          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM, patientUuid, false)}>
+          onClick={() => toggleSearchType(SearchTypes.VISIT_FORM)}>
           {t('anotherVisitType', 'Start another visit type')}
         </Button>
       </div>
 
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button
-          className={styles.button}
-          kind="secondary"
-          onClick={() => toggleSearchType(SearchTypes.BASIC, patientUuid, false)}>
+        <Button className={styles.button} kind="secondary" onClick={() => toggleSearchType(SearchTypes.SEARCH_RESULTS)}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { ExtensionSlot, isDesktop, launchWorkspace, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
@@ -43,6 +43,16 @@ function DefaultQueueTable() {
     }
   }, [error?.message]);
   const layout = useLayoutType();
+
+  const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
+  const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
+
+  const handleBackToSearchList = useCallback(() => {
+    setIsPatientSearchOpen(true);
+    setShowOverlay(false);
+    setViewState(null);
+  }, []);
+
   const columns = useColumns(null, null);
   if (!columns) {
     showToast({
@@ -78,6 +88,8 @@ function DefaultQueueTable() {
           <ExtensionSlot
             name="patient-search-button-slot"
             state={{
+              isOpen: isPatientSearchOpen,
+              searchQuery: patientSearchQuery,
               buttonText: t('addPatientToQueue', 'Add patient to queue'),
               overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
               buttonProps: {
@@ -85,7 +97,11 @@ function DefaultQueueTable() {
                 renderIcon: (props) => <Add size={16} {...props} />,
                 size: 'sm',
               },
-              selectPatientAction: (selectedPatientUuid) => {
+              searchQueryUpdatedAction: (searchQuery: string) => {
+                setPatientSearchQuery(searchQuery);
+              },
+              selectPatientAction: (selectedPatientUuid: string) => {
+                setIsPatientSearchOpen(false);
                 launchWorkspace('service-queues-patient-search', { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid });
               },
             }}

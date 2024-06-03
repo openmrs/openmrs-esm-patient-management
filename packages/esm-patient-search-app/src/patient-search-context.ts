@@ -7,6 +7,7 @@ interface PatientSearchContextProps {
    * patient dashboard.
    */
   nonNavigationSelectPatientAction?: (patientUuid: string) => void;
+  handleSearchTermUpdated?: (query: string) => void;
   /**
    * A function to execute when the user clicks on a patient result. Will
    * be executed whether or not nonNavigationSelectPatientAction is defined,

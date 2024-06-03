@@ -22,7 +22,7 @@ export function useScheduledVisits(patientUuid: string) {
     });
 
   const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(
-    patientUuid ? appointmentsSearchUrl : null,
+    patientUuid ? [appointmentsSearchUrl, patientUuid] : null,
     fetcher,
   );
 
