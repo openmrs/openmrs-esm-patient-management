@@ -57,7 +57,7 @@ const configWithCustomColumns = {
 
 describe('QueueTable', () => {
   beforeEach(() => {
-    mockUseSession.mockReturnValue(mockSession);
+    mockUseSession.mockReturnValue(mockSession.data);
     mockUseConfig.mockReturnValue(configDefaults);
   });
 
