@@ -19,11 +19,9 @@ const VisitFormQueueFields: React.FC = () => {
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
   const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
-  const [status, setStatus] = useState(config.concepts.defaultStatusConceptUuid);
   const [sortWeight, setSortWeight] = useState(0);
   const [selectedService, setSelectedService] = useState('');
   const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
-  const statuses = queues.find((q) => q.uuid === selectedService)?.allowedStatuses ?? [];
   const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
 
   useEffect(() => {
@@ -33,22 +31,14 @@ const VisitFormQueueFields: React.FC = () => {
   }, [priority]);
 
   useEffect(() => {
-    if (queues?.length > 0) {
-      if (currentServiceQueueUuid) {
-        setSelectedService(currentServiceQueueUuid);
-      } else {
-        setSelectedService(queues[0].uuid);
-      }
+    if (currentServiceQueueUuid) {
+      setSelectedService(currentServiceQueueUuid);
     }
   }, [queues]);
 
   useEffect(() => {
-    if (queueLocations?.length > 0) {
-      if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
-        setSelectedQueueLocation(sessionLocation.uuid);
-      } else {
-        setSelectedQueueLocation(queueLocations[0].id);
-      }
+    if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
+      setSelectedQueueLocation(sessionLocation.uuid);
     }
   }, [queueLocations]);
 
@@ -112,59 +102,40 @@ const VisitFormQueueFields: React.FC = () => {
         )}
       </section>
 
-      <section className={classNames(styles.section, styles.sectionHidden)}>
-        <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-        {isLoadingQueues ? (
-          <SelectSkeleton />
-        ) : (
-          <Select
-            labelText={t('selectStatus', 'Select a status')}
-            id="status"
-            name="status"
-            invalidText="Required"
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}>
-            {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-            {statuses?.length > 0 &&
-              statuses.map((status) => (
-                <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
-                  {status.display}
-                </SelectItem>
+      {selectedService ? (
+        <section className={styles.section}>
+          <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+          {isLoadingQueues ? (
+            <RadioButtonGroup>
+              <RadioButtonSkeleton />
+              <RadioButtonSkeleton />
+              <RadioButtonSkeleton />
+            </RadioButtonGroup>
+          ) : !priorities?.length ? (
+            <InlineNotification
+              className={styles.inlineNotification}
+              kind={'error'}
+              lowContrast
+              title={t('noPrioritiesForServiceTitle', 'No priorities available')}>
+              {t(
+                'noPrioritiesForService',
+                'The selected service does not have any allowed priorities. This is an error in configuration. Please contact your system administrator.',
+              )}
+            </InlineNotification>
+          ) : priorities.length ? (
+            <RadioButtonGroup
+              className={styles.radioButtonWrapper}
+              name="priority"
+              id="priority"
+              defaultSelected={config.concepts.defaultPriorityConceptUuid}
+              onChange={(uuid) => setPriority(uuid)}>
+              {priorities.map(({ uuid, display }) => (
+                <RadioButton key={uuid} labelText={display} value={uuid} />
               ))}
-          </Select>
-        )}
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-        {isLoadingQueues ? (
-          <RadioButtonGroup>
-            <RadioButtonSkeleton />
-            <RadioButtonSkeleton />
-            <RadioButtonSkeleton />
-          </RadioButtonGroup>
-        ) : !priorities?.length ? (
-          <InlineNotification
-            className={styles.inlineNotification}
-            kind={'error'}
-            lowContrast
-            subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
-            title={t('noPrioritiesConfigured', 'No priorities configured')}
-          />
-        ) : (
-          <RadioButtonGroup
-            className={styles.radioButtonWrapper}
-            name="priority"
-            id="priority"
-            defaultSelected={config.concepts.defaultPriorityConceptUuid}
-            onChange={(uuid) => {
-              setPriority(uuid);
-            }}>
-            {priorities?.length > 0 &&
-              priorities.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
-          </RadioButtonGroup>
-        )}
-      </section>
+            </RadioButtonGroup>
+          ) : null}
+        </section>
+      ) : null}
 
       <section className={classNames(styles.section, styles.sectionHidden)}>
         <TextInput
