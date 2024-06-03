@@ -108,7 +108,7 @@ const columnConfigSchemaFragment = {
     visitQueueNumberAttributeUuid: {
       _type: Type.String,
       _description:
-        'The UUID of the visit attribute that contains the visit queue number. This must be set in order to use the queue-number column, if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
+        'The UUID of the visit attribute that contains the visit queue number. This must be set to use the queue-number column if the top-level `visitQueueNumberAttributeUuid` config element is not set.',
       _default: null,
     },
   },
