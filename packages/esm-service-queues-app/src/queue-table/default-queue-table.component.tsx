@@ -1,7 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, launchWorkspace, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
+import {
+  closeWorkspace,
+  ExtensionSlot,
+  isDesktop,
+  launchWorkspace,
+  showSnackbar,
+  showToast,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -17,6 +25,8 @@ import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
+
+const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -49,8 +59,7 @@ function DefaultQueueTable() {
 
   const handleBackToSearchList = useCallback(() => {
     setIsPatientSearchOpen(true);
-    setShowOverlay(false);
-    setViewState(null);
+    closeWorkspace(serviceQueuesPatientSearchWorkspace);
   }, []);
 
   const columns = useColumns(null, null);
@@ -102,7 +111,7 @@ function DefaultQueueTable() {
               },
               selectPatientAction: (selectedPatientUuid: string) => {
                 setIsPatientSearchOpen(false);
-                launchWorkspace('service-queues-patient-search', { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid });
+                launchWorkspace(serviceQueuesPatientSearchWorkspace, { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid,handleBackToSearchList });
               },
             }}
           />

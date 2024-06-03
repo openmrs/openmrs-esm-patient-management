@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { Button, ButtonSet, Form, Row, Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
-  type Visit,
   ExtensionSlot,
   showSnackbar,
   useConfig,
   useLayoutType,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';

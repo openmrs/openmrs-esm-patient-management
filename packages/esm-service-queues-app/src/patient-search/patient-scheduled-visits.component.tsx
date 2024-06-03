@@ -263,13 +263,14 @@ const ScheduledVisitsForVisitType: React.FC<{
 
 interface PatientScheduledVisitsProps {
   appointments: { recentVisits: Appointment[]; futureVisits: Appointment[] };
-  toggleSearchType: (searchMode: SearchTypes, patientUuid, mode) => void;
+  toggleSearchType: (searchMode: SearchTypes) => void;
   patientUuid: string;
   closeWorkspace: () => void;
 }
 
 const PatientScheduledVisits: React.FC<PatientScheduledVisitsProps> = ({
-  appointments,                                                                      toggleSearchType,
+  appointments,
+  toggleSearchType,
   patientUuid,
   closeWorkspace,
 }) => {

@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
-import QueueServiceForm from '../queue-services/queue-service-form.component';
-import QueueRoomForm from '../queue-rooms/queue-room-form.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
-  type DefaultWorkspaceProps,
   ArrowLeftIcon,
+  type DefaultWorkspaceProps,
+  displayName,
   ErrorState,
-  ExtensionSlot,
+  PatientBannerContactDetails,
+  PatientBannerPatientInfo,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
   usePatient,
   useVisit,
-  PatientBannerPatientInfo,
-  PatientPhoto,
-  PatientBannerToggleContactDetailsButton,
-  PatientBannerContactDetails,
-  displayName,
 } from '@openmrs/esm-framework';
 import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
 import styles from './patient-search.scss';
@@ -37,7 +34,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   closeWorkspace,
   selectedPatientUuid,
   currentServiceQueueUuid,
-                                                       handleBackToSearchList
+  handleBackToSearchList,
 }) => {
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
@@ -76,9 +73,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
 
   useEffect(() => {
     if (searchType === SearchTypes.SEARCH_RESULTS) {
-      if (handleBackToSearchList) {
-        handleBackToSearchList();
-      }
+      handleBackToSearchList && handleBackToSearchList();
     }
   }, [searchType, handleBackToSearchList]);
 
