@@ -5,18 +5,18 @@ import biometricsConfigSchema, {
 } from './current-visit/visit-details/biometrics-config-schema';
 
 const columnTypes = [
-  'patient-name',
+  'actions',
+  'coming-from',
+  'extension',
   'patient-age',
-  'queue-number',
   'patient-identifier',
+  'patient-name',
   'priority',
+  'queue-number',
+  'queue',
   'status',
   'visit-start-time',
-  'coming-from',
-  'queue',
   'wait-time',
-  'actions',
-  'extension',
 ] as const;
 type ColumnType = (typeof columnTypes)[number];
 
