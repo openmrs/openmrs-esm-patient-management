@@ -85,8 +85,9 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const [selectedVisitType, setSelectedVisitType] = useState<string>();
 
-  const searchResults = useMemo(() => {
+  const results = useMemo(() => {
     if (!isEmpty(debouncedSearchTerm)) {
       return visitTypes.filter(
         (visitType) => visitType.display.toLowerCase().search(debouncedSearchTerm.toLowerCase()) !== -1,
@@ -96,9 +97,13 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
     }
   }, [debouncedSearchTerm, visitTypes]);
 
-  const { results } = usePagination(searchResults, 5);
+  const truncatedResults = results.slice(0, 5);
 
-  const defaultVisitType = results?.length === 1 ? results[0].uuid : '';
+  useEffect(() => {
+    if (results.length > 0) {
+      setSelectedVisitType(results[0].uuid);
+    }
+  }, [results]);
 
   return (
     <div
@@ -113,23 +118,29 @@ const VisitTypeSelectorPresentation: React.FC<VisitTypeSelectorPresentationProps
           labelText=""
         />
       </ResponsiveWrapper>
-      {results.length ? (
+      {truncatedResults.length ? (
         <RadioButtonGroup
           className={styles.radioButtonGroup}
-          defaultSelected={defaultVisitType}
+          defaultSelected={results[0].uuid}
           orientation="vertical"
-          onChange={onChange}
-          name="radio-button-group">
-          {results.map(({ uuid, display, name }) => (
+          onChange={(visitType) => {
+            setSelectedVisitType(visitType);
+            onChange(visitType);
+          }}
+          name="radio-button-group"
+          valueSelected={selectedVisitType}>
+          {truncatedResults.map(({ uuid, display, name }) => (
             <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
           ))}
+          {/* TODO: should have some visual indication that there are more results
+                if truncatedResults.length < results.length */}
         </RadioButtonGroup>
       ) : (
         <Layer>
           <Tile className={styles.tile}>
             <EmptyDataIllustration />
             <p className={styles.content}>
-              {t('noVisitTypes', 'There are no visit types to display for this patient')}
+              {t('noVisitTypesMatchingSearch', 'There are no visit types matching this search text')}
             </p>
           </Tile>
         </Layer>
