@@ -131,14 +131,15 @@ export class FormManager {
 
       await this.saveObservations(values.obs, savePatientResponse, currentLocation, currentUser, config);
 
-      const { patientPhotoUuid } = await getConfig('@openmrs/esm-styleguide');
-      if (patientPhotoUuid && capturePhotoProps?.imageData) {
+      const { patientPhotoConceptUuid } = await getConfig('@openmrs/esm-styleguide');
+
+      if (patientPhotoConceptUuid && capturePhotoProps?.imageData) {
         await savePatientPhoto(
           savePatientResponse.data.uuid,
           capturePhotoProps.imageData,
           `${restBaseUrl}/obs`,
           capturePhotoProps.dateTime || new Date().toISOString(),
-          patientPhotoUuid,
+          patientPhotoConceptUuid,
         );
       }
     }
