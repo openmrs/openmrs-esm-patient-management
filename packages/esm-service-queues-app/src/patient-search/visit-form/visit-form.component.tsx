@@ -32,7 +32,6 @@ import {
   useLayoutType,
   useLocations,
   useSession,
-  useVisitTypes,
 } from '@openmrs/esm-framework';
 import { VisitTypeSelector, RecommendedVisitTypeSelector } from './visit-type-selector.component';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
