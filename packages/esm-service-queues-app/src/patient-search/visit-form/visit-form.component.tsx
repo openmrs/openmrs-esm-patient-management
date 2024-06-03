@@ -27,7 +27,6 @@ import {
   useSession,
   ExtensionSlot,
   useLayoutType,
-  useVisitTypes,
   saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
@@ -35,10 +34,9 @@ import {
   useConfig,
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import BaseVisitType from './base-visit-type.component';
+import { VisitTypeSelector, RecommendedVisitTypeSelector } from './visit-type-selector.component';
 import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
 import styles from './visit-form.scss';
@@ -70,7 +68,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const allVisitTypes = useVisitTypes();
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
@@ -82,10 +79,8 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
   useEffect(() => {
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
-      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     } else if (!loadingDefaultFacility && defaultFacility) {
       setSelectedLocation(defaultFacility?.uuid);
-      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
   }, [locations, sessionUser, loadingDefaultFacility]);
 
@@ -314,24 +309,22 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
               </ContentSwitcher>
             )}
             {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && !isLoading && (
-              <MemoizedRecommendedVisitType
+              <RecommendedVisitTypeSelector
                 onChange={(visitType) => {
                   setVisitType(visitType);
                   setIsMissingVisitType(false);
                 }}
                 patientUuid={patientUuid}
-                patientProgramEnrollment={enrollment}
+                patientProgram={enrollment}
                 locationUuid={selectedLocation}
               />
             )}
             {(!config.showRecommendedVisitTypeTab || contentSwitcherIndex === 1) && (
-              <BaseVisitType
+              <VisitTypeSelector
                 onChange={(visitType) => {
                   setVisitType(visitType);
                   setIsMissingVisitType(false);
                 }}
-                visitTypes={allVisitTypes}
-                patientUuid={patientUuid}
               />
             )}
           </section>
