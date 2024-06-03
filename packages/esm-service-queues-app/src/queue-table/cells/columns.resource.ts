@@ -127,8 +127,6 @@ function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): Que
       return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'));
     }
     case 'extension': {
-      // this is a column that only has the queue-table-extension-column-slot extension slot
-      // it can be further configured with columnDef.config
       return queueTableExtensionColumn(id, translatedHeader);
     }
     default: {
