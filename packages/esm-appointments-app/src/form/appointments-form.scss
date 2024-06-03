@@ -60,6 +60,14 @@ $openmrs-background-grey: #ededed;
   align-items: center;
 }
 
+.dateTimeFields {
+  max-width: 100%;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .dateTimeFields {
+  max-width: 32.25rem;
+}
+
 .button {
   height: 4rem;
   display: flex;

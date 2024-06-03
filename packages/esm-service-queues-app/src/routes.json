@@ -49,11 +49,6 @@
       "component": "patientInfoBannerSlot"
     },
     {
-      "name": "add-patient-to-queue",
-      "component": "addPatientToQueue",
-      "slot": "add-patient-to-queue-slot"
-    },
-    {
       "name": "remove-queue-entry",
       "component": "removeQueueEntry"
     },
@@ -107,6 +102,32 @@
       "name": "active-visits-row-actions",
       "component": "activeVisitsRowActions",
       "slot": "queue-table-extension-column-slot"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "service-queues-service-form",
+      "title": "addNewQueueService",
+      "component": "addNewQueueServiceWorkspace",
+      "type": "service-queues"
+    },
+    {
+      "name": "service-queues-room-form",
+      "title": "addNewQueueServiceRoom",
+      "component": "addNewQueueServiceRoomWorkspace",
+      "type": "service-queues"
+    },
+    {
+      "name": "service-queues-linelist-filter",
+      "title": "filter",
+      "component": "queueLinelistFilterWorkspace",
+      "type": "service-queues"
+    },
+    {
+      "name": "service-queues-patient-search",
+      "title": "searchPatient",
+      "component": "patientSearchWorkspace",
+      "type": "service-queues"
     }
   ]
 }

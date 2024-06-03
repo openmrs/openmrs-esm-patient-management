@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import QueueRoomForm from './queue-room-form.component';
+import QueueRoomForm from './queue-room-form.workspace';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -12,13 +12,19 @@ jest.mock('@openmrs/esm-framework', () => ({
   showSnackbar: jest.fn(),
 }));
 
+const workspaceProps = {
+  closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+};
+
 jest.mock('./queue-room.resource', () => ({
   saveQueueRoom: jest.fn(() => Promise.resolve({ status: 201 })),
 }));
 
 describe('QueueRoomForm', () => {
   it('renders the form with queue room elements', () => {
-    render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
+    render(<QueueRoomForm {...workspaceProps} />);
 
     expect(screen.getByLabelText('Queue room name')).toBeInTheDocument();
     expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
@@ -30,7 +36,7 @@ describe('QueueRoomForm', () => {
   it('displays error notification if queue room name is missing on submission', async () => {
     const user = userEvent.setup();
 
-    render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
+    render(<QueueRoomForm {...workspaceProps} />);
 
     await user.click(screen.getByText('Save'));
 
@@ -40,7 +46,7 @@ describe('QueueRoomForm', () => {
   it('displays error notification if queue room service is missing on submission', async () => {
     const user = userEvent.setup();
 
-    render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
+    render(<QueueRoomForm {...workspaceProps} />);
 
     const queueRoomNameInput = screen.getByLabelText('Queue room name');
 
@@ -53,18 +59,18 @@ describe('QueueRoomForm', () => {
   it('calls closePanel when Cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    const closePanelMock = jest.fn();
-    render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={closePanelMock} />);
+    const closeWorkspace = jest.fn();
+    render(<QueueRoomForm {...{ ...workspaceProps, closeWorkspace }} />);
 
     await user.click(screen.getByText('Cancel'));
 
-    expect(closePanelMock).toHaveBeenCalledTimes(1);
+    expect(closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('updates queue room name state when a value is entered', async () => {
     const user = userEvent.setup();
 
-    render(<QueueRoomForm toggleSearchType={jest.fn()} closePanel={jest.fn()} />);
+    render(<QueueRoomForm {...workspaceProps} />);
 
     const queueRoomNameInput = screen.getByLabelText('Queue room name');
     await user.type(queueRoomNameInput, 'Room 123');

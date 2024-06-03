@@ -2,8 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-$overlay-header-height: 5.5rem;
-
 .heading {
   @include type.type-style('heading-compact-01');
   margin: spacing.$spacing-05 0 spacing.$spacing-05;
@@ -25,7 +23,7 @@ $overlay-header-height: 5.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - $overlay-header-height);
+  height: var(--desktop-workspace-window-height);
 }
 
 .grid {
@@ -45,12 +43,19 @@ $overlay-header-height: 5.5rem;
   min-width: 50%;
 }
 
-.tablet {
-  padding: spacing.$spacing-06 spacing.$spacing-05;
-  background-color: $ui-02;
-}
-
-.desktop {
+.buttonSet {
   padding: 0rem;
   margin-top: spacing.$spacing-05;
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: var(--tablet-workspace-window-height);
+  }
+
+  .buttonSet {
+    padding: spacing.$spacing-06 spacing.$spacing-05;
+    background-color: $ui-02;
+  }
 }

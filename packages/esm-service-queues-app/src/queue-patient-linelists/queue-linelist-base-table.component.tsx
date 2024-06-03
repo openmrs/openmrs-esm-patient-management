@@ -21,10 +21,16 @@ import {
   Pagination,
 } from '@carbon/react';
 import { Filter, OverflowMenuVertical } from '@carbon/react/icons';
-import { ConfigurableLink, ExtensionSlot, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  ExtensionSlot,
+  formatDatetime,
+  launchWorkspace,
+  parseDate,
+  usePagination,
+} from '@openmrs/esm-framework';
 import styles from './queue-linelist-base-table.scss';
 import { type FilterTypes } from '../types';
-import QueueLinelist from './queue-linelist.component';
 import { getGender } from '../helpers/functions';
 
 /**
@@ -60,7 +66,6 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
   isLoading,
 }) => {
   const { t } = useTranslation();
-  const [showOverlay, setShowOverlay] = useState(false);
   const { results, currentPage, goTo } = usePagination(patientData ?? [], 100);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
@@ -151,10 +156,10 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
             <Button
               kind="ghost"
               renderIcon={(props) => <Filter size={16} {...props} />}
-              iconDescription={t('filter', 'Filter (1)')}
-              onClick={() => setShowOverlay(true)}
+              iconDescription={t('filter', 'Filter')}
+              onClick={() => launchWorkspace('service-queues-linelist-filter')}
               size="sm">
-              {t('filter', 'Filter (1)')}
+              {t('filter', 'Filter')}
             </Button>
           </div>
         </Tile>
@@ -229,8 +234,6 @@ const QueuePatientBaseTable: React.FC<QueuePatientTableProps> = ({
         pageSizes={pageSizes?.length > 0 ? pageSizes : [100]}
         totalItems={patientData?.length ?? 0}
       />
-
-      {showOverlay && <QueueLinelist closePanel={() => setShowOverlay(false)} />}
     </div>
   );
 };

@@ -1,0 +1,18 @@
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.patientBannerContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $ui-01;
+  border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+}
+
+.patientBanner {
+  display: flex;
+  flex-direction: row;
+}
+
+.patientPhoto {
+  margin: 1rem;
+}

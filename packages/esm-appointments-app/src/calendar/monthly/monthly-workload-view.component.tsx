@@ -50,6 +50,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
 
   return (
     <div
+      onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
@@ -61,7 +62,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
       )}>
       {isSameMonth(dateTime, dayjs(selectedDate)) && (
         <p>
-          <div className={classNames(styles.totals)} onClick={() => navigateToAppointmentsByDate('')}>
+          <div className={classNames(styles.totals)}>
             {currentData?.services ? (
               <div role="button" tabIndex={0}>
                 <User size={16} />
