@@ -177,8 +177,8 @@ export const configSchema = {
   contactAttributeType: {
     _type: Type.UUID,
     _description:
-      'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
-    _default: [],
+      'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
+    _default: '',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
