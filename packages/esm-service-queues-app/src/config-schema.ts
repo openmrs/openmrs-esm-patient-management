@@ -43,8 +43,8 @@ type CarbonTagColor = (typeof carbonTagColors)[number];
 const tagStyles = ['bold'] as const;
 type TagStyle = (typeof tagStyles)[number];
 
-// equal to columnTypes but without extension and queue-number (which requires configuration)
-export const builtInColumns = columnTypes.filter((columnType) => !['extension', 'queue-number'].includes(columnType));
+// equal to columnTypes but without extension
+export const builtInColumns = columnTypes.filter((columnType) => columnType !== 'extension');
 const defaultIdentifierTypeUuid = '05a29f94-c0ed-11e2-94be-8c13b969e334'; // OpenMRS ID
 
 export const defaultColumnConfig: ColumnConfig = {
@@ -163,6 +163,11 @@ export const configSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.String,
+    _description: 'The UUID of the visit attribute that contains the visit queue number.',
+    _default: null,
+  },
   queueTables: {
     columnDefinitions: {
       _type: Type.Array,
@@ -181,46 +186,45 @@ export const configSchema = {
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
               return (
-                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid || colType == 'patient-identifier'
+                columnDfn.config.identifierTypeUuid == defaultIdentifierTypeUuid ||
+                columnHasType(columnDfn, 'patient-identifier')
               );
             },
             (columnDfn) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
-              return `Identifier type can only be set for 'patient-identifier' column type. Column ${columnDfn.id} has type '${colType}.`;
+              return `Identifier type can only be set for 'patient-identifier' column type. Column ${
+                columnDfn.id
+              } has type '${columnDfn.columnType ?? columnDfn.id}.`;
             },
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
               return (
                 !columnDfn.config.priorityConfigs ||
                 columnDfn.config.priorityConfigs.length == 0 ||
-                colType == 'priority'
+                columnHasType(columnDfn, 'priority')
               );
             },
             (columnDfn) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
-              return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${colType}.`;
+              return `Priorities can only be configured for 'priority' column type. Column ${columnDfn.id} has type '${
+                columnDfn.columnType ?? columnDfn.id
+              }.`;
             },
           ),
           validator(
             (columnDfn: ColumnDefinition) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
               return (
-                !columnDfn.config.statusConfigs || columnDfn.config.statusConfigs.length == 0 || colType == 'status'
+                !columnDfn.config.statusConfigs ||
+                columnDfn.config.statusConfigs.length == 0 ||
+                columnHasType(columnDfn, 'status')
               );
             },
             (columnDfn) => {
-              const colType = columnDfn.columnType ?? columnDfn.id;
-              return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${colType}.`;
+              return `Statuses can only be configured for 'status' column type. Column ${columnDfn.id} has type '${
+                columnDfn.columnType ?? columnDfn.id
+              }.`;
             },
           ),
-          validator((columnDfn: ColumnDefinition) => {
-            const colType = columnDfn.columnType ?? columnDfn.id;
-            return Boolean(colType != 'queue-number' || columnDfn.config.visitQueueNumberAttributeUuid);
-          }, `Columns with type 'queue-number' must have 'visitQueueNumberAttributeUuid' configured.`),
         ],
         id: {
           _type: Type.String,
@@ -334,18 +338,43 @@ export const configSchema = {
           return queueConfig.tableDefinitions.every((t) => t.columns.every((c) => validColumnIds.includes(c)));
         },
         (queueConfig: TablesConfig) => {
-          const validColumnIds = [...builtInColumns, ...queueConfig.columnDefinitions.map((colDef) => colDef.id)];
-          return `A table definition references a column that is not defined. You can define additional columns in 'columnDefinitions'.\n\nCurrently defined column IDs are ${validColumnIds.join(
-            ', ',
-          )}.\n\nInvalid columns: ${queueConfig.tableDefinitions
-            .map((t) => t.columns.filter((c) => !validColumnIds.includes(c)))
+          const validColumnIds = new Set([
+            ...builtInColumns,
+            ...queueConfig.columnDefinitions.map((colDef) => colDef.id),
+          ]);
+          return `A table definition references a column that is not defined. You can define additional columns in 'columnDefinitions'.\n\nCurrently defined column IDs are ${[
+            ...validColumnIds,
+          ].join(', ')}.\n\nInvalid columns: ${queueConfig.tableDefinitions
+            .map((t) => t.columns.filter((c) => !validColumnIds.has(c)))
             .flat()
             .join(', ')}`;
         },
       ),
     ],
   },
+  _validators: [
+    validator((config: ConfigObject) => {
+      const queueNumberColumnDefs = [
+        ...config.queueTables.columnDefinitions.filter((colDef) => columnHasType(colDef, 'queue-number')),
+        { id: 'queue-number', config: defaultColumnConfig },
+      ];
+      const queueNumberColumnsUsed = config.queueTables.tableDefinitions
+        .map((tableDef) => tableDef.columns)
+        .flat()
+        .filter((col) => queueNumberColumnDefs.map((d) => d.id).includes(col));
+      return Boolean(
+        config.visitQueueNumberAttributeUuid ||
+          queueNumberColumnsUsed.every(
+            (columnId) => queueNumberColumnDefs.find((d) => d.id == columnId).config.visitQueueNumberAttributeUuid,
+          ),
+      );
+    }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
+  ],
 };
+
+function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
+  return columnDef.columnType === type || columnDef.id === type;
+}
 
 export interface ConfigObject {
   concepts: {
@@ -371,6 +400,7 @@ export interface ConfigObject {
   showRecommendedVisitTypeTab: boolean;
   customPatientChartUrl: string;
   visitTypeResourceUrl: string;
+  visitQueueNumberAttributeUuid: string | null;
   queueTables: TablesConfig;
 }
 

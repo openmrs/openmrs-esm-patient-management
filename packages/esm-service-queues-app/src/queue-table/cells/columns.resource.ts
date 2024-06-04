@@ -28,16 +28,22 @@ import { queueTableActionColumn } from './queue-table-action-cell.component';
 export function useColumns(queue: string, status: string): QueueTableColumn[] {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { queueTables } = config;
+  const { queueTables, visitQueueNumberAttributeUuid } = config;
   const { columnDefinitions } = queueTables;
   const tableDefinitions = [...queueTables.tableDefinitions, defaultQueueTable];
+  const globalColumnConfig = {
+    ...defaultColumnConfig,
+    visitQueueNumberAttributeUuid,
+  };
 
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
     for (const column of builtInColumns) {
-      map.set(column, getColumnFromDefinition(t, { id: column, config: defaultColumnConfig }));
+      map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
     }
     for (const columnDef of columnDefinitions) {
+      columnDef.config.visitQueueNumberAttributeUuid =
+        columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
       map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
     }
     return map;

@@ -1,6 +1,8 @@
 import React from 'react';
 import { type VisitAttributeQueueNumberColumnConfig } from '../../config-schema';
 import { type QueueTableColumnFunction, type QueueEntry, type QueueTableCellComponentProps } from '../../types';
+import { InlineNotification } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 
 export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction = (
   key,
@@ -12,7 +14,18 @@ export const queueTableVisitAttributeQueueNumberColumn: QueueTableColumnFunction
   }
 
   const QueueTableVisitAttributeQueueNumberCell = ({ queueEntry }: QueueTableCellComponentProps) => {
-    return <span>{getVisitQueueNumber(queueEntry)}</span>;
+    const { t } = useTranslation();
+    return (
+      <>
+        {visitQueueNumberAttributeUuid ? (
+          <span>{getVisitQueueNumber(queueEntry)}</span>
+        ) : (
+          <InlineNotification lowContrast hideCloseButton>
+            {t('visitQueueNumberAttributeUuid not configured', 'visitQueueNumberAttributeUuid not configured')}
+          </InlineNotification>
+        )}
+      </>
+    );
   };
 
   return {
