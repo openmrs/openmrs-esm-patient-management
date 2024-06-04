@@ -1,5 +1,6 @@
 import { type Visit, type OpenmrsResource, type Location, type Patient } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type ColumnConfig } from '../config-schema';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -440,7 +441,7 @@ export type QueueTableColumn = {
 export type QueueTableColumnFunction = (
   key: string, // a unique key for the column
   header?: string,
-  config?: any,
+  config?: ColumnConfig,
 ) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
