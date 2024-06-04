@@ -1,4 +1,4 @@
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import { type ConfigSchema, getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -7,10 +7,12 @@ import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
+import { useInstalledModules } from '../hooks/useInstalledModules';
 import WardView from './ward-view.component';
+import { mockBackendModules } from '../../../../__mocks__/backend-modules.mock';
 
 jest.mocked(useConfig).mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
+  ...(getDefaultsFromConfigSchema(configSchema) as ConfigSchema),
 });
 
 const mockedSessionLocation = { uuid: 'abcd', display: 'mock location', links: [] };
@@ -44,6 +46,18 @@ jest.mocked(useAdmissionLocation).mockReturnValue({
   admissionLocation: mockAdmissionLocation,
 });
 
+jest.mock('../hooks/useInstalledModules', () => ({
+  useInstalledModules: jest.fn(),
+}));
+
+jest.mocked(useInstalledModules).mockReturnValue({
+  error: undefined,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  installedBackendModules: mockBackendModules,
+});
+
 describe('WardView:', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);
@@ -63,5 +77,12 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const emptyBedCards = await screen.findAllByText(/empty bed/i);
     expect(emptyBedCards).toHaveLength(3);
+  });
+
+  it('screen should be empty if backend module is not installed', () => {
+    const backendDependencies = jest.replaceProperty(mockBackendModules, 'results', []);
+    const { container } = renderWithSwr(<WardView />);
+    expect(container.firstChild).not.toBeInTheDocument();
+    backendDependencies.restore();
   });
 });

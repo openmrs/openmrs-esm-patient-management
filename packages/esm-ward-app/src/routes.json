@@ -3,6 +3,9 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies":{
+     "bedmanagement":"^5.14.0"
+  },
   "extensions": [
   ],
   "pages": [
