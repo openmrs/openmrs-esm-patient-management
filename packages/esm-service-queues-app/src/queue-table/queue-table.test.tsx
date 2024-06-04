@@ -189,8 +189,9 @@ describe('QueueTable', () => {
   it('uses the visitQueueNumberAttributeUuid defined at the top level', () => {
     mockUseConfig.mockReturnValue({
       ...configDefaults,
-      visitQueueNumberAttributeUuid: 'the-queue-number',
+      visitQueueNumberAttributeUuid: 'queue-number-visit-attr-uuid',
       queueTables: {
+        ...configDefaults.queueTables,
         tableDefinitions: [
           {
             columns: ['patient-name', 'queue-number'],
@@ -202,8 +203,8 @@ describe('QueueTable', () => {
     renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={'triage-queue-uuid'} />);
 
     const rows = screen.queryAllByRole('row');
-    const firstRow = rows[1];
-    const cells = within(firstRow).getAllByRole('cell');
-    expect(cells[1].childNodes[0]).toHaveClass('bold');
+    const aliceRow = rows[2];
+    const cells = within(aliceRow).getAllByRole('cell');
+    expect(cells[1].childNodes[0]).toHaveTextContent('42');
   });
 });

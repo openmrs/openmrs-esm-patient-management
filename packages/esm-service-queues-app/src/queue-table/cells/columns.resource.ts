@@ -42,8 +42,10 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
       map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
     }
     for (const columnDef of columnDefinitions) {
-      columnDef.config.visitQueueNumberAttributeUuid =
-        columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
+      if (columnDef.columnType == 'queue-number' || columnDef.id == 'queue-number') {
+        columnDef.config.visitQueueNumberAttributeUuid =
+          columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
+      }
       map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
     }
     return map;
