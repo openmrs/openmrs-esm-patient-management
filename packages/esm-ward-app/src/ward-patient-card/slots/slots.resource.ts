@@ -86,9 +86,9 @@ function getSlotFromDefinition(
   const { slotType } = slotDef;
   switch (slotType) {
     case 'bento-slot': {
-      const { elements } = slotDef;
+      const { elements, id } = slotDef;
       const slotElements = elements.map((element) => slotElementsMap.get(element));
-      return wardPatientCardBentoSlot(slotElements);
+      return wardPatientCardBentoSlot(slotElements, id);
     }
     default: {
       throw new Error('Unknown slot type from configuration' + slotType);

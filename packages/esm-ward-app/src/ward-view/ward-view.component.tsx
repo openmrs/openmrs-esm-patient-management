@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
-import { bedLayoutToBed } from './ward-view.resource';
+import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { Button } from '@carbon/react';
@@ -17,8 +17,9 @@ const WardView = () => {
   const allLocations = useLocations();
   const { t } = useTranslation();
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
+  const invalidLocation = !!(locationUuidFromUrl && !locationFromUrl);
 
-  const invalidLocation = locationUuidFromUrl && !locationFromUrl;
+
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
 
   return (
@@ -32,7 +33,7 @@ const WardView = () => {
           <Button
             size="sm"
             onClick={() => {
-              launchWorkspace('pending-admission-requests-workspace', {})
+              launchWorkspace('pending-admission-requests-workspace', {});
             }}>
             Manage
           </Button>
@@ -61,12 +62,7 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
   const { t } = useTranslation();
 
   if (admissionLocation) {
-    // admissionLocation.bedLayouts can contain row+column positions with no bed,
-    // filter out layout positions with no real bed
-    let collator = new Intl.Collator([], { numeric: true });
-    const bedLayouts = admissionLocation.bedLayouts
-      .filter((bl) => bl.bedId)
-      .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
+    const bedLayouts = filterBeds(admissionLocation);
 
     return (
       <>

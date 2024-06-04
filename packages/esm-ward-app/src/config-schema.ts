@@ -60,6 +60,7 @@ import _default from 'swr';
 //   | { slotElementType: 'time-on-ward-slot-element' }
 // );
 
+export const defaultAddressFields = ['stateProvince', 'country'];
 const defaultSlotElementDefinitions = [
   { id: 'bed-number-element', slotElementType: 'bed-number-slot-element' },
   { id: 'name-element', slotElementType: 'patient-name-slot-element' },
@@ -68,7 +69,7 @@ const defaultSlotElementDefinitions = [
     id: 'address-element',
     slotElementType: 'patient-address-slot-element',
     config: {
-      fields: ['stateProvince', 'country'],
+      fields: defaultAddressFields,
     },
   },
   { id: 'admission-time-element', slotElementType: 'admission-time-slot-element' },
@@ -94,7 +95,7 @@ const defaultSlotDefinitions = [
   // },
 ];
 
-const deafultCardDefinitions = [
+export const deafultCardDefinitions = [
   {
     slots: ['header-slot', 'footer-slot'],
     // appliedTo: {}

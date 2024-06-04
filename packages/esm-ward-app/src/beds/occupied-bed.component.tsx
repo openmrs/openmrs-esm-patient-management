@@ -11,14 +11,13 @@ export interface AdmittedPatientProps {
   bed: Bed | null;
 }
 const OccupiedBed: React.FC<AdmittedPatientProps> = ({ patients, bed }) => {
-  
   return (
     <div className={styles.occuipedBed}>
       {patients.map((patient, index: number) => {
-        const last = (index === patients.length - 1);
+        const last = index === patients.length - 1;
         return (
-          <div key={patient.uuid}>
-            <WardPatientCard patient={patient} bed={bed} status={"admitted"} />
+          <div key={patient.uuid + ' ' + index}>
+            <WardPatientCard patient={patient} bed={bed} status={'admitted'} />
             {!last && <BedShareDivider />}
           </div>
         );
@@ -36,6 +35,6 @@ const BedShareDivider = () => {
       <div className={styles.bedDividerLine}></div>
     </div>
   );
-}
+};
 
 export default OccupiedBed;
