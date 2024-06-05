@@ -77,7 +77,7 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
 
   const [autoGenOptions, identifierSourcesResponse] = await Promise.all([
     fetchAutoGenerationOptions(),
-    fetchIdentifierSources(), // Modified here to remove identifierTypes parameter
+    fetchIdentifierSources(),
   ]);
 
   const allIdentifierSources = identifierSourcesResponse.data.results;
