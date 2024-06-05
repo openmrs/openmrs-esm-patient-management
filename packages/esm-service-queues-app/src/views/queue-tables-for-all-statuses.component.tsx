@@ -17,28 +17,27 @@ import { SkeletonText } from '@carbon/react';
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
   isLoadingQueue: boolean; // whether the queue is still loading
+  errorFetchingQueue: Error;
 }
 
 // displays the queue entries of a given queue by
 // showing one table per status
-const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ selectedQueue, isLoadingQueue }) => {
+const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
+  selectedQueue,
+  isLoadingQueue,
+  errorFetchingQueue,
+}) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
 
-  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const noStatuses = !allowedStatuses?.length;
-  if (isLoading && !queueEntries.length) {
-    return <QueueTableByStatusSkeleton />;
-  } else if (noStatuses) {
+  if (errorFetchingQueue) {
     return (
       <InlineNotification
-        kind={'error'}
-        lowContrast
-        subtitle={t('configureStatus', 'Please configure status to continue.')}
-        title={t('noStatusConfigured', 'No status configured')}
+        kind="error"
+        title={t('invalidQueue', 'Invalid Queue')}
+        subtitle={errorFetchingQueue?.message}
       />
     );
   }
