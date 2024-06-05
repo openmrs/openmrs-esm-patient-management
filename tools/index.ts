@@ -2,6 +2,7 @@ export {
   getByTextWithMarkup,
   mockPatient,
   mockPatientWithLongName,
+  mockPatientWithoutFormattedName,
   patientChartBasePath,
   renderWithSwr,
   waitForLoadingToFinish,

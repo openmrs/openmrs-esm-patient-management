@@ -5,6 +5,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
+import { PatientRegistrationContext } from '../../patient-registration-context';
 
 const mockUseConfig = useConfig as jest.Mock;
 
@@ -40,6 +41,14 @@ const useConceptMockImpl = (uuid: string) => {
         { display: 'USA', uuid: 'usa' },
         { display: 'Mexico', uuid: 'mex' },
       ],
+      setMembers: [],
+    };
+  } else if (uuid == 'vaccination-date-uuid') {
+    data = {
+      uuid: 'vaccination-date-uuid',
+      display: 'Vaccination Date',
+      datatype: { display: 'Date', uuid: 'date' },
+      answers: [],
       setMembers: [],
     };
   } else {
@@ -79,12 +88,14 @@ const useConceptAnswersMockImpl = (uuid: string) => {
 };
 
 type FieldProps = {
-  children: ({ field, form: { touched, errors } }) => React.ReactNode;
+  children: ({ field, form: { touched, errors }, meta }) => React.ReactNode;
 };
 
 jest.mock('formik', () => ({
   ...(jest.requireActual('formik') as object),
-  Field: jest.fn(({ children }: FieldProps) => <>{children({ field: {}, form: { touched: {}, errors: {} } })}</>),
+  Field: jest.fn(({ children }: FieldProps) => (
+    <>{children({ field: {}, form: { touched: {}, errors: {} }, meta: { error: undefined } })}</>
+  )),
   useField: jest.fn(() => [{ value: null }, {}]),
 }));
 
@@ -110,6 +121,21 @@ const numberFieldDef: FieldDefinition = {
   placeholder: '',
   showHeading: false,
   uuid: 'weight-uuid',
+  validation: {
+    required: false,
+    matches: null,
+  },
+  answerConceptSetUuid: null,
+  customConceptAnswers: [],
+};
+
+const dateFieldDef: FieldDefinition = {
+  id: 'vac_date',
+  type: 'obs',
+  label: '',
+  placeholder: '',
+  showHeading: false,
+  uuid: 'vaccination-date-uuid',
   validation: {
     required: false,
     matches: null,
@@ -161,6 +187,22 @@ describe('ObsField', () => {
     render(<ObsField fieldDefinition={numberFieldDef} />);
     // expect(screen.getByLabelText("Weight (kg)")).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+  });
+
+  it('renders a datepicker for date concept', async () => {
+    render(
+      <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() }}>
+        <ObsField fieldDefinition={dateFieldDef} />
+      </PatientRegistrationContext.Provider>,
+    );
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+
+    const datePickerInput = screen.getByPlaceholderText('dd/mm/yyyy');
+    expect(datePickerInput).toBeInTheDocument();
+
+    await userEvent.type(datePickerInput, '28/05/2024');
+    expect(datePickerInput).toHaveValue('28/05/2024');
   });
 
   it('renders a select for a coded concept', () => {

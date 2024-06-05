@@ -114,6 +114,40 @@
     {
       "name": "patient-appointment-cancel-confirmation-dialog",
       "component": "patientAppointmentsCancelConfirmationDialog"
+    },
+    {
+      "name": "edit-appointments-form",
+      "component": "appointementForm",
+      "meta": {
+        "title":{
+          "key":"editAppointment",
+          "default":"Edit Appointment"
+        }
+      }
+    },
+    {
+      "name": "search-patient",
+      "component": "searchPatient"
+   },
+    {
+      "name": "create-appointment",
+      "component": "appointementForm",
+      "meta": {
+        "title": {
+          "key":"appointmentForm",
+          "default":"Appointment Form"
+        }
+      }
+    },
+    {
+      "name": "add-appointment",
+      "component": "appointementForm",
+      "meta": {
+        "title": {
+          "key": "createNewAppointment",
+          "default": "Create new appointment"
+        }
+      }
     }
   ]
 }

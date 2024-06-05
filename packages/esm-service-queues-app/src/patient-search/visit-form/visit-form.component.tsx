@@ -46,6 +46,7 @@ import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { type ConfigObject } from '../../config-schema';
+import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
@@ -54,7 +55,7 @@ interface VisitFormProps {
   mode: boolean;
 }
 
-const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
+const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -216,7 +217,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
               <DatePicker
-                dateFormat="d/m/Y"
+                dateFormat={datePickerFormat}
                 datePickerType="single"
                 id="visitDate"
                 style={{ paddingBottom: '1rem' }}
@@ -226,7 +227,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 <DatePickerInput
                   id="visitStartDateInput"
                   labelText={t('date', 'Date')}
-                  placeholder="dd/mm/yyyy"
+                  placeholder={datePickerPlaceHolder}
                   style={{ width: '100%' }}
                 />
               </DatePicker>
@@ -361,4 +362,4 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   );
 };
 
-export default StartVisitForm;
+export default VisitForm;

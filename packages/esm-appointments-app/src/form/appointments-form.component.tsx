@@ -20,7 +20,7 @@ import {
   TimePickerSelect,
   Toggle,
 } from '@carbon/react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
@@ -95,7 +95,7 @@ const appointmentsFormSchema = z
       return true;
     },
     {
-      path: ['appointmentDateTime[]'],
+      path: ['appointmentDateTime.recurringPatternEndDate'],
       message: 'A recurring appointment should have an end date',
     },
   );
@@ -136,11 +136,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
-  const [pickedDate, setPickedDate] = useState<Date | null>(null); // Added state for pickedDate
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -199,6 +197,22 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
+  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  const {
+    field: { ref: startDateRef },
+  } = useController({ name: 'appointmentDateTime.startDate', control });
+  const {
+    field: { ref: endDateRef },
+  } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
+
+  // Manually call ref callback from 'react-hook-form' with the element(s) we want to be focused
+  useEffect(() => {
+    const startDateElement = document.getElementById('startDatePickerInput');
+    const endDateElement = document.getElementById('endDatePickerInput');
+    startDateRef(startDateElement);
+    endDateRef(endDateElement);
+  }, [startDateRef, endDateRef]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
@@ -360,13 +374,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
 
-  // const updateLocations = uniqBy(
-  //   [...locations, { uuid: session.sessionLocation.uuid, display: session.sessionLocation.display }],
-  //   'uuid',
-  // );
-
-  const minAllowedDate = new Date();
-
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
@@ -483,7 +490,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
-          <div>
+          <div className={styles.dateTimeFields}>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
@@ -500,33 +507,34 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value, ref } }) => (
+                    render={({ field: { onChange, value } }) => (
                       <ResponsiveWrapper>
-                        <Controller
-                          name="appointmentDateTime"
-                          control={control}
-                          render={({ field: { onChange, value, ref } }) => (
-                            <DatePicker
-                              datePickerType="single"
-                              dateFormat={datePickerFormat}
-                              value={pickedDate || value.startDate}
-                              onChange={([date]) => {
-                                if (date) {
-                                  onChange({ ...value, startDate: date });
-                                }
-                              }}
-                              minDate={minAllowedDate} // Set the minimum allowed date
-                            >
-                              <DatePickerInput
-                                id="datePickerInput"
-                                labelText={t('date', 'Date')}
-                                style={{ width: '100%' }}
-                                placeholder={datePickerPlaceHolder}
-                                ref={ref}
-                              />
-                            </DatePicker>
-                          )}
-                        />
+                        <DatePicker
+                          datePickerType="range"
+                          dateFormat={datePickerFormat}
+                          value={[value.startDate, value.recurringPatternEndDate]}
+                          onChange={([startDate, endDate]) => {
+                            onChange({
+                              startDate: new Date(startDate),
+                              recurringPatternEndDate: new Date(endDate),
+                              recurringPatternEndDateText: dayjs(new Date(endDate)).format(dateFormat),
+                              startDateText: dayjs(new Date(startDate)).format(dateFormat),
+                            });
+                          }}>
+                          <DatePickerInput
+                            id="startDatePickerInput"
+                            labelText={t('startDate', 'Start date')}
+                            style={{ width: '100%' }}
+                            value={watch('appointmentDateTime').startDateText}
+                          />
+                          <DatePickerInput
+                            id="endDatePickerInput"
+                            labelText={t('endDate', 'End date')}
+                            style={{ width: '100%' }}
+                            placeholder={datePickerPlaceHolder}
+                            value={watch('appointmentDateTime').recurringPatternEndDateText}
+                          />
+                        </DatePicker>
                       </ResponsiveWrapper>
                     )}
                   />

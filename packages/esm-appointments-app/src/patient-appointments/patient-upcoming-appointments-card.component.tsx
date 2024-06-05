@@ -1,25 +1,25 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import {
-  Checkbox,
   InlineLoading,
   InlineNotification,
-  StructuredListHead,
-  StructuredListCell,
-  StructuredListRow,
+  RadioButton,
   StructuredListBody,
+  StructuredListCell,
+  StructuredListHead,
+  StructuredListRow,
   StructuredListWrapper,
 } from '@carbon/react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { usePatientAppointments } from './patient-appointments.resource';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-
 import styles from './patient-upcoming-appointments-card.scss';
 import dayjs from 'dayjs';
+import { type Appointment } from '../types';
+
 interface PatientUpcomingAppointmentsProps {
   patientUuid: string;
-  setUpcomingAppointment: (value: any) => void;
+  setUpcomingAppointment: (value: Appointment) => void;
 }
 
 const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps> = ({
@@ -29,6 +29,7 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
   const { t } = useTranslation();
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const headerTitle = t('upcomingAppointments', 'Upcoming appointments');
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const ac = useMemo<AbortController>(() => new AbortController(), []);
   useEffect(() => () => ac.abort(), [ac]);
@@ -39,63 +40,40 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
     ? appointmentsData?.upcomingAppointments
     : [];
 
-  // Filter out checked in appointments
   const appointments = todaysAppointments
     .concat(futureAppointments)
     .filter((appointment) => appointment.status !== 'CheckedIn');
 
-  const defaultAppointment = ((appointments) => {
-    // if there's only one appointment today, select it by default, otherwise no default
-    const appts = appointments?.filter((appointment) =>
-      dayjs(new Date(appointment.startDateTime).toISOString()).isToday(),
-    );
-    if (appts?.length === 1) {
-      return appts[0];
+  useEffect(() => {
+    if (appointments.length === 1) {
+      setSelectedAppointment(appointments[0]);
+      setUpcomingAppointment(appointments[0]);
     }
-  })(appointments);
+  }, [appointments]);
 
-  if (defaultAppointment) {
-    setUpcomingAppointment(defaultAppointment);
-  }
+  const handleRadioChange = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setUpcomingAppointment(appointment);
+  };
 
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
   if (isLoading) {
-    <span>
-      <InlineLoading />
-    </span>;
+    return (
+      <span>
+        <InlineLoading />
+      </span>
+    );
   }
 
-  if (appointments?.length) {
-    const structuredListBodyRowGenerator = () => {
-      return appointments.map((appointment, i) => (
-        <StructuredListRow label key={`row-${i}`} className={styles.structuredList}>
-          <StructuredListCell>{formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}</StructuredListCell>
-          <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
-          <StructuredListCell>
-            <Checkbox
-              className={styles.checkbox}
-              key={i}
-              labelText=""
-              defaultChecked={appointment.uuid === defaultAppointment?.uuid}
-              id={appointment.uuid}
-              onChange={(e) => (e.target.checked ? setUpcomingAppointment(appointment) : '')}
-            />
-          </StructuredListCell>
-        </StructuredListRow>
-      ));
-    };
-
+  if (appointments.length) {
     return (
       <div>
         <div>
           <p className={styles.sectionTitle}>{headerTitle}</p>
-          <span className={styles.headerLabel}>
-            {t('appointmentToFulfill', 'Select appointment(s) to fulfill')}
-          </span>{' '}
+          <span className={styles.headerLabel}>{t('appointmentToFulfill', 'Select appointment to fulfill')}</span>
         </div>
-
         <StructuredListWrapper>
           <StructuredListHead>
             <StructuredListRow head>
@@ -104,7 +82,27 @@ const PatientUpcomingAppointmentsCard: React.FC<PatientUpcomingAppointmentsProps
               <StructuredListCell head>{t('action', 'Action')}</StructuredListCell>
             </StructuredListRow>
           </StructuredListHead>
-          <StructuredListBody>{structuredListBodyRowGenerator()}</StructuredListBody>
+          <StructuredListBody>
+            {appointments.map((appointment, index) => (
+              <StructuredListRow key={index} className={styles.structuredList}>
+                <StructuredListCell>
+                  {formatDate(parseDate(appointment.startDateTime), { mode: 'wide' })}
+                </StructuredListCell>
+                <StructuredListCell>{appointment.service ? appointment.service.name : '——'}</StructuredListCell>
+                <StructuredListCell>
+                  <RadioButton
+                    className={styles.radioButton}
+                    labelText=""
+                    id={`radio-${index}`}
+                    name="appointmentRadio"
+                    value={appointment.uuid}
+                    checked={selectedAppointment === appointment}
+                    onChange={() => handleRadioChange(appointment)}
+                  />
+                </StructuredListCell>
+              </StructuredListRow>
+            ))}
+          </StructuredListBody>
         </StructuredListWrapper>
       </div>
     );

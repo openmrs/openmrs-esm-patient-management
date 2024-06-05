@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0"
+  },
+  "extensions": [
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "ward"
+    }
+  ]
+}
