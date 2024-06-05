@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
 import { useQueueLocations } from '../hooks/useQueueLocations';
@@ -11,18 +11,30 @@ import { SelectSkeleton } from '@carbon/react';
 import { RadioButtonSkeleton } from '@carbon/react';
 import { AddPatientToQueueContext } from '../patient-search.workspace';
 
-const VisitFormQueueFields: React.FC = () => {
+export interface VisitFormQueueFieldsProps {
+  setFormFields: (fields: {
+    queueLocation: string;
+    service: string;
+    status: string;
+    priority: string;
+    sortWeight: number;
+  }) => void;
+}
+
+const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
+  const { setFormFields } = props;
   const { t } = useTranslation();
   const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const { sessionLocation } = useSession();
   const config = useConfig<ConfigObject>();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
-  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
-  const [sortWeight, setSortWeight] = useState(0);
+  const defaultStatus = config.concepts.defaultStatusConceptUuid;
   const [selectedService, setSelectedService] = useState('');
-  const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
   const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
+  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
+  const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
+  const [sortWeight, setSortWeight] = useState(0);
 
   useEffect(() => {
     if (priority === config.concepts.emergencyPriorityConceptUuid) {
@@ -41,6 +53,16 @@ const VisitFormQueueFields: React.FC = () => {
       setSelectedQueueLocation(sessionLocation.uuid);
     }
   }, [queueLocations]);
+
+  useEffect(() => {
+    setFormFields({
+      queueLocation: selectedQueueLocation,
+      service: selectedService,
+      status: defaultStatus,
+      priority,
+      sortWeight,
+    });
+  }, [selectedQueueLocation, selectedService, defaultStatus, priority, sortWeight]);
 
   return (
     <div>
@@ -101,6 +123,9 @@ const VisitFormQueueFields: React.FC = () => {
           </Select>
         )}
       </section>
+
+      {/* Status section of the form would go here; historical version of this code can be found at
+          https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
       {selectedService ? (
         <section className={styles.section}>
