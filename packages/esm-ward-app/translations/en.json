@@ -3,7 +3,5 @@
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "noBedsConfigured": "No beds configured for this location",
-  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}",
-  "errorLoadingBackendModules":"Error loading Backend Modules",
-  "cannotLoadBackendModules":"Could not load Backend Modules"
+  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}"
 }

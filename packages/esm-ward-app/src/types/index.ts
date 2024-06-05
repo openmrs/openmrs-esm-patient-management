@@ -50,12 +50,3 @@ interface BedTagMap {
 }
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
-
-export interface InstalledBackendModules {
-  results: BackendModules[];
-}
-
-interface BackendModules {
-  version: string;
-  uuid: string;
-}

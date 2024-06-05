@@ -1,53 +1,26 @@
 import React, { useMemo } from 'react';
 import { InlineNotification } from '@carbon/react';
-import { useLocations, useSession, type Location } from '@openmrs/esm-framework';
-
+import { useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
-import { bedLayoutToBed, checkIfBedManagementInstalled } from './ward-view.resource';
+import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
 import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
-import { useInstalledModules } from '../hooks/useInstalledModules';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
   const { sessionLocation } = useSession();
   const allLocations = useLocations();
   const { t } = useTranslation();
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
-  const { installedBackendModules, isLoading, error } = useInstalledModules();
-  const isBedManagementModuleInstalled = useMemo(() => {
-    return checkIfBedManagementInstalled(installedBackendModules);
-  }, [installedBackendModules]);
   const invalidLocation = locationUuidFromUrl && !locationFromUrl;
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
-
-  if (isLoading) {
-    return (
-      <div className={styles.wardViewMain}>
-        {Array(20)
-          .fill(0)
-          .map((_, i) => (
-            <EmptyBedSkeleton key={i} />
-          ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <InlineNotification
-        kind="error"
-        lowContrast={true}
-        title={t('errorLoadingBackendModules', 'Error loading Backend Modules')}
-        subtitle={error?.message ?? t('cannotLoadBackendModules', 'Could not load Backend Modules')}
-      />
-    );
-  }
-
+  //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
   if (!isBedManagementModuleInstalled) return <></>;
+
   return (
     <div className={styles.wardView}>
       <div className={styles.wardViewHeader}>

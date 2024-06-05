@@ -1,4 +1,4 @@
-import { type InstalledBackendModules, type Bed, type BedLayout } from '../types';
+import { type Bed, type BedLayout } from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -11,11 +11,4 @@ export function bedLayoutToBed(bedLayout: BedLayout): Bed {
     column: bedLayout.columnNumber,
     status: bedLayout.status,
   };
-}
-
-export function checkIfBedManagementInstalled(data: InstalledBackendModules) {
-  if (!data) return false;
-  const { results } = data;
-  const isBedManagementModuleInstalled = !!results.find((module) => module.uuid == 'bedmanagement');
-  return isBedManagementModuleInstalled;
 }
