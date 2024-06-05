@@ -41,21 +41,17 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
   const [showContactDetails, setContactDetails] = useState(false);
   const { appointments, isLoading, isError } = useScheduledVisits(selectedPatientUuid);
-  const hasAppointments = useMemo(
-    () => !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits)),
-    [appointments],
-  );
 
-  const backButtonDescription = useMemo(() => {
-    if (searchType === SearchTypes.VISIT_FORM && hasAppointments) {
-      return t('backToScheduledVisits', 'Back to scheduled visits');
-    }
-    return t('backToSearchResults', 'Back to search results');
-  }, [activeVisit, searchType, hasAppointments]);
+  const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
 
-  const toggleSearchType = useCallback((searchType: SearchTypes) => {
+  const backButtonDescription =
+    searchType === SearchTypes.VISIT_FORM && hasAppointments
+      ? t('backToScheduledVisits', 'Back to scheduled visits')
+      : t('backToSearchResults', 'Back to search results');
+
+  const toggleSearchType = (searchType: SearchTypes) => {
     setSearchType(searchType);
-  }, []);
+  };
 
   const handleBackToAction = () => {
     if (searchType === SearchTypes.VISIT_FORM && hasAppointments) {
