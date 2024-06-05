@@ -35,7 +35,7 @@ import {
   ResponsiveWrapper,
 } from '@openmrs/esm-framework';
 import { VisitTypeSelector, RecommendedVisitTypeSelector } from './visit-type-selector.component';
-import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
+import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
 import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
@@ -45,15 +45,16 @@ import isEmpty from 'lodash-es/isEmpty';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { type ConfigObject } from '../../config-schema';
 import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
+import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
 
 interface VisitFormProps {
   toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
-  closePanel: () => void;
+  closeWorkspace: () => void;
   mode: boolean;
 }
 
-const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
+const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closeWorkspace, mode }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -124,7 +125,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
           (response) => {
             if (response.status === 201) {
               // add new queue entry if visit created successfully
-              addQueueEntry(
+              postQueueEntry(
                 response.data.uuid,
                 serviceUuid,
                 patientUuid,
@@ -146,7 +147,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
                         `${hours} : ${minutes}`,
                       ),
                     });
-                    closePanel();
+                    closeWorkspace();
                     mutateQueueEntries();
                   }
                 },
@@ -170,7 +171,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
         );
     },
     [
-      closePanel,
+      closeWorkspace,
       mutateQueueEntries,
       patientUuid,
       selectedLocation,
@@ -340,9 +341,9 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
             </section>
           )}
 
-          <ExtensionSlot name="add-queue-entry-slot" />
+          <VisitFormQueueFields />
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={closePanel}>
+            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('discard', 'Discard')}
             </Button>
             <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

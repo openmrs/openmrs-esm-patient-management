@@ -1,19 +1,18 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { render } from '@testing-library/react';
-import StartVisitQueueFields from './visit-form-queue-fields.component';
+import { render, screen } from '@testing-library/react';
+import VisitFormQueueFields from './visit-form-queue-fields.component';
+import { defineConfigSchema, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { configSchema } from '../../config-schema';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: () => 'desktop',
-  showSnackbar: jest.fn(),
-  useConfig: jest.fn(() => ({
-    concepts: {
-      defaultStatusConceptUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-    },
-    visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  })),
-}));
+defineConfigSchema('@openmrs/esm-service-queues-app', configSchema);
+
+const mockUseLayoutType = useLayoutType as jest.Mock;
+mockUseLayoutType.mockReturnValue('small-desktop');
+
+const mockUseSession = useSession as jest.Mock;
+mockUseSession.mockReturnValue({ sessionLocation: { uuid: '1' } });
+
 jest.mock('../hooks/useQueueLocations', () => ({
   useQueueLocations: jest.fn(() => ({
     queueLocations: [{ id: '1', name: 'Location 1' }],
@@ -35,34 +34,19 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('StartVisitQueueFields', () => {
-  it('renders the form fields', () => {
-    const { getByLabelText, getByText } = render(<StartVisitQueueFields />);
-
-    expect(getByLabelText('Select a queue location')).toBeInTheDocument();
-    expect(getByLabelText('Select a service')).toBeInTheDocument();
-    expect(getByLabelText('Select a status')).toBeInTheDocument();
-    expect(getByText('High')).toBeInTheDocument();
-    expect(getByLabelText('Sort weight')).toBeInTheDocument();
-  });
-
-  it('updates the selected queue location', async () => {
+describe('VisitFormQueueFields', () => {
+  it('renders the form fields', async () => {
     const user = userEvent.setup();
-    const { getByLabelText } = render(<StartVisitQueueFields />);
+    render(<VisitFormQueueFields />);
 
-    const selectQueueLocation = getByLabelText('Select a queue location') as HTMLInputElement;
-    await user.type(selectQueueLocation, '1');
+    expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
+    expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sort weight')).toBeInTheDocument();
 
-    expect(selectQueueLocation.value).toBe('1');
-  });
+    const serviceSelect = screen.getByLabelText('Select a service').closest('select');
+    await user.selectOptions(serviceSelect, 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
 
-  it('updates the selected service', async () => {
-    const user = userEvent.setup();
-    const { getByLabelText } = render(<StartVisitQueueFields />);
-
-    const selectService = getByLabelText('Select a service') as HTMLInputElement;
-    await user.type(selectService, 'service-1');
-
-    expect(selectService.value).toBe('e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90');
+    expect(screen.getByText('Priority')).toBeInTheDocument();
+    expect(screen.getByText('High')).toBeInTheDocument();
   });
 });
