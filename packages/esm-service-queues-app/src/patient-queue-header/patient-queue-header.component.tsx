@@ -17,7 +17,7 @@ import styles from './patient-queue-header.scss';
 import type { ConfigObject } from '../config-schema';
 
 interface PatientQueueHeaderProps {
-  title?: string;
+  title?: string | JSX.Element;
   showLocationDropdown: boolean;
   actions?: React.ReactNode;
 }
