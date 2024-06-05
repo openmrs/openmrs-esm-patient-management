@@ -77,7 +77,7 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
 
   const [autoGenOptions, identifierSourcesResponse] = await Promise.all([
     fetchAutoGenerationOptions(),
-    fetchIdentifierSources(identifierTypes.map((identifierType) => identifierType.uuid)),
+    fetchIdentifierSources(), // Modified here to remove identifierTypes parameter
   ]);
 
   const allIdentifierSources = identifierSourcesResponse.data.results;
@@ -127,11 +127,8 @@ async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdenti
   return [];
 }
 
-async function fetchIdentifierSources(identifierTypes: string[]) {
-  const identifierTypeQueryString = identifierTypes.join('&identifierType=');
-  return await cacheAndFetch(
-    `${restBaseUrl}/idgen/identifiersource?v=default&identifierType=${identifierTypeQueryString}`,
-  );
+async function fetchIdentifierSources() {
+  return await cacheAndFetch(`${restBaseUrl}/idgen/identifiersource?v=default`);
 }
 
 async function fetchAutoGenerationOptions(abortController?: AbortController) {
