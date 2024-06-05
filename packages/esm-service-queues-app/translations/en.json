@@ -95,6 +95,7 @@
   "hourAndMinuteFormatted": "{{hours}} hour(s) and {{minutes}} minute(s)",
   "idNumber": "ID Number",
   "indication": "Indication",
+  "invalidQueue": "Invalid Queue",
   "invalidtableConfig": "Invalid table configuration",
   "lastClinicalVisit": "Last clinical visit",
   "lastEncounter": "Last encounter",
