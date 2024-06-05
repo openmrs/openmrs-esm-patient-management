@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button, ButtonSet, Form, Row, Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
@@ -28,23 +28,23 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
   const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
+    service: null,
+    priority: null,
+    status: null,
+    sortWeight: null,
+    queueLocation: null,
+  });
 
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
 
-      // retrieve values from queue extension
-      const queueLocation = event?.target['queueLocation']?.value;
-      const serviceUuid = event?.target['service']?.value;
-      const priority = event?.target['priority']?.value;
-      const status = event?.target['status']?.value;
-      const sortWeight = event?.target['sortWeight']?.value;
-
       setIsSubmitting(true);
 
       postQueueEntry(
         visit.uuid,
-        serviceUuid,
+        service,
         visit.patient.uuid,
         priority,
         status,
@@ -95,7 +95,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         </Row>
       )}
       <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
-        <VisitFormQueueFields />
+        <VisitFormQueueFields setFormFields={setVisitFormFields} />
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}

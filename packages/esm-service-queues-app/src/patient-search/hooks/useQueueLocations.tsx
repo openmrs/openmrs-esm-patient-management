@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import useSWR from 'swr';
 import { fhirBaseUrl, getLocale, openmrsFetch } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
 
 interface FHIRResponse {
   entry: Array<{ resource: fhir.Location }>;
@@ -10,7 +10,7 @@ interface FHIRResponse {
 }
 export function useQueueLocations() {
   const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
-  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
 
   const queueLocations = useMemo(
     () =>

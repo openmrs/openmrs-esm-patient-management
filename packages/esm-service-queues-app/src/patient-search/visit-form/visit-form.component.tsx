@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { first } from 'rxjs/operators';
 import {
@@ -76,6 +76,13 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [selectedLocation, setSelectedLocation] = useState('');
   const [visitType, setVisitType] = useState('');
+  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
+    service: null,
+    priority: null,
+    status: null,
+    sortWeight: null,
+    queueLocation: null,
+  });
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
@@ -88,13 +95,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-
-      // retrieve values from queue extension
-      const queueLocation = event?.target['queueLocation']?.value;
-      const serviceUuid = event?.target['service']?.value;
-      const priority = event?.target['priority']?.value;
-      const status = event?.target['status']?.value;
-      const sortWeight = event?.target['sortWeight']?.value;
 
       if (!visitType) {
         setIsMissingVisitType(true);
@@ -127,7 +127,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
               // add new queue entry if visit created successfully
               postQueueEntry(
                 response.data.uuid,
-                serviceUuid,
+                service,
                 patientUuid,
                 priority,
                 status,
@@ -341,7 +341,7 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
             </section>
           )}
 
-          <VisitFormQueueFields />
+          <VisitFormQueueFields setFormFields={setVisitFormFields} />
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
             <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('discard', 'Discard')}

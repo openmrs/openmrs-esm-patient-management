@@ -9,7 +9,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
   const { t } = useTranslation();
 
   return (
-    <div>
+    <div className={styles.actionCellContainer}>
       <Button
         kind="ghost"
         aria-label={t('actions', 'Actions')}
