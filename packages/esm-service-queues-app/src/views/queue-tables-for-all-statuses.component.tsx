@@ -9,18 +9,19 @@ import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
-import type { Concept, Queue, QueueEntry, QueueTableColumn, QueueTableTabConfig } from '../types';
+import type { Concept, Queue, QueueEntry } from '../types';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
-import ClinicMetrics from '../patient-queue-metrics/clinic-metrics.component';
-import MetricsHeader from '../patient-queue-metrics/metrics-header.component';
+import { SearchSkeleton } from '@carbon/react';
+import { SkeletonText } from '@carbon/react';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
+  isLoadingQueue: boolean; // whether the queue is still loading
 }
 
 // displays the queue entries of a given queue by
 // showing one table per status
-const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ selectedQueue }) => {
+const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ selectedQueue, isLoadingQueue }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
 
@@ -45,7 +46,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
   return (
     <>
       <PatientQueueHeader
-        title={selectedQueue?.display}
+        title={!isLoadingQueue ? selectedQueue?.display : <SkeletonText />}
         showLocationDropdown={false}
         actions={
           <div className={styles.headerButtons}>
@@ -73,29 +74,59 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 placeholder={t('filterTable', 'Filter table')}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 size={isDesktop(layout) ? 'sm' : 'lg'}
+                disabled={isLoadingQueue}
               />
             </div>
           </div>
         }
       />
-      <QueueTableMetrics selectedQueue={selectedQueue} />
-
-      {/* <MetricsHeader /> */}
-      <div className={styles.container}>
-        {allowedStatuses?.map((status) => (
-          <QueueTableForQueueAndStatus
-            isValidating={isValidating}
-            key={status.uuid}
-            queueEntries={queueEntries}
-            searchTerm={searchTerm}
-            queue={selectedQueue}
-            status={status}
-          />
-        ))}
-      </div>
+      {!isLoadingQueue && <QueueTableMetrics selectedQueue={selectedQueue} />}
+      {!isLoadingQueue ? (
+        <QueueTablesByStatus selectedQueue={selectedQueue} searchTerm={searchTerm} />
+      ) : (
+        <QueueTableByStatusSkeleton />
+      )}
     </>
   );
 };
+
+interface QueueTablesByStatusProps {
+  selectedQueue: Queue;
+  searchTerm: string;
+}
+
+function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
+  const { t } = useTranslation();
+  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const noStatuses = !allowedStatuses?.length;
+  if (isLoading) {
+    return <QueueTableByStatusSkeleton />;
+  } else if (noStatuses) {
+    return (
+      <InlineNotification
+        kind={'error'}
+        lowContrast
+        subtitle={t('configureStatus', 'Please configure status to continue.')}
+        title={t('noStatusConfigured', 'No status configured')}
+      />
+    );
+  }
+  return (
+    <div className={styles.container}>
+      {allowedStatuses?.map((status) => (
+        <QueueTableForQueueAndStatus
+          isValidating={isValidating}
+          key={status.uuid}
+          queueEntries={queueEntries}
+          searchTerm={searchTerm}
+          queue={selectedQueue}
+          status={status}
+        />
+      ))}
+    </div>
+  );
+}
 
 interface QueueTableForQueueAndStatusProps {
   queueEntries: QueueEntry[];
