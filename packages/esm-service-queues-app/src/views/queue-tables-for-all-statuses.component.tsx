@@ -9,7 +9,7 @@ import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
-import type { Concept, Queue, QueueEntry, QueueTableColumn, QueueTableTabConfig } from '../types';
+import type { Concept, Queue, QueueEntry } from '../types';
 
 
 interface QueueTablesForAllStatusesProps {
@@ -61,7 +61,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', { viewState: { selectedPatientUuid } });
+                launchWorkspace('service-queues-patient-search', { selectedPatientUuid, currentServiceQueueUuid: selectedQueue.uuid });
               },
             }}
           />
