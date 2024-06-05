@@ -33,12 +33,11 @@ import {
   useLocations,
   useSession,
 } from '@openmrs/esm-framework';
-import { VisitTypeSelector, RecommendedVisitTypeSelector } from './visit-type-selector.component';
+import { RecommendedVisitTypeSelector, VisitTypeSelector } from './visit-type-selector.component';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
-import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
+import { type amPm, convertTime12to24 } from '../../helpers/time-helpers';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
-import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
+import { type NewVisitPayload, type PatientProgram } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
@@ -19,6 +20,7 @@ import styles from './patient-search.scss';
 import { Button, DataTableSkeleton } from '@carbon/react';
 import { useScheduledVisits } from './hooks/useScheduledVisits';
 import isNil from 'lodash-es/isNil';
+import { useTranslation } from 'react-i18next';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
@@ -36,6 +38,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   currentServiceQueueUuid,
   handleBackToSearchList,
 }) => {
+  const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
