@@ -2,14 +2,14 @@ import { test } from '../core';
 import { PatientListsPage } from '../pages';
 import { expect } from '@playwright/test';
 import {
+  addPatientToCohort,
   type Cohort,
   type CohortMember,
-  type Patient,
-  addPatientToCohort,
   deleteCohort,
   deletePatient,
   generateRandomCohort,
   generateRandomPatient,
+  type Patient,
   removePatientFromCohort,
 } from '../commands';
 
@@ -39,7 +39,7 @@ test('Return to patient list from the patient chart', async ({ page }) => {
   });
 
   await test.step('When I click on the `Close` button', async () => {
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Close', exact: true }).first().click();
   });
 
   await test.step('Then I should be redirected back to the patient list', async () => {
