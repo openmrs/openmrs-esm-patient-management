@@ -13,7 +13,7 @@ import { requeueQueueEntry } from './transition-queue-entry.resource';
 import { usePastVisits } from '../past-visit/past-visit.resource';
 import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import styles from './transition-queue-entry-dialog.scss';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
 
 interface TransitionQueueEntryModalProps {

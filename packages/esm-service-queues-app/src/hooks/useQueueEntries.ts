@@ -1,8 +1,8 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
-import useSWRInfinite from 'swr/infinite';
+import { Queue, type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { cache, useSWRConfig } from 'swr/_internal';
 
 type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
@@ -13,66 +13,139 @@ type QueueEntryResponse = FetchResponse<{
   totalCount: number;
 }>;
 
+const queueEntryBaseUrl = `${restBaseUrl}/queue-entry`;
+
 const repString =
   'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
+function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
+  const searchParam = new URLSearchParams();
+  searchParam.append('v', rep);
+  searchParam.append('totalCount', 'true');
+  searchParam.append('limit', '4');
+
+  if (searchCriteria) {
+    for (let [key, value] of Object.entries(searchCriteria)) {
+      if (value != null) {
+        searchParam.append(key, value?.toString());
+      }
+    }
+  }
+
+  return `${queueEntryBaseUrl}?${searchParam.toString()}`;
+}
+
+function getNextUrlFromResponse(data: QueueEntryResponse) {
+  if (data?.data?.links?.some((link) => link.rel === 'next')) {
+    const nextUrl = new URL(data.data.links.find((link) => link.rel === 'next')?.uri);
+    // default for production
+    if (nextUrl.origin === window.location.origin) {
+      return nextUrl.toString();
+    }
+
+    // in development, the request should be routed through the local proxy
+    return new URL(`${nextUrl.pathname}${nextUrl.search ? nextUrl.search : ''}`, window.location.origin).toString();
+  }
+  // There's no next URL
+  return null;
+}
+
+export function useMutateQueueEntries() {
+  const { mutate } = useSWRConfig();
+
+  return { mutateQueueEntries: () => {
+    console.log("called mutate!");
+    console.log("queue cached", [...cache.keys()].filter(key => key.includes(`${restBaseUrl}/queue-entry`)));
+    return mutate((key) => {
+      return (
+        typeof key === 'string' &&
+        (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
+      );
+    }).then(() => {
+      console.log("mutate promise resolved");
+      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+    });
+  }}
+}
+
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
+  const id = useRef(Math.floor(Math.random() * 1000));
+  const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [totalCount, setTotalCount] = useState<number>();
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
+  const [error, setError] = useState<Error>();
+  const { mutateQueueEntries} = useMutateQueueEntries();
+  const [waitingForMutate, setWaitingForMutate] = useState(false);
 
-  const getUrl = useCallback(
-    (pageIndex: number, previousPageData: QueueEntryResponse) => {
-      if (pageIndex && !previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
-        return null;
-      }
+  const { data: pageData, isLoading, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
 
-      if (previousPageData?.data?.links?.some((link) => link.rel === 'next')) {
-        const nextUrl = new URL(previousPageData.data.links.find((link) => link.rel === 'next')?.uri);
-        // default for production
-        if (nextUrl.origin === window.location.origin) {
-          return nextUrl.toString();
-        }
-
-        // in development, the request should be funnelled through the local proxy
-        return new URL(`${nextUrl.pathname}${nextUrl.search ? nextUrl.search : ''}`, window.location.origin).toString();
-      }
-
-      const apiUrl = `${restBaseUrl}/queue-entry`;
-      const searchParam = new URLSearchParams();
-      searchParam.append('v', rep);
-      searchParam.append('totalCount', 'true');
-
-      for (let [key, value] of Object.entries(searchCriteria)) {
-        if (value != null) {
-          searchParam.append(key, value?.toString());
-        }
-      }
-
-      return `${apiUrl}?${searchParam.toString()}`;
-    },
-    [searchCriteria, rep],
-  );
-
-  const { data, size, setSize, ...rest } = useSWRInfinite<QueueEntryResponse, Error>(getUrl, openmrsFetch);
+  // console.log(`${id.current} useQueueEntries`, { pageUrl, isLoading, isValidating, error, pageData })
 
   useEffect(() => {
-    if (data && data.length && data?.[data?.length - 1]?.data?.links?.some((link) => link.rel === 'next')) {
-      // Calling for the next set of data
-      setSize((prev) => prev + 1);
+    const nextUrl = getNextUrlFromResponse(pageData);
+    const stillWaitingForMutate = waitingForMutate && !isValidating;
+    if (waitingForMutate && isValidating) {
+      setWaitingForMutate(false);
     }
-  }, [data, setSize]);
+    console.log(`${id.current} in useEffect`, { nextUrl, pageData, isValidating, stillWaitingForMutate, data, currentPage, totalCount })
+    if (pageData && !isValidating && !stillWaitingForMutate) {
+      if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
+        setTotalCount(pageData?.data?.totalCount);
+      }
+      if (pageData?.data?.results?.length) {
+        const newData = [...data];
+        newData[currentPage] = pageData?.data?.results;
+        setData(newData);
+      }
+      setCurrentPage(currentPage + 1);
+      console.log(`${id.current} setting pageUrl`, nextUrl)
+      setPageUrl(nextUrl);
+      const inMutateMode = data.length > currentPage;
+      if (inMutateMode && nextUrl) {
+        setWaitingForMutate(true);
+      } 
+    }
+    if (!nextUrl) {
+      if (data.length > currentPage + 1) {
+        setData(prevData => {
+          const newData = [...prevData];
+          newData.splice(currentPage + 1);
+          return newData;
+        });
+      }
+    }
+  }, [pageData, data, currentPage, totalCount, waitingForMutate, isValidating]);
 
   useEffect(() => {
-    if (data?.[0]?.data?.totalCount && data[0].data.totalCount !== totalCount) {
-      setTotalCount(data[0].data.totalCount);
+    if (pageError) {
+      setError(pageError);
     }
-  }, [data?.[0], totalCount, setTotalCount]);
+  }, [pageError]);
 
-  const allResults: QueueEntry[] = data ? [].concat(...data?.map((response) => response?.data?.results)) : [];
+  const queueUpdateListener = useCallback(() => {
+    console.log("caught the mutate!");
+    setWaitingForMutate(true);
+    setCurrentPage(0);
+    setPageUrl(getInitialUrl(rep, searchCriteria));
+  }, [rep, searchCriteria])
+
+  useEffect(() => {
+    window.addEventListener('queue-entry-updated', queueUpdateListener);
+    return () => {
+      window.removeEventListener('queue-entry-updated', queueUpdateListener);
+    }
+  }, [queueUpdateListener]);
+
+  const queueEntries = useMemo(() => data.flat(), [data]);
 
   return {
-    queueEntries: allResults,
+    queueEntries,
     totalCount,
-    ...rest,
+    isLoading: totalCount && queueEntries.length < totalCount,
+    isValidating: isValidating || currentPage < data.length,
+    error,
+    mutate: mutateQueueEntries
   };
 }
 

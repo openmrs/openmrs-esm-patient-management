@@ -10,7 +10,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './visit-form.scss';
 import classNames from 'classnames';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
