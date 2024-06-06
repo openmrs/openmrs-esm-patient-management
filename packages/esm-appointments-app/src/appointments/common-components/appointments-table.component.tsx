@@ -217,13 +217,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                                   itemText={t('editAppointments', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
- 
                                     launchWorkspace('edit-appointments-form', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
                                     })
-
                                   }
                                 />
                               </OverflowMenu>

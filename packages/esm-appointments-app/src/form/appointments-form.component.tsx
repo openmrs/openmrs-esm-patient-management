@@ -33,8 +33,10 @@ import {
   useLocations,
   usePatient,
   useSession,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
+  checkAppointmentConflict,
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
@@ -54,6 +56,7 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import uniqBy from 'lodash/uniqBy';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
@@ -95,6 +98,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
+  const [isConflict, setIsConflict] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -265,10 +269,29 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   })();
 
   // Same for creating and editing
-  const handleSaveAppointment = (data: AppointmentFormData) => {
+  const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
+
+    // check if Duplicate Response Occurs
+    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    let errorMessage = t('appointmentDuplicateForm', 'Appointment is not available');
+    if (response?.data?.SERVICE_UNAVAILABE) {
+      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
+    } else if (response?.data?.PATIENT_DOUBLE_BOOKING) {
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+    }
+    if (response.status === 200) {
+      setIsSubmitting(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: errorMessage,
+      });
+      return;
+    }
+
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
       appointmentRequest: appointmentPayload,
