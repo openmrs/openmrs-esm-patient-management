@@ -1,8 +1,8 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { Queue, type QueueEntry, type QueueEntrySearchCriteria } from '../types';
+import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { cache, useSWRConfig } from 'swr/_internal';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSWRConfig } from 'swr/_internal';
 
 type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
@@ -22,7 +22,6 @@ function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
   const searchParam = new URLSearchParams();
   searchParam.append('v', rep);
   searchParam.append('totalCount', 'true');
-  searchParam.append('limit', '4');
 
   if (searchCriteria) {
     for (let [key, value] of Object.entries(searchCriteria)) {
@@ -68,6 +67,16 @@ export function useMutateQueueEntries() {
 }
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
+  // This manually implements a kind of pagination using the useSWR hook. It does not use useSWRInfinite
+  // because useSWRInfinite does not support with `mutate`. The hook starts by fetching the first page,
+  // page zero, waits until data is fetched, then fetches the next page, and so on.
+  //
+  // Fine so far. Where things get complicated is in supporting mutation. When a mutation is made, the
+  // SWR hook first returns stale data with `isValidating` set to false. At this point we say we are
+  // "waiting for mutate," because we have called mutate, but the useSWR hook hasn't updated properly
+  // for it yet. Next it returns stale data again, this time with `isValidating` set to true. At this
+  // point we say we are no longer waiting for mutate. Finally, it returns fresh data with `isValidating`
+  // again set to false. We may then update the data array and move on to the next page.
   const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [totalCount, setTotalCount] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -85,6 +94,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
       setWaitingForMutate(false);
     }
     if (pageData && !isValidating && !stillWaitingForMutate) {
+      // We've got results! Time to update the data array and move on to the next page.
       if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
         setTotalCount(pageData?.data?.totalCount);
       }
@@ -95,12 +105,19 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
       }
       setCurrentPage(currentPage + 1);
       setPageUrl(nextUrl);
+      // If we're mutating existing data, then we again need to wait for the mutate to work,
+      // since useSWR will (again) first return stale data with isValidating set to false.
       const inMutateMode = data.length > currentPage;
       if (inMutateMode && nextUrl) {
         setWaitingForMutate(true);
       }
     }
+    // It may happen that there are fewer pages in the new data than in the old data. In this
+    // case, we need to remove the extra pages, which are stored on the `data` array.
+    // Note that since we mutated the `data` state earlier in this function, it is important to
+    // use the functional form of `setData` so as not to use the stale `data` state.
     if (!nextUrl) {
+      // I will not be very suprised if there is an off-by-one error here.
       if (data.length > currentPage + 1) {
         setData((prevData) => {
           const newData = [...prevData];
@@ -112,6 +129,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }, [pageData, data, currentPage, totalCount, waitingForMutate, isValidating]);
 
   useEffect(() => {
+    // An error to one is an error to all
     if (pageError) {
       setError(pageError);
     }
