@@ -30,7 +30,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({ queues: mockServices }),
   };

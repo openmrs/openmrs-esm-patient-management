@@ -44,12 +44,13 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
     return false;
   }, [layout, currentData, currentData]);
 
-  const onClick = (serviceUuid: string) => {
+  const navigateToAppointmentsByDate = (serviceUuid: string) => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
   };
 
   return (
     <div
+      onClick={() => navigateToAppointmentsByDate('')}
       className={classNames(
         styles[isSameMonth(dateTime, dayjs(selectedDate)) ? 'monthly-cell' : 'monthly-cell-disabled'],
         showAllServices
@@ -81,7 +82,7 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onClick(serviceUuid);
+                    navigateToAppointmentsByDate(serviceUuid);
                   }}
                   className={styles.serviceArea}>
                   <span>{serviceName}</span>

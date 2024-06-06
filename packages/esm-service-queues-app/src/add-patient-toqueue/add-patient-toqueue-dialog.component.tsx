@@ -13,13 +13,15 @@ import {
   RadioButton,
 } from '@carbon/react';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { addQueueEntry } from '../active-visits/active-visits-table.resource';
+import { postQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 import { type ConfigObject } from '../config-schema';
+import { RadioButtonSkeleton } from '@carbon/react';
+import { SelectSkeleton } from '@carbon/react';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;
@@ -36,8 +38,8 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
   const patientAge = visitDetails?.age;
   const patientSex = visitDetails?.gender;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { queues } = useQueues(selectedQueueLocation);
-  const { queueLocations } = useQueueLocations();
+  const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
+  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
   const [isMissingPriority, setIsMissingPriority] = useState(false);
   const [isMissingService, setIsMissingService] = useState(false);
   const config = useConfig<ConfigObject>();
@@ -62,7 +64,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     const status = config.concepts.defaultStatusConceptUuid;
     const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
-    addQueueEntry(
+    postQueueEntry(
       visitUuid,
       queueUuid,
       patientUuid,
@@ -118,40 +120,48 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             </h5>
           </div>
           <section>
-            <Select
-              labelText={t('selectQueueLocation', 'Select a queue location')}
-              id="location"
-              invalidText="Required"
-              value={selectedQueueLocation}
-              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
-              {!selectedQueueLocation ? (
-                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-              ) : null}
-              {queueLocations?.length > 0 &&
-                queueLocations.map((location) => (
-                  <SelectItem key={location.id} text={location.name} value={location.id}>
-                    {location.name}
-                  </SelectItem>
-                ))}
-            </Select>
+            {isLoadingQueueLocations ? (
+              <SelectSkeleton />
+            ) : (
+              <Select
+                labelText={t('selectQueueLocation', 'Select a queue location')}
+                id="location"
+                invalidText="Required"
+                value={selectedQueueLocation}
+                onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+                {!selectedQueueLocation ? (
+                  <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                ) : null}
+                {queueLocations?.length > 0 &&
+                  queueLocations.map((location) => (
+                    <SelectItem key={location.id} text={location.name} value={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
           </section>
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueService', 'Queue service')}</div>
-            <Select
-              labelText={t('selectService', 'Select a service')}
-              id="service"
-              invalidText="Required"
-              value={queueUuid}
-              onChange={(event) => setQueueUuid(event.target.value)}>
-              {!queueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-              {queues?.length > 0 &&
-                queues.map((service) => (
-                  <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                    {service.display}
-                  </SelectItem>
-                ))}
-            </Select>
+            {isLoadingQueues ? (
+              <SelectSkeleton />
+            ) : (
+              <Select
+                labelText={t('selectService', 'Select a service')}
+                id="service"
+                invalidText="Required"
+                value={queueUuid}
+                onChange={(event) => setQueueUuid(event.target.value)}>
+                {!queueUuid ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+                {queues?.length > 0 &&
+                  queues.map((service) => (
+                    <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                      {service.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            )}
           </section>
           {isMissingService && (
             <section>
@@ -166,7 +176,13 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
 
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('queueStatus', 'Queue status')}</div>
-            {!priorities?.length ? (
+            {isLoadingQueues ? (
+              <RadioButtonGroup>
+                <RadioButtonSkeleton />
+                <RadioButtonSkeleton />
+                <RadioButtonSkeleton />
+              </RadioButtonGroup>
+            ) : !priorities?.length ? (
               <InlineNotification
                 className={styles.inlineNotification}
                 kind={'error'}

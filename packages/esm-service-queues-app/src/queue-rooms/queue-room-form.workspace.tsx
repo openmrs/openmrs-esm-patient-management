@@ -12,18 +12,14 @@ import {
   Button,
   InlineNotification,
 } from '@carbon/react';
-import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { type DefaultWorkspaceProps, restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { saveQueueRoom } from './queue-room.resource';
 import styles from './queue-room-form.scss';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 
-interface QueueRoomFormProps {
-  closePanel: () => void;
-}
-
-const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ closePanel }) => {
+const QueueRoomForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [queueRoomName, setQueueRoomName] = useState('');
@@ -58,7 +54,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ closePanel }) => {
               kind: 'success',
               subtitle: t('queueRoomAddedSuccessfully', 'Queue room added successfully'),
             });
-            closePanel();
+            closeWorkspace();
             mutate(`${restBaseUrl}/queueroom`);
           }
         },
@@ -72,7 +68,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ closePanel }) => {
         },
       );
     },
-    [queueRoomName, queueRoomService, t, closePanel],
+    [queueRoomName, queueRoomService, t, closeWorkspace],
   );
 
   return (
@@ -159,7 +155,7 @@ const QueueRoomForm: React.FC<QueueRoomFormProps> = ({ closePanel }) => {
         </Column>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={() => closePanel()}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

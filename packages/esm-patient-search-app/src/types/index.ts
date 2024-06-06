@@ -64,6 +64,7 @@ export interface FHIRName {
   id: string;
   family: string;
   given: Array<string>;
+  text: string;
 }
 
 export interface FHIRPatientSearchResponse {

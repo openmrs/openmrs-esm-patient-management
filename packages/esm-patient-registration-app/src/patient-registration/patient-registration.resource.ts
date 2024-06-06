@@ -5,7 +5,7 @@ export const uuidIdentifier = '05a29f94-c0ed-11e2-94be-8c13b969e334';
 export const uuidTelephoneNumber = '14d4f066-15f5-102d-96e4-000c29c2a5d7';
 
 function dataURItoFile(dataURI: string) {
-  const byteString = atob(dataURI.split(',')[1]);
+  const byteString = window.atob(dataURI.split(',')[1]);
   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
   // write the bytes of the string to a typed array
   const buffer = new Uint8Array(byteString.length);
