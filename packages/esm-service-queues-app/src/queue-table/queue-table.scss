@@ -91,12 +91,6 @@
   }
 }
 
-.queueTable tr:last-of-type {
-  td {
-    border-bottom: none;
-  }
-}
-
 .desktopHeading {
   h4 {
     @include type.type-style('heading-compact-02');

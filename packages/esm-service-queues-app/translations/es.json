@@ -73,7 +73,7 @@
   "errorAddingQueue": "Error adding queue",
   "errorAddingQueueRoom": "Error adding queue room",
   "errorClearingQueues": "Error clearing queues",
-  "errorFetchingAppoinments": "Error fetching appointments",
+  "errorFetchingAppointments": "Error fetching appointments",
   "errorLoadingQueueEntries": "Error loading queue entries",
   "errorPostingToScreen": "Error posting to screen",
   "facility": "Facility",

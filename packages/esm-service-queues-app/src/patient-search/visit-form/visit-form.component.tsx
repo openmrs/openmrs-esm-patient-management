@@ -8,7 +8,10 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  FormGroup,
   InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
   Row,
   Select,
   SelectItem,
@@ -16,29 +19,25 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
-  FormGroup,
-  RadioButton,
-  RadioButtonGroup,
 } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
+  ExtensionSlot,
+  ResponsiveWrapper,
+  saveVisit,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  useLayoutType,
   useLocations,
   useSession,
-  ExtensionSlot,
-  useLayoutType,
-  saveVisit,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  useConfig,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import { VisitTypeSelector, RecommendedVisitTypeSelector } from './visit-type-selector.component';
+import { RecommendedVisitTypeSelector, VisitTypeSelector } from './visit-type-selector.component';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
-import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
+import { type amPm, convertTime12to24 } from '../../helpers/time-helpers';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
+import { type NewVisitPayload, type PatientProgram } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
@@ -48,13 +47,11 @@ import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
 
 interface VisitFormProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
   closeWorkspace: () => void;
-  mode: boolean;
 }
 
-const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closeWorkspace, mode }) => {
+const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -196,18 +193,6 @@ const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, cl
             <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <div className={styles.backButton}>
-          {mode === true ? null : (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-            </Button>
-          )}
-        </div>
         <Stack gap={8} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>

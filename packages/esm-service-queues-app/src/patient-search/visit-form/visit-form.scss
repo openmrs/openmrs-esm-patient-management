@@ -71,26 +71,3 @@
     flex-direction: column;
   }
 }
-
-.backButton {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
-  padding: 0;
-  @include type.type-style('body-compact-01');
-
-  button {
-    display: flex;
-
-    svg {
-      order: 1;
-      margin-right: spacing.$spacing-03;
-      margin-left: 0rem !important;
-    }
-
-    span {
-      order: 2;
-    }
-  }
-}
