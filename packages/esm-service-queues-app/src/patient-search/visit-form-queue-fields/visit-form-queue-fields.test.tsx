@@ -35,9 +35,10 @@ jest.mock('../../hooks/useQueues', () => {
 });
 
 describe('VisitFormQueueFields', () => {
-  it('renders the form fields', async () => {
+  it('renders the form fields and returns the set values', async () => {
     const user = userEvent.setup();
-    render(<VisitFormQueueFields />);
+    const setFormFields = jest.fn();
+    render(<VisitFormQueueFields setFormFields={setFormFields} />);
 
     expect(screen.getByLabelText('Select a queue location')).toBeInTheDocument();
     expect(screen.getByLabelText('Select a service')).toBeInTheDocument();
@@ -48,5 +49,15 @@ describe('VisitFormQueueFields', () => {
 
     expect(screen.getByText('Priority')).toBeInTheDocument();
     expect(screen.getByText('High')).toBeInTheDocument();
+
+    expect(setFormFields).toHaveBeenCalledWith({
+      queueLocation: '1',
+      service: 'e2ec9cf0-ec38-4d2b-af6c-59c82fa30b90',
+      // The status and priority are the defaults that come from the config schema.
+      // They are selected even though they are not 'allowed' for the queue.
+      status: '51ae5e4d-b72b-4912-bf31-a17efb690aeb',
+      priority: 'f4620bfa-3625-4883-bd3f-84c2cce14470',
+      sortWeight: 0,
+    });
   });
 });
