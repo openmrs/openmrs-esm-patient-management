@@ -43,7 +43,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   await test.step('And I set date for tomorrow', async () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    await page.fill('input[placeholder="dd/mm/yyyy"]', tomorrow.toLocaleDateString('en-GB'));
+    await page.getByRole('textbox', { name: /^Date$/i }).fill(tomorrow.toLocaleDateString('en-GB'));
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
