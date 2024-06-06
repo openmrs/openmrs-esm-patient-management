@@ -73,7 +73,7 @@
   "errorAddingQueue": "אירעה שגיאה בעת הוספת התור",
   "errorAddingQueueRoom": "שגיאה בהוספת חדר תור",
   "errorClearingQueues": "אירעה שגיאה בעת ניקוי התורים",
-  "errorFetchingAppoinments": "אירעה שגיאה בעת קבלת התורים",
+  "errorFetchingAppointments": "אירעה שגיאה בעת קבלת התורים",
   "errorLoadingQueueEntries": "Error loading queue entries",
   "errorPostingToScreen": "שגיאה בפרסום למסך",
   "facility": "מוסד",
