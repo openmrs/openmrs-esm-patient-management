@@ -198,16 +198,16 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
                 invalidText="Required"
                 value={formState.selectedQueue}
                 onChange={(event) => setSelectedQueueUuid(event.target.value)}>
-                {queues?.map(({ uuid, display }) => (
+                {queues?.map(({ uuid, display, location }) => (
                   <SelectItem
                     key={uuid}
                     text={
                       uuid == queueEntry.queue.uuid
                         ? t('currentValueFormatted', '{{value}} (Current)', {
-                            value: display,
+                            value: `${display} - ${location?.display}`,
                             interpolation: { escapeValue: false },
                           })
-                        : display
+                        : `${display} - ${location?.display}`
                     }
                     value={uuid}
                   />
