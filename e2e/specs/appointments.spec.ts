@@ -32,6 +32,10 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
     await page.selectOption('select#service', { label: 'Outpatient Department' });
   });
 
+  await test.step('And I fill in an appointment date in the `Date appointment issued` field', async () => {
+    await page.getByLabel('Date appointment issued').fill(new Date().toLocaleDateString('en-GB'));
+  });
+
   await test.step('And I make appointment as “Scheduled”', async () => {
     await page.getByLabel('Select an appointment type').selectOption('Scheduled');
   });
