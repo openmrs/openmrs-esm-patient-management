@@ -370,6 +370,12 @@ export const configSchema = {
       );
     }, 'If a queue-number column is used in a table definition, the `visitQueueNumberAttributeUuid` must be set either at the top-level config or in the column definition.'),
   ],
+  useServeQueueTableActionButton: {
+    _type: Type.Boolean,
+    _description:
+      'Determines whether to display the action button for transitioning the queue status from "waiting" to "serving."',
+    _default: false,
+  },
 };
 
 function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
@@ -402,6 +408,7 @@ export interface ConfigObject {
   visitTypeResourceUrl: string;
   visitQueueNumberAttributeUuid: string | null;
   queueTables: TablesConfig;
+  useServeQueueTableActionButton: boolean;
 }
 
 interface TablesConfig {

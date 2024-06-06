@@ -1,15 +1,30 @@
 import React from 'react';
 import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 import styles from './queue-table-action-cell.scss';
+import { type ConfigObject } from '../../config-schema';
 
 export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProps) {
   const { t } = useTranslation();
+  const { useServeQueueTableActionButton } = useConfig<ConfigObject>();
 
   return (
     <div className={styles.actionCellContainer}>
+      {useServeQueueTableActionButton && (
+        <Button
+          kind="ghost"
+          aria-label={t('servePatient', 'Serve patient')}
+          onClick={() => {
+            const dispose = showModal('serve-patient-modal', {
+              closeModal: () => dispose(),
+              queueEntry,
+            });
+          }}>
+          {t('serve', 'Serve')}
+        </Button>
+      )}
       <Button
         kind="ghost"
         aria-label={t('actions', 'Actions')}

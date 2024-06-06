@@ -1,0 +1,25 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.modalBody {
+  padding-bottom: spacing.$spacing-03;
+  margin-bottom: 0rem;
+}
+
+.p {
+  margin-bottom: spacing.$spacing-02;
+  @include type.type-style('body-01');
+}
+
+.patientName {
+  @include type.type-style('heading-03');
+  margin-right: 0.25rem;
+}
+
+.demographics {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  margin-top: 0.25rem;
+}
