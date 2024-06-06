@@ -13,7 +13,7 @@ import {
   RadioButton,
 } from '@carbon/react';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { addQueueEntry } from '../active-visits/active-visits-table.resource';
+import { postQueueEntry } from '../active-visits/active-visits-table.resource';
 import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
@@ -64,7 +64,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     const status = config.concepts.defaultStatusConceptUuid;
     const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
-    addQueueEntry(
+    postQueueEntry(
       visitUuid,
       queueUuid,
       patientUuid,

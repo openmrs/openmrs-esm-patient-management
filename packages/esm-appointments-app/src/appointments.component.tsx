@@ -37,7 +37,6 @@ const Appointments: React.FC = () => {
       />
       <AppointmentMetrics appointmentServiceType={appointmentServiceType} />
       <AppointmentTabs appointmentServiceType={appointmentServiceType} />
-      <WorkspaceOverlay contextKey="appointments" />
     </SelectedDateContext.Provider>
   );
 };

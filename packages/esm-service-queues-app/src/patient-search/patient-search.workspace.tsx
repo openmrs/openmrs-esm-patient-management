@@ -1,43 +1,84 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
+  ArrowLeftIcon,
   type DefaultWorkspaceProps,
-  ExtensionSlot,
+  displayName,
+  ErrorState,
+  PatientBannerContactDetails,
+  PatientBannerPatientInfo,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
   usePatient,
   useVisit,
-  PatientBannerPatientInfo,
-  PatientPhoto,
-  PatientBannerToggleContactDetailsButton,
-  PatientBannerContactDetails,
-  displayName,
 } from '@openmrs/esm-framework';
 import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
 import styles from './patient-search.scss';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { useScheduledVisits } from './hooks/useScheduledVisits';
+import isNil from 'lodash-es/isNil';
+import { useTranslation } from 'react-i18next';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
-  viewState: {
-    selectedPatientUuid?: string;
-  };
+  selectedPatientUuid: string;
+  currentServiceQueueUuid?: string;
+  handleBackToSearchList?: () => void;
 }
 
-const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState }) => {
-  const { selectedPatientUuid } = viewState;
+export const AddPatientToQueueContext = React.createContext({
+  currentServiceQueueUuid: '',
+});
+
+const PatientSearch: React.FC<PatientSearchProps> = ({
+  closeWorkspace,
+  selectedPatientUuid,
+  currentServiceQueueUuid,
+  handleBackToSearchList,
+}) => {
+  const { t } = useTranslation();
   const { patient } = usePatient(selectedPatientUuid);
   const { activeVisit } = useVisit(selectedPatientUuid);
   const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
-  const [newVisitMode, setNewVisitMode] = useState<boolean>(false);
   const [showContactDetails, setContactDetails] = useState(false);
+  const { appointments, isLoading, isError } = useScheduledVisits(selectedPatientUuid);
 
-  const toggleSearchType = (searchType: SearchTypes, mode: boolean = false) => {
+  const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
+
+  const backButtonDescription =
+    searchType === SearchTypes.VISIT_FORM && hasAppointments
+      ? t('backToScheduledVisits', 'Back to scheduled visits')
+      : t('backToSearchResults', 'Back to search results');
+
+  const toggleSearchType = (searchType: SearchTypes) => {
     setSearchType(searchType);
-    setNewVisitMode(mode);
   };
+
+  const handleBackToAction = () => {
+    if (searchType === SearchTypes.VISIT_FORM && hasAppointments) {
+      setSearchType(SearchTypes.SCHEDULED_VISITS);
+    } else {
+      setSearchType(SearchTypes.SEARCH_RESULTS);
+    }
+  };
+
+  useEffect(() => {
+    if (searchType === SearchTypes.SCHEDULED_VISITS && appointments && !hasAppointments) {
+      setSearchType(SearchTypes.VISIT_FORM);
+    }
+  }, [hasAppointments, appointments]);
+
+  useEffect(() => {
+    if (searchType === SearchTypes.SEARCH_RESULTS) {
+      handleBackToSearchList && handleBackToSearchList();
+    }
+  }, [searchType, handleBackToSearchList]);
 
   const patientName = patient && displayName(patient);
   return patient ? (
-    <>
+    <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
       <div className={styles.patientBannerContainer}>
         <div className={styles.patientBanner}>
           <div className={styles.patientPhoto}>
@@ -53,25 +94,41 @@ const PatientSearch: React.FC<PatientSearchProps> = ({ closeWorkspace, viewState
           <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
         ) : null}
       </div>
+      <div className={styles.backButton}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
+          iconDescription={backButtonDescription}
+          size="sm"
+          onClick={() => handleBackToAction()}>
+          <span>{backButtonDescription}</span>
+        </Button>
+      </div>
       <div>
         {activeVisit ? (
-          <ExistingVisitFormComponent visit={activeVisit} closePanel={closeWorkspace} />
-        ) : searchType === SearchTypes.SCHEDULED_VISITS ? (
-          <PatientScheduledVisits
-            patientUuid={selectedPatientUuid}
-            toggleSearchType={toggleSearchType}
-            closeWorkspace={closeWorkspace}
-          />
-        ) : searchType === SearchTypes.VISIT_FORM ? (
-          <VisitForm
-            patientUuid={selectedPatientUuid}
-            toggleSearchType={toggleSearchType}
-            closePanel={closeWorkspace}
-            mode={newVisitMode}
-          />
-        ) : null}
+          <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
+        ) : (
+          <>
+            {isError ? (
+              <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={isError} />
+            ) : null}
+
+            {isLoading && !isError ? (
+              <DataTableSkeleton role="progressbar" />
+            ) : searchType === SearchTypes.SCHEDULED_VISITS && hasAppointments ? (
+              <PatientScheduledVisits
+                appointments={appointments}
+                patientUuid={selectedPatientUuid}
+                toggleSearchType={toggleSearchType}
+                closeWorkspace={closeWorkspace}
+              />
+            ) : searchType === SearchTypes.VISIT_FORM ? (
+              <VisitForm patientUuid={selectedPatientUuid} closeWorkspace={closeWorkspace} />
+            ) : null}
+          </>
+        )}
       </div>
-    </>
+    </AddPatientToQueueContext.Provider>
   ) : null;
 };
 

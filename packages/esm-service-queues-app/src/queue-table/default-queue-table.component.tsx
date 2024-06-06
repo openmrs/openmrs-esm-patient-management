@@ -1,7 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, launchWorkspace, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
+import {
+  closeWorkspace,
+  ExtensionSlot,
+  isDesktop,
+  launchWorkspace,
+  showSnackbar,
+  showToast,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -17,6 +25,8 @@ import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
+
+const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -43,6 +53,14 @@ function DefaultQueueTable() {
     }
   }, [error?.message]);
   const layout = useLayoutType();
+
+  const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
+  const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
+
+  const handleBackToSearchList = useCallback(() => {
+    setIsPatientSearchOpen(true);
+    closeWorkspace(serviceQueuesPatientSearchWorkspace);
+  }, []);
 
   const columns = useColumns(null, null);
   if (!columns) {
@@ -79,6 +97,8 @@ function DefaultQueueTable() {
           <ExtensionSlot
             name="patient-search-button-slot"
             state={{
+              isOpen: isPatientSearchOpen,
+              searchQuery: patientSearchQuery,
               buttonText: t('addPatientToQueue', 'Add patient to queue'),
               overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
               buttonProps: {
@@ -86,8 +106,12 @@ function DefaultQueueTable() {
                 renderIcon: (props) => <Add size={16} {...props} />,
                 size: 'sm',
               },
-              selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', { viewState: { selectedPatientUuid } });
+              searchQueryUpdatedAction: (searchQuery: string) => {
+                setPatientSearchQuery(searchQuery);
+              },
+              selectPatientAction: (selectedPatientUuid: string) => {
+                setIsPatientSearchOpen(false);
+                launchWorkspace(serviceQueuesPatientSearchWorkspace, { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid,handleBackToSearchList });
               },
             }}
           />

@@ -61,47 +61,6 @@ function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
 
-// t('durationErrorMessage', 'Duration should be greater than zero')
-const appointmentsFormSchema = z
-  .object({
-    duration: z.number().refine((duration) => duration > 0, {
-      message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-    }),
-    location: z.string().refine((value) => value !== ''),
-    provider: z.string().refine((value) => value !== ''),
-    appointmentStatus: z.string().optional(),
-    appointmentNote: z.string(),
-    appointmentType: z.string().refine((value) => value !== ''),
-    selectedService: z.string().refine((value) => value !== ''),
-    recurringPatternType: z.enum(['DAY', 'WEEK']),
-    recurringPatternPeriod: z.number(),
-    recurringPatternDaysOfWeek: z.array(z.string()),
-    selectedDaysOfWeekText: z.string().optional(),
-    startTime: z.string().refine((value) => isValidTime(value)),
-    timeFormat: z.enum(['AM', 'PM']),
-    appointmentDateTime: z.object({
-      startDate: z.date(),
-      startDateText: z.string(),
-      recurringPatternEndDate: z.date().nullable(),
-      recurringPatternEndDateText: z.string().nullable(),
-    }),
-    formIsRecurringAppointment: z.boolean(),
-  })
-  .refine(
-    (formValues) => {
-      if (formValues.formIsRecurringAppointment === true) {
-        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
-      }
-      return true;
-    },
-    {
-      path: ['appointmentDateTime.recurringPatternEndDate'],
-      message: 'A recurring appointment should have an end date',
-    },
-  );
-
-type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
-
 interface AppointmentsFormProps {
   appointment?: Appointment;
   recurringPattern?: RecurringPattern;
@@ -136,7 +95,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -167,6 +125,50 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     appointment?.startDateTime && appointment?.endDateTime
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
       : null;
+
+  // t('durationErrorMessage', 'Duration should be greater than zero')
+  const appointmentsFormSchema = z
+    .object({
+      duration: z
+        .number()
+        .nullable()
+        .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
+          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        }),
+      location: z.string().refine((value) => value !== ''),
+      provider: z.string().refine((value) => value !== ''),
+      appointmentStatus: z.string().optional(),
+      appointmentNote: z.string(),
+      appointmentType: z.string().refine((value) => value !== ''),
+      selectedService: z.string().refine((value) => value !== ''),
+      recurringPatternType: z.enum(['DAY', 'WEEK']),
+      recurringPatternPeriod: z.number(),
+      recurringPatternDaysOfWeek: z.array(z.string()),
+      selectedDaysOfWeekText: z.string().optional(),
+      startTime: z.string().refine((value) => isValidTime(value)),
+      timeFormat: z.enum(['AM', 'PM']),
+      appointmentDateTime: z.object({
+        startDate: z.date(),
+        startDateText: z.string(),
+        recurringPatternEndDate: z.date().nullable(),
+        recurringPatternEndDateText: z.string().nullable(),
+      }),
+      formIsRecurringAppointment: z.boolean(),
+    })
+    .refine(
+      (formValues) => {
+        if (formValues.formIsRecurringAppointment === true) {
+          return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+        }
+        return true;
+      },
+      {
+        path: ['appointmentDateTime.recurringPatternEndDate'],
+        message: 'A recurring appointment should have an end date',
+      },
+    );
+
+  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
@@ -491,7 +493,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
-          <div>
+          <div className={styles.dateTimeFields}>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (

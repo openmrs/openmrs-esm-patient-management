@@ -3,7 +3,8 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.container {
+.container,
+.deceasedPatientContainer {
   border-bottom: 0.063rem solid $ui-03;
   background-color: $ui-02;
   display: grid;
@@ -18,28 +19,6 @@
   width: 1rem;
   height: 1rem;
   margin-left: 0.5rem;
-}
-
-.deceasedPatientContainer {
-  background-color: colors.$gray-80;
-
-  .patientName {
-    color: $ui-01;
-  }
-
-  .demographics,
-  .identifiers {
-    color: $ui-02;
-  }
-
-  .menu {
-    fill: colors.$blue-40;
-  }
-
-  &:focus,
-  &:hover {
-    background-color: colors.$gray-90;
-  }
 }
 
 .patientBanner {

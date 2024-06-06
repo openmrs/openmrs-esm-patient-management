@@ -73,7 +73,7 @@
   "errorAddingQueue": "កំហុសក្នុងការបន្ថែមជួរ",
   "errorAddingQueueRoom": "Error adding queue room",
   "errorClearingQueues": "កំហុសក្នុងការសម្អាតជួរ",
-  "errorFetchingAppoinments": "កំហុសក្នុងការទៅយកការណាត់ជួប",
+  "errorFetchingAppointments": "កំហុសក្នុងការទៅយកការណាត់ជួប",
   "errorLoadingQueueEntries": "Error loading queue entries",
   "errorPostingToScreen": "Error posting to screen",
   "facility": "Facility",
