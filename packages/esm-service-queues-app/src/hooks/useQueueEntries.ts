@@ -53,34 +53,30 @@ function getNextUrlFromResponse(data: QueueEntryResponse) {
 export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
 
-  return { mutateQueueEntries: () => {
-    console.log("called mutate!");
-    console.log("queue cached", [...cache.keys()].filter(key => key.includes(`${restBaseUrl}/queue-entry`)));
-    return mutate((key) => {
-      return (
-        typeof key === 'string' &&
-        (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
-      );
-    }).then(() => {
-      console.log("mutate promise resolved");
-      window.dispatchEvent(new CustomEvent('queue-entry-updated'));
-    });
-  }}
+  return {
+    mutateQueueEntries: () => {
+      return mutate((key) => {
+        return (
+          typeof key === 'string' &&
+          (key.includes(`${restBaseUrl}/queue-entry`) || key.includes(`${restBaseUrl}/visit-queue-entry`))
+        );
+      }).then(() => {
+        window.dispatchEvent(new CustomEvent('queue-entry-updated'));
+      });
+    },
+  };
 }
 
 export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
-  const id = useRef(Math.floor(Math.random() * 1000));
   const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [totalCount, setTotalCount] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
   const [error, setError] = useState<Error>();
-  const { mutateQueueEntries} = useMutateQueueEntries();
+  const { mutateQueueEntries } = useMutateQueueEntries();
   const [waitingForMutate, setWaitingForMutate] = useState(false);
 
-  const { data: pageData, isLoading, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
-
-  // console.log(`${id.current} useQueueEntries`, { pageUrl, isLoading, isValidating, error, pageData })
+  const { data: pageData, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
 
   useEffect(() => {
     const nextUrl = getNextUrlFromResponse(pageData);
@@ -88,7 +84,6 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     if (waitingForMutate && isValidating) {
       setWaitingForMutate(false);
     }
-    console.log(`${id.current} in useEffect`, { nextUrl, pageData, isValidating, stillWaitingForMutate, data, currentPage, totalCount })
     if (pageData && !isValidating && !stillWaitingForMutate) {
       if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
         setTotalCount(pageData?.data?.totalCount);
@@ -99,16 +94,15 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
         setData(newData);
       }
       setCurrentPage(currentPage + 1);
-      console.log(`${id.current} setting pageUrl`, nextUrl)
       setPageUrl(nextUrl);
       const inMutateMode = data.length > currentPage;
       if (inMutateMode && nextUrl) {
         setWaitingForMutate(true);
-      } 
+      }
     }
     if (!nextUrl) {
       if (data.length > currentPage + 1) {
-        setData(prevData => {
+        setData((prevData) => {
           const newData = [...prevData];
           newData.splice(currentPage + 1);
           return newData;
@@ -124,17 +118,16 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }, [pageError]);
 
   const queueUpdateListener = useCallback(() => {
-    console.log("caught the mutate!");
     setWaitingForMutate(true);
     setCurrentPage(0);
     setPageUrl(getInitialUrl(rep, searchCriteria));
-  }, [rep, searchCriteria])
+  }, [rep, searchCriteria]);
 
   useEffect(() => {
     window.addEventListener('queue-entry-updated', queueUpdateListener);
     return () => {
       window.removeEventListener('queue-entry-updated', queueUpdateListener);
-    }
+    };
   }, [queueUpdateListener]);
 
   const queueEntries = useMemo(() => data.flat(), [data]);
@@ -145,7 +138,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     isLoading: totalCount && queueEntries.length < totalCount,
     isValidating: isValidating || currentPage < data.length,
     error,
-    mutate: mutateQueueEntries
+    mutate: mutateQueueEntries,
   };
 }
 
