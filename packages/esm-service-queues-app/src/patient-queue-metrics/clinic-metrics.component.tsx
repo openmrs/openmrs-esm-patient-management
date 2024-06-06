@@ -78,7 +78,9 @@ function ClinicMetrics() {
             type="inline"
             label={currentServiceName ?? `${t('all', 'All')}`}
             items={[{ display: `${t('all', 'All')}` }, ...queues]}
-            itemToString={(item) => (item ? item.display : '')}
+            itemToString={(item) =>
+              item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
+            }
             onChange={handleServiceChange}
           />
         </MetricsCard>

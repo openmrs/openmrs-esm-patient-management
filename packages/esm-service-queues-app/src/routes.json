@@ -97,6 +97,11 @@
       "name": "active-visits-row-actions",
       "component": "activeVisitsRowActions",
       "slot": "queue-table-extension-column-slot"
+    },
+    {
+      "name": "visit-form-queue-fields",
+      "component": "visitFormQueueFields",
+      "slot":"visit-form-queue-slot"
     }
   ],
   "workspaces": [
