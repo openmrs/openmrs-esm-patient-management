@@ -62,6 +62,8 @@
   "date": "Date",
   "date&Time": "Date & time",
   "dateOfBirth": "Date of birth",
+  "dateScheduled": "Date appointment issued",
+  "dateScheduledDetail": "Date appointment issued",
   "dateTime": "Date & Time",
   "day": "Day",
   "daysOfWeek": "Days of the week",
