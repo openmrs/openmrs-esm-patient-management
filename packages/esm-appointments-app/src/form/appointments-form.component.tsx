@@ -267,12 +267,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
     // check if Duplicate Response Occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    let errorMessage = t('appointmentDuplicateForm', 'Appointment is not available');
+    if (response?.data?.SERVICE_UNAVAILABE) {
+      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
+    } else if (response?.data?.PATIENT_DOUBLE_BOOKING) {
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+    }
     if (response.status === 200) {
       setIsSubmitting(false);
       showSnackbar({
         isLowContrast: true,
         kind: 'error',
-        title: t('appointmentDuplicateForm', 'Appointment is not available'),
+        title: errorMessage,
       });
       return;
     }
