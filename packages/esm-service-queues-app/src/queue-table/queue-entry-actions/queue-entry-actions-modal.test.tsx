@@ -66,7 +66,9 @@ describe('TransitionQueueEntryModal: ', () => {
     // change queue
     const queueDropdown = screen.getByRole('combobox', { name: /Select a queue/ });
     await queueDropdown.click();
-    const queueSelection = screen.getByRole('option', { name: nextQueue.display });
+    const queueSelection = screen.getByRole('option', {
+      name: `${nextQueue.display} - ${nextQueue.location?.display}`,
+    });
     await user.selectOptions(queueDropdown, queueSelection);
 
     // change status
@@ -131,7 +133,9 @@ describe('EditQueueEntryModal: ', () => {
     // change queue
     const queueDropdown = screen.getByRole('combobox', { name: /Select a queue/ });
     await queueDropdown.click();
-    const queueSelection = screen.getByRole('option', { name: nextQueue.display });
+    const queueSelection = screen.getByRole('option', {
+      name: `${nextQueue.display} - ${nextQueue.location?.display}`,
+    });
     await user.selectOptions(queueDropdown, queueSelection);
 
     // change status
