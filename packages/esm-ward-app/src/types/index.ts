@@ -7,7 +7,7 @@ export interface WardPatientCardProps {
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
-export type WardPatientCardBentoElement<T = {}> = React.FC<WardPatientCardProps & T>;
+export type WardPatientCardBentoElement = React.FC<WardPatientCardProps>;
 
 type DispositionType = "ADMISSION"|"TRANSFER"|"DISCHARGE"
 

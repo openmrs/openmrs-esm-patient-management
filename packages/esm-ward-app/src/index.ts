@@ -7,10 +7,6 @@ import {
 } from '@openmrs/esm-framework';
 import rootComponent from './root.component';
 import { configSchema } from './config-schema';
-import {
-  admittedPatientHeaderAddressConfigSchema,
-  admittedPatientHeaderNameConfigSchema,
-} from './ward-patient-card/bento-elements/admitted-patient-header-config-schema';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -27,8 +23,6 @@ export function startupApp() {
   registerBreadcrumbs([]);
 
   defineConfigSchema(moduleName, configSchema);
-  defineExtensionConfigSchema('admitted-patient-header-address', admittedPatientHeaderAddressConfigSchema);
-  defineExtensionConfigSchema('admitted-patient-header-name', admittedPatientHeaderNameConfigSchema);
 }
 
 // extensions:

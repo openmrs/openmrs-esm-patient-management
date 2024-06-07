@@ -1,5 +1,5 @@
-import { Type, validator, type ConfigSchema } from '@openmrs/esm-framework';
-import { bentoElementTypes } from './types';
+import { PersonAddress, Type, validator, validators, type ConfigSchema } from '@openmrs/esm-framework';
+import { BentoElementType, bentoElementTypes } from './types';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
   card: {
@@ -9,9 +9,38 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   appliedTo: null
 }
 
+export const defaultBentoElementConfig: BentoElementConfig = {
+  addressFields: ["cityVillage"]
+};
+
+export const builtInBentoElements : BentoElementType[] = ["bed-number", "patient-name", "patient-age", "patient-address", "admission-time"];
+
 export const configSchema : ConfigSchema = {
   wardPatientCards: {
     _description: 'Configure the display of ward patient cards',
+    bentoElementDefinitions: {
+      _type: Type.Array,
+      _default: [],
+      _elements: {
+        id: {
+          _type: Type.String,
+          _description: 'The unique identifier for this custom bento element'
+        },
+        elementType: {
+          _type: Type.String,
+          _description: 'The bento element type',
+          _validators: [
+            validators.oneOf(bentoElementTypes)
+          ]
+        },
+        config: {
+          addressFields: {
+            _type: Type.Array,
+            _description: 'For bentoElementType "patient-address", defining which address fields to show'
+          }
+        }
+      }
+    },
     cardDefinitions: {
       _type: Type.Array,
       _default: [defaultWardPatientCard],
@@ -59,6 +88,7 @@ export interface WardConfigObject {
 }
 
 export interface WardPatientCardsConfig {
+  bentoElementDefinitions: Array<BentoElementDefinition>;
   cardDefinitions: Array<WardPatientCardDefinition>;
 }
 
@@ -71,3 +101,15 @@ export interface WardPatientCardDefinition {
     location: string; // locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
   }>;
 }
+
+export type BentoElementDefinition = {
+  id: string;
+  elementType: BentoElementType;
+  config?: BentoElementConfig;
+};
+
+export interface PatientAddressBentoElementConfig {
+  addressFields: Array<keyof PersonAddress>;
+}
+
+export type BentoElementConfig = {} & PatientAddressBentoElementConfig;
