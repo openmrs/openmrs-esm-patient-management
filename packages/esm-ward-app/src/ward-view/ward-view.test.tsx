@@ -1,4 +1,10 @@
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  type ConfigSchema,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useSession,
+  useFeatureFlag,
+} from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,7 +16,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
 
 jest.mocked(useConfig).mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
+  ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
 });
 
 const mockedSessionLocation = { uuid: 'abcd', display: 'mock location', links: [] };
@@ -19,6 +25,8 @@ jest.mocked(useSession).mockReturnValue({
   authenticated: true,
   sessionId: 'sessionId',
 });
+
+const mockedUseFeatureFlag = useFeatureFlag as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
@@ -63,5 +71,11 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const emptyBedCards = await screen.findAllByText(/empty bed/i);
     expect(emptyBedCards).toHaveLength(3);
+  });
+
+  it('screen should be empty if backend module is not installed', () => {
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
+    const { container } = renderWithSwr(<WardView />);
+    expect(container.firstChild).not.toBeInTheDocument();
   });
 });
