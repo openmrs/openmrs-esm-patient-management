@@ -1,26 +1,27 @@
-import React from 'react';
 import { InlineNotification } from '@carbon/react';
-import { launchWorkspace, useLocations, useSession, type Location } from '@openmrs/esm-framework';
-
+import { useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
-import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
-import { Button } from '@carbon/react';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
   const { sessionLocation } = useSession();
   const allLocations = useLocations();
   const { t } = useTranslation();
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
-  const invalidLocation = !!(locationUuidFromUrl && !locationFromUrl);
-
-
+  const invalidLocation = Boolean(locationUuidFromUrl && !locationFromUrl);
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
+  //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
+  if (!isBedManagementModuleInstalled) {
+    return <></>;
+  }
 
   return (
     <div className={styles.wardView}>
@@ -28,16 +29,7 @@ const WardView = () => {
         <div className={styles.wardViewHeaderLocationDisplay}>
           <h4>{location?.display}</h4>
         </div>
-        <div className={styles.wardViewHeaderAdmissionRequestMenuBar}>
-          3 admission requests
-          <Button
-            size="sm"
-            onClick={() => {
-              launchWorkspace('pending-admission-requests-workspace', {});
-            }}>
-            Manage
-          </Button>
-        </div>
+        <div className={styles.wardViewHeaderAdmissionRequestMenuBar}>{/* TODO: Admission Request bar */}</div>
       </div>
       <div className={styles.wardViewMain}>
         {invalidLocation ? (

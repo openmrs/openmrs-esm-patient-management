@@ -96,7 +96,7 @@
     {
       "name": "active-visits-row-actions",
       "component": "activeVisitsRowActions",
-      "slot": "queue-table-extension-column-slot"
+      "slot": "queue-table-serve-patient-slot"
     },
     {
       "name": "visit-form-queue-fields",

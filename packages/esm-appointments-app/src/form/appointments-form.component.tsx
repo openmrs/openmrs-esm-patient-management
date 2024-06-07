@@ -33,8 +33,10 @@ import {
   useLocations,
   usePatient,
   useSession,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
+  checkAppointmentConflict,
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
@@ -54,6 +56,7 @@ import {
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
+import uniqBy from 'lodash/uniqBy';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
 
@@ -95,6 +98,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
+  const [isConflict, setIsConflict] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -154,6 +158,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDateText: z.string().nullable(),
       }),
       formIsRecurringAppointment: z.boolean(),
+      dateAppointmentScheduled: z.date().optional(),
     })
     .refine(
       (formValues) => {
@@ -169,6 +174,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     );
 
   type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
+
+  const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
+    ? new Date(appointment?.dateAppointmentScheduled)
+    : new Date();
 
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
@@ -196,6 +205,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDateText: defaultEndDateText,
       },
       formIsRecurringAppointment: isRecurringAppointment,
+      dateAppointmentScheduled: defaultDateAppointmentScheduled,
     },
   });
 
@@ -259,10 +269,29 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   })();
 
   // Same for creating and editing
-  const handleSaveAppointment = (data: AppointmentFormData) => {
+  const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
+
+    // check if Duplicate Response Occurs
+    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    let errorMessage = t('appointmentDuplicateForm', 'Appointment is not available');
+    if (response?.data?.SERVICE_UNAVAILABE) {
+      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
+    } else if (response?.data?.PATIENT_DOUBLE_BOOKING) {
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+    }
+    if (response.status === 200) {
+      setIsSubmitting(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: errorMessage,
+      });
+      return;
+    }
+
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
       appointmentRequest: appointmentPayload,
@@ -328,6 +357,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       provider,
       appointmentNote,
       appointmentStatus,
+      dateAppointmentScheduled,
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
@@ -348,6 +378,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       patientUuid: patientUuid,
       comments: appointmentNote,
       uuid: context === 'editing' ? appointment.uuid : undefined,
+      dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
 
@@ -413,6 +444,31 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       </SelectItem>
                     ))}
                 </Select>
+              )}
+            />
+          </ResponsiveWrapper>
+        </section>
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+          <ResponsiveWrapper>
+            <Controller
+              name="dateAppointmentScheduled"
+              control={control}
+              render={({ field: { onChange, value, ref } }) => (
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={value}
+                  maxDate={new Date()}
+                  onChange={([date]) => onChange(date)}>
+                  <DatePickerInput
+                    id="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    style={{ width: '100%' }}
+                    placeholder={datePickerPlaceHolder}
+                    ref={ref}
+                  />
+                </DatePicker>
               )}
             />
           </ResponsiveWrapper>

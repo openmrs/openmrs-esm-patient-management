@@ -11,7 +11,6 @@ import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
 import type { Concept, Queue, QueueEntry } from '../types';
 
-
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
 }
@@ -61,7 +60,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', { selectedPatientUuid, currentServiceQueueUuid: selectedQueue.uuid });
+                launchWorkspace('service-queues-patient-search', {
+                  selectedPatientUuid,
+                  currentServiceQueueUuid: selectedQueue.uuid,
+                });
               },
             }}
           />
