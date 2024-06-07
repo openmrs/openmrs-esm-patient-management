@@ -1,4 +1,4 @@
-import { type Location, type Patient } from '@openmrs/esm-framework';
+import type { Visit, Location, Patient } from '@openmrs/esm-framework';
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -50,3 +50,15 @@ interface BedTagMap {
 }
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+export type DispositionType = 'ADMISSION' | 'TRANSFER' | 'DISCHARGE';
+
+export interface Disposition {
+  patient: Patient;
+  visit: Visit;
+  type: DispositionType;
+  // encounter?: Encounter;
+  // dispositionObs?: Obs;
+  dispositionLocation?: Location;
+  dispositionDate?: Date;
+}

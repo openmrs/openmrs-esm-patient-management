@@ -3,5 +3,6 @@
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "noBedsConfigured": "No beds configured for this location",
-  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}"
+  "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}",
+  "admissionRequests":"Admission Requests"
 }

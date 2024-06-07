@@ -1,0 +1,37 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.admissionRequestsContainer {
+  width: fit-content;
+  border-left: 2px solid $color-blue-60-2;
+  background-color: $color-gray-70;
+  display: flex;
+  align-items: center;
+  padding: spacing.$spacing-02;
+}
+
+.movementIcon {
+  padding: spacing.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: $color-blue-60-2;
+}
+
+.manageButton {
+  background-color: transparent;
+  border: none;
+  color: $inverse-link;
+  cursor: pointer;
+  margin-left: spacing.$spacing-04;
+  &::after {
+    content: '→';
+    padding: spacing.$spacing-02;
+  }
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: $ui-02;
+  margin-left: spacing.$spacing-02;
+}

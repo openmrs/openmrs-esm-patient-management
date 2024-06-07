@@ -12,10 +12,6 @@
   padding: 0 spacing.$spacing-05;
 }
 
-.wardViewHeader {
-  margin: spacing.$spacing-05 0;
-}
-
 .wardViewMain {
   background-color: #e4e4e4;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

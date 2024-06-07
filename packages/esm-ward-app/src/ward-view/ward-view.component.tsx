@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { InlineNotification } from '@carbon/react';
-import { useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import { WorkspaceOverlay, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
@@ -8,6 +8,7 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed } from './ward-view.resource';
 import styles from './ward-view.scss';
 import EmptyBedSkeleton from '../empty-beds/empty-bed-skeleton';
+import WardViewHeader from '../ward-view-header/ward-view-header.component';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -19,13 +20,11 @@ const WardView = () => {
   const invalidLocation = locationUuidFromUrl && !locationFromUrl;
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
   //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
-  if (!isBedManagementModuleInstalled) return <></>;
+  // if (!isBedManagementModuleInstalled) return <></>;
 
   return (
     <div className={styles.wardView}>
-      <div className={styles.wardViewHeader}>
-        <h4>{location?.display}</h4>
-      </div>
+      <WardViewHeader location={location.display} />
       <div className={styles.wardViewMain}>
         {invalidLocation ? (
           <InlineNotification
@@ -40,6 +39,7 @@ const WardView = () => {
           <WardViewByLocation location={location} />
         )}
       </div>
+      <WorkspaceOverlay contextKey="ward" />
     </div>
   );
 };

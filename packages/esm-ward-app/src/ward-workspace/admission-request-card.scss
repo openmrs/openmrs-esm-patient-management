@@ -1,0 +1,33 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.admissionRequestCardHeader {
+  background-color: $ui-03;
+  padding: spacing.$spacing-03;
+  border: 1px solid $color-gray-30;
+  color: $color-gray-70;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  > div:not(:first-of-type)::before {
+    content: '·';
+    padding: spacing.$spacing-02;
+  }
+}
+
+.patientName,
+.patientGender,
+.patientAge {
+  @include type.type-style('heading-01');
+}
+
+.patientName {
+  color: $color-gray-100;
+}
+
+.time,
+.city,
+.ward {
+  @include type.type-style('body-compact-01');
+}

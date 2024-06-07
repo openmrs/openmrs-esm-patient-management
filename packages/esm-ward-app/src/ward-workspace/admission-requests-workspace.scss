@@ -1,0 +1,8 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.admissionRequestsWorkspace {
+  min-height: var(--desktop-workspace-window-height);
+  padding: spacing.$spacing-04;
+}
