@@ -54,7 +54,7 @@ export const defaultColumnConfig: ColumnConfig = {
   visitQueueNumberAttributeUuid: null,
 };
 
-export const defaultQueueTable = {
+export const defaultQueueTable : TableDefinitions = {
   columns: ['patient-name', 'coming-from', 'priority', 'status', 'queue', 'wait-time', 'actions'],
   appliedTo: [{ queue: null, status: null }],
 };

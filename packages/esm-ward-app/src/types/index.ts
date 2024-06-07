@@ -1,18 +1,26 @@
 import { OpenmrsResource, OpenmrsResourceStrict, Person, Visit, type Location, type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 
-export interface WardPatientCardSlotProps {
+export interface WardPatientCardProps {
   patient: Patient;
   bed: Bed;
 }
-export type WardPatientCardSlot = React.FC<WardPatientCardSlotProps>;
-export type WardPatientCardSlotFunction = (config?: any) => WardPatientCardSlot;
 
-export type WardPatientCardSlotElementProps = WardPatientCardSlotProps;
-export type WardPatientCardSlotElement = WardPatientCardSlot;
-export type WardPatientCardSlotElementFunction = WardPatientCardSlotFunction;
+export type WardPatientCardRow = React.FC<WardPatientCardProps>;
+export type WardPatientCardBentoElement<T = {}> = React.FC<WardPatientCardProps & T>;
 
 type DispositionType = "ADMISSION"|"TRANSFER"|"DISCHARGE"
+
+export type WardPatientStatus = "admitted" | "pending";
+
+export const bentoElementTypes = [
+  'bed-number',
+  'patient-name',
+  'patient-age',
+  'patient-address',
+  'admission-time',
+] as const;
+export type BentoElementType = (typeof bentoElementTypes)[number];
 
 interface Disposition {
   patient:Patient

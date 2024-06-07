@@ -10,7 +10,7 @@ import { configSchema } from './config-schema';
 import {
   admittedPatientHeaderAddressConfigSchema,
   admittedPatientHeaderNameConfigSchema,
-} from './ward-patient-card/slot-elements/admitted-patient-header-config-schema';
+} from './ward-patient-card/bento-elements/admitted-patient-header-config-schema';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 

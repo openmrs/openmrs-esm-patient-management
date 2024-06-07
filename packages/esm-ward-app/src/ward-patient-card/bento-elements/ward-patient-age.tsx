@@ -1,8 +1,8 @@
 import React from 'react';
-import { type AdmittedPatientHeaderProps } from './admitted-patient-header';
+import { WardPatientCardBentoElement } from '../../types';
 import styles from '../admitted-patient-details.scss';
 
-const AdmittedPatientHeaderAge: React.FC<AdmittedPatientHeaderProps> = ({ patient }) => {
+const AdmittedPatientHeaderAge: WardPatientCardBentoElement = ({ patient }) => {
   return <div className={styles.admittedPatientField}>{patient?.person?.age} yrs</div>;
 };
 
