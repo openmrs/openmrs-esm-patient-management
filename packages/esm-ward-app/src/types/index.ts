@@ -9,8 +9,6 @@ export interface WardPatientCardProps {
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
 export type WardPatientCardBentoElement = React.FC<WardPatientCardProps>;
 
-type DispositionType = "ADMISSION"|"TRANSFER"|"DISCHARGE"
-
 export type WardPatientStatus = "admitted" | "pending";
 
 export const bentoElementTypes = [
@@ -21,16 +19,6 @@ export const bentoElementTypes = [
   'admission-time',
 ] as const;
 export type BentoElementType = (typeof bentoElementTypes)[number];
-
-interface Disposition {
-  patient:Patient
-  visit:Visit;
-  type:DispositionType;
-  encounter?:Encounter;
-  dispositionObs?:Observation;
-  dispositionLocation?:Location
-  dispositionDate?:Date
-}
 
 // server-side types defined in openmrs-module-bedmanagement:
 
