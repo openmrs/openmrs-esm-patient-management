@@ -19,6 +19,7 @@
     "@hookform/resolvers": "^3.3.1",
     "classnames": "^2.3.2",
     "react-hook-form": "^7.46.2",
+    "react-joyride": "^2.8.2",
     "swr": "^2.0.1",
     "xlsx": "^0.18.5",
     "zod": "^3.22.2"
@@ -26,7 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@carbon/react": "~1.37.0",
-    "@openmrs/esm-framework": "next",
+    "@openmrs/esm-framework": "^5.6.1-pre.1881",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "1.44.0",
     "@swc/core": "^1.2.165",
@@ -61,7 +62,7 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.1",
-    "openmrs": "next",
+    "openmrs": "^5.6.1-pre.1881",
     "prettier": "^3.1.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
