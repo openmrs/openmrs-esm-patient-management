@@ -88,13 +88,18 @@ export const configSchema = {
   allowAllDayAppointments: {
     _type: Type.Boolean,
     _description: 'Whether to allow scheduling of all-day appointments (vs appointments with start time and end time)',
-    _default: true,
+    _default: false,
   },
   checkInButton: {
     enabled: {
       _type: Type.Boolean,
       _description: 'Whether the check-in button on the "Appointments" list should be enabled',
       _default: true,
+    },
+    showIfActiveVisit: {
+      _type: Type.Boolean,
+      _description: 'Whether to show the check-in button if the patient currently has an active visit',
+      _default: false,
     },
     customUrl: {
       _type: Type.String,
@@ -136,6 +141,7 @@ export interface ConfigObject {
   allowAllDayAppointments: boolean;
   checkInButton: {
     enabled: boolean;
+    showIfActiveVisit: boolean;
     customUrl: string;
   };
   checkOutButton: {

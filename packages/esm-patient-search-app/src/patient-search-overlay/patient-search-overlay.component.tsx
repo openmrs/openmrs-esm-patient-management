@@ -8,11 +8,17 @@ import { type PatientSearchConfig } from '../config-schema';
 
 interface PatientSearchOverlayProps {
   onClose: () => void;
+  handleSearchTermUpdated?: (value: string) => void;
   query?: string;
   header?: string;
 }
 
-const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, query = '', header }) => {
+const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({
+  onClose,
+  query = '',
+  header,
+  handleSearchTermUpdated,
+}) => {
   const { t } = useTranslation();
   const {
     search: { disableTabletSearchOnKeyUp },
@@ -23,13 +29,16 @@ const PatientSearchOverlay: React.FC<PatientSearchOverlayProps> = ({ onClose, qu
 
   const handleClearSearchTerm = useCallback(() => setSearchTerm(''), [setSearchTerm]);
 
-  const onSearchTermChange = (query: string) => setSearchTerm(query);
+  const onSearchTermChange = useCallback((value: string) => {
+    setSearchTerm(value);
+    handleSearchTermUpdated && handleSearchTermUpdated(value);
+  }, []);
 
   return (
     <Overlay header={header ?? t('searchResults', 'Search results')} close={onClose}>
       <PatientSearchBar
         initialSearchTerm={query}
-        onChange={(query) => !disableTabletSearchOnKeyUp && onSearchTermChange(query)}
+        onChange={(value) => !disableTabletSearchOnKeyUp && onSearchTermChange(value)}
         onClear={handleClearSearchTerm}
         onSubmit={onSearchTermChange}
       />

@@ -1,24 +1,26 @@
 import React, { useCallback, useState } from 'react';
-import { Button, ButtonSet, Form, Row, Stack } from '@carbon/react';
+import { Button, ButtonSet, Form, Row } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
   type ConfigObject,
-  type Visit,
   ExtensionSlot,
   showSnackbar,
   useConfig,
   useLayoutType,
+  type Visit,
 } from '@openmrs/esm-framework';
-import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
+import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
 import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import styles from './visit-form.scss';
+import classNames from 'classnames';
+import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
 
 interface ExistingVisitFormProps {
-  closePanel: () => void;
+  closeWorkspace: () => void;
   visit: Visit;
 }
 
-const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel }) => {
+const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,23 +28,23 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
   const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { mutateQueueEntries } = useMutateQueueEntries();
+  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
+    service: null,
+    priority: null,
+    status: null,
+    sortWeight: null,
+    queueLocation: null,
+  });
 
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
 
-      // retrieve values from queue extension
-      const queueLocation = event?.target['queueLocation']?.value;
-      const serviceUuid = event?.target['service']?.value;
-      const priority = event?.target['priority']?.value;
-      const status = event?.target['status']?.value;
-      const sortWeight = event?.target['sortWeight']?.value;
-
       setIsSubmitting(true);
 
-      addQueueEntry(
+      postQueueEntry(
         visit.uuid,
-        serviceUuid,
+        service,
         visit.patient.uuid,
         priority,
         status,
@@ -58,7 +60,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
               title: t('addPatientToQueue', 'Add patient to queue'),
               subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
             });
-            closePanel();
+            closeWorkspace();
             setIsSubmitting(false);
             mutateQueueEntries();
           }
@@ -78,11 +80,11 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
         },
       );
     },
-    [closePanel, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
+    [closeWorkspace, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
   );
 
   return visit ? (
-    <div>
+    <>
       {isTablet && (
         <Row className={styles.headerGridRow}>
           <ExtensionSlot
@@ -92,22 +94,18 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closePanel
           />
         </Row>
       )}
-      <Stack gap={8} className={styles.container}>
-        <Form className={styles.form} onSubmit={handleSubmit}>
-          <ExtensionSlot name="add-queue-entry-slot" />
-          <section className={styles.buttonSet}>
-            <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-              <Button className={styles.button} kind="secondary" onClick={closePanel}>
-                {t('discard', 'Discard')}
-              </Button>
-              <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
-                {t('addPatientToQueue', 'Add patient to queue')}
-              </Button>
-            </ButtonSet>
-          </section>
-        </Form>
-      </Stack>
-    </div>
+      <Form className={classNames(styles.form, styles.container)} onSubmit={handleSubmit}>
+        <VisitFormQueueFields setFormFields={setVisitFormFields} />
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+            {t('addPatientToQueue', 'Add patient to queue')}
+          </Button>
+        </ButtonSet>
+      </Form>
+    </>
   ) : null;
 };
 

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-management",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "private": true,
   "description": "Patient management microfrontend for the OpenMRS 3.x frontend",
   "workspaces": [
@@ -28,7 +28,7 @@
     "@carbon/react": "~1.37.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
-    "@playwright/test": "1.43.0",
+    "@playwright/test": "1.44.0",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.29",
     "@testing-library/dom": "^9.3.3",
@@ -81,5 +81,5 @@
     "*.{ts,tsx}": "eslint --cache --fix --max-warnings 0",
     "*.{css,scss,ts,tsx}": "prettier --cache --write --list-different"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.2.2"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-service-queues-app",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "description": "Outpatient front-end module for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-service-queues-app.js",
   "main": "src/index.ts",
@@ -18,7 +18,7 @@
     "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js --color",
     "coverage": "yarn test --coverage",
     "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/**/*.extension.tsx' 'src/**/*.workspace.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

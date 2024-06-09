@@ -1,7 +1,6 @@
-import { type Visit, type OpenmrsResource, type Location } from '@openmrs/esm-framework';
+import { type Visit, type OpenmrsResource, type Location, type Patient } from '@openmrs/esm-framework';
 import type React from 'react';
-import { type ConfigObject } from '../config-schema';
-import { type TFunction } from 'react-i18next';
+import { type ColumnConfig } from '../config-schema';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -429,14 +428,21 @@ export interface QueueTableCellComponentProps {
   queueEntry: QueueEntry;
 }
 
-export type QueueTableColumn = (t: TFunction) => {
-  header: string; // header of the column, MUST be unique for each column in the queue table
+export type QueueTableColumn = {
+  key: string; // key used by DataTable, MUST be unique for each column in the queue table
+  header: string; // header of the column
   CellComponent: React.FC<QueueTableCellComponentProps>;
 
   // function to extract from the queue entry a searchable string representing the its value within this column.
   // May be null to make this column's content unsearchable
-  getFilterableValue: (queueEntry: QueueEntry, config?: ConfigObject) => string | null;
+  getFilterableValue: (queueEntry: QueueEntry) => string | null;
 };
+
+export type QueueTableColumnFunction = (
+  key: string, // a unique key for the column
+  header?: string,
+  config?: ColumnConfig,
+) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
   columns: QueueTableColumn[];
@@ -486,80 +492,3 @@ export interface QueueEntrySearchCriteria {
 export interface Concept extends OpenmrsResource {}
 
 export interface Provider extends OpenmrsResource {}
-
-export interface PatientIdentifierType extends OpenmrsResource {}
-
-export interface Person {
-  uuid: string;
-  display: string;
-  gender: string;
-  age: number;
-  birthdate: string;
-  birthdateEstimated: boolean;
-  dead: boolean;
-  deathDate: string;
-  causeOfDeath: Concept;
-  preferredName: PersonName;
-  preferredAddress: PersonAddress;
-  names: Array<PersonName>;
-  addresses: Array<PersonAddress>;
-  attributes: Array<Attribute>;
-  birthtime: string;
-  deathdateEstimated: boolean;
-  causeOfDeathNonCoded: string;
-}
-
-export interface PersonName {
-  uuid: string;
-  display: string;
-  givenName: string;
-  middleName: string;
-  familyName: string;
-  familyName2: string;
-}
-
-export interface PersonAddress {
-  uuid: string;
-  display: string;
-  preferred: true;
-  cityVillage: string;
-  stateProvince: string;
-  country: string;
-  postalCode: string;
-  countyDistrict: string;
-  startDate: string;
-  endDate: string;
-  latitude: string;
-  longitude: string;
-  address1: string;
-  address2: string;
-  address3: string;
-  address4: string;
-  address5: string;
-  address6: string;
-  address7: string;
-  address8: string;
-  address9: string;
-  address10: string;
-  address11: string;
-  address12: string;
-  address13: string;
-  address14: string;
-  address15: string;
-}
-
-export interface Patient {
-  uuid: string;
-  display: string;
-  identifiers: PatientIdentifier[];
-  person: Person;
-}
-
-export interface PatientIdentifier {
-  uuid: string;
-  display: string;
-  identifier: string;
-  identifierType: PatientIdentifierType;
-  location: Location;
-  preferred: boolean;
-}

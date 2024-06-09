@@ -73,7 +73,7 @@
   "errorAddingQueue": "خطأ في إضافة الطابور",
   "errorAddingQueueRoom": "خطأ في إضافة غرفة الطابور",
   "errorClearingQueues": "خطأ في مسح الطوابير",
-  "errorFetchingAppoinments": "خطأ في جلب المواعيد",
+  "errorFetchingAppointments": "خطأ في جلب المواعيد",
   "errorLoadingQueueEntries": "Error loading queue entries",
   "errorPostingToScreen": "خطأ في النشر على الشاشة",
   "facility": "المنشأة",

@@ -4,11 +4,10 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
-  margin: spacing.$spacing-05 0rem;
-  background-color: $ui-background;
+  flex: 1;
 
   & section {
-    margin: spacing.$spacing-02 spacing.$spacing-05 0;
+    margin: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
   }
 }
 
@@ -44,10 +43,10 @@
 }
 
 .form {
-  background-color: $ui-background;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: calc(var(--desktop-workspace-window-height) - 7rem - 2px); // 7rem patient banner, plus border
 }
 
 .button {
@@ -56,7 +55,6 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 50%;
-  margin-top: layout.$spacing-05;
 }
 
 .tablet {
@@ -71,28 +69,5 @@
 @media screen and (max-width: 600px) {
   .dateTimeSection {
     flex-direction: column;
-  }
-}
-
-.backButton {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  margin: spacing.$spacing-03 0;
-  padding: 0;
-  @include type.type-style('body-compact-01');
-
-  button {
-    display: flex;
-
-    svg {
-      order: 1;
-      margin-right: spacing.$spacing-03;
-      margin-left: 0rem !important;
-    }
-
-    span {
-      order: 2;
-    }
   }
 }

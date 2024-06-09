@@ -1,12 +1,13 @@
 import React from 'react';
-import { type QueueTableCellComponentProps, type QueueTableColumn } from '../../types';
+import { type QueueTableColumnFunction, type QueueTableCellComponentProps } from '../../types';
 
 export const QueueTableComingFromCell = ({ queueEntry }: QueueTableCellComponentProps) => {
   return <>{queueEntry.queueComingFrom?.display}</>;
 };
 
-export const queueTableComingFromColumn: QueueTableColumn = (t) => ({
-  header: t('queueComingFrom', 'Coming from'),
+export const queueTableComingFromColumn: QueueTableColumnFunction = (key, header) => ({
+  key,
+  header,
   CellComponent: QueueTableComingFromCell,
   getFilterableValue: (queueEntry) => queueEntry.queueComingFrom?.display,
 });

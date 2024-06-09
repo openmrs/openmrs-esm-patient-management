@@ -13,7 +13,7 @@ import {
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
 import styles from './clinic-metrics.scss';
-import { useQueues } from '../helpers/useQueues';
+import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
 
 export interface Service {
@@ -78,7 +78,9 @@ function ClinicMetrics() {
             type="inline"
             label={currentServiceName ?? `${t('all', 'All')}`}
             items={[{ display: `${t('all', 'All')}` }, ...queues]}
-            itemToString={(item) => (item ? item.display : '')}
+            itemToString={(item) =>
+              item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
+            }
             onChange={handleServiceChange}
           />
         </MetricsCard>

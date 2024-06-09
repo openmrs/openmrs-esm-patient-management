@@ -10,7 +10,7 @@ import outpatientSideNavComponent from './side-menu/side-menu.component';
 import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
+import VisitFormQueueFields from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -44,11 +44,6 @@ export const editQueueEntryStatusModal = getAsyncLifecycle(
 );
 
 export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotComponent, {
-  featureName: 'patient info slot',
-  moduleName,
-});
-
-export const addPatientToQueue = getAsyncLifecycle(() => import('./patient-search/visit-form/visit-form.component'), {
   featureName: 'patient info slot',
   moduleName,
 });
@@ -127,7 +122,48 @@ export const voidQueueEntryModal = getAsyncLifecycle(
   },
 );
 
-export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
+export const endQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/end-queue-entry-modal.component'),
+  {
+    featureName: 'end queue entry of a patient',
+    moduleName,
+  },
+);
+
+// t('addNewQueueService', 'Add New Queue Service')
+export const addnewQueueServiceWorkspace = getAsyncLifecycle(
+  () => import('./queue-services/queue-service-form.workspace'),
+  {
+    featureName: 'service-queues-service-form',
+    moduleName,
+  },
+);
+
+// t('addNewQueueServiceRoom', 'Add new queue service room')
+export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
+  () => import('./queue-rooms/queue-room-form.workspace'),
+  {
+    featureName: 'service-queues-queue-room-form',
+    moduleName,
+  },
+);
+
+export const visitFormQueueFields = getSyncLifecycle(VisitFormQueueFields, options);
+
+// t('searchPatient', 'Search Patient')
+export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
+  featureName: 'service-queues-patient-search',
+  moduleName,
+});
+
+export const activeVisitsRowActions = getAsyncLifecycle(
+  () => import('./active-visits/active-visits-row-actions.component'),
+  {
+    featureName:
+      'quick actions to queue, requeue and transfer patients. With overflow menu actions to edit patient and end visit',
+    moduleName,
+  },
+);
 
 export function startupApp() {
   registerBreadcrumbs([]);

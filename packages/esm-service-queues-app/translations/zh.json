@@ -73,7 +73,7 @@
   "errorAddingQueue": "清除队列时出现错误",
   "errorAddingQueueRoom": "添加候诊室时出现错误",
   "errorClearingQueues": "清除队列时出现错误",
-  "errorFetchingAppoinments": "获取预约时出现错误",
+  "errorFetchingAppointments": "获取预约时出现错误",
   "errorLoadingQueueEntries": "Error loading queue entries",
   "errorPostingToScreen": "发布至大屏时出现错误",
   "facility": "机构",

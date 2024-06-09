@@ -20,19 +20,23 @@ import {
   TimePickerSelect,
   Toggle,
 } from '@carbon/react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useController, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
+  ExtensionSlot,
   ResponsiveWrapper,
   showSnackbar,
   translateFrom,
   useConfig,
   useLayoutType,
   useLocations,
+  usePatient,
   useSession,
+  type FetchResponse,
 } from '@openmrs/esm-framework';
 import {
+  checkAppointmentConflict,
   saveAppointment,
   saveRecurringAppointments,
   useAppointmentService,
@@ -47,57 +51,18 @@ import {
   dateFormat,
   datePickerFormat,
   datePickerPlaceHolder,
+  moduleName,
   weekDays,
 } from '../constants';
 import styles from './appointments-form.scss';
 import SelectedDateContext from '../hooks/selectedDateContext';
-import { moduleName } from '../constants';
+import uniqBy from 'lodash/uniqBy';
 
 const time12HourFormatRegexPattern = '^(1[0-2]|0?[1-9]):[0-5][0-9]$';
+
 function isValidTime(timeStr) {
   return timeStr.match(new RegExp(time12HourFormatRegexPattern));
 }
-
-// t('durationErrorMessage', 'Duration should be greater than zero')
-const appointmentsFormSchema = z
-  .object({
-    duration: z.number().refine((duration) => duration > 0, {
-      message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
-    }),
-    location: z.string().refine((value) => value !== ''),
-    provider: z.string().refine((value) => value !== ''),
-    appointmentStatus: z.string().optional(),
-    appointmentNote: z.string(),
-    appointmentType: z.string().refine((value) => value !== ''),
-    selectedService: z.string().refine((value) => value !== ''),
-    recurringPatternType: z.enum(['DAY', 'WEEK']),
-    recurringPatternPeriod: z.number(),
-    recurringPatternDaysOfWeek: z.array(z.string()),
-    selectedDaysOfWeekText: z.string().optional(),
-    startTime: z.string().refine((value) => isValidTime(value)),
-    timeFormat: z.enum(['AM', 'PM']),
-    appointmentDateTime: z.object({
-      startDate: z.date(),
-      startDateText: z.string(),
-      recurringPatternEndDate: z.date().nullable(),
-      recurringPatternEndDateText: z.string().nullable(),
-    }),
-    formIsRecurringAppointment: z.boolean(),
-  })
-  .refine(
-    (formValues) => {
-      if (formValues.formIsRecurringAppointment === true) {
-        return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
-      }
-      return true;
-    },
-    {
-      path: ['appointmentDateTime[]'],
-      message: 'A recurring appointment should have an end date',
-    },
-  );
-
-type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
 
 interface AppointmentsFormProps {
   appointment?: Appointment;
@@ -114,6 +79,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   context,
   closeWorkspace,
 }) => {
+  const { patient } = usePatient(patientUuid);
   const { mutateAppointments } = useMutateAppointments();
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
   const defaultTimeFormat = appointment?.startDateTime
@@ -132,7 +98,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const [isRecurringAppointment, setIsRecurringAppointment] = useState(false);
   const [isAllDayAppointment, setIsAllDayAppointment] = useState(false);
-
+  const [isConflict, setIsConflict] = useState(false);
   const defaultRecurringPatternType = recurringPattern?.type || 'DAY';
   const defaultRecurringPatternPeriod = recurringPattern?.period || 1;
   const defaultRecurringPatternDaysOfWeek = recurringPattern?.daysOfWeek || [];
@@ -164,6 +130,55 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       ? dayjs(appointment.endDateTime).diff(dayjs(appointment.startDateTime), 'minutes')
       : null;
 
+  // t('durationErrorMessage', 'Duration should be greater than zero')
+  const appointmentsFormSchema = z
+    .object({
+      duration: z
+        .number()
+        .nullable()
+        .refine((duration) => (isAllDayAppointment ? true : duration > 0), {
+          message: translateFrom(moduleName, 'durationErrorMessage', 'Duration should be greater than zero'),
+        }),
+      location: z.string().refine((value) => value !== ''),
+      provider: z.string().refine((value) => value !== ''),
+      appointmentStatus: z.string().optional(),
+      appointmentNote: z.string(),
+      appointmentType: z.string().refine((value) => value !== ''),
+      selectedService: z.string().refine((value) => value !== ''),
+      recurringPatternType: z.enum(['DAY', 'WEEK']),
+      recurringPatternPeriod: z.number(),
+      recurringPatternDaysOfWeek: z.array(z.string()),
+      selectedDaysOfWeekText: z.string().optional(),
+      startTime: z.string().refine((value) => isValidTime(value)),
+      timeFormat: z.enum(['AM', 'PM']),
+      appointmentDateTime: z.object({
+        startDate: z.date(),
+        startDateText: z.string(),
+        recurringPatternEndDate: z.date().nullable(),
+        recurringPatternEndDateText: z.string().nullable(),
+      }),
+      formIsRecurringAppointment: z.boolean(),
+      dateAppointmentScheduled: z.date().optional(),
+    })
+    .refine(
+      (formValues) => {
+        if (formValues.formIsRecurringAppointment === true) {
+          return z.date().safeParse(formValues.appointmentDateTime.recurringPatternEndDate).success;
+        }
+        return true;
+      },
+      {
+        path: ['appointmentDateTime.recurringPatternEndDate'],
+        message: 'A recurring appointment should have an end date',
+      },
+    );
+
+  type AppointmentFormData = z.infer<typeof appointmentsFormSchema>;
+
+  const defaultDateAppointmentScheduled = appointment?.dateAppointmentScheduled
+    ? new Date(appointment?.dateAppointmentScheduled)
+    : new Date();
+
   const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
@@ -190,10 +205,27 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         recurringPatternEndDateText: defaultEndDateText,
       },
       formIsRecurringAppointment: isRecurringAppointment,
+      dateAppointmentScheduled: defaultDateAppointmentScheduled,
     },
   });
 
   useEffect(() => setValue('formIsRecurringAppointment', isRecurringAppointment), [isRecurringAppointment]);
+
+  // Retrive ref callback for appointmentDateTime (startDate & recurringPatternEndDate)
+  const {
+    field: { ref: startDateRef },
+  } = useController({ name: 'appointmentDateTime.startDate', control });
+  const {
+    field: { ref: endDateRef },
+  } = useController({ name: 'appointmentDateTime.recurringPatternEndDate', control });
+
+  // Manually call ref callback from 'react-hook-form' with the element(s) we want to be focused
+  useEffect(() => {
+    const startDateElement = document.getElementById('startDatePickerInput');
+    const endDateElement = document.getElementById('endDatePickerInput');
+    startDateRef(startDateElement);
+    endDateRef(endDateElement);
+  }, [startDateRef, endDateRef]);
 
   const handleWorkloadDateChange = (date: Date) => {
     const appointmentDate = getValues('appointmentDateTime');
@@ -237,10 +269,29 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   })();
 
   // Same for creating and editing
-  const handleSaveAppointment = (data: AppointmentFormData) => {
+  const handleSaveAppointment = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     // Construct appointment payload
     const appointmentPayload = constructAppointmentPayload(data);
+
+    // check if Duplicate Response Occurs
+    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    let errorMessage = t('appointmentDuplicateForm', 'Appointment is not available');
+    if (response?.data?.SERVICE_UNAVAILABE) {
+      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
+    } else if (response?.data?.PATIENT_DOUBLE_BOOKING) {
+      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+    }
+    if (response.status === 200) {
+      setIsSubmitting(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: errorMessage,
+      });
+      return;
+    }
+
     // Construct recurring pattern payload
     const recurringAppointmentPayload = {
       appointmentRequest: appointmentPayload,
@@ -306,6 +357,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       provider,
       appointmentNote,
       appointmentStatus,
+      dateAppointmentScheduled,
     } = data;
 
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
@@ -326,6 +378,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       patientUuid: patientUuid,
       comments: appointmentNote,
       uuid: context === 'editing' ? appointment.uuid : undefined,
+      dateAppointmentScheduled: dayjs(dateAppointmentScheduled).format(),
     };
   };
 
@@ -358,6 +411,16 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   return (
     <Form onSubmit={handleSubmit(handleSaveAppointment, onError)}>
       <Stack gap={4}>
+        {patient && (
+          <ExtensionSlot
+            name="patient-header-slot"
+            state={{
+              patient,
+              patientUuid: patientUuid,
+              hideActionsOverflow: true,
+            }}
+          />
+        )}
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('location', 'Location')}</span>
           <ResponsiveWrapper>
@@ -381,6 +444,31 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                       </SelectItem>
                     ))}
                 </Select>
+              )}
+            />
+          </ResponsiveWrapper>
+        </section>
+        <section className={styles.formGroup}>
+          <span className={styles.heading}>{t('dateScheduled', 'Date appointment issued')}</span>
+          <ResponsiveWrapper>
+            <Controller
+              name="dateAppointmentScheduled"
+              control={control}
+              render={({ field: { onChange, value, ref } }) => (
+                <DatePicker
+                  datePickerType="single"
+                  dateFormat={datePickerFormat}
+                  value={value}
+                  maxDate={new Date()}
+                  onChange={([date]) => onChange(date)}>
+                  <DatePickerInput
+                    id="dateAppointmentScheduledPickerInput"
+                    labelText={t('dateScheduledDetail', 'Date appointment issued')}
+                    style={{ width: '100%' }}
+                    placeholder={datePickerPlaceHolder}
+                    ref={ref}
+                  />
+                </DatePicker>
               )}
             />
           </ResponsiveWrapper>
@@ -461,7 +549,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
         <section className={styles.formGroup}>
           <span className={styles.heading}>{t('dateTime', 'Date & Time')}</span>
-          <div>
+          <div className={styles.dateTimeFields}>
             {isRecurringAppointment && (
               <div className={styles.inputContainer}>
                 {allowAllDayAppointments && (
@@ -478,13 +566,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   <Controller
                     name="appointmentDateTime"
                     control={control}
-                    render={({ field: { onChange, value, ref } }) => (
+                    render={({ field: { onChange, value } }) => (
                       <ResponsiveWrapper>
                         <DatePicker
                           datePickerType="range"
                           dateFormat={datePickerFormat}
                           value={[value.startDate, value.recurringPatternEndDate]}
-                          ref={ref}
                           onChange={([startDate, endDate]) => {
                             onChange({
                               startDate: new Date(startDate),
