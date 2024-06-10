@@ -73,7 +73,7 @@ test('Return to patient list after navigating to visits page from the patient ch
   });
 
   await test.step('And I click on the `Close` button', async () => {
-    await page.getByRole('button', { name: 'Close' }).click();
+    await page.getByRole('button', { name: 'Close', exact: true }).click();
   });
 
   await test.step('Then I should be redirected back to the patient list', async () => {
