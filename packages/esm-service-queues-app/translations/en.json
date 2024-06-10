@@ -268,7 +268,7 @@
   "startVisitQueueSuccessfully": "Patient has been added to active visits list and queue.",
   "status": "Status",
   "statusIsRequired": "Status is required",
-  "submitting": "Submitting...",
+  "submitting": "Submitting",
   "success": "Success",
   "tcaDate": "Tca date",
   "temperature": "Temperature",

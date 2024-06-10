@@ -254,7 +254,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                     <InlineLoading
                       status="active"
                       iconDescription={t('submitting', 'Submitting')}
-                      description={t('submitting...', 'Submitting...')}
+                      description={t('submitting', 'Submitting')}
                     />
                   </div>
                 ) : (
