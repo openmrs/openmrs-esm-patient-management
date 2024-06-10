@@ -9,7 +9,6 @@ import {
 } from './patient-registration.types';
 import { parseDate } from '@openmrs/esm-framework';
 import camelCase from 'lodash-es/camelCase';
-import capitalize from 'lodash-es/capitalize';
 
 export function parseAddressTemplateXml(addressTemplate: string) {
   const templateXmlDoc = new DOMParser().parseFromString(addressTemplate, 'text/xml');
@@ -214,3 +213,29 @@ export const filterUndefinedPatientIdenfier = (patientIdenfiers) =>
 
 export const latestFirstEncounter = (a: Encounter, b: Encounter) =>
   new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
+
+/**
+ * Extracts error messages from a given error response object.
+ * If fieldErrors are present, it extracts the error messages from each field.
+ * If globalErrors are present, it extracts the error messages from each global error.
+ * Otherwise, it returns the top-level error message.
+ *
+ * @param {ErrorObject} errorObject - The error response object.
+ */
+export function extractErrorMessagesFromResponse(errorObject): string {
+  const {
+    error: { fieldErrors, globalErrors, message },
+  } = errorObject ?? {};
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return Object.values(fieldErrors)
+      .flatMap((errors: Array<any>) => errors.map((error) => error.message))
+      .join('\n');
+  }
+
+  if (globalErrors.length) {
+    return globalErrors.map((error) => error.message).join('\n');
+  }
+
+  return message;
+}

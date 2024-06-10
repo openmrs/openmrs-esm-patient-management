@@ -5,20 +5,18 @@ import { XAxis } from '@carbon/react/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Formik, Form, type FormikHelpers } from 'formik';
-import {
-  createErrorHandler,
-  showSnackbar,
-  useConfig,
-  interpolateUrl,
-  usePatient,
-  usePatientPhoto,
-} from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, interpolateUrl, usePatient, usePatientPhoto } from '@openmrs/esm-framework';
 import { getValidationSchema } from './validation/patient-registration-validation';
 import { type FormValues, type CapturePhotoProps } from './patient-registration.types';
 import { PatientRegistrationContext } from './patient-registration-context';
 import { type SavePatientForm, SavePatientTransactionManager } from './form-manager';
 import { DummyDataInput } from './input/dummy-data/dummy-data-input.component';
-import { cancelRegistration, filterUndefinedPatientIdenfier, scrollIntoView } from './patient-registration-utils';
+import {
+  cancelRegistration,
+  extractErrorMessagesFromResponse,
+  filterUndefinedPatientIdenfier,
+  scrollIntoView,
+} from './patient-registration-utils';
 import { useInitialAddressFieldValues, useInitialFormValues, usePatientUuidMap } from './patient-registration-hooks';
 import { ResourcesContext } from '../offline.resources';
 import { builtInSections, type RegistrationConfig, type SectionDefinition } from '../config-schema';
@@ -106,27 +104,16 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
 
       setTarget(redirectUrl);
     } catch (error) {
-      if (error.responseBody?.error?.globalErrors) {
-        error.responseBody.error.globalErrors.forEach((error) => {
-          showSnackbar({
-            title: inEditMode
-              ? t('updatePatientErrorSnackbarTitle', 'Patient Details Update Failed')
-              : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
-            subtitle: error.message,
-            kind: 'error',
-          });
-        });
-      } else if (error.responseBody?.error?.message) {
-        showSnackbar({
-          title: inEditMode
-            ? t('updatePatientErrorSnackbarTitle', 'Patient Details Update Failed')
-            : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
-          subtitle: error.responseBody.error.message,
-          kind: 'error',
-        });
-      } else {
-        createErrorHandler()(error);
-      }
+      const errorMessages = extractErrorMessagesFromResponse(error.responseBody);
+
+      showSnackbar({
+        title: inEditMode
+          ? t('updatePatientErrorSnackbarTitle', 'Patient Details Update Failed')
+          : t('registrationErrorSnackbarTitle', 'Patient Registration Failed'),
+        subtitle: errorMessages,
+        kind: 'error',
+        isLowContrast: true,
+      });
 
       helpers.setSubmitting(false);
     }

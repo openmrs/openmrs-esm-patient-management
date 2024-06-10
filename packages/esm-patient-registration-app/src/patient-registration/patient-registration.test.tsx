@@ -348,7 +348,9 @@ describe('Registering a new patient', () => {
     const weight = within(customSection).getByLabelText('Weight (kg) (optional)');
     await user.type(weight, '-999');
 
-    mockedSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
+    mockedSaveEncounter.mockRejectedValue({
+      responseBody: { error: { message: 'an error message', globalErrors: [], fieldErrors: {} } },
+    });
 
     const registerPatientButton = screen.getByText('Register Patient');
 
@@ -357,7 +359,14 @@ describe('Registering a new patient', () => {
     expect(mockedSavePatient).toHaveBeenCalledTimes(1);
     expect(mockedSaveEncounter).toHaveBeenCalledTimes(1);
 
-    expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ subtitle: 'an error message' })),
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isLowContrast: true,
+        kind: 'error',
+        subtitle: 'an error message',
+        title: 'Patient Registration Failed',
+      }),
+    ),
       mockedSaveEncounter.mockResolvedValue({});
 
     await user.click(registerPatientButton);
@@ -365,6 +374,82 @@ describe('Registering a new patient', () => {
     expect(mockedSaveEncounter).toHaveBeenCalledTimes(2);
 
     expect(mockedShowSnackbar).toHaveBeenCalledWith(expect.objectContaining({ kind: 'success' }));
+  });
+
+  test('should display field error messages', async () => {
+    const user = userEvent.setup();
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
+
+    await fillRequiredFields();
+
+    const mockFieldErrorResponse = {
+      responseBody: {
+        error: {
+          message: 'Invalid Submission',
+          code: 'webservices.rest.error.invalid.submission',
+          globalErrors: [],
+          fieldErrors: {
+            'names[0].middleName': [
+              {
+                code: 'MiddleName.invalid',
+                message: 'MiddleName.invalid',
+              },
+            ],
+          },
+        },
+      },
+    };
+    mockedSavePatient.mockRejectedValueOnce(mockFieldErrorResponse);
+
+    const registerButton = screen.getByRole('button', { name: /Register patient/i });
+    await user.click(registerButton);
+
+    expect(mockedShowSnackbar).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subtitle: 'MiddleName.invalid',
+        kind: 'error',
+      }),
+    );
+
+    mockedSavePatient.mockClear();
+  });
+
+  test('should display global error messages', async () => {
+    const user = userEvent.setup();
+    render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
+      wrapper: Wrapper,
+    });
+
+    await fillRequiredFields();
+
+    const mockFieldErrorResponse = {
+      responseBody: {
+        error: {
+          message: 'Invalid Submission',
+          code: 'webservices.rest.error.invalid.submission',
+          globalErrors: [
+            {
+              code: 'Identifier 1245647 already in use by another patient',
+              message: 'Identifier 1245647 already in use by another patient',
+            },
+          ],
+          fieldErrors: [],
+        },
+      },
+    };
+    mockedSavePatient.mockRejectedValueOnce(mockFieldErrorResponse);
+
+    const registerButton = screen.getByRole('button', { name: /Register patient/i });
+    await user.click(registerButton);
+
+    expect(mockedShowSnackbar).toHaveBeenCalledWith({
+      isLowContrast: true,
+      kind: 'error',
+      subtitle: 'Identifier 1245647 already in use by another patient',
+      title: 'Patient Registration Failed',
+    });
   });
 });
 
