@@ -6,13 +6,13 @@ import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import WardPatientCard from '../ward-patient-card/ward-pateint-card.component';
 
-export interface AdmittedPatientProps {
+export interface OccupiedBedProps {
   patients: Patient[];
-  bed: Bed | null;
+  bed: Bed;
 }
-const OccupiedBed: React.FC<AdmittedPatientProps> = ({ patients, bed }) => {
+const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
   return (
-    <div className={styles.occuipedBed}>
+    <div className={styles.occupiedBed}>
       {patients.map((patient, index: number) => {
         const last = index === patients.length - 1;
         return (

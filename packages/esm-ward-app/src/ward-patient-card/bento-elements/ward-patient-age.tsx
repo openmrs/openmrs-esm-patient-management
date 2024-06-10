@@ -1,9 +1,16 @@
 import React from 'react';
-import { WardPatientCardBentoElement } from '../../types';
-import styles from '../admitted-patient-details.scss';
+import { useTranslation } from 'react-i18next';
+import { type WardPatientCardBentoElement } from '../../types';
 
 const WardPatientAge: WardPatientCardBentoElement = ({ patient }) => {
-  return <div className={styles.admittedPatientField}>{patient?.person?.age} yrs</div>;
+  const { t } = useTranslation();
+  return (
+    <div>
+      {t('yearsOld', '{{age}} yrs', {
+        age: patient?.person?.age,
+      })}
+    </div>
+  );
 };
 
 export default WardPatientAge;

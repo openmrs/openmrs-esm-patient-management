@@ -1,20 +1,18 @@
 import { useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-  type BentoElementDefinition,
   builtInBentoElements,
   defaultBentoElementConfig,
+  type BentoElementDefinition,
   type WardConfigObject,
 } from '../config-schema';
 import type { WardPatientCardBentoElement } from '../types';
-import wardPatientAddress from './bento-elements/ward-patient-header-address';
 import WardPatientAge from './bento-elements/ward-patient-age';
 import WardPatientBedNumber from './bento-elements/ward-patient-bed-number';
+import wardPatientAddress from './bento-elements/ward-patient-header-address';
 import WardPatientName from './bento-elements/ward-patient-name';
 
-export function useCardSlots(location: string) {
-  const { t } = useTranslation();
+export function useBentoElements(location: string) {
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const { cardDefinitions, bentoElementDefinitions } = wardPatientCards;
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './empty-bed.scss';
-import admittedPatientHeaderStyles from '../ward-patient-card/bento-elements/bento-elements.scss';
+import wardPatientCardStyles from '../ward-patient-card/ward-patient-card.scss';
 import { type Bed } from '../types';
 
 interface EmptyBedProps {
@@ -10,7 +10,9 @@ interface EmptyBedProps {
 const EmptyBed: React.FC<EmptyBedProps> = ({ bed }) => {
   return (
     <div className={styles.container}>
-      <span className={admittedPatientHeaderStyles.bedNumber}>{bed.bedNumber}</span>
+      <span className={`${wardPatientCardStyles.wardPatientBedNumber} ${wardPatientCardStyles.empty}`}>
+        {bed.bedNumber}
+      </span>
       <p className={styles.emptyBed}>Empty Bed</p>
     </div>
   );

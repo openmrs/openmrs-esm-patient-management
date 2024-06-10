@@ -1,15 +1,23 @@
-import { OpenmrsResource, OpenmrsResourceStrict, Person, Visit, type Location, type Patient } from '@openmrs/esm-framework';
-import React from 'react';
+import {
+  type OpenmrsResource,
+  type OpenmrsResourceStrict,
+  type Person,
+  type Visit,
+  type Location,
+  type Patient,
+} from '@openmrs/esm-framework';
+import type React from 'react';
 
 export interface WardPatientCardProps {
   patient: Patient;
   bed: Bed;
+  status?: WardPatientStatus;
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
 export type WardPatientCardBentoElement = React.FC<WardPatientCardProps>;
 
-export type WardPatientStatus = "admitted" | "pending";
+export type WardPatientStatus = 'admitted' | 'pending';
 
 export const bentoElementTypes = [
   'bed-number',

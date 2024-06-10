@@ -1,4 +1,5 @@
 {
+  "bedshare": "Bed share",
   "errorLoadingWardLocation": "Error loading ward location",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",

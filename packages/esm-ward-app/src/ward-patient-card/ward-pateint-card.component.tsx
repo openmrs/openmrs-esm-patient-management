@@ -1,26 +1,15 @@
-import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { WardPatientStatus, type Bed } from '../types';
-import { useCardSlots } from './ward-patient-card.resources';
-import styles from "./ward-patient-card.scss";
+import { type WardPatientCardProps } from '../types';
+import WardPatientCardBentoBox from './ward-patient-card-bento-box.component';
+import styles from './ward-patient-card.scss';
 
-export interface WardPatientCardProps {
-  patient: Patient;
-  bed: Bed;
-  status: WardPatientStatus;
-}
-const WardPatientCard: React.FC<WardPatientCardProps> = ({ patient, bed }) => {
-  const { locationUuid } = useParams();
-  const wardPatientCardSlots = useCardSlots(locationUuid);
-
+const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
+  // TODO: currently a patient card only has a row of bento-box header.
+  // We intend of having other rows to show in the patient card be
+  // extensions.
   return (
     <div className={styles.wardPatientCard}>
-      <div className={styles.wardPatientCardHeader}>
-        {wardPatientCardSlots.map((WardPatientCardSlot, i) => (
-          <WardPatientCardSlot key={i} patient={patient} bed={bed} />
-        ))}
-      </div>
+      <WardPatientCardBentoBox {...props} className={styles.wardPatientCardHeader} />
     </div>
   );
 };

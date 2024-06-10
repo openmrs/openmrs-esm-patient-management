@@ -1,11 +1,11 @@
 import React from 'react';
-import styles from "../admitted-patient-details.scss"
-import { WardPatientCardBentoElement } from '../../types';
+import styles from '../ward-patient-card.scss';
+import { type WardPatientCardBentoElement } from '../../types';
 
-const WardPatientBedNumber: WardPatientCardBentoElement = ({bed}) => {
+const WardPatientBedNumber: WardPatientCardBentoElement = ({ bed }) => {
   return (
     <div className={styles.bedNumberBox}>
-      <span className={styles.admittedPatientBedNumber}>{bed.bedNumber}</span>
+      <span className={styles.wardPatientBedNumber}>{bed.bedNumber}</span>
     </div>
   );
 };
