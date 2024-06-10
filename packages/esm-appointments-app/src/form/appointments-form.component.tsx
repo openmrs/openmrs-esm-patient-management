@@ -179,7 +179,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     ? new Date(appointment?.dateAppointmentScheduled)
     : new Date();
 
-  const { control, getValues, setValue, watch, handleSubmit } = useForm<AppointmentFormData>({
+  const {
+    control,
+    getValues,
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AppointmentFormData>({
     mode: 'all',
     resolver: zodResolver(appointmentsFormSchema),
     defaultValues: {
@@ -479,7 +486,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             <Controller
               name="selectedService"
               control={control}
-              render={({ field: { onBlur, onChange, value, ref } }) => (
+              render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
                 <Select
                   id="service"
                   invalidText="Required"
@@ -493,7 +500,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   }}
                   onBlur={onBlur}
                   value={value}
-                  ref={ref}>
+                  ref={ref}
+                  invalid={fieldState?.error?.message}>
                   <SelectItem text={t('chooseService', 'Select service')} value="" />
                   {services?.length > 0 &&
                     services.map((service) => (
@@ -513,7 +521,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             <Controller
               name="appointmentType"
               control={control}
-              render={({ field: { onBlur, onChange, value, ref } }) => (
+              render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
                 <Select
                   disabled={!appointmentTypes?.length}
                   id="appointmentType"
@@ -522,7 +530,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                   onChange={onChange}
                   value={value}
                   ref={ref}
-                  onBlur={onBlur}>
+                  onBlur={onBlur}
+                  invalid={fieldState?.error?.message}>
                   <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
                   {appointmentTypes?.length > 0 &&
                     appointmentTypes.map((appointmentType, index) => (
@@ -740,7 +749,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               <Controller
                 name="appointmentStatus"
                 control={control}
-                render={({ field: { onBlur, onChange, value, ref } }) => (
+                render={({ field: { onBlur, onChange, value, ref }, fieldState }) => (
                   <Select
                     id="appointmentStatus"
                     invalidText="Required"
@@ -748,7 +757,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     onChange={onChange}
                     value={value}
                     ref={ref}
-                    onBlur={onBlur}>
+                    onBlur={onBlur}
+                    invalid={fieldState?.error?.message}>
                     <SelectItem text={t('selectAppointmentStatus', 'selectAppointmentStatus')} value="" />
                     {appointmentStatuses?.length > 0 &&
                       appointmentStatuses.map((appointmentStatus, index) => (
@@ -866,7 +876,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
           name="duration"
           control={control}
           defaultValue={defaultDuration}
-          render={({ field: { onChange, onBlur, value, ref } }) => (
+          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => (
             <NumberInput
               hideSteppers
               disableWheel
@@ -880,6 +890,7 @@ function TimeAndDuration({ isTablet, t, watch, control, services }) {
               onChange={(event) => onChange(Number(event.target.value))}
               value={value}
               ref={ref}
+              invalid={fieldState?.error?.message}
             />
           )}
         />
