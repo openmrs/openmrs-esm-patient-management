@@ -9,8 +9,10 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   appliedTo: null,
 };
 
+const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 'country'];
+
 export const defaultPatientCardElementConfig: PatientCardElementConfig = {
-  addressFields: ['cityVillage', 'country'],
+  addressFields: defaultPatientAddressFields,
 };
 
 export const builtInPatientCardElements: PatientCardElementType[] = [
@@ -41,6 +43,7 @@ export const configSchema: ConfigSchema = {
           addressFields: {
             _type: Type.Array,
             _description: 'For patientCardElementType "patient-address", defining which address fields to show',
+            _default: defaultPatientAddressFields,
           },
         },
       },
@@ -95,13 +98,13 @@ export interface WardPatientCardDefinition {
     /**
      * an array of (either built-in or custom) patient card element ids
      */
-    header: Array<string>; 
+    header: Array<string>;
   };
   appliedTo?: Array<{
     /**
      * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
      */
-    location: string; 
+    location: string;
   }>;
 }
 
