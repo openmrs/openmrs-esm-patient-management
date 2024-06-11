@@ -27,6 +27,10 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
     isEnded: false,
   });
 
+  const handleClick = () => {
+    document.getElementById(status)?.scrollIntoView();
+  };
+
   return (
     <Layer
       className={classNames(styles.container, {
@@ -40,7 +44,9 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
           </div>
         </div>
         <div>
-          <label className={styles.valueLabel}>{!isNaN(value) ? value : count}</label>
+          <label className={styles.valueLabel} onClick={handleClick}>
+            {!isNaN(value) ? value : count}
+          </label>
         </div>
       </Tile>
     </Layer>

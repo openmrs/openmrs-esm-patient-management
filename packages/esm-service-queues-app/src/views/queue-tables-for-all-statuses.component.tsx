@@ -97,7 +97,7 @@ interface QueueTablesByStatusProps {
 function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
   const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const allowedStatuses = selectedQueue.allowedStatuses;
   const noStatuses = !allowedStatuses?.length;
   if (isLoading) {
     return <QueueTableByStatusSkeleton />;
@@ -113,17 +113,15 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
   }
   return (
     <div className={styles.container}>
-      {allowedStatuses
-        ?.reverse()
-        ?.map((status) => (
-          <QueueTableForQueueAndStatus
-            key={status.uuid}
-            queueEntries={queueEntries}
-            searchTerm={searchTerm}
-            queue={selectedQueue}
-            status={status}
-          />
-        ))}
+      {allowedStatuses?.map((status) => (
+        <QueueTableForQueueAndStatus
+          key={status.uuid}
+          queueEntries={queueEntries}
+          searchTerm={searchTerm}
+          queue={selectedQueue}
+          status={status}
+        />
+      ))}
     </div>
   );
 }
@@ -167,7 +165,9 @@ function QueueTableForQueueAndStatus({ queueEntries, searchTerm, queue, status }
   const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
   return (
     <div className={styles.statusTableContainer}>
-      <h5 className={styles.statusTableHeader}>{status.display}</h5>
+      <h5 id={statusUuid} className={styles.statusTableHeader}>
+        {status.display}
+      </h5>
       <QueueTable key={statusUuid} queueEntries={filteredQueueEntries} queueUuid={queue.uuid} statusUuid={statusUuid} />
     </div>
   );
