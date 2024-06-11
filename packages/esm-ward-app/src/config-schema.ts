@@ -1,11 +1,14 @@
-import { type PersonAddress, Type, validator, validators, type ConfigSchema } from '@openmrs/esm-framework';
-import { type PatientCardElementType, patientCardElementTypes } from './types';
+import { Type, validators, type ConfigSchema, type PersonAddress } from '@openmrs/esm-framework';
+import { patientCardElementTypes, type PatientCardElementType } from './types';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
-  card: {
-    id: 'default-card',
-    header: ['bed-number', 'patient-name', 'patient-age', 'patient-address'],
-  },
+  id: 'default-card',
+  rows: [
+    {
+      rowType: 'header',
+      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address'],
+    },
+  ],
   appliedTo: null,
 };
 
@@ -58,13 +61,20 @@ export const configSchema: ConfigSchema = {
           _type: Type.String,
           _description: 'The unique identifier for this card definition. Currently unused, but that might change.',
         },
-        card: {
-          header: {
-            _type: Type.Array,
-            _element: {
+        rows: {
+          _type: Type.Array,
+          _elements: {
+            id: {
               _type: Type.String,
-              _description: 'The ID of the (bulit-in or custom) patient card element',
-              _validators: [validators.oneOf(patientCardElementTypes)],
+              _description: 'The unique identifier for this card row. Currently unused, but that might change.',
+            },
+            elements: {
+              _type: Type.Array,
+              _element: {
+                _type: Type.String,
+                _description: 'The ID of the (bulit-in or custom) patient card elements to appear in this card row',
+                _validators: [validators.oneOf(patientCardElementTypes)],
+              },
             },
           },
         },
@@ -93,13 +103,18 @@ export interface WardPatientCardsConfig {
 }
 
 export interface WardPatientCardDefinition {
-  card: {
-    id: string;
+  id: string;
+  rows: Array<{
+    /**
+     * The type of row. Currently, only "header" is supported
+     */
+    rowType: 'header';
+
     /**
      * an array of (either built-in or custom) patient card element ids
      */
-    header: Array<string>;
-  };
+    elements: Array<string>;
+  }>;
   appliedTo?: Array<{
     /**
      * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
