@@ -1,7 +1,7 @@
-import { InlineNotification } from '@carbon/react';
-import { WorkspaceContainer, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
+import { InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { WorkspaceContainer, useFeatureFlag } from '@openmrs/esm-framework';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
@@ -34,7 +34,7 @@ const WardView = () => {
       <div className={styles.wardViewMain}>
         <WardViewByLocation />
       </div>
-      <WorkspaceContainer contextKey="ward" />
+      <WorkspaceContainer overlay contextKey="ward" />
     </div>
   );
 };
