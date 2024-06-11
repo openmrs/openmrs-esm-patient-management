@@ -37,7 +37,7 @@ function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
 function getNextUrlFromResponse(data: QueueEntryResponse) {
   const next = data?.data?.links?.find((link) => link.rel === 'next');
   if (next) {
-    const nextUrl = new URL(next .uri);
+    const nextUrl = new URL(next.uri);
     // default for production
     if (nextUrl.origin === window.location.origin) {
       return nextUrl.toString();
