@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { InlineNotification } from '@carbon/react';
-import { useLocations, useSession, type Location } from '@openmrs/esm-framework';
-
+import { useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
@@ -15,10 +14,12 @@ const WardView = () => {
   const { sessionLocation } = useSession();
   const allLocations = useLocations();
   const { t } = useTranslation();
+  const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
   const locationFromUrl = allLocations.find((l) => l.uuid === locationUuidFromUrl);
-
   const invalidLocation = locationUuidFromUrl && !locationFromUrl;
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
+  //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
+  if (!isBedManagementModuleInstalled) return <></>;
 
   return (
     <div className={styles.wardView}>

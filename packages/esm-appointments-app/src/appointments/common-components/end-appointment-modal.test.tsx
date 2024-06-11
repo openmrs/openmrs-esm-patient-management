@@ -37,7 +37,7 @@ describe('EndAppointmentModal', () => {
 
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
-    const submitButton = screen.getByRole('button', { name: /Check Out/ });
+    const submitButton = screen.getByRole('button', { name: /check out/i });
     expect(submitButton).not.toBeDisabled();
     await user.click(submitButton);
 
@@ -62,7 +62,7 @@ describe('EndAppointmentModal', () => {
 
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
-    const submitButton = screen.getByRole('button', { name: /Check Out/ });
+    const submitButton = screen.getByRole('button', { name: /check out/i });
     expect(submitButton).not.toBeDisabled();
     await user.click(submitButton);
 

@@ -111,7 +111,11 @@ function DefaultQueueTable() {
               },
               selectPatientAction: (selectedPatientUuid: string) => {
                 setIsPatientSearchOpen(false);
-                launchWorkspace(serviceQueuesPatientSearchWorkspace, { selectedPatientUuid, currentServiceQueueUuid: selectedQueueUuid,handleBackToSearchList });
+                launchWorkspace(serviceQueuesPatientSearchWorkspace, {
+                  selectedPatientUuid,
+                  currentServiceQueueUuid: selectedQueueUuid,
+                  handleBackToSearchList,
+                });
               },
             }}
           />

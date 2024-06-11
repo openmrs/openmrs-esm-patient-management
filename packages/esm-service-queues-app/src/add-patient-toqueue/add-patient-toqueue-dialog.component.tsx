@@ -80,7 +80,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             isLowContrast: true,
             title: t('addEntry', 'Add entry'),
             kind: 'success',
-            subtitle: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
+            subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
           });
           closeModal();
           mutateQueueEntries();
