@@ -1,5 +1,5 @@
 import { type PersonAddress, Type, validator, validators, type ConfigSchema } from '@openmrs/esm-framework';
-import { type BentoElementType, bentoElementTypes } from './types';
+import { type PatientCardElementType, patientCardElementTypes } from './types';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
   card: {
@@ -9,11 +9,11 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   appliedTo: null,
 };
 
-export const defaultBentoElementConfig: BentoElementConfig = {
+export const defaultPatientCardElementConfig: PatientCardElementConfig = {
   addressFields: ['cityVillage', 'country'],
 };
 
-export const builtInBentoElements: BentoElementType[] = [
+export const builtInPatientCardElements: PatientCardElementType[] = [
   'bed-number',
   'patient-name',
   'patient-age',
@@ -24,23 +24,23 @@ export const builtInBentoElements: BentoElementType[] = [
 export const configSchema: ConfigSchema = {
   wardPatientCards: {
     _description: 'Configure the display of ward patient cards',
-    bentoElementDefinitions: {
+    patientCardElementDefinitions: {
       _type: Type.Array,
       _default: [],
       _elements: {
         id: {
           _type: Type.String,
-          _description: 'The unique identifier for this custom bento element',
+          _description: 'The unique identifier for this custom patient card element',
         },
         elementType: {
           _type: Type.String,
-          _description: 'The bento element type',
-          _validators: [validators.oneOf(bentoElementTypes)],
+          _description: 'The patient card element type',
+          _validators: [validators.oneOf(patientCardElementTypes)],
         },
         config: {
           addressFields: {
             _type: Type.Array,
-            _description: 'For bentoElementType "patient-address", defining which address fields to show',
+            _description: 'For patientCardElementType "patient-address", defining which address fields to show',
           },
         },
       },
@@ -60,14 +60,14 @@ export const configSchema: ConfigSchema = {
             _type: Type.Array,
             _element: {
               _type: Type.String,
-              _description: 'The ID of the (bulit-in or custom) bento element',
+              _description: 'The ID of the (bulit-in or custom) patient card element',
               _validators: [
                 validator(
-                  (bentoElementId: string) => {
-                    const validBentoElementIds: string[] = [...bentoElementTypes];
-                    return validBentoElementIds.includes(bentoElementId);
+                  (patientCardElementId: string) => {
+                    const validPatientCardElementIds: string[] = [...patientCardElementTypes];
+                    return validPatientCardElementIds.includes(patientCardElementId);
                   },
-                  (bentoElementId: string) => 'Invalid bento element id: ' + bentoElementId,
+                  (patientCardElementId: string) => 'Invalid patient card element id: ' + patientCardElementId,
                 ),
               ],
             },
@@ -93,7 +93,7 @@ export interface WardConfigObject {
 }
 
 export interface WardPatientCardsConfig {
-  bentoElementDefinitions: Array<BentoElementDefinition>;
+  patientCardElementDefinitions: Array<PatientCardElementDefinition>;
   cardDefinitions: Array<WardPatientCardDefinition>;
 }
 
@@ -101,7 +101,7 @@ export interface WardPatientCardDefinition {
   card: {
     id: string;
     /**
-     * an array of (either built-in or custom) bento element ids
+     * an array of (either built-in or custom) patient card element ids
      */
     header: Array<string>; 
   };
@@ -113,14 +113,14 @@ export interface WardPatientCardDefinition {
   }>;
 }
 
-export type BentoElementDefinition = {
+export type PatientCardElementDefinition = {
   id: string;
-  elementType: BentoElementType;
-  config?: BentoElementConfig;
+  elementType: PatientCardElementType;
+  config?: PatientCardElementConfig;
 };
 
-export interface PatientAddressBentoElementConfig {
+export interface PatientAddressElementConfig {
   addressFields: Array<keyof PersonAddress>;
 }
 
-export type BentoElementConfig = {} & PatientAddressBentoElementConfig;
+export type PatientCardElementConfig = {} & PatientAddressElementConfig;

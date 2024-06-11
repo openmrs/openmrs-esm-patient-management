@@ -1,8 +1,8 @@
 import React from 'react';
-import { type WardPatientCardBentoElement } from '../../types';
+import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
 
-const WardPatientName: WardPatientCardBentoElement = ({ patient }) => {
+const WardPatientName: WardPatientCardElement = ({ patient }) => {
   // TODO: BED-10
   // make server return patient.display and use that instead
   const { givenName, familyName } = patient?.person?.preferredName;

@@ -1,10 +1,10 @@
 import React from 'react';
-import { type WardPatientCardBentoElement } from '../../types';
+import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { type PatientAddressBentoElementConfig } from '../../config-schema';
+import { type PatientAddressElementConfig } from '../../config-schema';
 
-const wardPatientAddress = (config: PatientAddressBentoElementConfig) => {
-  const wardPatientAddress: WardPatientCardBentoElement = ({ patient }) => {
+const wardPatientAddress = (config: PatientAddressElementConfig) => {
+  const wardPatientAddress: WardPatientCardElement = ({ patient }) => {
     const { addressFields } = config;
 
     const preferredAddress = patient?.person?.preferredAddress;
