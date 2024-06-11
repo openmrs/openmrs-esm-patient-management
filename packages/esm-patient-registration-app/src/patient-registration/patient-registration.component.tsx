@@ -158,7 +158,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
           <div className={styles.formContainer}>
             <div>
               <div className={styles.stickyColumn}>
-                <h4>{inEditMode ? t('editPatient', 'Edit Patient') : t('createNewPatient', 'Create New Patient')}</h4>
+                <h4>{inEditMode ? t('editPatient', 'Edit patient') : t('createNewPatient', 'Create new patient')}</h4>
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
                 {sections.map((section) => (
