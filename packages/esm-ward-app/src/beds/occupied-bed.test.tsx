@@ -6,11 +6,9 @@ import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
 
-const defaultConfigSchema = getDefaultsFromConfigSchema(configSchema);
+const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
-jest.mocked(useConfig).mockReturnValue({
-  ...defaultConfigSchema,
-});
+jest.mocked(useConfig).mockReturnValue(defaultConfig);
 
 const mockBedLayouts = filterBeds(mockAdmissionLocation);
 
