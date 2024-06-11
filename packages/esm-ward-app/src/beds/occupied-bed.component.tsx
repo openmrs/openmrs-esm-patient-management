@@ -17,7 +17,7 @@ const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
         const last = index === patients.length - 1;
         return (
           <div key={patient.uuid}>
-            <WardPatientCard patient={patient} bed={bed} status={'admitted'} />
+            <WardPatientCard patient={patient} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
         );
@@ -31,7 +31,7 @@ const BedShareDivider = () => {
   return (
     <div className={styles.bedDivider}>
       <div className={styles.bedDividerLine}></div>
-      <Tag>{t('bedshare', 'Bed share')}</Tag>
+      <Tag>{t('bedShare', 'Bed share')}</Tag>
       <div className={styles.bedDividerLine}></div>
     </div>
   );

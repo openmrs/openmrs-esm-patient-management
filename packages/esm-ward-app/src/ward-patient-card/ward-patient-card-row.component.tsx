@@ -9,7 +9,7 @@ interface WardPatientCardElementProps extends WardPatientCardProps {
 
 /**
  * A patient card can have a list of patient card rows, and each patient card row 
- * can list any number of attributes about the patient. 
+ * can list any number of PatientCardElements, which contain attributes about the patient. 
  */
 const WardPatientCardRow: React.FC<WardPatientCardElementProps> = ({ patient, bed, className }) => {
   const { locationUuid } = useParams();

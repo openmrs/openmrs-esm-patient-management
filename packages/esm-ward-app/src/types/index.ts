@@ -11,13 +11,10 @@ import type React from 'react';
 export interface WardPatientCardProps {
   patient: Patient;
   bed: Bed;
-  status?: WardPatientStatus;
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
 export type WardPatientCardElement = React.FC<WardPatientCardProps>;
-
-export type WardPatientStatus = 'admitted' | 'pending';
 
 export const patientCardElementTypes = [
   'bed-number',

@@ -61,15 +61,7 @@ export const configSchema: ConfigSchema = {
             _element: {
               _type: Type.String,
               _description: 'The ID of the (bulit-in or custom) patient card element',
-              _validators: [
-                validator(
-                  (patientCardElementId: string) => {
-                    const validPatientCardElementIds: string[] = [...patientCardElementTypes];
-                    return validPatientCardElementIds.includes(patientCardElementId);
-                  },
-                  (patientCardElementId: string) => 'Invalid patient card element id: ' + patientCardElementId,
-                ),
-              ],
+              _validators: [validators.oneOf(patientCardElementTypes)],
             },
           },
         },
