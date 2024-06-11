@@ -431,7 +431,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 <Select
                   id="location"
                   invalidText="Required"
-                  labelText={t('selectLocation', 'Select a location')}
+                  labelText={t('selectALocation', 'Select a location')}
                   onChange={onChange}
                   onBlur={onBlur}
                   value={value}
@@ -749,7 +749,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     value={value}
                     ref={ref}
                     onBlur={onBlur}>
-                    <SelectItem text={t('selectAppointmentStatus', 'selectAppointmentStatus')} value="" />
+                    <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                     {appointmentStatuses?.length > 0 &&
                       appointmentStatuses.map((appointmentStatus, index) => (
                         <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>
