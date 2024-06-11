@@ -16,7 +16,7 @@ const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
       {patients.map((patient, index: number) => {
         const last = index === patients.length - 1;
         return (
-          <div key={patient.uuid}>
+          <div key={'occupied-bed-pt-' + patient.uuid}>
             <WardPatientCard patient={patient} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
