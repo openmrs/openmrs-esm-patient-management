@@ -12,6 +12,7 @@ interface MonthlyCalendarViewProps {
   dateToDisplay?: string;
   onDateClick?: (pickedDate: Date) => void;
 }
+
 const monthFormat = 'MMMM, YYYY';
 const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   calendarWorkload,
@@ -41,7 +42,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
           <div className={styles.monthlyCalendar}>
             {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
               <div
-                onClick={() => handleClick(dayjs(dateTime).format('YYYY-MM-DD'))}
+                onClick={() => handleClick(dayjs(dateTime).toString())}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
                   dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
