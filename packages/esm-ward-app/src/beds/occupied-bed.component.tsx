@@ -4,7 +4,7 @@ import { type Bed } from '../types';
 import styles from './occupied-bed.scss';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import WardPatientCard from '../ward-patient-card/ward-pateint-card.component';
+import WardPatientCard from '../ward-patient-card/ward-patient-card';
 
 export interface OccupiedBedProps {
   patients: Patient[];
@@ -16,7 +16,7 @@ const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
       {patients.map((patient, index: number) => {
         const last = index === patients.length - 1;
         return (
-          <div key={patient.uuid + ' ' + index}>
+          <div key={patient.uuid}>
             <WardPatientCard patient={patient} bed={bed} status={'admitted'} />
             {!last && <BedShareDivider />}
           </div>

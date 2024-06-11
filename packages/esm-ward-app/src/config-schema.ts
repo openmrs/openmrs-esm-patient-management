@@ -100,10 +100,16 @@ export interface WardPatientCardsConfig {
 export interface WardPatientCardDefinition {
   card: {
     id: string;
-    header: Array<string>; // an array of (either built-in or custom) bento element ids
+    /**
+     * an array of (either built-in or custom) bento element ids
+     */
+    header: Array<string>; 
   };
   appliedTo?: Array<{
-    location: string; // locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
+    /**
+     * locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
+     */
+    location: string; 
   }>;
 }
 
