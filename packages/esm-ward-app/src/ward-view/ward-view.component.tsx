@@ -20,28 +20,22 @@ const WardView = () => {
   const invalidLocation = Boolean(locationUuidFromUrl && !locationFromUrl);
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
   //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
-  // if (!isBedManagementModuleInstalled) return <></>;
+  if (!isBedManagementModuleInstalled) return <></>;
 
-  return (
+  return invalidLocation ? (
+    <InlineNotification
+      kind="error"
+      lowContrast={true}
+      title={t('invalidLocationSpecified', 'Invalid location specified')}
+      subtitle={t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', {
+        locationUuidFromUrl,
+      })}
+    />
+  ) : (
     <div className={styles.wardView}>
-      <WardViewHeader
-        location={location.display}
-        isLocationInValid={invalidLocation}
-        locationUuidFromUrl={locationUuidFromUrl}
-      />
+      <WardViewHeader location={location.display} />
       <div className={styles.wardViewMain}>
-        {invalidLocation ? (
-          <InlineNotification
-            kind="error"
-            lowContrast={true}
-            title={t('invalidLocationSpecified', 'Invalid location specified')}
-            subtitle={t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', {
-              locationUuidFromUrl,
-            })}
-          />
-        ) : (
-          <WardViewByLocation location={location} />
-        )}
+        <WardViewByLocation location={location} />
       </div>
       <WorkspaceOverlay contextKey="ward" />
     </div>

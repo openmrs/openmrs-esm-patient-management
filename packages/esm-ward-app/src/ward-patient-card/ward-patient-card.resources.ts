@@ -13,6 +13,7 @@ import WardPatientAge from './bento-elements/ward-patient-age';
 import WardPatientBedNumber from './bento-elements/ward-patient-bed-number';
 import WardPatientName from './bento-elements/ward-patient-name';
 import WardPatientAdmissionTime from './bento-elements/ward-patient-admission-time';
+import React from 'react';
 
 export function useCardSlots(location: string, cardType: string) {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ export function useCardSlots(location: string, cardType: string) {
   // map of bentoElementId to its corresponding React component
   const bentoElementsMap = useMemo(() => {
     const map = new Map<string, WardPatientCardBentoElement>();
+
     for (const elementType of builtInBentoElements) {
       map.set(
         elementType,
@@ -50,9 +52,9 @@ export function useCardSlots(location: string, cardType: string) {
 
   const bentoElements = cardDefinition.card.header.map((bentoElement) => {
     if (!bentoElement.appliesTo.includes(cardType)) {
-      return;
+      return React.Fragment;
     }
-    const slot = bentoElementsMap.get(bentoElement.name);
+    const slot = bentoElementsMap.get(bentoElement.id);
     return slot;
   });
 

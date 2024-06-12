@@ -5,11 +5,11 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   card: {
     id: 'default-card',
     header: [
-      { name: 'bed-number', appliesTo: ['ward-bed-card'] },
-      { name: 'patient-name', appliesTo: ['ward-bed-card', 'admission-card'] },
-      { name: 'patient-age', appliesTo: ['ward-bed-card', 'admission-card'] },
-      { name: 'patient-address', appliesTo: ['ward-bed-card', 'admission-card'] },
-      { name: 'admission-time', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { id: 'bed-number', appliesTo: ['ward-bed-card'] },
+      { id: 'patient-name', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { id: 'patient-age', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { id: 'patient-address', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { id: 'admission-time', appliesTo: ['ward-bed-card', 'admission-card'] },
     ],
   },
   appliedTo: null,
@@ -27,6 +27,7 @@ export const builtInBentoElements: BentoElementType[] = [
   'admission-time',
 ];
 
+export const builtInCardTypes = ['ward-bed-card', 'admission-card'];
 export const configSchema: ConfigSchema = {
   wardPatientCards: {
     _description: 'Configure the display of ward patient cards',
@@ -64,18 +65,36 @@ export const configSchema: ConfigSchema = {
         card: {
           header: {
             _type: Type.Array,
-            _element: {
-              _type: Type.String,
-              _description: 'The ID of the (bulit-in or custom) bento element',
-              _validators: [
-                validator(
-                  (bentoElementId: string) => {
-                    const validBentoElementIds: string[] = [...bentoElementTypes];
-                    return validBentoElementIds.includes(bentoElementId);
-                  },
-                  (bentoElementId: string) => 'Invalid bento element id: ' + bentoElementId,
-                ),
-              ],
+            _elements: {
+              id: {
+                _type: Type.String,
+                _description: 'The ID of the (bulit-in or custom) bento element',
+                _validators: [
+                  validator(
+                    (bentoElementId: string) => {
+                      const validBentoElementIds: string[] = [...bentoElementTypes];
+                      return validBentoElementIds.includes(bentoElementId);
+                    },
+                    (bentoElementId: string) => 'Invalid bento element id: ' + bentoElementId,
+                  ),
+                ],
+              },
+              appliesTo: {
+                _type: Type.Array,
+                _description: 'List of card in which the bento element should be present',
+                _elements: {
+                  _type: Type.String,
+                  _validators: [
+                    validator(
+                      (cardType: string) => {
+                        const validCardTypes: string[] = [...builtInCardTypes];
+                        return validCardTypes.includes(cardType);
+                      },
+                      (cardType: string) => 'Invalid card type: ' + cardType,
+                    ),
+                  ],
+                },
+              },
             },
           },
         },
@@ -114,7 +133,7 @@ export interface WardPatientCardDefinition {
 }
 
 export interface WardPatientCardHeader {
-  name: string;
+  id: string;
   appliesTo: Array<string>;
 }
 export type BentoElementDefinition = {

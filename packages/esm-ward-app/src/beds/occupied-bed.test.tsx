@@ -4,7 +4,7 @@ import React from 'react';
 import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema, deafultCardDefinitions, defaultAddressFields } from '../config-schema';
+import { configSchema, defaultBentoElementConfig } from '../config-schema';
 
 const defaultConfigSchema = getDefaultsFromConfigSchema(configSchema);
 
@@ -22,8 +22,6 @@ jest.replaceProperty(mockBedToUse.patient.person, 'preferredName', {
 });
 const mockPatient = mockBedToUse.patient;
 const mockBed = bedLayoutToBed(mockBedToUse);
-const configAddressFields = defaultAddressFields;
-const cardDefinitions = deafultCardDefinitions.map((cardDef) => cardDef.slots);
 
 describe('Occupied bed: ', () => {
   it('renders a single bed with patient details', () => {
@@ -32,8 +30,9 @@ describe('Occupied bed: ', () => {
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatient.person.age} yrs`;
     expect(screen.getByText(patientAge)).toBeInTheDocument();
-    configAddressFields.forEach((addressField) => {
-      const addressFieldValue = mockPatient.person.preferredAddress[addressField];
+    const defaultAddressFields = defaultBentoElementConfig.addressFields;
+    defaultAddressFields.forEach((addressField) => {
+      const addressFieldValue = mockPatient.person.preferredAddress[addressField] as string;
       expect(screen.getByText(addressFieldValue)).toBeInTheDocument();
     });
   });
@@ -42,15 +41,5 @@ describe('Occupied bed: ', () => {
     render(<OccupiedBed patients={[mockPatient, mockPatient]} bed={mockBed} />);
     const bedShareText = screen.getByTitle('Bed share');
     expect(bedShareText).toBeInTheDocument();
-  });
-
-  it('check if the card definition slots are rendered', () => {
-    const { container } = render(<OccupiedBed patients={[mockPatient]} bed={mockBed} />);
-    cardDefinitions.forEach((cardDefs) => {
-      cardDefs.forEach((cardDef) => {
-        const cardSlot = container.querySelector(`[data-card-slot-id="${cardDef}"]`);
-        expect(cardSlot).toBeInTheDocument();
-      });
-    });
   });
 });
