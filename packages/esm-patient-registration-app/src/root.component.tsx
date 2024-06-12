@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import useSWRImmutable from 'swr/immutable';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Grid, Row } from '@carbon/react';
-import { ExtensionSlot, useConnectivity, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConnectivity, useSession, useConfig } from '@openmrs/esm-framework';
 import {
   ResourcesContext,
   fetchAddressTemplate,
@@ -13,10 +13,15 @@ import {
 import { FormManager } from './patient-registration/form-manager';
 import { PatientRegistration } from './patient-registration/patient-registration.component';
 import styles from './root.scss';
+import Joyride, { type CallBackProps, STATUS } from 'react-joyride';
+import { onboardingSteps } from './onboardingSteps';
+import { type RegistrationConfig } from './config-schema';
 
 export default function Root() {
   const isOnline = useConnectivity();
   const currentSession = useSession();
+  const config = useConfig() as RegistrationConfig;
+  const [runJoyride, setRunJoyride] = useState<boolean>(config.showTutorial);
   const { data: addressTemplate } = useSWRImmutable('patientRegistrationAddressTemplate', fetchAddressTemplate);
   const { data: relationshipTypes } = useSWRImmutable(
     'patientRegistrationRelationshipTypes',
@@ -31,8 +36,41 @@ export default function Root() {
     [isOnline],
   );
 
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
+      setRunJoyride(false);
+    }
+  };
+
+  useEffect(() => {
+    setRunJoyride(config.showTutorial);
+  }, [config.showTutorial]);
+
   return (
     <main className={classNames('omrs-main-content', styles.root)}>
+      <Joyride
+        callback={handleJoyrideCallback}
+        continuous
+        run={runJoyride}
+        showProgress
+        showSkipButton
+        steps={onboardingSteps as []}
+        locale={{
+          last: 'Done',
+        }}
+        styles={{
+          options: {
+            primaryColor: '#005D5D',
+          },
+          overlay: {
+            backgroundColor: 'none',
+            mixBlendMode: 'unset',
+          },
+          spotlight: {
+            backgroundColor: 'none',
+          },
+        }}
+      />
       <Grid className={styles.grid}>
         <Row>
           <ExtensionSlot name="breadcrumbs-slot" />

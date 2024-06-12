@@ -70,6 +70,7 @@ export interface RegistrationConfig {
   links: {
     submitButton: string;
   };
+  showTutorial: boolean;
   defaultPatientIdentifierTypes: Array<string>;
   registrationObs: {
     encounterTypeUuid: string | null;
@@ -330,6 +331,11 @@ export const esmPatientRegistrationSchema = {
       _default: '${openmrsSpaBase}/patient/${patientUuid}/chart',
       _validators: [validators.isUrlWithTemplateParameters(['patientUuid'])],
     },
+  },
+  showTutorial: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Enable or Disable the tutorial for the patient registration app',
   },
   defaultPatientIdentifierTypes: {
     _type: Type.Array,
