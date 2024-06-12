@@ -5,4 +5,7 @@
 .admissionRequestsWorkspace {
   min-height: var(--desktop-workspace-window-height);
   padding: spacing.$spacing-04;
+  > div:not(:first-of-type) {
+    margin-top: 10px;
+  }
 }

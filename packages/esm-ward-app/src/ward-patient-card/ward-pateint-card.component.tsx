@@ -1,9 +1,9 @@
 import { type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { WardPatientStatus, type Bed } from '../types';
+import { type WardPatientStatus, type Bed } from '../types';
 import { useCardSlots } from './ward-patient-card.resources';
-import styles from "./ward-patient-card.scss";
+import styles from './ward-patient-card.scss';
 
 export interface WardPatientCardProps {
   patient: Patient;
@@ -12,7 +12,7 @@ export interface WardPatientCardProps {
 }
 const WardPatientCard: React.FC<WardPatientCardProps> = ({ patient, bed }) => {
   const { locationUuid } = useParams();
-  const wardPatientCardSlots = useCardSlots(locationUuid);
+  const wardPatientCardSlots = useCardSlots(locationUuid, 'ward-bed-card');
 
   return (
     <div className={styles.wardPatientCard}>

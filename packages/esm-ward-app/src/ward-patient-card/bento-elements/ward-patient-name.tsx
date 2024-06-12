@@ -1,5 +1,5 @@
 import React from 'react';
-import { WardPatientCardBentoElement } from '../../types';
+import { type WardPatientCardBentoElement } from '../../types';
 import styles from '../admitted-patient-details.scss';
 
 const WardPatientName: WardPatientCardBentoElement = ({ patient }) => {

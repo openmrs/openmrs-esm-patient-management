@@ -4,7 +4,13 @@ import { type BentoElementType, bentoElementTypes } from './types';
 const defaultWardPatientCard: WardPatientCardDefinition = {
   card: {
     id: 'default-card',
-    header: ['bed-number', 'patient-name', 'patient-age', 'patient-address', 'admission-time'],
+    header: [
+      { name: 'bed-number', appliesTo: ['ward-bed-card'] },
+      { name: 'patient-name', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { name: 'patient-age', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { name: 'patient-address', appliesTo: ['ward-bed-card', 'admission-card'] },
+      { name: 'admission-time', appliesTo: ['ward-bed-card', 'admission-card'] },
+    ],
   },
   appliedTo: null,
 };
@@ -100,13 +106,17 @@ export interface WardPatientCardsConfig {
 export interface WardPatientCardDefinition {
   card: {
     id: string;
-    header: Array<string>; // an array of (either built-in or custom) bento element ids
+    header: Array<WardPatientCardHeader>;
   };
   appliedTo?: Array<{
     location: string; // locationUuid. If given, only applies to patients at the specified ward locations. (If not provided, applies to all locations)
   }>;
 }
 
+export interface WardPatientCardHeader {
+  name: string;
+  appliesTo: Array<string>;
+}
 export type BentoElementDefinition = {
   id: string;
   elementType: BentoElementType;

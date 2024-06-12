@@ -24,7 +24,11 @@ const WardView = () => {
 
   return (
     <div className={styles.wardView}>
-      <WardViewHeader location={location.display} />
+      <WardViewHeader
+        location={location.display}
+        isLocationInValid={invalidLocation}
+        locationUuidFromUrl={locationUuidFromUrl}
+      />
       <div className={styles.wardViewMain}>
         {invalidLocation ? (
           <InlineNotification

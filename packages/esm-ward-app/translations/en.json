@@ -4,5 +4,8 @@
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "noBedsConfigured": "No beds configured for this location",
   "unknownLocationUuid": "Unknown location uuid: {{locationUuidFromUrl}}",
-  "admissionRequests":"Admission Requests"
+  "admissionRequests":"Admission Requests",
+  "errorLoadingPatientAdmissionRequests":"Error Loading Patient Admission Requests",
+  "couldNotLoadPatientSAdmissionRequests":"Could not load patient admission requests"
+
 }

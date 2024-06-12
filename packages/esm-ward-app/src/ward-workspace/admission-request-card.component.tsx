@@ -1,16 +1,21 @@
 import React from 'react';
 import styles from './admission-request-card.scss';
+import { useCardSlots } from '../ward-patient-card/ward-patient-card.resources';
+import { useParams } from 'react-router-dom';
+import { type Patient } from '@openmrs/esm-framework';
 
-const AdmissionRequestCard = () => {
-  const slots = useSlots();
+interface AdmissionRequestCardProps {
+  patient: Patient;
+}
+
+const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({ patient }) => {
+  const { locationUuid } = useParams();
+  const admissionPatientCardSlots = useCardSlots(locationUuid, 'admission-card');
   return (
     <div className={styles.admissionRequestCardHeader}>
-      <div className={styles.patientName}>Name</div>
-      <div className={styles.patientGender}>Female</div>
-      <div className={styles.patientAge}>28 years</div>
-      <div className={styles.time}>18:24</div>
-      <div className={styles.city}>Joanne Cantwell</div>
-      <div className={styles.ward}>ANC Ward</div>
+      {admissionPatientCardSlots.map((AdmissionPatientCard, i) => (
+        <AdmissionPatientCard key={i} patient={patient} bed={null} />
+      ))}
     </div>
   );
 };
