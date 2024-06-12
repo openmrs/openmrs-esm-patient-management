@@ -8,7 +8,7 @@
   "appointmentCancelled": "Appointment Cancelled",
   "appointmentCancelledSuccessfully": "Appointment cancelled successfully",
   "appointmentColor": "Appointment color",
-  "appointmentDuplicateForm": "Appointment has been already Scheduled",
+  "appointmentConflict": "Appointment conflict",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",
   "appointmentEnded": "Appointment ended",
