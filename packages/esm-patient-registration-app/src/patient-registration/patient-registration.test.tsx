@@ -264,7 +264,7 @@ describe('Registering a new patient', () => {
     });
 
     await fillRequiredFields();
-    await user.click(await screen.findByText('Register Patient'));
+    await user.click(await screen.findByText(/Register Patient/i));
     expect(mockedSavePatient).toHaveBeenCalledWith(
       expect.objectContaining({
         identifiers: [], //TODO when the identifer story is finished: { identifier: '', identifierType: '05a29f94-c0ed-11e2-94be-8c13b969e334', location: '' },
@@ -293,7 +293,7 @@ describe('Registering a new patient', () => {
     const givenNameInput = (await screen.findByLabelText('First Name')) as HTMLInputElement;
 
     await user.type(givenNameInput, '5');
-    await user.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText(/Register Patient/i));
 
     expect(mockedSavePatientForm).not.toHaveBeenCalled();
   });
@@ -317,7 +317,7 @@ describe('Registering a new patient', () => {
     const nationality = within(customSection).getByLabelText('Nationality');
     await user.selectOptions(nationality, 'USA');
 
-    await user.click(screen.getByText('Register Patient'));
+    await user.click(screen.getByText(/Register Patient/i));
 
     expect(mockedSavePatient).toHaveBeenCalled();
 
@@ -350,7 +350,7 @@ describe('Registering a new patient', () => {
 
     mockedSaveEncounter.mockRejectedValue({ status: 400, responseBody: { error: { message: 'an error message' } } });
 
-    const registerPatientButton = screen.getByText('Register Patient');
+    const registerPatientButton = screen.getByText(/Register Patient/i);
 
     await user.click(registerPatientButton);
 
@@ -415,7 +415,7 @@ describe('Updating an existing patient record', () => {
     await user.type(givenNameInput, 'Eric');
     await user.type(middleNameInput, 'Johnson');
     await user.type(familyNameInput, 'Smith');
-    await user.click(screen.getByText('Update Patient'));
+    await user.click(screen.getByText(/Update patient/i));
 
     expect(mockedSavePatient).toHaveBeenCalledWith(
       false,
