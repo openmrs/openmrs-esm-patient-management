@@ -22,10 +22,9 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   const { selectedDate } = useContext(SelectedDateContext);
   const daysInWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
   const monthViewDate = dateToDisplay === '' ? selectedDate : dateToDisplay;
-  const handleClick = (date: string) => {
-    const parsedDate = new Date(date);
+  const handleClick = (date: Date) => {
     if (onDateClick) {
-      onDateClick(parsedDate);
+      onDateClick(date);
     }
   };
   const { t } = useTranslation();
@@ -42,7 +41,7 @@ const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
           <div className={styles.monthlyCalendar}>
             {monthDays(dayjs(monthViewDate)).map((dateTime, i) => (
               <div
-                onClick={() => handleClick(dayjs(dateTime).toString())}
+                onClick={() => handleClick(dayjs(dateTime).toDate())}
                 key={i}
                 className={`${styles.monthlyWorkloadCard} ${
                   dayjs(dateTime).format('YYYY-MM-DD') === dayjs(monthViewDate).format('YYYY-MM-DD')
