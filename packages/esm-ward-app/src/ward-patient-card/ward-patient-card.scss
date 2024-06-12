@@ -1,0 +1,27 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+
+.wardPatientCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: spacing.$spacing-02;
+  background-color: $ui-02;
+  padding: spacing.$spacing-04;
+}
+
+.wardPatientCardHeader {
+  display: flex;
+  flex-wrap: wrap;
+
+  > div:not(div:first-of-type) {
+    display: flex;
+    align-items: center;
+    &::before {
+      content: '·';
+      padding: 0 spacing.$spacing-02;
+    }
+  }
+}

@@ -5,11 +5,11 @@
 .bedNumber {
   @include type.type-style('heading-compact-01');
   border-radius: 50%;
-  background-color: $color-blue-10;
-  color: $color-blue-60-2;
+  color: $ui-02;
+  background-color: $color-blue-60-2;
   padding: spacing.$spacing-04;
-  width: spacing.$spacing-03;
-  height: spacing.$spacing-03;
+  width: spacing.$spacing-04;
+  height: spacing.$spacing-04;
   display: flex;
   justify-content: center;
   align-items: center;

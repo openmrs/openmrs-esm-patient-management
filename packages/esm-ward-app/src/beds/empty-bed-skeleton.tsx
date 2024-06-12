@@ -1,6 +1,6 @@
+import { SkeletonIcon } from '@carbon/react';
 import React from 'react';
 import styles from './empty-bed.scss';
-import { SkeletonIcon, SkeletonText } from '@carbon/react';
 
 const EmptyBedSkeleton = () => {
   return (

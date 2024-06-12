@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './empty-bed.scss';
-import admittedPatientHeaderStyles from '../admitted-patient/admitted-patient-header.scss';
+import admittedPatientHeaderStyles from '../ward-patient-card/bento-elements/bento-elements.scss';
 import { type Bed } from '../types';
 
 interface EmptyBedProps {

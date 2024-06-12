@@ -1,4 +1,23 @@
-import type { Visit, Location, Patient } from '@openmrs/esm-framework';
+import type { OpenmrsResource, OpenmrsResourceStrict, Person, Visit,  Location,  Patient } from '@openmrs/esm-framework';
+
+export interface WardPatientCardProps {
+  patient: Patient;
+  bed: Bed;
+}
+
+export type WardPatientCardRow = React.FC<WardPatientCardProps>;
+export type WardPatientCardBentoElement = React.FC<WardPatientCardProps>;
+
+export type WardPatientStatus = "admitted" | "pending";
+
+export const bentoElementTypes = [
+  'bed-number',
+  'patient-name',
+  'patient-age',
+  'patient-address',
+  'admission-time',
+] as const;
+export type BentoElementType = (typeof bentoElementTypes)[number];
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -61,4 +80,51 @@ export interface Disposition {
   // dispositionObs?: Obs;
   dispositionLocation?: Location;
   dispositionDate?: Date;
+}
+// TODO: Move these types to esm-core
+export interface Observation extends OpenmrsResourceStrict {
+  concept: OpenmrsResource;
+  person: Person;
+  obsDatetime: string;
+  accessionNumber: string;
+  obsGroup: Observation;
+  valueCodedName: OpenmrsResource; // ConceptName
+  groupMembers: Array<Observation>;
+  comment: string;
+  location: Location;
+  order: OpenmrsResource; // Order
+  encounter: Encounter;
+  voided: boolean;
+}
+
+export interface Encounter extends OpenmrsResourceStrict {
+  encounterDatetime?: string;
+  patient?: Patient;
+  location?: Location;
+  form?: OpenmrsResource;
+  encounterType?: EncounterType;
+  obs?: Observation;
+  orders?: any;
+  voided?: boolean;
+  visit?: Visit;
+  encounterProviders?: Array<EncounterProvider>;
+  diagnoses?: any;
+}
+
+export interface EncounterProvider extends OpenmrsResourceStrict {
+  provider?: OpenmrsResource;
+  encounterRole?: EncounterRole;
+  voided?: boolean;
+}
+
+export interface EncounterType extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}
+
+export interface EncounterRole extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
 }

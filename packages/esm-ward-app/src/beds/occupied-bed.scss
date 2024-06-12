@@ -1,0 +1,24 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.occuipedBed {
+  display: flex;
+  flex-direction: column;
+  background-color: $ui-02;
+}
+
+.bedDivider {
+  background-color: $ui-02;
+  color: $text-02;
+  padding: spacing.$spacing-01;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bedDividerLine {
+  height: 1px;
+  background-color: $ui-03;
+  width: 30%;
+}

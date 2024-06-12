@@ -1,4 +1,5 @@
 import {
+  type Person,
   type ConfigSchema,
   getDefaultsFromConfigSchema,
   useConfig,
@@ -14,6 +15,13 @@ import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
+import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
+
+jest.replaceProperty(mockPatientAlice.person as Person, 'preferredName', {
+  uuid: '',
+  givenName: 'Alice',
+  familyName: 'Johnson',
+});
 
 jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
@@ -71,6 +79,15 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const emptyBedCards = await screen.findAllByText(/empty bed/i);
     expect(emptyBedCards).toHaveLength(3);
+  });
+
+  it('renders notification for invalid location uuid', () => {
+    mockedUseParams.mockReturnValueOnce({ locationUuid: 'invalid-uuid' });
+    renderWithSwr(<WardView />);
+    const notification = screen.getByRole('status');
+    expect(notification).toBeInTheDocument();
+    const invalidText = screen.getByText('Unknown location uuid: invalid-uuid');
+    expect(invalidText).toBeInTheDocument();
   });
 
   it('screen should be empty if backend module is not installed', () => {
