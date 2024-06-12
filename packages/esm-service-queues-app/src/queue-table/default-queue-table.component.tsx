@@ -83,7 +83,7 @@ function DefaultQueueTable() {
     });
   }, [queueEntries, searchTerm]);
 
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <DataTableSkeleton role="progressbar" />;
   }
 

@@ -26,7 +26,7 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
   const [searchTerm, setSearchTerm] = useState('');
 
   const noStatuses = !allowedStatuses?.length;
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <QueueTableByStatusSkeleton />;
   } else if (noStatuses) {
     return (
