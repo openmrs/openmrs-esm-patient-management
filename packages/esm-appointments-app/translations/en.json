@@ -140,7 +140,7 @@
   "service": "Service",
   "serviceName": "Service name",
   "serviceType": "Service Type",
-  "serviceUnavailable": "Service unavailable at this time",
+  "serviceUnavailable": "Appointment time is outside of service hours",
   "startDate": "Start date",
   "startTime": "Start Time",
   "status": "Status",

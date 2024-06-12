@@ -278,7 +278,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
     let errorMessage = t('appointmentConflict', 'Appointment conflict');
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
-      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
+      errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
       errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
