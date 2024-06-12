@@ -54,7 +54,7 @@ test('Edit a patient', async ({ page, api }) => {
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
     await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
     await expect(person.preferredAddress.country).toBe(formValues.country);
-    await expect(person.attributes[0].display).toBe(`Telephone Number = ${formValues.phone}`);
+    await expect(person.attributes[0].display).toBe(formValues.phone);
   });
 });
 
