@@ -1,8 +1,8 @@
-import type { Disposition } from '../packages/esm-ward-app/src/types';
+import type { InpatientRequest } from '../packages/esm-ward-app/src/types';
 import { mockPatientAlice } from './patient.mock';
 import { mockPastVisit } from './visits.mock';
 
-export const mockAdmissionRequest: Disposition = {
+export const mockInpatientRequest: InpatientRequest = {
   patient: mockPatientAlice,
   visit: mockPastVisit.data.results[0],
   type: 'ADMISSION',

@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './ward-view-header.scss';
 import AdmissionRequestsBar from './admission-requests-bar.component';
-import { useTranslation } from 'react-i18next';
 
 interface WardViewHeaderProps {
   location: string;

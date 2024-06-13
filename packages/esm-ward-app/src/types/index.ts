@@ -78,7 +78,7 @@ export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
 
 export type DispositionType = 'ADMISSION' | 'TRANSFER' | 'DISCHARGE';
 
-export interface Disposition {
+export interface InpatientRequest {
   patient: Patient;
   visit: Visit;
   type: DispositionType;

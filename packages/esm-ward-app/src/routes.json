@@ -13,16 +13,12 @@
       }
      }
   },
-  "extensions": [
+   "workspaces": [
     {
       "name":"admission-requests-cards",
       "component": "admissionRequestWorkspace",
-      "meta": {
-        "title": {
-          "key":"admissionRequests",
-          "default":"Admission Requests"
-        }
-      }
+      "title":"admissionRequests",
+       "type":"admission-requests"
     }
   ],
   "pages": [
