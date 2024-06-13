@@ -159,7 +159,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
             <div>
               <div className={styles.stickyColumn}>
                 <h4>
-                  {inEditMode ? t('edit', 'Edit') : t('createNew', 'Create New')} {t('patient', 'Patient')}
+                  {inEditMode
+                    ? t('editPatientDetails', 'Edit patient details')
+                    : t('createNewPatient', 'Create new patient')}
                 </h4>
                 {showDummyData && <DummyDataInput setValues={props.setValues} />}
                 <p className={styles.label01}>{t('jumpTo', 'Jump to')}</p>
@@ -186,9 +188,9 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       status="active"
                     />
                   ) : inEditMode ? (
-                    t('updatePatient', 'Update Patient')
+                    t('updatePatient', 'Update patient')
                   ) : (
-                    t('registerPatient', 'Register Patient')
+                    t('registerPatient', 'Register patient')
                   )}
                 </Button>
                 <Button className={styles.cancelButton} kind="tertiary" onClick={cancelRegistration}>

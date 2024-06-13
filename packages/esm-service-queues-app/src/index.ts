@@ -131,7 +131,7 @@ export const endQueueEntryModal = getAsyncLifecycle(
 );
 
 // t('addNewQueueService', 'Add New Queue Service')
-export const addnewQueueServiceWorkspace = getAsyncLifecycle(
+export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   () => import('./queue-services/queue-service-form.workspace'),
   {
     featureName: 'service-queues-service-form',
@@ -140,7 +140,7 @@ export const addnewQueueServiceWorkspace = getAsyncLifecycle(
 );
 
 // t('addNewQueueServiceRoom', 'Add new queue service room')
-export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
+export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./queue-rooms/queue-room-form.workspace'),
   {
     featureName: 'service-queues-queue-room-form',

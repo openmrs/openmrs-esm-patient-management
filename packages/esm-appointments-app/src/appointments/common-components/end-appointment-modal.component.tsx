@@ -94,7 +94,7 @@ const EndAppointmentModal: React.FC<EndAppointmentModalProps> = ({ patientUuid, 
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={endAppointment}>
-          {t('checkOut', 'Check Out')}
+          {t('checkOut', 'Check out')}
         </Button>
       </ModalFooter>
     </div>

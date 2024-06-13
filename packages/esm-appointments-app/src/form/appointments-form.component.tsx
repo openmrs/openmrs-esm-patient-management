@@ -276,10 +276,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
     // check if Duplicate Response Occurs
     const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
-    let errorMessage = t('appointmentDuplicateForm', 'Appointment is not available');
-    if (response?.data?.SERVICE_UNAVAILABE) {
-      errorMessage = t('serviceUnavailable', 'Service unavailable at this time');
-    } else if (response?.data?.PATIENT_DOUBLE_BOOKING) {
+    let errorMessage = t('appointmentConflict', 'Appointment conflict');
+    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+      errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
+    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
       errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
     }
     if (response.status === 200) {
@@ -431,7 +431,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 <Select
                   id="location"
                   invalidText="Required"
-                  labelText={t('selectLocation', 'Select a location')}
+                  labelText={t('selectALocation', 'Select a location')}
                   onChange={onChange}
                   onBlur={onBlur}
                   value={value}
@@ -749,7 +749,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                     value={value}
                     ref={ref}
                     onBlur={onBlur}>
-                    <SelectItem text={t('selectAppointmentStatus', 'selectAppointmentStatus')} value="" />
+                    <SelectItem text={t('selectAppointmentStatus', 'Select status')} value="" />
                     {appointmentStatuses?.length > 0 &&
                       appointmentStatuses.map((appointmentStatus, index) => (
                         <SelectItem key={index} text={appointmentStatus} value={appointmentStatus}>

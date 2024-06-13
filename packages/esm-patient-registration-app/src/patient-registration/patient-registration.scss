@@ -94,9 +94,8 @@
 }
 
 .spinner {
-  &:global(.cds--inline-loading) {
-    min-height: 1rem;
-  }
+  min-height: 1rem;
+  width: max-content;
 }
 
 // Overriding styles for RTL support
