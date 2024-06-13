@@ -4,20 +4,20 @@ import { type Bed } from '../types';
 import styles from './occupied-bed.scss';
 import { Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import WardPatientCard from '../ward-patient-card/ward-pateint-card.component';
+import WardPatientCard from '../ward-patient-card/ward-patient-card';
 
-export interface AdmittedPatientProps {
+export interface OccupiedBedProps {
   patients: Patient[];
-  bed: Bed | null;
+  bed: Bed;
 }
-const OccupiedBed: React.FC<AdmittedPatientProps> = ({ patients, bed }) => {
+const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
   return (
-    <div className={styles.occuipedBed}>
+    <div className={styles.occupiedBed}>
       {patients.map((patient, index: number) => {
         const last = index === patients.length - 1;
         return (
-          <div key={patient.uuid + ' ' + index}>
-            <WardPatientCard patient={patient} bed={bed} status={'admitted'} />
+          <div key={'occupied-bed-pt-' + patient.uuid}>
+            <WardPatientCard patient={patient} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
         );
@@ -31,7 +31,7 @@ const BedShareDivider = () => {
   return (
     <div className={styles.bedDivider}>
       <div className={styles.bedDividerLine}></div>
-      <Tag>{t('bedshare', 'Bed share')}</Tag>
+      <Tag>{t('bedShare', 'Bed share')}</Tag>
       <div className={styles.bedDividerLine}></div>
     </div>
   );

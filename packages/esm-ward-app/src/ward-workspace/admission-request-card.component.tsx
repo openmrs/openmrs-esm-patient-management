@@ -1,8 +1,9 @@
 import React from 'react';
 import styles from './admission-request-card.scss';
-import { useCardSlots } from '../ward-patient-card/ward-patient-card.resources';
+
 import { useParams } from 'react-router-dom';
 import { type Patient } from '@openmrs/esm-framework';
+import { usePatientCardRows } from '../ward-patient-card/ward-patient-card-row.resources';
 
 interface AdmissionRequestCardProps {
   patient: Patient;
@@ -10,7 +11,7 @@ interface AdmissionRequestCardProps {
 
 const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({ patient }) => {
   const { locationUuid } = useParams();
-  const admissionPatientCardSlots = useCardSlots(locationUuid, 'admission-card');
+  const admissionPatientCardSlots = usePatientCardRows(locationUuid);
   return (
     <div className={styles.admissionRequestCardHeader}>
       {admissionPatientCardSlots.map((AdmissionPatientCard, i) => (

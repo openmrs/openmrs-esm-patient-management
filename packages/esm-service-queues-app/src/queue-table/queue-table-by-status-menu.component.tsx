@@ -15,7 +15,7 @@ export default function QueueTableByStatusMenu() {
   const { queues } = useQueues();
 
   return (
-    <SideNavMenu title={t('serviceQueues', 'Service Queues')} className={styles.queueTableByStatusNavMenu}>
+    <SideNavMenu title={t('serviceQueues', 'Service queues')} className={styles.queueTableByStatusNavMenu}>
       <BrowserRouter>
         {queues.map((queue) => (
           <QueueTableByStatusLink queue={queue} />

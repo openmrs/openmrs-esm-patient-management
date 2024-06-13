@@ -1,23 +1,29 @@
-import type { OpenmrsResource, OpenmrsResourceStrict, Person, Visit, Location, Patient } from '@openmrs/esm-framework';
+import {
+  type OpenmrsResource,
+  type OpenmrsResourceStrict,
+  type Person,
+  type Visit,
+  type Location,
+  type Patient,
+} from '@openmrs/esm-framework';
+import type React from 'react';
 
 export interface WardPatientCardProps {
   patient: Patient;
-  bed: Bed | null;
+  bed: Bed;
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
-export type WardPatientCardBentoElement = React.FC<WardPatientCardProps>;
+export type WardPatientCardElement = React.FC<WardPatientCardProps>;
 
-export type WardPatientStatus = 'admitted' | 'pending';
-
-export const bentoElementTypes = [
+export const patientCardElementTypes = [
   'bed-number',
   'patient-name',
   'patient-age',
   'patient-address',
   'admission-time',
 ] as const;
-export type BentoElementType = (typeof bentoElementTypes)[number];
+export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
 // server-side types defined in openmrs-module-bedmanagement:
 

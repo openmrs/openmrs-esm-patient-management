@@ -1,9 +1,5 @@
 import admissionRequestsWorkspace from './ward-workspace/admission-requests-workspace.component';
-import {
-  defineConfigSchema,
-  getSyncLifecycle,
-  registerBreadcrumbs
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import rootComponent from './root.component';
 

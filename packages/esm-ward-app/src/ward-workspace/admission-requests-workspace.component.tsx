@@ -8,21 +8,21 @@ import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
 import { useTranslation } from 'react-i18next';
 import { closeWorkspace, showNotification } from '@openmrs/esm-framework';
 
-// const testPatient = mockPatientAlice;
-// testPatient.person.preferredName = {
-//   givenName: 'Chi bong',
-//   familyName: 'ho',
-//   uuid: '',
-// };
+const testPatient = mockPatientAlice;
+testPatient.person.preferredName = {
+  givenName: 'Chi bong',
+  familyName: 'ho',
+  uuid: '',
+};
 const AdmissionRequestsWorkspace = () => {
   const { locationUuid } = useParams();
   const { t } = useTranslation();
   const { admissionRequests, isLoading, error } = useDisposition(locationUuid);
-  // const testDispositionData = [
-  //   {
-  //     patient: testPatient,
-  //   },
-  // ];
+  const testDispositionData = [
+    {
+      patient: testPatient,
+    },
+  ];
   if (isLoading) {
     return (
       <div className={styles.admissionRequestsWorkspace}>
@@ -35,17 +35,17 @@ const AdmissionRequestsWorkspace = () => {
     );
   }
 
-  if (error) {
-    closeWorkspace('admission-requests-cards');
-    showNotification({
-      kind: 'error',
-      title: t('errorLoadingPatientAdmissionRequests', 'Error Loading Patient Admission Requests'),
-      description: error.message,
-    });
-  }
+  // if (error) {
+  //   closeWorkspace('admission-requests-cards');
+  //   showNotification({
+  //     kind: 'error',
+  //     title: t('errorLoadingPatientAdmissionRequests', 'Error Loading Patient Admission Requests'),
+  //     description: error.message,
+  //   });
+  // }
   return (
     <div className={styles.admissionRequestsWorkspace}>
-      {admissionRequests?.map((disposition) => <AdmissionRequestCard patient={disposition.patient} />)}
+      {testDispositionData?.map((disposition) => <AdmissionRequestCard patient={disposition.patient} />)}
     </div>
   );
 };

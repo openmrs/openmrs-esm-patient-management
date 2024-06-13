@@ -63,7 +63,7 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
           const url = `/queue-table-by-status/${selectedQueue.uuid}` + (newStatusUuid ? '/' + newStatusUuid : '');
           navigate(url);
         }}>
-        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
+        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
           {allStatusTabConfig && <Tab>{t('all', 'All')}</Tab>}
         </TabList>

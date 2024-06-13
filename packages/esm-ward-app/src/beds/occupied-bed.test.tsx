@@ -4,17 +4,15 @@ import React from 'react';
 import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
-import { configSchema, defaultBentoElementConfig } from '../config-schema';
+import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
 
-const defaultConfigSchema = getDefaultsFromConfigSchema(configSchema);
+const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
-jest.mocked(useConfig).mockReturnValue({
-  ...defaultConfigSchema,
-});
+jest.mocked(useConfig).mockReturnValue(defaultConfig);
 
-const mockBedLyouts = filterBeds(mockAdmissionLocation);
+const mockBedLayouts = filterBeds(mockAdmissionLocation);
 
-const mockBedToUse = mockBedLyouts[0];
+const mockBedToUse = mockBedLayouts[0];
 jest.replaceProperty(mockBedToUse.patient.person, 'preferredName', {
   uuid: '',
   givenName: 'Alice',
@@ -30,7 +28,7 @@ describe('Occupied bed: ', () => {
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatient.person.age} yrs`;
     expect(screen.getByText(patientAge)).toBeInTheDocument();
-    const defaultAddressFields = defaultBentoElementConfig.addressFields;
+    const defaultAddressFields = defaultPatientCardElementConfig.addressFields;
     defaultAddressFields.forEach((addressField) => {
       const addressFieldValue = mockPatient.person.preferredAddress[addressField] as string;
       expect(screen.getByText(addressFieldValue)).toBeInTheDocument();
