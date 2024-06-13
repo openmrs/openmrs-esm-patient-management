@@ -3,7 +3,7 @@ import { Movement } from '@carbon/react/icons';
 import styles from './admission-requests.scss';
 import { launchWorkspace } from '@openmrs/esm-framework';
 
-const AdmissionRequests = () => {
+const AdmissionRequestsBar = () => {
   return (
     <div className={styles.admissionRequestsContainer}>
       <Movement className={styles.movementIcon} size="24" />
@@ -15,4 +15,4 @@ const AdmissionRequests = () => {
   );
 };
 
-export default AdmissionRequests;
+export default AdmissionRequestsBar;

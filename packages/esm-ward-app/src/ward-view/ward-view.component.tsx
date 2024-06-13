@@ -20,9 +20,9 @@ const WardView = () => {
   const invalidLocation = Boolean(locationUuidFromUrl && !locationFromUrl);
   const location = (locationFromUrl ?? sessionLocation) as any as Location;
   //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
-  // if (!isBedManagementModuleInstalled) {
-  //   return <></>;
-  // }
+  if (!isBedManagementModuleInstalled) {
+    return <></>;
+  }
 
   return invalidLocation ? (
     <InlineNotification

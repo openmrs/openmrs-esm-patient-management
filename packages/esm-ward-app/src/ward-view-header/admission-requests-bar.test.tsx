@@ -3,7 +3,7 @@ import { renderWithSwr } from '../../../../tools/test-utils';
 import { screen } from '@testing-library/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
-import AdmissionRequests from './admission-requests.component';
+import AdmissionRequests from './admission-requests-bar.component';
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
