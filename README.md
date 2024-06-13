@@ -90,7 +90,7 @@ yarn turbo run test:watch
 To run tests for a specific package, pass the package name to the `--filter` flag. For example, to run tests for `esm-patient-conditions-app`, run:
 
 ```bash
-yarn turbo run test --filter="esm-patient-conditions-app"
+yarn turbo test --filter=@openmrs/esm-patient-conditions-app
 ```
 
 To run a specific test file, run:
