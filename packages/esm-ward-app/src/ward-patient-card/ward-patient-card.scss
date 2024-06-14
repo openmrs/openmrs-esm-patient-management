@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .wardPatientCard {
@@ -11,6 +12,14 @@
   align-items: center;
   gap: spacing.$spacing-02;
   background-color: $ui-02;
+
+  > .wardPatientCardRow:not(:first-child) {
+    border-top: 1px colors.$gray-20 solid;
+  }
+}
+
+.wardPatientCardRow {
+  width: 100%;
   padding: spacing.$spacing-04;
 }
 
