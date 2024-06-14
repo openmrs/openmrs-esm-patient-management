@@ -21,6 +21,7 @@ export const patientCardElementTypes = [
   'patient-name',
   'patient-age',
   'patient-address',
+  'patient-obs',
   'admission-time',
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
@@ -98,7 +99,7 @@ export interface Encounter extends OpenmrsResourceStrict {
   location?: Location;
   form?: OpenmrsResource;
   encounterType?: EncounterType;
-  obs?: Observation;
+  obs?: Array<Observation>;
   orders?: any;
   voided?: boolean;
   visit?: Visit;

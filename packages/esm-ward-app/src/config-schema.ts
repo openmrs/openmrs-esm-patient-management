@@ -16,6 +16,7 @@ const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 
 
 export const defaultPatientCardElementConfig: PatientCardElementConfig = {
   addressFields: defaultPatientAddressFields,
+  obsConceptUuid: null,
 };
 
 export const builtInPatientCardElements: PatientCardElementType[] = [
@@ -133,4 +134,11 @@ export interface PatientAddressElementConfig {
   addressFields: Array<keyof PersonAddress>;
 }
 
-export type PatientCardElementConfig = {} & PatientAddressElementConfig;
+export interface PatientObsElementConfig {
+  /**
+   * the observation with the specified concept to display
+   */
+  obsConceptUuid: string;
+}
+
+export type PatientCardElementConfig = PatientAddressElementConfig & PatientObsElementConfig;
