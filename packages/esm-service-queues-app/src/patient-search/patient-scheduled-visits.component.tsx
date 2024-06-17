@@ -35,7 +35,7 @@ import dayjs from 'dayjs';
 import head from 'lodash-es/head';
 import { useQueueLocations } from './hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
 
 enum visitType {

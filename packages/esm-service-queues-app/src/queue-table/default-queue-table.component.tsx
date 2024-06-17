@@ -35,7 +35,7 @@ This is used in the main dashboard of the queues app. (Currently behind a featur
 function DefaultQueueTable() {
   const selectedQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const { queueEntries, isLoading, error } = useQueueEntries({
+  const { queueEntries, isLoading, isValidating, error } = useQueueEntries({
     queue: selectedQueueUuid,
     location: currentLocationUuid,
     isEnded: false,
@@ -83,7 +83,7 @@ function DefaultQueueTable() {
     });
   }, [queueEntries, searchTerm]);
 
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
@@ -123,6 +123,7 @@ function DefaultQueueTable() {
       </div>
       <QueueTable
         queueEntries={filteredQueueEntries ?? []}
+        isValidating={isValidating}
         queueUuid={null}
         statusUuid={null}
         ExpandedRow={QueueTableExpandedRow}

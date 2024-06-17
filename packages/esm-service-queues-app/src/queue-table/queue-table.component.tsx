@@ -1,6 +1,7 @@
 import React, { useEffect, useState, type FC } from 'react';
 import {
   DataTable,
+  InlineLoading,
   Pagination,
   Table,
   TableBody,
@@ -24,6 +25,7 @@ import { useColumns } from './cells/columns.resource';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
+  isValidating?: boolean;
 
   // the queueUuid and statusUuid are used to determine the columns
   // to display based on the tablesConfig configuration.
@@ -43,15 +45,20 @@ interface QueueTableProps {
 
   // if provided, adds addition table toolbar elements
   tableFilter?: React.ReactNode[];
+
+  // if provided, adds title to the top-left
+  header?: string;
 }
 
 function QueueTable({
   queueEntries,
+  isValidating,
   queueUuid,
   statusUuid,
   queueTableColumnsOverride,
   ExpandedRow,
   tableFilter,
+  header,
 }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
@@ -92,11 +99,20 @@ function QueueTable({
       {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getToolbarProps, getExpandHeaderProps }) => (
         <>
           <TableContainer className={styles.tableContainer}>
-            {tableFilter && (
-              <TableToolbar {...getToolbarProps()}>
-                <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
-              </TableToolbar>
-            )}
+            <div className={styles.toolbarContainer}>
+              <h5 className={styles.tableHeader}>{header}</h5>
+              {isValidating ? (
+                <span>
+                  <InlineLoading />
+                </span>
+              ) : null}
+
+              {tableFilter && (
+                <TableToolbar {...getToolbarProps()}>
+                  <TableToolbarContent className={styles.toolbarContent}>{tableFilter}</TableToolbarContent>
+                </TableToolbar>
+              )}
+            </div>
             <Table {...getTableProps()} className={styles.queueTable} useZebraStyles>
               <TableHead>
                 <TableRow>

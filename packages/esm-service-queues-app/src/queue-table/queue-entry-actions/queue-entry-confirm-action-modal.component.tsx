@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../../types';
 import { Button, ModalHeader, ModalBody, ModalFooter, Stack } from '@carbon/react';
 import { type FetchResponse, showSnackbar } from '@openmrs/esm-framework';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 
 interface QueueEntryUndoActionsModalProps {
   queueEntry: QueueEntry;

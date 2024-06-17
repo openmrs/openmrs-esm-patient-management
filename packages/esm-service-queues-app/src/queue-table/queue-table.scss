@@ -55,7 +55,7 @@
   padding: spacing.$spacing-05;
 }
 
-.statusTableHeader {
+.tableHeader {
   padding: 8px 0;
 }
 
@@ -74,6 +74,10 @@
 
   :global(.cds--data-table) {
     background-color: $ui-03;
+  }
+
+  .toolbarContainer {
+    display: flex;
   }
 
   .toolbarContent {

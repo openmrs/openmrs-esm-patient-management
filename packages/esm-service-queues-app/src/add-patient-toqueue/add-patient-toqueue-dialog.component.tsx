@@ -18,7 +18,7 @@ import styles from './add-patient-toqueue-dialog.scss';
 import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
 import { RadioButtonSkeleton } from '@carbon/react';
 import { SelectSkeleton } from '@carbon/react';

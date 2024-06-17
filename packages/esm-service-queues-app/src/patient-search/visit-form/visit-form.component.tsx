@@ -41,7 +41,7 @@ import { type NewVisitPayload, type PatientProgram } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type ConfigObject } from '../../config-schema';
 import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';

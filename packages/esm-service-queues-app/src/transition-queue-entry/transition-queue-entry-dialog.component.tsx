@@ -9,7 +9,7 @@ import {
 } from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import styles from './transition-queue-entry-dialog.scss';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
 
 interface TransitionQueueEntryModalProps {
