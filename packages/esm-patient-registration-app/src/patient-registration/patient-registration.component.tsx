@@ -185,7 +185,6 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                       className={styles.spinner}
                       description={`${t('submitting', 'Submitting')} ...`}
                       iconDescription="submitting"
-                      status="active"
                     />
                   ) : inEditMode ? (
                     t('updatePatient', 'Update patient')
