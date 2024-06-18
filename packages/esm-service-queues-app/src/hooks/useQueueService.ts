@@ -1,37 +1,21 @@
-import { type FetchResponse, OpenmrsResource, openmrsFetch, restBaseUrl, useOpenmrsSWR } from '@openmrs/esm-framework';
-import { useSystemSetting } from './useSystemSetting';
+import { getLocale } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
-import type { Concept } from '../types';
-import useSWRImmutable from 'swr/immutable';
+import { useQueues } from './useQueues';
 
 function useQueueServices() {
-  const {
-    isLoading: isLoadingQueueServiceConceptNameUuid,
-    systemSetting,
-    isValueUuid,
-  } = useSystemSetting('queue.serviceConceptSetName');
-
-  const { data, isLoading: isLoadingQueueServices } = useSWRImmutable<
-    FetchResponse<Concept | { results: Array<Concept> }>
-  >(
-    systemSetting?.value
-      ? isValueUuid
-        ? `${restBaseUrl}/concept/${systemSetting?.value}`
-        : `${restBaseUrl}/concept?q=${systemSetting?.value}`
-      : null,
-    openmrsFetch,
-  );
+  const { queues, isLoading } = useQueues();
 
   const results = useMemo(
     () => ({
-      services: isValueUuid
-        ? (data?.data as Concept)?.setMembers
-        : (data?.data as { results: Array<Concept> })?.results?.[0]?.setMembers,
-      isLoadingQueueServices: isLoadingQueueServiceConceptNameUuid || isLoadingQueueServices,
+      services: [...new Set(queues?.map((queue) => queue.service) ?? [])].sort((a, b) =>
+        a.display.localeCompare(b.display, getLocale()),
+      ),
+      isLoadingQueueServices: isLoading,
     }),
-    [data, isLoadingQueueServices, isLoadingQueueServiceConceptNameUuid, isValueUuid],
+    [queues, isLoading],
   );
 
   return results;
 }
+
 export default useQueueServices;
