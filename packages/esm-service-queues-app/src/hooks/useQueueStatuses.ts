@@ -23,8 +23,8 @@ function useQueueStatuses() {
     const statuses: Array<Concept> = [];
 
     allStatuses.forEach((status) => {
-      if (!uuidSet.has(status.uuid)) {
-        uuidSet.add(status.uuid);
+      if (!uuidSet.has(status?.uuid)) {
+        uuidSet.add(status?.uuid);
         statuses.push(status);
       }
     });
