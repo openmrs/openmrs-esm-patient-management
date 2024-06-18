@@ -102,6 +102,30 @@
       "name": "visit-form-queue-fields",
       "component": "visitFormQueueFields",
       "slot":"visit-form-queue-slot"
+    },
+    {
+      "name":"total-patients-in-queue-metrics",
+      "component": "totalPatientsInQueueMetrics",
+      "slot": "queue-table-metrics-slot",
+      "order": 0
+    },
+    {
+      "name":"waiting-status-queue-metrics",
+      "component": "waitingStatusQueueMetrics",
+      "slot": "queue-table-metrics-slot",
+      "order": 1
+    },
+    {
+      "name": "in-service-status-queue-metrics",
+      "component": "inServiceStatusQueueMetrics",
+      "slot": "queue-table-metrics-slot",
+      "order": 2
+    },
+    {
+      "name": "finished-service-status-queue-metrics",
+      "component": "finishedServiceStatusQueueMetrics",
+      "slot": "queue-table-metrics-slot",
+      "order": 3
     }
   ],
   "workspaces": [
