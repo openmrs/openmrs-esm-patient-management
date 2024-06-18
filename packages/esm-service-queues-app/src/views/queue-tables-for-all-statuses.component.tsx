@@ -11,13 +11,14 @@ import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
 import type { Concept, Queue, QueueEntry } from '../types';
 import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
-import { SearchSkeleton } from '@carbon/react';
 import { SkeletonText } from '@carbon/react';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
   isLoadingQueue: boolean; // whether the queue is still loading
   errorFetchingQueue: Error;
+  errorFetchingStatus: Error;
+  selectedStatus: Concept;
 }
 
 // displays the queue entries of a given queue by
@@ -26,6 +27,8 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
   selectedQueue,
   isLoadingQueue,
   errorFetchingQueue,
+  selectedStatus,
+  errorFetchingStatus,
 }) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
@@ -36,7 +39,17 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
     return (
       <InlineNotification
         kind="error"
-        title={t('invalidQueue', 'Invalid Queue')}
+        title={t('invalidQueue', 'Invalid queue')}
+        subtitle={errorFetchingQueue?.message}
+      />
+    );
+  }
+
+  if (errorFetchingStatus) {
+    return (
+      <InlineNotification
+        kind="error"
+        title={t('invalidStatus', 'Invalid status')}
         subtitle={errorFetchingQueue?.message}
       />
     );
@@ -79,9 +92,9 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
           </div>
         }
       />
-      {!isLoadingQueue && <QueueTableMetrics selectedQueue={selectedQueue} />}
+      {!isLoadingQueue && <QueueTableMetrics selectedQueue={selectedQueue} selectedStatus={selectedStatus} />}
       {!isLoadingQueue ? (
-        <QueueTablesByStatus selectedQueue={selectedQueue} searchTerm={searchTerm} />
+        <QueueTablesByStatus selectedQueue={selectedQueue} searchTerm={searchTerm} selectedStatus={selectedStatus} />
       ) : (
         <QueueTableByStatusSkeleton />
       )}
@@ -91,17 +104,15 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
 
 interface QueueTablesByStatusProps {
   selectedQueue: Queue;
+  selectedStatus: Concept;
   searchTerm: string;
 }
 
-function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
+function QueueTablesByStatus({ selectedQueue, selectedStatus, searchTerm }: QueueTablesByStatusProps) {
   const { t } = useTranslation();
-  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
+  const allowedStatuses = selectedStatus ? [selectedStatus] : selectedQueue.allowedStatuses.reverse();
   const noStatuses = !allowedStatuses?.length;
-  if (isLoading) {
-    return <QueueTableByStatusSkeleton />;
-  } else if (noStatuses) {
+  if (noStatuses) {
     return (
       <InlineNotification
         kind={'error'}
@@ -117,9 +128,7 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
         ?.reverse()
         ?.map((status) => (
           <QueueTableForQueueAndStatus
-            isValidating={isValidating}
             key={status.uuid}
-            queueEntries={queueEntries}
             searchTerm={searchTerm}
             queue={selectedQueue}
             status={status}
@@ -130,21 +139,18 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
 }
 
 interface QueueTableForQueueAndStatusProps {
-  queueEntries: QueueEntry[];
-  isValidating: boolean;
   searchTerm: string;
   queue: Queue;
   status: Concept;
 }
 
 // renders a table for a particular queue and status within the QueueTablesForAllStatuses view
-function QueueTableForQueueAndStatus({
-  queueEntries,
-  isValidating,
-  searchTerm,
-  queue,
-  status,
-}: QueueTableForQueueAndStatusProps) {
+function QueueTableForQueueAndStatus({ searchTerm, queue, status }: QueueTableForQueueAndStatusProps) {
+  const { queueEntries, isLoading, isValidating } = useQueueEntries({
+    queue: queue.uuid,
+    status: status ? status.uuid : null,
+    isEnded: false,
+  });
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
   const { t } = useTranslation();
@@ -173,6 +179,11 @@ function QueueTableForQueueAndStatus({
   );
 
   const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
+
+  if (isLoading) {
+    return <QueueTableByStatusSkeleton />;
+  }
+
   return (
     <div className={styles.statusTableContainer}>
       <QueueTable
