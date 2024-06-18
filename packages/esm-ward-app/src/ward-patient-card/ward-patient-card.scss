@@ -68,6 +68,10 @@
   gap: spacing.$spacing-02;
 }
 
+.wardPatientObsLabel {
+  padding-right: spacing.$spacing-02;
+}
+
 .dotSeparatedChildren {
   > div:not(div:first-of-type) {
     display: flex;

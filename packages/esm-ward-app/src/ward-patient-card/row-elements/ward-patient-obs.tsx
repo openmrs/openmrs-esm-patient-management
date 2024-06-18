@@ -1,34 +1,69 @@
-import { useVisit } from '@openmrs/esm-framework';
+import { SkeletonText, Tag } from '@carbon/react';
+import { type OpenmrsResource, translateFrom } from '@openmrs/esm-framework';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { type PatientObsElementConfig } from '../../config-schema';
-import { type Encounter, type WardPatientCardElement } from '../../types';
+import { useObs } from '../../hooks/useObs';
+import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { SkeletonText } from '@carbon/react';
+import { moduleName } from '../../constant';
 
 // prettier-ignore
-export const visitCustomRepresentation =
-  'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
-  'encounters:(uuid,display,encounterDatetime,' +
-    'form:(uuid,name),location:ref,' +
-    'obs:(uuid,display,concept:(uuid,display)),' + 
-    'encounterType:ref,' +
-    'encounterProviders:(uuid,display,' +
-      'provider:(uuid,display))),' +
-  'patient:(uuid,display),' +
-  'visitType:(uuid,name,display),' +
-  'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
-  'location:(uuid,name,display))';
+const obsCustomRepresentation = 
+  'custom:(uuid,display,obsDatetime,value,' + 
+    'concept:(uuid,display),' + 
+    'encounter:(uuid,display,' + 
+      'visit:(uuid,display)))';
 
 const wardPatientObs = (config: PatientObsElementConfig) => {
-  const WardPatientObs: WardPatientCardElement = ({ patient }) => {
-    const { obsConceptUuid } = config;
-    const { activeVisit } = useVisit(patient.uuid, visitCustomRepresentation);
-    if (activeVisit) {
-      const encounters = activeVisit.encounters as Encounter[];
-      const obs = encounters.flatMap((e) => e?.obs).find((obs) => obs?.concept?.uuid == obsConceptUuid);
-      return <div className={styles.wardPatientAddress}>{obs.display}</div>;
-    } else {
+  const WardPatientObs: WardPatientCardElement = ({ patient, visit }) => {
+    const {
+      conceptUuid,
+      onlyWithinCurrentVisit,
+      orderBy,
+      limit,
+      label,
+      labelI18nModule: labelModule,
+      displayType,
+    } = config;
+    const { data, isLoading } = useObs({ patient: patient.uuid }, obsCustomRepresentation);
+    const { t } = useTranslation();
+
+    if (isLoading) {
       return <SkeletonText />;
+    } else {
+      const obsToDisplay = data?.data?.results
+        ?.filter((o) => {
+          const matchConcept = o.concept.uuid == conceptUuid;
+          const matchVisit = !onlyWithinCurrentVisit || o.encounter.visit?.uuid == visit?.uuid;
+          return matchConcept && matchVisit;
+        })
+        ?.sort((obsA, obsB) => {
+          return (orderBy == 'descending' ? -1 : 1) * obsA.obsDatetime.localeCompare(obsB.obsDatetime);
+        })
+        ?.slice(0, limit ?? Number.MAX_VALUE);
+
+      const labelToDisplay =
+        label != null ? translateFrom(labelModule ?? moduleName, label) : obsToDisplay?.[0]?.concept?.display;
+
+      const obsNodes = obsToDisplay?.map((o) => {
+        const { value } = o;
+        const display: any = (value as OpenmrsResource)?.display ?? o.value;
+        if (displayType == 'tags') {
+          return <Tag>{display}</Tag>;
+        } else {
+          return <span> {display} </span>;
+        }
+      });
+
+      return (
+        <div>
+          <span className={styles.wardPatientObsLabel}>
+            {labelToDisplay ? t('labelColon', '{{label}}:', { label: labelToDisplay }) : ''}
+          </span>
+          {obsNodes}
+        </div>
+      );
     }
   };
 

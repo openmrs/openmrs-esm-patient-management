@@ -23,12 +23,12 @@ const mockBed = bedLayoutToBed(mockBedToUse);
 
 describe('Occupied bed: ', () => {
   it('renders a single bed with patient details', () => {
-    render(<OccupiedBed patients={[mockPatient]} bed={mockBed} />);
+    render(<OccupiedBed patientInfos={[{ patient: mockPatient, visit: null }]} bed={mockBed} />);
     const patientName = screen.getByText('Alice Johnson');
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatient.person.age} yrs`;
     expect(screen.getByText(patientAge)).toBeInTheDocument();
-    const defaultAddressFields = defaultPatientCardElementConfig.addressFields;
+    const defaultAddressFields = defaultPatientCardElementConfig.address.addressFields;
     defaultAddressFields.forEach((addressField) => {
       const addressFieldValue = mockPatient.person.preferredAddress[addressField] as string;
       expect(screen.getByText(addressFieldValue)).toBeInTheDocument();
@@ -36,7 +36,15 @@ describe('Occupied bed: ', () => {
   });
 
   it('renders a divider for shared patients', () => {
-    render(<OccupiedBed patients={[mockPatient, mockPatient]} bed={mockBed} />);
+    render(
+      <OccupiedBed
+        patientInfos={[
+          { patient: mockPatient, visit: null },
+          { patient: mockPatient, visit: null },
+        ]}
+        bed={mockBed}
+      />,
+    );
     const bedShareText = screen.getByTitle('Bed share');
     expect(bedShareText).toBeInTheDocument();
   });
