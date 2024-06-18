@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { useQueueEntriesMetrics } from '../hooks/useQueueEntries';
 import styles from './queue-table-metrics-card.scss';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 interface QueueTableMetricsCardProps {
   value?: number;
@@ -11,6 +12,7 @@ interface QueueTableMetricsCardProps {
   status?: string;
   headerLabel: string;
   children?: React.ReactNode;
+  linkTo?: string;
 }
 
 const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
@@ -19,6 +21,7 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
   status,
   headerLabel,
   children,
+  linkTo,
 }) => {
   const { t } = useTranslation();
   const { count } = useQueueEntriesMetrics({
@@ -35,7 +38,13 @@ const QueueTableMetricsCard: React.FC<QueueTableMetricsCardProps> = ({
       <Tile className={styles.tileContainerWithoutBorder}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>
-            <label className={styles.headerLabel}>{headerLabel}</label>
+            {linkTo ? (
+              <label className={styles.headerLabel}>
+                <ConfigurableLink to={linkTo}>{headerLabel}</ConfigurableLink>
+              </label>
+            ) : (
+              <label className={styles.headerLabel}>{headerLabel}</label>
+            )}
             {children}
           </div>
         </div>
