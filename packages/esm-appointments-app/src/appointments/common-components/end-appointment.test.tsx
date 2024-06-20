@@ -1,9 +1,9 @@
-import EndAppointmentModal from './end-appointment-modal.component';
-import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateVisit, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { changeAppointmentStatus } from '../../patient-appointments/patient-appointments.resource';
+import EndAppointmentModal from './end-appointment.modal';
 
 const closeModal = jest.fn();
 jest.mock('../../patient-appointments/patient-appointments.resource', () => ({

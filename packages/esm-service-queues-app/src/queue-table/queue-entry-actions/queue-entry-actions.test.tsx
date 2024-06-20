@@ -3,9 +3,9 @@ import { screen } from '@testing-library/react';
 import { mockQueueEntryBrian, mockQueueSurgery, mockStatusInService, mockQueues } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
-import TransitionQueueEntryModal from './transition-queue-entry-modal.component';
+import TransitionQueueEntryModal from './transition-queue-entry.modal';
 import userEvent from '@testing-library/user-event';
-import EditQueueEntryModal from './edit-queue-entry-modal.component';
+import EditQueueEntryModal from './edit-queue-entry.modal';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 
