@@ -14,6 +14,8 @@ import WardPatientName from './row-elements/ward-patient-name';
 import React from 'react';
 import styles from './ward-patient-card.scss';
 
+import wardPatientIdentifier from './row-elements/ward-patient-identifier';
+
 export function usePatientCardRows(location: string) {
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const patientCardRows = useMemo(() => {
@@ -81,5 +83,7 @@ function getPatientCardElementFromDefinition(
       // TODO: configure address fields to pass in
       return wardPatientAddress(config);
     }
+    case 'patient-identifier':
+      return wardPatientIdentifier(config);
   }
 }

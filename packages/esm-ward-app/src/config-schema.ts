@@ -6,16 +6,18 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   rows: [
     {
       rowType: 'header',
-      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address'],
+      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address', 'patient-identifier'],
     },
   ],
   appliedTo: null,
 };
 
 const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 'country'];
-
+const defaultIdentifierTypeUuid = null;
+const defaultLabel = null;
 export const defaultPatientCardElementConfig: PatientCardElementConfig = {
   addressFields: defaultPatientAddressFields,
+  identifierTypeUuid: defaultIdentifierTypeUuid,
 };
 
 export const builtInPatientCardElements: PatientCardElementType[] = [
@@ -24,6 +26,7 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-age',
   'patient-address',
   'admission-time',
+  'patient-identifier',
 ];
 
 export const configSchema: ConfigSchema = {
@@ -47,6 +50,22 @@ export const configSchema: ConfigSchema = {
             _type: Type.Array,
             _description: 'For patientCardElementType "patient-address", defining which address fields to show',
             _default: defaultPatientAddressFields,
+          },
+          identifierTypeUuid: {
+            _type: Type.UUID,
+            _description: 'The UUID of the identifier type to display',
+            _default: defaultIdentifierTypeUuid,
+          },
+          label: {
+            _type: Type.String,
+            _description:
+              'he custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
+            _default: defaultLabel,
+          },
+          labelI18nModule: {
+            _type: Type.String,
+            _description: 'Optional. The custom module to use for translation of the label',
+            _default: null,
           },
         },
       },
@@ -133,4 +152,20 @@ export interface PatientAddressElementConfig {
   addressFields: Array<keyof PersonAddress>;
 }
 
-export type PatientCardElementConfig = {} & PatientAddressElementConfig;
+export interface PatientIdentifierElementConfig {
+  /**
+   * By default the preferred patient identifier is chosen,but
+   * if uuid is given the identifier corresponding to uuid is displayed
+   */
+  identifierTypeUuid: string | null;
+  /**
+   * Optional. The custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.
+   * (Note that this can be set to an empty string to not show a label)
+   */
+  label?: string;
+  /**
+   * Optional. The custom module to use for translation of the label
+   */
+  labelI18nModule?: string;
+}
+export type PatientCardElementConfig = PatientIdentifierElementConfig & PatientAddressElementConfig;
