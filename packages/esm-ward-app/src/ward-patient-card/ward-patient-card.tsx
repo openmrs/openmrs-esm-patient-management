@@ -10,8 +10,8 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
 
   return (
     <div className={styles.wardPatientCard}>
-      {patientCardRows.map((WardPatientCardRow) => (
-        <WardPatientCardRow {...props} />
+      {patientCardRows.map((WardPatientCardRow, i) => (
+        <WardPatientCardRow key={i} {...props} />
       ))}
     </div>
   );
