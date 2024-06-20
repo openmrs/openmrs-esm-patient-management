@@ -206,11 +206,6 @@ export interface PatientObsElementConfig {
    * Optional. If true, limits display to only observations within current visit
    */
   onlyWithinCurrentVisit?: boolean;
-
-  /**
-   * Optional. Specifies the display styling of obs
-   */
-  displayType?: 'tags' | 'normal';
 }
 
 export type PatientCardElementConfig = {

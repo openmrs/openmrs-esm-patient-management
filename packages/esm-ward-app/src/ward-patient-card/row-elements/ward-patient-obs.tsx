@@ -17,15 +17,7 @@ const obsCustomRepresentation =
 
 const wardPatientObs = (config: PatientObsElementConfig) => {
   const WardPatientObs: WardPatientCardElement = ({ patient, visit }) => {
-    const {
-      conceptUuid,
-      onlyWithinCurrentVisit,
-      orderBy,
-      limit,
-      label,
-      labelI18nModule: labelModule,
-      displayType,
-    } = config;
+    const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label, labelI18nModule: labelModule } = config;
     const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
     const { t } = useTranslation();
 
@@ -48,11 +40,8 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
       const obsNodes = obsToDisplay?.map((o) => {
         const { value } = o;
         const display: any = (value as OpenmrsResource)?.display ?? o.value;
-        if (displayType == 'tags') {
-          return <Tag>{display}</Tag>;
-        } else {
-          return <span> {display} </span>;
-        }
+
+        return <span> {display} </span>;
       });
 
       return (
