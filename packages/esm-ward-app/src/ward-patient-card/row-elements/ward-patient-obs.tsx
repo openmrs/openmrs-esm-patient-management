@@ -26,7 +26,7 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
       labelI18nModule: labelModule,
       displayType,
     } = config;
-    const { data, isLoading } = useObs({ patient: patient.uuid }, obsCustomRepresentation);
+    const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
     const { t } = useTranslation();
 
     if (isLoading) {
@@ -34,9 +34,8 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
     } else {
       const obsToDisplay = data?.data?.results
         ?.filter((o) => {
-          const matchConcept = o.concept.uuid == conceptUuid;
           const matchVisit = !onlyWithinCurrentVisit || o.encounter.visit?.uuid == visit?.uuid;
-          return matchConcept && matchVisit;
+          return matchVisit;
         })
         ?.sort((obsA, obsB) => {
           return (orderBy == 'descending' ? -1 : 1) * obsA.obsDatetime.localeCompare(obsB.obsDatetime);
