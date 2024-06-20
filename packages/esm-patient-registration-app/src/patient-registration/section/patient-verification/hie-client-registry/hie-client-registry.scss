@@ -1,0 +1,20 @@
+@import '../../../patient-registration.scss';
+
+:global(.omrs-breakpoint-lt-desktop) .tileContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  align-items: flex-end;
+  column-gap: 0.5rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .tileContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  align-items: flex-end;
+  column-gap: 0.5rem;
+
+  & > button {
+    justify-self: center;
+  }
+}

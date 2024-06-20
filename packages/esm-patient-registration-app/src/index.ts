@@ -6,6 +6,7 @@ import rootComponent from './root.component';
 import addPatientLinkComponent from './add-patient-link';
 import editPatientDetailsButtonComponent from './widgets/edit-patient-details-button.component';
 import { PatientPhotoExtension } from './patient-photo.extension';
+import HIECOnfirmModal from './patient-registration/section/patient-verification/hie-client-registry/hie-conform-modal/hie-confirm-modal.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -66,3 +67,5 @@ export const deleteIdentifierConfirmationModal = getAsyncLifecycle(
   () => import('./widgets/delete-identifier-confirmation-modal'),
   options,
 );
+
+export const heiConfirmationModal = getSyncLifecycle(HIECOnfirmModal, options);

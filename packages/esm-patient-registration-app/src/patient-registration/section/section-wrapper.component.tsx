@@ -4,6 +4,7 @@ import { Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type SectionDefinition } from '../../config-schema';
 import { Section } from './section.component';
+import { useConfig } from '@openmrs/esm-framework';
 
 export interface SectionWrapperProps {
   sectionDefinition: SectionDefinition;

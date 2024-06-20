@@ -1,4 +1,4 @@
-import { Type, validator, validators } from '@openmrs/esm-framework';
+import { type OpenmrsResource, Type, validator, validators } from '@openmrs/esm-framework';
 
 export interface SectionDefinition {
   id: string;
@@ -76,6 +76,10 @@ export interface RegistrationConfig {
     encounterProviderRoleUuid: string;
     registrationFormUuid: string | null;
   };
+  clientRegistry: {
+    url: string;
+    identificationTypes: Array<OpenmrsResource>;
+  };
 }
 
 export const builtInSections: Array<SectionDefinition> = [
@@ -93,6 +97,38 @@ export const builtInSections: Array<SectionDefinition> = [
 export const builtInFields = ['name', 'gender', 'dob', 'id', 'address', 'phone'] as const;
 
 export const esmPatientRegistrationSchema = {
+  clientRegistry: {
+    _description: 'Configuration for HIE Client Registry',
+    url: {
+      _type: Type.String,
+      _description: 'URL of the HIE Client Registry',
+      _default: 'https://shr.tiberbuapps.com/fhir/Patient/shaPatientVerification001',
+    },
+    identificationTypes: {
+      _type: Type.Array,
+      _elements: {
+        uuid: {
+          _type: Type.String,
+          _description: 'UUID of the identification type',
+        },
+        display: {
+          _type: Type.String,
+          _description: 'Display name of the identification type',
+        },
+      },
+      _description: 'Identification types supported by the HIE Client Registry',
+      _default: [
+        {
+          uuid: '1',
+          display: 'National ID',
+        },
+        {
+          uuid: '2',
+          display: 'Passport',
+        },
+      ],
+    },
+  },
   sections: {
     _type: Type.Array,
     _default: ['demographics', 'contact', 'relationships'],

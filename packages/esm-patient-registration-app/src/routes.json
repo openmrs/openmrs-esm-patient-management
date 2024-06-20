@@ -58,5 +58,11 @@
       "online": true,
       "offline": true
     }
+  ],
+  "modals": [
+    {
+      "component": "heiConfirmationModal",
+      "name": "hei-confirmation-modal"
+    }
   ]
 }

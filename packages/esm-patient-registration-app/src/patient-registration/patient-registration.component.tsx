@@ -25,6 +25,7 @@ import { builtInSections, type RegistrationConfig, type SectionDefinition } from
 import { SectionWrapper } from './section/section-wrapper.component';
 import BeforeSavePrompt from './before-save-prompt';
 import styles from './patient-registration.scss';
+import HIEClientRegistry from './section/patient-verification/hie-client-registry/hie-client-registry.component';
 
 let exportedInitialFormValuesForTesting = {} as FormValues;
 
@@ -211,6 +212,11 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({ savePa
                   initialFormValues: props.initialValues,
                   setInitialFormValues,
                 }}>
+                <section>
+                  <div>
+                    <HIEClientRegistry updateRegistrationInitialValues={setInitialFormValues} />
+                  </div>
+                </section>
                 {sections.map((section, index) => (
                   <SectionWrapper
                     key={`registration-section-${section.id}`}
