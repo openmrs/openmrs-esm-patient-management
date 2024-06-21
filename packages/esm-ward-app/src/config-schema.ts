@@ -15,7 +15,10 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
 const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 'country'];
 
 export const defaultPatientCardElementConfig: PatientCardElementConfig = {
-  addressFields: defaultPatientAddressFields,
+  address: {
+    addressFields: defaultPatientAddressFields,
+  },
+  obs: null,
 };
 
 export const builtInPatientCardElements: PatientCardElementType[] = [
@@ -23,7 +26,6 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-name',
   'patient-age',
   'patient-address',
-  'admission-time',
 ];
 
 export const configSchema: ConfigSchema = {
@@ -43,10 +45,50 @@ export const configSchema: ConfigSchema = {
           _validators: [validators.oneOf(patientCardElementTypes)],
         },
         config: {
-          addressFields: {
-            _type: Type.Array,
-            _description: 'For patientCardElementType "patient-address", defining which address fields to show',
-            _default: defaultPatientAddressFields,
+          address: {
+            _description: 'Config for the patientCardElementType "patient-address"',
+            addressFields: {
+              _type: Type.Array,
+              _description: 'defines which address fields to show',
+              _default: defaultPatientAddressFields,
+            },
+          },
+          obs: {
+            _description: 'Config for the patientCardElementType "patient-obs"',
+            conceptUuid: {
+              _type: Type.UUID,
+              _description: 'defines which observation value to show',
+              _default: null,
+            },
+            label: {
+              _type: Type.String,
+              _description:
+                "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
+              _default: null,
+            },
+            labelI18nModule: {
+              _type: Type.String,
+              _description: 'Optional. The custom module to use for translation of the label',
+              _default: null,
+            },
+            orderBy: {
+              _type: Type.String,
+              _description:
+                "Optional. One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly. Defaults to ascending.",
+              _default: 'descending',
+              _validators: [validators.oneOf(['ascending', 'descending'])],
+            },
+            limit: {
+              _type: Type.Number,
+              _description: 'Optional. Limits the max number of obs to display. Unlimited by default.',
+              _default: null,
+            },
+            onlyWithinCurrentVisit: {
+              _type: Type.Boolean,
+              _description:
+                'Optional. If true, limits display to only observations within current visit. Defaults to false',
+              _default: false,
+            },
           },
         },
       },
@@ -133,4 +175,40 @@ export interface PatientAddressElementConfig {
   addressFields: Array<keyof PersonAddress>;
 }
 
-export type PatientCardElementConfig = {} & PatientAddressElementConfig;
+export interface PatientObsElementConfig {
+  /**
+   * Required. Defines which observation value to show
+   */
+  conceptUuid: string;
+
+  /**
+   * Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name.
+   * (Note that this can be set to an empty string to not show a label)
+   */
+  label?: string;
+
+  /**
+   * Optional. The custom module to use for translation of the label
+   */
+  labelI18nModule?: string;
+
+  /**
+   * Optional. One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly. Defaults to descending.
+   */
+  orderBy?: 'ascending' | 'descending';
+
+  /**
+   * Optional. Limits the max number of obs to display. Unlimited by default.
+   */
+  limit?: number;
+
+  /**
+   * Optional. If true, limits display to only observations within current visit
+   */
+  onlyWithinCurrentVisit?: boolean;
+}
+
+export type PatientCardElementConfig = {
+  address: PatientAddressElementConfig;
+  obs: PatientObsElementConfig;
+};
