@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
-import styles from './delete-identifier-modal.scss';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
+import styles from './delete-identifier-confirmation.scss';
 
 interface DeleteIdentifierConfirmationModalProps {
   deleteIdentifier: (x: boolean) => void;
