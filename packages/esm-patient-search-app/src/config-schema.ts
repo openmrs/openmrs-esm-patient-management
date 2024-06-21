@@ -43,8 +43,8 @@ export const configSchema = {
     },
     _description:
       'A list of identifier types to be displayed in the patient search results as banner tags. If no defaultIdentifierTypes are provided, the defaultIdentifier will be displayed.',
-    // These values correspond to the Patient Clinic Number and National Unique Patient Identifier (NUPI) identifier types respectively
-    _default: ['b4d66522-11fc-45c7-83e3-39a1af21ae0d', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
+    // This UUID is for the OpenMRS ID
+    _default: ['05a29f94-c0ed-11e2-94be-8c13b969e334'],
   },
   defaultIdentifier: {
     _type: Type.String,
