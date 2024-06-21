@@ -15,14 +15,14 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-const initialServiceNameState = { serviceName: localStorage.getItem('queueServiceName') };
-const initialServiceUuidState = { serviceUuid: localStorage.getItem('queueServiceUuid') };
+const initialServiceNameState = { serviceName: sessionStorage.getItem('queueServiceName') };
+const initialServiceUuidState = { serviceUuid: sessionStorage.getItem('queueServiceUuid') };
 const intialStatusNameState = { status: '' };
-const initialQueueLocationNameState = { queueLocationName: localStorage.getItem('queueLocationName') };
-const initialQueueLocationUuidState = { queueLocationUuid: localStorage.getItem('queueLocationUuid') };
+const initialQueueLocationNameState = { queueLocationName: sessionStorage.getItem('queueLocationName') };
+const initialQueueLocationUuidState = { queueLocationUuid: sessionStorage.getItem('queueLocationUuid') };
 const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
 const initialPermanentProviderQueueRoomState = {
-  isPermanentProviderQueueRoom: localStorage.getItem('isPermanentProviderQueueRoom'),
+  isPermanentProviderQueueRoom: sessionStorage.getItem('isPermanentProviderQueueRoom'),
 };
 
 export function getSelectedServiceName() {
@@ -61,11 +61,13 @@ export function getIsPermanentProviderQueueRoom() {
 
 export const updateSelectedServiceName = (currentServiceName: string) => {
   const store = getSelectedServiceName();
+  sessionStorage.setItem('queueServiceName', currentServiceName);
   store.setState({ serviceName: currentServiceName });
 };
 
 export const updateSelectedServiceUuid = (currentServiceUuid: string) => {
   const store = getSelectedServiceUuid();
+  sessionStorage.setItem('queueServiceUuid', currentServiceUuid);
   store.setState({ serviceUuid: currentServiceUuid });
 };
 
@@ -76,11 +78,13 @@ export const updateSelectedAppointmentStatus = (currentAppointmentStatus: string
 
 export const updateSelectedQueueLocationName = (currentLocationName: string) => {
   const store = getSelectedQueueLocationName();
+  sessionStorage.setItem('queueLocationName', currentLocationName);
   store.setState({ queueLocationName: currentLocationName });
 };
 
 export const updateSelectedQueueLocationUuid = (currentLocationUuid: string) => {
   const store = getSelectedQueueLocationUuid();
+  sessionStorage.setItem('queueLocationUuid', currentLocationUuid);
   store.setState({ queueLocationUuid: currentLocationUuid });
 };
 
@@ -91,6 +95,7 @@ export const updatedSelectedQueueRoomTimestamp = (currentProviderRoomTimestamp: 
 
 export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQueueRoom) => {
   const store = getIsPermanentProviderQueueRoom();
+  sessionStorage.setItem('isPermanentProviderQueueRoom', currentIsPermanentProviderQueueRoom);
   store.setState({ isPermanentProviderQueueRoom: currentIsPermanentProviderQueueRoom });
 };
 

@@ -41,7 +41,7 @@ describe('Home Component', () => {
     window.location = { pathname: '/some-path/screen' };
 
     render(<Home />);
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByText(/patients currently in queue/i)).toBeInTheDocument();
 
     window.location = originalLocation;
   });

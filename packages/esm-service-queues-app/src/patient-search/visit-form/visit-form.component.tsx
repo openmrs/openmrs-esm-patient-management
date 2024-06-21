@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import dayjs from 'dayjs';
 import { first } from 'rxjs/operators';
 import {
@@ -8,7 +8,10 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  FormGroup,
   InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
   Row,
   Select,
   SelectItem,
@@ -16,46 +19,39 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
-  FormGroup,
-  RadioButton,
-  RadioButtonGroup,
 } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
+  ExtensionSlot,
+  ResponsiveWrapper,
+  saveVisit,
+  showSnackbar,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useConfig,
+  useLayoutType,
   useLocations,
   useSession,
-  ExtensionSlot,
-  useLayoutType,
-  useVisitTypes,
-  saveVisit,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showSnackbar,
-  useConfig,
-  ResponsiveWrapper,
 } from '@openmrs/esm-framework';
-import BaseVisitType from './base-visit-type.component';
-import { addQueueEntry } from '../../active-visits/active-visits-table.resource';
-import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
-import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import { RecommendedVisitTypeSelector, VisitTypeSelector } from './visit-type-selector.component';
+import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
+import { type amPm, convertTime12to24 } from '../../helpers/time-helpers';
 import { useActivePatientEnrollment } from '../hooks/useActivePatientEnrollment';
-import { SearchTypes, type PatientProgram, type NewVisitPayload } from '../../types';
+import { type NewVisitPayload, type PatientProgram } from '../../types';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import { type ConfigObject } from '../../config-schema';
 import { datePickerFormat, datePickerPlaceHolder } from '../../constants';
+import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
 
 interface VisitFormProps {
-  toggleSearchType: (searchMode: SearchTypes, patientUuid) => void;
   patientUuid: string;
-  closePanel: () => void;
-  mode: boolean;
+  closeWorkspace: () => void;
 }
 
-const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchType, closePanel, mode }) => {
+const VisitForm: React.FC<VisitFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -70,7 +66,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const allVisitTypes = useVisitTypes();
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
@@ -78,27 +73,25 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const [selectedLocation, setSelectedLocation] = useState('');
   const [visitType, setVisitType] = useState('');
+  const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
+    service: null,
+    priority: null,
+    status: null,
+    sortWeight: null,
+    queueLocation: null,
+  });
 
   useEffect(() => {
     if (locations?.length && sessionUser) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
-      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     } else if (!loadingDefaultFacility && defaultFacility) {
       setSelectedLocation(defaultFacility?.uuid);
-      setVisitType(allVisitTypes?.length > 0 ? allVisitTypes[0].uuid : null);
     }
   }, [locations, sessionUser, loadingDefaultFacility]);
 
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-
-      // retrieve values from queue extension
-      const queueLocation = event?.target['queueLocation']?.value;
-      const serviceUuid = event?.target['service']?.value;
-      const priority = event?.target['priority']?.value;
-      const status = event?.target['status']?.value;
-      const sortWeight = event?.target['sortWeight']?.value;
 
       if (!visitType) {
         setIsMissingVisitType(true);
@@ -129,9 +122,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
           (response) => {
             if (response.status === 201) {
               // add new queue entry if visit created successfully
-              addQueueEntry(
+              postQueueEntry(
                 response.data.uuid,
-                serviceUuid,
+                service,
                 patientUuid,
                 priority,
                 status,
@@ -151,7 +144,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                         `${hours} : ${minutes}`,
                       ),
                     });
-                    closePanel();
+                    closeWorkspace();
                     mutateQueueEntries();
                   }
                 },
@@ -175,7 +168,7 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
         );
     },
     [
-      closePanel,
+      closeWorkspace,
       mutateQueueEntries,
       patientUuid,
       selectedLocation,
@@ -200,18 +193,6 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             <ExtensionSlot name="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <div className={styles.backButton}>
-          {mode === true ? null : (
-            <Button
-              kind="ghost"
-              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-              iconDescription={t('backToScheduledVisits', 'Back to scheduled visits')}
-              size="sm"
-              onClick={() => toggleSearchType(SearchTypes.SCHEDULED_VISITS, patientUuid)}>
-              <span>{t('backToScheduledVisits', 'Back to scheduled visits')}</span>
-            </Button>
-          )}
-        </div>
         <Stack gap={8} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
@@ -313,25 +294,23 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
                 <Switch name="all" text={t('all', 'All')} />
               </ContentSwitcher>
             )}
-            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && !isLoading && (
-              <MemoizedRecommendedVisitType
+            {config.showRecommendedVisitTypeTab && contentSwitcherIndex === 0 && (
+              <RecommendedVisitTypeSelector
                 onChange={(visitType) => {
                   setVisitType(visitType);
                   setIsMissingVisitType(false);
                 }}
                 patientUuid={patientUuid}
-                patientProgramEnrollment={enrollment}
+                patientProgram={enrollment}
                 locationUuid={selectedLocation}
               />
             )}
             {(!config.showRecommendedVisitTypeTab || contentSwitcherIndex === 1) && (
-              <BaseVisitType
+              <VisitTypeSelector
                 onChange={(visitType) => {
                   setVisitType(visitType);
                   setIsMissingVisitType(false);
                 }}
-                visitTypes={allVisitTypes}
-                patientUuid={patientUuid}
               />
             )}
           </section>
@@ -347,9 +326,9 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
             </section>
           )}
 
-          <ExtensionSlot name="add-queue-entry-slot" />
+          <VisitFormQueueFields setFormFields={setVisitFormFields} />
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={closePanel}>
+            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('discard', 'Discard')}
             </Button>
             <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
@@ -362,4 +341,4 @@ const StartVisitForm: React.FC<VisitFormProps> = ({ patientUuid, toggleSearchTyp
   );
 };
 
-export default StartVisitForm;
+export default VisitForm;

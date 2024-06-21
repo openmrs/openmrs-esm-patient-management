@@ -3,6 +3,16 @@
   "backendDependencies": {
     "webservices.rest": "^2.2.0"
   },
+  "optionalBackendDependencies":{
+     "bedmanagement":{
+      "version": "^5.14.0 || 5.14.0-SNAPSHOT",
+      "feature": {
+        "flagName": "bedmanagement-module",
+        "label":"Ward App Patient Service",
+        "description": "This module, if installed, provides services for managing patients admitted to the ward."
+      }
+     }
+  },
   "extensions": [
   ],
   "pages": [

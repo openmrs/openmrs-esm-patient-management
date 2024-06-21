@@ -27,14 +27,14 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
   const allowedStatuses = selectedQueue.allowedStatuses;
 
   const currentStatusUuid = selectedStatus?.uuid ?? allowedStatuses?.[0]?.uuid;
   const currentStatusIndex = allowedStatuses?.findIndex((s) => s.uuid == currentStatusUuid);
 
   const noStatuses = !allowedStatuses?.length;
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <QueueTableByStatusSkeleton />;
   } else if (noStatuses) {
     return (
@@ -63,7 +63,7 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
           const url = `/queue-table-by-status/${selectedQueue.uuid}` + (newStatusUuid ? '/' + newStatusUuid : '');
           navigate(url);
         }}>
-        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue Status')} contained>
+        <TabList className={styles.tabList} aria-label={t('queueStatus', 'Queue status')} contained>
           {allowedStatuses?.map((s) => <Tab key={s?.uuid}>{s?.display}</Tab>)}
           {allStatusTabConfig && <Tab>{t('all', 'All')}</Tab>}
         </TabList>
@@ -81,6 +81,7 @@ const QueueTableByStatus: React.FC<QueueTableByStatusProps> = ({
             <TabPanel>
               <QueueTable
                 queueEntries={queueEntriesForCurrentStatus}
+                isValidating={isValidating}
                 queueUuid={selectedQueue.uuid}
                 statusUuid={null}
               />

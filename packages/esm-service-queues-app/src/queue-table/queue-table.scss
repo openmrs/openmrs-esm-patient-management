@@ -55,7 +55,7 @@
   padding: spacing.$spacing-05;
 }
 
-.statusTableHeader {
+.tableHeader {
   padding: 8px 0;
 }
 
@@ -76,6 +76,10 @@
     background-color: $ui-03;
   }
 
+  .toolbarContainer {
+    display: flex;
+  }
+
   .toolbarContent {
     display: flex;
     z-index: 1; // prevent dropdown from getting covered by table elements
@@ -84,12 +88,6 @@
   :global(.cds--table-toolbar) {
     position: static;
     overflow: visible;
-  }
-}
-
-.queueTable tr:last-of-type {
-  td {
-    border-bottom: none;
   }
 }
 

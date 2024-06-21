@@ -13,7 +13,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 
 jest.mock('./clear-queue-entries-dialog.resource');
 
-jest.mock('../hooks/useMutateQueueEntries', () => ({
+jest.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 

@@ -1,0 +1,84 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.wardPatientCard {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: spacing.$spacing-02;
+  background-color: $ui-02;
+
+  > .wardPatientCardRow:not(:first-child) {
+    border-top: 1px colors.$gray-20 solid;
+  }
+}
+
+.wardPatientCardRow {
+  width: 100%;
+  padding: spacing.$spacing-04;
+}
+
+.wardPatientCardHeader {
+  @extend .dotSeparatedChildren;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.wardPatientName {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  &::before {
+    content: '' !important;
+  }
+}
+
+.wardPatientBedNumber {
+  @include type.type-style('heading-compact-01');
+  border-radius: 50%;
+  color: $ui-02;
+  background-color: $color-blue-60-2;
+  padding: spacing.$spacing-04;
+  width: spacing.$spacing-04;
+  height: spacing.$spacing-04;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &.empty {
+    background-color: $color-blue-10;
+    color: $color-blue-60-2;
+  }
+}
+
+.bedNumberBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wardPatientAddress {
+  @extend .dotSeparatedChildren;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: spacing.$spacing-02;
+}
+
+.wardPatientObsLabel {
+  padding-right: spacing.$spacing-02;
+}
+
+.dotSeparatedChildren {
+  > div:not(div:first-of-type) {
+    display: flex;
+    align-items: center;
+    &::before {
+      content: '·';
+      padding: 0 spacing.$spacing-02;
+    }
+  }
+}

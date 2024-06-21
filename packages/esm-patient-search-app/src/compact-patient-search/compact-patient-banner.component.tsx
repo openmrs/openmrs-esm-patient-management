@@ -1,16 +1,16 @@
-import React, { forwardRef, useContext, useMemo } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { Tag } from '@carbon/react';
 import {
   ConfigurableLink,
   ExtensionSlot,
   PatientPhoto,
   age,
-  displayName,
+  getPatientName,
   interpolateString,
   useConfig,
 } from '@openmrs/esm-framework';
+import classNames from 'classnames';
+import React, { forwardRef, useContext, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PatientSearchContext } from '../patient-search-context';
 import type { FHIRIdentifier, FHIRPatientType, Identifier, SearchedPatient } from '../types';
 import styles from './compact-patient-banner.scss';

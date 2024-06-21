@@ -11,17 +11,17 @@ import {
   SelectItem,
   RadioButtonGroup,
   RadioButton,
+  RadioButtonSkeleton,
+  SelectSkeleton,
 } from '@carbon/react';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { addQueueEntry } from '../active-visits/active-visits-table.resource';
-import styles from './add-patient-toqueue-dialog.scss';
-import { type ActiveVisit, useMissingQueueEntries } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
+import { postQueueEntry } from '../active-visits/active-visits-table.resource';
+import { type ActiveVisit } from '../visits-missing-inqueue/visits-missing-inqueue.resource';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 import { useQueues } from '../hooks/useQueues';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
-import { RadioButtonSkeleton } from '@carbon/react';
-import { SelectSkeleton } from '@carbon/react';
+import styles from './add-patient-toqueue-dialog.scss';
 
 interface AddVisitToQueueDialogProps {
   visitDetails: ActiveVisit;
@@ -64,7 +64,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
     const status = config.concepts.defaultStatusConceptUuid;
     const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
-    addQueueEntry(
+    postQueueEntry(
       visitUuid,
       queueUuid,
       patientUuid,
@@ -80,7 +80,7 @@ const AddVisitToQueue: React.FC<AddVisitToQueueDialogProps> = ({ visitDetails, c
             isLowContrast: true,
             title: t('addEntry', 'Add entry'),
             kind: 'success',
-            subtitle: t('queueEntryAddedSuccessfully', 'Queue Entry Added Successfully'),
+            subtitle: t('queueEntryAddedSuccessfully', 'Queue entry added successfully'),
           });
           closeModal();
           mutateQueueEntries();

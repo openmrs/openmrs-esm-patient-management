@@ -1,17 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { InlineNotification, Search } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, isDesktop, launchWorkspace, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import PatientSearch from '../patient-search/patient-search.component';
 import { useColumns } from '../queue-table/cells/columns.resource';
 import { QueueTableByStatusSkeleton } from '../queue-table/queue-table-by-status-skeleton.component';
 import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
-import type { Concept, Queue, QueueEntry, QueueTableColumn, QueueTableTabConfig } from '../types';
-
+import type { Concept, Queue, QueueEntry } from '../types';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
@@ -23,14 +21,12 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
   const layout = useLayoutType();
   const { t } = useTranslation();
 
-  const { queueEntries, isLoading } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
   const allowedStatuses = selectedQueue.allowedStatuses;
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const noStatuses = !allowedStatuses?.length;
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <QueueTableByStatusSkeleton />;
   } else if (noStatuses) {
     return (
@@ -64,8 +60,10 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
                 size: 'sm',
               },
               selectPatientAction: (selectedPatientUuid) => {
-                setShowOverlay(true);
-                setViewState({ selectedPatientUuid });
+                launchWorkspace('service-queues-patient-search', {
+                  selectedPatientUuid,
+                  currentServiceQueueUuid: selectedQueue.uuid,
+                });
               },
             }}
           />
@@ -84,22 +82,29 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
           searchTerm={searchTerm}
           queue={selectedQueue}
           status={status}
+          isValidating={isValidating}
         />
       ))}
-      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 };
 
 interface QueueTableForQueueAndStatus {
   queueEntries: QueueEntry[];
+  isValidating: boolean;
   searchTerm: string;
   queue: Queue;
   status: Concept;
 }
 
 // renders a table for a particular queue and status within the QueueTablesForAllStatuses view
-function QueueTableForQueueAndStatus({ queueEntries, searchTerm, queue, status }: QueueTableForQueueAndStatus) {
+function QueueTableForQueueAndStatus({
+  queueEntries,
+  isValidating,
+  searchTerm,
+  queue,
+  status,
+}: QueueTableForQueueAndStatus) {
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
   const { t } = useTranslation();
@@ -130,8 +135,14 @@ function QueueTableForQueueAndStatus({ queueEntries, searchTerm, queue, status }
   const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
   return (
     <div className={styles.statusTableContainer}>
-      <h5 className={styles.statusTableHeader}>{status.display}</h5>
-      <QueueTable key={statusUuid} queueEntries={filteredQueueEntries} queueUuid={queue.uuid} statusUuid={statusUuid} />
+      <QueueTable
+        key={statusUuid}
+        queueEntries={filteredQueueEntries}
+        header={status.display}
+        isValidating={isValidating}
+        queueUuid={queue.uuid}
+        statusUuid={statusUuid}
+      />
     </div>
   );
 }

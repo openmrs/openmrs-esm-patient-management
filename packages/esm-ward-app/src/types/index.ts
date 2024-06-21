@@ -1,4 +1,31 @@
-import { type Location, type Patient } from '@openmrs/esm-framework';
+import {
+  type OpenmrsResource,
+  type OpenmrsResourceStrict,
+  type Person,
+  type Visit,
+  type Location,
+  type Patient,
+} from '@openmrs/esm-framework';
+import type React from 'react';
+
+export interface WardPatientCardProps {
+  patient: Patient;
+  visit: Visit;
+  bed: Bed;
+}
+
+export type WardPatientCardRow = React.FC<WardPatientCardProps>;
+export type WardPatientCardElement = React.FC<WardPatientCardProps>;
+
+export const patientCardElementTypes = [
+  'bed-number',
+  'patient-name',
+  'patient-age',
+  'patient-address',
+  'patient-obs',
+  'admission-time',
+] as const;
+export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
 // server-side types defined in openmrs-module-bedmanagement:
 
@@ -50,3 +77,52 @@ interface BedTagMap {
 }
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+// TODO: Move these types to esm-core
+export interface Observation extends OpenmrsResourceStrict {
+  concept: OpenmrsResource;
+  person: Person;
+  obsDatetime: string;
+  accessionNumber: string;
+  obsGroup: Observation;
+  value: number | string | boolean | OpenmrsResource;
+  valueCodedName: OpenmrsResource; // ConceptName
+  groupMembers: Array<Observation>;
+  comment: string;
+  location: Location;
+  order: OpenmrsResource; // Order
+  encounter: Encounter;
+  voided: boolean;
+}
+
+export interface Encounter extends OpenmrsResourceStrict {
+  encounterDatetime?: string;
+  patient?: Patient;
+  location?: Location;
+  form?: OpenmrsResource;
+  encounterType?: EncounterType;
+  obs?: Array<Observation>;
+  orders?: any;
+  voided?: boolean;
+  visit?: Visit;
+  encounterProviders?: Array<EncounterProvider>;
+  diagnoses?: any;
+}
+
+export interface EncounterProvider extends OpenmrsResourceStrict {
+  provider?: OpenmrsResource;
+  encounterRole?: EncounterRole;
+  voided?: boolean;
+}
+
+export interface EncounterType extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}
+
+export interface EncounterRole extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}

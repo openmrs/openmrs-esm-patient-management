@@ -1,7 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataTableSkeleton, Dropdown, TableToolbarSearch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, showSnackbar, showToast, useLayoutType } from '@openmrs/esm-framework';
+import {
+  closeWorkspace,
+  ExtensionSlot,
+  isDesktop,
+  launchWorkspace,
+  showSnackbar,
+  showToast,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
@@ -13,11 +21,12 @@ import {
 } from '../helpers/helpers';
 import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
-import PatientSearch from '../patient-search/patient-search.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
+
+const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
 
 /*
 Component with default values / sub-components passed into the more generic QueueTable.
@@ -26,7 +35,7 @@ This is used in the main dashboard of the queues app. (Currently behind a featur
 function DefaultQueueTable() {
   const selectedQueueUuid = useSelectedServiceUuid();
   const currentLocationUuid = useSelectedQueueLocationUuid();
-  const { queueEntries, isLoading, error } = useQueueEntries({
+  const { queueEntries, isLoading, isValidating, error } = useQueueEntries({
     queue: selectedQueueUuid,
     location: currentLocationUuid,
     isEnded: false,
@@ -45,8 +54,13 @@ function DefaultQueueTable() {
   }, [error?.message]);
   const layout = useLayoutType();
 
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [viewState, setViewState] = useState<{ selectedPatientUuid: string }>(null);
+  const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false);
+  const [patientSearchQuery, setPatientSearchQuery] = useState<string>('');
+
+  const handleBackToSearchList = useCallback(() => {
+    setIsPatientSearchOpen(true);
+    closeWorkspace(serviceQueuesPatientSearchWorkspace);
+  }, []);
 
   const columns = useColumns(null, null);
   if (!columns) {
@@ -69,7 +83,7 @@ function DefaultQueueTable() {
     });
   }, [queueEntries, searchTerm]);
 
-  if (isLoading) {
+  if (isLoading && !queueEntries.length) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
@@ -83,6 +97,8 @@ function DefaultQueueTable() {
           <ExtensionSlot
             name="patient-search-button-slot"
             state={{
+              isOpen: isPatientSearchOpen,
+              searchQuery: patientSearchQuery,
               buttonText: t('addPatientToQueue', 'Add patient to queue'),
               overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
               buttonProps: {
@@ -90,9 +106,16 @@ function DefaultQueueTable() {
                 renderIcon: (props) => <Add size={16} {...props} />,
                 size: 'sm',
               },
-              selectPatientAction: (selectedPatientUuid) => {
-                setShowOverlay(true);
-                setViewState({ selectedPatientUuid });
+              searchQueryUpdatedAction: (searchQuery: string) => {
+                setPatientSearchQuery(searchQuery);
+              },
+              selectPatientAction: (selectedPatientUuid: string) => {
+                setIsPatientSearchOpen(false);
+                launchWorkspace(serviceQueuesPatientSearchWorkspace, {
+                  selectedPatientUuid,
+                  currentServiceQueueUuid: selectedQueueUuid,
+                  handleBackToSearchList,
+                });
               },
             }}
           />
@@ -100,6 +123,7 @@ function DefaultQueueTable() {
       </div>
       <QueueTable
         queueEntries={filteredQueueEntries ?? []}
+        isValidating={isValidating}
         queueUuid={null}
         statusUuid={null}
         ExpandedRow={QueueTableExpandedRow}
@@ -114,7 +138,6 @@ function DefaultQueueTable() {
           <ClearQueueEntries queueEntries={filteredQueueEntries} />,
         ]}
       />
-      {showOverlay && <PatientSearch closePanel={() => setShowOverlay(false)} viewState={viewState} />}
     </div>
   );
 }

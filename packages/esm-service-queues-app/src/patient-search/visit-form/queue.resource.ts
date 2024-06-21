@@ -2,7 +2,7 @@ import { openmrsFetch, restBaseUrl, toDateObjectStrict, toOmrsIsoString } from '
 import { generateVisitQueueNumber } from '../../active-visits/active-visits-table.resource';
 import { type Appointment } from '../../types';
 
-export async function addQueueEntry(
+export async function postQueueEntry(
   visitUuid: string,
   patientUuid: string,
   priority: string,

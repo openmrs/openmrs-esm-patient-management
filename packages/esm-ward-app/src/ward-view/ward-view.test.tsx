@@ -1,4 +1,11 @@
-import { getDefaultsFromConfigSchema, useConfig, useSession } from '@openmrs/esm-framework';
+import {
+  type Person,
+  type ConfigSchema,
+  getDefaultsFromConfigSchema,
+  useConfig,
+  useSession,
+  useFeatureFlag,
+} from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
@@ -8,9 +15,16 @@ import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
+import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
+
+jest.replaceProperty(mockPatientAlice.person as Person, 'preferredName', {
+  uuid: '',
+  givenName: 'Alice',
+  familyName: 'Johnson',
+});
 
 jest.mocked(useConfig).mockReturnValue({
-  ...getDefaultsFromConfigSchema(configSchema),
+  ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
 });
 
 const mockedSessionLocation = { uuid: 'abcd', display: 'mock location', links: [] };
@@ -19,6 +33,8 @@ jest.mocked(useSession).mockReturnValue({
   authenticated: true,
   sessionId: 'sessionId',
 });
+
+const mockedUseFeatureFlag = useFeatureFlag as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
@@ -63,5 +79,20 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const emptyBedCards = await screen.findAllByText(/empty bed/i);
     expect(emptyBedCards).toHaveLength(3);
+  });
+
+  it('renders notification for invalid location uuid', () => {
+    mockedUseParams.mockReturnValueOnce({ locationUuid: 'invalid-uuid' });
+    renderWithSwr(<WardView />);
+    const notification = screen.getByRole('status');
+    expect(notification).toBeInTheDocument();
+    const invalidText = screen.getByText('Unknown location uuid: invalid-uuid');
+    expect(invalidText).toBeInTheDocument();
+  });
+
+  it('screen should be empty if backend module is not installed', () => {
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
+    const { container } = renderWithSwr(<WardView />);
+    expect(container.firstChild).not.toBeInTheDocument();
   });
 });
