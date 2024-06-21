@@ -1,11 +1,11 @@
 import { Tag } from '@carbon/react';
 import {
+  age,
   ConfigurableLink,
   ExtensionSlot,
-  PatientPhoto,
-  age,
   getPatientName,
   interpolateString,
+  PatientPhoto,
   useConfig,
 } from '@openmrs/esm-framework';
 import classNames from 'classnames';
@@ -109,7 +109,7 @@ const CompactPatientBanner = forwardRef<HTMLDivElement, CompactPatientBannerProp
           ? [preferredIdentifier, ...configuredIdentifiers]
           : configuredIdentifiers;
 
-        const patientName = displayName(patient);
+        const patientName = getPatientName(patient);
 
         return (
           <ClickablePatientContainer key={patient.id} patient={patients[index]}>
