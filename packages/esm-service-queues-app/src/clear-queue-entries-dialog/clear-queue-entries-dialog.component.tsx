@@ -2,10 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
 import { type QueueEntry } from '../types';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
 import styles from './clear-queue-entries-dialog.scss';
+import { emitRefetchQueuesEvent } from '../helpers/http-events';
 
 interface ClearQueueEntriesDialogProps {
   queueEntries: Array<QueueEntry>;
@@ -14,7 +14,6 @@ interface ClearQueueEntriesDialogProps {
 
 const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queueEntries, closeModal }) => {
   const { t } = useTranslation();
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClearQueueBatchRequest = useCallback(() => {
@@ -28,7 +27,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
           kind: 'success',
           subtitle: t('queuesClearedSuccessfully', 'Queues cleared successfully'),
         });
-        mutateQueueEntries();
+        emitRefetchQueuesEvent();
       },
       (error) => {
         showSnackbar({
@@ -40,7 +39,7 @@ const ClearQueueEntriesDialog: React.FC<ClearQueueEntriesDialogProps> = ({ queue
         closeModal();
       },
     );
-  }, [closeModal, mutateQueueEntries, t, queueEntries]);
+  }, [closeModal, t, queueEntries]);
 
   return (
     <div>
