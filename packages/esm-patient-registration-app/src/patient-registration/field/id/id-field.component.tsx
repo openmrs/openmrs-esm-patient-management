@@ -3,58 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType, useConfig, isDesktop, UserHasAccess } from '@openmrs/esm-framework';
+import IdentifierInput from '../../input/custom-input/identifier/identifier-input.component';
 import IdentifierSelectionOverlay from './identifier-selection-overlay.component';
-import { IdentifierInput } from '../../input/custom-input/identifier/identifier-input.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import {
-  type FormValues,
-  type IdentifierSource,
-  type PatientIdentifierType,
-  type PatientIdentifierValue,
-} from '../../patient-registration.types';
 import { ResourcesContext } from '../../../offline.resources';
+import { initializeIdentifier } from './identifier-utils';
 import styles from '../field.scss';
-
-export function setIdentifierSource(
-  identifierSource: IdentifierSource,
-  identifierValue: string,
-  initialValue: string,
-): {
-  identifierValue: string;
-  autoGeneration: boolean;
-  selectedSource: IdentifierSource;
-} {
-  const autoGeneration = identifierSource?.autoGenerationOption?.automaticGenerationEnabled;
-  return {
-    selectedSource: identifierSource,
-    autoGeneration,
-    identifierValue: autoGeneration
-      ? 'auto-generated'
-      : identifierValue !== 'auto-generated'
-        ? identifierValue
-        : initialValue,
-  };
-}
-
-export function initializeIdentifier(identifierType: PatientIdentifierType, identifierProps): PatientIdentifierValue {
-  return {
-    identifierTypeUuid: identifierType.uuid,
-    identifierName: identifierType.name,
-    preferred: identifierType.isPrimary,
-    initialValue: '',
-    required: identifierType.isPrimary || identifierType.required,
-    ...identifierProps,
-    ...setIdentifierSource(
-      identifierProps?.selectedSource ?? identifierType.identifierSources?.[0],
-      identifierProps?.identifierValue,
-      identifierProps?.initialValue ?? '',
-    ),
-  };
-}
-
-export function deleteIdentifierType(identifiers: FormValues['identifiers'], identifierFieldName) {
-  return Object.fromEntries(Object.entries(identifiers).filter(([fieldName]) => fieldName !== identifierFieldName));
-}
 
 export const Identifiers: React.FC = () => {
   const { identifierTypes } = useContext(ResourcesContext);

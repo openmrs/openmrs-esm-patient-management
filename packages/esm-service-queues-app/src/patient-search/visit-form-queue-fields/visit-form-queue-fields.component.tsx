@@ -15,7 +15,7 @@ import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework
 import { useQueues } from '../../hooks/useQueues';
 import { useQueueLocations } from '../hooks/useQueueLocations';
 import { type ConfigObject } from '../../config-schema';
-import { AddPatientToQueueContext } from '../patient-search.workspace';
+import { AddPatientToQueueContext } from '../context/addPatientToQueueContext';
 import styles from './visit-form-queue-fields.scss';
 
 export interface VisitFormQueueFieldsProps {

@@ -1,7 +1,7 @@
 import React, { type ChangeEvent, useCallback, useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useField } from 'formik';
+import { useTranslation } from 'react-i18next';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';

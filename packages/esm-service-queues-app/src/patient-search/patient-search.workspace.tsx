@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from 'react';
-
-import { SearchTypes } from '../types';
-import PatientScheduledVisits from './patient-scheduled-visits.component';
-import VisitForm from './visit-form/visit-form.component';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 import {
+  getPatientName,
   ArrowLeftIcon,
-  type DefaultWorkspaceProps,
-  displayName,
   ErrorState,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
   PatientPhoto,
-  usePatient,
-  useVisit,
+  type DefaultWorkspaceProps,
 } from '@openmrs/esm-framework';
+import { SearchTypes } from '../types';
 import ExistingVisitFormComponent from './visit-form/existing-visit-form.component';
+import PatientScheduledVisits from './patient-scheduled-visits.component';
+import VisitForm from './visit-form/visit-form.component';
+import usePatientData from './hooks/usePatientData';
 import styles from './patient-search.scss';
-import { Button, DataTableSkeleton } from '@carbon/react';
-import { useScheduledVisits } from './hooks/useScheduledVisits';
-import isNil from 'lodash-es/isNil';
-import { useTranslation } from 'react-i18next';
 
 interface PatientSearchProps extends DefaultWorkspaceProps {
   selectedPatientUuid: string;
@@ -39,22 +35,14 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   handleBackToSearchList,
 }) => {
   const { t } = useTranslation();
-  const { patient } = usePatient(selectedPatientUuid);
-  const { activeVisit } = useVisit(selectedPatientUuid);
-  const [searchType, setSearchType] = useState<SearchTypes>(SearchTypes.SCHEDULED_VISITS);
+  const { patient, activeVisit, appointments, isLoading, isError, searchType, setSearchType, hasAppointments } =
+    usePatientData(selectedPatientUuid);
   const [showContactDetails, setContactDetails] = useState(false);
-  const { appointments, isLoading, isError } = useScheduledVisits(selectedPatientUuid);
-
-  const hasAppointments = !(isNil(appointments?.futureVisits) && isNil(appointments?.recentVisits));
 
   const backButtonDescription =
     searchType === SearchTypes.VISIT_FORM && hasAppointments
       ? t('backToScheduledVisits', 'Back to scheduled visits')
       : t('backToSearchResults', 'Back to search results');
-
-  const toggleSearchType = (searchType: SearchTypes) => {
-    setSearchType(searchType);
-  };
 
   const handleBackToAction = () => {
     if (searchType === SearchTypes.VISIT_FORM && hasAppointments) {
@@ -65,18 +53,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
   };
 
   useEffect(() => {
-    if (searchType === SearchTypes.SCHEDULED_VISITS && appointments && !hasAppointments) {
-      setSearchType(SearchTypes.VISIT_FORM);
-    }
-  }, [hasAppointments, appointments]);
-
-  useEffect(() => {
     if (searchType === SearchTypes.SEARCH_RESULTS) {
       handleBackToSearchList && handleBackToSearchList();
     }
   }, [searchType, handleBackToSearchList]);
 
-  const patientName = patient && displayName(patient);
+  const patientName = patient && getPatientName(patient);
+
   return patient ? (
     <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
       <div className={styles.patientBannerContainer}>
@@ -100,7 +83,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
           renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
           iconDescription={backButtonDescription}
           size="sm"
-          onClick={() => handleBackToAction()}>
+          onClick={handleBackToAction}>
           <span>{backButtonDescription}</span>
         </Button>
       </div>
@@ -112,14 +95,13 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
             {isError ? (
               <ErrorState headerTitle={t('errorFetchingAppointments', 'Error fetching appointments')} error={isError} />
             ) : null}
-
             {isLoading && !isError ? (
               <DataTableSkeleton role="progressbar" />
             ) : searchType === SearchTypes.SCHEDULED_VISITS && hasAppointments ? (
               <PatientScheduledVisits
                 appointments={appointments}
                 patientUuid={selectedPatientUuid}
-                toggleSearchType={toggleSearchType}
+                toggleSearchType={setSearchType}
                 closeWorkspace={closeWorkspace}
               />
             ) : searchType === SearchTypes.VISIT_FORM ? (

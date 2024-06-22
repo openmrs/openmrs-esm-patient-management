@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
-import { IdentifierInput } from './identifier-input.component';
+import IdentifierInput from './identifier-input.component';
 import { initialFormValues } from '../../../patient-registration.component';
-import { type PatientIdentifierType } from '../../../patient-registration-types';
+import { type PatientIdentifierType } from '../../../patient-registration.types';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');

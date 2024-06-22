@@ -6,7 +6,7 @@ import { TrashCan, Edit, Reset } from '@carbon/react/icons';
 import { ResourcesContext } from '../../../../offline.resources';
 import { showModal, useConfig, UserHasAccess } from '@openmrs/esm-framework';
 import { shouldBlockPatientIdentifierInOfflineMode } from './utils';
-import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/id-field.component';
+import { deleteIdentifierType, setIdentifierSource } from '../../../field/id/identifier-utils';
 import { type PatientIdentifierValue } from '../../../patient-registration.types';
 import { PatientRegistrationContext } from '../../../patient-registration-context';
 import { Input } from '../../basic-input/input/input.component';
@@ -17,7 +17,7 @@ interface IdentifierInputProps {
   fieldName: string;
 }
 
-export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
+const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentifier, fieldName }) => {
   const { t } = useTranslation();
   const { defaultPatientIdentifierTypes } = useConfig();
   const { identifierTypes } = useContext(ResourcesContext);
@@ -154,3 +154,5 @@ export const IdentifierInput: React.FC<IdentifierInputProps> = ({ patientIdentif
     </div>
   );
 };
+
+export default IdentifierInput;

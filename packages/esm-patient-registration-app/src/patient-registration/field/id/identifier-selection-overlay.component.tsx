@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, Checkbox, Search, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { Button, ButtonSet, Checkbox, RadioButton, RadioButtonGroup, Search } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type FormValues, type PatientIdentifierType, PatientIdentifierValue } from '../../patient-registration.types';
 import Overlay from '../../ui-components/overlay/overlay.component';
@@ -10,7 +10,7 @@ import {
   isUniqueIdentifierTypeForOffline,
   shouldBlockPatientIdentifierInOfflineMode,
 } from '../../input/custom-input/identifier/utils';
-import { initializeIdentifier, setIdentifierSource } from './id-field.component';
+import { initializeIdentifier, setIdentifierSource } from './identifier-utils';
 import styles from './identifier-selection.scss';
 
 interface PatientIdentifierOverlayProps {
@@ -107,11 +107,11 @@ const PatientIdentifierOverlay: React.FC<PatientIdentifierOverlayProps> = ({ clo
             />
             {patientIdentifier &&
               identifierType?.identifierSources?.length > 0 &&
-              /* 
+              /*
                 This check are for the cases when there's an initialValue identifier is assigned
                 to the patient
                 The corresponding flow is like:
-                1. If there's no change to the actual initial identifier, then the source remains null, 
+                1. If there's no change to the actual initial identifier, then the source remains null,
                 hence the list of the identifier sources shouldn't be displayed.
                 2. If user wants to edit the patient identifier's value, hence there will be an initialValue,
                 along with a source assigned to itself(only if the identifierType has sources, else there's nothing to worry about), which by

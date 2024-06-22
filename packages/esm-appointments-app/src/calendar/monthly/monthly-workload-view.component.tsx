@@ -1,14 +1,15 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import dayjs, { type Dayjs } from 'dayjs';
+import { Popover, PopoverContent } from '@carbon/react';
+import { User } from '@carbon/react/icons';
+import { useTranslation } from 'react-i18next';
 import { navigate, useLayoutType } from '@openmrs/esm-framework';
+import { type DailyAppointmentsCountByService } from '../../types';
 import { isSameMonth } from '../../helpers';
 import { spaHomePage } from '../../constants';
-import styles from './monthly-view-workload.scss';
-import { type DailyAppointmentsCountByService } from '../../types';
 import SelectedDateContext from '../../hooks/selectedDateContext';
-import { User } from '@carbon/react/icons';
-import MonthlyWorkloadViewExpanded from './monthly-workload-view-expanded.component';
+import styles from './monthly-view-workload.scss';
 
 export interface MonthlyWorkloadViewProps {
   events: Array<DailyAppointmentsCountByService>;
@@ -17,8 +18,11 @@ export interface MonthlyWorkloadViewProps {
 }
 
 const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, events, showAllServices = false }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
   const { selectedDate } = useContext(SelectedDateContext);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const popoverRef = useRef(null);
 
   const currentData = useMemo(
     () =>
@@ -47,6 +51,20 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
   const navigateToAppointmentsByDate = (serviceUuid: string) => {
     navigate({ to: `${spaHomePage}/appointments/${dayjs(dateTime).format('YYYY-MM-DD')}/${serviceUuid}` });
   };
+
+  const handleClickOutside = (event) => {
+    if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div
@@ -90,11 +108,16 @@ const MonthlyWorkloadView: React.FC<MonthlyWorkloadViewProps> = ({ dateTime, eve
                 </div>
               ))}
               {hasHiddenServices ? (
-                <MonthlyWorkloadViewExpanded
-                  count={currentData.services.length - (layout === 'small-desktop' ? 2 : 4)}
-                  events={events}
-                  dateTime={dateTime}
-                />
+                <Popover open={isOpen} align="top" ref={popoverRef}>
+                  <button className={styles.showMoreItems} onClick={() => setIsOpen((prev) => !prev)}>
+                    {t('countMore', '{{count}} more', {
+                      count: currentData.services.length - (layout === 'small-desktop' ? 2 : 4),
+                    })}
+                  </button>
+                  <PopoverContent>
+                    <MonthlyWorkloadView events={events} dateTime={dateTime} showAllServices={true} />
+                  </PopoverContent>
+                </Popover>
               ) : (
                 ''
               )}
