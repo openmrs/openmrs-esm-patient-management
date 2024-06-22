@@ -24,10 +24,10 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { datePickerFormat, datePickerPlaceHolder, time12HourFormatRegexPattern } from '../../constants';
 import { convertTime12to24, type amPm } from '../../helpers/time-helpers';
-import { useMutateQueueEntries } from '../../hooks/useMutateQueueEntries';
 import { useQueues } from '../../hooks/useQueues';
 import { type QueueEntry } from '../../types';
 import styles from './queue-entry-actons-modal.scss';
+import { emitRefetchQueuesEvent } from '../../helpers/http-events';
 
 interface QueueEntryActionModalProps {
   queueEntry: QueueEntry;
@@ -66,7 +66,6 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
   modalParams,
 }) => {
   const { t } = useTranslation();
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const {
     modalTitle,
     modalInstruction,
@@ -154,7 +153,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
             kind: 'success',
             subtitle: submitSuccessText,
           });
-          mutateQueueEntries();
+          emitRefetchQueuesEvent();
           closeModal();
         } else {
           throw { message: t('unexpectedServerResponse', 'Unexpected Server Response') };
