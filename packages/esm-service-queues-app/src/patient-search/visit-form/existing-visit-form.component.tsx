@@ -10,10 +10,10 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { postQueueEntry } from '../../active-visits/active-visits-table.resource';
-import { useMutateQueueEntries } from '../../hooks/useQueueEntries';
 import styles from './visit-form.scss';
 import classNames from 'classnames';
 import VisitFormQueueFields from '../visit-form-queue-fields/visit-form-queue-fields.component';
+import { emitRefetchQueuesEvent } from '../../helpers/http-events';
 
 interface ExistingVisitFormProps {
   closeWorkspace: () => void;
@@ -27,7 +27,6 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
 
   const config = useConfig<ConfigObject>();
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const { mutateQueueEntries } = useMutateQueueEntries();
   const [{ service, priority, status, sortWeight, queueLocation }, setVisitFormFields] = useState({
     service: null,
     priority: null,
@@ -62,7 +61,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
             });
             closeWorkspace();
             setIsSubmitting(false);
-            mutateQueueEntries();
+            emitRefetchQueuesEvent();
           }
         },
         (error) => {
@@ -80,7 +79,7 @@ const ExistingVisitForm: React.FC<ExistingVisitFormProps> = ({ visit, closeWorks
         },
       );
     },
-    [closeWorkspace, mutateQueueEntries, visit, t, visitQueueNumberAttributeUuid],
+    [closeWorkspace, visit, t, visitQueueNumberAttributeUuid],
   );
 
   return visit ? (
