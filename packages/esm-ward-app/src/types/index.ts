@@ -54,7 +54,7 @@ export interface BedLayout {
   status: BedStatus;
   bedType: BedType;
   location: string;
-  patient: Patient;
+  patients: Patient[];
   bedTagMaps: BedTagMap[];
 }
 
