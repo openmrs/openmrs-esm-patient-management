@@ -13,12 +13,12 @@ jest.mocked(useConfig).mockReturnValue(defaultConfig);
 const mockBedLayouts = filterBeds(mockAdmissionLocation);
 
 const mockBedToUse = mockBedLayouts[0];
-jest.replaceProperty(mockBedToUse.patient.person, 'preferredName', {
+jest.replaceProperty(mockBedToUse.patients[0].person, 'preferredName', {
   uuid: '',
   givenName: 'Alice',
   familyName: 'Johnson',
 });
-const mockPatient = mockBedToUse.patient;
+const mockPatient = mockBedToUse.patients[0];
 const mockBed = bedLayoutToBed(mockBedToUse);
 
 describe('Occupied bed: ', () => {
