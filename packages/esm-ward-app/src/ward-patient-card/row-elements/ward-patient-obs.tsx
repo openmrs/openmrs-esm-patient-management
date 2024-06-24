@@ -7,13 +7,7 @@ import { useObs } from '../../hooks/useObs';
 import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
 import { moduleName } from '../../constant';
-
-// prettier-ignore
-const obsCustomRepresentation = 
-  'custom:(uuid,display,obsDatetime,value,' + 
-    'concept:(uuid,display),' + 
-    'encounter:(uuid,display,' + 
-      'visit:(uuid,display)))';
+import { obsCustomRepresentation } from './ward-patient-obs.resource';
 
 const wardPatientObs = (config: PatientObsElementConfig) => {
   const WardPatientObs: WardPatientCardElement = ({ patient, visit }) => {
@@ -40,8 +34,7 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
       const obsNodes = obsToDisplay?.map((o) => {
         const { value } = o;
         const display: any = (value as OpenmrsResource)?.display ?? o.value;
-
-        return <span> {display} </span>;
+        return <span key={o.uuid}> {display} </span>;
       });
 
       return (
