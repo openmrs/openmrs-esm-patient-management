@@ -113,18 +113,16 @@ function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusP
   }
   return (
     <div className={styles.container}>
-      {allowedStatuses
-        ?.reverse()
-        ?.map((status) => (
-          <QueueTableForQueueAndStatus
-            isValidating={isValidating}
-            key={status.uuid}
-            queueEntries={queueEntries}
-            searchTerm={searchTerm}
-            queue={selectedQueue}
-            status={status}
-          />
-        ))}
+      {allowedStatuses?.map((status) => (
+        <QueueTableForQueueAndStatus
+          isValidating={isValidating}
+          key={status.uuid}
+          queueEntries={queueEntries}
+          searchTerm={searchTerm}
+          queue={selectedQueue}
+          status={status}
+        />
+      ))}
     </div>
   );
 }
