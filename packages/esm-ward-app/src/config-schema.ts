@@ -58,7 +58,7 @@ export const configSchema: ConfigSchema = {
             _description: 'Config for the patientCardElementType "patient-obs"',
             conceptUuid: {
               _type: Type.UUID,
-              _description: 'Required. Defines which observation to show',
+              _description: 'Required. Identifies the concept to use to identify the desired observations.',
               _default: null,
             },
             label: {
@@ -95,7 +95,7 @@ export const configSchema: ConfigSchema = {
             _description: 'Config for the patientCardElementType "patient-coded-obs"',
             conceptUuid: {
               _type: Type.UUID,
-              _description: 'Required. Defines which observation to show',
+              _description: 'Required. Identifies the concept to use to identify the desired observations.',
               _default: null,
             },
             summaryLabel: {
@@ -220,7 +220,7 @@ export interface PatientAddressElementConfig {
 
 export interface PatientObsElementConfig {
   /**
-   * Required. Defines which observation to show
+   * Required. Identifies the concept to use to identify the desired observations.
    */
   conceptUuid: string;
 
@@ -253,7 +253,7 @@ export interface PatientObsElementConfig {
 
 export interface PatientCodedObsElementConfig {
   /**
-   * Required. Defines which observation to show
+   * Required. Identifies the concept to use to identify the desired observations.
    */
   conceptUuid: string;
 
