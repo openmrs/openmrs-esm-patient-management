@@ -37,14 +37,18 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
         return <span key={o.uuid}> {display} </span>;
       });
 
-      return (
-        <div>
-          <span className={styles.wardPatientObsLabel}>
-            {labelToDisplay ? t('labelColon', '{{label}}:', { label: labelToDisplay }) : ''}
-          </span>
-          {obsNodes}
-        </div>
-      );
+      if (obsNodes?.length > 0) {
+        return (
+          <div>
+            <span className={styles.wardPatientObsLabel}>
+              {labelToDisplay ? t('labelColon', '{{label}}:', { label: labelToDisplay }) : ''}
+            </span>
+            {obsNodes}
+          </div>
+        );
+      } else {
+        return null;
+      }
     }
   };
 

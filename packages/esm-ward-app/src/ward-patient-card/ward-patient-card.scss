@@ -23,6 +23,10 @@
   padding: spacing.$spacing-04;
 }
 
+.wardPatientCardRow:empty {
+  display: none;
+}
+
 .wardPatientCardHeader {
   @extend .dotSeparatedChildren;
   display: flex;

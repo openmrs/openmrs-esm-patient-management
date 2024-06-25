@@ -55,18 +55,22 @@ const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
       });
 
       const obsWithNoTagCount = obsNodes.filter((o) => o == null).length;
-      return (
-        <div>
-          <span className={styles.wardPatientObsLabel}>
-            {obsNodes}
-            {obsWithNoTagCount > 0 ? (
-              <Tag type={summaryLabelColor}>
-                {t('countItems', '{{count}} {{item}}', { count: obsWithNoTagCount, item: summaryLabelToDisplay })}
-              </Tag>
-            ) : null}
-          </span>
-        </div>
-      );
+      if (obsNodes?.length > 0 || obsWithNoTagCount > 0) {
+        return (
+          <div>
+            <span className={styles.wardPatientObsLabel}>
+              {obsNodes}
+              {obsWithNoTagCount > 0 ? (
+                <Tag type={summaryLabelColor}>
+                  {t('countItems', '{{count}} {{item}}', { count: obsWithNoTagCount, item: summaryLabelToDisplay })}
+                </Tag>
+              ) : null}
+            </span>
+          </div>
+        );
+      } else {
+        return null;
+      }
     }
   };
 
