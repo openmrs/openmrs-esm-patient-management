@@ -126,3 +126,9 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   description?: string;
   retired?: boolean;
 }
+
+export interface WardMetrics {
+  patients: string;
+  freeBeds: string;
+  capacity: string;
+}

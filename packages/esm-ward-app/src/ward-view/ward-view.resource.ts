@@ -1,4 +1,4 @@
-import type { AdmissionLocation, Bed, BedLayout } from '../types';
+import type { AdmissionLocation, Bed, BedLayout, WardMetrics } from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -21,4 +21,20 @@ export function filterBeds(admissionLocation: AdmissionLocation): BedLayout[] {
     .filter((bl) => bl.bedId)
     .sort((bedA, bedB) => collator.compare(bedA.bedNumber, bedB.bedNumber));
   return bedLayouts;
+}
+
+//TODO: This implementation will change when the api is ready
+export function getWardMetrics(beds: Bed[]): WardMetrics {
+  const bedMetrics = {
+    patients: '--',
+    freeBeds: '--',
+    capacity: '--',
+  };
+  if (beds.length == 0) return bedMetrics;
+  const total = beds.length;
+  const occupiedBeds = beds.filter((bed) => bed.status === 'OCCUPIED');
+  const patients = occupiedBeds.length;
+  const freeBeds = total - patients;
+  const capacity = total != 0 ? Math.trunc((patients / total) * 100) : 0;
+  return { patients: patients.toString(), freeBeds: freeBeds.toString(), capacity: capacity.toString() + '%' };
 }

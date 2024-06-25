@@ -8,6 +8,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
+import WardViewHeader from '../ward-view-header/ward-view-header.component';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -25,12 +26,7 @@ const WardView = () => {
 
   return (
     <div className={styles.wardView}>
-      <div className={styles.wardViewHeader}>
-        <div className={styles.wardViewHeaderLocationDisplay}>
-          <h4>{location?.display}</h4>
-        </div>
-        <div className={styles.wardViewHeaderAdmissionRequestMenuBar}>{/* TODO: Admission Request bar */}</div>
-      </div>
+      <WardViewHeader location={location.display} />
       <div className={styles.wardViewMain}>
         {invalidLocation ? (
           <InlineNotification

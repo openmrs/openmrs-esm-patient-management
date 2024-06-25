@@ -1,0 +1,7 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.metricsContainer {
+  display: flex;
+  align-items: end;
+}
