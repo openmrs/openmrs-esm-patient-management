@@ -1,7 +1,8 @@
 import React, { type ChangeEvent, useCallback, useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
+import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
+import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
@@ -46,8 +47,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: Date) => {
-      setFieldValue('birthdate', birthdate);
+    (birthdate: CalendarDate) => {
+      setFieldValue('birthdate', birthdate.toDate(getLocalTimeZone()));
     },
     [setFieldValue],
   );
@@ -104,16 +105,11 @@ export const DobField: React.FC = () => {
             <OpenmrsDatePicker
               id="birthdate"
               {...birthdate}
-              dateFormat={dateFormat}
               onChange={onDateChange}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
               value={birthdate.value}
-              carbonOptions={{
-                placeholder: placeHolder,
-              }}
             />
           </div>
         ) : (

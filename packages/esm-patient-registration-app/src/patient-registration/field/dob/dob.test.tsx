@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -20,6 +21,18 @@ jest.mock('@openmrs/esm-framework', () => {
       },
     })),
     getLocale: jest.fn().mockReturnValue('en'),
+    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+      return (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
+            onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
+          />
+        </>
+      );
+    }),
   };
 });
 
@@ -41,7 +54,7 @@ describe('Dob', () => {
 
     renderDob();
 
-    const dateInput = screen.getByRole('textbox', { name: /date of birth/i });
+    const dateInput = screen.getByLabelText(/Date of birth/i);
     expect(dateInput).toBeInTheDocument();
 
     await user.type(dateInput, '10/10/2022');
