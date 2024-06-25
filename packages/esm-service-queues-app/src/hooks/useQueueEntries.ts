@@ -99,6 +99,11 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
       if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
         setTotalCount(pageData?.data?.totalCount);
       }
+      //edge case when the new Data is an empty array E.g. you deleted the last patient, or you cleared the queue
+      if (pageData?.data?.totalCount === 0) {
+        setTotalCount(0);
+        setData([]);
+      }
       if (pageData?.data?.results?.length) {
         const newData = [...data];
         newData[currentPage] = pageData?.data?.results;
