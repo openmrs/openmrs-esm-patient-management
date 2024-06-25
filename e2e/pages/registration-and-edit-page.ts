@@ -26,7 +26,7 @@ export class RegistrationAndEditPage {
   readonly middleNameInput = () => this.page.locator('#middleName');
   readonly familyNameInput = () => this.page.locator('#familyName');
   readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
-  readonly birthdateInput = () => this.page.locator('#birthdate');
+  readonly birthdateInput = () => this.page.locator('#birthdate > input');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');
   readonly countyDistrictInput = () => this.page.locator('#countyDistrict');
