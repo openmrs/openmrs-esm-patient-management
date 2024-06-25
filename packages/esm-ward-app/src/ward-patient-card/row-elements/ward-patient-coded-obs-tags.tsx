@@ -2,7 +2,7 @@ import { SkeletonText, Tag } from '@carbon/react';
 import { translateFrom, type OpenmrsResource } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { type PatientCodedObsElementConfig } from '../../config-schema';
+import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
 import { moduleName } from '../../constant';
 import { useObs } from '../../hooks/useObs';
 import { type WardPatientCardElement } from '../../types';
@@ -10,7 +10,7 @@ import styles from '../ward-patient-card.scss';
 import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient-obs.resource';
 
 /**
- * The WardPatientCodedObs displays observations of coded values from a particular concept in the active visit.
+ * The WardPatientCodedObsTags displays observations of coded values of a particular concept in the active visit as tags.
  * Typically, these are taken from checkbox fields from a form. Each answer value can either be configured
  * to show as its own tag, or collapsed into a summary tag show the number of these values present.
  *
@@ -19,8 +19,8 @@ import { obsCustomRepresentation, useConceptToTagColorMap } from './ward-patient
  * @param config
  * @returns
  */
-const wardPatientCodedObs = (config: PatientCodedObsElementConfig) => {
-  const WardPatientCodedObs: WardPatientCardElement = ({ patient, visit }) => {
+const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
+  const WardPatientCodedObsTags: WardPatientCardElement = ({ patient, visit }) => {
     const { conceptUuid, summaryLabel, summaryLabelColor, summaryLabelI18nModule } = config;
     const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
     const { t } = useTranslation();
@@ -70,7 +70,7 @@ const wardPatientCodedObs = (config: PatientCodedObsElementConfig) => {
     }
   };
 
-  return WardPatientCodedObs;
+  return WardPatientCodedObsTags;
 };
 
-export default wardPatientCodedObs;
+export default wardPatientCodedObsTags;

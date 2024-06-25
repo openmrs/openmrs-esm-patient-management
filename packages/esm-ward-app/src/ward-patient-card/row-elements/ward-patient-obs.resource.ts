@@ -1,6 +1,6 @@
 import { openmrsFetch, restBaseUrl, type Concept } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { type PatientCodedObsElementConfig } from '../../config-schema';
+import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
 
 // prettier-ignore
 export const obsCustomRepresentation = 
@@ -12,13 +12,13 @@ export const obsCustomRepresentation =
 //  get the setMembers of a concept set
 const conceptSetCustomRepresentation = 'custom:(uuid,setMembers:(uuid))';
 
-export function useConceptToTagColorMap(codedObsConfig: PatientCodedObsElementConfig) {
+export function useConceptToTagColorMap(codedObsTagsConfig: PatientCodedObsTagsElementConfig) {
   // fetch the members of the concept sets and process the data
   // to return conceptToTagColorMap (wrapped in a promise).
   // Let swr cache the result of this function.
   const fetchAndMap = (url: string) => {
     const conceptSetToTagColorMap = new Map<string, string>();
-    for (const tag of codedObsConfig.tags) {
+    for (const tag of codedObsTagsConfig.tags) {
       const { color, appliedToConceptSets } = tag;
       for (const answer of appliedToConceptSets ?? []) {
         if (!conceptSetToTagColorMap.has(answer)) {
@@ -44,7 +44,7 @@ export function useConceptToTagColorMap(codedObsConfig: PatientCodedObsElementCo
     });
   };
 
-  const conceptSetUuids = codedObsConfig.tags.flatMap((tag) => tag.appliedToConceptSets);
+  const conceptSetUuids = codedObsTagsConfig.tags.flatMap((tag) => tag.appliedToConceptSets);
   const apiUrl = `${restBaseUrl}/concept?references=${conceptSetUuids.join()}&v=${conceptSetCustomRepresentation}`;
   const conceptToTagColorMap = useSWRImmutable(apiUrl, fetchAndMap);
 

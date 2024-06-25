@@ -19,7 +19,7 @@ export const defaultPatientCardElementConfig: PatientCardElementConfig = {
     addressFields: defaultPatientAddressFields,
   },
   obs: null,
-  codedObs: null,
+  codedObsTags: null,
 };
 
 export const builtInPatientCardElements: PatientCardElementType[] = [
@@ -91,8 +91,8 @@ export const configSchema: ConfigSchema = {
               _default: false,
             },
           },
-          codedObs: {
-            _description: 'Config for the patientCardElementType "patient-coded-obs"',
+          codedObsTags: {
+            _description: 'Config for the patientCardElementType "patient-coded-obs-tags"',
             conceptUuid: {
               _type: Type.UUID,
               _description: 'Required. Identifies the concept to use to identify the desired observations.',
@@ -251,7 +251,7 @@ export interface PatientObsElementConfig {
   onlyWithinCurrentVisit?: boolean;
 }
 
-export interface PatientCodedObsElementConfig {
+export interface PatientCodedObsTagsElementConfig {
   /**
    * Required. Identifies the concept to use to identify the desired observations.
    */
@@ -298,5 +298,5 @@ export interface PatientCodedObsElementConfig {
 export type PatientCardElementConfig = {
   address: PatientAddressElementConfig;
   obs: PatientObsElementConfig;
-  codedObs: PatientCodedObsElementConfig;
+  codedObsTags: PatientCodedObsTagsElementConfig;
 };
