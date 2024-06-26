@@ -4,7 +4,7 @@ import styles from './admission-requests.scss';
 import { launchWorkspace, showNotification } from '@openmrs/esm-framework';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import { useParams } from 'react-router-dom';
-import { ButtonSkeleton } from '@carbon/react';
+import { SkeletonIcon } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 
 const AdmissionRequestsBar = () => {
@@ -13,8 +13,8 @@ const AdmissionRequestsBar = () => {
   const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
   const { t } = useTranslation();
 
-  if (isLoading) {
-    return <ButtonSkeleton />;
+  if (true) {
+    return <SkeletonIcon className={styles.skeleton} />;
   }
 
   if (error) {
