@@ -51,18 +51,18 @@ describe('Dob', () => {
 
   // TODO : Fix this test case.
   // Disabling this test case for now as it doesn't work as expected when mocking the date picker
-  // it('typing in the date picker input sets the date of birth', async () => {
-  //   const user = userEvent.setup();
+  it.skip('typing in the date picker input sets the date of birth', async () => {
+    const user = userEvent.setup();
 
-  //   renderDob();
+    renderDob();
 
-  //   const dateInput = screen.getByLabelText(/Date of birth/i);
-  //   expect(dateInput).toBeInTheDocument();
+    const dateInput = screen.getByLabelText(/Date of birth/i);
+    expect(dateInput).toBeInTheDocument();
 
-  //   await user.type(dateInput, '10/10/2022');
+    await user.type(dateInput, '10/10/2022');
 
-  //   expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
-  // });
+    expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
+  });
 });
 
 function renderDob() {
