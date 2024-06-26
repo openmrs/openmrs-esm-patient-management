@@ -49,7 +49,7 @@ describe('Dob', () => {
     expect(screen.getByRole('textbox', { name: /date of birth/i })).toBeInTheDocument();
   });
 
-  // TODO : Fix this test case.
+  // TODO O3-3482: Fix this test case.
   // Disabling this test case for now as it doesn't work as expected when mocking the date picker
   it.skip('typing in the date picker input sets the date of birth', async () => {
     const user = userEvent.setup();
