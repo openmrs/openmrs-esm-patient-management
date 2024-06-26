@@ -61,7 +61,9 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
         {bedLayouts.map((bedLayout, i) => {
           const { patient } = bedLayout;
           const bed = bedLayoutToBed(bedLayout);
-          return <WardBed key={bed.uuid} bed={bed} patients={patient ? [patient] : null} />;
+
+          // TODO: replace visit field with real value fetched from useAdmissionLocation (or replacement API)
+          return <WardBed key={bed.uuid} bed={bed} patientInfos={patient ? [{ patient, visit: null }] : null} />;
         })}
         {bedLayouts.length == 0 && (
           <InlineNotification

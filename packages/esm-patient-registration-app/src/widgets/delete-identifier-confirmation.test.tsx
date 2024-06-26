@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation-modal';
+import DeleteIdentifierConfirmationModal from './delete-identifier-confirmation.modal';
 
 describe('DeleteIdentifierConfirmationModal component', () => {
   const mockDeleteIdentifier = jest.fn();

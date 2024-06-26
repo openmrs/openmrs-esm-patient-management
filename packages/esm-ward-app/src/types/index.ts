@@ -10,6 +10,7 @@ import type React from 'react';
 
 export interface WardPatientCardProps {
   patient: Patient;
+  visit: Visit;
   bed: Bed;
 }
 
@@ -21,6 +22,7 @@ export const patientCardElementTypes = [
   'patient-name',
   'patient-age',
   'patient-address',
+  'patient-obs',
   'admission-time',
   'patient-identifier',
 ] as const;
@@ -84,6 +86,7 @@ export interface Observation extends OpenmrsResourceStrict {
   obsDatetime: string;
   accessionNumber: string;
   obsGroup: Observation;
+  value: number | string | boolean | OpenmrsResource;
   valueCodedName: OpenmrsResource; // ConceptName
   groupMembers: Array<Observation>;
   comment: string;
@@ -99,7 +102,7 @@ export interface Encounter extends OpenmrsResourceStrict {
   location?: Location;
   form?: OpenmrsResource;
   encounterType?: EncounterType;
-  obs?: Observation;
+  obs?: Array<Observation>;
   orders?: any;
   voided?: boolean;
   visit?: Visit;
