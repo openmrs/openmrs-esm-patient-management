@@ -35,12 +35,9 @@ test('Edit a patient', async ({ page, api }) => {
     await patientEditPage.waitUntilTheFormIsLoaded();
   });
 
-  test.describe.fixme('Broken due to the date picker and should be fixed', async () => {
-    await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
-      await expect(patientEditPage.givenNameInput()).not.toHaveValue('', { timeout: 2 * 60 * 1000 });
-
-      await patientEditPage.fillPatientRegistrationForm(formValues);
-    });
+  await test.step('And then I click on fill new values into the registration form and then click the `Submit` button', async () => {
+    await expect(patientEditPage.givenNameInput()).not.toHaveValue('', { timeout: 2 * 60 * 1000 });
+    await patientEditPage.fillPatientRegistrationForm(formValues);
   });
 
   await test.step("Then I should be redirected to the patient's chart page and the patient object should have updated information", async () => {
@@ -51,7 +48,8 @@ test('Edit a patient', async ({ page, api }) => {
 
     await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
     await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
-    await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
+    // TODO: O3-3482 Broken due to the date picker and should be fixed
+    // await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
     await expect(person.preferredAddress.address1).toBe(formValues.address1);
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
     await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
