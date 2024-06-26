@@ -171,8 +171,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const onDateChange = useCallback(
-    (birthdate: CalendarDate) => {
-      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
+    (date: CalendarDate) => {
+      setFieldValue(fieldName, date?.toDate(getLocalTimeZone()));
     },
     [setFieldValue],
   );
