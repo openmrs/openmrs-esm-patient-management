@@ -10,6 +10,7 @@ import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 import { PatientRegistrationContext } from '../../patient-registration-context';
+import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -170,8 +171,8 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
   const { setFieldValue } = useContext(PatientRegistrationContext);
 
   const onDateChange = useCallback(
-    (date: Date) => {
-      setFieldValue(fieldName, date);
+    (birthdate: CalendarDate) => {
+      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
     },
     [setFieldValue],
   );

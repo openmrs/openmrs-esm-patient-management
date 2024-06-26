@@ -272,7 +272,7 @@ describe('Registering a new patient', () => {
     expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
   });
 
-  // TODO : Fix this test case when OpenmrsDatePicker gets fixed on core
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('saves the patient without extra info', async () => {
     const user = userEvent.setup();
 
@@ -315,7 +315,7 @@ describe('Registering a new patient', () => {
     expect(mockedSavePatientForm).not.toHaveBeenCalled();
   });
 
-  // TODO : Fix this test case when OpenmrsDatePicker gets fixed on core
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
   it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
