@@ -3,7 +3,6 @@ import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
 import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
-import { generateFormatting } from '../../date-util';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
@@ -33,7 +32,6 @@ export const DobField: React.FC = () => {
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
   const { setFieldValue } = useContext(PatientRegistrationContext);
-  const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
   const today = new Date();
 
   const onToggle = useCallback(
@@ -48,7 +46,7 @@ export const DobField: React.FC = () => {
 
   const onDateChange = useCallback(
     (birthdate: CalendarDate) => {
-      setFieldValue('birthdate', birthdate.toDate(getLocalTimeZone()));
+      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
     },
     [setFieldValue],
   );
@@ -111,6 +109,9 @@ export const DobField: React.FC = () => {
               isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
               value={birthdate.value}
             />
+            {!!(birthdateMeta.touched && birthdateMeta.error) && (
+              <div className={styles.radioFieldError}>{birthdateMeta.error && t(birthdateMeta.error)}</div>
+            )}
           </div>
         ) : (
           <div className={styles.grid}>
