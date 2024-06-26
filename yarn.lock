@@ -2893,6 +2893,7 @@ __metadata:
     "@babel/core": "npm:^7.11.6"
     "@carbon/react": "npm:~1.37.0"
     "@hookform/resolvers": "npm:^3.3.1"
+    "@internationalized/date": "npm:^3.5.4"
     "@openmrs/esm-framework": "npm:next"
     "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:1.44.0"
