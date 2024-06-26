@@ -4,8 +4,8 @@ import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import React from 'react';
 import { renderWithSwr } from 'tools';
 import userEvent from '@testing-library/user-event';
-import UndoTransitionQueueEntryModal from './undo-transition-queue-entry-modal.component';
-import VoidQueueEntryModal from './void-queue-entry-modal.component';
+import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
+import VoidQueueEntryModal from './void-queue-entry.modal';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 

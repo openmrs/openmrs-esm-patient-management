@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type QueueEntry } from '../../types';
 import { voidQueueEntry } from './queue-entry-actions.resource';
-import QueueEntryConfirmActionModal from './queue-entry-confirm-action-modal.component';
+import QueueEntryConfirmActionModal from './queue-entry-confirm-action.modal';
 
 interface VoidQueueEntryModalProps {
   queueEntry: QueueEntry;

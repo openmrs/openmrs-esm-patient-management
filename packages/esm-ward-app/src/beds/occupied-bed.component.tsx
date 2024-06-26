@@ -1,23 +1,18 @@
-import React from 'react';
-import { type Patient } from '@openmrs/esm-framework';
-import { type Bed } from '../types';
-import styles from './occupied-bed.scss';
 import { Tag } from '@carbon/react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import WardPatientCard from '../ward-patient-card/ward-patient-card';
+import { type WardBedProps } from '../ward-view/ward-bed.component';
+import styles from './occupied-bed.scss';
 
-export interface OccupiedBedProps {
-  patients: Patient[];
-  bed: Bed;
-}
-const OccupiedBed: React.FC<OccupiedBedProps> = ({ patients, bed }) => {
+const OccupiedBed: React.FC<WardBedProps> = ({ patientInfos, bed }) => {
   return (
     <div className={styles.occupiedBed}>
-      {patients.map((patient, index: number) => {
-        const last = index === patients.length - 1;
+      {patientInfos.map(({ patient, visit }, index: number) => {
+        const last = index === patientInfos.length - 1;
         return (
           <div key={'occupied-bed-pt-' + patient.uuid}>
-            <WardPatientCard patient={patient} bed={bed} />
+            <WardPatientCard patient={patient} visit={visit} bed={bed} />
             {!last && <BedShareDivider />}
           </div>
         );
