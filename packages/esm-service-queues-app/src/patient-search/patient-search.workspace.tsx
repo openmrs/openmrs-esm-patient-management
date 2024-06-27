@@ -4,10 +4,10 @@ import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
-  ArrowLeftIcon,
   type DefaultWorkspaceProps,
-  displayName,
+  ArrowLeftIcon,
   ErrorState,
+  getPatientName,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
@@ -76,7 +76,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
     }
   }, [searchType, handleBackToSearchList]);
 
-  const patientName = patient && displayName(patient);
+  const patientName = patient && getPatientName(patient);
   return patient ? (
     <div className={styles.patientSearchContainer}>
       <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
