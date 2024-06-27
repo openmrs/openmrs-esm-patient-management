@@ -14,7 +14,7 @@ import useWardLocation from '../hooks/useWardLocation';
 
 const WardView = () => {
   const response = useWardLocation();
-  const { isLoadingLocation, errorFetchingLocation } = response;
+  const { isLoadingLocation, errorFetchingLocation, invalidLocation } = response;
 
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
@@ -24,7 +24,7 @@ const WardView = () => {
     return <></>;
   }
 
-  if (errorFetchingLocation) {
+  if (invalidLocation) {
     return <InlineNotification kind="error" title={t('invalidLocationSpecified', 'Invalid location specified')} />;
   }
 

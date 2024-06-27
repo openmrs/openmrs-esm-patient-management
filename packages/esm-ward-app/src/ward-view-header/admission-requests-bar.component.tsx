@@ -15,7 +15,7 @@ const AdmissionRequestsBar = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
 
-  if (isLoading || !admissionRequests.length) {
+  if (isLoading || !admissionRequests?.length) {
     return null;
   }
 
