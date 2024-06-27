@@ -1,5 +1,5 @@
-import { Type, validators, type ConfigSchema, type PersonAddress } from '@openmrs/esm-framework';
-import { patientCardElementTypes, type PatientCardElementType } from './types';
+import { type ConfigSchema, type PersonAddress, Type, validators } from '@openmrs/esm-framework';
+import { type PatientCardElementType, patientCardElementTypes } from './types';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
   id: 'default-card',
@@ -7,6 +7,10 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
     {
       rowType: 'header',
       elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address'],
+    },
+    {
+      rowType: 'waitingFor',
+      elements: ['hour-glass', 'patient-transfer'],
     },
   ],
   appliedTo: null,
@@ -18,6 +22,9 @@ export const defaultPatientCardElementConfig: PatientCardElementConfig = {
   address: {
     addressFields: defaultPatientAddressFields,
   },
+  orders: {
+    types: [],
+  },
   obs: null,
   codedObsTags: null,
 };
@@ -27,6 +34,8 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-name',
   'patient-age',
   'patient-address',
+  'hour-glass',
+  'patient-transfer',
 ];
 
 export const configSchema: ConfigSchema = {
@@ -52,6 +61,14 @@ export const configSchema: ConfigSchema = {
               _type: Type.Array,
               _description: 'defines which address fields to show',
               _default: defaultPatientAddressFields,
+            },
+          },
+          orders: {
+            _description: 'Config for the patientCardElementType "patient-pending-orders"',
+            types: {
+              _type: Type.Array,
+              _description: 'defines which order types that can be waited for',
+              _default: [],
             },
           },
           obs: {
@@ -191,9 +208,9 @@ export interface WardPatientCardDefinition {
   id: string;
   rows: Array<{
     /**
-     * The type of row. Currently, only "header" is supported
+     * The type of row. Currently, only "header" and "waiting-list" is supported
      */
-    rowType: 'header';
+    rowType: 'header' | 'waitingFor';
 
     /**
      * an array of (either built-in or custom) patient card element ids
@@ -216,6 +233,10 @@ export type PatientCardElementDefinition = {
 
 export interface PatientAddressElementConfig {
   addressFields: Array<keyof PersonAddress>;
+}
+
+export interface PatientPendingOrdersElementConfig {
+  types: Array<string>;
 }
 
 export interface PatientObsElementConfig {
@@ -297,6 +318,7 @@ export interface PatientCodedObsTagsElementConfig {
 
 export type PatientCardElementConfig = {
   address: PatientAddressElementConfig;
+  orders: PatientPendingOrdersElementConfig;
   obs: PatientObsElementConfig;
   codedObsTags: PatientCodedObsTagsElementConfig;
 };

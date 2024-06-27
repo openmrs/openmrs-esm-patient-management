@@ -1,10 +1,10 @@
 import {
+  type Location,
   type OpenmrsResource,
   type OpenmrsResourceStrict,
+  type Patient,
   type Person,
   type Visit,
-  type Location,
-  type Patient,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
@@ -25,6 +25,9 @@ export const patientCardElementTypes = [
   'patient-obs',
   'patient-coded-obs-tags',
   'admission-time',
+  'hour-glass',
+  'patient-transfer',
+  'patient-pending-orders',
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
@@ -36,6 +39,7 @@ export interface AdmissionLocation {
   ward: Location;
   bedLayouts: Array<BedLayout>;
 }
+
 export interface Bed {
   id: number;
   uuid: string;
@@ -90,6 +94,7 @@ export interface InpatientRequest {
   dispositionLocation?: Location;
   dispositionDate?: Date;
 }
+
 // TODO: Move these types to esm-core
 export interface Observation extends OpenmrsResourceStrict {
   concept: OpenmrsResource;
