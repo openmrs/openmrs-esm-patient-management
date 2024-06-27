@@ -101,7 +101,7 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
             renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
             iconDescription={backButtonDescription}
             size="sm"
-            onClick={() => handleBackToAction()}>
+            onClick={handleBackToAction}>
             <span>{backButtonDescription}</span>
           </Button>
         </div>
