@@ -1,0 +1,25 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.metric {
+  margin-left: spacing.$spacing-05;
+  display: flex;
+  align-items: end;
+  gap: 5px;
+}
+
+.metricName {
+  @include type.type-style('helper-text-01');
+  color: $color-gray-70;
+}
+
+.metricValue {
+  @include type.type-style('heading-03');
+  line-height: revert;
+}
+
+.skeleton {
+  height: 15px;
+  width: 15px;
+}
