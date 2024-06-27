@@ -2,6 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.patientSearchContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .patientBannerContainer {
   display: flex;
   flex-direction: column;

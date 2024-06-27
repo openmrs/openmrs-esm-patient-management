@@ -13,7 +13,7 @@ const AdmissionRequestsBar = () => {
   const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
   const { t } = useTranslation();
 
-  if (true) {
+  if (isLoading) {
     return <SkeletonIcon className={styles.skeleton} />;
   }
 

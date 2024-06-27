@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { Dropdown } from '@carbon/react';
@@ -11,6 +11,7 @@ import {
   updateSelectedQueueLocationName,
   updateSelectedServiceName,
   useSelectedQueueLocationName,
+  useSelectedQueueLocationUuid,
 } from '../helpers/helpers';
 import styles from './patient-queue-header.scss';
 
@@ -20,6 +21,7 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   const currentQueueLocationName = useSelectedQueueLocationName();
+  const currentQueueLocationUuid = useSelectedQueueLocationUuid();
 
   const handleQueueLocationChange = useCallback(({ selectedItem }) => {
     if (selectedItem.id === 'all') {
@@ -31,6 +33,29 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
       updateSelectedServiceName('All');
     }
   }, []);
+
+  useEffect(() => {
+    if (!isLoading && !error && !currentQueueLocationUuid) {
+      if (queueLocations.length === 1) {
+        handleQueueLocationChange({ selectedItem: queueLocations[0] });
+      }
+      if (queueLocations.some((location) => location.id === userSession?.sessionLocation?.uuid)) {
+        handleQueueLocationChange({
+          selectedItem: {
+            id: userSession?.sessionLocation?.uuid,
+            name: userSession?.sessionLocation?.display,
+          },
+        });
+      }
+    }
+  }, [
+    queueLocations,
+    currentQueueLocationName,
+    currentQueueLocationUuid,
+    isLoading,
+    error,
+    userSession?.sessionLocation?.uuid,
+  ]);
 
   return (
     <>
@@ -56,9 +81,11 @@ const PatientQueueHeader: React.FC<{ title?: string }> = ({ title }) => {
               className={styles.dropdown}
               id="queueLocationDropdown"
               label={currentQueueLocationName ?? t('all', 'All')}
-              items={[{ id: 'all', name: t('all', 'All') }, ...queueLocations]}
+              items={
+                queueLocations.length !== 1 ? [{ id: 'all', name: t('all', 'All') }, ...queueLocations] : queueLocations
+              }
               itemToString={(item) => (item ? item.name : '')}
-              titleText={t('view', 'View')}
+              titleText={t('location', 'Location')}
               type="inline"
               onChange={handleQueueLocationChange}
             />

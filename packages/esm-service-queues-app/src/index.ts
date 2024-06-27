@@ -91,7 +91,7 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/transition-queue-entry.modal'),
   {
     featureName: 'transfer patient to a different queue',
     moduleName,
@@ -99,7 +99,7 @@ export const transitionQueueEntryModal = getAsyncLifecycle(
 );
 
 export const editQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/edit-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/edit-queue-entry.modal'),
   {
     featureName: 'edit queue entry of a patient',
     moduleName,
@@ -107,7 +107,7 @@ export const editQueueEntryModal = getAsyncLifecycle(
 );
 
 export const undoTransitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry.modal'),
   {
     featureName: 'undo queue entry transiion of a patient',
     moduleName,
@@ -115,7 +115,7 @@ export const undoTransitionQueueEntryModal = getAsyncLifecycle(
 );
 
 export const voidQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/void-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/void-queue-entry.modal'),
   {
     featureName: 'void queue entry of a patient',
     moduleName,
@@ -123,7 +123,7 @@ export const voidQueueEntryModal = getAsyncLifecycle(
 );
 
 export const endQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/end-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/end-queue-entry.modal'),
   {
     featureName: 'end queue entry of a patient',
     moduleName,
@@ -131,7 +131,7 @@ export const endQueueEntryModal = getAsyncLifecycle(
 );
 
 // t('addNewQueueService', 'Add New Queue Service')
-export const addnewQueueServiceWorkspace = getAsyncLifecycle(
+export const addNewQueueServiceWorkspace = getAsyncLifecycle(
   () => import('./queue-services/queue-service-form.workspace'),
   {
     featureName: 'service-queues-service-form',
@@ -140,7 +140,7 @@ export const addnewQueueServiceWorkspace = getAsyncLifecycle(
 );
 
 // t('addNewQueueServiceRoom', 'Add new queue service room')
-export const addnewQueueServiceRoomWorkspace = getAsyncLifecycle(
+export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
   () => import('./queue-rooms/queue-room-form.workspace'),
   {
     featureName: 'service-queues-queue-room-form',

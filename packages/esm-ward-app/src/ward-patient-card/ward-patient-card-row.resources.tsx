@@ -13,6 +13,8 @@ import wardPatientAddress from './row-elements/ward-patient-header-address';
 import WardPatientName from './row-elements/ward-patient-name';
 import React from 'react';
 import styles from './ward-patient-card.scss';
+import wardPatientObs from './row-elements/ward-patient-obs';
+import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
 
 export function usePatientCardRows(location: string) {
   const { wardPatientCards } = useConfig<WardConfigObject>();
@@ -48,11 +50,11 @@ export function usePatientCardRows(location: string) {
         return slot;
       });
 
-      const WardPatientCardRow: React.FC<WardPatientCardProps> = ({ patient, bed }) => {
+      const WardPatientCardRow: React.FC<WardPatientCardProps> = (props) => {
         return (
-          <div className={rowType == 'header' ? styles.wardPatientCardHeader : ''}>
+          <div className={styles.wardPatientCardRow + ' ' + (rowType == 'header' ? styles.wardPatientCardHeader : '')}>
             {patientCardElements.map((PatientCardElement, i) => (
-              <PatientCardElement patient={patient} bed={bed} key={i} />
+              <PatientCardElement {...props} key={i} />
             ))}
           </div>
         );
@@ -78,8 +80,13 @@ function getPatientCardElementFromDefinition(
     case 'patient-age':
       return WardPatientAge;
     case 'patient-address': {
-      // TODO: configure address fields to pass in
-      return wardPatientAddress(config);
+      return wardPatientAddress(config.address);
+    }
+    case 'patient-obs': {
+      return wardPatientObs(config.obs);
+    }
+    case 'patient-coded-obs-tags': {
+      return wardPatientCodedObsTags(config.codedObsTags);
     }
   }
 }
