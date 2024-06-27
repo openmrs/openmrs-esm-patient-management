@@ -23,6 +23,7 @@ import { type QueueEntry, type QueueTableColumn } from '../types';
 import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
 import classNames from 'classnames';
+import { DataTableSkeleton } from '@carbon/react';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];
@@ -49,6 +50,8 @@ interface QueueTableProps {
 
   // if provided, adds title to the top-left
   header?: string;
+
+  isLoading?: boolean;
 }
 
 function QueueTable({
@@ -60,6 +63,7 @@ function QueueTable({
   ExpandedRow,
   tableFilter,
   header,
+  isLoading,
 }: QueueTableProps) {
   const { t } = useTranslation();
   const [currentPageSize, setPageSize] = useState(10);
@@ -84,6 +88,10 @@ function QueueTable({
       });
       return row;
     }) ?? [];
+
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
   if (columns.length == 0) {
     return <p>{t('noColumnsDefined', 'No table columns defined. Check Configuration')}</p>;
