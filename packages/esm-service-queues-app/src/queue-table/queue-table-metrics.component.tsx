@@ -1,29 +1,20 @@
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useQueueEntries, useQueueEntriesMetrics } from '../hooks/useQueueEntries';
-import QueueTableMetricsCard from './queue-table-metrics-card.component';
+import React from 'react';
 import styles from './queue-table-metrics.scss';
-import { type Queue } from '../types';
+import type { Concept, Queue } from '../types';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 interface QueueTableMetricsProps {
   selectedQueue: Queue;
+  selectedStatus: Concept;
 }
 
-function QueueTableMetrics({ selectedQueue }: QueueTableMetricsProps) {
-  const { t } = useTranslation();
-
-  const allowedStatuses = selectedQueue.allowedStatuses;
-  const { count } = useQueueEntriesMetrics({ queue: selectedQueue.uuid, isEnded: false });
-
+function QueueTableMetrics({ selectedQueue, selectedStatus }: QueueTableMetricsProps) {
   return (
-    <div className={styles.metricsBorder}>
-      <QueueTableMetricsCard value={count} headerLabel={t('totalPatients', 'Total Patients')} />
-      {allowedStatuses?.map((status) => {
-        return (
-          <QueueTableMetricsCard queueUuid={selectedQueue.uuid} status={status.uuid} headerLabel={status.display} />
-        );
-      })}
-    </div>
+    <ExtensionSlot
+      name="queue-table-metrics-slot"
+      className={styles.metricsBorder}
+      state={{ queueUuid: selectedQueue.uuid, statusUuid: selectedStatus?.uuid }}
+    />
   );
 }
 

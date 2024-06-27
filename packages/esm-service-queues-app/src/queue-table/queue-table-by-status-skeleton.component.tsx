@@ -2,31 +2,31 @@ import { DataTableSkeleton, SkeletonText, Tab, TabList, TabPanel, TabPanels, Tab
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
 import styles from './queue-table.scss';
+import classNames from 'classnames';
 
 export const QueueTableByStatusSkeleton = () => {
   const layout = useLayoutType();
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h3>
-            <SkeletonText />
-          </h3>
-        </div>
+      <div className={styles.statusTableContainer}>
+        <h5 className={styles.statusTableHeader}>
+          <SkeletonText width={'40%'} />
+        </h5>
+        <DataTableSkeleton showHeader={false} />
       </div>
-      <Tabs selectedIndex={0}>
-        <TabList>
-          <Tab>
-            <SkeletonText />
-          </Tab>
-        </TabList>
-      </Tabs>
-      <TabPanels>
-        <TabPanel>
-          <DataTableSkeleton />
-        </TabPanel>
-      </TabPanels>
+      <div className={styles.statusTableContainer}>
+        <h5 className={styles.statusTableHeader}>
+          <SkeletonText width={'40%'} />
+        </h5>
+        <DataTableSkeleton showHeader={false} />
+      </div>
+      <div className={styles.statusTableContainer}>
+        <h5 className={styles.statusTableHeader}>
+          <SkeletonText width={'40%'} />
+        </h5>
+        <DataTableSkeleton showHeader={false} />
+      </div>
     </div>
   );
 };

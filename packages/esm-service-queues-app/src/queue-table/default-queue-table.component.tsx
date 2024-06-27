@@ -121,23 +121,25 @@ function DefaultQueueTable() {
           />
         </div>
       </div>
-      <QueueTable
-        queueEntries={filteredQueueEntries ?? []}
-        isValidating={isValidating}
-        queueUuid={null}
-        statusUuid={null}
-        ExpandedRow={QueueTableExpandedRow}
-        tableFilter={[
-          <QueueDropdownFilter />,
-          <TableToolbarSearch
-            className={styles.search}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={t('searchThisList', 'Search this list')}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-          />,
-          <ClearQueueEntries queueEntries={filteredQueueEntries} />,
-        ]}
-      />
+      <div className={styles.paddedQueueTable}>
+        <QueueTable
+          isValidating={isValidating}
+          queueEntries={filteredQueueEntries ?? []}
+          queueUuid={null}
+          statusUuid={null}
+          ExpandedRow={QueueTableExpandedRow}
+          tableFilter={[
+            <QueueDropdownFilter />,
+            <TableToolbarSearch
+              className={styles.search}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('searchThisList', 'Search this list')}
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+            />,
+            <ClearQueueEntries queueEntries={filteredQueueEntries} />,
+          ]}
+        />
+      </div>
     </div>
   );
 }

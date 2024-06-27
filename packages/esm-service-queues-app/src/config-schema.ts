@@ -3,6 +3,7 @@ import vitalsConfigSchema, { type VitalsConfigObject } from './current-visit/vis
 import biometricsConfigSchema, {
   type BiometricsConfigObject,
 } from './current-visit/visit-details/biometrics-config-schema';
+import _default from 'react-hook-form/dist/utils/createSubject';
 
 const columnTypes = [
   'actions',
@@ -60,6 +61,22 @@ export const defaultQueueTable: TableDefinitions = {
 };
 
 export const configSchema = {
+  dashboardTitle: {
+    _type: Type.Object,
+    _description: 'The title to be displayed on the service queues dashboard',
+    key: {
+      _type: Type.String,
+      _description: 'The translation key of the title to be displayed on the service queues dashboard',
+    },
+    value: {
+      _type: Type.String,
+      _description: 'The translation value of the title to be displayed on the service queues dashboard',
+    },
+    _default: {
+      key: 'serviceQueues',
+      value: 'Service queues',
+    },
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -118,12 +135,26 @@ export const configSchema = {
       _description: 'The Uuids of the obs that are displayed on the previous visit modal',
       _default: ['161643AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     },
+    waitingQueueStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the concept that represents Status = Waiting.',
+      _default: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    inServiceQueueStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the concept that represents Status = In Service.',
+      _default: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    finishedServiceQueueStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the concept that represents Status = Finished service.',
+      _default: 'b559fb77-4e1e-4285-b9b7-1d03e0ba983f',
+    },
   },
   contactAttributeType: {
     _type: Type.UUID,
     _description:
       'The UUID of the person attribute type that captures contact information such as `Next of kin contact details`',
-    _default: '',
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
@@ -377,6 +408,10 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 }
 
 export interface ConfigObject {
+  dashboardTitle: {
+    key: string;
+    value: string;
+  };
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;
@@ -391,6 +426,9 @@ export interface ConfigObject {
     respiratoryRateUuid: string;
     emergencyPriorityConceptUuid: string;
     historicalObsConceptUuid: Array<string>;
+    waitingQueueStatusConceptUuid: string;
+    inServiceQueueStatusConceptUuid: string;
+    finishedServiceQueueStatusConceptUuid: string;
   };
   contactAttributeType: Array<string>;
   vitals: VitalsConfigObject;

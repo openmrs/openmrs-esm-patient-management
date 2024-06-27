@@ -156,6 +156,29 @@ export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-
   moduleName,
 });
 
+export const totalPatientsInQueueMetrics = getAsyncLifecycle(
+  () => import('./queue-table-metrics-extensions/total-patients-in-queue.extension'),
+  {
+    featureName: 'total-patients-in-queue-metrics',
+    moduleName,
+  },
+);
+
+export const waitingStatusQueueMetrics = getAsyncLifecycle(
+  () => import('./queue-table-metrics-extensions/waiting-status.extension'),
+  { featureName: 'waiting-status-queue-metrics', moduleName },
+);
+
+export const inServiceStatusQueueMetrics = getAsyncLifecycle(
+  () => import('./queue-table-metrics-extensions/in-service-status.extension'),
+  { featureName: 'in-service-status-queue-metrics', moduleName },
+);
+
+export const finishedServiceStatusQueueMetrics = getAsyncLifecycle(
+  () => import('./queue-table-metrics-extensions/finished-service-status.extension'),
+  { featureName: 'finished-service-status-queue-metrics', moduleName },
+);
+
 export const activeVisitsRowActions = getAsyncLifecycle(
   () => import('./active-visits/active-visits-row-actions.component'),
   {

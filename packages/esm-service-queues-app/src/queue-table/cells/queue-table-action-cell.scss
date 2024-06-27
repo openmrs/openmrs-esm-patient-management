@@ -5,3 +5,10 @@
 .menuItem {
   max-width: none;
 }
+
+.actionsCell {
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+  align-items: center;
+}
