@@ -10,7 +10,7 @@ import {
 } from '@openmrs/esm-framework';
 import { configSchema } from '../config-schema';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { mockInpatientRequest } from '../../../../__mocks__/inpatientRequest.mock';
+import { mockInpatientRequest } from '../../../../__mocks__/ward-patient';
 
 jest.replaceProperty(mockInpatientRequest.patient.person as Person, 'preferredName', {
   uuid: '',

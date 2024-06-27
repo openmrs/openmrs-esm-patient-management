@@ -28,6 +28,10 @@ export const patientCardElementTypes = [
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
+// a Ward Patient can either be a patient that is already admitted or a
+// patient that is awaiting admission
+export type WardPatient = (AdmittedPatient & { admitted: true }) | (InpatientRequest & { admitted: false });
+
 // server-side types defined in openmrs-module-bedmanagement:
 
 export interface AdmissionLocation {
@@ -79,17 +83,36 @@ interface BedTagMap {
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
 
+// server-side types defined in openmrs-module-emrapi:
+
 export type DispositionType = 'ADMISSION' | 'TRANSFER' | 'DISCHARGE';
 
+// InpatientRequest[] returned by:
+// GET /rest/emrapi/inpatient/admissionRequests
+// GET /rest/emrapi/inpatient/transferRequests
+// GET /rest/emrapi/inpatient/admissionAndTransferRequests
 export interface InpatientRequest {
   patient: Patient;
   visit: Visit;
   type: DispositionType;
+
+  // as of now, these fields are not included in the backend
   encounter?: Encounter;
   dispositionObs?: Observation;
   dispositionLocation?: Location;
   dispositionDate?: Date;
 }
+
+// AdmittedPatient[] returned by:
+// GET /rest/emrapi/inpatient/visits
+export interface AdmittedPatient {
+  patient: Patient;
+  visit: Visit;
+  currentLocation: Location;
+  timeSinceAdmissionInMinutes: number;
+  timeAtInpatientLocationInMinutes: number;
+}
+
 // TODO: Move these types to esm-core
 export interface Observation extends OpenmrsResourceStrict {
   concept: OpenmrsResource;

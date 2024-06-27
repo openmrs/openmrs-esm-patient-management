@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
 import AdmissionRequestsBar from './admission-requests-bar.component';
-import { mockInpatientRequest } from '../../../../__mocks__/inpatientRequest.mock';
+import { mockInpatientRequest } from '../../../../__mocks__/ward-patient';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 
 jest.mock('@openmrs/esm-framework', () => {

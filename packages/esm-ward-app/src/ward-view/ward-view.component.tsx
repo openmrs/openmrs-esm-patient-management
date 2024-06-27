@@ -9,6 +9,7 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
 import WardViewHeader from '../ward-view-header/ward-view-header.component';
+import { type WardPatient } from '../types';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -58,7 +59,14 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
           const bed = bedLayoutToBed(bedLayout);
 
           // TODO: replace visit field with real value fetched from useAdmissionLocation (or replacement API)
-          const patientInfos = patients.map((patient) => ({ patient, visit: null }));
+          const patientInfos: WardPatient[] = patients.map((patient) => ({
+            patient,
+            visit: null,
+            admitted: true,
+            currentLocation: null,
+            timeSinceAdmissionInMinutes: null,
+            timeAtInpatientLocationInMinutes: null,
+          }));
           return <WardBed key={bed.uuid} bed={bed} patientInfos={patientInfos} />;
         })}
         {bedLayouts.length == 0 && (
