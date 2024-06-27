@@ -1,5 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import { WorkspaceOverlay, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import { WorkspaceContainer, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -39,7 +39,7 @@ const WardView = () => {
       <div className={styles.wardViewMain}>
         <WardViewByLocation location={location} />
       </div>
-      <WorkspaceOverlay contextKey="ward" />
+      <WorkspaceContainer contextKey="ward" />
     </div>
   );
 };
