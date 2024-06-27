@@ -12,21 +12,6 @@
   padding: 0 spacing.$spacing-05;
 }
 
-.wardViewHeader {
-  display: flex;
-  margin: spacing.$spacing-05 0;
-}
-
-.wardViewHeaderLocationDisplay {
-  flex: 1;
-}
-
-.wardViewHeaderAdmissionRequestMenuBar {
-  background-color: black;
-  color: white;
-  padding: 4px 0 4px 12px;
-}
-
 .wardViewMain {
   background-color: #e4e4e4;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

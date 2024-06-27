@@ -79,6 +79,17 @@ interface BedTagMap {
 
 export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
 
+export type DispositionType = 'ADMISSION' | 'TRANSFER' | 'DISCHARGE';
+
+export interface InpatientRequest {
+  patient: Patient;
+  visit: Visit;
+  type: DispositionType;
+  encounter?: Encounter;
+  dispositionObs?: Observation;
+  dispositionLocation?: Location;
+  dispositionDate?: Date;
+}
 // TODO: Move these types to esm-core
 export interface Observation extends OpenmrsResourceStrict {
   concept: OpenmrsResource;

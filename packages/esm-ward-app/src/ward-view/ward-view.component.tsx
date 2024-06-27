@@ -1,5 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import { useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import { WorkspaceContainer, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardBed from './ward-bed.component';
 import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
+import WardViewHeader from '../ward-view-header/ward-view-header.component';
 
 const WardView = () => {
   const { locationUuid: locationUuidFromUrl } = useParams();
@@ -23,28 +24,22 @@ const WardView = () => {
     return <></>;
   }
 
-  return (
+  return invalidLocation ? (
+    <InlineNotification
+      kind="error"
+      lowContrast={true}
+      title={t('invalidLocationSpecified', 'Invalid location specified')}
+      subtitle={t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', {
+        locationUuidFromUrl,
+      })}
+    />
+  ) : (
     <div className={styles.wardView}>
-      <div className={styles.wardViewHeader}>
-        <div className={styles.wardViewHeaderLocationDisplay}>
-          <h4>{location?.display}</h4>
-        </div>
-        <div className={styles.wardViewHeaderAdmissionRequestMenuBar}>{/* TODO: Admission Request bar */}</div>
-      </div>
+      <WardViewHeader location={location.display} />
       <div className={styles.wardViewMain}>
-        {invalidLocation ? (
-          <InlineNotification
-            kind="error"
-            lowContrast={true}
-            title={t('invalidLocationSpecified', 'Invalid location specified')}
-            subtitle={t('unknownLocationUuid', 'Unknown location uuid: {{locationUuidFromUrl}}', {
-              locationUuidFromUrl,
-            })}
-          />
-        ) : (
-          <WardViewByLocation location={location} />
-        )}
+        <WardViewByLocation location={location} />
       </div>
+      <WorkspaceContainer contextKey="ward" />
     </div>
   );
 };
