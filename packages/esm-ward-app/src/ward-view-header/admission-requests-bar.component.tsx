@@ -1,45 +1,50 @@
-import { SkeletonIcon } from '@carbon/react';
-import { Movement } from '@carbon/react/icons';
-import { launchWorkspace, showNotification, type Location } from '@openmrs/esm-framework';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import { Movement } from '@carbon/react/icons';
 import styles from './admission-requests.scss';
+import { ArrowRightIcon, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
+import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import { useTranslation } from 'react-i18next';
+import useWardLocation from '../hooks/useWardLocation';
+import { InlineNotification } from '@carbon/react';
+import { Button } from '@carbon/react';
 
-interface AdmissionRequestsBarProps {
-  location: Location;
-}
-
-const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ location }) => {
+const AdmissionRequestsBar = () => {
+  const { location } = useWardLocation();
   const { inpatientRequests, isLoading, error } = useInpatientRequest(location.uuid);
   const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
   const { t } = useTranslation();
+  const layout = useLayoutType();
 
-  if (isLoading) {
-    return <SkeletonIcon className={styles.skeleton} />;
+  if (isLoading || !admissionRequests.length) {
+    return null;
   }
 
   if (error) {
-    showNotification({
-      kind: 'error',
-      title: t('errorLoadingPatientAdmissionRequests', 'Error Loading Patient Admission Requests'),
-      description: error.message,
-    });
-    return <></>;
+    console.error(error);
+    return (
+      <InlineNotification
+        kind="error"
+        title={t('errorLoadingPatientAdmissionRequests', 'Error Loading patient admission requests')}
+      />
+    );
   }
 
-  return admissionRequests.length > 0 ? (
+  return (
     <div className={styles.admissionRequestsContainer}>
       <Movement className={styles.movementIcon} size="24" />
-      <span className={styles.content}>{admissionRequests.length} admission requests</span>
-      <button
-        className={styles.manageButton}
-        onClick={() => launchWorkspace('admission-requests-cards', { admissionRequests })}>
-        Manage
-      </button>
+      <span className={styles.content}>
+        {t('admissionRequestsCount', '{{count}} admission requests', {
+          count: admissionRequests.length,
+        })}
+      </span>
+      <Button
+        onClick={() => launchWorkspace('admission-requests-workspace', { admissionRequests })}
+        renderIcon={ArrowRightIcon}
+        kind="ghost"
+        size={isDesktop(layout) ? 'sm' : 'lg'}>
+        t('manage', 'Manage')
+      </Button>
     </div>
-  ) : (
-    <></>
   );
 };
 

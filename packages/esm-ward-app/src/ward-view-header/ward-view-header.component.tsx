@@ -1,16 +1,16 @@
 import React from 'react';
 import styles from './ward-view-header.scss';
 import AdmissionRequestsBar from './admission-requests-bar.component';
-import { type Location } from '@openmrs/esm-framework';
+import useWardLocation from '../hooks/useWardLocation';
 
-interface WardViewHeaderProps {
-  location: Location;
-}
-const WardViewHeader: React.FC<WardViewHeaderProps> = ({ location }) => {
+interface WardViewHeaderProps {}
+
+const WardViewHeader: React.FC<WardViewHeaderProps> = () => {
+  const { location } = useWardLocation();
   return (
     <div className={styles.wardViewHeader}>
-      <h4>{location.display}</h4>
-      <AdmissionRequestsBar location={location} />
+      <h4>{location?.display}</h4>
+      <AdmissionRequestsBar />
     </div>
   );
 };
