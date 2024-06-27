@@ -5,6 +5,7 @@ import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
+import { mockAdmittedPatient } from '../../../../__mocks__/ward-patient';
 
 const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
@@ -18,12 +19,12 @@ jest.replaceProperty(mockBedToUse.patients[0].person, 'preferredName', {
   givenName: 'Alice',
   familyName: 'Johnson',
 });
-const mockPatient = mockBedToUse.patients[0];
 const mockBed = bedLayoutToBed(mockBedToUse);
 
 describe('Occupied bed: ', () => {
   it('renders a single bed with patient details', () => {
-    render(<OccupiedBed patientInfos={[{ patient: mockPatient, visit: null }]} bed={mockBed} />);
+    const mockPatient = mockAdmittedPatient.patient;
+    render(<OccupiedBed patientInfos={[{ ...mockAdmittedPatient, admitted: true }]} bed={mockBed} />);
     const patientName = screen.getByText('Alice Johnson');
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatient.person.age} yrs`;
@@ -39,8 +40,8 @@ describe('Occupied bed: ', () => {
     render(
       <OccupiedBed
         patientInfos={[
-          { patient: mockPatient, visit: null },
-          { patient: mockPatient, visit: null },
+          { ...mockAdmittedPatient, admitted: true },
+          { ...mockAdmittedPatient, admitted: true },
         ]}
         bed={mockBed}
       />,
