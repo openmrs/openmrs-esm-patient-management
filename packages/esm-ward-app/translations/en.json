@@ -7,5 +7,6 @@
   "errorLoadingWardLocation": "Error loading ward location",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
+  "manage": "Manage",
   "noBedsConfigured": "No beds configured for this location"
 }
