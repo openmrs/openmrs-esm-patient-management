@@ -10,7 +10,7 @@ import { Button } from '@carbon/react';
 
 const AdmissionRequestsBar = () => {
   const { location } = useWardLocation();
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(location.uuid);
+  const { inpatientRequests, isLoading, error } = useInpatientRequest(location?.uuid);
   const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -42,7 +42,7 @@ const AdmissionRequestsBar = () => {
         renderIcon={ArrowRightIcon}
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}>
-        t('manage', 'Manage')
+        {t('manage', 'Manage')}
       </Button>
     </div>
   );

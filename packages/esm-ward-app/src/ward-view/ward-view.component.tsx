@@ -13,7 +13,8 @@ import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 import useWardLocation from '../hooks/useWardLocation';
 
 const WardView = () => {
-  const { isLoadingLocation, errorFetchingLocation } = useWardLocation();
+  const response = useWardLocation();
+  const { isLoadingLocation, errorFetchingLocation } = response;
 
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');

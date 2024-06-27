@@ -6,6 +6,7 @@ export default function useWardLocation(): {
   location: Location;
   isLoadingLocation: boolean;
   errorFetchingLocation: Error;
+  invalidLocation: boolean;
 } {
   const { locationUuid: locationUuidFromUrl } = useParams();
   const { sessionLocation } = useSession();
@@ -20,5 +21,6 @@ export default function useWardLocation(): {
     location: locationUuidFromUrl ? locationResponse?.data : sessionLocation,
     isLoadingLocation,
     errorFetchingLocation,
+    invalidLocation,
   };
 }
