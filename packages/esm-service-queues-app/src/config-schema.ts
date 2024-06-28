@@ -60,6 +60,22 @@ export const defaultQueueTable: TableDefinitions = {
 };
 
 export const configSchema = {
+  dashboardTitle: {
+    _type: Type.Object,
+    _description: 'The title to be displayed on the service queues dashboard',
+    key: {
+      _type: Type.String,
+      _description: 'The translation key of the title to be displayed on the service queues dashboard',
+    },
+    value: {
+      _type: Type.String,
+      _description: 'The translation value of the title to be displayed on the service queues dashboard',
+    },
+    _default: {
+      key: 'serviceQueues',
+      value: 'Service queues',
+    },
+  },
   concepts: {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
@@ -377,6 +393,10 @@ function columnHasType(columnDef: ColumnDefinition, type: ColumnType): boolean {
 }
 
 export interface ConfigObject {
+  dashboardTitle: {
+    key: string;
+    value: string;
+  };
   concepts: {
     defaultPriorityConceptUuid: string;
     defaultStatusConceptUuid: string;

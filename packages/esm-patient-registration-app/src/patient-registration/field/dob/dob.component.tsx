@@ -1,8 +1,8 @@
 import React, { type ChangeEvent, useCallback, useContext } from 'react';
-import { ContentSwitcher, DatePicker, DatePickerInput, Layer, Switch, TextInput } from '@carbon/react';
+import { ContentSwitcher, Layer, Switch, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useField } from 'formik';
-import { generateFormatting } from '../../date-util';
+import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { OpenmrsDatePicker, useConfig } from '@openmrs/esm-framework';
 import { type RegistrationConfig } from '../../../config-schema';
@@ -32,7 +32,6 @@ export const DobField: React.FC = () => {
   const [yearsEstimated, yearsEstimateMeta] = useField('yearsEstimated');
   const [monthsEstimated, monthsEstimateMeta] = useField('monthsEstimated');
   const { setFieldValue } = useContext(PatientRegistrationContext);
-  const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
   const today = new Date();
 
   const onToggle = useCallback(
@@ -46,8 +45,8 @@ export const DobField: React.FC = () => {
   );
 
   const onDateChange = useCallback(
-    (birthdate: Date) => {
-      setFieldValue('birthdate', birthdate);
+    (birthdate: CalendarDate) => {
+      setFieldValue('birthdate', birthdate?.toDate(getLocalTimeZone()));
     },
     [setFieldValue],
   );
@@ -104,17 +103,15 @@ export const DobField: React.FC = () => {
             <OpenmrsDatePicker
               id="birthdate"
               {...birthdate}
-              dateFormat={dateFormat}
               onChange={onDateChange}
               maxDate={today}
               labelText={t('dateOfBirthLabelText', 'Date of Birth')}
-              invalid={!!(birthdateMeta.touched && birthdateMeta.error)}
-              invalidText={birthdateMeta.error && t(birthdateMeta.error)}
+              isInvalid={!!(birthdateMeta.touched && birthdateMeta.error)}
               value={birthdate.value}
-              carbonOptions={{
-                placeholder: placeHolder,
-              }}
             />
+            {!!(birthdateMeta.touched && birthdateMeta.error) && (
+              <div className={styles.radioFieldError}>{birthdateMeta.error && t(birthdateMeta.error)}</div>
+            )}
           </div>
         ) : (
           <div className={styles.grid}>
