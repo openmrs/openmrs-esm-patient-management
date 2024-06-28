@@ -1,11 +1,13 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import useSWR from 'swr';
+import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import type { InpatientRequest } from '../types';
+import useSWRImmutable from 'swr/immutable';
 
 //TODO:The api is still in implementation stage and this is just a placeholder for the api
 export function useInpatientRequest(locationUuid: string) {
-  const apiUrl = `${restBaseUrl}/emrapi/inpatient/admissionRequests?admissionLocation=${locationUuid}`;
-  const { data, ...rest } = useSWR<{ data: Array<InpatientRequest> }, Error>(apiUrl, openmrsFetch);
+  const { data, ...rest } = useSWRImmutable<FetchResponse<Array<InpatientRequest>>, Error>(
+    locationUuid ? `${restBaseUrl}/emrapi/inpatient/admissionRequests?admissionLocation=${locationUuid}` : null,
+    openmrsFetch,
+  );
 
   return {
     inpatientRequests: data?.data || null,

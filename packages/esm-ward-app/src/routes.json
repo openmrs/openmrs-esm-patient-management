@@ -15,7 +15,7 @@
   },
    "workspaces": [
     {
-      "name":"admission-requests-cards",
+      "name":"admission-requests-workspace",
       "component": "admissionRequestWorkspace",
       "title":"admissionRequests",
        "type":"admission-requests"
