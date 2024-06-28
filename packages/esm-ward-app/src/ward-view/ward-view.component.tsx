@@ -134,7 +134,7 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
       <InlineNotification
         kind="error"
         lowContrast={true}
-        title={t('errorLoadingWardLocation', 'Error loading admitted patients')}
+        title={t('errorLoadingPatients', 'Error loading admitted patients')}
         subtitle={errorLoadingPatients?.message}
       />
     );
