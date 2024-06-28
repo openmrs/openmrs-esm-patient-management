@@ -69,35 +69,37 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
   if (admissionLocation != null && admittedPatients != null) {
     const bedLayouts = filterBeds(admissionLocation);
 
+    const wardBeds = bedLayouts.map((bedLayout, i) => {
+      const { patients } = bedLayout;
+      const bed = bedLayoutToBed(bedLayout);
+      const wardPatients: WardPatient[] = patients.map((patient) => {
+        const admittedPatient = admittedPatientsByUuid.get(patient.uuid);
+
+        if (admittedPatient) {
+          // ideally, we can just use the patient object within admittedPatient
+          // and not need the one from bedLayouts, however, the emr api
+          // does not respect custom representation right now and does not return
+          // all required fields for the patient object
+          return { ...admittedPatient, admitted: true };
+        }
+
+        // patient assigned a bed but *not* admitted
+        // TODO: get the patient's visit and current location
+        return {
+          patient,
+          visit: null,
+          admitted: true,
+          currentLocation: null,
+          timeSinceAdmissionInMinutes: null,
+          timeAtInpatientLocationInMinutes: null,
+        };
+      });
+      return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
+    });
+
     return (
       <>
-        {bedLayouts.map((bedLayout, i) => {
-          const { patients } = bedLayout;
-          const bed = bedLayoutToBed(bedLayout);
-          const patientInfos: WardPatient[] = patients.map((patient) => {
-            const admittedPatient = admittedPatientsByUuid.get(patient.uuid);
-
-            if (admittedPatient) {
-              // ideally, we can just use the patient object within admittedPatient
-              // and not need the one from bedLayouts, however, the emr api
-              // does not respect custom representation right now and does not return
-              // all required fields for the patient object
-              return { ...admittedPatient, patient, admitted: true };
-            }
-
-            // patient assigned a bed but *not* admitted
-            // TODO: get the patient's visit and current location
-            return {
-              patient,
-              visit: null,
-              admitted: true,
-              currentLocation: null,
-              timeSinceAdmissionInMinutes: null,
-              timeAtInpatientLocationInMinutes: null,
-            };
-          });
-          return <WardBed key={bed.uuid} bed={bed} patientInfos={patientInfos} />;
-        })}
+        {wardBeds}
         {bedLayouts.length == 0 && (
           <InlineNotification
             kind="warning"

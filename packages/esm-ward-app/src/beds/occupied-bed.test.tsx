@@ -24,7 +24,7 @@ const mockBed = bedLayoutToBed(mockBedToUse);
 describe('Occupied bed: ', () => {
   it('renders a single bed with patient details', () => {
     const mockPatient = mockAdmittedPatient.patient;
-    render(<OccupiedBed patientInfos={[{ ...mockAdmittedPatient, admitted: true }]} bed={mockBed} />);
+    render(<OccupiedBed wardPatients={[{ ...mockAdmittedPatient, admitted: true }]} bed={mockBed} />);
     const patientName = screen.getByText('Alice Johnson');
     expect(patientName).toBeInTheDocument();
     const patientAge = `${mockPatient.person.age} yrs`;
@@ -39,7 +39,7 @@ describe('Occupied bed: ', () => {
   it('renders a divider for shared patients', () => {
     render(
       <OccupiedBed
-        patientInfos={[
+        wardPatients={[
           { ...mockAdmittedPatient, admitted: true },
           { ...mockAdmittedPatient, admitted: true },
         ]}

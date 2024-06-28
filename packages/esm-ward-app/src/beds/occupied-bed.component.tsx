@@ -5,11 +5,11 @@ import WardPatientCard from '../ward-patient-card/ward-patient-card';
 import { type WardBedProps } from '../ward-view/ward-bed.component';
 import styles from './occupied-bed.scss';
 
-const OccupiedBed: React.FC<WardBedProps> = ({ patientInfos, bed }) => {
+const OccupiedBed: React.FC<WardBedProps> = ({ wardPatients, bed }) => {
   return (
     <div className={styles.occupiedBed}>
-      {patientInfos.map(({ patient, visit }, index: number) => {
-        const last = index === patientInfos.length - 1;
+      {wardPatients.map(({ patient, visit }, index: number) => {
+        const last = index === wardPatients.length - 1;
         return (
           <div key={'occupied-bed-pt-' + patient.uuid}>
             <WardPatientCard patient={patient} visit={visit} bed={bed} />
