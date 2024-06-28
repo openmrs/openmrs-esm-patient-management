@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(var(--desktop-workspace-window-height) - 7rem - 2px); // 7rem patient banner, plus border
+  height: 100%;
 }
 
 .grid {

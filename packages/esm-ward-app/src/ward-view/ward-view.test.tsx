@@ -16,6 +16,7 @@ import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
 import WardView from './ward-view.component';
 import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
+import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 
 jest.replaceProperty(mockPatientAlice.person as Person, 'preferredName', {
   uuid: '',
@@ -52,12 +53,23 @@ const mockedUseParams = useParams as jest.Mock;
 jest.mock('../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
 }));
+jest.mock('../hooks/useAdmittedPatients', () => ({
+  useAdmittedPatients: jest.fn(),
+}));
+
 jest.mocked(useAdmissionLocation).mockReturnValue({
   error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
   admissionLocation: mockAdmissionLocation,
+});
+jest.mocked(useAdmittedPatients).mockReturnValue({
+  error: undefined,
+  mutate: jest.fn(),
+  isValidating: false,
+  isLoading: false,
+  admittedPatients: [],
 });
 
 describe('WardView:', () => {

@@ -154,7 +154,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   return {
     queueEntries,
     totalCount,
-    isLoading: totalCount && queueEntries.length < totalCount,
+    isLoading: !totalCount || (totalCount && queueEntries.length < totalCount),
     isValidating: isValidating || currentPage < data.length,
     error,
     mutate: mutateQueueEntries,

@@ -10,23 +10,96 @@ import QueueTable from '../queue-table/queue-table.component';
 import QueueTableMetrics from '../queue-table/queue-table-metrics.component';
 import styles from '../queue-table/queue-table.scss';
 import type { Concept, Queue, QueueEntry } from '../types';
+import PatientQueueHeader from '../patient-queue-header/patient-queue-header.component';
+import { SearchSkeleton } from '@carbon/react';
+import { SkeletonText } from '@carbon/react';
 
 interface QueueTablesForAllStatusesProps {
   selectedQueue: Queue; // the selected queue
+  isLoadingQueue: boolean; // whether the queue is still loading
+  errorFetchingQueue: Error;
 }
 
 // displays the queue entries of a given queue by
 // showing one table per status
-const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ selectedQueue }) => {
+const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({
+  selectedQueue,
+  isLoadingQueue,
+  errorFetchingQueue,
+}) => {
   const layout = useLayoutType();
   const { t } = useTranslation();
 
-  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
-  const allowedStatuses = selectedQueue.allowedStatuses;
   const [searchTerm, setSearchTerm] = useState('');
 
+  if (errorFetchingQueue) {
+    return (
+      <InlineNotification
+        kind="error"
+        title={t('invalidQueue', 'Invalid Queue')}
+        subtitle={errorFetchingQueue?.message}
+      />
+    );
+  }
+
+  return (
+    <>
+      <PatientQueueHeader
+        title={!isLoadingQueue ? selectedQueue?.display : <SkeletonText />}
+        showLocationDropdown={false}
+        actions={
+          <div className={styles.headerButtons}>
+            <ExtensionSlot
+              name="patient-search-button-slot"
+              state={{
+                buttonText: t('addPatientToQueue', 'Add patient to queue'),
+                overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
+                buttonProps: {
+                  kind: 'secondary',
+                  renderIcon: (props) => <Add size={16} {...props} />,
+                  size: isDesktop(layout) ? 'sm' : 'lg',
+                },
+                selectPatientAction: (selectedPatientUuid) => {
+                  launchWorkspace('service-queues-patient-search', {
+                    selectedPatientUuid,
+                    currentServiceQueueUuid: selectedQueue.uuid,
+                  });
+                },
+              }}
+            />
+            <div className={styles.filterSearch}>
+              <Search
+                labelText=""
+                placeholder={t('filterTable', 'Filter table')}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size={isDesktop(layout) ? 'sm' : 'lg'}
+                disabled={isLoadingQueue}
+              />
+            </div>
+          </div>
+        }
+      />
+      {!isLoadingQueue && <QueueTableMetrics selectedQueue={selectedQueue} />}
+      {!isLoadingQueue ? (
+        <QueueTablesByStatus selectedQueue={selectedQueue} searchTerm={searchTerm} />
+      ) : (
+        <QueueTableByStatusSkeleton />
+      )}
+    </>
+  );
+};
+
+interface QueueTablesByStatusProps {
+  selectedQueue: Queue;
+  searchTerm: string;
+}
+
+function QueueTablesByStatus({ selectedQueue, searchTerm }: QueueTablesByStatusProps) {
+  const { t } = useTranslation();
+  const { queueEntries, isLoading, isValidating } = useQueueEntries({ queue: selectedQueue.uuid, isEnded: false });
+  const allowedStatuses = selectedQueue.allowedStatuses.reverse();
   const noStatuses = !allowedStatuses?.length;
-  if (isLoading && !queueEntries.length) {
+  if (isLoading) {
     return <QueueTableByStatusSkeleton />;
   } else if (noStatuses) {
     return (
@@ -38,58 +111,23 @@ const QueueTablesForAllStatuses: React.FC<QueueTablesForAllStatusesProps> = ({ s
       />
     );
   }
-
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>
-        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h3>{selectedQueue.display}</h3>
-        </div>
-        <div>
-          <QueueTableMetrics selectedQueue={selectedQueue} />
-        </div>
-        <div className={styles.headerButtons}>
-          <ExtensionSlot
-            name="patient-search-button-slot"
-            state={{
-              buttonText: t('addPatientToQueue', 'Add patient to queue'),
-              overlayHeader: t('addPatientToQueue', 'Add patient to queue'),
-              buttonProps: {
-                kind: 'secondary',
-                renderIcon: (props) => <Add size={16} {...props} />,
-                size: 'sm',
-              },
-              selectPatientAction: (selectedPatientUuid) => {
-                launchWorkspace('service-queues-patient-search', {
-                  selectedPatientUuid,
-                  currentServiceQueueUuid: selectedQueue.uuid,
-                });
-              },
-            }}
-          />
-          <Search
-            labelText=""
-            placeholder={t('filterTable', 'Filter table')}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
-          />
-        </div>
-      </div>
       {allowedStatuses?.map((status) => (
         <QueueTableForQueueAndStatus
+          isValidating={isValidating}
           key={status.uuid}
           queueEntries={queueEntries}
           searchTerm={searchTerm}
           queue={selectedQueue}
           status={status}
-          isValidating={isValidating}
         />
       ))}
     </div>
   );
-};
+}
 
-interface QueueTableForQueueAndStatus {
+interface QueueTableForQueueAndStatusProps {
   queueEntries: QueueEntry[];
   isValidating: boolean;
   searchTerm: string;
@@ -104,7 +142,7 @@ function QueueTableForQueueAndStatus({
   searchTerm,
   queue,
   status,
-}: QueueTableForQueueAndStatus) {
+}: QueueTableForQueueAndStatusProps) {
   const statusUuid = status.uuid;
   const columns = useColumns(queue.uuid, statusUuid);
   const { t } = useTranslation();
