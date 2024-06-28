@@ -96,15 +96,10 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     }
     if (pageData && !isValidating && !stillWaitingForMutate) {
       // We've got results! Time to update the data array and move on to the next page.
-      if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
+      if (pageData?.data?.totalCount > -1 && pageData?.data?.totalCount !== totalCount) {
         setTotalCount(pageData?.data?.totalCount);
       }
-      //edge case when the new Data is an empty array E.g. you deleted the last patient, or you cleared the queue
-      if (pageData?.data?.totalCount === 0) {
-        setTotalCount(0);
-        setData([]);
-      }
-      if (pageData?.data?.results?.length) {
+      if (pageData?.data?.results) {
         const newData = [...data];
         newData[currentPage] = pageData?.data?.results;
         setData(newData);
