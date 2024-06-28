@@ -1,15 +1,17 @@
-import React from 'react';
-import { Movement } from '@carbon/react/icons';
-import styles from './admission-requests.scss';
-import { launchWorkspace, showNotification } from '@openmrs/esm-framework';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { useParams } from 'react-router-dom';
 import { SkeletonIcon } from '@carbon/react';
+import { Movement } from '@carbon/react/icons';
+import { launchWorkspace, showNotification, type Location } from '@openmrs/esm-framework';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInpatientRequest } from '../hooks/useInpatientRequest';
+import styles from './admission-requests.scss';
 
-const AdmissionRequestsBar = () => {
-  const { locationUuid } = useParams();
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(locationUuid);
+interface AdmissionRequestsBarProps {
+  location: Location;
+}
+
+const AdmissionRequestsBar: React.FC<AdmissionRequestsBarProps> = ({ location }) => {
+  const { inpatientRequests, isLoading, error } = useInpatientRequest(location.uuid);
   const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
   const { t } = useTranslation();
 

@@ -1,15 +1,15 @@
 import { type Visit, type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 import EmptyBed from '../beds/empty-bed.component';
-import { type Bed } from '../types';
+import { type WardPatient, type Bed } from '../types';
 import OccupiedBed from '../beds/occupied-bed.component';
 export interface WardBedProps {
-  patientInfos: Array<{ patient: Patient; visit: Visit }>;
+  wardPatients: Array<WardPatient>;
   bed: Bed;
 }
 
-const WardBed: React.FC<WardBedProps> = ({ bed, patientInfos }) => {
-  return patientInfos?.length > 0 ? <OccupiedBed bed={bed} patientInfos={patientInfos} /> : <EmptyBed bed={bed} />;
+const WardBed: React.FC<WardBedProps> = ({ bed, wardPatients }) => {
+  return wardPatients?.length > 0 ? <OccupiedBed bed={bed} wardPatients={wardPatients} /> : <EmptyBed bed={bed} />;
 };
 
 export default WardBed;
