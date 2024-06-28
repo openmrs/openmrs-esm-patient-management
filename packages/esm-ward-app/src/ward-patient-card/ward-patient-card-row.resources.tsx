@@ -17,6 +17,7 @@ import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags'
 import WardHourGlass from './row-elements/ward-hour-glass';
 import WardPatientTransfer from './row-elements/ward-patient-transfer';
 import WardPatientPendingOrders from './row-elements/ward-patient-pending-orders';
+import classNames from 'classnames';
 
 export function usePatientCardRows(location: string) {
   const { wardPatientCards } = useConfig<WardConfigObject>();
@@ -55,13 +56,10 @@ export function usePatientCardRows(location: string) {
       const WardPatientCardRow: React.FC<WardPatientCardProps> = (props) => {
         return (
           <div
-            className={
-              styles.wardPatientCardRow +
-              ' ' +
-              (rowType == 'header' ? styles.wardPatientCardHeader : '') +
-              ' ' +
-              (rowType === 'waitingFor' ? styles.wardPatientCardWaitingFor : '')
-            }>
+            className={classNames(styles.wardPatientCardRow, {
+              [styles.wardPatientCardHeader]: rowType === 'header',
+              [styles.wardPatientCardWaitingFor]: rowType === 'waitingFor',
+            })}>
             {patientCardElements.map((PatientCardElement, i) => (
               <PatientCardElement {...props} key={i} />
             ))}
