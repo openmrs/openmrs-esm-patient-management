@@ -2,6 +2,7 @@
   "bedShare": "Bed share",
   "emptyBed": "Empty bed",
   "errorLoadingPatientAdmissionRequests": "Error Loading Patient Admission Requests",
+  "errorLoadingPatients": "Error loading admitted patients",
   "errorLoadingWardLocation": "Error loading ward location",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
