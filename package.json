@@ -71,7 +71,7 @@
     "sass": "^1.29.0",
     "sass-loader": "^10.1.0",
     "swc-loader": "^0.2.3",
-    "turbo": "^2.0.3",
+    "turbo": "^2.0.6",
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0",
