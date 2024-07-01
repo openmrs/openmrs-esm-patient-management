@@ -80,7 +80,8 @@ const WardViewByLocation = ({ location }: { location: Location }) => {
           // and not need the one from bedLayouts, however, the emr api
           // does not respect custom representation right now and does not return
           // all required fields for the patient object
-          return { ...admittedPatient, admitted: true };
+          // TODO: change after this is done. https://openmrs.atlassian.net/browse/EA-192
+          return { ...admittedPatient, patient, admitted: true };
         }
 
         // patient assigned a bed but *not* admitted
