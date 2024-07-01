@@ -14,7 +14,17 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-function updateValueInSessionStorage(key: string, value: string) {
+/**
+ * This function updates the value in session storage if the value is a valid string.
+ *
+ * In case the value is null or undefined, the key will be removed from session storage.
+ *
+ * This function is mainly useful for not writing null/ undefined in the session storage
+ *
+ * @param key
+ * @param value
+ */
+export function updateValueInSessionStorage(key: string, value: string) {
   if (value === undefined || value === null) {
     sessionStorage.removeItem(key);
   } else {
@@ -22,8 +32,13 @@ function updateValueInSessionStorage(key: string, value: string) {
   }
 }
 
-function getValueFromSessionStorage(key: string) {
-  return sessionStorage.getItem(key) && sessionStorage.getItem(key) !== 'null' ? sessionStorage.getItem(key) : null;
+/**
+ * This function fetches the value for the passed key from session storage
+ * @param key
+ * @returns
+ */
+export function getValueFromSessionStorage(key: string): string | null {
+  return sessionStorage.getItem(key);
 }
 
 const initialQueueLocationNameState = {
