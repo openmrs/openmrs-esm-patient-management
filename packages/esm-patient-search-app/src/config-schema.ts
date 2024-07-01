@@ -1,4 +1,5 @@
 import { Type, validators } from '@openmrs/esm-framework';
+
 export const configSchema = {
   search: {
     patientResultUrl: {
@@ -41,15 +42,11 @@ export const configSchema = {
     _elements: {
       _type: Type.UUID,
     },
-    _description:
-      'A list of identifier types to be displayed in the patient search results as banner tags. If no defaultIdentifierTypes are provided, the defaultIdentifier will be displayed.',
-    // This UUID is for the OpenMRS ID
-    _default: ['05a29f94-c0ed-11e2-94be-8c13b969e334'],
-  },
-  defaultIdentifier: {
-    _type: Type.String,
-    _description: 'Identifer type to be displayed when no defaultIdentifierTypes are provided. Default is OpenMRS ID.',
-    _default: 'OpenMRS ID',
+    _description: 'A list of identifier types to be displayed in the patient search results as banner tags.',
+    _default: [
+      // This UUID is for the OpenMRS ID identifier
+      '05a29f94-c0ed-11e2-94be-8c13b969e334',
+    ],
   },
 };
 
