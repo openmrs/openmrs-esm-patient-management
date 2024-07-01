@@ -10,7 +10,7 @@ import { Input } from '../../input/basic-input/input/input.component';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import styles from './../field.scss';
 import { PatientRegistrationContext } from '../../patient-registration-context';
-import { generateFormatting } from '../../date-util';
+import { type CalendarDate, getLocalTimeZone } from '@internationalized/date';
 
 export interface ObsFieldProps {
   fieldDefinition: FieldDefinition;
@@ -169,36 +169,32 @@ function DateObsField({ concept, label, required, placeholder }: DateObsFieldPro
   const { t } = useTranslation();
   const fieldName = `obs.${concept.uuid}`;
   const { setFieldValue } = useContext(PatientRegistrationContext);
-  const { format, placeHolder, dateFormat } = generateFormatting(['d', 'm', 'Y'], '/');
 
-  const onDateChange = useCallback(
-    (date: Date) => {
-      setFieldValue(fieldName, date);
-    },
-    [setFieldValue],
-  );
+  const onDateChange = ([date]) => {
+    const refinedDate = date instanceof Date ? new Date(date.setHours(0, 0, 0, 0)) : new Date(date);
+    setFieldValue(fieldName, refinedDate);
+  };
 
   return (
     <Layer>
       <div className={styles.dobField}>
         <Field name={fieldName}>
           {({ field, form: { touched, errors }, meta }) => {
-            const dateValue = field.value ? parseDate(field.value) : field.value;
             return (
-              <OpenmrsDatePicker
-                id={fieldName}
-                {...field}
-                required={required}
-                dateFormat={dateFormat}
-                onChange={onDateChange}
-                labelText={label ?? concept.display}
-                invalid={errors[fieldName] && touched[fieldName]}
-                invalidText={meta.error && t(meta.error)}
-                value={dateValue}
-                carbonOptions={{
-                  placeholder: placeholder ?? placeHolder,
-                }}
-              />
+              <>
+                <OpenmrsDatePicker
+                  id={fieldName}
+                  {...field}
+                  isRequired={required}
+                  onChange={(date) => onDateChange([date])}
+                  labelText={label ?? concept.display}
+                  isInvalid={errors[fieldName] && touched[fieldName]}
+                  value={field.value}
+                />
+                {errors[fieldName] && touched[fieldName] && (
+                  <div className={styles.radioFieldError}>{meta.error && t(meta.error)}</div>
+                )}
+              </>
             );
           }}
         </Field>

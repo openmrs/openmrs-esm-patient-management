@@ -25,7 +25,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ConfigObject } from '../config-schema';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 
 interface ChangeStatusDialogProps {
   queueEntry: MappedQueueEntry;
@@ -42,7 +42,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
       z.object({
         location: z.string({ required_error: t('queueLocationRequired', 'Queue location is required') }),
         service: z.string({ required_error: t('serviceIsRequired', 'Service is required') }),
-        status: z.string({ required_error: t('serviceIsRequired', 'Status is required') }),
+        status: z.string({ required_error: t('statusIsRequired', 'Status is required') }),
         priority: z.string({ required_error: t('priorityIsRequired', 'Priority is required') }),
       }),
     [],
@@ -254,7 +254,7 @@ const ChangeStatus: React.FC<ChangeStatusDialogProps> = ({ queueEntry, closeModa
                     <InlineLoading
                       status="active"
                       iconDescription={t('submitting', 'Submitting')}
-                      description={t('submitting', 'Submitting...')}
+                      description={t('submitting', 'Submitting')}
                     />
                   </div>
                 ) : (

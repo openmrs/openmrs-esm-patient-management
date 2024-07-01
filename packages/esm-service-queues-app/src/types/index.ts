@@ -1,5 +1,6 @@
 import { type Visit, type OpenmrsResource, type Location, type Patient } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type ColumnConfig } from '../config-schema';
 
 export enum SearchTypes {
   BASIC = 'basic',
@@ -440,7 +441,7 @@ export type QueueTableColumn = {
 export type QueueTableColumnFunction = (
   key: string, // a unique key for the column
   header?: string,
-  config?: any,
+  config?: ColumnConfig,
 ) => QueueTableColumn;
 
 export interface QueueTableTabConfig {
@@ -488,6 +489,8 @@ export interface QueueEntrySearchCriteria {
 // TODO: The follow types match the types from backend.
 // They should be common enough to move to esm-core
 
-export interface Concept extends OpenmrsResource {}
+export interface Concept extends OpenmrsResource {
+  setMembers?: Array<Concept>;
+}
 
 export interface Provider extends OpenmrsResource {}

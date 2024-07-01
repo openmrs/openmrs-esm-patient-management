@@ -46,7 +46,7 @@ jest.mock('../active-visits/active-visits-table.resource', () => ({
   updateQueueEntry: jest.fn(() => Promise.resolve({ status: 201 })),
 }));
 
-jest.mock('../hooks/useMutateQueueEntries', () => ({
+jest.mock('../hooks/useQueueEntries', () => ({
   useMutateQueueEntries: () => ({ mutateQueueEntries: jest.fn() }),
 }));
 

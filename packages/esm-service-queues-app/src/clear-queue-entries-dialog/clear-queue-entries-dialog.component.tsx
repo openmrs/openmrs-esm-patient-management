@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, ButtonSkeleton, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type QueueEntry } from '../types';
 import { batchClearQueueEntries } from './clear-queue-entries-dialog.resource';
 import styles from './clear-queue-entries-dialog.scss';

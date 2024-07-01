@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import classNames from 'classnames';
-import { useTranslation } from 'react-i18next';
 import { ClickableTile } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import {
-  age,
-  displayName,
-  formatDate,
-  parseDate,
   ConfigurableLink,
-  PatientPhoto,
-  PatientBannerToggleContactDetailsButton,
   PatientBannerContactDetails,
+  PatientBannerToggleContactDetailsButton,
+  PatientPhoto,
+  age,
+  formatDate,
+  getPatientName,
+  parseDate,
 } from '@openmrs/esm-framework';
+import classNames from 'classnames';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppointmentDetails from './appointment-details.component';
 import styles from './patient-info.scss';
 
@@ -24,7 +24,7 @@ interface PatientInfoProps {
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient, handlePatientInfoClick }) => {
   const { t } = useTranslation();
   const [showContactDetails, setShowContactDetails] = useState<boolean>(false);
-  const patientName = displayName(patient);
+  const patientName = getPatientName(patient);
 
   const toggleShowMore = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -15,7 +15,7 @@ test.beforeEach(async ({ api }) => {
 test('Add, edit and cancel an appointment', async ({ page, api }) => {
   const appointmentsPage = new AppointmentsPage(page);
 
-  await test.step('When I go to the appointment tab in the patient chart', async () => {
+  await test.step('When I go to the Appointments page in the patient chart', async () => {
     await appointmentsPage.goto(patient.uuid);
   });
 
@@ -39,7 +39,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   await test.step('And I set date for tomorrow', async () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    await page.fill('input[placeholder="dd/mm/yyyy"]', tomorrow.toLocaleDateString('en-GB'));
+    await page.getByLabel(/^Date$/i).fill(tomorrow.toLocaleDateString('en-GB'));
   });
 
   await test.step('And I set the “Duration” to 60', async () => {
@@ -79,7 +79,7 @@ test('Add, edit and cancel an appointment', async ({ page, api }) => {
   await test.step('And I change the date to Today', async () => {
     const today = new Date();
     today.setDate(today.getDate());
-    await page.fill('input[placeholder="dd/mm/yyyy"]', today.toLocaleDateString('en-GB'));
+    await page.getByLabel(/^Date$/i).fill(today.toLocaleDateString('en-GB'));
   });
 
   await test.step('And I set the “Duration” of the appointment”', async () => {

@@ -134,6 +134,14 @@ export const mockQueueEntryAlice: QueueEntry = {
   visit: {
     uuid: 'c90386ff-ae85-45cc-8a01-25852099c5ae',
     display: 'Facility Visit @ Outpatient Clinic - 04/03/2022 07:22',
+    attributes: [
+      {
+        attributeType: {
+          uuid: 'queue-number-visit-attr-uuid',
+        },
+        value: '42',
+      },
+    ],
   } as Visit,
   sortWeight: 0,
   queueComingFrom: mockQueueTriage,

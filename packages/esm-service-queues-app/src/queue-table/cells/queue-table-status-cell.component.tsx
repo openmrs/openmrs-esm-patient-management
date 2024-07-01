@@ -6,7 +6,7 @@ import { type StatusColumnConfig } from '../../config-schema';
 export const queueTableStatusColumn: QueueTableColumnFunction = (key, header, config: StatusColumnConfig) => {
   const QueueTableStatusCell = ({ queueEntry }: QueueTableCellComponentProps) => {
     // Do not pass queue into status, as we do not want to render it
-    return <QueueStatus status={queueEntry.status} statusConfigs={config?.statuses} />;
+    return <QueueStatus status={queueEntry.status} statusConfigs={config?.statusConfigs} />;
   };
 
   return {

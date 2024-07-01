@@ -1,6 +1,7 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { getLocale, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { type Queue } from '../types';
+import { useMemo } from 'react';
 
 export function useQueues(locationUuid?: string) {
   const customRepresentation =
@@ -9,8 +10,13 @@ export function useQueues(locationUuid?: string) {
 
   const { data, ...rest } = useSWRImmutable<{ data: { results: Array<Queue> } }, Error>(apiUrl, openmrsFetch);
 
+  const queues = useMemo(
+    () => data?.data?.results.sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
+    [data?.data?.results],
+  );
+
   return {
-    queues: data?.data?.results ?? [],
+    queues,
     ...rest,
   };
 }

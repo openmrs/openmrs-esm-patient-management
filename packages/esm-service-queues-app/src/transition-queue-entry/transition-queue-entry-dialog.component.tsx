@@ -1,19 +1,15 @@
 import React, { useCallback } from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { ExtensionSlot, formatDatetime, navigate, parseDate, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { Button, ModalBody, ModalFooter, ModalHeader, Tag } from '@carbon/react';
+import { navigate, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   type MappedVisitQueueEntry,
   serveQueueEntry,
   updateQueueEntry,
 } from '../active-visits/active-visits-table.resource';
-import { findObsByConceptUUID } from '../helpers/functions';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
-import { usePastVisits } from '../past-visit/past-visit.resource';
-import { usePatientAppointments } from '../queue-patient-linelists/queue-linelist.resource';
 import styles from './transition-queue-entry-dialog.scss';
-import { useMutateQueueEntries } from '../hooks/useMutateQueueEntries';
+import { useMutateQueueEntries } from '../hooks/useQueueEntries';
 import { type ConfigObject } from '../config-schema';
 
 interface TransitionQueueEntryModalProps {
@@ -27,7 +23,6 @@ enum priorityComment {
 
 const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ queueEntry, closeModal }) => {
   const { t } = useTranslation();
-
   const config = useConfig<ConfigObject>();
   const defaultTransitionStatus = config.concepts.defaultTransitionStatus;
 
@@ -35,11 +30,6 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
     config.defaultIdentifierTypes.includes(identifier?.identifierType?.uuid),
   );
 
-  const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
-  const { upcomingAppointment, isLoading } = usePatientAppointments(queueEntry?.patientUuid, startDate);
-  const { visits, isLoading: loading } = usePastVisits(queueEntry?.patientUuid);
-  const obsToDisplay =
-    !loading && visits ? findObsByConceptUUID(visits?.encounters, config.concepts.historicalObsConceptUuid) : [];
   const { mutateQueueEntries } = useMutateQueueEntries();
 
   const launchEditPriorityModal = useCallback(() => {
@@ -125,30 +115,10 @@ const TransitionQueueEntryModal: React.FC<TransitionQueueEntryModalProps> = ({ q
                 ))
               : ''}
             <p className={styles.p}>
-              {t('lastClinicalVisit', 'Last clinical visit')} : &nbsp; {loading && t('loading', 'Loading...')}
-              {!loading && !visits && t('none', 'None')}
-              {visits && formatDatetime(parseDate(visits?.startDatetime))}
+              {t('patientAge', 'Age')} : &nbsp; {queueEntry?.patientAge}
             </p>
-            {obsToDisplay?.length
-              ? obsToDisplay.map((o) => (
-                  <p className={styles.p}>
-                    {o.concept.display} : &nbsp; {o.value.display}
-                  </p>
-                ))
-              : ''}
-            <p className={styles.p}>
-              {t('tcaDate', 'Tca date')} : &nbsp; {isLoading && t('loading', 'Loading...')}
-              {!isLoading && !upcomingAppointment && t('none', 'None')}
-              {upcomingAppointment && formatDatetime(parseDate(upcomingAppointment?.startDateTime))}
-            </p>
+            <p>{queueEntry.identifiers?.map((identifier) => <Tag key={identifier.uuid}>{identifier.display}</Tag>)}</p>
           </section>
-          <ExtensionSlot
-            className={styles.visitSummaryContainer}
-            name="previous-visit-summary-slot"
-            state={{
-              patientUuid: queueEntry?.patientUuid,
-            }}
-          />
         </div>
       </ModalBody>
       <ModalFooter>

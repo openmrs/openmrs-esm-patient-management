@@ -25,7 +25,7 @@ $overlay-header-height: 5.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: var(--desktop-workspace-window-height);
+  height: 100%;
 }
 
 .grid {

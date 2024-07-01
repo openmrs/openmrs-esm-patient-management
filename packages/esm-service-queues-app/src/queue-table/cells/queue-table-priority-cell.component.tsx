@@ -9,7 +9,7 @@ export const queueTablePriorityColumn: QueueTableColumnFunction = (key, header, 
       <QueuePriority
         priority={queueEntry.priority}
         priorityComment={queueEntry.priorityComment}
-        priorityConfigs={config?.priorities}
+        priorityConfigs={config?.priorityConfigs}
       />
     );
   };

@@ -132,7 +132,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
     <Layer className={styles.container}>
       <Tile className={styles.headerContainer}>
         <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
-          <h4>{`${t(tableHeading)} ${t('appointments', 'appointments')}`}</h4>
+          <h4>{`${t(tableHeading)} ${t('appointments', 'Appointments')}`}</h4>
         </div>
       </Tile>
       <div className={styles.toolbar}>
@@ -217,13 +217,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, isL
                                   itemText={t('editAppointments', 'Edit appointment')}
                                   size={responsiveSize}
                                   onClick={() =>
- 
                                     launchWorkspace('edit-appointments-form', {
                                       patientUuid: matchingAppointment.patient.uuid,
                                       appointment: matchingAppointment,
                                       context: 'editing',
                                     })
-
                                   }
                                 />
                               </OverflowMenu>

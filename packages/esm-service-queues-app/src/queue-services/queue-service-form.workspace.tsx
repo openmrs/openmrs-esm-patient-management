@@ -136,12 +136,12 @@ const QueueServiceForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) =
         <Column>
           <Layer className={styles.input}>
             <Select
-              labelText={t('selectLocation', 'Select a location')}
+              labelText={t('selectALocation', 'Select a location')}
               id="location"
               invalidText="Required"
               value={userLocation}
               onChange={(event) => setUserLocation(event.target.value)}>
-              {!userLocation && <SelectItem text={t('selectLocation', 'Select a location')} />}
+              {!userLocation && <SelectItem text={t('selectALocation', 'Select a location')} />}
               {queueLocations.length === 0 && <SelectItem text={t('noLocationsAvailable', 'No locations available')} />}
               {queueLocations?.length > 0 &&
                 queueLocations.map((location) => (

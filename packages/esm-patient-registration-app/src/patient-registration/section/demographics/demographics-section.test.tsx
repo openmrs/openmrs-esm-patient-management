@@ -5,6 +5,7 @@ import { initialFormValues } from '../../patient-registration.component';
 import { DemographicsSection } from './demographics-section.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { type FormValues } from '../../patient-registration.types';
+import dayjs from 'dayjs';
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -16,6 +17,20 @@ jest.mock('@openmrs/esm-framework', () => {
       fieldConfigurations: { dateOfBirth: { useEstimatedDateOfBirth: { enabled: true, dayOfMonth: 0, month: 0 } } },
     })),
     getLocale: jest.fn().mockReturnValue('en'),
+    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+      return (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+            onChange={(evt) => {
+              onChange(dayjs(evt.target.value).toDate());
+            }}
+          />
+        </>
+      );
+    }),
   };
 });
 

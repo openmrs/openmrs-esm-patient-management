@@ -1,7 +1,13 @@
-import { showToast, useConfig } from '@openmrs/esm-framework';
+import { showToast, translateFrom, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import { useTranslation, type TFunction } from 'react-i18next';
-import { type ColumnDefinition, type ConfigObject } from '../../config-schema';
+import {
+  builtInColumns,
+  defaultColumnConfig,
+  defaultQueueTable,
+  type ColumnDefinition,
+  type ConfigObject,
+} from '../../config-schema';
 import { type QueueTableColumn } from '../../types';
 import { queueTableComingFromColumn } from './queue-table-coming-from-cell.component';
 import { queueTableExtensionColumn } from './queue-table-extension-cell.component';
@@ -22,13 +28,25 @@ import { queueTableActionColumn } from './queue-table-action-cell.component';
 export function useColumns(queue: string, status: string): QueueTableColumn[] {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { tablesConfig, visitQueueNumberAttributeUuid } = config;
-  const { columnDefinitions, tableDefinitions } = tablesConfig;
+  const { queueTables, visitQueueNumberAttributeUuid } = config;
+  const { columnDefinitions } = queueTables;
+  const tableDefinitions = [...queueTables.tableDefinitions, defaultQueueTable];
+  const globalColumnConfig = {
+    ...defaultColumnConfig,
+    visitQueueNumberAttributeUuid,
+  };
 
   const columnsMap = useMemo(() => {
     const map = new Map<string, QueueTableColumn>();
+    for (const column of builtInColumns) {
+      map.set(column, getColumnFromDefinition(t, { id: column, config: globalColumnConfig }));
+    }
     for (const columnDef of columnDefinitions) {
-      map.set(columnDef.id, getColumnFromDefinition(t, columnDef, visitQueueNumberAttributeUuid));
+      if (columnDef.columnType == 'queue-number' || columnDef.id == 'queue-number') {
+        columnDef.config.visitQueueNumberAttributeUuid =
+          columnDef.config.visitQueueNumberAttributeUuid ?? visitQueueNumberAttributeUuid;
+      }
+      map.set(columnDef.id, getColumnFromDefinition(t, columnDef));
     }
     return map;
   }, [columnDefinitions, t]);
@@ -64,58 +82,51 @@ export function useColumns(queue: string, status: string): QueueTableColumn[] {
   return columns;
 }
 
-function getColumnFromDefinition(
-  t: TFunction,
-  columnDef: ColumnDefinition,
-  visitQueueNumberAttributeUuid: string,
-): QueueTableColumn {
-  const { id, header, columnType } = columnDef;
+function getColumnFromDefinition(t: TFunction, columnDef: ColumnDefinition): QueueTableColumn {
+  const { id, header, headerI18nModule, columnType } = columnDef;
 
-  // TODO: make it possible to use header translation key from another module O3-3138
-  const translatedHeader = header ? t(header) : null;
+  const translatedHeader = header ? translateFrom(headerI18nModule ?? '@openmrs/esm-service-queues-app', header) : null;
 
-  switch (columnType) {
-    case 'patient-name-column': {
+  switch (columnType ?? id) {
+    case 'patient-name': {
       return queueTableNameColumn(id, translatedHeader ?? t('name', 'Name'));
     }
-    case 'patient-identifier-column': {
+    case 'patient-identifier': {
       return queueTablePatientIdentifierColumn(id, translatedHeader ?? t('patientId', 'Patient Id'), columnDef.config);
     }
-    case 'visit-attribute-queue-number-column': {
-      // use visitQueueNumberAttributeUuid from ConfigObject for now to keep backward compatibility
-      // TODO: change it to use the value passed in from columnDef.config instead when ready
-      return queueTableVisitAttributeQueueNumberColumn(id, translatedHeader ?? t('queueNumber', 'Queue Number'), {
-        visitQueueNumberAttributeUuid,
-      });
+    case 'queue-number': {
+      return queueTableVisitAttributeQueueNumberColumn(
+        id,
+        translatedHeader ?? t('queueNumber', 'Queue Number'),
+        columnDef.config,
+      );
     }
-    case 'patient-age-column': {
+    case 'patient-age': {
       return queueTablePatientAgeColumn(id, translatedHeader ?? t('age', 'Age'));
     }
-    case 'priority-column': {
+    case 'priority': {
       return queueTablePriorityColumn(id, translatedHeader ?? t('priority', 'Priority'), columnDef.config);
     }
-    case 'status-column': {
+    case 'status': {
       return queueTableStatusColumn(id, translatedHeader ?? t('status', 'Status'), columnDef.config);
     }
-    case 'queue-coming-from-column': {
+    case 'coming-from': {
       return queueTableComingFromColumn(id, translatedHeader ?? t('comingFrom', 'Coming from'));
     }
-    case 'current-queue-column': {
+    case 'queue': {
       return queueTableQueueNameColumn(id, translatedHeader ?? t('queue', 'Queue'));
     }
-    case 'wait-time-column': {
+    case 'wait-time': {
       return queueTableWaitTimeColumn(id, translatedHeader ?? t('waitTime', 'Wait time'));
     }
-    case 'visit-start-time-column': {
+    case 'visit-start-time': {
       return queueTableVisitStartTimeColumn(id, translatedHeader ?? t('visitStartTime', 'Visit start time'));
     }
-    case 'actions-column': {
+    case 'actions': {
       return queueTableActionColumn(id, translatedHeader ?? t('actions', 'Actions'));
     }
-    case 'extension-column': {
-      // this is a column that only has the queue-table-extension-column-slot extension slot
-      // it can be further configured with columnDef.config
-      return queueTableExtensionColumn(id, translatedHeader, columnDef.config);
+    case 'extension': {
+      return queueTableExtensionColumn(id, translatedHeader);
     }
     default: {
       throw new Error('Unknown column type from configuration: ' + columnType);

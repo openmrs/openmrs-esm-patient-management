@@ -24,7 +24,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'OCCUPIED',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: mockPatientAlice,
+      patients: [mockPatientAlice],
       bedTagMaps: [],
     },
     {
@@ -36,7 +36,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
     {
@@ -48,7 +48,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
     {
@@ -60,7 +60,7 @@ export const mockAdmissionLocation: AdmissionLocation = {
       status: 'AVAILABLE',
       bedType: mockBedType,
       location: mockLocationInpatientWard.display,
-      patient: null,
+      patients: [],
       bedTagMaps: [],
     },
   ],

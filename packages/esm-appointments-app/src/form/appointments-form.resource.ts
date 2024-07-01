@@ -147,3 +147,19 @@ export const cancelAppointment = async (toStatus: string, appointmentUuid: strin
     headers: { 'Content-Type': 'application/json' },
   });
 };
+
+export const checkAppointmentConflict = async (appointmentPayload: AppointmentPayload) => {
+  return await openmrsFetch(`${restBaseUrl}/appointments/conflicts`, {
+    method: 'POST',
+    body: {
+      patientUuid: appointmentPayload.patientUuid,
+      serviceUuid: appointmentPayload.serviceUuid,
+      startDateTime: appointmentPayload.startDateTime,
+      endDateTime: appointmentPayload.endDateTime,
+      providers: [],
+      locationUuid: appointmentPayload.locationUuid,
+      appointmentKind: appointmentPayload.appointmentKind,
+    },
+    headers: { 'Content-Type': 'application/json' },
+  });
+};

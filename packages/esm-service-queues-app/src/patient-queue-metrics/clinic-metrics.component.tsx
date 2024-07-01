@@ -3,18 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
 import MetricsCard from './metrics-card.component';
 import MetricsHeader from './metrics-header.component';
-import {
-  updateSelectedServiceName,
-  updateSelectedServiceUuid,
-  useSelectedServiceName,
-  useSelectedServiceUuid,
-  useSelectedQueueLocationUuid,
-} from '../helpers/helpers';
+import { updateSelectedService, useSelectedService, useSelectedQueueLocationUuid } from '../helpers/helpers';
 import { useActiveVisits, useAverageWaitTime } from './clinic-metrics.resource';
 import { useServiceMetricsCount } from './queue-metrics.resource';
 import styles from './clinic-metrics.scss';
 import { useQueues } from '../hooks/useQueues';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import useQueueServices from '../hooks/useQueueService';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 
 export interface Service {
   uuid: string;
@@ -23,32 +19,25 @@ export interface Service {
 
 function ClinicMetrics() {
   const { t } = useTranslation();
+  const layout = useLayoutType();
 
   const currentQueueLocation = useSelectedQueueLocationUuid();
-  const { queues } = useQueues(currentQueueLocation);
-  const currentServiceUuid = useSelectedServiceUuid();
-  const currentServiceName = useSelectedServiceName();
-  const { serviceCount } = useServiceMetricsCount(currentServiceUuid, currentQueueLocation);
+  const { services } = useQueueServices();
+  const currentService = useSelectedService();
+  const { serviceCount } = useServiceMetricsCount(currentService?.serviceUuid, currentQueueLocation);
   const [initialSelectedItem, setInitialSelectItem] = useState(() => {
-    if (currentServiceName && currentServiceUuid) {
-      return false;
-    } else if (currentServiceName === t('all', 'All')) {
-      return true;
-    } else {
-      return true;
-    }
+    return !currentService?.serviceDisplay || !currentService?.serviceUuid;
   });
-  const { queueEntries, totalCount } = useQueueEntries({
-    queue: currentServiceUuid,
+  const { totalCount } = useQueueEntries({
+    service: currentService?.serviceUuid,
     location: currentQueueLocation,
     isEnded: false,
   });
   const { activeVisitsCount, isLoading: loading } = useActiveVisits();
-  const { waitTime } = useAverageWaitTime(currentServiceUuid, '');
+  const { waitTime } = useAverageWaitTime(currentService?.serviceUuid, '');
 
   const handleServiceChange = ({ selectedItem }) => {
-    updateSelectedServiceUuid(selectedItem.uuid);
-    updateSelectedServiceName(selectedItem.display);
+    updateSelectedService(selectedItem.uuid, selectedItem.display);
     if (selectedItem.uuid == undefined) {
       setInitialSelectItem(true);
     } else {
@@ -70,16 +59,18 @@ function ClinicMetrics() {
           label={t('patients', 'Patients')}
           value={initialSelectedItem ? totalCount ?? '--' : serviceCount}
           headerLabel={`${t('waitingFor', 'Waiting for')}:`}
-          service={currentServiceName}
-          serviceUuid={currentServiceUuid}
+          service={currentService?.serviceDisplay}
+          serviceUuid={currentService?.serviceUuid}
           locationUuid={currentQueueLocation}>
           <Dropdown
             id="inline"
             type="inline"
-            label={currentServiceName ?? `${t('all', 'All')}`}
-            items={[{ display: `${t('all', 'All')}` }, ...queues]}
-            itemToString={(item) => (item ? item.display : '')}
+            items={[{ display: `${t('all', 'All')}` }, ...(services ?? [])]}
+            itemToString={(item) =>
+              item ? `${item.display} ${item.location?.display ? `- ${item.location.display}` : ''}` : ''
+            }
             onChange={handleServiceChange}
+            size={isDesktop(layout) ? 'sm' : 'lg'}
           />
         </MetricsCard>
         <MetricsCard

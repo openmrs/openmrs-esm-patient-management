@@ -76,6 +76,9 @@ dist
 .turbo/
 ~
 
+# Environment variables
+.env
+
 # Playwright and e2e tests
 /test-results/
 /playwright-report/
