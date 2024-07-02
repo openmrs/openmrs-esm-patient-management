@@ -25,7 +25,7 @@ function getInitialUrl(rep: string, searchCriteria?: QueueEntrySearchCriteria) {
 
   if (searchCriteria) {
     for (let [key, value] of Object.entries(searchCriteria)) {
-      if (value != null) {
+      if (value != null && value !== undefined) {
         searchParam.append(key, value?.toString());
       }
     }
