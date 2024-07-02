@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -8,6 +8,7 @@ import { ConfigurableLink } from '@openmrs/esm-framework';
 import { ArrowRight } from '@carbon/react/icons';
 import { basePath, spaHomePage } from '../constants';
 import styles from './metrics-card.scss';
+import SelectedDateContext from '../hooks/selectedDateContext';
 
 interface MetricsCardProps {
   label: string;
@@ -29,7 +30,8 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
   appointmentDate,
 }) => {
   const { t } = useTranslation();
-  const isDateInPast = useMemo(() => !dayjs(appointmentDate).isBefore(dayjs(), 'date'), [appointmentDate]);
+  const { selectedDate } = useContext(SelectedDateContext);
+  const isSelectedDateInPast = useMemo(() => dayjs(selectedDate).isBefore(dayjs(), 'date'), [selectedDate]);
 
   const metricsLink = {
     patients: 'appointments-list/scheduled',
@@ -62,7 +64,7 @@ const MetricsCard: React.FC<MetricsCardProps> = ({
           {!isEmpty(count) && (
             <div className={styles.countGrid}>
               <span>{t('checkedIn', 'Checked in')}</span>
-              <span>{isDateInPast ? t('notArrived', 'Not arrived') : t('missed', 'Missed')}</span>
+              <span>{isSelectedDateInPast ? t('missed', 'Missed') : t('notArrived', 'Not arrived')}</span>
               <p style={{ color: '#319227' }}>{count.arrivedAppointments?.length}</p>
               <p style={{ color: '#da1e28' }}>{count.pendingAppointments?.length}</p>
             </div>
