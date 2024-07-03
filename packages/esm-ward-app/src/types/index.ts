@@ -7,6 +7,7 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type Order } from '@openmrs/esm-service-queues-app/src/types';
 
 export interface WardPatientCardProps {
   patient: Patient;
@@ -165,4 +166,8 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   name?: string;
   description?: string;
   retired?: boolean;
+}
+
+export interface PatientOrderFetchResponse {
+  results: Array<Order>;
 }

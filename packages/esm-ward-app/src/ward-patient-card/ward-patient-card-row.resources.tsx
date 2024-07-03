@@ -91,7 +91,7 @@ function getPatientCardElementFromDefinition(
     case 'patient-age':
       return WardPatientAge;
     case 'patient-pending-orders': {
-      return WardPatientPendingOrders(config.orders);
+      return (props: WardPatientCardProps) => <WardPatientPendingOrders {...props} {...config.orders} />;
     }
     case 'patient-address': {
       return wardPatientAddress(config.address);
