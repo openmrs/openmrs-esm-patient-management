@@ -67,7 +67,7 @@ export const configSchema: ConfigSchema = {
             _description: 'Config for the patientCardElementType "patient-pending-orders"',
             types: {
               _type: Type.Array,
-              _description: 'defines which order types that can be waited for',
+              _description: 'defines which order types that can be waited for i.e uuid for Test Orders',
               _default: [],
             },
           },

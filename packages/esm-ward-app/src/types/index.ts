@@ -108,7 +108,6 @@ export interface InpatientRequest {
   dispositionDate?: Date;
 }
 
-
 // AdmittedPatient[] returned by:
 // GET /rest/emrapi/inpatient/visits
 export interface AdmittedPatient {
@@ -136,6 +135,20 @@ export interface Observation extends OpenmrsResourceStrict {
   voided: boolean;
 }
 
+export interface Diagnosis {
+  uuid: string;
+  display: string;
+  diagnosis: {
+    coded?: {
+      uuid: string;
+      display?: string;
+    };
+    nonCoded?: string;
+  };
+  certainty: string;
+  rank: number;
+}
+
 export interface Encounter extends OpenmrsResourceStrict {
   encounterDatetime?: string;
   patient?: Patient;
@@ -147,7 +160,7 @@ export interface Encounter extends OpenmrsResourceStrict {
   voided?: boolean;
   visit?: Visit;
   encounterProviders?: Array<EncounterProvider>;
-  diagnoses?: any;
+  diagnoses?: Array<Diagnosis>;
 }
 
 export interface EncounterProvider extends OpenmrsResourceStrict {

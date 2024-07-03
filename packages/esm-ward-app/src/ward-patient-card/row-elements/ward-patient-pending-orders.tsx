@@ -5,6 +5,8 @@ import styles from './row-elements.scss';
 import { type PatientPendingOrdersElementConfig } from '../../config-schema';
 import { useTranslation } from 'react-i18next';
 import { usePatientOrders } from '@openmrs/esm-patient-common-lib';
+import { SkeletonIcon } from '@carbon/react';
+import { useTestOrderCount } from '../../hooks/usePatientPendingOrders';
 
 interface WardPatientPendingOrdersProps extends WardPatientCardProps {
   orderType: string;
@@ -12,19 +14,21 @@ interface WardPatientPendingOrdersProps extends WardPatientCardProps {
 
 const WardPatientPendingOrdersItem: React.FC<WardPatientPendingOrdersProps> = ({ patient, orderType }) => {
   const { t } = useTranslation();
-  const {
-    data: allOrders,
-    error: isError,
-    isLoading,
-    isValidating,
-  } = usePatientOrders(patient.uuid, 'ACTIVE', orderType);
+  const { data: allOrders, error: isError, isLoading } = usePatientOrders(patient.uuid, 'ACTIVE', orderType);
+  const count = useTestOrderCount(allOrders || []);
 
-  // console.log(allOrders);
+  if (count === 0) return null;
 
   return (
     <div className={styles.waitingForItemContainer}>
-      <ChemistryReference className={styles.chemistryReferenceIcon} size="24" />
-      {t('labs', '{{count}} Labs', { count: 2 })}
+      {isLoading ? (
+        <SkeletonIcon />
+      ) : (
+        <>
+          <ChemistryReference className={styles.chemistryReferenceIcon} size="24" />
+          {t('labs', '{{count}} Labs', { count })}
+        </>
+      )}
     </div>
   );
 };
