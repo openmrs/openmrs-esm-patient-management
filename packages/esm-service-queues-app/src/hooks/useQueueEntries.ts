@@ -96,10 +96,10 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
     }
     if (pageData && !isValidating && !stillWaitingForMutate) {
       // We've got results! Time to update the data array and move on to the next page.
-      if (pageData?.data?.totalCount && pageData?.data?.totalCount !== totalCount) {
+      if (pageData?.data?.totalCount > -1 && pageData?.data?.totalCount !== totalCount) {
         setTotalCount(pageData?.data?.totalCount);
       }
-      if (pageData?.data?.results?.length) {
+      if (pageData?.data?.results) {
         const newData = [...data];
         newData[currentPage] = pageData?.data?.results;
         setData(newData);
@@ -154,7 +154,7 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   return {
     queueEntries,
     totalCount,
-    isLoading: !totalCount || (totalCount && queueEntries.length < totalCount),
+    isLoading: totalCount === undefined || (totalCount && queueEntries.length < totalCount),
     isValidating: isValidating || currentPage < data.length,
     error,
     mutate: mutateQueueEntries,
