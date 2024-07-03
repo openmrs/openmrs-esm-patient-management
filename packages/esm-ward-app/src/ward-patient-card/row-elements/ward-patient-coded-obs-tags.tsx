@@ -45,7 +45,7 @@ const wardPatientCodedObsTags = (config: PatientCodedObsTagsElementConfig) => {
         const color = conceptToTagColorMap?.get(uuid);
         if (color) {
           return (
-            <Tag type={color} key={o.uuid}>
+            <Tag type={color} key={`ward-coded-obs-tag-${o.uuid}`}>
               {display}
             </Tag>
           );
