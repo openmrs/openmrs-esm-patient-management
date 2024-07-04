@@ -1,13 +1,14 @@
+import { getPatientName, usePatient } from '@openmrs/esm-framework';
 import React from 'react';
 import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
+import { SkeletonText } from '@carbon/react';
 
-const WardPatientName: WardPatientCardElement = ({ patient }) => {
-  // TODO: BED-10
-  // make server return patient.display and use that instead
-  const { givenName, familyName } = patient?.person?.preferredName;
-  const name = `${givenName} ${familyName}`;
-  return <div className={styles.wardPatientName}>{name}</div>;
+const WardPatientName: WardPatientCardElement = ({ patient: { uuid: patientUuid } }) => {
+  const { patient, isLoading } = usePatient(patientUuid);
+
+  if (!patient || isLoading) return <SkeletonText width="40%" />;
+  return <div className={styles.wardPatientName}>{getPatientName(patient)}</div>;
 };
 
 export default WardPatientName;
