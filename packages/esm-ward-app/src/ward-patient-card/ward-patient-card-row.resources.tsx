@@ -15,9 +15,8 @@ import React from 'react';
 import styles from './ward-patient-card.scss';
 import wardPatientObs from './row-elements/ward-patient-obs';
 import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
-
-import wardPatientIdentifier from './row-elements/ward-patient-identifier';
 import useWardLocation from '../hooks/useWardLocation';
+import wardPatientIdentifier from './row-elements/ward-patient-identifier';
 
 export function usePatientCardRows() {
   const {
