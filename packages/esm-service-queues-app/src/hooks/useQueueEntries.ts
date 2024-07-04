@@ -3,6 +3,7 @@ import { type QueueEntry, type QueueEntrySearchCriteria } from '../types';
 import useSWR from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig } from 'swr/_internal';
+import isEqual from 'lodash-es/isEqual';
 
 type QueueEntryResponse = FetchResponse<{
   results: Array<QueueEntry>;
@@ -81,10 +82,36 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [totalCount, setTotalCount] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
+  const [currentSearchCriteria, setCurrentSearchCriteria] = useState(searchCriteria);
+  const [currentRep, setCurrentRep] = useState(rep);
+  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(currentRep, currentSearchCriteria));
   const [error, setError] = useState<Error>();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [waitingForMutate, setWaitingForMutate] = useState(false);
+
+  const refetchAllData = useCallback(
+    (newRep: string = currentRep, newSearchCriteria: QueueEntrySearchCriteria = currentSearchCriteria) => {
+      setWaitingForMutate(true);
+      setCurrentPage(0);
+      setPageUrl(getInitialUrl(newRep, newSearchCriteria));
+    },
+    [currentRep, currentSearchCriteria],
+  );
+
+  // This hook listens to the searchCriteria and rep values and refetches the data when they change.
+  useEffect(() => {
+    const isSearchCriteriaUpdated = !isEqual(currentSearchCriteria, searchCriteria);
+    const isRepUpdated = currentRep !== rep;
+    if (isSearchCriteriaUpdated || isRepUpdated) {
+      if (isSearchCriteriaUpdated) {
+        setCurrentSearchCriteria(searchCriteria);
+      }
+      if (isRepUpdated) {
+        setCurrentRep(rep);
+      }
+      refetchAllData(rep, searchCriteria);
+    }
+  }, [searchCriteria, currentSearchCriteria, setCurrentSearchCriteria, currentRep, rep]);
 
   const { data: pageData, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
 
@@ -137,10 +164,8 @@ export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: 
   }, [pageError]);
 
   const queueUpdateListener = useCallback(() => {
-    setWaitingForMutate(true);
-    setCurrentPage(0);
-    setPageUrl(getInitialUrl(rep, searchCriteria));
-  }, [rep, searchCriteria]);
+    refetchAllData();
+  }, [refetchAllData]);
 
   useEffect(() => {
     window.addEventListener('queue-entry-updated', queueUpdateListener);
