@@ -68,7 +68,7 @@ export function useMutateQueueEntries() {
   };
 }
 
-export function useQueueEntries(searchCriteriaVal?: QueueEntrySearchCriteria, repVal: string = repString) {
+export function useQueueEntries(searchCriteria?: QueueEntrySearchCriteria, rep: string = repString) {
   // This manually implements a kind of pagination using the useSWR hook. It does not use useSWRInfinite
   // because useSWRInfinite does not support with `mutate`. The hook starts by fetching the first page,
   // page zero, waits until data is fetched, then fetches the next page, and so on.
@@ -82,38 +82,36 @@ export function useQueueEntries(searchCriteriaVal?: QueueEntrySearchCriteria, re
   const [data, setData] = useState<Array<Array<QueueEntry>>>([]);
   const [totalCount, setTotalCount] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [searchCriteria, setSearchCriteria] = useState(searchCriteriaVal);
-  const [rep, setRep] = useState(repVal);
-  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(rep, searchCriteria));
+  const [currentSearchCriteria, setCurrentSearchCriteria] = useState(searchCriteria);
+  const [currentRep, setCurrentRep] = useState(rep);
+  const [pageUrl, setPageUrl] = useState<string>(getInitialUrl(currentRep, currentSearchCriteria));
   const [error, setError] = useState<Error>();
   const { mutateQueueEntries } = useMutateQueueEntries();
   const [waitingForMutate, setWaitingForMutate] = useState(false);
 
   const refetchAllData = useCallback(
-    (newRep: string = rep, newSearchCriteria: QueueEntrySearchCriteria = searchCriteria) => {
+    (newRep: string = currentRep, newSearchCriteria: QueueEntrySearchCriteria = currentSearchCriteria) => {
       setWaitingForMutate(true);
       setCurrentPage(0);
       setPageUrl(getInitialUrl(newRep, newSearchCriteria));
     },
-    [rep, searchCriteria],
+    [currentRep, currentSearchCriteria],
   );
 
-  /**
-   * This hook listens to the searchCriteria and rep values and refetches the data when they change.
-   */
+  // This hook listens to the searchCriteria and rep values and refetches the data when they change.
   useEffect(() => {
-    const isSearchCriteriaUpdated = !isEqual(searchCriteria, searchCriteriaVal);
-    const isRepUpdated = rep !== repVal;
-    if (isSearchCriteriaUpdated || rep !== repVal) {
+    const isSearchCriteriaUpdated = !isEqual(currentSearchCriteria, searchCriteria);
+    const isRepUpdated = currentRep !== rep;
+    if (isSearchCriteriaUpdated || isRepUpdated) {
       if (isSearchCriteriaUpdated) {
-        setSearchCriteria(searchCriteriaVal);
+        setCurrentSearchCriteria(searchCriteria);
       }
       if (isRepUpdated) {
-        setRep(rep);
+        setCurrentRep(rep);
       }
-      refetchAllData(repVal, searchCriteriaVal);
+      refetchAllData(rep, searchCriteria);
     }
-  }, [searchCriteriaVal, searchCriteria, setSearchCriteria, rep, repVal]);
+  }, [searchCriteria, currentSearchCriteria, setCurrentSearchCriteria, currentRep, rep]);
 
   const { data: pageData, isValidating, error: pageError } = useSWR<QueueEntryResponse, Error>(pageUrl, openmrsFetch);
 
