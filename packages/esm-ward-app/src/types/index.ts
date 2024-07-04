@@ -26,7 +26,6 @@ export const patientCardElementTypes = [
   'patient-obs',
   'patient-coded-obs-tags',
   'admission-time',
-  'hour-glass',
   'patient-transfer',
   'patient-pending-orders',
 ] as const;

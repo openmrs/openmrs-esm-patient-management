@@ -53,6 +53,9 @@ export function usePatientCardRows(location: string) {
         return slot;
       });
 
+      if (rowType === 'waitingFor') {
+        patientCardElements.unshift(WardHourGlass);
+      }
       const WardPatientCardRow: React.FC<WardPatientCardProps> = (props) => {
         return (
           <div
@@ -80,8 +83,6 @@ function getPatientCardElementFromDefinition(
 ): WardPatientCardElement {
   const { elementType, config } = patientCardElementDef;
   switch (elementType) {
-    case 'hour-glass':
-      return WardHourGlass;
     case 'patient-transfer':
       return WardPatientTransfer;
     case 'bed-number':

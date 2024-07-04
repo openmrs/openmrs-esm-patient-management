@@ -6,7 +6,7 @@ import { type PatientPendingOrdersElementConfig } from '../../config-schema';
 import { useTranslation } from 'react-i18next';
 import { usePatientOrders } from '@openmrs/esm-patient-common-lib';
 import { SkeletonIcon } from '@carbon/react';
-import { useTestOrderCount } from '../../hooks/usePatientPendingOrders';
+import { useCountTestOrdersWithoutObs } from '../../hooks/usePatientPendingOrders';
 
 interface WardPatientPendingOrdersProps extends WardPatientCardProps {
   orderType: string;
@@ -14,14 +14,14 @@ interface WardPatientPendingOrdersProps extends WardPatientCardProps {
 
 const WardPatientPendingOrdersItem: React.FC<WardPatientPendingOrdersProps> = ({ patient, orderType }) => {
   const { t } = useTranslation();
-  const { data: allOrders, error: isError, isLoading } = usePatientOrders(patient.uuid, 'ACTIVE', orderType);
-  const count = useTestOrderCount(allOrders || []);
+  const { data: orders, error: isError, isLoading } = usePatientOrders(patient.uuid, 'ACTIVE', orderType);
+  const { count, isLoading: countingOrdersWithoutObs } = useCountTestOrdersWithoutObs(orders || []);
 
   if (count === 0) return null;
 
   return (
     <div className={styles.waitingForItemContainer}>
-      {isLoading ? (
+      {isLoading || countingOrdersWithoutObs ? (
         <SkeletonIcon />
       ) : (
         <>

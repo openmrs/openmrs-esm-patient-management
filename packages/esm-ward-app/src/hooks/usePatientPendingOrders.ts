@@ -13,44 +13,83 @@ const conceptRepresentation =
   'custom:(uuid,display,name,datatype,set,answers,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,' +
   'setMembers:(uuid,display,answers,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 
-export function useTestOrderCount(testOrders: Order[]) {
+/**
+ * Custom hook to count orders of type TestOrder that lack associated observations.
+ *
+ * This hook takes an array of orders and counts how many of them do not have observations recorded.
+ * It fetches the necessary concept and encounter data for each order to determine if observations are missing.
+ *
+ * @param {Order[]} orders - An array of order objects. Each order contains information about the order, including concept and encounter UUIDs.
+ * @returns {count: number, isLoading: boolean } - The count of orders without observations, and a loading state.
+ *
+ * @example
+ * const orders = [
+ *   { concept: { uuid: 'concept-uuid-1' }, encounter: { uuid: 'encounter-uuid-1' }, ... },
+ *   { concept: { uuid: 'concept-uuid-2' }, encounter: { uuid: 'encounter-uuid-2' }, ... },
+ * ];
+ *
+ * const {count: unobservedCount, isLoading } = useCountTestOrdersWithoutObs(testOrders);
+ * // unobservedCount would be the number of test orders without associated observations.
+ */
+
+export function useCountTestOrdersWithoutObs(orders: Order[]): { count: number; isLoading: boolean } {
   const [countPending, setCountPending] = useState(0);
-
-  const fetchOrderData = async (order: Order) => {
-    const conceptKey = `${restBaseUrl}/concept/${order.concept.uuid}?v=${conceptRepresentation}`;
-    const encounterKey = `${restBaseUrl}/encounter/${order.encounter.uuid}?v=${encounterRepresentation}`;
-
-    const concept = await openmrsFetch<Concept>(conceptKey);
-    const encounter = await openmrsFetch<Encounter>(encounterKey);
-
-    return { concept, encounter };
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    testOrders.forEach(async (order) => {
-      if (order.orderType['javaClassName'] === 'org.openmrs.TestOrder') {
-        const { concept, encounter } = await fetchOrderData(order);
+    const fetchOrderData = async (order: Order) => {
+      const conceptKey = `${restBaseUrl}/concept/${order.concept.uuid}?v=${conceptRepresentation}`;
+      const encounterKey = `${restBaseUrl}/encounter/${order.encounter.uuid}?v=${encounterRepresentation}`;
 
-        if (concept && encounter) {
-          const conceptData = concept.data;
-          const encounterData = encounter.data;
+      const [concept, encounter] = await Promise.all([
+        openmrsFetch<Concept>(conceptKey),
+        openmrsFetch<Encounter>(encounterKey),
+      ]);
 
-          const testResultObs = encounterData?.obs?.find((obs) => obs.concept.uuid === conceptData.uuid);
+      return { concept, encounter };
+    };
 
-          if (conceptData.setMembers.length > 0) {
-            const noResultCount = conceptData.setMembers.filter(
-              (memberConcept) => !testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid),
-            ).length;
-            setCountPending((prevState) => (prevState += noResultCount));
-          } else if (conceptData.setMembers.length === 0) {
-            if (!testResultObs?.value['display']) {
-              setCountPending((prevState) => (prevState += 1));
+    const countPendingOrders = async () => {
+      setIsLoading(true);
+      try {
+        const pendingCounts = await Promise.all(
+          orders.map(async (order) => {
+            if (order.orderType['javaClassName'] === 'org.openmrs.TestOrder') {
+              const { concept, encounter } = await fetchOrderData(order);
+
+              if (concept && encounter) {
+                const conceptData = concept.data;
+                const encounterData = encounter.data;
+
+                const testResultObs = encounterData?.obs?.find((obs) => obs.concept.uuid === conceptData.uuid);
+
+                if (conceptData.setMembers.length > 0) {
+                  return conceptData.setMembers.filter(
+                    (memberConcept: { uuid: string }) =>
+                      !testResultObs?.groupMembers?.find((obs) => obs.concept.uuid === memberConcept.uuid),
+                  ).length;
+                } else if (conceptData.setMembers.length === 0 && !testResultObs?.value['display']) {
+                  return 1;
+                }
+              }
             }
-          }
-        }
-      }
-    });
-  }, [testOrders]);
+            return 0;
+          }),
+        );
 
-  return countPending;
+        // Sum up all the counts
+        const totalPendingCount = pendingCounts.reduce((total, count) => total + count, 0);
+        setCountPending(totalPendingCount);
+      } catch (error) {
+        console.error('Error fetching order data:', error);
+        setCountPending(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    countPendingOrders();
+  }, [orders]);
+
+  return { count: countPending, isLoading };
 }

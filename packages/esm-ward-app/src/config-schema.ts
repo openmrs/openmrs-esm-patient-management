@@ -10,7 +10,7 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
     },
     {
       rowType: 'waitingFor',
-      elements: ['hour-glass', 'patient-transfer'],
+      elements: ['patient-transfer'],
     },
   ],
   appliedTo: null,
@@ -34,7 +34,6 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-name',
   'patient-age',
   'patient-address',
-  'hour-glass',
   'patient-transfer',
 ];
 
@@ -67,8 +66,9 @@ export const configSchema: ConfigSchema = {
             _description: 'Config for the patientCardElementType "patient-pending-orders"',
             types: {
               _type: Type.Array,
-              _description: 'defines which order types that can be waited for i.e uuid for Test Orders',
-              _default: [],
+              _elements: { _type: Type.UUID },
+              _description: 'UUIDs of order types to display in the `waitingFor` row',
+              _default: ['52a447d3-a64a-11e3-9aeb-50e549534c5e'],
             },
           },
           obs: {
@@ -208,7 +208,7 @@ export interface WardPatientCardDefinition {
   id: string;
   rows: Array<{
     /**
-     * The type of row. Currently, only "header" and "waiting-list" is supported
+     * The type of row. Currently, only "header" and "waitingFor" are supported
      */
     rowType: 'header' | 'waitingFor';
 
