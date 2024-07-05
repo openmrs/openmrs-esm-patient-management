@@ -1,11 +1,10 @@
-import { cleanup } from '@testing-library/react';
 import { updateValueInSessionStorage } from './helpers';
 
 describe('Testing updateValueInSessionStorage', () => {
   beforeEach(() => {
-    cleanup();
     sessionStorage.clear();
   });
+
   it('should save value in the session storage if valid value is passed', () => {
     updateValueInSessionStorage('key', 'value');
     expect(sessionStorage.getItem('key')).toBe('value');
