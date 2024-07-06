@@ -3,7 +3,6 @@ import {
   type ConfigSchema,
   getDefaultsFromConfigSchema,
   useConfig,
-  useSession,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
@@ -108,6 +107,6 @@ describe('WardView:', () => {
   it('screen should be empty if backend module is not installed', () => {
     mockedUseFeatureFlag.mockReturnValueOnce(false);
     const { container } = renderWithSwr(<WardView />);
-    expect(container.firstChild).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 });
