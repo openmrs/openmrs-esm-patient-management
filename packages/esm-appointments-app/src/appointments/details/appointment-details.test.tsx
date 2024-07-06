@@ -77,7 +77,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 test('renders appointment details correctly', async () => {
-  const { getByText } = render(<AppointmentDetails appointment={appointment} />);
+  render(<AppointmentDetails appointment={appointment} />);
   expect(screen.getByText(/Patient name/i)).toBeInTheDocument();
   expect(screen.getByText(/John Wilson/i)).toBeInTheDocument();
   expect(screen.getByText(/Age/i)).toBeInTheDocument();

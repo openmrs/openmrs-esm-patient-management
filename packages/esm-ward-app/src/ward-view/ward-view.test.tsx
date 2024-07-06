@@ -1,3 +1,5 @@
+import React from 'react';
+import { screen } from '@testing-library/react';
 import {
   type Person,
   type ConfigSchema,
@@ -5,18 +7,15 @@ import {
   useConfig,
   useFeatureFlag,
 } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
-import React from 'react';
 import { useParams } from 'react-router-dom';
-import { mockLocations } from '../../../../__mocks__/locations.mock';
 import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import WardView from './ward-view.component';
 import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
 import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 import useWardLocation from '../hooks/useWardLocation';
+import WardView from './ward-view.component';
 
 jest.replaceProperty(mockPatientAlice.person as Person, 'preferredName', {
   uuid: '',
