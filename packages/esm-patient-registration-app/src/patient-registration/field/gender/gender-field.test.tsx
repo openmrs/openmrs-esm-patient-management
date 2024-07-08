@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { Formik, Form } from 'formik';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { GenderField } from './gender-field.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
@@ -12,6 +12,10 @@ jest.mock('@openmrs/esm-framework', () => ({
         {
           value: 'male',
           label: 'Male',
+        },
+        {
+          value: 'female',
+          label: 'Female',
         },
       ],
       name: {
@@ -37,23 +41,30 @@ jest.mock('formik', () => ({
 }));
 
 describe('GenderField', () => {
-  const renderComponent = () => {
-    return render(
-      <Formik initialValues={{}} onSubmit={null}>
-        <Form>
-          <GenderField />
-        </Form>
-      </Formik>,
-    );
-  };
-
   it('has a label', () => {
-    expect(renderComponent().getAllByText('Sex')).toBeTruthy();
+    renderGenderField();
+
+    expect(screen.getByRole('heading', { name: /sex/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/^male/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/female/i)).toBeInTheDocument();
   });
 
   it('checks an option', async () => {
     const user = userEvent.setup();
-    const component = renderComponent();
-    expect(component.getByLabelText('Male').getAttribute('value')).toBe('male');
+    renderGenderField();
+
+    await user.click(screen.getByText(/female/i));
+    expect(screen.getByLabelText(/female/i)).toBeChecked();
+    expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
   });
 });
+
+function renderGenderField() {
+  render(
+    <Formik initialValues={{}} onSubmit={null}>
+      <Form>
+        <GenderField />
+      </Form>
+    </Formik>,
+  );
+}
