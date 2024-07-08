@@ -41,7 +41,9 @@ export default function WardPatientWorkspace({ patientUuid, setTitle }: WardPati
       ) : error ? (
         <InlineNotification>{error.message}</InlineNotification>
       ) : (
-        <h1>Something has gone wrong.</h1>
+        <InlineNotification>
+          {t('failedToLoadPatientWorkspace', 'Ward patient workspace has failed to load.')}
+        </InlineNotification>
       )}
     </div>
   );
