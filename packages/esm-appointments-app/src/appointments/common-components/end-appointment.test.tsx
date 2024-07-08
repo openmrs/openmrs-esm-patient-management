@@ -38,7 +38,7 @@ describe('EndAppointmentModal', () => {
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
     const submitButton = screen.getByRole('button', { name: /check out/i });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     expect(changeAppointmentStatus).toHaveBeenCalledWith('Completed', 'abc');
@@ -63,7 +63,7 @@ describe('EndAppointmentModal', () => {
     render(<EndAppointmentModal appointmentUuid={'abc'} patientUuid={'123'} closeModal={closeModal} />);
 
     const submitButton = screen.getByRole('button', { name: /check out/i });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     expect(changeAppointmentStatus).toHaveBeenCalledWith('Completed', 'abc');

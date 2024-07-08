@@ -140,6 +140,7 @@ let mockOpenmrsConfig: RegistrationConfig = {
   ],
   fieldDefinitions: [],
   fieldConfigurations: {
+    phone: null,
     dateOfBirth: {
       allowEstimatedDateOfBirth: true,
       useEstimatedDateOfBirth: {
@@ -169,9 +170,6 @@ let mockOpenmrsConfig: RegistrationConfig = {
         searchAddressByLevel: true,
       },
     },
-  },
-  concepts: {
-    patientPhotoUuid: '736e8771-e501-4615-bfa7-570c03f4bef5',
   },
   links: {
     submitButton: '#',
@@ -236,7 +234,6 @@ const fillRequiredFields = async () => {
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
   const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i) as HTMLInputElement;
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
-  screen.debug(dateOfBirthInput);
   await user.type(givenNameInput, 'Paul');
   await user.type(familyNameInput, 'Gaihre');
   await user.clear(dateOfBirthInput);
@@ -268,8 +265,8 @@ describe('Registering a new patient', () => {
   it('has the expected sections', async () => {
     render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
-    expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull();
-    expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
+    expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /contact info section/i })).toBeInTheDocument();
   });
 
   // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
