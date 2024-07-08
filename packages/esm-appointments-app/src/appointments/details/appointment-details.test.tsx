@@ -1,7 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
-import AppointmentDetails from './appointment-details.component';
+import { render, screen } from '@testing-library/react';
 import { type Appointment } from '../../types';
+import AppointmentDetails from './appointment-details.component';
 
 const appointment: Appointment = {
   uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
@@ -58,31 +58,46 @@ jest.mock('../../hooks/usePatientAppointmentHistory', () => ({
   }),
 }));
 
-jest.mock('../../hooks/usePatientDetails', () => ({
-  usePatientDetails: () => ({
-    patientDetails: {
-      dateOfBirth: '22-Mar-2020',
-    },
-  }),
-}));
-test('renders appointment details correctly', () => {
-  const { getByText } = render(<AppointmentDetails appointment={appointment} />);
-  expect(getByText(/Patient name/i)).toBeInTheDocument();
-  expect(getByText(/John Wilson/i)).toBeInTheDocument();
-  expect(getByText(/Age/i)).toBeInTheDocument();
-  expect(getByText(/34/i)).toBeInTheDocument();
-  expect(getByText(/Gender/i)).toBeInTheDocument();
-  expect(getByText(/Male/i)).toBeInTheDocument();
-  expect(getByText(/Date of birth/i)).toBeInTheDocument();
-  expect(getByText(/Appointment Notes/i)).toBeInTheDocument();
-  expect(getByText(/Some comments/i)).toBeInTheDocument();
-  expect(getByText(/Appointment History/i)).toBeInTheDocument();
-  expect(getByText(/Completed/i)).toBeInTheDocument();
-  expect(getByText('1', { exact: true })).toBeInTheDocument();
-  expect(getByText(/Missed/i)).toBeInTheDocument();
-  expect(getByText('2', { exact: true })).toBeInTheDocument();
-  expect(getByText(/Cancelled/i)).toBeInTheDocument();
-  expect(getByText('3', { exact: true })).toBeInTheDocument();
-  expect(getByText(/Upcoming/i)).toBeInTheDocument();
-  expect(getByText('4', { exact: true })).toBeInTheDocument();
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    usePatient: jest.fn().mockImplementation((...args) => ({
+      patient: {
+        birthDate: '22-Mar-2020',
+        telecom: [
+          {
+            uuid: 'tel-uuid-1',
+            value: '0899129989932',
+          },
+        ],
+      },
+    })),
+  };
+});
+
+test('renders appointment details correctly', async () => {
+  render(<AppointmentDetails appointment={appointment} />);
+  expect(screen.getByText(/Patient name/i)).toBeInTheDocument();
+  expect(screen.getByText(/John Wilson/i)).toBeInTheDocument();
+  expect(screen.getByText(/Age/i)).toBeInTheDocument();
+  expect(screen.getByText(/34/i)).toBeInTheDocument();
+  expect(screen.getByText(/Gender/i)).toBeInTheDocument();
+  expect(screen.getByText(/Male/i)).toBeInTheDocument();
+  expect(screen.getByText(/Date of birth/i)).toBeInTheDocument();
+  expect(screen.getByText(/Date of birth/i)).toBeInTheDocument();
+  expect(screen.getByText(/22-Mar-2020/i)).toBeInTheDocument();
+  expect(screen.getByText(/Contact 1/i)).toBeInTheDocument();
+  expect(screen.getByText(/0899129989932/i)).toBeInTheDocument();
+  expect(screen.getByText(/Appointment Notes/i)).toBeInTheDocument();
+  expect(screen.getByText(/Some comments/i)).toBeInTheDocument();
+  expect(screen.getByText(/Appointment History/i)).toBeInTheDocument();
+  expect(screen.getByText(/Completed/i)).toBeInTheDocument();
+  expect(screen.getByText('1', { exact: true })).toBeInTheDocument();
+  expect(screen.getByText(/Missed/i)).toBeInTheDocument();
+  expect(screen.getByText('2', { exact: true })).toBeInTheDocument();
+  expect(screen.getByText(/Cancelled/i)).toBeInTheDocument();
+  expect(screen.getByText('3', { exact: true })).toBeInTheDocument();
+  expect(screen.getByText(/Upcoming/i)).toBeInTheDocument();
+  expect(screen.getByText('4', { exact: true })).toBeInTheDocument();
 });

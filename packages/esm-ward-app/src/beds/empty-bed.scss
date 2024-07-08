@@ -1,0 +1,28 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.container {
+  display: flex;
+  gap: spacing.$spacing-04;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed $ui-04;
+  padding: spacing.$spacing-03 spacing.$spacing-04;
+  height: fit-content;
+}
+
+.container:hover:not(.skeleton) {
+  border: 1px solid transparent;
+  box-shadow: inset 0px 0px 0px 2px $color-blue-60-2;
+  cursor: pointer;
+}
+
+.emptyBed {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.skeletonText {
+  width: 100px;
+}

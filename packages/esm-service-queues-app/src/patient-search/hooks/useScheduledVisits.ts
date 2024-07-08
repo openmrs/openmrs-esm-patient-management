@@ -3,27 +3,29 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { type AppointmentsFetchResponse } from '../../types';
 
-export function useScheduledVisits(patientUuid: string) {
+const fetcher = (appointmentsSearchUrl: string, patientUuid: string) => {
   const abortController = new AbortController();
   let startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
+
+  return openmrsFetch(appointmentsSearchUrl, {
+    method: 'POST',
+    signal: abortController.signal,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: {
+      patientUuid: patientUuid,
+      startDate: startDate,
+    },
+  });
+};
+
+export function useScheduledVisits(patientUuid: string) {
   const appointmentsSearchUrl = `${restBaseUrl}/appointments/search`;
 
-  const fetcher = () =>
-    openmrsFetch(appointmentsSearchUrl, {
-      method: 'POST',
-      signal: abortController.signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        patientUuid: patientUuid,
-        startDate: startDate,
-      },
-    });
-
   const { data, error, isLoading } = useSWR<AppointmentsFetchResponse, Error>(
-    patientUuid ? appointmentsSearchUrl : null,
-    fetcher,
+    patientUuid ? [appointmentsSearchUrl, patientUuid] : null,
+    ([appointmentsSearchUrl, patientUuid]) => fetcher(appointmentsSearchUrl, patientUuid as string),
   );
 
   const appointments = data?.data?.length

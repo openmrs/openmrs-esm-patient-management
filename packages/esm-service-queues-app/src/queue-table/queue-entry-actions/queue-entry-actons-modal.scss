@@ -31,10 +31,6 @@ section {
   padding-bottom: spacing.$spacing-05;
 }
 
-// This is a hack to get the modal to scroll
-// vertically. Ideally, this should have be fixed by having
-// the extension slot in showModal not warp its content
-// in a div
-:global(.cds--modal-container):has(.queueEntryActionModalBody) {
-  overflow: auto;
+.dateTimeFields {
+  display: flex;
 }

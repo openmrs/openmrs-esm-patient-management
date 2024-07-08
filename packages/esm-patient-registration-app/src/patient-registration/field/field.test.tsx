@@ -6,10 +6,24 @@ import { Field } from './field.component';
 import type { AddressTemplate, FormValues } from '../patient-registration.types';
 import { type Resources, ResourcesContext } from '../../offline.resources';
 import { PatientRegistrationContext } from '../patient-registration-context';
+import dayjs from 'dayjs';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useConfig: jest.fn(),
+  getLocale: jest.fn().mockReturnValue('en'),
+  OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+    return (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input
+          id={id}
+          value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
+          onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
+        />
+      </>
+    );
+  }),
 }));
 
 const predefinedAddressTemplate = {

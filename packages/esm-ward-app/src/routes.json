@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "webservices.rest": "^2.2.0",
+    "emrapi": "^2.0.0 || 2.0.0-SNAPSHOT"
+  },
+  "optionalBackendDependencies":{
+     "bedmanagement":{
+      "version": "^6.0.0 || 6.0.0-SNAPSHOT",
+      "feature": {
+        "flagName": "bedmanagement-module",
+        "label":"Ward App Patient Service",
+        "description": "This module, if installed, provides services for managing patients admitted to the ward."
+      }
+     }
+  },
+   "workspaces": [
+    {
+      "name":"admission-requests-workspace",
+      "component": "admissionRequestWorkspace",
+      "title":"admissionRequests",
+       "type":"admission-requests"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "ward"
+    }
+  ]
+}

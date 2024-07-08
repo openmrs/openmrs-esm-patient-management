@@ -1,0 +1,13 @@
+{
+  "admissionRequestsCount_one": "{{count}} admission request",
+  "admissionRequestsCount_other": "{{count}} admission requests",
+  "bedShare": "Bed share",
+  "emptyBed": "Empty bed",
+  "errorLoadingPatientAdmissionRequests": "Error Loading patient admission requests",
+  "errorLoadingPatients": "Error loading admitted patients",
+  "errorLoadingWardLocation": "Error loading ward location",
+  "invalidLocationSpecified": "Invalid location specified",
+  "invalidWardLocation": "Invalid ward location: {{location}}",
+  "manage": "Manage",
+  "noBedsConfigured": "No beds configured for this location"
+}

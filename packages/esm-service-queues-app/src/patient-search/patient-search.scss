@@ -1,0 +1,49 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.patientSearchContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.patientBannerContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: $ui-01;
+  border-top: 1px solid $ui-03;
+  border-bottom: 1px solid $ui-03;
+}
+
+.patientBanner {
+  display: flex;
+  flex-direction: row;
+}
+
+.patientPhoto {
+  margin: 1rem;
+}
+
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  margin: spacing.$spacing-03 0;
+  padding: 0;
+  @include type.type-style('body-compact-01');
+
+  button {
+    display: flex;
+
+    svg {
+      order: 1;
+      margin-right: spacing.$spacing-03;
+      margin-left: 0rem !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
+}

@@ -26,7 +26,9 @@ export interface Identifier {
   identifierType: OpenmrsResource;
   location: OpenmrsResource;
   uuid: string;
+  preferred: boolean;
 }
+
 export interface Address {
   preferred: boolean;
   voided: boolean;
@@ -36,6 +38,7 @@ export interface Address {
   postalCode: string;
   stateProvince: string;
 }
+
 export interface FHIRPatientType {
   id: string;
   identifier: Array<FHIRIdentifier>;
@@ -64,6 +67,7 @@ export interface FHIRName {
   id: string;
   family: string;
   given: Array<string>;
+  text: string;
 }
 
 export interface FHIRPatientSearchResponse {
@@ -76,6 +80,7 @@ export interface FHIRPatientSearchResponse {
     resource: FHIRPatientType;
   }>;
 }
+
 export interface PatientSearchResponse {
   data?: Array<SearchedPatient>;
   isLoading: boolean;

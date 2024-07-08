@@ -10,7 +10,7 @@ import outpatientSideNavComponent from './side-menu/side-menu.component';
 import homeDashboardComponent from './home.component';
 import patientInfoBannerSlotComponent from './patient-info/patient-info.component';
 import pastVisitSummaryComponent from './past-visit/past-visit.component';
-import addQueueEntryComponent from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
+import VisitFormQueueFields from './patient-search/visit-form-queue-fields/visit-form-queue-fields.component';
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -44,11 +44,6 @@ export const editQueueEntryStatusModal = getAsyncLifecycle(
 );
 
 export const patientInfoBannerSlot = getSyncLifecycle(patientInfoBannerSlotComponent, {
-  featureName: 'patient info slot',
-  moduleName,
-});
-
-export const addPatientToQueue = getAsyncLifecycle(() => import('./patient-search/visit-form/visit-form.component'), {
   featureName: 'patient info slot',
   moduleName,
 });
@@ -96,7 +91,7 @@ export const addProviderToRoomModal = getAsyncLifecycle(
 );
 
 export const transitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/transition-queue-entry.modal'),
   {
     featureName: 'transfer patient to a different queue',
     moduleName,
@@ -104,7 +99,7 @@ export const transitionQueueEntryModal = getAsyncLifecycle(
 );
 
 export const editQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/edit-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/edit-queue-entry.modal'),
   {
     featureName: 'edit queue entry of a patient',
     moduleName,
@@ -112,7 +107,7 @@ export const editQueueEntryModal = getAsyncLifecycle(
 );
 
 export const undoTransitionQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/undo-transition-queue-entry.modal'),
   {
     featureName: 'undo queue entry transiion of a patient',
     moduleName,
@@ -120,14 +115,46 @@ export const undoTransitionQueueEntryModal = getAsyncLifecycle(
 );
 
 export const voidQueueEntryModal = getAsyncLifecycle(
-  () => import('./queue-table/queue-entry-actions/void-queue-entry-modal.component'),
+  () => import('./queue-table/queue-entry-actions/void-queue-entry.modal'),
   {
     featureName: 'void queue entry of a patient',
     moduleName,
   },
 );
 
-export const addQueueEntry = getSyncLifecycle(addQueueEntryComponent, options);
+export const endQueueEntryModal = getAsyncLifecycle(
+  () => import('./queue-table/queue-entry-actions/end-queue-entry.modal'),
+  {
+    featureName: 'end queue entry of a patient',
+    moduleName,
+  },
+);
+
+// t('addNewQueueService', 'Add New Queue Service')
+export const addNewQueueServiceWorkspace = getAsyncLifecycle(
+  () => import('./queue-services/queue-service-form.workspace'),
+  {
+    featureName: 'service-queues-service-form',
+    moduleName,
+  },
+);
+
+// t('addNewQueueServiceRoom', 'Add new queue service room')
+export const addNewQueueServiceRoomWorkspace = getAsyncLifecycle(
+  () => import('./queue-rooms/queue-room-form.workspace'),
+  {
+    featureName: 'service-queues-queue-room-form',
+    moduleName,
+  },
+);
+
+export const visitFormQueueFields = getSyncLifecycle(VisitFormQueueFields, options);
+
+// t('searchPatient', 'Search Patient')
+export const patientSearchWorkspace = getAsyncLifecycle(() => import('./patient-search/patient-search.workspace'), {
+  featureName: 'service-queues-patient-search',
+  moduleName,
+});
 
 export const activeVisitsRowActions = getAsyncLifecycle(
   () => import('./active-visits/active-visits-row-actions.component'),

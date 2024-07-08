@@ -193,7 +193,7 @@ export function useServiceQueueEntries(service: string, locationUuid: string) {
   };
 }
 
-export async function addQueueEntry(
+export async function postQueueEntry(
   visitUuid: string,
   queueUuid: string,
   patientUuid: string,

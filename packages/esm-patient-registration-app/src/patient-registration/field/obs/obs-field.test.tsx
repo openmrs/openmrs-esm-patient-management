@@ -5,10 +5,31 @@ import { useConfig } from '@openmrs/esm-framework';
 import { type FieldDefinition } from '../../../config-schema';
 import { useConcept, useConceptAnswers } from '../field.resource';
 import { ObsField } from './obs-field.component';
+import { PatientRegistrationContext } from '../../patient-registration-context';
+import dayjs from 'dayjs';
 
 const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('../field.resource'); // Mock the useConceptAnswers hook
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+      return (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
+            onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
+          />
+        </>
+      );
+    }),
+  };
+});
 
 const mockedUseConcept = useConcept as jest.Mock;
 const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
@@ -40,6 +61,14 @@ const useConceptMockImpl = (uuid: string) => {
         { display: 'USA', uuid: 'usa' },
         { display: 'Mexico', uuid: 'mex' },
       ],
+      setMembers: [],
+    };
+  } else if (uuid == 'vaccination-date-uuid') {
+    data = {
+      uuid: 'vaccination-date-uuid',
+      display: 'Vaccination Date',
+      datatype: { display: 'Date', uuid: 'date' },
+      answers: [],
       setMembers: [],
     };
   } else {
@@ -79,12 +108,14 @@ const useConceptAnswersMockImpl = (uuid: string) => {
 };
 
 type FieldProps = {
-  children: ({ field, form: { touched, errors } }) => React.ReactNode;
+  children: ({ field, form: { touched, errors }, meta }) => React.ReactNode;
 };
 
 jest.mock('formik', () => ({
   ...(jest.requireActual('formik') as object),
-  Field: jest.fn(({ children }: FieldProps) => <>{children({ field: {}, form: { touched: {}, errors: {} } })}</>),
+  Field: jest.fn(({ children }: FieldProps) => (
+    <>{children({ field: {}, form: { touched: {}, errors: {} }, meta: { error: undefined } })}</>
+  )),
   useField: jest.fn(() => [{ value: null }, {}]),
 }));
 
@@ -110,6 +141,21 @@ const numberFieldDef: FieldDefinition = {
   placeholder: '',
   showHeading: false,
   uuid: 'weight-uuid',
+  validation: {
+    required: false,
+    matches: null,
+  },
+  answerConceptSetUuid: null,
+  customConceptAnswers: [],
+};
+
+const dateFieldDef: FieldDefinition = {
+  id: 'vac_date',
+  type: 'obs',
+  label: '',
+  placeholder: '',
+  showHeading: false,
+  uuid: 'vaccination-date-uuid',
   validation: {
     required: false,
     matches: null,
@@ -147,7 +193,7 @@ describe('ObsField', () => {
     expect(console.error).toHaveBeenCalledWith(
       expect.stringMatching(/no registration encounter type has been configured/i),
     );
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('renders a text box for text concept', () => {
@@ -161,6 +207,22 @@ describe('ObsField', () => {
     render(<ObsField fieldDefinition={numberFieldDef} />);
     // expect(screen.getByLabelText("Weight (kg)")).toBeInTheDocument();
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+  });
+
+  // TODO O3-3482: Fix this test case.
+  // Disabling this test case for now as it doesn't work as expected when mocking the date picker
+  it.skip('renders a datepicker for date concept', async () => {
+    render(
+      <PatientRegistrationContext.Provider value={{ setFieldValue: jest.fn() }}>
+        <ObsField fieldDefinition={dateFieldDef} />
+      </PatientRegistrationContext.Provider>,
+    );
+
+    const datePickerInput = screen.getByRole('textbox');
+    expect(datePickerInput).toBeInTheDocument();
+
+    await userEvent.type(datePickerInput, '28/05/2024');
+    expect(datePickerInput).toHaveValue('28/05/2024');
   });
 
   it('renders a select for a coded concept', () => {

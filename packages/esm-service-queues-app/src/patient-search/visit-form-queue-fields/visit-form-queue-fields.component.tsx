@@ -1,76 +1,110 @@
-import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
-import { InlineNotification, Select, SelectItem, RadioButtonGroup, RadioButton, TextInput } from '@carbon/react';
-import { useQueueLocations } from '../hooks/useQueueLocations';
-import styles from './visit-form-queue-fields.scss';
-import { useConfig, useLayoutType, ResponsiveWrapper } from '@openmrs/esm-framework';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueues } from '../../helpers/useQueues';
+import classNames from 'classnames';
+import {
+  InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
+  RadioButtonSkeleton,
+  Select,
+  SelectItem,
+  SelectSkeleton,
+  TextInput,
+} from '@carbon/react';
+import { useConfig, ResponsiveWrapper, useSession } from '@openmrs/esm-framework';
+import { useQueues } from '../../hooks/useQueues';
+import { useQueueLocations } from '../hooks/useQueueLocations';
 import { type ConfigObject } from '../../config-schema';
+import { AddPatientToQueueContext } from '../patient-search.workspace';
+import styles from './visit-form-queue-fields.scss';
 
-const StartVisitQueueFields: React.FC = () => {
+export interface VisitFormQueueFieldsProps {
+  setFormFields: (fields: {
+    queueLocation: string;
+    service: string;
+    status: string;
+    priority: string;
+    sortWeight: number;
+  }) => void;
+}
+
+const VisitFormQueueFields: React.FC<VisitFormQueueFieldsProps> = (props) => {
+  const { setFormFields } = props;
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
-  const { queueLocations } = useQueueLocations();
+  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const { sessionLocation } = useSession();
   const config = useConfig<ConfigObject>();
-  const defaultStatus = config.concepts.defaultStatusConceptUuid;
-  const defaultPriority = config.concepts.defaultPriorityConceptUuid;
-  const emergencyPriorityConceptUuid = config.concepts.emergencyPriorityConceptUuid;
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
-  const { queues } = useQueues(selectedQueueLocation);
-  const [priority, setPriority] = useState(defaultPriority);
-  const [status, setStatus] = useState(defaultStatus);
+  const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
+  const defaultStatus = config.concepts.defaultStatusConceptUuid;
+  const [selectedService, setSelectedService] = useState('');
+  const { currentServiceQueueUuid } = useContext(AddPatientToQueueContext);
+  const [priority, setPriority] = useState(config.concepts.defaultPriorityConceptUuid);
+  const priorities = queues.find((q) => q.uuid === selectedService)?.allowedPriorities ?? [];
   const [sortWeight, setSortWeight] = useState(0);
-  const [service, setSelectedService] = useState('');
-  const priorities = queues.find((q) => q.uuid === service)?.allowedPriorities ?? [];
-  const statuses = queues.find((q) => q.uuid === service)?.allowedStatuses ?? [];
 
   useEffect(() => {
-    if (priority === emergencyPriorityConceptUuid) {
+    if (priority === config.concepts.emergencyPriorityConceptUuid) {
       setSortWeight(1);
     }
   }, [priority]);
 
   useEffect(() => {
-    if (queues?.length > 0) {
-      setSelectedService(queues[0].uuid);
+    if (currentServiceQueueUuid) {
+      setSelectedService(currentServiceQueueUuid);
     }
   }, [queues]);
 
   useEffect(() => {
-    if (queueLocations?.length > 0) {
-      setSelectedQueueLocation(queueLocations[0].id);
+    if (queueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
+      setSelectedQueueLocation(sessionLocation.uuid);
     }
   }, [queueLocations]);
+
+  useEffect(() => {
+    setFormFields({
+      queueLocation: selectedQueueLocation,
+      service: selectedService,
+      status: defaultStatus,
+      priority,
+      sortWeight,
+    });
+  }, [selectedQueueLocation, selectedService, defaultStatus, priority, sortWeight]);
 
   return (
     <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
         <ResponsiveWrapper>
-          <Select
-            labelText={t('selectQueueLocation', 'Select a queue location')}
-            id="queueLocation"
-            name="queueLocation"
-            invalidText="Required"
-            value={selectedQueueLocation}
-            onChange={(event) => setSelectedQueueLocation(event.target.value)}>
-            {!selectedQueueLocation ? (
-              <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-            ) : null}
-            {queueLocations?.length > 0 &&
-              queueLocations.map((location) => (
-                <SelectItem key={location.id} text={location.name} value={location.id}>
-                  {location.name}
-                </SelectItem>
-              ))}
-          </Select>
+          {isLoadingQueueLocations ? (
+            <SelectSkeleton />
+          ) : (
+            <Select
+              labelText={t('selectQueueLocation', 'Select a queue location')}
+              id="queueLocation"
+              name="queueLocation"
+              invalidText="Required"
+              value={selectedQueueLocation}
+              onChange={(event) => setSelectedQueueLocation(event.target.value)}>
+              {!selectedQueueLocation ? (
+                <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+              ) : null}
+              {queueLocations?.length > 0 &&
+                queueLocations.map((location) => (
+                  <SelectItem key={location.id} text={location.name} value={location.id}>
+                    {location.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          )}
         </ResponsiveWrapper>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-        {!queues?.length ? (
+        {isLoadingQueues ? (
+          <SelectSkeleton />
+        ) : !queues?.length ? (
           <InlineNotification
             className={styles.inlineNotification}
             kind={'error'}
@@ -84,9 +118,9 @@ const StartVisitQueueFields: React.FC = () => {
             id="service"
             name="service"
             invalidText="Required"
-            value={service}
+            value={selectedService}
             onChange={(event) => setSelectedService(event.target.value)}>
-            {!service ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
+            {!selectedService ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
             {queues?.length > 0 &&
               queues.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
@@ -97,49 +131,43 @@ const StartVisitQueueFields: React.FC = () => {
         )}
       </section>
 
-      <section className={classNames(styles.section, styles.sectionHidden)}>
-        <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-        <Select
-          labelText={t('selectStatus', 'Select a status')}
-          id="status"
-          name="status"
-          invalidText="Required"
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}>
-          {!statuses ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-          {statuses?.length > 0 &&
-            statuses.map((status) => (
-              <SelectItem key={status.uuid} text={status.display} value={status.uuid}>
-                {status.display}
-              </SelectItem>
-            ))}
-        </Select>
-      </section>
+      {/* Status section of the form would go here; historical version of this code can be found at
+          https://github.com/openmrs/openmrs-esm-patient-management/blame/6c31e5ff2579fc89c2fd0d12c13510a1f2e913e0/packages/esm-service-queues-app/src/patient-search/visit-form-queue-fields/visit-form-queue-fields.component.tsx#L115 */}
 
-      <section className={styles.section}>
-        <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-        {!priorities?.length ? (
-          <InlineNotification
-            className={styles.inlineNotification}
-            kind={'error'}
-            lowContrast
-            subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
-            title={t('noPrioritiesConfigured', 'No priorities configured')}
-          />
-        ) : (
-          <RadioButtonGroup
-            className={styles.radioButtonWrapper}
-            name="priority"
-            id="priority"
-            defaultSelected={defaultPriority}
-            onChange={(uuid) => {
-              setPriority(uuid);
-            }}>
-            {priorities?.length > 0 &&
-              priorities.map(({ uuid, display }) => <RadioButton key={uuid} labelText={display} value={uuid} />)}
-          </RadioButtonGroup>
-        )}
-      </section>
+      {selectedService ? (
+        <section className={styles.section}>
+          <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+          {isLoadingQueues ? (
+            <RadioButtonGroup>
+              <RadioButtonSkeleton />
+              <RadioButtonSkeleton />
+              <RadioButtonSkeleton />
+            </RadioButtonGroup>
+          ) : !priorities?.length ? (
+            <InlineNotification
+              className={styles.inlineNotification}
+              kind={'error'}
+              lowContrast
+              title={t('noPrioritiesForServiceTitle', 'No priorities available')}>
+              {t(
+                'noPrioritiesForService',
+                'The selected service does not have any allowed priorities. This is an error in configuration. Please contact your system administrator.',
+              )}
+            </InlineNotification>
+          ) : priorities.length ? (
+            <RadioButtonGroup
+              className={styles.radioButtonWrapper}
+              name="priority"
+              id="priority"
+              defaultSelected={config.concepts.defaultPriorityConceptUuid}
+              onChange={(uuid) => setPriority(uuid)}>
+              {priorities.map(({ uuid, display }) => (
+                <RadioButton key={uuid} labelText={display} value={uuid} />
+              ))}
+            </RadioButtonGroup>
+          ) : null}
+        </section>
+      ) : null}
 
       <section className={classNames(styles.section, styles.sectionHidden)}>
         <TextInput
@@ -154,4 +182,4 @@ const StartVisitQueueFields: React.FC = () => {
   );
 };
 
-export default StartVisitQueueFields;
+export default VisitFormQueueFields;

@@ -57,7 +57,7 @@ describe('ActiveVisitsTable', () => {
     await user.type(searchInput, 'John');
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.queryByText('Some One')).toBeNull();
+    expect(screen.queryByText('Some One')).not.toBeInTheDocument();
   });
 
   it('displays empty state when there are no active visits', () => {

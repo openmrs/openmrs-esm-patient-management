@@ -31,7 +31,7 @@ jest.mock('./add-provider-queue-room.resource', () => ({
   })),
 }));
 
-jest.mock('../helpers/useQueues', () => {
+jest.mock('../hooks/useQueues', () => {
   return {
     useQueues: jest.fn().mockReturnValue({
       queues: [
@@ -82,7 +82,7 @@ describe('AddProviderQueueRoom', () => {
     const retainLocationCheckbox: HTMLInputElement = screen.getByRole('checkbox');
     await user.click(retainLocationCheckbox);
 
-    expect(retainLocationCheckbox.checked).toBe(true);
+    expect(retainLocationCheckbox).toBeChecked();
   });
 
   it('should submit the form and add provider to queue room when all fields are filled', async () => {

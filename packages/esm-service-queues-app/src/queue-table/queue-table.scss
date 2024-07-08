@@ -16,7 +16,10 @@
 
 .headerButtons {
   display: flex;
-  flex-flow: column;
+  justify-content: space-between;
+  .filterSearch {
+    margin-left: spacing.$spacing-05;
+  }
 }
 
 .filterContainer {
@@ -55,13 +58,13 @@
   padding: spacing.$spacing-05;
 }
 
-.statusTableHeader {
+.tableHeader {
   padding: 8px 0;
 }
 
 .tableContainer {
   background-color: $ui-01;
-  margin: 0 spacing.$spacing-05;
+  // margin: 0 spacing.$spacing-05;
   padding: 0;
 
   a {
@@ -76,24 +79,19 @@
     background-color: $ui-03;
   }
 
+  .toolbarContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .toolbarContent {
     display: flex;
-    align-items: baseline;
-    height: spacing.$spacing-07;
-    margin-bottom: spacing.$spacing-02;
     z-index: 1; // prevent dropdown from getting covered by table elements
   }
 
   :global(.cds--table-toolbar) {
     position: static;
-    height: 3rem;
     overflow: visible;
-  }
-}
-
-.queueTable tr:last-of-type {
-  td {
-    border-bottom: none;
   }
 }
 
@@ -181,7 +179,8 @@ html[dir='rtl'] {
 .tileContainer {
   background-color: $ui-02;
   border-top: 1px solid $ui-03;
-  padding: 5rem 0;
+  padding: 2rem 0;
+  // margin: 0 spacing.$spacing-05;
 }
 
 .tile {
@@ -194,4 +193,8 @@ html[dir='rtl'] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.paddedQueueTable {
+  padding: 0 spacing.$spacing-05;
 }
