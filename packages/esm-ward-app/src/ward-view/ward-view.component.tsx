@@ -1,5 +1,5 @@
 import { InlineNotification } from '@carbon/react';
-import { WorkspaceContainer, useFeatureFlag, useLocations, useSession, type Location } from '@openmrs/esm-framework';
+import { useFeatureFlag, WorkspaceContainer } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import EmptyBedSkeleton from '../beds/empty-bed-skeleton';
