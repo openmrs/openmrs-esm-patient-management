@@ -193,7 +193,7 @@ describe('ObsField', () => {
     expect(console.error).toHaveBeenCalledWith(
       expect.stringMatching(/no registration encounter type has been configured/i),
     );
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('renders a text box for text concept', () => {

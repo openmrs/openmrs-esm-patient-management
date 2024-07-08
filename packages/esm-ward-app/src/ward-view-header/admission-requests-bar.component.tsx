@@ -1,12 +1,11 @@
 import React from 'react';
 import { Movement } from '@carbon/react/icons';
-import styles from './admission-requests.scss';
+import { Button, InlineNotification } from '@carbon/react';
 import { ArrowRightIcon, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import { useTranslation } from 'react-i18next';
 import useWardLocation from '../hooks/useWardLocation';
-import { InlineNotification } from '@carbon/react';
-import { Button } from '@carbon/react';
+import styles from './admission-requests.scss';
 
 const AdmissionRequestsBar = () => {
   const { location } = useWardLocation();

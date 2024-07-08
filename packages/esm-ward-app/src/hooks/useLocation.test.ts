@@ -1,4 +1,4 @@
-import { cleanup, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import useLocation from './useLocation';
 import useSWRImmutable from 'swr/immutable';
 import { restBaseUrl } from '@openmrs/esm-framework';
@@ -14,11 +14,7 @@ jest.mock('swr/immutable', () =>
 
 const useSWRImmutableMock = useSWRImmutable as jest.Mock;
 
-describe('Testing useLocation', () => {
-  beforeEach(() => {
-    cleanup();
-  });
-
+describe('useLocation hook', () => {
   it('should call useLocation', () => {
     const { result } = renderHook(() => useLocation('testUUID'));
     expect(useSWRImmutableMock).toHaveBeenCalledWith(

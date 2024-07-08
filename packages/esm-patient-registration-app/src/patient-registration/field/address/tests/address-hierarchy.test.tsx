@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { AddressComponent } from '../address-field.component';
 import { Formik, Form } from 'formik';
 import { type Resources, ResourcesContext } from '../../../../offline.resources';
@@ -44,8 +44,6 @@ async function renderAddressHierarchy(addressTemplate = mockedAddressTemplate) {
 }
 
 describe('Testing address hierarchy', () => {
-  beforeEach(cleanup);
-
   it('should render skeleton when address template is loading', () => {
     (useConfig as jest.Mock).mockImplementation(() => ({
       fieldConfigurations: {

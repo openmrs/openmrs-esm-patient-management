@@ -1,17 +1,13 @@
 import React from 'react';
+import { Form, Formik } from 'formik';
 import { render, screen } from '@testing-library/react';
 import { usePersonAttributeType } from './person-attributes.resource';
-import { PersonAttributeField } from './person-attribute-field.component';
 import { useConceptAnswers } from '../field.resource';
-import { Form, Formik } from 'formik';
 import { type FieldDefinition } from '../../../config-schema';
+import { PersonAttributeField } from './person-attribute-field.component';
 
-jest.mock('./person-attributes.resource'); // Mock the usePersonAttributeType hook
-jest.mock('../field.resource'); // Mock the useConceptAnswers hook
-
-jest.mock('formik', () => ({
-  ...jest.requireActual('formik'),
-}));
+jest.mock('./person-attributes.resource');
+jest.mock('../field.resource');
 
 const mockedUsePersonAttributeType = usePersonAttributeType as jest.Mock;
 const mockedUseConceptAnswers = useConceptAnswers as jest.Mock;
@@ -28,7 +24,7 @@ describe('PersonAttributeField', () => {
   beforeEach(() => {
     fieldDefinition = {
       id: 'referredby',
-      name: 'Referred by',
+      label: 'Referred by',
       type: 'person attribute',
       uuid: '4dd56a75-14ab-4148-8700-1f4f704dc5b0',
       answerConceptSetUuid: '6682d17f-0777-45e4-a39b-93f77eb3531c',
@@ -135,6 +131,7 @@ describe('PersonAttributeField', () => {
     expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByText(/Patient attribute type has unknown format/i)).toBeInTheDocument();
   });
+
   it('renders an error notification if unable to fetch attribute type', () => {
     mockedUsePersonAttributeType.mockReturnValue({
       data: null,
@@ -143,9 +140,11 @@ describe('PersonAttributeField', () => {
     });
 
     fieldDefinition = {
+      id: 'referredBy',
       uuid: 'attribute-uuid',
       label: 'Attribute',
       showHeading: false,
+      type: 'person attribute',
     };
 
     render(
@@ -160,7 +159,7 @@ describe('PersonAttributeField', () => {
     expect(screen.getByText(/Unable to fetch person attribute type/i)).toBeInTheDocument();
   });
 
-  it('renders a skeleton if attribute type is loading', () => {
+  it('renders a skeleton if attribute type is loading', async () => {
     mockedUsePersonAttributeType.mockReturnValue({
       data: null,
       isLoading: true,
@@ -168,9 +167,11 @@ describe('PersonAttributeField', () => {
     });
 
     fieldDefinition = {
+      id: 'referredBy',
       uuid: 'attribute-uuid',
       label: 'Attribute',
       showHeading: true,
+      type: 'person attribute',
     };
 
     render(
@@ -180,8 +181,8 @@ describe('PersonAttributeField', () => {
         </Form>
       </Formik>,
     );
-    const input = screen.findByLabelText(/Reffered by/i);
-    expect(screen.getByText(/Attribute/i)).toBeInTheDocument();
-    expect(input).not.toBeNull(); // checks that the input is not rendered when the attribute type is loading
+    await screen.findByRole('heading', { name: /attribute/i });
+    const input = screen.queryByLabelText(/Referred by/i);
+    expect(input).not.toBeInTheDocument(); // checks that the input is not rendered when the attribute type is loading
   });
 });

@@ -37,12 +37,16 @@ function DefaultQueueTable() {
   const selectedService = useSelectedService();
   const currentLocationUuid = useSelectedQueueLocationUuid();
   const selectedQueueStatus = useSelectedQueueStatus();
-  const { queueEntries, isLoading, error, isValidating } = useQueueEntries({
-    service: selectedService?.serviceUuid,
-    location: currentLocationUuid,
-    isEnded: false,
-    status: selectedQueueStatus?.statusUuid,
-  });
+  const searchCriteria = useMemo(
+    () => ({
+      service: selectedService?.serviceUuid,
+      location: currentLocationUuid,
+      isEnded: false,
+      status: selectedQueueStatus?.statusUuid,
+    }),
+    [selectedService?.serviceUuid, currentLocationUuid, selectedQueueStatus?.statusUuid],
+  );
+  const { queueEntries, isLoading, error, isValidating } = useQueueEntries(searchCriteria);
 
   const { t } = useTranslation();
 
