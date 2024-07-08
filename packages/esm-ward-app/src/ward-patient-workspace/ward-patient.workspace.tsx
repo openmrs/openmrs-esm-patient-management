@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InlineNotification } from '@carbon/react';
 import { InlineLoading } from '@carbon/react';
 import {
@@ -18,15 +19,16 @@ export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
 }
 
 export default function WardPatientWorkspace({ patientUuid, setTitle }: WardPatientWorkspaceProps) {
+  const { t } = useTranslation();
   const { patient, isLoading, error } = usePatient(patientUuid);
 
   useEffect(() => {
     if (isLoading) {
-      setTitle('Ward Patient', <InlineLoading />);
+      setTitle(t('wardPatientWorkspaceTitle', 'Ward Patient'), <InlineLoading />);
     } else if (patient) {
       setTitle(getPatientName(patient), <PatientWorkspaceTitle patient={patient} />);
     } else if (error) {
-      setTitle('Ward Patient');
+      setTitle(t('wardPatientWorkspaceTitle', 'Ward Patient'));
     }
   }, [patient]);
 
