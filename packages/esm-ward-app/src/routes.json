@@ -14,18 +14,31 @@
       }
      }
   },
-   "workspaces": [
-    {
-      "name":"admission-requests-workspace",
-      "component": "admissionRequestWorkspace",
-      "title":"admissionRequests",
-       "type":"admission-requests"
-    }
-  ],
   "pages": [
     {
       "component": "root",
       "route": "ward"
     }
-  ]
+  ],
+  "extensions": [{
+    "component": "wardPatientActionButtonExtension",
+    "name": "ward-patient-action-button",
+    "slot": "action-menu-ward-patient-items-slot"
+  }],
+  "workspaces": [
+    {
+      "name":"admission-requests-workspace",
+      "component": "admissionRequestWorkspace",
+      "title":"admissionRequests",
+       "type":"admission-requests"
+    },
+    {
+    "name": "ward-patient-workspace",
+    "component": "wardPatientWorkspace",
+    "type": "ward",
+    "title": "Ward Patient",
+    "width": "extra-wide",
+    "hasOwnSidebar": true,
+    "sidebarFamily": "ward-patient"
+  }]
 }
