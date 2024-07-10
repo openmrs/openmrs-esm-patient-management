@@ -23,6 +23,7 @@
   "noVisitsToDisplay": "No visits to display",
   "orderDurationAndUnit": "for {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Indefinite duration",
+  "patients": "Patients",
   "provider": "Provider",
   "quantity": "Quantity",
   "refills": "Refills",

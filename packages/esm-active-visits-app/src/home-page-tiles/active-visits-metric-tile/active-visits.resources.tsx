@@ -1,4 +1,4 @@
-import { openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export default function useActiveVisits() {
@@ -8,7 +8,7 @@ export default function useActiveVisits() {
   const customRepresentation = 'custom:(uuid,startDatetime,stopDatetime)';
 
   const getUrl = () => {
-    let url = `/ws/rest/v1/visit?v=${customRepresentation}&`;
+    let url = `${restBaseUrl}/visit?v=${customRepresentation}&`;
     let urlSearchParams = new URLSearchParams();
 
     urlSearchParams.append('includeInactive', 'false');

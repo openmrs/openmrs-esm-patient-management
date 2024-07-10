@@ -2,29 +2,23 @@ import React from 'react';
 import { Tile } from '@carbon/react';
 import styles from '../homepage-tiles.scss';
 import { useTranslation } from 'react-i18next';
-import useTotalVisits from './total-visits-tile.resources';
+import useTotalVisits from './total-visits.resources';
 
 const TotalVisitsTile: React.FC = () => {
-  const { data: appointmentsData } = useTotalVisits();
+  const { data: visitsData } = useTotalVisits();
 
   const { t } = useTranslation();
 
   return (
-    <React.Fragment>
-      <Tile className={styles.tileContainer}>
-        <div>
-          <div className={styles.tileContent}>
-            <div className={styles.tileHeader}>
-              <header>{t('totalVisits', 'Total Visits Today')}</header>
-            </div>
-            <div className={styles.displayDetails}>
-              <div className={styles.countLabel}>Patients</div>
-              <div className={styles.displayData}>{appointmentsData?.length ?? 0}</div>
-            </div>
-          </div>
+    <Tile className={styles.tileContainer}>
+      <div className={styles.tileContent}>
+        <header className={styles.tileHeader}>{t('totalVisits', 'Total Visits Today')}</header>
+        <div className={styles.displayDetails}>
+          <div className={styles.countLabel}>{t('patients', 'Patients')}</div>
+          <div className={styles.displayData}>{visitsData?.length ?? 0}</div>
         </div>
-      </Tile>
-    </React.Fragment>
+      </div>
+    </Tile>
   );
 };
 
