@@ -38,7 +38,7 @@ describe('UndoTransitionQueueEntryModal: ', () => {
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Undo transition/ });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     expect(mockedOpenmrsFetch).toHaveBeenCalled();
@@ -67,7 +67,7 @@ describe('VoidQueueEntryModal: ', () => {
     renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await user.click(submitButton);
 
     expect(mockedOpenmrsFetch).toHaveBeenCalled();

@@ -24,7 +24,7 @@ describe('CurrentVisit', () => {
   it('renders visit details correctly', async () => {
     render(<CurrentVisit patientUuid={patientUuid} visitUuid={visitUuid} />);
 
-    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByText('Visit Type')).toBeInTheDocument();
     expect(screen.getByText('Scheduled for today')).toBeInTheDocument();
     expect(screen.getByText('On time')).toBeInTheDocument();

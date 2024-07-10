@@ -1,12 +1,11 @@
+import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { renderWithSwr } from '../../../../tools/test-utils';
 import { screen } from '@testing-library/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
-import React from 'react';
 import AdmissionRequestsBar from './admission-requests-bar.component';
 import { mockInpatientRequest } from '../../../../__mocks__/ward-patient';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { mockLocationInpatientWard } from '../../../../__mocks__/locations.mock';
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
@@ -30,13 +29,15 @@ jest.mocked(useInpatientRequest).mockReturnValue(mockInpatientRequestResponse);
 describe('Admission Requests Button', () => {
   it('call launch workspace when clicked on manage button', async () => {
     const user = userEvent.setup();
-    renderWithSwr(<AdmissionRequestsBar location={mockLocationInpatientWard} />);
+    renderWithSwr(<AdmissionRequestsBar />);
+
     await user.click(screen.getByRole('button', { name: /manage/i }));
     expect(launchWorkspace).toHaveBeenCalled();
   });
 
   it('there should be one admission request', () => {
-    const { getByText } = renderWithSwr(<AdmissionRequestsBar location={mockLocationInpatientWard} />);
-    expect(getByText('1 admission requests')).toBeInTheDocument();
+    renderWithSwr(<AdmissionRequestsBar />);
+
+    expect(screen.getByText('1 admission requests')).toBeInTheDocument();
   });
 });

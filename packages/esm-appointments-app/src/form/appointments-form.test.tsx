@@ -158,7 +158,7 @@ describe('AppointmentForm', () => {
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
-    expect(saveButton).not.toBeDisabled();
+    expect(saveButton).toBeEnabled();
 
     await user.clear(dateInput);
     await user.type(dateInput, '4/4/2021');

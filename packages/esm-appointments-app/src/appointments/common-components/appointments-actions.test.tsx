@@ -1,9 +1,9 @@
-import { render } from '@testing-library/react';
 import React from 'react';
-import AppointmentActions from './appointments-actions.component';
+import { render, screen } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { useTodaysVisits } from '../../hooks/useTodaysVisits';
 import { type Appointment, AppointmentKind, AppointmentStatus } from '../../types';
-import { useConfig } from '@openmrs/esm-framework';
+import AppointmentActions from './appointments-actions.component';
 
 const appointment: Appointment = {
   uuid: '7cd38a6d-377e-491b-8284-b04cf8b8c6d8',
@@ -46,7 +46,12 @@ const appointment: Appointment = {
   voided: false,
   teleconsultationLink: null,
   extensions: [],
+  endDateTime: null,
+  dateAppointmentScheduled: null,
 };
+
+const mockUseConfig = useConfig as jest.Mock;
+const mockUseTodaysVisits = useTodaysVisits as jest.Mock;
 
 jest.mock('../../hooks/useTodaysVisits', () => {
   const originalModule = jest.requireActual('../../hooks/useTodaysVisits');
@@ -79,41 +84,41 @@ describe('AppointmentActions', () => {
 
   it('renders the check in button when appointment is today and the patient has not checked in and check in button enabled', () => {
     appointment.status = AppointmentStatus.SCHEDULED;
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [],
     }));
     const props = { ...defaultProps };
-    const { getByText } = render(<AppointmentActions {...props} />);
-    const button = getByText(/check in/i);
-    expect(button).toBeInTheDocument();
+    render(<AppointmentActions {...props} />);
+
+    expect(screen.getByText(/check in/i)).toBeInTheDocument();
   });
 
   it('does not renders the check in button when appointment is today and the patient has not checked in but the check-in button is disabled', () => {
     appointment.status = AppointmentStatus.SCHEDULED;
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: false },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [],
     }));
     const props = { ...defaultProps };
-    const { queryByText } = render(<AppointmentActions {...props} />);
-    const button = queryByText('Check In');
-    expect(button).not.toBeInTheDocument();
+    render(<AppointmentActions {...props} />);
+
+    expect(screen.queryByText(/check in/i)).not.toBeInTheDocument();
   });
 
   it('renders the checked out button when the patient has checked out', () => {
     appointment.status = AppointmentStatus.COMPLETED;
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [
         {
           patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -123,18 +128,18 @@ describe('AppointmentActions', () => {
       ],
     }));
     const props = { ...defaultProps };
-    const { getByText } = render(<AppointmentActions {...props} />);
-    const button = getByText('Checked out');
-    expect(button).toBeInTheDocument();
+    render(<AppointmentActions {...props} />);
+
+    expect(screen.getByText('Checked out')).toBeInTheDocument();
   });
 
   it('renders the check out button when the patient has an active visit and today is the appointment date and the check out button enabled', () => {
     appointment.status = AppointmentStatus.CHECKEDIN;
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [
         {
           patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -144,18 +149,18 @@ describe('AppointmentActions', () => {
       ],
     }));
     const props = { ...defaultProps, scheduleType: 'Scheduled' };
-    const { getByText } = render(<AppointmentActions {...props} />);
-    const button = getByText('Check out');
-    expect(button).toBeInTheDocument();
+    render(<AppointmentActions {...props} />);
+
+    expect(screen.getByText(/check out/i)).toBeInTheDocument();
   });
 
   it('does not render check out button when the patient has an active visit and today is the appointment date but the check out button is disabled', () => {
     appointment.status = AppointmentStatus.CHECKEDIN;
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: false },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [
         {
           patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
@@ -165,18 +170,18 @@ describe('AppointmentActions', () => {
       ],
     }));
     const props = { ...defaultProps, scheduleType: 'Scheduled' };
-    const { queryByText } = render(<AppointmentActions {...props} />);
-    const button = queryByText('Check out');
-    expect(button).not.toBeInTheDocument();
+    render(<AppointmentActions {...props} />);
+
+    expect(screen.queryByText(/check out/i)).not.toBeInTheDocument();
   });
 
   // commenting these tests out as this functionality is not implemented yet so not sure how they would have ever passed?
   /*it('renders the correct button when today is the appointment date and the schedule type is pending', () => {
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [],
     }));
     const props = { ...defaultProps, scheduleType: 'Pending' };
@@ -186,11 +191,11 @@ describe('AppointmentActions', () => {
   });
 
   it('renders the correct button when today is the appointment date and the schedule type is not pending', () => {
-    useConfig.mockImplementation(() => ({
+    mockUseConfig.mockImplementation(() => ({
       checkInButton: { enabled: true },
       checkOutButton: { enabled: true },
     }));
-    useTodaysVisits.mockImplementation(() => ({
+    mockUseTodaysVisits.mockImplementation(() => ({
       visits: [],
     }));
     const props = { ...defaultProps, scheduleType: 'Confirmed' };

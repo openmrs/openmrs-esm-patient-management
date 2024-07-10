@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Formik, Form } from 'formik';
@@ -61,12 +62,14 @@ describe.skip('identifier input', () => {
 
   it('exists', async () => {
     const { identifierInput, identifierSourceSelectInput } = await setupIdentifierInput(openmrsID);
+
     expect(identifierInput.type).toBe('text');
     expect(identifierSourceSelectInput.type).toBe('select-one');
   });
 
   it('has correct props for identifier source select input', async () => {
     const { identifierSourceSelectInput } = await setupIdentifierInput(openmrsID);
+
     expect(identifierSourceSelectInput.childElementCount).toBe(3);
     expect(identifierSourceSelectInput.value).toBe('Generator 1 for OpenMRS ID');
   });

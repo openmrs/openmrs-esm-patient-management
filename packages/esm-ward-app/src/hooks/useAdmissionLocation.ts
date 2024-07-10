@@ -1,13 +1,12 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 import { type AdmissionLocation } from '../types/index';
+import useSWRImmutable from 'swr/immutable';
 
 export function useAdmissionLocation(locationUuid: string, rep: string = 'full') {
-  const apiUrl = `${restBaseUrl}/admissionLocation/${locationUuid}` + (rep ? `?v=${rep}` : '');
-  const { data, ...rest } = useSWR<{ data: AdmissionLocation }, Error>(apiUrl, openmrsFetch);
-
+  const apiUrl = locationUuid ? `${restBaseUrl}/admissionLocation/${locationUuid}?v=${rep}` : null;
+  const { data, ...rest } = useSWRImmutable<{ data: AdmissionLocation }, Error>(apiUrl, openmrsFetch);
   return {
-    admissionLocation: data?.data ?? null,
+    admissionLocation: data?.data,
     ...rest,
   };
 }

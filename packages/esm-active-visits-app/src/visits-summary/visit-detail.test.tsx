@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
-import VisitDetailComponent from './visit-detail.component';
-import { useVisit } from './visit.resource';
 import { formatDate } from '@openmrs/esm-framework';
+import { useVisit } from './visit.resource';
+import VisitDetailComponent from './visit-detail.component';
 
 jest.mock('./visit.resource');
 
@@ -117,6 +117,6 @@ describe('VisitDetailComponent', () => {
 
     render(<VisitDetailComponent visitUuid={visitUuid} patientUuid={patientUuid} />);
 
-    expect(screen.queryByRole('button', { name: 'All Encounters' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'All Encounters' })).not.toBeInTheDocument();
   });
 });

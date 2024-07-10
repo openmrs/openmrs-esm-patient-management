@@ -1,16 +1,10 @@
-import { renderWithSwr } from '../../../../tools/test-utils';
 import React from 'react';
+import { screen } from '@testing-library/react';
 import AdmissionRequestsWorkspace from './admission-requests-workspace.component';
-import {
-  type ConfigSchema,
-  type Person,
-  closeWorkspace,
-  getDefaultsFromConfigSchema,
-  useConfig,
-} from '@openmrs/esm-framework';
+import { type ConfigSchema, type Person, getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { renderWithSwr } from 'tools';
+import { mockInpatientRequest } from '__mocks__';
 import { configSchema } from '../config-schema';
-import { useInpatientRequest } from '../hooks/useInpatientRequest';
-import { mockInpatientRequest } from '../../../../__mocks__/ward-patient';
 
 jest.replaceProperty(mockInpatientRequest.patient.person as Person, 'preferredName', {
   uuid: '',
@@ -31,8 +25,8 @@ jest.mock('@openmrs/esm-framework', () => {
 
 describe('Admission Requests Workspace', () => {
   it('should render a admission request card', () => {
-    const { getByText } = renderWithSwr(<AdmissionRequestsWorkspace admissionRequests={[mockInpatientRequest]} />);
+    renderWithSwr(<AdmissionRequestsWorkspace admissionRequests={[mockInpatientRequest]} />);
     const { givenName, familyName } = mockInpatientRequest.patient.person!.preferredName!;
-    expect(getByText(givenName + ' ' + familyName)).toBeInTheDocument();
+    expect(screen.getByText(givenName + ' ' + familyName)).toBeInTheDocument();
   });
 });

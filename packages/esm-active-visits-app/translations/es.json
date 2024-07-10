@@ -21,7 +21,7 @@
   "noObservationsFound": "No se encontraron observaciones",
   "notes": "Notas",
   "noVisitsToDisplay": "No hay visitas para mostrar",
-  "orderDurationAndUnit": "para {duración} {duraciónUnidad}",
+  "orderDurationAndUnit": "para {{duration}} {{durationUnit}}",
   "orderIndefiniteDuration": "Duración indefinida",
   "provider": "Proveedor",
   "quantity": "Cantidad",

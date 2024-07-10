@@ -1,9 +1,10 @@
+/* eslint-disable testing-library/no-node-access */
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import VisitFormQueueFields from './visit-form-queue-fields.component';
 import { defineConfigSchema, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { configSchema } from '../../config-schema';
+import VisitFormQueueFields from './visit-form-queue-fields.component';
 
 defineConfigSchema('@openmrs/esm-service-queues-app', configSchema);
 
