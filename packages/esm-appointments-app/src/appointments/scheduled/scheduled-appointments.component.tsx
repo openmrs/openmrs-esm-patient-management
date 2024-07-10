@@ -32,7 +32,7 @@ const ScheduledAppointments: React.FC<ScheduledAppointmentsProps> = ({ appointme
   const responsiveSize = isDesktop(layout) ? 'sm' : 'md';
 
   // added to prevent auto-removal of translations for dynamic keys
-  // t('checkedIn', 'Checked In');
+  // t('checkedIn', 'Checked in');
   // t('expected', 'Expected');
 
   const [currentTab, setCurrentTab] = useState<string>(null);

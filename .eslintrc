@@ -2,9 +2,14 @@
   "env": {
     "node": true
   },
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jest-dom/recommended",
+    "plugin:testing-library/react"
+  ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react-hooks"],
+  "plugins": ["@typescript-eslint", "jest-dom", "react-hooks", "testing-library"],
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     // Disabling these rules for now just to keep the diff small. I'll enable them one by one as we go.
@@ -14,6 +19,11 @@
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/triple-slash-reference": "off",
+    // The following rules need `noImplicitAny` to be set to `true` in our tsconfig. They are too restrictive for now, but should be reconsidered in future
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/unbound-method": "off",
     // Use `import type` instead of `import` for type imports https://typescript-eslint.io/blog/consistent-type-imports-and-exports-why-and-how
     "@typescript-eslint/consistent-type-imports": [
       "error",

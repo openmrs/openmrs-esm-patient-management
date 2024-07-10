@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .title {
@@ -19,23 +19,23 @@
 }
 
 .submitButton {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
   width: 11.688rem;
   display: block;
 }
 
 .infoGrid {
   width: 100%;
-  padding-left: spacing.$spacing-07;
+  padding-left: layout.$spacing-07;
   margin-bottom: 40vh;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   max-width: 50rem;
 }
 
 .label01 {
   @include type.type-style('label-01');
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
   color: $ui-04;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .space05 {
-  margin: spacing.$spacing-05 0 spacing.$spacing-05 0;
+  margin: layout.$spacing-05 0;
 }
 
 .formContainer {
@@ -56,7 +56,7 @@
 
 .stickyColumn {
   position: sticky;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   // 3rem for the nav height and 1rem for top margin
   top: 4rem;
 }
@@ -68,7 +68,7 @@
 .linkName {
   color: $color-gray-70;
   line-height: 1.38;
-  font-size: spacing.$spacing-05;
+  font-size: layout.$spacing-05;
   font-weight: 600;
 
   &:active {
@@ -94,8 +94,11 @@
 }
 
 .spinner {
-  &:global(.cds--inline-loading) {
-    min-height: 1rem;
+  min-height: 1rem;
+  width: max-content;
+
+  :global(.cds--inline-loading__text) {
+    @include type.type-style('body-01');
   }
 }
 
@@ -109,6 +112,6 @@ html[dir='rtl'] {
 
   .infoGrid {
     padding-left: unset;
-    padding-right: spacing.$spacing-07;
+    padding-right: layout.$spacing-07;
   }
 }

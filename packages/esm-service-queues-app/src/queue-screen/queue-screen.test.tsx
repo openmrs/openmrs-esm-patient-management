@@ -6,6 +6,7 @@ import QueueScreen from './queue-screen.component';
 jest.mock('./useActiveTickets');
 jest.mock('../helpers/helpers', () => ({
   useSelectedQueueLocationName: jest.fn().mockReturnValue('Room A'),
+  useSelectedQueueLocationUuid: jest.fn().mockReturnValue(''),
 }));
 
 describe('QueueScreen component', () => {

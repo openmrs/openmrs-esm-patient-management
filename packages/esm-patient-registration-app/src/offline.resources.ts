@@ -75,17 +75,21 @@ export async function fetchPatientIdentifierTypesWithSources(): Promise<Array<Pa
   // @ts-ignore Reason: The required props of the type are generated below.
   const identifierTypes: Array<PatientIdentifierType> = patientIdentifierTypes.filter(Boolean);
 
-  const [autoGenOptions, ...allIdentifierSources] = await Promise.all([
+  const [autoGenOptions, identifierSourcesResponse] = await Promise.all([
     fetchAutoGenerationOptions(),
-    ...identifierTypes.map((identifierType) => fetchIdentifierSources(identifierType.uuid)),
+    fetchIdentifierSources(),
   ]);
 
+  const allIdentifierSources = identifierSourcesResponse.data.results;
+
   for (let i = 0; i < identifierTypes?.length; i++) {
-    identifierTypes[i].identifierSources = allIdentifierSources[i].data.results.map((source) => {
-      const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
-      source.autoGenerationOption = option;
-      return source;
-    });
+    identifierTypes[i].identifierSources = allIdentifierSources
+      .filter((source) => source.identifierType.uuid === identifierTypes[i].uuid)
+      .map((source) => {
+        const option = find(autoGenOptions.data.results, { source: { uuid: source.uuid } });
+        source.autoGenerationOption = option;
+        return source;
+      });
   }
 
   return identifierTypes;
@@ -125,8 +129,8 @@ async function fetchPatientIdentifierTypes(): Promise<Array<FetchedPatientIdenti
   return [];
 }
 
-async function fetchIdentifierSources(identifierType: string) {
-  return await cacheAndFetch(`${restBaseUrl}/idgen/identifiersource?v=default&identifierType=${identifierType}`);
+async function fetchIdentifierSources() {
+  return await cacheAndFetch(`${restBaseUrl}/idgen/identifiersource?v=default`);
 }
 
 async function fetchAutoGenerationOptions(abortController?: AbortController) {

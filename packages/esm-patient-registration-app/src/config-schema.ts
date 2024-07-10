@@ -12,6 +12,7 @@ export interface FieldDefinition {
   label?: string;
   uuid: string;
   placeholder?: string;
+  dateFormat?: string;
   showHeading: boolean;
   validation?: {
     required: boolean;

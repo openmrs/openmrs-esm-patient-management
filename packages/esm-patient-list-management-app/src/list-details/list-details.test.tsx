@@ -87,12 +87,12 @@ describe('ListDetails', () => {
     expect(screen.getByText(/there are no patients in this list/i)).toBeInTheDocument();
   });
 
-  it('opens overlay with a form when the "Edit name or description" button is clicked', () => {
+  it('opens overlay with a form when the "Edit name or description" button is clicked', async () => {
     render(<ListDetails />);
 
-    userEvent.click(screen.getByText('Actions'));
+    await userEvent.click(screen.getByText('Actions'));
     const editBtn = screen.getByText('Edit name or description');
-    userEvent.click(editBtn);
+    await userEvent.click(editBtn);
   });
 
   it('deletes patient list and navigates back to the list page', async () => {
@@ -105,7 +105,8 @@ describe('ListDetails', () => {
     expect(screen.getByText('Delete')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
 
-    expect(screen.getByText('Delete').closest('button')).not.toHaveAttribute('disabled');
+    // eslint-disable-next-line testing-library/no-node-access
+    expect(screen.getByText('Delete').closest('button')).toBeEnabled();
 
     await userEvent.click(screen.getByText('Cancel'));
   });

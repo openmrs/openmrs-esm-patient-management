@@ -4,31 +4,10 @@
 
 $openmrs-background-grey: #ededed;
 
-.formWrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-:global(.omrs-breakpoint-lt-desktop) .formWrapper {
-  background-color: $openmrs-background-grey;
-  margin-top: spacing.$spacing-09;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .formWrapper {
-  background-color: colors.$white;
-}
-
 .formGroup {
   display: flex;
   margin-bottom: spacing.$spacing-02;
   padding: spacing.$spacing-05;
-
-  checkbox {
-    color: colors.$gray-70;
-    @include type.type-style('heading-compact-02');
-    margin-bottom: spacing.$spacing-03;
-  }
 }
 
 :global(.omrs-breakpoint-gt-tablet) .formGroup {
@@ -60,6 +39,14 @@ $openmrs-background-grey: #ededed;
   align-items: center;
 }
 
+.dateTimeFields {
+  max-width: 100%;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .dateTimeFields {
+  max-width: 32.25rem;
+}
+
 .button {
   height: 4rem;
   display: flex;
@@ -88,18 +75,4 @@ $openmrs-background-grey: #ededed;
 .weekSelect {
   max-inline-size: fit-content;
   padding-top: spacing.$spacing-03;
-}
-
-:global(.cds--select-input):focus {
-  outline: 2.5px solid colors.$red-60;
-}
-
-.errorMessage {
-  @include type.type-style('label-02');
-  color: colors.$red-60;
-  margin-top: 0.5rem;
-}
-
-:global(.cds--number input[type='number']):focus {
-  outline: 2.5px solid colors.$red-60;
 }

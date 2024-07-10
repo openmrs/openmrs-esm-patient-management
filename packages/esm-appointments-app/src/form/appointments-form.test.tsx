@@ -84,6 +84,9 @@ jest.mock('react-hook-form', () => ({
   useSubscribe: () => ({
     r: { current: { subject: { subscribe: () => jest.fn() } } },
   }),
+  useController: () => ({
+    field: { ref: jest.fn() },
+  }),
 }));
 
 jest.mock('./appointments-form.resource', () => {
@@ -104,12 +107,12 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByLabelText(/Select a location/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Date$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select a service/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write any additional points here/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/dd\/mm\/yyyy/i)).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText(/dd\/mm\/yyyy/i).length).toBe(2);
     expect(screen.getByRole('option', { name: /Mosoriot/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();
@@ -117,7 +120,7 @@ describe('AppointmentForm', () => {
     expect(screen.getByRole('option', { name: /Choose appointment type/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /Scheduled/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /WalkIn/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /Date/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /^Date$/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
@@ -149,13 +152,13 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
-    const dateInput = screen.getByRole('textbox', { name: /Date/i });
+    const dateInput = screen.getByRole('textbox', { name: /^Date$/i });
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
-    expect(saveButton).not.toBeDisabled();
+    expect(saveButton).toBeEnabled();
 
     await user.clear(dateInput);
     await user.type(dateInput, '4/4/2021');
@@ -187,7 +190,7 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const saveButton = screen.getByRole('button', { name: /Save and close/i });
-    const dateInput = screen.getByRole('textbox', { name: /Date/i });
+    const dateInput = screen.getByRole('textbox', { name: /^Date$/i });
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
