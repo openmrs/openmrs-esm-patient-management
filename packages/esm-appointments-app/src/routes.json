@@ -11,11 +11,6 @@
   ],
   "extensions": [
     {
-      "name": "home-appointments-tile",
-      "slot": "metrics-extension-slot",
-      "component": "homeAppointmentsTile"
-    },
-    {
       "name": "home-appointments",
       "slot": "homepage-widgets-slot",
       "component": "homeAppointments",
@@ -153,6 +148,11 @@
           "default": "Create new appointment"
         }
       }
+    },
+    {
+      "name": "home-appointments-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeAppointmentsTile"
     }
   ]
 }
