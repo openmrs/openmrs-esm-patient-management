@@ -2716,6 +2716,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-bed-management-app@workspace:packages/esm-bed-management-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-bed-management-app@workspace:packages/esm-bed-management-app"
+  dependencies:
+    "@carbon/react": "npm:~1.37.0"
+    formik: "npm:^2.1.5"
+    lodash-es: "npm:^4.17.15"
+    uuid: "npm:^8.3.2"
+    webpack: "npm:^5.74.0"
+    yup: "npm:^0.29.1"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-config@npm:5.6.1-pre.2029":
   version: 5.6.1-pre.2029
   resolution: "@openmrs/esm-config@npm:5.6.1-pre.2029"
