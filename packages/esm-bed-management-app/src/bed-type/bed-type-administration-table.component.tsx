@@ -16,13 +16,13 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { isDesktop as desktopLayout, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
-import type { BedTypeData } from '../../types';
-import { useBedType } from '../../summary/summary.resource';
-import Header from '../../header/header.component';
+import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
+import type { BedTypeData } from '../types';
+import { useBedType } from '../summary/summary.resource';
+import Header from '../header/header.component';
 import BedTypeForm from './new-bed-type-form.component';
-import styles from '../../bed-administration/bed-administration-table.scss';
+import styles from '../bed-administration/bed-administration-table.scss';
+import { CardHeader } from '../card-header/card-header.component';
 import EditBedTypeForm from './edit-bed-type.component';
 
 const BedTypeAdministrationTable: React.FC = () => {

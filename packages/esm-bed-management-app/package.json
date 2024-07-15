@@ -38,10 +38,7 @@
   },
   "dependencies": {
     "@carbon/react": "~1.37.0",
-    "formik": "^2.1.5",
-    "lodash-es": "^4.17.15",
-    "uuid": "^8.3.2",
-    "yup": "^0.29.1"
+    "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",

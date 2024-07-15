@@ -1,45 +1,48 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
-import { useBedType } from '../../bed-administration/bed-administration.resource';
-import BedTagsAdministrationForm from './bed-tags-admin-form.component';
-import { saveBedTag, useLocationsByTag } from '../../summary/summary.resource';
-import { type BedTagData, type Mutator } from '../../types';
+import type { BedTypeData, Mutator } from '../types';
+import { useBedType } from '../bed-administration/bed-administration.resource';
+import { saveBedType, useLocationsWithAdmissionTag } from '../summary/summary.resource';
+import BedTypeAdministrationForm from './bed-type-admin-form.component';
 
-interface BedTagFormProps {
+interface BedTypeFormProps {
   showModal: boolean;
   onModalChange: (showModal: boolean) => void;
   mutate: Mutator;
 }
 
-const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutate }) => {
+const NewBedTypeForm: React.FC<BedTypeFormProps> = ({ showModal, onModalChange, mutate }) => {
   const { t } = useTranslation();
-  const { admissionLocationTagUuid } = useConfig();
-  const { data: admissionLocations } = useLocationsByTag(admissionLocationTagUuid);
-  const headerTitle = t('addBedTag', 'Create Bed Tag');
+  const { data: admissionLocations } = useLocationsWithAdmissionTag();
+  const headerTitle = t('addBedType', 'Create Bed type');
   const { bedTypes } = useBedType();
   const availableBedTypes = bedTypes ? bedTypes : [];
 
-  const initialData: BedTagData = {
+  const initialData: BedTypeData = {
     uuid: '',
     name: '',
+    displayName: '',
+    description: '',
   };
 
   const handleCreateQuestion = useCallback(
-    (formData: BedTagData) => {
-      const { name } = formData;
+    (formData: BedTypeData) => {
+      const { name, displayName, description } = formData;
 
-      const bedObject = {
+      const bedTypePayload = {
         name,
+        displayName,
+        description,
       };
 
-      saveBedTag({ bedPayload: bedObject })
+      saveBedType({ bedTypePayload })
         .then(() => {
           showToast({
-            title: t('formCreated', 'Add Bed Tag'),
+            title: t('formCreated', 'Add bed Type'),
             kind: 'success',
             critical: true,
-            description: `Tag ${name} was created successfully.`,
+            description: `Bed ${name} was created successfully.`,
           });
 
           mutate();
@@ -61,7 +64,7 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutat
 
   return (
     <>
-      <BedTagsAdministrationForm
+      <BedTypeAdministrationForm
         onModalChange={onModalChange}
         allLocations={admissionLocations}
         availableBedTypes={availableBedTypes}
@@ -74,4 +77,4 @@ const NewTagForm: React.FC<BedTagFormProps> = ({ showModal, onModalChange, mutat
   );
 };
 
-export default NewTagForm;
+export default NewBedTypeForm;

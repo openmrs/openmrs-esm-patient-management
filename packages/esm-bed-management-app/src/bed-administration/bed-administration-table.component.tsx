@@ -18,14 +18,14 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { isDesktop as desktopLayout, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
-import type { InitialData, Location } from '../types';
-import { findBedByLocation, useWards } from '../summary/summary.resource';
+import { ErrorState, isDesktop as desktopLayout, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import type { BedFormData } from '../types';
+import { useBedsGroupedByLocation } from '../summary/summary.resource';
 import EditBedForm from './edit-bed-form.component';
 import Header from '../header/header.component';
 import NewBedForm from './new-bed-form.component';
 import styles from './bed-administration-table.scss';
+import { CardHeader } from '../card-header/card-header.component';
 
 const BedAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
@@ -34,13 +34,17 @@ const BedAdministrationTable: React.FC = () => {
   const isTablet = layout === 'tablet';
   const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
-  const { admissionLocationTagUuid } = useConfig();
 
-  const [wardsGroupedByLocations, setWardsGroupedByLocation] = useState<Array<Location>>([]);
-  const [isBedDataLoading, setIsBedDataLoading] = useState(false);
+  const {
+    data: wardsGroupedByLocations,
+    isLoading: isLoadingBeds,
+    isValidating,
+    mutate,
+    error,
+  } = useBedsGroupedByLocation();
   const [showAddBedModal, setShowAddBedModal] = useState(false);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
-  const [editData, setEditData] = useState<InitialData>();
+  const [editData, setEditData] = useState<BedFormData>();
   const [filterOption, setFilterOption] = useState('ALL');
 
   function CustomTag({ condition }: { condition: boolean }) {
@@ -64,41 +68,13 @@ const BedAdministrationTable: React.FC = () => {
   const handleBedStatusChange = ({ selectedItem }: { selectedItem: string }) =>
     setFilterOption(selectedItem.trim().toUpperCase());
 
-  const bedsMappedToLocation = wardsGroupedByLocations?.length ? [].concat(...wardsGroupedByLocations) : [];
-
-  const { data, isLoading, error, isValidating, mutate } = useWards(admissionLocationTagUuid);
-
-  const [currentPageSize, setPageSize] = useState(10);
-  const pageSizes = [10, 20, 30, 40, 50];
+  const [pageSize, setPageSize] = useState(10);
   const { results, currentPage, totalPages, goTo } = usePagination(
     filterOption === 'ALL'
-      ? bedsMappedToLocation
-      : bedsMappedToLocation.filter((bed) => bed.status === filterOption) ?? [],
-    currentPageSize,
+      ? wardsGroupedByLocations
+      : wardsGroupedByLocations.filter((bed) => bed.status === filterOption) ?? [],
+    pageSize,
   );
-
-  useEffect(() => {
-    if (!isLoading && data) {
-      setIsBedDataLoading(true);
-      const fetchData = async () => {
-        const promises = data.data.results.map(async (ward) => {
-          const bedLocations = await findBedByLocation(ward.uuid);
-          if (bedLocations.data.results.length) {
-            return bedLocations.data.results.map((bed) => ({
-              ...bed,
-              location: ward,
-            }));
-          }
-          return null;
-        });
-
-        const updatedWards = (await Promise.all(promises)).filter(Boolean);
-        setWardsGroupedByLocation(updatedWards);
-        setIsBedDataLoading(false);
-      };
-      fetchData().finally(() => setIsBedDataLoading(false));
-    }
-  }, [data, isLoading, wardsGroupedByLocations.length]);
 
   const tableHeaders = [
     {
@@ -124,12 +100,12 @@ const BedAdministrationTable: React.FC = () => {
   ];
 
   const tableRows = useMemo(() => {
-    return results.map((ward) => ({
-      id: ward.uuid,
-      bedNumber: ward.bedNumber,
-      location: ward.location.display,
-      occupancyStatus: <CustomTag condition={ward?.status === 'OCCUPIED'} />,
-      allocationStatus: <CustomTag condition={ward.location?.uuid} />,
+    return results.flat().map((bed) => ({
+      id: bed.uuid,
+      bedNumber: bed.bedNumber,
+      location: bed.location.display,
+      occupancyStatus: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
+      allocationStatus: <CustomTag condition={Boolean(bed.location?.uuid)} />,
       actions: (
         <>
           <Button
@@ -137,7 +113,7 @@ const BedAdministrationTable: React.FC = () => {
             renderIcon={Edit}
             onClick={(e) => {
               e.preventDefault();
-              setEditData(ward);
+              setEditData(bed);
               setShowEditBedModal(true);
               setShowAddBedModal(false);
             }}
@@ -152,7 +128,7 @@ const BedAdministrationTable: React.FC = () => {
     }));
   }, [responsiveSize, results, t]);
 
-  if ((isBedDataLoading || isLoading) && !wardsGroupedByLocations.length) {
+  if (isLoadingBeds && !wardsGroupedByLocations.length) {
     return (
       <>
         <Header route="Ward Allocation" />
@@ -262,12 +238,10 @@ const BedAdministrationTable: React.FC = () => {
                 page={currentPage}
                 pageNumberText="Page Number"
                 pageSize={totalPages}
-                pageSizes={pageSizes?.length > 0 ? pageSizes : [10]}
-                totalItems={bedsMappedToLocation.length ?? 0}
+                pageSizes={[10, 20, 30, 40, 50]}
+                totalItems={wardsGroupedByLocations.length}
                 onChange={({ pageSize, page }) => {
-                  if (pageSize !== currentPageSize) {
-                    setPageSize(pageSize);
-                  }
+                  setPageSize(pageSize);
                   if (page !== currentPage) {
                     goTo(page);
                   }

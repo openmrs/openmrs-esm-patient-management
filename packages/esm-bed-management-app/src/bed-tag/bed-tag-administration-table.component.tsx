@@ -16,12 +16,12 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
-import { isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
-import type { BedTagData } from '../../types';
-import { useBedTag } from '../../summary/summary.resource';
-import Header from '../../header/header.component';
-import styles from '../../bed-administration/bed-administration-table.scss';
+import { ErrorState, isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
+import type { BedTagData } from '../types';
+import { useBedTag } from '../summary/summary.resource';
+import Header from '../header/header.component';
+import styles from '../bed-administration/bed-administration-table.scss';
+import { CardHeader } from '../card-header/card-header.component';
 import BedTagForm from './new-tag-form.component';
 import EditBedTagForm from './edit-tag-form.component';
 
@@ -37,10 +37,8 @@ const BedTagAdministrationTable: React.FC = () => {
   const [showEditBedModal, setShowEditBedModal] = useState(false);
   const [editData, setEditData] = useState<BedTagData>();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
   const { bedTypeData, isError, loading, validate, mutate } = useBedTag();
-  const [currentPageSize, setPageSize] = useState(10);
-  const pageSizes = [10, 20, 30, 40, 50];
+  const [pageSize, setPageSize] = useState(10);
 
   const tableHeaders = [
     {

@@ -1,32 +1,32 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
+import { showToast, showNotification } from '@openmrs/esm-framework';
 
-import type { InitialData, Mutator } from '../types';
+import type { BedFormData } from '../types';
 import { useBedType, saveBed } from './bed-administration.resource';
 import BedAdministrationForm from './bed-administration-form.component';
-import { useLocationsByTag } from '../summary/summary.resource';
+import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 import { type BedAdministrationData } from './bed-administration-types';
 
 interface NewBedFormProps {
   showModal: boolean;
   onModalChange: (showModal: boolean) => void;
-  mutate: Mutator;
+  mutate: () => any;
 }
 
 const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutate }) => {
   const { t } = useTranslation();
-  const { admissionLocationTagUuid } = useConfig();
-  const { data: admissionLocations } = useLocationsByTag(admissionLocationTagUuid);
+  const { data: admissionLocations } = useLocationsWithAdmissionTag();
   const headerTitle = t('createNewBed', 'Create a new bed');
   const occupancyStatuses = ['Available', 'Occupied'];
   const { bedTypes } = useBedType();
   const availableBedTypes = bedTypes ? bedTypes : [];
 
-  const initialData: InitialData = {
+  const initialData: BedFormData = {
+    id: 0,
     uuid: '',
     bedNumber: '',
-    status: '',
+    status: null,
     description: '',
     row: 0,
     column: 0,
@@ -34,9 +34,7 @@ const NewBedForm: React.FC<NewBedFormProps> = ({ showModal, onModalChange, mutat
       display: '',
       uuid: '',
     },
-    bedType: {
-      name: '',
-    },
+    bedType: null,
   };
 
   const handleCreateQuestion = useCallback(

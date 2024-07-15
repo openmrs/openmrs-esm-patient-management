@@ -1,24 +1,23 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
+import { showToast, showNotification } from '@openmrs/esm-framework';
 
-import type { InitialData, Mutator } from '../types';
+import type { BedFormData } from '../types';
 import { useBedType, editBed } from './bed-administration.resource';
 import BedAdministrationForm from './bed-administration-form.component';
 import { type BedAdministrationData } from './bed-administration-types';
-import { useLocationsByTag } from '../summary/summary.resource';
+import { useLocationsWithAdmissionTag } from '../summary/summary.resource';
 
 interface EditBedFormProps {
   showModal: boolean;
   onModalChange: (showModal: boolean) => void;
-  editData: InitialData;
-  mutate: Mutator;
+  editData: BedFormData;
+  mutate: () => any;
 }
 
 const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
   const { t } = useTranslation();
-  const { admissionLocationTagUuid } = useConfig();
-  const { data: admissionLocations } = useLocationsByTag(admissionLocationTagUuid);
+  const { data: admissionLocations } = useLocationsWithAdmissionTag();
 
   const headerTitle = t('editBed', 'Edit bed');
   const occupancyStatuses = ['Available', 'Occupied'];

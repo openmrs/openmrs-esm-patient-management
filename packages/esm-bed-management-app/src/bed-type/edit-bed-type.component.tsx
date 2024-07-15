@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
 
-import { editBedType, useBedType } from '../../summary/summary.resource';
-import { type BedTypeDataAdministration } from '../../bed-administration/bed-administration-types';
-import { type BedTypeData, type Mutator } from '../../types';
+import { editBedType, useBedType } from '../summary/summary.resource';
+import { type BedTypeDataAdministration } from '../bed-administration/bed-administration-types';
+import { type BedTypeData, type Mutator } from '../types';
 import BedTypeAdministrationForm from './bed-type-admin-form.component';
 
 interface EditBedTypeFormProps {
@@ -23,18 +23,18 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ showModal, onModalCha
     (formData: BedTypeDataAdministration) => {
       const bedUuid = editData.uuid;
       const { name, displayName, description } = formData;
-      const bedPayload = {
+      const bedTypePayload = {
         name,
         displayName,
         description,
       };
-      editBedType({ bedPayload, bedTypeId: bedUuid })
+      editBedType({ bedTypePayload, bedTypeId: bedUuid })
         .then(() => {
           showToast({
             title: t('formSaved', 'Bed Type'),
             kind: 'success',
             critical: true,
-            description: bedPayload.name + ' ' + t('saveSuccessMessage', 'was saved successfully.'),
+            description: bedTypePayload.name + ' ' + t('saveSuccessMessage', 'was saved successfully.'),
           });
 
           mutate();

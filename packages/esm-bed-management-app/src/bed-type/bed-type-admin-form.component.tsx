@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Location } from '@openmrs/esm-framework';
-import type { BedType, BedTypeData } from '../../types';
+import type { BedType, BedTypeData } from '../types';
 
 const BedTypeAdministrationSchema = z.object({
   name: z.string().max(255),

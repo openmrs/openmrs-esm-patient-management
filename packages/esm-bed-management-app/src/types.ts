@@ -14,6 +14,12 @@ export type Tag = {
   resourceVersion: string;
 };
 
+export type LocationFetchResponse = {
+  data: {
+    results: Array<Location>;
+  };
+};
+
 export type Location = {
   uuid: string;
   display: string;
@@ -68,21 +74,25 @@ export type Location = {
   beds: Bed[];
 };
 
+export type BedFetchResponse = {
+  results: Array<Bed>;
+};
+
 export interface Bed {
   id: number;
-  bedId: number;
   uuid: string;
   bedNumber: string;
-  bedType: {
-    uuid: string;
-    name: string;
-    displayName: string;
-    description: string;
-    resourceVersion: string;
-  };
+  bedType?: BedType;
   row: number;
   column: number;
-  status: 'AVAILABLE' | string;
+  status: 'AVAILABLE' | 'OCCUPIED';
+}
+
+export interface BedWithLocation extends Bed {
+  location: {
+    display: string;
+    uuid: string;
+  };
 }
 
 export interface BedType {
@@ -90,22 +100,11 @@ export interface BedType {
   name: string;
   displayName: string;
   description: string;
+  resourceVersion: string;
 }
 
-export interface InitialData {
-  uuid: string;
-  bedNumber: string;
-  status: string;
+export interface BedFormData extends BedWithLocation {
   description: string;
-  row: number;
-  column: number;
-  location: {
-    display: string;
-    uuid: string;
-  };
-  bedType: {
-    name: string;
-  };
 }
 
 export interface BedTypeData {
@@ -119,6 +118,26 @@ export interface BedTagData {
   uuid: string;
   name: string;
 }
+
+export interface BedPostPayload {
+  bedNumber: string;
+  bedType: string;
+  row: number;
+  column: number;
+  status: string;
+  locationUuid: string;
+}
+
+export interface BedTagPayload {
+  name: string;
+}
+
+export interface BedTypePayload {
+  name: string;
+  displayName: string;
+  description: string;
+}
+
 export type Mutator = KeyedMutator<{
   data: {
     results: Array<Location>;

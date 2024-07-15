@@ -22,7 +22,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { type Location } from '@openmrs/esm-framework';
-import type { BedType, InitialData } from '../types';
+import type { BedType, BedFormData } from '../types';
 import { type BedAdministrationData } from './bed-administration-types';
 
 const numberInString = z.string().transform((val, ctx) => {
@@ -38,7 +38,7 @@ const numberInString = z.string().transform((val, ctx) => {
 });
 
 const BedAdministrationSchema = z.object({
-  bedId: z.string().min(5).max(255),
+  bedId: z.string().max(255),
   description: z.string().max(255),
   bedRow: numberInString,
   bedColumn: numberInString,
@@ -57,7 +57,7 @@ interface BedAdministrationFormProps {
   handleCreateQuestion?: (formData: BedAdministrationData) => void;
   headerTitle: string;
   occupancyStatuses: string[];
-  initialData: InitialData;
+  initialData: BedFormData;
 }
 
 interface ErrorType {
@@ -76,7 +76,7 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
-  const [selectedBedType] = useState(initialData.bedType.name);
+  const [selectedBedType] = useState(initialData.bedType?.name ?? '');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [formStateError, setFormStateError] = useState('');
 
@@ -92,13 +92,13 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
     defaultValues: {
-      bedId: initialData.bedNumber || '',
-      description: initialData.description || '',
-      bedRow: initialData.row.toString() || '0',
-      bedColumn: initialData.column.toString() || '0',
-      location: initialData.location || {},
-      occupancyStatus: capitalize(initialData.status) || occupancyStatus,
-      bedType: initialData.bedType.name || '',
+      bedId: initialData.bedNumber ?? '',
+      description: initialData.bedType?.description ?? '',
+      bedRow: initialData.row.toString() ?? '0',
+      bedColumn: initialData.column.toString() ?? '0',
+      location: initialData.location ?? {},
+      occupancyStatus: capitalize(initialData.status) ?? occupancyStatus,
+      bedType: initialData.bedType?.name ?? '',
     },
   });
 

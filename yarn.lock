@@ -2721,11 +2721,8 @@ __metadata:
   resolution: "@openmrs/esm-bed-management-app@workspace:packages/esm-bed-management-app"
   dependencies:
     "@carbon/react": "npm:~1.37.0"
-    formik: "npm:^2.1.5"
     lodash-es: "npm:^4.17.15"
-    uuid: "npm:^8.3.2"
     webpack: "npm:^5.74.0"
-    yup: "npm:^0.29.1"
   peerDependencies:
     "@openmrs/esm-framework": 5.x
     dayjs: 1.x

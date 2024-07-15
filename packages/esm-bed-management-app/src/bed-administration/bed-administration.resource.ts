@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { type BedPostPayload } from '../types';
 
 interface BedForm {
   bedNumber: string;
@@ -11,7 +12,7 @@ interface BedForm {
   locationUuid: string;
 }
 
-export async function saveBed({ bedPayload }): Promise<FetchResponse<BedForm>> {
+export async function saveBed({ bedPayload }: { bedPayload: BedPostPayload }): Promise<FetchResponse<BedForm>> {
   const response: FetchResponse = await openmrsFetch(`/ws/rest/v1/bed`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -40,7 +41,13 @@ export function useBedType() {
   return { bedTypes: bedTypes ? bedTypes : [], isLoading, error };
 }
 
-export async function editBed({ bedPayload, bedId }): Promise<FetchResponse<BedForm>> {
+export async function editBed({
+  bedPayload,
+  bedId,
+}: {
+  bedPayload: BedPostPayload;
+  bedId: string;
+}): Promise<FetchResponse<BedForm>> {
   const response: FetchResponse = await openmrsFetch(`/ws/rest/v1/bed/${bedId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
