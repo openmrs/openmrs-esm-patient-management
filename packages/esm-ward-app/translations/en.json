@@ -9,5 +9,6 @@
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
   "manage": "Manage",
-  "noBedsConfigured": "No beds configured for this location"
+  "noBedsConfigured": "No beds configured for this location",
+  "wards": "Wards"
 }
