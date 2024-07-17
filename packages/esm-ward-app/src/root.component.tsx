@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import WardView from './ward-view/ward-view.component';
 
 const Root: React.FC = () => {
+  // t('wards', 'Wards')
   const wardViewBasename = window.getOpenmrsSpaBase() + 'home/ward';
 
   return (

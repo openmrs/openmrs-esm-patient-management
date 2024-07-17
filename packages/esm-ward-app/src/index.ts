@@ -20,7 +20,6 @@ const options = {
 
 export const root = getSyncLifecycle(rootComponent, options);
 
-// t('wards', 'Wards')
 export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'ward', title: 'wards' }), options);
 
 export const admissionRequestWorkspace = getAsyncLifecycle(
