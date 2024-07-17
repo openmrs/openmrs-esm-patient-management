@@ -9,10 +9,12 @@ export interface DashboardLinkConfig {
   title: string;
 }
 
+// TODO: extract this out into the esm-framework and all 4 copies of this file in this repo?
+
 function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: DashboardLinkConfig }) {
   //
   const { t } = useTranslation();
-  const { name } = dashboardLinkConfig;
+  const { name, title } = dashboardLinkConfig;
   const location = useLocation();
   const spaBasePath = `${window.spaBase}/home`;
 
@@ -28,7 +30,7 @@ function DashboardExtension({ dashboardLinkConfig }: { dashboardLinkConfig: Dash
         'active-left-nav-link': navLink.match(name),
       })}
       to={`${spaBasePath}/${name}`}>
-      {t('wards', 'Wards')}
+      {t(title)}
     </ConfigurableLink>
   );
 }
