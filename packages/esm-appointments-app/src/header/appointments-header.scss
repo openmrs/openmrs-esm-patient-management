@@ -8,67 +8,23 @@
   color: $text-02;
   height: spacing.$spacing-12;
   background-color: $ui-02;
-  border-bottom: 1px solid $ui-03;
+  border: 1px solid $ui-03;
+  border-left: 0px;
   display: flex;
   justify-content: space-between;
-}
-
-.left-justified-items {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-}
-
-.right-justified-items {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  margin: 0.5rem;
-}
-
-.page-name {
-  @include type.type-style('heading-04');
-}
-
-.page-labels {
-  margin: 1rem 0;
-
-  p:first-of-type {
-    margin-bottom: 0.25rem;
-  }
-}
-
-.date-and-location {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  padding-right: 1rem;
 }
 
 .dropdownContainer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 0.25rem;
-}
-
-.value {
-  margin-left: 0.25rem;
-}
-
-.middot {
-  margin: 0 0.5rem;
+  margin: 0.5rem;
 }
 
 .view {
   @include type.type-style('label-01');
-}
-
-.datePicker {
-  background-color: transparent;
-  width: 10rem;
-  border: none;
-  & > input {
-    color: colors.$blue-10;
-  }
 }
 
 .dropdown {

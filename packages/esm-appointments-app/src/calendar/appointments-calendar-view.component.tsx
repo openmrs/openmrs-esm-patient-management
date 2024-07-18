@@ -25,7 +25,7 @@ const AppointmentsCalendarView: React.FC = () => {
   return (
     <SelectedDateContext.Provider value={{ selectedDate, setSelectedDate }}>
       <div data-testid="appointments-calendar">
-        <AppointmentsHeader title={t('calendar', 'Calendar')} />
+        <AppointmentsHeader title={'Calendar'} />
         <CalendarHeader />
         <MonthlyCalendarView events={calendarEvents} />
       </div>
