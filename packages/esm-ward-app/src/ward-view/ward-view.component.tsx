@@ -20,7 +20,6 @@ const WardView = () => {
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
-  //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
   if (!isBedManagementModuleInstalled || isLoadingLocation) {
     return <></>;
   }
@@ -104,7 +103,6 @@ const WardViewByLocation = () => {
     return (
       <>
         {wardBeds}
-        {wardUnassignedPatients}
         {bedLayouts.length == 0 && (
           <InlineNotification
             kind="warning"
@@ -112,6 +110,7 @@ const WardViewByLocation = () => {
             title={t('noBedsConfigured', 'No beds configured for this location')}
           />
         )}
+        {wardUnassignedPatients}
       </>
     );
   } else if (isLoadingLocation || isLoadingPatients) {
