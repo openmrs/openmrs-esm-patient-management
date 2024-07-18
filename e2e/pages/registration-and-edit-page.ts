@@ -7,7 +7,11 @@ export interface PatientRegistrationFormValues {
   middleName?: string;
   familyName?: string;
   sex?: PatientRegistrationSex;
-  birthdate?: string;
+  birthdate?: {
+    day: string;
+    month: string;
+    year: string;
+  };
   postalCode?: string;
   address1?: string;
   address2?: string;
@@ -26,7 +30,10 @@ export class RegistrationAndEditPage {
   readonly middleNameInput = () => this.page.locator('#middleName');
   readonly familyNameInput = () => this.page.locator('#familyName');
   readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
-  readonly birthdateInput = () => this.page.locator('#birthdate');
+  readonly birthDateInput = () => this.page.locator('#birthdate');
+  readonly birthdateDayInput = () => this.birthDateInput().getByText('dd');
+  readonly birthdateMonthInput = () => this.birthDateInput().getByText('mm');
+  readonly birthdateYearInput = () => this.birthDateInput().getByText('yyyy');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');
   readonly countyDistrictInput = () => this.page.locator('#countyDistrict');
@@ -46,12 +53,18 @@ export class RegistrationAndEditPage {
 
   async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {
     const tryFill = (locator: Locator, value?: string) => value && locator.fill(value);
+    const focusDatePicker = (locator: Locator) => {
+      const focusElement = locator.getByRole('presentation');
+      return focusElement.focus();
+    };
     await tryFill(this.givenNameInput(), formValues.givenName);
     await tryFill(this.middleNameInput(), formValues.middleName);
     await tryFill(this.familyNameInput(), formValues.familyName);
     formValues.sex && (await this.sexRadioButton(formValues.sex).check());
-    // TODO: O3-3482 Broken due to the date picker and should be fixed
-    // await tryFill(this.birthdateInput(), formValues.birthdate);
+    await focusDatePicker(this.birthDateInput());
+    await tryFill(this.birthdateDayInput(), formValues.birthdate.day);
+    await tryFill(this.birthdateMonthInput(), formValues.birthdate.month);
+    await tryFill(this.birthdateYearInput(), formValues.birthdate.year);
     await tryFill(this.phoneInput(), formValues.phone);
     await tryFill(this.emailInput(), formValues.email);
     await tryFill(this.address1Input(), formValues.address1);

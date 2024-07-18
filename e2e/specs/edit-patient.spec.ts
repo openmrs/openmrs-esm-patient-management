@@ -16,7 +16,7 @@ const formValues: PatientRegistrationFormValues = {
   middleName: 'Donny',
   familyName: `Ronny`,
   sex: 'male',
-  birthdate: '01/02/2020',
+  birthdate: { day: '01', month: '02', year: '2020' },
   postalCode: '',
   address1: 'Bom Jesus Street',
   address2: '',
@@ -48,8 +48,9 @@ test('Edit a patient', async ({ page, api }) => {
 
     await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
     await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
-    // TODO: O3-3482 Broken due to the date picker and should be fixed
-    // await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(formValues.birthdate);
+    await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(
+      `${formValues.birthdate.day}/${formValues.birthdate.month}/${formValues.birthdate.year}`,
+    );
     await expect(person.preferredAddress.address1).toBe(formValues.address1);
     await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
     await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);

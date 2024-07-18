@@ -64,5 +64,12 @@
         ]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // This rule prevents commiting because of we have used page.getBy...
+      "files": ["e2e/**"],
+      "rules" : {"testing-library/prefer-screen-queries": "off"}
+    }
+  ]
 }
