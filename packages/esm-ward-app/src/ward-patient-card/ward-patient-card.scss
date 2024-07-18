@@ -44,6 +44,10 @@
   }
 }
 
+.activeWardPatientCardButton {
+  outline: 2px solid $interactive-01;
+}
+
 .wardPatientCardRow {
   width: 100%;
   padding: spacing.$spacing-04;
@@ -62,6 +66,7 @@
 .wardPatientName {
   @include type.type-style('heading-compact-02');
   color: $text-02;
+
   &::before {
     content: '' !important;
   }
@@ -78,6 +83,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   &.empty {
     background-color: $color-blue-10;
     color: $color-blue-60-2;
@@ -106,6 +112,7 @@
   > div:not(div:first-of-type) {
     display: flex;
     align-items: center;
+
     &::before {
       content: '·';
       padding: 0 spacing.$spacing-02;

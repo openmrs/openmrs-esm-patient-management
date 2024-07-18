@@ -4,10 +4,16 @@ import { type WardPatientCardProps } from '../types';
 import { usePatientCardRows } from './ward-patient-card-row.resources';
 import styles from './ward-patient-card.scss';
 import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
-import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/ward-patient.workspace';
+import { getWardStore } from '../store';
+import classNames from 'classnames';
+
+const spaRoot = window['getOpenmrsSpaBase'];
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
-  const patientCardRows = usePatientCardRows();
+  const wardStore = getWardStore();
+  const activeBedSelection = wardStore.getState().activeBedSelection;
+  const { locationUuid } = useParams();
+  const patientCardRows = usePatientCardRows(locationUuid);
 
   return (
     <div className={styles.wardPatientCard}>
@@ -15,10 +21,14 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
         <WardPatientCardRow key={i} {...props} />
       ))}
       <button
-        className={styles.wardPatientCardButton}
-        onClick={() =>
-          launchWorkspace<WardPatientWorkspaceProps>('ward-patient-workspace', { patientUuid: props.patient.uuid })
-        }>
+        className={classNames(styles.wardPatientCardButton, {
+          // []: activeBedSelection?.bed.uuid !== props.bed.uuid,
+          [styles.activeWardPatientCard]: activeBedSelection?.bed.uuid === props.bed.uuid,
+        })}
+        onClick={() => {
+          wardStore.setState({ activeBedSelection: { ...props } });
+          launchWorkspace('ward-patient-workspace');
+        }}>
         {/* Name will not be displayed; just there for a11y */}
         {getPatientName(props.patient.person)}
       </button>
