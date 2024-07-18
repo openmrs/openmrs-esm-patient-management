@@ -1,19 +1,26 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { type WardPatientCardProps } from '../types';
 import { usePatientCardRows } from './ward-patient-card-row.resources';
 import styles from './ward-patient-card.scss';
 import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
-import { getWardStore } from '../store';
+import { type ActiveBedSelection, getWardStore, type WardStoreState } from '../store';
 import classNames from 'classnames';
-
-const spaRoot = window['getOpenmrsSpaBase'];
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
   const wardStore = getWardStore();
-  const activeBedSelection = wardStore.getState().activeBedSelection;
   const { locationUuid } = useParams();
   const patientCardRows = usePatientCardRows(locationUuid);
+  const [activeBedSelection, setActiveBedSelection] = useState<ActiveBedSelection | null>(null);
+
+  const updateActiveBedSelection = useCallback((state: WardStoreState) => {
+    setActiveBedSelection(state.activeBedSelection);
+  }, []);
+
+  useEffect(() => {
+    updateActiveBedSelection(getWardStore().getState());
+    getWardStore().subscribe(updateActiveBedSelection);
+  }, [updateActiveBedSelection]);
 
   return (
     <div className={styles.wardPatientCard}>
@@ -22,8 +29,8 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
       ))}
       <button
         className={classNames(styles.wardPatientCardButton, {
-          // []: activeBedSelection?.bed.uuid !== props.bed.uuid,
-          [styles.activeWardPatientCard]: activeBedSelection?.bed.uuid === props.bed.uuid,
+          [styles.activeWardPatientCardButton]:
+            activeBedSelection?.bed.uuid === props.bed.uuid && activeBedSelection?.patient.uuid === props.patient.uuid,
         })}
         onClick={() => {
           wardStore.setState({ activeBedSelection: { ...props } });

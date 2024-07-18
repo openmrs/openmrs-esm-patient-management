@@ -1,9 +1,9 @@
 import { createGlobalStore, getGlobalStore } from '@openmrs/esm-framework';
 import { type WardPatientCardProps } from './types';
 
-type ActiveBedSelection = WardPatientCardProps;
+export type ActiveBedSelection = WardPatientCardProps;
 
-interface WardStoreState {
+export interface WardStoreState {
   activeBedSelection: ActiveBedSelection | null;
 }
 
