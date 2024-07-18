@@ -39,22 +39,22 @@ test('Register a new patient', async ({ page, api }) => {
   await test.step("Then I should be redirected to the new patient's chart page and a new patient record should be created from the information captured in the form", async () => {
     await expect(page).toHaveURL(new RegExp('^[\\w\\d:\\/.-]+\\/patient\\/[\\w\\d-]+\\/chart\\/.*$'));
     const patientUuid = /patient\/(.+)\/chart/.exec(page.url())?.[1] ?? null;
-    await expect(patientUuid).not.toBeNull();
+    expect(patientUuid).not.toBeNull();
 
     const patient = await getPatient(api, patientUuid);
     const { person } = patient;
     const { givenName, middleName, familyName, sex } = formValues;
 
-    await expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
-    await expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
-    await expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(
+    expect(person.display).toBe(`${givenName} ${middleName} ${familyName}`);
+    expect(person.gender).toMatch(new RegExp(sex[0], 'i'));
+    expect(dayjs(person.birthdate).format('DD/MM/YYYY')).toBe(
       `${formValues.birthdate.day}/${formValues.birthdate.month}/${formValues.birthdate.year}`,
     );
-    await expect(person.preferredAddress.address1).toBe(formValues.address1);
-    await expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
-    await expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
-    await expect(person.preferredAddress.country).toBe(formValues.country);
-    await expect(person.attributes[0].display).toBe(formValues.phone);
+    expect(person.preferredAddress.address1).toBe(formValues.address1);
+    expect(person.preferredAddress.cityVillage).toBe(formValues.cityVillage);
+    expect(person.preferredAddress.stateProvince).toBe(formValues.stateProvince);
+    expect(person.preferredAddress.country).toBe(formValues.country);
+    expect(person.attributes[0].display).toBe(formValues.phone);
   });
 });
 
@@ -99,7 +99,7 @@ test('Register an unknown patient', async ({ api, page }) => {
 
   await test.step('And I should see the newly recorded unknown patient dispalyed on the dashboard', async () => {
     const patient = await getPatient(api, /patient\/(.+)\/chart/.exec(page.url())?.[1]);
-    await expect(patient?.person?.display).toBe('UNKNOWN UNKNOWN');
+    expect(patient?.person?.display).toBe('UNKNOWN UNKNOWN');
   });
 });
 
