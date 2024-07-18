@@ -11,6 +11,7 @@ import WardViewHeader from '../ward-view-header/ward-view-header.component';
 import { type AdmittedPatient, type WardPatient } from '../types';
 import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 import useWardLocation from '../hooks/useWardLocation';
+import UnassignedPatient from '../beds/unassigned-patient.component';
 
 const WardView = () => {
   const response = useWardLocation();
@@ -70,6 +71,7 @@ const WardViewByLocation = () => {
         const admittedPatient = admittedPatientsByUuid.get(patient.uuid);
 
         if (admittedPatient) {
+          admittedPatientsByUuid.delete(patient.uuid); // remove the patient from the admittedPatientsByUuid map so at the end we have a list of patients that are admitted but have no beds assigned
           // ideally, we can just use the patient object within admittedPatient
           // and not need the one from bedLayouts, however, the emr api
           // does not respect custom representation right now and does not return
@@ -92,9 +94,17 @@ const WardViewByLocation = () => {
       return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
     });
 
+    const wardUnassignedPatients = Array.from(admittedPatientsByUuid.values()).map((admittedPatient) => {
+      // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
+      return (
+        <UnassignedPatient wardPatient={{ ...admittedPatient, admitted: true }} key={admittedPatient.patient.uuid} />
+      );
+    });
+
     return (
       <>
         {wardBeds}
+        {wardUnassignedPatients}
         {bedLayouts.length == 0 && (
           <InlineNotification
             kind="warning"
