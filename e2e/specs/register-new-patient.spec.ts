@@ -6,7 +6,6 @@ import { deletePatient, getPatient } from '../commands';
 
 let patientUuid: string;
 
-// TODO: O3-3482 Broken due to the date picker and should be fixed
 test('Register a new patient', async ({ page, api }) => {
   test.setTimeout(5 * 60 * 1000);
   const patientRegistrationPage = new RegistrationAndEditPage(page);

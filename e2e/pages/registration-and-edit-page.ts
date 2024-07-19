@@ -31,9 +31,9 @@ export class RegistrationAndEditPage {
   readonly familyNameInput = () => this.page.locator('#familyName');
   readonly sexRadioButton = (sex: PatientRegistrationSex) => this.page.locator(`label[for=gender-option-${sex}]`);
   readonly birthDateInput = () => this.page.locator('#birthdate');
-  readonly birthdateDayInput = () => this.birthDateInput().getByText('dd');
-  readonly birthdateMonthInput = () => this.birthDateInput().getByText('mm');
-  readonly birthdateYearInput = () => this.birthDateInput().getByText('yyyy');
+  readonly birthdateDayInput = () => this.birthDateInput().locator('[data-type="day"]');
+  readonly birthdateMonthInput = () => this.birthDateInput().locator('[data-type="month"]');
+  readonly birthdateYearInput = () => this.birthDateInput().locator('[data-type="year"]');
   readonly address1Input = () => this.page.locator('#address1');
   readonly countryInput = () => this.page.locator('#country');
   readonly countyDistrictInput = () => this.page.locator('#countyDistrict');
