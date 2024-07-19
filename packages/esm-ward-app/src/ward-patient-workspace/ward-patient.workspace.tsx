@@ -12,7 +12,7 @@ import {
 } from '@openmrs/esm-framework';
 import styles from './ward-patient.style.scss';
 
-attach('ward-patient-workspace-header-slot', 'patient-vitals-info');
+attach('ward-patient-workspace-header-slot', 'o2-clinicial-dashboard');
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   patientUuid: string;
