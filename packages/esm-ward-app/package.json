@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-ward-app",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "Ward and bed management module for O3",
   "browser": "dist/openmrs-esm-ward-app.js",
   "main": "src/index.ts",
