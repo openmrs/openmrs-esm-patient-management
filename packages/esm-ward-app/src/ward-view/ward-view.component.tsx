@@ -92,9 +92,9 @@ const WardViewByLocation = () => {
       return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
     });
 
-    const patientInBedsUuids = bedLayouts.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
+    const patientsInBedsUuids = bedLayouts.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
     const wardUnassignedPatients = admittedPatients
-      .filter((admittedPatient) => !patientInBedsUuids.includes(admittedPatient.patient.uuid))
+      .filter((admittedPatient) => !patientsInBedsUuids.includes(admittedPatient.patient.uuid))
       .map((admittedPatient) => {
         // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
         return (
