@@ -16,8 +16,6 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const homePageTilesSlot = getAsyncLifecycle(() => import('./home-page-tiles/metrics-slot.component'), options);
-
 export const activeVisits = getSyncLifecycle(activeVisitsComponent, options);
 
 export const visitDetail = getSyncLifecycle(visitDetailComponent, options);

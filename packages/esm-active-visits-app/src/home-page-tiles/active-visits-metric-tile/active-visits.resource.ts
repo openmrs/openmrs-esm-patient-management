@@ -1,4 +1,4 @@
-import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useSession, type Visit } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export default function useActiveVisits() {
@@ -18,10 +18,10 @@ export default function useActiveVisits() {
     return url + urlSearchParams.toString();
   };
 
-  const { data, error, isLoading } = useSWR<{ data: { results: any[]; totalCount: number } }>(getUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWR<{ data: { totalCount: number } }>(getUrl, openmrsFetch);
 
   return {
-    data: data?.data.results,
+    count: data?.data.totalCount,
     error,
     isLoading,
   };

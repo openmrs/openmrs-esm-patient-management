@@ -16,12 +16,12 @@
       "component": "visitDetail"
     },
     {
-      "name": "home-active-visits-tile",
+      "name": "active-visits-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeActiveVisitsTile"
     },
     {
-      "name": "home-total-visits-tile",
+      "name": "total-visits-tile",
       "slot": "home-metrics-tiles-slot",
       "component": "homeTotalVisitsTile"
     }

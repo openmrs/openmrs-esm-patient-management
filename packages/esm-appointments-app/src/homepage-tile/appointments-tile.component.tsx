@@ -2,7 +2,7 @@ import React from 'react';
 import { Tile } from '@carbon/react';
 import styles from './appointments-tile.scss';
 import { useTranslation } from 'react-i18next';
-import useAppointmentsData from './appointments.resources';
+import useAppointmentsData from './appointments.resource';
 
 const AppointmentsTile: React.FC = () => {
   const { data: appointmentsData } = useAppointmentsData();

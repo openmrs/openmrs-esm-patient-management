@@ -3,8 +3,7 @@ import useSWR from 'swr';
 import dayjs from 'dayjs';
 
 const useAppointmentsData = () => {
-  const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
-  const appointmentDate = dayjs(new Date().setHours(0, 0, 0, 0)).format(omrsDateFormat);
+  const appointmentDate = dayjs(new Date().setHours(0, 0, 0, 0)).toISOString();
 
   const url = `${restBaseUrl}/appointment/all?forDate=${appointmentDate}`;
 

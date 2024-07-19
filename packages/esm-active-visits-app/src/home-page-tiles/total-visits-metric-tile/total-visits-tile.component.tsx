@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tile } from '@carbon/react';
-import styles from '../homepage-tiles.scss';
 import { useTranslation } from 'react-i18next';
-import useTotalVisits from './total-visits.resources';
+import useTotalVisits from './total-visits.resource';
+import styles from '../homepage-tiles.scss';
 
 const TotalVisitsTile: React.FC = () => {
   const { data: visitsData } = useTotalVisits();
