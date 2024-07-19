@@ -8,7 +8,7 @@ import {
   useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
+import { mockAdmissionLocation, mockInpatientVisits } from '../../../../__mocks__/wards.mock';
 import { renderWithSwr } from '../../../../tools/test-utils';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
@@ -65,7 +65,7 @@ jest.mocked(useAdmittedPatients).mockReturnValue({
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  admittedPatients: [],
+  admittedPatients: mockInpatientVisits,
 });
 
 describe('WardView:', () => {
@@ -88,6 +88,12 @@ describe('WardView:', () => {
     expect(emptyBedCards).toHaveLength(3);
   });
 
+  it('renders admitted patient without bed', async () => {
+    renderWithSwr(<WardView />);
+    const admittedPatientWithoutBed = screen.queryByText('Nicks, Stevie');
+    expect(admittedPatientWithoutBed).toBeInTheDocument();
+  });
+
   it('renders notification for invalid location uuid', () => {
     mockedUseWardLocation.mockReturnValueOnce({
       location: null,
@@ -99,13 +105,39 @@ describe('WardView:', () => {
     renderWithSwr(<WardView />);
     const notification = screen.getByRole('status');
     expect(notification).toBeInTheDocument();
-    const invalidText = screen.getByText('Invalid location specified');
+    const invalidText = screen.queryByText('Invalid location specified');
     expect(invalidText).toBeInTheDocument();
   });
 
-  it('screen should be empty if backend module is not installed', () => {
+  it('screen should render warning if backend module installed and no beds configured', () => {
+    // override the default response so that no beds are returned
+    jest.mocked(useAdmissionLocation).mockReturnValue({
+      error: undefined,
+      mutate: jest.fn(),
+      isValidating: false,
+      isLoading: false,
+      admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
+    });
+    mockedUseFeatureFlag.mockReturnValueOnce(true);
+
+    renderWithSwr(<WardView />);
+    const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
+    expect(noBedsConfiguredForThisLocation).toBeInTheDocument();
+  });
+
+  it('screen not should render warning if backend module installed and no beds configured', () => {
+    // override the default response so that no beds are returned
+    jest.mocked(useAdmissionLocation).mockReturnValue({
+      error: undefined,
+      mutate: jest.fn(),
+      isValidating: false,
+      isLoading: false,
+      admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
+    });
     mockedUseFeatureFlag.mockReturnValueOnce(false);
-    const { container } = renderWithSwr(<WardView />);
-    expect(container).toBeEmptyDOMElement();
+
+    renderWithSwr(<WardView />);
+    const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
+    expect(noBedsConfiguredForThisLocation).not.toBeInTheDocument();
   });
 });
