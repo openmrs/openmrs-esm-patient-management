@@ -1,11 +1,11 @@
-import React, { useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { showToast, showNotification, useConfig } from "@openmrs/esm-framework";
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
 
-import { editBedType, useBedType } from "../../summary/summary.resource";
-import { BedTypeDataAdministration } from "../../bed-administration/bed-administration-types";
-import { BedTypeData, Mutator } from "../../types";
-import BedTypeAdministrationForm from "./bed-type-admin-form.component";
+import { editBedType, useBedType } from '../../summary/summary.resource';
+import { type BedTypeDataAdministration } from '../../bed-administration/bed-administration-types';
+import { type BedTypeData, type Mutator } from '../../types';
+import BedTypeAdministrationForm from './bed-type-admin-form.component';
 
 interface EditBedTypeFormProps {
   showModal: boolean;
@@ -14,14 +14,9 @@ interface EditBedTypeFormProps {
   mutate: Mutator;
 }
 
-const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({
-  showModal,
-  onModalChange,
-  editData,
-  mutate,
-}) => {
+const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
   const { t } = useTranslation();
-  const headerTitle = t("editBedType", "Edit Bed Type");
+  const headerTitle = t('editBedType', 'Edit Bed Type');
   const { bedTypeData } = useBedType();
   const availableBedTypes = bedTypeData ? bedTypeData : [];
   const handleCreateQuestion = useCallback(
@@ -36,13 +31,10 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({
       editBedType({ bedPayload, bedTypeId: bedUuid })
         .then(() => {
           showToast({
-            title: t("formSaved", "Bed Type"),
-            kind: "success",
+            title: t('formSaved', 'Bed Type'),
+            kind: 'success',
             critical: true,
-            description:
-              bedPayload.name +
-              " " +
-              t("saveSuccessMessage", "was saved successfully."),
+            description: bedPayload.name + ' ' + t('saveSuccessMessage', 'was saved successfully.'),
           });
 
           mutate();
@@ -50,8 +42,8 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({
         })
         .catch((error) => {
           showNotification({
-            title: t("errorCreatingForm", "Error creating bed"),
-            kind: "error",
+            title: t('errorCreatingForm', 'Error creating bed'),
+            kind: 'error',
             critical: true,
             description: error?.message,
           });
@@ -59,7 +51,7 @@ const EditBedTypeForm: React.FC<EditBedTypeFormProps> = ({
         });
       onModalChange(false);
     },
-    [onModalChange, mutate, editData, t]
+    [onModalChange, mutate, editData, t],
   );
 
   return (

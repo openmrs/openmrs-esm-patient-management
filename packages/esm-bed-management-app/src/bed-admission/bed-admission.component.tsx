@@ -1,6 +1,6 @@
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ActivePatientsHome from "./active-patients";
+import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import ActivePatientsHome from './active-patients';
 
 const BedAdmission: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -14,26 +14,23 @@ import {
   TableHeader,
   TableRow,
   Tile,
-} from "@carbon/react";
-import { Add, Edit } from "@carbon/react/icons";
-import {
-  isDesktop as desktopLayout,
-  useLayoutType,
-} from "@openmrs/esm-framework";
-import { CardHeader, ErrorState } from "@openmrs/esm-patient-common-lib";
-import type { BedTagData } from "../../types";
-import { useBedTag } from "../../summary/summary.resource";
-import Header from "../../header/header.component";
-import styles from "../../bed-administration/bed-administration-table.scss";
-import BedTagForm from "./new-tag-form.component";
-import EditBedTagForm from "./edit-tag-form.component";
+} from '@carbon/react';
+import { Add, Edit } from '@carbon/react/icons';
+import { isDesktop as desktopLayout, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
+import type { BedTagData } from '../../types';
+import { useBedTag } from '../../summary/summary.resource';
+import Header from '../../header/header.component';
+import styles from '../../bed-administration/bed-administration-table.scss';
+import BedTagForm from './new-tag-form.component';
+import EditBedTagForm from './edit-tag-form.component';
 
 const BedTagAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t("bedTag", "Bed Tag");
+  const headerTitle = t('bedTag', 'Bed Tag');
   const layout = useLayoutType();
-  const isTablet = layout === "tablet";
-  const responsiveSize = isTablet ? "lg" : "sm";
+  const isTablet = layout === 'tablet';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
   const [isBedDataLoading] = useState(false);
   const [showBedTagsModal, setAddBedTagsModal] = useState(false);
@@ -47,16 +44,16 @@ const BedTagAdministrationTable: React.FC = () => {
 
   const tableHeaders = [
     {
-      header: t("ids", "Id"),
-      key: "ids",
+      header: t('ids', 'Id'),
+      key: 'ids',
     },
     {
-      header: t("name", "Name"),
-      key: "name",
+      header: t('name', 'Name'),
+      key: 'name',
     },
     {
-      header: t("actions", "Actions"),
-      key: "actions",
+      header: t('actions', 'Actions'),
+      key: 'actions',
     },
   ];
 
@@ -76,8 +73,8 @@ const BedTagAdministrationTable: React.FC = () => {
               setShowEditBedModal(true);
               setAddBedTagsModal(false);
             }}
-            kind={"ghost"}
-            iconDescription={t("editBedTag", "Edit Bed Tag")}
+            kind={'ghost'}
+            iconDescription={t('editBedTag', 'Edit Bed Tag')}
             hasIconOnly
             size={responsiveSize}
             tooltipAlignment="start"
@@ -115,11 +112,7 @@ const BedTagAdministrationTable: React.FC = () => {
 
       <div className={styles.widgetCard}>
         {showBedTagsModal ? (
-          <BedTagForm
-            onModalChange={setAddBedTagsModal}
-            showModal={showBedTagsModal}
-            mutate={mutate}
-          />
+          <BedTagForm onModalChange={setAddBedTagsModal} showModal={showBedTagsModal} mutate={mutate} />
         ) : null}
         {showEditBedModal ? (
           <EditBedTagForm
@@ -137,28 +130,19 @@ const BedTagAdministrationTable: React.FC = () => {
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTagsModal(true)}
-            >
-              {t("addBedTag", "Add Bed Tag")}
+              onClick={() => setAddBedTagsModal(true)}>
+              {t('addBedTag', 'Add Bed Tag')}
             </Button>
           ) : null}
         </CardHeader>
-        <DataTable
-          rows={tableRows}
-          headers={tableHeaders}
-          isSortable
-          size={isTablet ? "lg" : "sm"}
-          useZebraStyles
-        >
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader>
-                        {header.header?.content ?? header.header}
-                      </TableHeader>
+                      <TableHeader>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -166,9 +150,7 @@ const BedTagAdministrationTable: React.FC = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>
-                          {cell.value?.content ?? cell.value}
-                        </TableCell>
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
                   ))}
@@ -178,21 +160,16 @@ const BedTagAdministrationTable: React.FC = () => {
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
-                      <p className={styles.content}>
-                        {t("No data", "No data to display")}
-                      </p>
-                      <p className={styles.helper}>
-                        {t("checkFilters", "Check the filters above")}
-                      </p>
+                      <p className={styles.content}>{t('No data', 'No data to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
-                    <p className={styles.separator}>{t("or", "or")}</p>
+                    <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTagsModal(true)}
-                    >
-                      {t("bedTag", "Add Bed Tag")}
+                      onClick={() => setAddBedTagsModal(true)}>
+                      {t('bedTag', 'Add Bed Tag')}
                     </Button>
                   </Tile>
                 </div>

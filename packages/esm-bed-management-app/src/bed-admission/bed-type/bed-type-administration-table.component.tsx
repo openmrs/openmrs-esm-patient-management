@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -14,27 +14,23 @@ import {
   TableHeader,
   TableRow,
   Tile,
-} from "@carbon/react";
-import { Add, Edit } from "@carbon/react/icons";
-import {
-  isDesktop as desktopLayout,
-  useConfig,
-  useLayoutType,
-} from "@openmrs/esm-framework";
-import { CardHeader, ErrorState } from "@openmrs/esm-patient-common-lib";
-import type { BedTypeData } from "../../types";
-import { useBedType } from "../../summary/summary.resource";
-import Header from "../../header/header.component";
-import BedTypeForm from "./new-bed-type-form.component";
-import styles from "../../bed-administration/bed-administration-table.scss";
-import EditBedTypeForm from "./edit-bed-type.component";
+} from '@carbon/react';
+import { Add, Edit } from '@carbon/react/icons';
+import { isDesktop as desktopLayout, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
+import type { BedTypeData } from '../../types';
+import { useBedType } from '../../summary/summary.resource';
+import Header from '../../header/header.component';
+import BedTypeForm from './new-bed-type-form.component';
+import styles from '../../bed-administration/bed-administration-table.scss';
+import EditBedTypeForm from './edit-bed-type.component';
 
 const BedTypeAdministrationTable: React.FC = () => {
   const { t } = useTranslation();
-  const headerTitle = t("bedType", "Bed Type");
+  const headerTitle = t('bedType', 'Bed Type');
   const layout = useLayoutType();
-  const isTablet = layout === "tablet";
-  const responsiveSize = isTablet ? "lg" : "sm";
+  const isTablet = layout === 'tablet';
+  const responsiveSize = isTablet ? 'lg' : 'sm';
   const isDesktop = desktopLayout(layout);
   const [showEditBedModal, setShowEditBedModal] = useState(false);
   const [isBedDataLoading, setIsBedDataLoading] = useState(false);
@@ -47,20 +43,20 @@ const BedTypeAdministrationTable: React.FC = () => {
   const pageSizes = [10, 20, 30, 40, 50];
   const tableHeaders = [
     {
-      header: t("name", "Name"),
-      key: "name",
+      header: t('name', 'Name'),
+      key: 'name',
     },
     {
-      header: t("displayName", "Display Name"),
-      key: "displayName",
+      header: t('displayName', 'Display Name'),
+      key: 'displayName',
     },
     {
-      header: t("description", "Description"),
-      key: "description",
+      header: t('description', 'Description'),
+      key: 'description',
     },
     {
-      key: "actions",
-      header: t("actions", "Actions"),
+      key: 'actions',
+      header: t('actions', 'Actions'),
     },
   ];
 
@@ -81,8 +77,8 @@ const BedTypeAdministrationTable: React.FC = () => {
               setShowEditBedModal(true);
               setAddBedTypeModal(false);
             }}
-            kind={"ghost"}
-            iconDescription={t("editBedType", "Edit Bed Type")}
+            kind={'ghost'}
+            iconDescription={t('editBedType', 'Edit Bed Type')}
             hasIconOnly
             size={responsiveSize}
             tooltipAlignment="start"
@@ -120,11 +116,7 @@ const BedTypeAdministrationTable: React.FC = () => {
 
       <div className={styles.widgetCard}>
         {showBedTypeModal ? (
-          <BedTypeForm
-            onModalChange={setAddBedTypeModal}
-            showModal={showBedTypeModal}
-            mutate={mutate}
-          />
+          <BedTypeForm onModalChange={setAddBedTypeModal} showModal={showBedTypeModal} mutate={mutate} />
         ) : null}
         {showEditBedModal ? (
           <EditBedTypeForm
@@ -142,28 +134,19 @@ const BedTypeAdministrationTable: React.FC = () => {
             <Button
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
-              onClick={() => setAddBedTypeModal(true)}
-            >
-              {t("addBedtype", "Add Bed Type")}
+              onClick={() => setAddBedTypeModal(true)}>
+              {t('addBedtype', 'Add Bed Type')}
             </Button>
           ) : null}
         </CardHeader>
-        <DataTable
-          rows={tableRows}
-          headers={tableHeaders}
-          isSortable
-          size={isTablet ? "lg" : "sm"}
-          useZebraStyles
-        >
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader>
-                        {header.header?.content ?? header.header}
-                      </TableHeader>
+                      <TableHeader>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -171,9 +154,7 @@ const BedTypeAdministrationTable: React.FC = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>
-                          {cell.value?.content ?? cell.value}
-                        </TableCell>
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
                   ))}
@@ -183,21 +164,16 @@ const BedTypeAdministrationTable: React.FC = () => {
                 <div className={styles.tileContainer}>
                   <Tile className={styles.tile}>
                     <div className={styles.tileContent}>
-                      <p className={styles.content}>
-                        {t("No data", "No data to display")}
-                      </p>
-                      <p className={styles.helper}>
-                        {t("checkFilters", "Check the filters above")}
-                      </p>
+                      <p className={styles.content}>{t('No data', 'No data to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                     </div>
-                    <p className={styles.separator}>{t("or", "or")}</p>
+                    <p className={styles.separator}>{t('or', 'or')}</p>
                     <Button
                       kind="ghost"
                       size="sm"
                       renderIcon={(props) => <Add size={16} {...props} />}
-                      onClick={() => setAddBedTypeModal(true)}
-                    >
-                      {t("bedType", "Add Bed Type")}
+                      onClick={() => setAddBedTypeModal(true)}>
+                      {t('bedType', 'Add Bed Type')}
                     </Button>
                   </Tile>
                 </div>

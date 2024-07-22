@@ -18,40 +18,26 @@ import {
   TableExpandedRow,
   TableExpandHeader,
   TableExpandRow,
-} from "@carbon/react";
+} from '@carbon/react';
 
-import {
-  isDesktop,
-  useLayoutType,
-  usePagination,
-  useSession,
-} from "@openmrs/esm-framework";
-import React, { useCallback, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  formatWaitTime,
-  getOriginFromPathName,
-  getTagColor,
-  getTagType,
-  trimVisitNumber,
-} from "../helpers/functions";
-import styles from "./styles.scss";
-import { usePatientQueuesList } from "./patient-queues.resource";
-import EmptyState from "../../empty-state/empty-state.component";
-import AssignBedWorkSpace from "../../workspace/allocate-bed-workspace.component";
-import AdmissionActionButton from "./admission-action-button.component";
-import { patientDetailsProps } from "../types";
-import ViewActionsMenu from "./view-action-menu.component";
+import { isDesktop, useLayoutType, usePagination, useSession } from '@openmrs/esm-framework';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { formatWaitTime, getOriginFromPathName, getTagColor, getTagType, trimVisitNumber } from '../helpers/functions';
+import styles from './styles.scss';
+import { usePatientQueuesList } from './patient-queues.resource';
+import EmptyState from '../../empty-state/empty-state.component';
+import AssignBedWorkSpace from '../../workspace/allocate-bed-workspace.component';
+import AdmissionActionButton from './admission-action-button.component';
+import { type patientDetailsProps } from '../types';
+import ViewActionsMenu from './view-action-menu.component';
 
 interface ActiveVisitsTableProps {
   status: string;
   setPatientCount?: (value: number) => void;
 }
 
-const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
-  status,
-  setPatientCount,
-}) => {
+const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({ status, setPatientCount }) => {
   const { t } = useTranslation();
   const session = useSession();
   const currentPathName: string = window.location.pathname;
@@ -59,14 +45,10 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
   const pageSizes = [10, 20, 30, 40, 50];
   const [currentPageSize, setPageSize] = useState(10);
   const [showOverlay, setShowOverlay] = useState(false);
-  const [selectedPatientDetails, setSelectedPatientDetails] =
-    useState<patientDetailsProps>();
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState<patientDetailsProps>();
 
   const layout = useLayoutType();
-  const { patientQueueEntries, isLoading } = usePatientQueuesList(
-    session?.sessionLocation?.uuid,
-    status
-  );
+  const { patientQueueEntries, isLoading } = usePatientQueuesList(session?.sessionLocation?.uuid, status);
   const handleBedAssigmentModal = useCallback(
     (entry) => {
       setSelectedPatientDetails({
@@ -80,16 +62,16 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
       });
       setShowOverlay(true);
     },
-    [session?.sessionLocation?.uuid]
+    [session?.sessionLocation?.uuid],
   );
 
   const renderActionButton = useCallback(
     (entry) => {
       const buttonTexts = {
-        pending: "Assign Bed",
-        completed: "Transfer",
+        pending: 'Assign Bed',
+        completed: 'Transfer',
       };
-      const buttonText = buttonTexts[status] || "Un-assign";
+      const buttonText = buttonTexts[status] || 'Un-assign';
 
       return (
         <AdmissionActionButton
@@ -99,54 +81,50 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
         />
       );
     },
-    [handleBedAssigmentModal, status]
+    [handleBedAssigmentModal, status],
   );
 
-  const {
-    goTo,
-    results: paginatedQueueEntries,
-    currentPage,
-  } = usePagination(patientQueueEntries, currentPageSize);
+  const { goTo, results: paginatedQueueEntries, currentPage } = usePagination(patientQueueEntries, currentPageSize);
 
   const tableHeaders = useMemo(
     () => [
       {
         id: 0,
-        header: t("visitNumber", "Visit Number"),
-        key: "visitNumber",
+        header: t('visitNumber', 'Visit Number'),
+        key: 'visitNumber',
       },
       {
         id: 1,
-        header: t("name", "Name"),
-        key: "name",
+        header: t('name', 'Name'),
+        key: 'name',
       },
       {
         id: 2,
-        header: t("locationFrom", "Location From"),
-        key: "locationFrom",
+        header: t('locationFrom', 'Location From'),
+        key: 'locationFrom',
       },
       {
         id: 3,
-        header: t("priority", "Priority"),
-        key: "priority",
+        header: t('priority', 'Priority'),
+        key: 'priority',
       },
       {
         id: 4,
-        header: t("priorityLevel", "Priority Level"),
-        key: "priorityLevel",
+        header: t('priorityLevel', 'Priority Level'),
+        key: 'priorityLevel',
       },
       {
         id: 5,
-        header: t("waitTime", "Wait time"),
-        key: "waitTime",
+        header: t('waitTime', 'Wait time'),
+        key: 'waitTime',
       },
       {
         id: 6,
-        header: t("actions", "Actions"),
-        key: "actions",
+        header: t('actions', 'Actions'),
+        key: 'actions',
       },
     ],
-    [t]
+    [t],
   );
 
   const tableRows = useMemo(() => {
@@ -165,32 +143,18 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
         content: (
           <>
             {entry?.priorityComment ? (
-              <DefinitionTooltip
-                className={styles.tooltip}
-                align="bottom-left"
-                definition={entry.priorityComment}
-              >
+              <DefinitionTooltip className={styles.tooltip} align="bottom-left" definition={entry.priorityComment}>
                 <Tag
                   role="tooltip"
-                  className={
-                    entry.priority === "Priority"
-                      ? styles.priorityTag
-                      : styles.tag
-                  }
-                  type={getTagType(entry.priority as string)}
-                >
+                  className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                  type={getTagType(entry.priority as string)}>
                   {entry.priority}
                 </Tag>
               </DefinitionTooltip>
             ) : (
               <Tag
-                className={
-                  entry.priority === "Priority"
-                    ? styles.priorityTag
-                    : styles.tag
-                }
-                type={getTagType(entry.priority as string)}
-              >
+                className={entry.priority === 'Priority' ? styles.priorityTag : styles.tag}
+                type={getTagType(entry.priority as string)}>
                 {entry.priority}
               </Tag>
             )}
@@ -203,10 +167,7 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
       waitTime: {
         content: (
           <Tag>
-            <span
-              className={styles.statusContainer}
-              style={{ color: `${getTagColor(entry.waitTime)}` }}
-            >
+            <span className={styles.statusContainer} style={{ color: `${getTagColor(entry.waitTime)}` }}>
               {formatWaitTime(entry.waitTime, t)}
             </span>
           </Tag>
@@ -216,11 +177,8 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
         content: (
           <div className={styles.displayFlex}>
             {renderActionButton(entry)}
-            {status === "completed" && (
-              <ViewActionsMenu
-                to={`\${openmrsSpaBase}/patient/${entry?.patientUuid}/chart`}
-                from={fromPage}
-              />
+            {status === 'completed' && (
+              <ViewActionsMenu to={`\${openmrsSpaBase}/patient/${entry?.patientUuid}/chart`} from={fromPage} />
             )}
           </div>
         ),
@@ -235,11 +193,7 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
     return <DataTableSkeleton role="progressbar" />;
   }
 
-  if (
-    (!isLoading && patientQueueEntries && status === "pending") ||
-    status === "completed" ||
-    status === ""
-  ) {
+  if ((!isLoading && patientQueueEntries && status === 'pending') || status === 'completed' || status === '') {
     setPatientCount(patientQueueEntries.length);
   }
 
@@ -255,24 +209,22 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
           rows={tableRows}
           isSortable
           size="xs"
-          useZebraStyles
-        >
+          useZebraStyles>
           {({ rows, headers, getTableProps, getRowProps, onInputChange }) => (
             <TableContainer className={styles.tableContainer}>
               <TableToolbar
                 style={{
-                  position: "static",
-                  height: "3rem",
-                  overflow: "visible",
-                  backgroundColor: "color",
-                }}
-              >
+                  position: 'static',
+                  height: '3rem',
+                  overflow: 'visible',
+                  backgroundColor: 'color',
+                }}>
                 <TableToolbarContent className={styles.toolbarContent}>
                   <Layer>
                     <TableToolbarSearch
                       className={styles.search}
                       onChange={onInputChange}
-                      placeholder={t("searchThisList", "Search this list")}
+                      placeholder={t('searchThisList', 'Search this list')}
                       size="sm"
                     />
                   </Layer>
@@ -283,9 +235,7 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
                   <TableRow>
                     <TableExpandHeader />
                     {headers.map((header) => (
-                      <TableHeader>
-                        {header.header?.content ?? header.header}
-                      </TableHeader>
+                      <TableHeader>{header.header?.content ?? header.header}</TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -295,26 +245,18 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
                       <>
                         <TableExpandRow {...getRowProps({ row })} key={row.id}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>
-                              {cell.value?.content ?? cell.value}
-                            </TableCell>
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                         </TableExpandRow>
 
                         {row.isExpanded ? (
-                          <TableExpandedRow
-                            className={styles.expandedLabQueueVisitRow}
-                            colSpan={headers.length + 2}
-                          >
+                          <TableExpandedRow className={styles.expandedLabQueueVisitRow} colSpan={headers.length + 2}>
                             <>
-                              <span>{tableRows[index]?.comment ?? ""}</span>
+                              <span>{tableRows[index]?.comment ?? ''}</span>
                             </>
                           </TableExpandedRow>
                         ) : (
-                          <TableExpandedRow
-                            className={styles.hiddenRow}
-                            colSpan={headers.length + 2}
-                          />
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </>
                     );
@@ -347,8 +289,8 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
             closePanel={() => setShowOverlay(false)}
             queueStatus={status}
             headerTitle={t(
-              "assignBedToPatient",
-              `Assign Bed to Patient ${selectedPatientDetails.name} in the ${session?.sessionLocation?.display} Ward`
+              'assignBedToPatient',
+              `Assign Bed to Patient ${selectedPatientDetails.name} in the ${session?.sessionLocation?.display} Ward`,
             )}
           />
         )}
@@ -356,11 +298,6 @@ const ActivePatientsTable: React.FC<ActiveVisitsTableProps> = ({
     );
   }
 
-  return (
-    <EmptyState
-      msg={t("noQueueItems", "No queue items to display")}
-      helper=""
-    />
-  );
+  return <EmptyState msg={t('noQueueItems', 'No queue items to display')} helper="" />;
 };
 export default ActivePatientsTable;

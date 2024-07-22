@@ -1,4 +1,4 @@
-import type { KeyedMutator } from "swr";
+import type { KeyedMutator } from 'swr';
 
 export type Tag = {
   uuid: string;
@@ -82,7 +82,7 @@ export interface Bed {
   };
   row: number;
   column: number;
-  status: "AVAILABLE" | string;
+  status: 'AVAILABLE' | string;
 }
 
 export interface BedType {

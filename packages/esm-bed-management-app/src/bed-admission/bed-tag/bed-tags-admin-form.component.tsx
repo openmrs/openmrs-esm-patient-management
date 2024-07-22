@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ComposedModal,
@@ -13,10 +13,10 @@ import {
   Stack,
   TextInput,
   InlineNotification,
-} from "@carbon/react";
-import { useTranslation } from "react-i18next";
-import { Location } from "@openmrs/esm-framework";
-import type { BedTagData } from "../../types";
+} from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { type Location } from '@openmrs/esm-framework';
+import type { BedTagData } from '../../types';
 
 const BedTagAdministrationSchema = z.object({
   name: z.string().max(255),
@@ -47,17 +47,17 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   const { t } = useTranslation();
 
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [formStateError, setFormStateError] = useState("");
+  const [formStateError, setFormStateError] = useState('');
 
   const {
     handleSubmit,
     control,
     formState: { isDirty },
   } = useForm<BedTagData>({
-    mode: "all",
+    mode: 'all',
     resolver: zodResolver(BedTagAdministrationSchema),
     defaultValues: {
-      name: initialData.name || "",
+      name: initialData.name || '',
     },
   });
 
@@ -75,16 +75,12 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal
-      open={showModal}
-      onClose={() => onModalChange(false)}
-      preventCloseOnClickOutside
-    >
+    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
       <Form onSubmit={handleSubmit(onSubmit, onError)}>
         <ModalBody hasScrollingContent>
           <Stack gap={3}>
-            <FormGroup legendText={""}>
+            <FormGroup legendText={''}>
               <Controller
                 name="name"
                 control={control}
@@ -92,8 +88,8 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedTag"
-                      labelText={t("bedTag", "Bed Tag Name")}
-                      placeholder={t("bedTagPlaceholder", "")}
+                      labelText={t('bedTag', 'Bed Tag Name')}
+                      placeholder={t('bedTagPlaceholder', '')}
                       invalidText={fieldState.error?.message}
                       {...field}
                     />
@@ -105,11 +101,11 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
             {showErrorNotification && (
               <InlineNotification
                 lowContrast
-                title={t("error", "Error")}
-                style={{ minWidth: "100%", margin: "0rem", padding: "0rem" }}
+                title={t('error', 'Error')}
+                style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
                 role="alert"
                 kind="error"
-                subtitle={t("pleaseFillField", formStateError) + "."}
+                subtitle={t('pleaseFillField', formStateError) + '.'}
                 onClose={() => setShowErrorNotification(false)}
               />
             )}
@@ -117,10 +113,10 @@ const BedTagsAdministrationForm: React.FC<BedTagAdministrationFormProps> = ({
         </ModalBody>
         <ModalFooter>
           <Button onClick={() => onModalChange(false)} kind="secondary">
-            {t("cancel", "Cancel")}
+            {t('cancel', 'Cancel')}
           </Button>
           <Button disabled={!isDirty} type="submit">
-            <span>{t("save", "Save")}</span>
+            <span>{t('save', 'Save')}</span>
           </Button>
         </ModalFooter>
       </Form>

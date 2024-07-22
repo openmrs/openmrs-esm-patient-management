@@ -1,12 +1,12 @@
-import React, { useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { showToast, showNotification, useConfig } from "@openmrs/esm-framework";
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { showToast, showNotification, useConfig } from '@openmrs/esm-framework';
 
-import type { InitialData, Mutator } from "../types";
-import { useBedType, editBed } from "./bed-administration.resource";
-import BedAdministrationForm from "./bed-administration-form.component";
-import { BedAdministrationData } from "./bed-administration-types";
-import { useLocationsByTag } from "../summary/summary.resource";
+import type { InitialData, Mutator } from '../types';
+import { useBedType, editBed } from './bed-administration.resource';
+import BedAdministrationForm from './bed-administration-form.component';
+import { type BedAdministrationData } from './bed-administration-types';
+import { useLocationsByTag } from '../summary/summary.resource';
 
 interface EditBedFormProps {
   showModal: boolean;
@@ -15,20 +15,13 @@ interface EditBedFormProps {
   mutate: Mutator;
 }
 
-const EditBedForm: React.FC<EditBedFormProps> = ({
-  showModal,
-  onModalChange,
-  editData,
-  mutate,
-}) => {
+const EditBedForm: React.FC<EditBedFormProps> = ({ showModal, onModalChange, editData, mutate }) => {
   const { t } = useTranslation();
   const { admissionLocationTagUuid } = useConfig();
-  const { data: admissionLocations } = useLocationsByTag(
-    admissionLocationTagUuid
-  );
+  const { data: admissionLocations } = useLocationsByTag(admissionLocationTagUuid);
 
-  const headerTitle = t("editBed", "Edit bed");
-  const occupancyStatuses = ["Available", "Occupied"];
+  const headerTitle = t('editBed', 'Edit bed');
+  const occupancyStatuses = ['Available', 'Occupied'];
   const { bedTypes } = useBedType();
   const availableBedTypes = bedTypes ? bedTypes : [];
   const handleCreateQuestion = useCallback(
@@ -55,13 +48,10 @@ const EditBedForm: React.FC<EditBedFormProps> = ({
       editBed({ bedPayload, bedId: bedUuid })
         .then(() => {
           showToast({
-            title: t("formSaved", "Bed saved"),
-            kind: "success",
+            title: t('formSaved', 'Bed saved'),
+            kind: 'success',
             critical: true,
-            description:
-              bedPayload.bedNumber +
-              " " +
-              t("saveSuccessMessage", "was saved successfully."),
+            description: bedPayload.bedNumber + ' ' + t('saveSuccessMessage', 'was saved successfully.'),
           });
 
           mutate();
@@ -69,8 +59,8 @@ const EditBedForm: React.FC<EditBedFormProps> = ({
         })
         .catch((error) => {
           showNotification({
-            title: t("errorCreatingForm", "Error creating bed"),
-            kind: "error",
+            title: t('errorCreatingForm', 'Error creating bed'),
+            kind: 'error',
             critical: true,
             description: error?.message,
           });
@@ -78,7 +68,7 @@ const EditBedForm: React.FC<EditBedFormProps> = ({
         });
       onModalChange(false);
     },
-    [onModalChange, mutate, editData, t]
+    [onModalChange, mutate, editData, t],
   );
 
   return (

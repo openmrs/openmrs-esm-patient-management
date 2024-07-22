@@ -1,6 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
-@use "@carbon/type";
+@use '@carbon/type';
 
 .header {
   @include type.type-style('body-compact-02');

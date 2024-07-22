@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import capitalize from "lodash-es/capitalize";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from 'react';
+import capitalize from 'lodash-es/capitalize';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   ComboBox,
@@ -19,18 +19,18 @@ import {
   TextArea,
   TextInput,
   InlineNotification,
-} from "@carbon/react";
-import { useTranslation } from "react-i18next";
-import { Location } from "@openmrs/esm-framework";
-import type { BedType, InitialData } from "../types";
-import { BedAdministrationData } from "./bed-administration-types";
+} from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { type Location } from '@openmrs/esm-framework';
+import type { BedType, InitialData } from '../types';
+import { type BedAdministrationData } from './bed-administration-types';
 
 const numberInString = z.string().transform((val, ctx) => {
   const parsed = parseInt(val);
   if (isNaN(parsed) || parsed < 1) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Please enter a valid number",
+      message: 'Please enter a valid number',
     });
     return z.NEVER;
   }
@@ -44,13 +44,9 @@ const BedAdministrationSchema = z.object({
   bedColumn: numberInString,
   location: z
     .object({ display: z.string(), uuid: z.string() })
-    .refine((value) => value.display != "", "Please select a valid location"),
-  occupancyStatus: z
-    .string()
-    .refine((value) => value != "", "Please select a valid occupied status"),
-  bedType: z
-    .string()
-    .refine((value) => value != "", "Please select a valid bed type"),
+    .refine((value) => value.display != '', 'Please select a valid location'),
+  occupancyStatus: z.string().refine((value) => value != '', 'Please select a valid occupied status'),
+  bedType: z.string().refine((value) => value != '', 'Please select a valid bed type'),
 });
 
 interface BedAdministrationFormProps {
@@ -79,19 +75,13 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   initialData,
 }) => {
   const { t } = useTranslation();
-  const [occupancyStatus, setOccupancyStatus] = useState(
-    capitalize(initialData.status)
-  );
+  const [occupancyStatus, setOccupancyStatus] = useState(capitalize(initialData.status));
   const [selectedBedType] = useState(initialData.bedType.name);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [formStateError, setFormStateError] = useState("");
+  const [formStateError, setFormStateError] = useState('');
 
   const filterLocationNames = (location) => {
-    return (
-      location.item.display
-        ?.toLowerCase()
-        .includes(location?.inputValue?.toLowerCase()) ?? []
-    );
+    return location.item.display?.toLowerCase().includes(location?.inputValue?.toLowerCase()) ?? [];
   };
 
   const {
@@ -99,16 +89,16 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
     control,
     formState: { isDirty },
   } = useForm<BedAdministrationData>({
-    mode: "all",
+    mode: 'all',
     resolver: zodResolver(BedAdministrationSchema),
     defaultValues: {
-      bedId: initialData.bedNumber || "",
-      description: initialData.description || "",
-      bedRow: initialData.row.toString() || "0",
-      bedColumn: initialData.column.toString() || "0",
+      bedId: initialData.bedNumber || '',
+      description: initialData.description || '',
+      bedRow: initialData.row.toString() || '0',
+      bedColumn: initialData.column.toString() || '0',
       location: initialData.location || {},
       occupancyStatus: capitalize(initialData.status) || occupancyStatus,
-      bedType: initialData.bedType.name || "",
+      bedType: initialData.bedType.name || '',
     },
   });
 
@@ -126,16 +116,12 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
   };
 
   return (
-    <ComposedModal
-      open={showModal}
-      onClose={() => onModalChange(false)}
-      preventCloseOnClickOutside
-    >
+    <ComposedModal open={showModal} onClose={() => onModalChange(false)} preventCloseOnClickOutside>
       <ModalHeader title={headerTitle} />
       <Form onSubmit={handleSubmit(onSubmit, onError)}>
         <ModalBody hasScrollingContent>
           <Stack gap={3}>
-            <FormGroup legendText={""}>
+            <FormGroup legendText={''}>
               <Controller
                 name="bedId"
                 control={control}
@@ -143,8 +129,8 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                   <>
                     <TextInput
                       id="bedId"
-                      labelText={t("bedId", "Bed number")}
-                      placeholder={t("bedIdPlaceholder", "e.g. BMW-201")}
+                      labelText={t('bedId', 'Bed number')}
+                      placeholder={t('bedIdPlaceholder', 'e.g. BMW-201')}
                       invalidText={fieldState.error?.message}
                       {...field}
                     />
@@ -163,12 +149,9 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                       rows={2}
                       id="description"
                       invalidText={fieldState?.error?.message}
-                      labelText={t("description", "Bed description")}
+                      labelText={t('description', 'Bed description')}
                       {...field}
-                      placeholder={t(
-                        "description",
-                        "Enter the bed description"
-                      )}
+                      placeholder={t('description', 'Enter the bed description')}
                     />
                   </>
                 )}
@@ -213,27 +196,21 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
               <Controller
                 name="location"
                 control={control}
-                render={({
-                  fieldState,
-                  field: { onChange, onBlur, value, ref },
-                }) => (
+                render={({ fieldState, field: { onChange, onBlur, value, ref } }) => (
                   <ComboBox
-                    aria-label={t("location", "Location")}
+                    aria-label={t('location', 'Location')}
                     shouldFilterItem={filterLocationNames}
                     id="location"
-                    label={t("location", "Location")}
+                    label={t('location', 'Location')}
                     invalidText={fieldState?.error?.message}
                     items={allLocations}
                     onBlur={onBlur}
                     ref={ref}
                     selectedItem={value}
                     onChange={({ selectedItem }) => onChange(selectedItem)}
-                    itemToString={(location) => location?.display ?? ""}
-                    placeholder={t(
-                      "selectBedLocation",
-                      "Select a bed location"
-                    )}
-                    titleText={t("bedLocation", "Location")}
+                    itemToString={(location) => location?.display ?? ''}
+                    placeholder={t('selectBedLocation', 'Select a bed location')}
+                    titleText={t('bedLocation', 'Location')}
                   />
                 )}
               />
@@ -246,21 +223,17 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 render={({ field, fieldState }) => (
                   <Select
                     id="occupancyStatus"
-                    labelText={t("occupancyStatus", "Occupied Status")}
+                    labelText={t('occupancyStatus', 'Occupied Status')}
                     invalidText={fieldState.error?.message}
                     defaultValue={occupancyStatus}
                     onChange={(event) => setOccupancyStatus(event.target.value)}
                     value={occupancyStatus}
-                    {...field}
-                  >
-                    <SelectItem
-                      text={t("chooseOccupiedStatus", "Choose occupied status")}
-                      value=""
-                    />
+                    {...field}>
+                    <SelectItem text={t('chooseOccupiedStatus', 'Choose occupied status')} value="" />
                     {occupancyStatuses.map((occupancyStatus, index) => (
                       <SelectItem
-                        text={t("occupancyStatus", `${occupancyStatus}`)}
-                        value={t("occupancyStatus", `${occupancyStatus}`)}
+                        text={t('occupancyStatus', `${occupancyStatus}`)}
+                        value={t('occupancyStatus', `${occupancyStatus}`)}
                         key={`occupancyStatus-${index}`}
                       />
                     ))}
@@ -276,20 +249,13 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
                 render={({ field }) => (
                   <Select
                     id="bedType"
-                    labelText={t("bedType", "Bed type")}
-                    invalidText={t("required", "Required")}
+                    labelText={t('bedType', 'Bed type')}
+                    invalidText={t('required', 'Required')}
                     defaultValue={selectedBedType}
-                    {...field}
-                  >
-                    <SelectItem
-                      text={t("chooseBedtype", "Choose a bed type")}
-                    />
+                    {...field}>
+                    <SelectItem text={t('chooseBedtype', 'Choose a bed type')} />
                     {availableBedTypes.map((bedType, index) => (
-                      <SelectItem
-                        text={bedType.name}
-                        value={bedType.name}
-                        key={`bedType-${index}`}
-                      >
+                      <SelectItem text={bedType.name} value={bedType.name} key={`bedType-${index}`}>
                         {bedType.name}
                       </SelectItem>
                     ))}
@@ -300,11 +266,11 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
             {showErrorNotification && (
               <InlineNotification
                 lowContrast
-                title={t("error", "Error")}
-                style={{ minWidth: "100%", margin: "0rem", padding: "0rem" }}
+                title={t('error', 'Error')}
+                style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
                 role="alert"
                 kind="error"
-                subtitle={t("pleaseFillField", formStateError) + "."}
+                subtitle={t('pleaseFillField', formStateError) + '.'}
                 onClose={() => setShowErrorNotification(false)}
               />
             )}
@@ -312,10 +278,10 @@ const BedAdministrationForm: React.FC<BedAdministrationFormProps> = ({
         </ModalBody>
         <ModalFooter>
           <Button onClick={() => onModalChange(false)} kind="secondary">
-            {t("cancel", "Cancel")}
+            {t('cancel', 'Cancel')}
           </Button>
           <Button disabled={!isDirty} type="submit">
-            <span>{t("save", "Save")}</span>
+            <span>{t('save', 'Save')}</span>
           </Button>
         </ModalFooter>
       </Form>

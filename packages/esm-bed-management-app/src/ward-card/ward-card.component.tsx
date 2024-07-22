@@ -1,6 +1,6 @@
-import React from "react";
-import { Layer, Tile } from "@carbon/react";
-import styles from "./ward-card.scss";
+import React from 'react';
+import { Layer, Tile } from '@carbon/react';
+import styles from './ward-card.scss';
 
 interface WardCardProps {
   label: string;
@@ -12,16 +12,9 @@ interface WardCardProps {
   locationUuid?: string;
 }
 
-const WardCard: React.FC<WardCardProps> = ({
-  children,
-  headerLabel,
-  label,
-  value,
-}) => {
+const WardCard: React.FC<WardCardProps> = ({ children, headerLabel, label, value }) => {
   return (
-    <Layer
-      className={`${children && styles.cardWithChildren} ${styles.container}`}
-    >
+    <Layer className={`${children && styles.cardWithChildren} ${styles.container}`}>
       <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.headerLabelContainer}>

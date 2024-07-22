@@ -9,11 +9,11 @@
   display: flex;
   justify-content: flex-start;
   margin-left: 1rem;
-  
+
   button {
     display: flex;
     padding-left: 0 !important;
-    
+
     svg {
       order: 1;
       margin-right: layout.$spacing-03;

@@ -6,18 +6,16 @@
   // margin: spacing.$spacing-05 0rem;
   background-color: $ui-background;
   max-height: 100%;
-  
 
   & section {
     margin: spacing.$spacing-09 0 0;
     // overflow-y: auto;
-
   }
 
   :global(.cds--text-input) {
     &:focus,
     &:hover {
-      outline: 2px solid var(--cds-focus,#ff832b);
+      outline: 2px solid var(--cds-focus, #ff832b);
     }
   }
 }

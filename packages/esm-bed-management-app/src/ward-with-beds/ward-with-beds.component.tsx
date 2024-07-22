@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTable,
@@ -14,15 +14,12 @@ import {
   TableBody,
   TableCell,
   Tag,
-} from "@carbon/react";
-import { ArrowLeft } from "@carbon/react/icons";
-import { navigate, usePagination } from "@openmrs/esm-framework";
-import Header from "../header/header.component";
-import {
-  useBedsForLocation,
-  useLocationName,
-} from "../summary/summary.resource";
-import styles from "./ward-with-beds.scss";
+} from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
+import { navigate, usePagination } from '@openmrs/esm-framework';
+import Header from '../header/header.component';
+import { useBedsForLocation, useLocationName } from '../summary/summary.resource';
+import styles from './ward-with-beds.scss';
 
 type RouteParams = { location: string };
 
@@ -33,11 +30,7 @@ const WardWithBeds: React.FC = () => {
   const { name } = useLocationName(location);
 
   const [pageSize, setPageSize] = useState(10);
-  const {
-    results: paginatedData,
-    goTo,
-    currentPage,
-  } = usePagination(bedData, pageSize);
+  const { results: paginatedData, goTo, currentPage } = usePagination(bedData, pageSize);
 
   if (isLoading) {
     <p>Loading...</p>;
@@ -46,28 +39,28 @@ const WardWithBeds: React.FC = () => {
   const tableHeaders = [
     {
       id: 0,
-      header: "ID",
-      key: "id",
+      header: 'ID',
+      key: 'id',
     },
     {
       id: 1,
-      header: "Number",
-      key: "number",
+      header: 'Number',
+      key: 'number',
     },
     {
       id: 2,
-      header: "Name",
-      key: "name",
+      header: 'Name',
+      key: 'name',
     },
     {
       id: 3,
-      header: "Description",
-      key: "description",
+      header: 'Description',
+      key: 'description',
     },
     {
       id: 4,
-      header: "Occupied",
-      key: "occupied",
+      header: 'Occupied',
+      key: 'occupied',
     },
   ];
 
@@ -77,14 +70,14 @@ const WardWithBeds: React.FC = () => {
     if (condition) {
       return (
         <Tag type="green" size="md">
-          {t("yes", "Yes")}
+          {t('yes', 'Yes')}
         </Tag>
       );
     }
 
     return (
       <Tag type="red" size="md">
-        {t("no", "No")}
+        {t('no', 'No')}
       </Tag>
     );
   };
@@ -95,13 +88,13 @@ const WardWithBeds: React.FC = () => {
       number: bed.number,
       name: bed.name,
       description: bed.description,
-      occupied: <CustomTag condition={bed?.status === "OCCUPIED"} />,
+      occupied: <CustomTag condition={bed?.status === 'OCCUPIED'} />,
     }));
   }, [paginatedData]);
 
   return (
     <>
-      <Header route={name ? name : "--"} />
+      <Header route={name ? name : '--'} />
       {isLoading && (
         <div className={styles.container}>
           <DataTableSkeleton role="progressbar" zebra />
@@ -119,29 +112,19 @@ const WardWithBeds: React.FC = () => {
                 navigate({
                   to: `${window.getOpenmrsSpaBase()}bed-management`,
                 })
-              }
-            >
+              }>
               <span>Return to summary</span>
             </Button>
           </div>
           <div className={styles.container}>
             <DataTable rows={tableRows} headers={tableHeaders} useZebraStyles>
-              {({
-                rows,
-                headers,
-                getHeaderProps,
-                getRowProps,
-                getTableProps,
-              }) => (
+              {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
                 <TableContainer>
                   <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
-                          <TableHeader
-                            key={header.key}
-                            {...getHeaderProps({ header })}
-                          >
+                          <TableHeader key={header.key} {...getHeaderProps({ header })}>
                             {header.header}
                           </TableHeader>
                         ))}
@@ -151,9 +134,7 @@ const WardWithBeds: React.FC = () => {
                       {rows.map((row) => (
                         <TableRow key={row.id} {...getRowProps({ row })}>
                           {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>
-                              {cell.value?.content ?? cell.value}
-                            </TableCell>
+                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                           ))}
                         </TableRow>
                       ))}

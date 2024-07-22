@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./header.scss";
-import { Stethoscope } from "@carbon/react/icons";
+import React from 'react';
+import styles from './header.scss';
+import { Stethoscope } from '@carbon/react/icons';
 
 const Illustration: React.FC = () => {
   return (
