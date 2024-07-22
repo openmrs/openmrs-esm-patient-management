@@ -53,15 +53,11 @@ export class RegistrationAndEditPage {
 
   async fillPatientRegistrationForm(formValues: PatientRegistrationFormValues) {
     const tryFill = (locator: Locator, value?: string) => value && locator.fill(value);
-    const focusDatePicker = (locator: Locator) => {
-      const focusElement = locator.getByRole('presentation');
-      return focusElement.focus();
-    };
     await tryFill(this.givenNameInput(), formValues.givenName);
     await tryFill(this.middleNameInput(), formValues.middleName);
     await tryFill(this.familyNameInput(), formValues.familyName);
     formValues.sex && (await this.sexRadioButton(formValues.sex).check());
-    await focusDatePicker(this.birthDateInput());
+    this.birthDateInput().getByRole('presentation').focus();
     await tryFill(this.birthdateDayInput(), formValues.birthdate.day);
     await tryFill(this.birthdateMonthInput(), formValues.birthdate.month);
     await tryFill(this.birthdateYearInput(), formValues.birthdate.year);
