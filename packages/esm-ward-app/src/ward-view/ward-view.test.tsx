@@ -8,11 +8,11 @@ import {
   useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { mockAdmissionLocation, mockInpatientVisits } from '../../../../__mocks__/wards.mock';
-import { renderWithSwr } from '../../../../tools/test-utils';
+import { mockAdmissionLocation, mockInpatientVisits } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { mockPatientAlice } from '../../../../__mocks__/patient.mock';
+import { mockPatientAlice } from '__mocks__';
 import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 import useWardLocation from '../hooks/useWardLocation';
 import WardView from './ward-view.component';
@@ -89,6 +89,13 @@ describe('WardView:', () => {
   });
 
   it('renders admitted patient without bed', async () => {
+    renderWithSwr(<WardView />);
+    const admittedPatientWithoutBed = screen.queryByText('Nicks, Stevie');
+    expect(admittedPatientWithoutBed).toBeInTheDocument();
+  });
+
+  it('renders all admitted patients even if bed management module not installed', async () => {
+    mockedUseFeatureFlag.mockReturnValueOnce(false);
     renderWithSwr(<WardView />);
     const admittedPatientWithoutBed = screen.queryByText('Nicks, Stevie');
     expect(admittedPatientWithoutBed).toBeInTheDocument();
