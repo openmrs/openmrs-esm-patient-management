@@ -1,0 +1,15 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.admissionRequestActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid $text-03;
+  margin: 0 -0.5rem -0.5rem;
+
+  svg {
+    fill: $interactive-01 !important;
+  }
+}

@@ -6,7 +6,7 @@
   background-color: $color-gray-70;
   display: flex;
   align-items: center;
-  padding-left: spacing.$spacing-04;
+  padding: spacing.$spacing-02 0 spacing.$spacing-02 spacing.$spacing-04;
   background-color: #393939;
 
   & > button {

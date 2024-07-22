@@ -21,5 +21,6 @@ export function useInpatientRequest(dispositionType: Array<DispositionType> = ['
   return {
     inpatientRequests: data?.data?.results,
     ...rest,
+    error: null,
   };
 }

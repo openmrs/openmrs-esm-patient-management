@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './admission-requests-workspace.scss';
-import AdmissionRequestCard from './admission-request-card.component';
+import AdmissionRequestCard from './components/admission-request-card.component';
+import { type InpatientRequest } from '../types';
 import { Search } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +41,7 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
         ) : (
           <>
             {inpatientRequests.map((request, indx) => (
-              <AdmissionRequestCard key={indx} patient={request.patient} />
+              <AdmissionRequestCard key={indx} {...request} />
             ))}
           </>
         )}

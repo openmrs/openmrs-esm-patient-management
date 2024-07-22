@@ -1,17 +1,23 @@
 {
-  "admissionRequests": "Admission Requests",
+  "admissionRequests": "Admission requests",
   "admissionRequestsCount_one": "{{count}} admission request",
   "admissionRequestsCount_other": "{{count}} admission requests",
+  "admitPatient": "Admit patient",
   "bedShare": "Bed share",
   "emptyBed": "Empty bed",
   "errorLoadingPatientAdmissionRequests": "Error Loading patient admission requests",
   "errorLoadingPatients": "Error loading admitted patients",
   "errorLoadingWardLocation": "Error loading ward location",
   "failedToLoadPatientWorkspace": "Ward patient workspace has failed to load.",
+  "female": "Female",
   "invalidLocationSpecified": "Invalid location specified",
   "invalidWardLocation": "Invalid ward location: {{location}}",
+  "male": "Male",
   "manage": "Manage",
   "noBedsConfigured": "No beds configured for this location",
-  "wardPatientWorkspaceTitle": "Ward Patient",
-  "wards": "Wards"
+  "other": "Other",
+  "searchForPatient": "Search for a patient",
+  "transferElsewhere": "Transfer elsewhere",
+  "unknown": "Unknown",
+  "wardPatientWorkspaceTitle": "Ward Patient"
 }
