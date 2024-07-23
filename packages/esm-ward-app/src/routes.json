@@ -31,14 +31,10 @@
       "slot": "ward-dashboard-slot"
     },
     {
-      "component": "wardPatientActionButtonExtension",
-      "name": "ward-patient-action-button",
-      "slot": "action-menu-ward-patient-items-slot"
-    },
-    {
-      "component": "o2ClinicialDashboard",
-      "name": "o2-clinicial-dashboard"
-    }],
+    "component": "wardPatientActionButtonExtension",
+    "name": "ward-patient-action-button",
+    "slot": "action-menu-ward-patient-items-slot"
+  }],
   "workspaces": [
     {
       "name":"admission-requests-workspace",

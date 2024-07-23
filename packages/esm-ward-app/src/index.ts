@@ -34,11 +34,6 @@ export const wardPatientWorkspace = getAsyncLifecycle(
 
 export const wardPatientActionButtonExtension = getSyncLifecycle(WardPatientActionButton, options);
 
-export const o2ClinicialDashboard = getAsyncLifecycle(
-  () => import('./ward-workspace/o2-clinicial-dashboard.component'),
-  options,
-);
-
 export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);

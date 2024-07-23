@@ -11,8 +11,7 @@ import {
   age,
 } from '@openmrs/esm-framework';
 import styles from './ward-patient.style.scss';
-
-attach('ward-patient-workspace-header-slot', 'o2-clinicial-dashboard');
+import O2Page from '../ward-workspace/o2-page.component';
 
 export interface WardPatientWorkspaceProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -59,10 +58,8 @@ function WardPatientWorkspaceView({ patient }: WardPatientWorkspaceViewProps) {
   return (
     <>
       <div>
-        <ExtensionSlot name="ward-patient-workspace-header-slot" state={extensionSlotState} />
-      </div>
-      <div>
-        <ExtensionSlot name="ward-patient-workspace-content-slot" state={extensionSlotState} />
+        <O2Page src={`/openmrs/coreapps/clinicianfacing/patient.page?patientId=${patient.id}`} />
+        {/*  <O2Page src={` /openmrs/htmlformentryui/htmlform/enterHtmlFormWithStandardUi.page?patientId=${patient.id}&definitionUiResource=file:configuration/pih/htmlforms/maternalAdmission.xml`} />*/}
       </div>
     </>
   );
