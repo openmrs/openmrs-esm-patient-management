@@ -9,6 +9,7 @@
   "bedShare": "Bed share",
   "cancel": "Cancel",
   "chooseAnOption": "Choose an option",
+  "clinicalNoteLabel": "Write your notes",
   "emptyBed": "Empty bed",
   "emptyText": "Empty",
   "errorCreatingEncounter": "Failed to admit patient",
@@ -35,6 +36,13 @@
   "transferElsewhere": "Transfer elsewhere",
   "unableToSelectBeds": "Unable to select beds",
   "unknown": "Unknown",
+  "note": "Note",
+  "patientNoteNowVisible": "It should be now visible in the notes history",
+  "patientNoteSaveError": "Error saving patient note",
+  "save": "Save",
+  "saving": "Saving...",
+  "visitNoteSaved": "Patient note saved",
+  "wardClinicalNotePlaceholder": "Write any notes here",
   "wardPatientWorkspaceTitle": "Ward Patient",
   "wards": "Wards"
 }
