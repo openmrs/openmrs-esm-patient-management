@@ -5,12 +5,7 @@ import { mockPastVisit } from './visits.mock';
 
 export const mockInpatientRequest: InpatientRequest = {
   patient: mockPatientAlice,
-  visit: mockPastVisit.data.results[0],
-  type: 'ADMISSION',
-  encounter: null,
-  dispositionObs: null,
-  dispositionLocation: null,
-  dispositionDate: null,
+  dispositionType: 'ADMIT',
 };
 
 export const mockAdmittedPatient: AdmittedPatient = {

@@ -2,9 +2,6 @@
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.admissionRequestsWorkspaceContainer {
-  min-height: var(--desktop-workspace-window-height);
-}
 .admissionRequestsWorkspace {
   padding: spacing.$spacing-04;
   display: grid;

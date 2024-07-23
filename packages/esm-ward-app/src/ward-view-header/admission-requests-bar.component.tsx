@@ -10,7 +10,7 @@ import styles from './admission-requests.scss';
 const AdmissionRequestsBar = () => {
   const { location } = useWardLocation();
   const { inpatientRequests, isLoading, error } = useInpatientRequest(location?.uuid);
-  const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
+  const admissionRequests = inpatientRequests?.filter((request) => request.dispositionType == 'ADMIT');
   const { t } = useTranslation();
   const layout = useLayoutType();
 
