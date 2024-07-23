@@ -30,7 +30,8 @@ const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
       <button
         className={classNames(styles.wardPatientCardButton, {
           [styles.activeWardPatientCardButton]:
-            activeBedSelection?.bed.uuid === props.bed.uuid && activeBedSelection?.patient.uuid === props.patient.uuid,
+            activeBedSelection?.bed.uuid === props.bed?.uuid &&
+            activeBedSelection?.patient.uuid === props.patient?.uuid,
         })}
         onClick={() => {
           wardStore.setState({ activeBedSelection: { ...props } });

@@ -36,6 +36,12 @@
       "slot": "action-menu-ward-patient-items-slot"
     },
     {
+      "name": "ward-patient-notes-form",
+      "component": "wardPatientNotesFormExtension",
+      "slot": "ward-patient-notes-workspace-slot",
+      "order": 1
+    },
+    {
       "component": "wardPatientNotesActionButtonExtension",
       "name": "ward-in-patient-notes-action-button",
       "slot": "action-menu-ward-patient-items-slot"

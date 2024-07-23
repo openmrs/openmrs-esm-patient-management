@@ -1,5 +1,6 @@
-import { Type, validators, type ConfigSchema, type PersonAddress } from '@openmrs/esm-framework';
-import { patientCardElementTypes, type PatientCardElementType } from './types';
+import { type ConfigSchema, type PersonAddress, Type, validators } from '@openmrs/esm-framework';
+import { type PatientCardElementType, patientCardElementTypes } from './types';
+import notesConfigSchema, { type NoteConfigObject } from './ward-workspace/ward-patient-notes/notes-config-schema';
 
 const defaultWardPatientCard: WardPatientCardDefinition = {
   id: 'default-card',
@@ -35,6 +36,7 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
 ];
 
 export const configSchema: ConfigSchema = {
+  notesConfig: notesConfigSchema,
   wardPatientCards: {
     _description: 'Configure the display of ward patient cards',
     patientCardElementDefinitions: {
@@ -334,6 +336,11 @@ export interface PatientCodedObsTagsElementConfig {
     appliedToConceptSets: Array<string>;
   }>;
 }
+
+export type ConfigObject = {
+  wardPatientCards: WardPatientCardsConfig;
+  notesConfig: NoteConfigObject;
+};
 
 export type PatientCardElementConfig = {
   address: PatientAddressElementConfig;
