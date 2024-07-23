@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './admission-request-card-actions.scss';
+import styles from './admission-request-card.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { ArrowRightIcon, launchWorkspace, useLayoutType, type Patient } from '@openmrs/esm-framework';

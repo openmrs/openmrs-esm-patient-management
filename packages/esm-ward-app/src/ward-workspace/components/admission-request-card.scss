@@ -5,18 +5,24 @@
 
 .admissionRequestCard {
   background-color: $ui-03;
-  padding: spacing.$spacing-03;
   border: 1px solid $color-gray-30;
   height: fit-content;
   color: $color-gray-70;
   margin-bottom: spacing.$spacing-05;
 }
 
+.admissionRequestCardHeaderContainer {
+  padding: spacing.$spacing-03;
+}
+
 .admissionRequestCardHeader {
   display: flex;
-  flex-direction: column;
-  > :not(:first-child) {
-    border-top: 1px colors.$gray-20 solid;
+  align-items: center;
+  flex-wrap: wrap;
+
+  > div:not(:first-of-type)::before {
+    content: '·';
+    padding: spacing.$spacing-02;
   }
 }
 
@@ -24,4 +30,15 @@
   @include type.type-style('helper-text-01');
   color: $text-02;
   margin-top: spacing.$spacing-03;
+}
+
+.admissionRequestActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid $text-03;
+
+  svg {
+    fill: $interactive-01 !important;
+  }
 }

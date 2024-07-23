@@ -14,7 +14,7 @@ interface AdmissionRequestCardHeaderProps {
 
 const AdmissionRequestCardHeader: React.FC<AdmissionRequestCardHeaderProps> = ({ patient, dispositionEncounter }) => {
   return (
-    <div>
+    <div className={styles.admissionRequestCardHeaderContainer}>
       <div className={styles.admissionRequestCardHeader}>
         <WardPatientName patient={patient} />
         <WardPatientGender patient={patient} />

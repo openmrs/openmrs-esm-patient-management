@@ -28,6 +28,11 @@ export const admissionRequestWorkspace = getAsyncLifecycle(
   options,
 );
 
+export const admitPatientFormWorkspace = getAsyncLifecycle(
+  () => import('./ward-workspace/admit-patient-form-workspace/admit-patient-form-workspace.workspace'),
+  options,
+);
+
 // Title for this workspace is set dynamically
 export const wardPatientWorkspace = getAsyncLifecycle(
   () => import('./ward-patient-workspace/ward-patient.workspace'),
