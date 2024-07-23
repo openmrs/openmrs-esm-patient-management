@@ -8,10 +8,11 @@ This repository contains frontend modules for O3. These modules relate to regist
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
-- [Service queues](packages/esm-service-queues-app/README.md)
-- [Patient search](packages/esm-patient-search-app)
-- [Patient registration](packages/esm-patient-registration-app)
+- [Bed management](packages/esm-bed-management-app/)
 - [Patient list management](packages/esm-patient-list-management-app)
+- [Patient registration](packages/esm-patient-registration-app)
+- [Patient search](packages/esm-patient-search-app)
+- [Service queues](packages/esm-service-queues-app/README.md)
 - [Ward](packages/esm-ward-app)
 
 ## Setup
