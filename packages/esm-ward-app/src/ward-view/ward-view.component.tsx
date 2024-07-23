@@ -11,16 +11,15 @@ import WardViewHeader from '../ward-view-header/ward-view-header.component';
 import { type AdmittedPatient, type WardPatient } from '../types';
 import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
 import useWardLocation from '../hooks/useWardLocation';
+import UnassignedPatient from '../beds/unassigned-patient.component';
 
 const WardView = () => {
   const response = useWardLocation();
-  const { isLoadingLocation, errorFetchingLocation, invalidLocation } = response;
-
+  const { isLoadingLocation, invalidLocation } = response;
   const { t } = useTranslation();
   const isBedManagementModuleInstalled = useFeatureFlag('bedmanagement-module');
 
-  //TODO:Display patients with admitted status (based on their observations) that have no beds assigned
-  if (!isBedManagementModuleInstalled || isLoadingLocation) {
+  if (isLoadingLocation) {
     return <></>;
   }
 
@@ -32,14 +31,14 @@ const WardView = () => {
     <div className={styles.wardView}>
       <WardViewHeader />
       <div className={styles.wardViewMain}>
-        <WardViewByLocation />
+        {isBedManagementModuleInstalled ? <WardViewWithBedManagement /> : <WardViewWithoutBedManagement />}
       </div>
       <WorkspaceContainer overlay contextKey="ward" />
     </div>
   );
 };
 
-const WardViewByLocation = () => {
+const WardViewWithBedManagement = () => {
   const { location } = useWardLocation();
   const {
     admissionLocation,
@@ -60,10 +59,9 @@ const WardViewByLocation = () => {
     return map;
   }, [admittedPatients]);
 
-  if (admissionLocation != null && admittedPatients != null) {
-    const bedLayouts = filterBeds(admissionLocation);
-
-    const wardBeds = bedLayouts.map((bedLayout, i) => {
+  if (admissionLocation != null || admittedPatients != null) {
+    const bedLayouts = admissionLocation && filterBeds(admissionLocation);
+    const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
       const wardPatients: WardPatient[] = patients.map((patient) => {
@@ -92,28 +90,38 @@ const WardViewByLocation = () => {
       return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
     });
 
+    const patientsInBedsUuids = bedLayouts?.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
+    const wardUnassignedPatients =
+      admittedPatients &&
+      admittedPatients
+        .filter(
+          (admittedPatient) => !patientsInBedsUuids || !patientsInBedsUuids.includes(admittedPatient.patient.uuid),
+        )
+        .map((admittedPatient) => {
+          // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
+          return (
+            <UnassignedPatient
+              wardPatient={{ ...admittedPatient, admitted: true }}
+              key={admittedPatient.patient.uuid}
+            />
+          );
+        });
+
     return (
       <>
         {wardBeds}
-        {bedLayouts.length == 0 && (
+        {bedLayouts?.length == 0 && (
           <InlineNotification
             kind="warning"
             lowContrast={true}
             title={t('noBedsConfigured', 'No beds configured for this location')}
           />
         )}
+        {wardUnassignedPatients}
       </>
     );
   } else if (isLoadingLocation || isLoadingPatients) {
-    return (
-      <>
-        {Array(20)
-          .fill(0)
-          .map((_, i) => (
-            <EmptyBedSkeleton key={i} />
-          ))}
-      </>
-    );
+    return <EmptyBeds />;
   } else if (errorLoadingLocation) {
     return (
       <InlineNotification
@@ -136,6 +144,49 @@ const WardViewByLocation = () => {
       />
     );
   }
+};
+
+const WardViewWithoutBedManagement = () => {
+  const { location } = useWardLocation();
+  const {
+    admittedPatients,
+    isLoading: isLoadingPatients,
+    error: errorLoadingPatients,
+  } = useAdmittedPatients(location.uuid);
+  const { t } = useTranslation();
+
+  if (admittedPatients) {
+    const wardPatients = admittedPatients?.map((admittedPatient) => {
+      // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
+      return (
+        <UnassignedPatient wardPatient={{ ...admittedPatient, admitted: true }} key={admittedPatient.patient.uuid} />
+      );
+    });
+    return <>{wardPatients}</>;
+  } else if (isLoadingPatients) {
+    return <EmptyBeds />;
+  } else {
+    return (
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorLoadingPatients', 'Error loading admitted patients')}
+        subtitle={errorLoadingPatients?.message}
+      />
+    );
+  }
+};
+
+const EmptyBeds = () => {
+  return (
+    <>
+      {Array(20)
+        .fill(0)
+        .map((_, i) => (
+          <EmptyBedSkeleton key={i} />
+        ))}
+    </>
+  );
 };
 
 export default WardView;
