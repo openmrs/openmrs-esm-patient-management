@@ -11,7 +11,7 @@ import type React from 'react';
 export interface WardPatientCardProps {
   patient: Patient;
   visit: Visit;
-  bed: Bed;
+  bed?: Bed;
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
