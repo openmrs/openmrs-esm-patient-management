@@ -275,23 +275,26 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     const appointmentPayload = constructAppointmentPayload(data);
 
     // check if Duplicate Response Occurs
-    if (context !== 'editing') {
-      const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
-      let errorMessage = t('appointmentConflict', 'Appointment conflict');
-      if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
-        errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
-      } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+    const response: FetchResponse = await checkAppointmentConflict(appointmentPayload);
+    let errorMessage = t('appointmentConflict', 'Appointment conflict');
+    if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
+      errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
+    } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
+      if (context !== 'editing') {
         errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+      } else {
+        errorMessage = null;
       }
-      if (response.status === 200) {
-        setIsSubmitting(false);
-        showSnackbar({
-          isLowContrast: true,
-          kind: 'error',
-          title: errorMessage,
-        });
-        return;
-      }
+    }
+
+    if (response.status === 200 && errorMessage) {
+      setIsSubmitting(false);
+      showSnackbar({
+        isLowContrast: true,
+        kind: 'error',
+        title: errorMessage,
+      });
+      return;
     }
 
     // Construct recurring pattern payload
