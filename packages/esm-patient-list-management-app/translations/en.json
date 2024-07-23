@@ -29,7 +29,6 @@
   "errorDeletingList": "Error deleting patient list",
   "errorRemovingPatientFromList": "Failed to remove patient from list",
   "errorUpdatingList": "Error updating list",
-  "home": "Home",
   "identifier": "Identifier",
   "items": "items",
   "itemsDisplayed": "{{numberOfItemsDisplayed}} items",

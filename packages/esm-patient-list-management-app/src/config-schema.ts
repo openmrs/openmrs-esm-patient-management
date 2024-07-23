@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/utils/createSubject';
 
 export const configSchema = {
   myListCohortTypeUUID: {
@@ -16,10 +17,22 @@ export const configSchema = {
     _description: 'The default number of lists to show in the Lists dashboard table',
     _default: 10,
   },
+  clinicName: {
+    _type: Type.String,
+    _description: 'The clinic name to display on theh page',
+    _default: 'WellnessPoint Demo Clinic',
+  },
+  showIllustration: {
+    _type: Type.Boolean,
+    _description: 'Illustration is visible by default',
+    _default: true,
+  },
 };
 
 export interface ConfigSchema {
   myListCohortTypeUUID: string;
   systemListCohortTypeUUID: string;
   patientListsToShow: number;
+  clinicName: string;
+  showIllustration: boolean;
 }

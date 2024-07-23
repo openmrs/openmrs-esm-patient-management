@@ -4,7 +4,8 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, Button } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { navigate, PageHeader } from '@openmrs/esm-framework';
+import { navigate, PageHeaderContainer, PageHeader, useConfig } from '@openmrs/esm-framework';
+import { type ConfigSchema } from '../config-schema';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
@@ -38,6 +39,7 @@ function usePatientListFilterForCurrentTab(selectedTab: number) {
 }
 
 const ListsDashboard: React.FC = () => {
+  const { clinicName, showIllustration } = useConfig<ConfigSchema>();
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(TabIndices.STARRED_LISTS);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
@@ -78,20 +80,22 @@ const ListsDashboard: React.FC = () => {
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <PageHeader
-          dashboardTitle={'Patient Lists'}
-          illustration={<Illustration />}
-          utilities={
-            <Button
-              kind="ghost"
-              iconDescription="Add"
-              renderIcon={(props) => <Add {...props} size={16} />}
-              onClick={handleShowNewListOverlay}
-              size="sm">
-              {t('newList', 'New list')}
-            </Button>
-          }
-        />
+        <PageHeaderContainer className="">
+          <PageHeader
+            title={t('Patient Lists')}
+            illustration={showIllustration ? <Illustration /> : null}
+            clinicName={clinicName}
+          />
+          <Button
+            className={styles.newListButton}
+            kind="ghost"
+            iconDescription="Add"
+            renderIcon={(props) => <Add {...props} size={16} />}
+            onClick={handleShowNewListOverlay}
+            size="sm">
+            {t('newList', 'New list')}
+          </Button>
+        </PageHeaderContainer>
         <Tabs
           className={styles.tabs}
           onChange={({ selectedIndex }) => {
