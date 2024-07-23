@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import { useSession, useConfig, PageHeaderContainer, PageHeader } from '@openmrs/esm-framework';
+import { useSession, useConfig, PageHeaderContainer, PageHeader, ServiceQueuesPictogram } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
-import PatientQueueIllustration from './patient-queue-illustration.component';
 import { useQueueLocations } from '../patient-search/hooks/useQueueLocations';
 
 import {
@@ -26,7 +25,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
   const userSession = useSession();
   const currentQueueLocationName = useSelectedQueueLocationName();
   const currentQueueLocationUuid = useSelectedQueueLocationUuid();
-  const { clinicName, showIllustration } = useConfig<ConfigObject>();
+  const { clinicName } = useConfig<ConfigObject>();
 
   const handleQueueLocationChange = useCallback(({ selectedItem }) => {
     if (selectedItem.id === 'all') {
@@ -64,11 +63,7 @@ const PatientQueueHeader: React.FC<PatientQueueHeaderProps> = ({ title, showLoca
 
   return (
     <PageHeaderContainer className={styles.header} data-testid="patient-queue-header">
-      <PageHeader
-        title={`${title}`}
-        illustration={showIllustration ? <PatientQueueIllustration /> : null}
-        clinicName={clinicName}
-      />
+      <PageHeader title={`${title}`} illustration={<ServiceQueuesPictogram />} clinicName={clinicName} />
       <div className={styles.dropdownContainer}>
         {showLocationDropdown && (
           <Dropdown

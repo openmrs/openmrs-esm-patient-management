@@ -373,11 +373,6 @@ export const configSchema = {
     _description: 'The clinic name to display on theh page',
     _default: 'WellnessPoint Demo Clinic',
   },
-  showIllustration: {
-    _type: Type.Boolean,
-    _description: 'Illustration is visible by default',
-    _default: true,
-  },
   _validators: [
     validator((config: ConfigObject) => {
       const queueNumberColumnDefs = [
@@ -433,7 +428,6 @@ export interface ConfigObject {
   visitQueueNumberAttributeUuid: string | null;
   queueTables: TablesConfig;
   clinicName: string;
-  showIllustration: boolean;
 }
 
 interface TablesConfig {
