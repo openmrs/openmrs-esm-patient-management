@@ -1,11 +1,12 @@
 {
   "$schema": "https://json.openmrs.org/routes.schema.json",
   "backendDependencies": {
-    "webservices.rest": "^2.2.0"
+    "webservices.rest": "^2.2.0",
+    "emrapi": "^2.0.0 || 2.0.0-SNAPSHOT"
   },
   "optionalBackendDependencies":{
      "bedmanagement":{
-      "version": "^5.14.0 || 5.14.0-SNAPSHOT",
+      "version": "^6.0.0 || 6.0.0-SNAPSHOT",
       "feature": {
         "flagName": "bedmanagement-module",
         "label":"Ward App Patient Service",
@@ -14,11 +15,40 @@
      }
   },
   "extensions": [
-  ],
-  "pages": [
+    {
+      "name": "ward-dashboard-link",
+      "component": "wardDashboardLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "ward",
+        "slot": "ward-dashboard-slot",
+        "title": "Wards"
+      }
+    },
     {
       "component": "root",
-      "route": "ward"
-    }
-  ]
+      "name": "ward-dashboard",
+      "slot": "ward-dashboard-slot"
+    },
+    {
+    "component": "wardPatientActionButtonExtension",
+    "name": "ward-patient-action-button",
+    "slot": "action-menu-ward-patient-items-slot"
+  }],
+  "workspaces": [
+    {
+      "name":"admission-requests-workspace",
+      "component": "admissionRequestWorkspace",
+      "title":"admissionRequests",
+       "type":"admission-requests"
+    },
+    {
+    "name": "ward-patient-workspace",
+    "component": "wardPatientWorkspace",
+    "type": "ward",
+    "title": "Ward Patient",
+    "width": "extra-wide",
+    "hasOwnSidebar": true,
+    "sidebarFamily": "ward-patient"
+  }]
 }

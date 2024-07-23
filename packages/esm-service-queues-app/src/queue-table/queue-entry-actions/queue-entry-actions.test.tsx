@@ -76,7 +76,7 @@ describe('TransitionQueueEntryModal: ', () => {
     await inServiceRadioButton.click();
 
     const submitButton = screen.getByRole('button', { name: /Transition patient/ });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     expect(mockedOpenmrsFetch).toHaveBeenCalled();
@@ -143,7 +143,7 @@ describe('EditQueueEntryModal: ', () => {
     await inServiceRadioButton.click();
 
     const submitButton = screen.getByRole('button', { name: /Edit queue entry/ });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     expect(mockedOpenmrsFetch).toHaveBeenCalled();

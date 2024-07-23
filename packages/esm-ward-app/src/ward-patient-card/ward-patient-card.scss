@@ -13,14 +13,44 @@
   gap: spacing.$spacing-02;
   background-color: $ui-02;
 
+  position: relative; // this allows positioning the button correctly
+
   > .wardPatientCardRow:not(:first-child) {
     border-top: 1px colors.$gray-20 solid;
+  }
+}
+
+.wardPatientCardButton {
+  border: none;
+  padding: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 200ms;
+  }
+
+  &:hover::before,
+  &:focus::before {
+    border-color: $interactive-01;
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
 .wardPatientCardRow {
   width: 100%;
   padding: spacing.$spacing-04;
+}
+
+.wardPatientCardRow:empty {
+  display: none;
 }
 
 .wardPatientCardHeader {

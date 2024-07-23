@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getGlobalStore } from '@openmrs/esm-framework';
 import type { AppointmentSummary } from '../types';
-import { useTranslation } from 'react-i18next';
 
 export const getServiceCountByAppointmentType = (
   appointmentSummary: Array<AppointmentSummary>,
@@ -15,26 +14,53 @@ export const getServiceCountByAppointmentType = (
     .reduce((count, val) => count + val, 0);
 };
 
-const initialServiceNameState = { serviceName: sessionStorage.getItem('queueServiceName') };
-const initialServiceUuidState = { serviceUuid: sessionStorage.getItem('queueServiceUuid') };
-const intialStatusNameState = { status: '' };
-const initialQueueLocationNameState = { queueLocationName: sessionStorage.getItem('queueLocationName') };
-const initialQueueLocationUuidState = { queueLocationUuid: sessionStorage.getItem('queueLocationUuid') };
-const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
-const initialPermanentProviderQueueRoomState = {
-  isPermanentProviderQueueRoom: sessionStorage.getItem('isPermanentProviderQueueRoom'),
-};
-
-export function getSelectedServiceName() {
-  return getGlobalStore<{ serviceName: string }>('queueSelectedServiceName', initialServiceNameState);
+/**
+ * This function is mainly useful for not writing null/ undefined in the session storage
+ */
+export function updateValueInSessionStorage(key: string, value: string) {
+  if (value === undefined || value === null) {
+    sessionStorage.removeItem(key);
+  } else {
+    sessionStorage.setItem(key, value);
+  }
 }
 
-export function getSelectedServiceUuid() {
-  return getGlobalStore<{ serviceUuid: string }>('queueSelectedServiceUuid', initialServiceUuidState);
+/**
+ * This function fetches the value for the passed key from session storage
+ */
+export function getValueFromSessionStorage(key: string): string | null {
+  return sessionStorage.getItem(key);
+}
+
+const initialQueueLocationNameState = {
+  queueLocationName: getValueFromSessionStorage('queueLocationName'),
+};
+const initialQueueLocationUuidState = {
+  queueLocationUuid: getValueFromSessionStorage('queueLocationUuid'),
+};
+const initialServiceUuidState = {
+  serviceUuid: getValueFromSessionStorage('queueServiceUuid'),
+  serviceDisplay: getValueFromSessionStorage('queueServiceDisplay'),
+};
+const intialAppointmentStatusNameState = { status: '' };
+const initialQueueStatusState = {
+  statusUuid: getValueFromSessionStorage('queueStatusUuid'),
+  statusDisplay: getValueFromSessionStorage('queueStatusDisplay'),
+};
+const initialSelectedQueueRoomTimestamp = { providerQueueRoomTimestamp: new Date() };
+const initialPermanentProviderQueueRoomState = {
+  isPermanentProviderQueueRoom: getValueFromSessionStorage('isPermanentProviderQueueRoom'),
+};
+
+export function getSelectedService() {
+  return getGlobalStore<{ serviceUuid: string; serviceDisplay: string }>(
+    'queueSelectedServiceUuid',
+    initialServiceUuidState,
+  );
 }
 
 export function getSelectedAppointmentStatus() {
-  return getGlobalStore<{ status: string }>('appointmentSelectedStatus', intialStatusNameState);
+  return getGlobalStore<{ status: string }>('appointmentSelectedStatus', intialAppointmentStatusNameState);
 }
 
 export function getSelectedQueueLocationName() {
@@ -43,6 +69,13 @@ export function getSelectedQueueLocationName() {
 
 export function getSelectedQueueLocationUuid() {
   return getGlobalStore<{ queueLocationUuid: string }>('queueLocationUuidSelected', initialQueueLocationUuidState);
+}
+
+export function getSelectedQueueStatus() {
+  return getGlobalStore<{ statusUuid: string; statusDisplay: string }>(
+    'queueStatusUuidSelected',
+    initialQueueStatusState,
+  );
 }
 
 export function getSelectedQueueRoomTimestamp() {
@@ -59,16 +92,11 @@ export function getIsPermanentProviderQueueRoom() {
   );
 }
 
-export const updateSelectedServiceName = (currentServiceName: string) => {
-  const store = getSelectedServiceName();
-  sessionStorage.setItem('queueServiceName', currentServiceName);
-  store.setState({ serviceName: currentServiceName });
-};
-
-export const updateSelectedServiceUuid = (currentServiceUuid: string) => {
-  const store = getSelectedServiceUuid();
-  sessionStorage.setItem('queueServiceUuid', currentServiceUuid);
-  store.setState({ serviceUuid: currentServiceUuid });
+export const updateSelectedService = (currentServiceUuid: string, currentServiceDisplay: string) => {
+  const store = getSelectedService();
+  updateValueInSessionStorage('queueServiceDisplay', currentServiceDisplay);
+  updateValueInSessionStorage('queueServiceUuid', currentServiceUuid);
+  store.setState({ serviceUuid: currentServiceUuid, serviceDisplay: currentServiceDisplay });
 };
 
 export const updateSelectedAppointmentStatus = (currentAppointmentStatus: string) => {
@@ -78,13 +106,13 @@ export const updateSelectedAppointmentStatus = (currentAppointmentStatus: string
 
 export const updateSelectedQueueLocationName = (currentLocationName: string) => {
   const store = getSelectedQueueLocationName();
-  sessionStorage.setItem('queueLocationName', currentLocationName);
+  updateValueInSessionStorage('queueLocationName', currentLocationName);
   store.setState({ queueLocationName: currentLocationName });
 };
 
 export const updateSelectedQueueLocationUuid = (currentLocationUuid: string) => {
   const store = getSelectedQueueLocationUuid();
-  sessionStorage.setItem('queueLocationUuid', currentLocationUuid);
+  updateValueInSessionStorage('queueLocationUuid', currentLocationUuid);
   store.setState({ queueLocationUuid: currentLocationUuid });
 };
 
@@ -95,32 +123,28 @@ export const updatedSelectedQueueRoomTimestamp = (currentProviderRoomTimestamp: 
 
 export const updateIsPermanentProviderQueueRoom = (currentIsPermanentProviderQueueRoom) => {
   const store = getIsPermanentProviderQueueRoom();
-  sessionStorage.setItem('isPermanentProviderQueueRoom', currentIsPermanentProviderQueueRoom);
+  updateValueInSessionStorage('isPermanentProviderQueueRoom', currentIsPermanentProviderQueueRoom);
   store.setState({ isPermanentProviderQueueRoom: currentIsPermanentProviderQueueRoom });
 };
 
-export const useSelectedServiceName = () => {
-  const { t } = useTranslation();
-  const [currentServiceName, setCurrentServiceName] = useState(initialServiceNameState.serviceName ?? t('all', 'All'));
-
-  useEffect(() => {
-    getSelectedServiceName().subscribe(({ serviceName }) => setCurrentServiceName(serviceName));
-  }, []);
-
-  return currentServiceName;
+export const updateSelectedQueueStatus = (currentQueueStatusUuid: string, currentQueueStatusDisplay: string) => {
+  const store = getSelectedQueueStatus();
+  updateValueInSessionStorage('queueStatusUuid', currentQueueStatusUuid);
+  updateValueInSessionStorage('queueStatusDisplay', currentQueueStatusDisplay);
+  store.setState({ statusUuid: currentQueueStatusUuid, statusDisplay: currentQueueStatusDisplay });
 };
 
-export const useSelectedServiceUuid = () => {
-  const [currentServiceUuid, setCurrentServiceUuid] = useState(initialServiceUuidState.serviceUuid);
+export const useSelectedService = () => {
+  const [currentService, setCurrentService] = useState(getSelectedService()?.getState());
 
   useEffect(() => {
-    getSelectedServiceUuid().subscribe(({ serviceUuid }) => setCurrentServiceUuid(serviceUuid));
+    getSelectedService().subscribe((newSelectedService) => setCurrentService(newSelectedService));
   }, []);
-  return currentServiceUuid;
+  return currentService;
 };
 
 export const useSelectedAppointmentStatus = () => {
-  const [currentAppointmentStatus, setCurrentAppointmentStatus] = useState(intialStatusNameState.status);
+  const [currentAppointmentStatus, setCurrentAppointmentStatus] = useState(intialAppointmentStatusNameState.status);
 
   useEffect(() => {
     getSelectedAppointmentStatus().subscribe(({ status }) => setCurrentAppointmentStatus(status));
@@ -175,3 +199,16 @@ export const useIsPermanentProviderQueueRoom = () => {
   }, []);
   return currentIsPermanentProviderQueueRoom;
 };
+
+export const useSelectedQueueStatus = () => {
+  const [currentQueueStatus, setCurrentQueueStatus] = useState(getSelectedQueueStatus()?.getState());
+
+  useEffect(() => {
+    getSelectedQueueStatus().subscribe((newStatus) => setCurrentQueueStatus(newStatus));
+  }, []);
+  return currentQueueStatus;
+};
+
+export function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value) || /^[0-9a-f]{36}$/i.test(value);
+}

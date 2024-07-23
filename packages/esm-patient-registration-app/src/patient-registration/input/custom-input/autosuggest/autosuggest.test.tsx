@@ -38,7 +38,7 @@ describe('Autosuggest', () => {
     renderAutosuggest();
 
     expect(screen.getByRole('searchbox')).toBeInTheDocument();
-    expect(screen.queryByRole('list')).toBeNull();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('renders matching search results in a list when the user types a query', async () => {
@@ -52,7 +52,7 @@ describe('Autosuggest', () => {
     const list = screen.getByRole('list');
 
     expect(list).toBeInTheDocument();
-    expect(list.children).toHaveLength(2);
+    expect(screen.getAllByRole('listitem').length).toEqual(2);
     expect(screen.getAllByRole('listitem')[0]).toHaveTextContent('John Doe');
     expect(screen.getAllByRole('listitem')[1]).toHaveTextContent('John Smith');
   });
@@ -63,7 +63,7 @@ describe('Autosuggest', () => {
     renderAutosuggest();
 
     let list = screen.queryByRole('list');
-    expect(list).toBeNull();
+    expect(list).not.toBeInTheDocument();
 
     const searchbox = screen.getByRole('searchbox');
     await user.type(searchbox, 'john');
@@ -77,7 +77,7 @@ describe('Autosuggest', () => {
     expect(mockedHandleSuggestionSelected).toHaveBeenLastCalledWith('person', 'randomuuid1');
 
     list = screen.queryByRole('list');
-    expect(list).toBeNull();
+    expect(list).not.toBeInTheDocument();
   });
 
   it('changes suggestions when a search input is changed', async () => {
@@ -86,7 +86,7 @@ describe('Autosuggest', () => {
     renderAutosuggest();
 
     let list = screen.queryByRole('list');
-    expect(list).toBeNull();
+    expect(list).not.toBeInTheDocument();
 
     const searchbox = screen.getByRole('searchbox');
     await user.type(searchbox, 'john');
@@ -97,7 +97,7 @@ describe('Autosuggest', () => {
     await user.clear(searchbox);
 
     list = screen.queryByRole('list');
-    expect(list).toBeNull();
+    expect(list).not.toBeInTheDocument();
   });
 
   it('hides the list of suggestions when the user clicks outside of the component', async () => {

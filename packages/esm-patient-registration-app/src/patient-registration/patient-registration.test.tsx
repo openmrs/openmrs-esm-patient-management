@@ -11,6 +11,8 @@ import { PatientRegistration } from './patient-registration.component';
 import { saveEncounter, savePatient } from './patient-registration.resource';
 import { mockedAddressTemplate } from '__mocks__';
 import { mockPatient } from 'tools';
+import dayjs from 'dayjs';
+import { CalendarDate, parseDate } from '@internationalized/date';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatient = usePatient as jest.Mock;
@@ -101,6 +103,20 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     validator: jest.fn(),
     getLocale: jest.fn().mockReturnValue('en'),
+    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+      return (
+        <>
+          <label htmlFor={id}>{labelText}</label>
+          <input
+            id={id}
+            value={value ? dayjs(value).format('DD/MM/YYYY') : ''}
+            onChange={(evt) => {
+              onChange(dayjs(evt.target.value).toDate());
+            }}
+          />
+        </>
+      );
+    }),
   };
 });
 
@@ -124,6 +140,7 @@ let mockOpenmrsConfig: RegistrationConfig = {
   ],
   fieldDefinitions: [],
   fieldConfigurations: {
+    phone: null,
     dateOfBirth: {
       allowEstimatedDateOfBirth: true,
       useEstimatedDateOfBirth: {
@@ -153,9 +170,6 @@ let mockOpenmrsConfig: RegistrationConfig = {
         searchAddressByLevel: true,
       },
     },
-  },
-  concepts: {
-    patientPhotoUuid: '736e8771-e501-4615-bfa7-570c03f4bef5',
   },
   links: {
     submitButton: '#',
@@ -220,7 +234,6 @@ const fillRequiredFields = async () => {
   const familyNameInput = within(demographicsSection).getByLabelText(/family/i) as HTMLInputElement;
   const dateOfBirthInput = within(demographicsSection).getByLabelText(/date of birth/i) as HTMLInputElement;
   const genderInput = within(demographicsSection).getByLabelText(/Male/) as HTMLSelectElement;
-
   await user.type(givenNameInput, 'Paul');
   await user.type(familyNameInput, 'Gaihre');
   await user.clear(dateOfBirthInput);
@@ -252,11 +265,12 @@ describe('Registering a new patient', () => {
   it('has the expected sections', async () => {
     render(<PatientRegistration isOffline={false} savePatientForm={jest.fn()} />, { wrapper: Wrapper });
 
-    expect(screen.getByLabelText(/Demographics Section/)).not.toBeNull();
-    expect(screen.getByLabelText(/Contact Info Section/)).not.toBeNull();
+    expect(screen.getByRole('region', { name: /demographics section/i })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /contact info section/i })).toBeInTheDocument();
   });
 
-  it('saves the patient without extra info', async () => {
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
+  it.skip('saves the patient without extra info', async () => {
     const user = userEvent.setup();
 
     render(<PatientRegistration isOffline={false} savePatientForm={FormManager.savePatientFormOnline} />, {
@@ -298,7 +312,8 @@ describe('Registering a new patient', () => {
     expect(mockedSavePatientForm).not.toHaveBeenCalled();
   });
 
-  it('renders and saves registration obs', async () => {
+  // TODO O3-3482: Fix this test case when OpenmrsDatePicker gets fixed on core
+  it.skip('renders and saves registration obs', async () => {
     const user = userEvent.setup();
 
     mockedSaveEncounter.mockResolvedValue({});
@@ -334,7 +349,8 @@ describe('Registering a new patient', () => {
     );
   });
 
-  it('retries saving registration obs after a failed attempt', async () => {
+  // TODO : Fix this test case when OpenmrsDatePicker gets fixed on core
+  it.skip('retries saving registration obs after a failed attempt', async () => {
     const user = userEvent.setup();
 
     mockedUseConfig.mockReturnValue(configWithObs);

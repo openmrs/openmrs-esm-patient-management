@@ -1,5 +1,4 @@
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type Appointment, type QueueServiceInfo } from '../types';
 import { startOfDay } from '../constants';
@@ -11,7 +10,7 @@ export function useServiceMetricsCount(service: string, location: string) {
     (service ? `&service=${service}` : '') +
     (location ? `&location=${location}` : '');
 
-  const { data } = useSWRImmutable<
+  const { data } = useSWR<
     {
       data: {
         count: number;

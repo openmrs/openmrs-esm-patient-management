@@ -4,10 +4,10 @@ import { SearchTypes } from '../types';
 import PatientScheduledVisits from './patient-scheduled-visits.component';
 import VisitForm from './visit-form/visit-form.component';
 import {
-  ArrowLeftIcon,
   type DefaultWorkspaceProps,
-  displayName,
+  ArrowLeftIcon,
   ErrorState,
+  getPatientName,
   PatientBannerContactDetails,
   PatientBannerPatientInfo,
   PatientBannerToggleContactDetailsButton,
@@ -76,35 +76,35 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
     }
   }, [searchType, handleBackToSearchList]);
 
-  const patientName = patient && displayName(patient);
+  const patientName = patient && getPatientName(patient);
   return patient ? (
-    <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
-      <div className={styles.patientBannerContainer}>
-        <div className={styles.patientBanner}>
-          <div className={styles.patientPhoto}>
-            <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+    <div className={styles.patientSearchContainer}>
+      <AddPatientToQueueContext.Provider value={{ currentServiceQueueUuid }}>
+        <div className={styles.patientBannerContainer}>
+          <div className={styles.patientBanner}>
+            <div className={styles.patientPhoto}>
+              <PatientPhoto patientUuid={patient.id} patientName={patientName} />
+            </div>
+            <PatientBannerPatientInfo patient={patient} />
+            <PatientBannerToggleContactDetailsButton
+              showContactDetails={showContactDetails}
+              toggleContactDetails={() => setContactDetails(!showContactDetails)}
+            />
           </div>
-          <PatientBannerPatientInfo patient={patient} />
-          <PatientBannerToggleContactDetailsButton
-            showContactDetails={showContactDetails}
-            toggleContactDetails={() => setContactDetails(!showContactDetails)}
-          />
+          {showContactDetails ? (
+            <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
+          ) : null}
         </div>
-        {showContactDetails ? (
-          <PatientBannerContactDetails patientId={patient.id} deceased={patient.deceasedBoolean} />
-        ) : null}
-      </div>
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
-          iconDescription={backButtonDescription}
-          size="sm"
-          onClick={() => handleBackToAction()}>
-          <span>{backButtonDescription}</span>
-        </Button>
-      </div>
-      <div>
+        <div className={styles.backButton}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <ArrowLeftIcon size={24} {...props} />}
+            iconDescription={backButtonDescription}
+            size="sm"
+            onClick={handleBackToAction}>
+            <span>{backButtonDescription}</span>
+          </Button>
+        </div>
         {activeVisit ? (
           <ExistingVisitFormComponent visit={activeVisit} closeWorkspace={closeWorkspace} />
         ) : (
@@ -127,8 +127,8 @@ const PatientSearch: React.FC<PatientSearchProps> = ({
             ) : null}
           </>
         )}
-      </div>
-    </AddPatientToQueueContext.Provider>
+      </AddPatientToQueueContext.Provider>
+    </div>
   ) : null;
 };
 
