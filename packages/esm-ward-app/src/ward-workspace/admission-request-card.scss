@@ -5,13 +5,10 @@
 
 .admissionRequestCard {
   background-color: $ui-01;
-  padding: spacing.$spacing-03;
   border: 1px solid $ui-03;
-  height: fit-content;
   color: $color-gray-70;
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   > :not(:first-child) {
     border-top: 1px colors.$gray-20 solid;
   }
