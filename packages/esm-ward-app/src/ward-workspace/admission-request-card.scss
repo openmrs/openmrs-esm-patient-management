@@ -1,19 +1,19 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.admissionRequestCardHeader {
-  background-color: $ui-03;
+.admissionRequestCard {
+  background-color: $ui-01;
   padding: spacing.$spacing-03;
-  border: 1px solid $color-gray-30;
+  border: 1px solid $ui-03;
   height: fit-content;
   color: $color-gray-70;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  > div:not(:first-of-type)::before {
-    content: '·';
-    padding: spacing.$spacing-02;
+  > :not(:first-child) {
+    border-top: 1px colors.$gray-20 solid;
   }
 }
 
