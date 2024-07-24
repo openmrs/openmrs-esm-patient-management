@@ -14,5 +14,5 @@ export * from './queue-rooms.mock';
 export * from './search.mock';
 export * from './session.mock';
 export * from './wards.mock';
-export * from './ward-patient';
+export * from './inpatient-request';
 export * from './visits.mock';
