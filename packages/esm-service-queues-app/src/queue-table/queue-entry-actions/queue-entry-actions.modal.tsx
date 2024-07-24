@@ -180,7 +180,7 @@ export const QueueEntryActionModal: React.FC<QueueEntryActionModalProps> = ({
     return startAtDate > now;
   }, [formState.transitionDate, formState.transitionTime, formState.transitionTimeFormat]);
 
-  const selectedPriorityIndex = priorities.findIndex((p) => p.uuid == formState.selectedPriority);
+  const selectedPriorityIndex = priorities?.findIndex((p) => p.uuid == formState.selectedPriority);
 
   return (
     <>
