@@ -258,11 +258,6 @@ export const configSchema = {
             'The header text for the column. Will be translated if it is a valid translation key. If not provided, the header will be based on the columnType.',
           _default: null,
         },
-        headerI18nModule: {
-          _type: Type.String,
-          _description: 'The module to use for translation of the header.',
-          _default: '@openmrs/esm-service-queues-app',
-        },
         config: {
           identifierTypeUuid: {
             _type: Type.UUID,

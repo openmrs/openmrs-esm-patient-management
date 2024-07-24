@@ -67,11 +67,6 @@ export const configSchema: ConfigSchema = {
                 "Optional. The custom label or i18n key to the translated label to display. If not provided, defaults to the concept's name. (Note that this can be set to an empty string to not show a label)",
               _default: null,
             },
-            labelI18nModule: {
-              _type: Type.String,
-              _description: 'Optional. The custom module to use for translation of the label',
-              _default: null,
-            },
             orderBy: {
               _type: Type.String,
               _description:
@@ -101,11 +96,6 @@ export const configSchema: ConfigSchema = {
             summaryLabel: {
               _type: Type.String,
               _description: `Optional. The custom label or i18n key to the translated label to display for the summary tag. The summary tag shows the count of the number of answers that are present but not configured to show as their own tags. If not provided, defaults to the name of the concept.`,
-              _default: null,
-            },
-            summaryLabelI18nModule: {
-              _type: Type.String,
-              _description: 'Optional. The custom module to use for translation of the summary label',
               _default: null,
             },
             summaryLabelColor: {
