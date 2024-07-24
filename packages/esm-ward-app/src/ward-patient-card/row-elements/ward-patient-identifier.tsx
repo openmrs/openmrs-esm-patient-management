@@ -32,7 +32,7 @@ const wardPatientIdentifier = (config: PatientCardElementConfig) => {
     patientIdentifiers.sort(identifierCompareFunction);
     const patientIdentifier = patientIdentifiers[0];
     const labelToDisplay =
-      label != null ? translateFrom(labelModule ?? moduleName, label) : patientIdentifier?.identifierType.name;
+      label != null ? translateFrom(labelModule ?? moduleName, label) : patientIdentifier?.identifierType?.name;
     return (
       <div>
         {labelToDisplay ? <Tag>{t('identifierTypelabel', '{{label}}:', { label: labelToDisplay })}</Tag> : <></>}

@@ -114,6 +114,7 @@ export const configSchema: ConfigSchema = {
               _description: 'Optional. The custom module to use for translation of the label',
               _default: null,
             },
+          },
           codedObsTags: {
             _description: 'Config for the patientCardElementType "patient-coded-obs-tags"',
             conceptUuid: {
@@ -199,7 +200,6 @@ export const configSchema: ConfigSchema = {
       },
     },
   },
-}
 };
 
 export interface WardConfigObject {
