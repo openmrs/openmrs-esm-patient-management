@@ -6,6 +6,7 @@ export const mockPatientAlice: Patient = {
   identifiers: [],
   person: {
     uuid: '00000000-0000-0001-0000-00000asdfasd',
+    display: 'Alice Johnson',
     gender: 'F',
     age: 24,
     birthdate: '2000-01-01T00:00:00.000+0000',
