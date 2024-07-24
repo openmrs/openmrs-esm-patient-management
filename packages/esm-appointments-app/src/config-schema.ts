@@ -119,11 +119,6 @@ export const configSchema = {
       _default: '',
     },
   },
-  clinicName: {
-    _type: Type.String,
-    _description: 'The clinic name to display on theh page',
-    _default: 'WellnessPoint Demo Clinic',
-  },
 };
 
 export interface ConfigObject {
@@ -153,5 +148,4 @@ export interface ConfigObject {
     enabled: boolean;
     customUrl: string;
   };
-  clinicName: string;
 }

@@ -368,11 +368,6 @@ export const configSchema = {
       ),
     ],
   },
-  clinicName: {
-    _type: Type.String,
-    _description: 'The clinic name to display on theh page',
-    _default: 'WellnessPoint Demo Clinic',
-  },
   _validators: [
     validator((config: ConfigObject) => {
       const queueNumberColumnDefs = [
@@ -427,7 +422,6 @@ export interface ConfigObject {
   visitTypeResourceUrl: string;
   visitQueueNumberAttributeUuid: string | null;
   queueTables: TablesConfig;
-  clinicName: string;
 }
 
 interface TablesConfig {

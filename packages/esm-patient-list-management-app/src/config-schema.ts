@@ -17,16 +17,10 @@ export const configSchema = {
     _description: 'The default number of lists to show in the Lists dashboard table',
     _default: 10,
   },
-  clinicName: {
-    _type: Type.String,
-    _description: 'The clinic name to display on theh page',
-    _default: 'WellnessPoint Demo Clinic',
-  },
 };
 
 export interface ConfigSchema {
   myListCohortTypeUUID: string;
   systemListCohortTypeUUID: string;
   patientListsToShow: number;
-  clinicName: string;
 }

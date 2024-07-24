@@ -3,8 +3,6 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .header {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
   background-color: $ui-02;
   border: 1px solid $ui-03;
   border-left: 0px;

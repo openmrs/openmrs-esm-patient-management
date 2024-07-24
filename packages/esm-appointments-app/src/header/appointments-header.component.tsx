@@ -1,8 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from '@carbon/react';
-import { PageHeaderContainer, PageHeader, AppointmentsPictogram, useConfig } from '@openmrs/esm-framework';
-import { type ConfigObject } from '../config-schema';
+import { PageHeaderContainer, PageHeader, AppointmentsPictogram } from '@openmrs/esm-framework';
 import { useAppointmentServices } from '../hooks/useAppointmentService';
 import styles from './appointments-header.scss';
 interface AppointmentHeaderProps {
@@ -14,11 +13,10 @@ interface AppointmentHeaderProps {
 const AppointmentsHeader: React.FC<AppointmentHeaderProps> = ({ title, appointmentServiceType, onChange }) => {
   const { t } = useTranslation();
   const { serviceTypes } = useAppointmentServices();
-  const { clinicName } = useConfig<ConfigObject>();
 
   return (
     <PageHeaderContainer className={styles.header} data-testid="appointments-header">
-      <PageHeader title={title} illustration={<AppointmentsPictogram />} clinicName={clinicName} />
+      <PageHeader title={title} illustration={<AppointmentsPictogram />} />
       <div className={styles.dropdownContainer}>
         {typeof onChange === 'function' && (
           <Dropdown

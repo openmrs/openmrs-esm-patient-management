@@ -4,8 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, Button } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { navigate, PageHeaderContainer, PageHeader, PatientListsPictogram, useConfig } from '@openmrs/esm-framework';
-import { type ConfigSchema } from '../config-schema';
+import { navigate, PageHeaderContainer, PageHeader, PatientListsPictogram } from '@openmrs/esm-framework';
 import { type PatientListFilter, PatientListType } from '../api/types';
 import { useAllPatientLists } from '../api/hooks';
 import CreateEditPatientList from '../create-edit-patient-list/create-edit-list.component';
@@ -38,7 +37,6 @@ function usePatientListFilterForCurrentTab(selectedTab: number) {
 }
 
 const ListsDashboard: React.FC = () => {
-  const { clinicName } = useConfig<ConfigSchema>();
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(TabIndices.STARRED_LISTS);
   const patientListFilter = usePatientListFilterForCurrentTab(selectedTab);
@@ -79,12 +77,8 @@ const ListsDashboard: React.FC = () => {
   return (
     <main className={classnames('omrs-main-content', styles.dashboardContainer)}>
       <section className={styles.dashboard}>
-        <PageHeaderContainer className="">
-          <PageHeader
-            title={t('patientLists', 'Patient Lists')}
-            illustration={<PatientListsPictogram />}
-            clinicName={clinicName}
-          />
+        <PageHeaderContainer>
+          <PageHeader title={t('patientLists', 'Patient Lists')} illustration={<PatientListsPictogram />} />
           <Button
             className={styles.newListButton}
             kind="ghost"
