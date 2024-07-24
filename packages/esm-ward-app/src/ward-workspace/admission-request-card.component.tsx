@@ -10,11 +10,11 @@ interface AdmissionRequestCardProps {
 
 const AdmissionRequestCard: React.FC<AdmissionRequestCardProps> = ({ patient }) => {
   const { locationUuid } = useParams();
-  const admissionPatientCardSlots = usePatientCardRows(locationUuid);
+  const rows = usePatientCardRows(locationUuid);
   return (
-    <div className={styles.admissionRequestCardHeader}>
-      {admissionPatientCardSlots.map((AdmissionPatientCard, i) => (
-        <AdmissionPatientCard key={i} patient={patient} bed={null} visit={null} />
+    <div className={styles.admissionRequestCard}>
+      {rows.map((CardRow, i) => (
+        <CardRow key={i} patient={patient} bed={null} visit={null} />
       ))}
     </div>
   );
