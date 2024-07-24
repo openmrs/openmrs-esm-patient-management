@@ -11,12 +11,10 @@ const ActiveVisitsTile: React.FC = () => {
 
   return (
     <Tile className={styles.tileContainer}>
-      <div className={styles.tileContent}>
-        <header className={styles.tileHeader}>{t('activeVisits', 'Active Visits')}</header>
-        <div className={styles.displayDetails}>
-          <div className={styles.countLabel}>{t('patients', 'Patients')}</div>
-          <div className={styles.displayData}>{count ?? 0}</div>
-        </div>
+      <header className={styles.tileHeader}>{t('activeVisits', 'Active Visits')}</header>
+      <div className={styles.displayDetails}>
+        <div className={styles.countLabel}>{t('patients', 'Patients')}</div>
+        <div className={styles.displayData}>{count ?? 0}</div>
       </div>
     </Tile>
   );

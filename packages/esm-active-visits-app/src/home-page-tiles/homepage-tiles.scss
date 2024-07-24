@@ -3,13 +3,10 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 
-.tileContent {
+.tileContainer {
   display: flex;
   flex-direction: column;
   align-items: space-between;
-}
-
-.tileContainer {
   background-color: colors.$white;
   border: 1px solid colors.$gray-20;
   height: 7.875rem;
