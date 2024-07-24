@@ -1,12 +1,13 @@
 import {
+  type Location,
   type OpenmrsResource,
   type OpenmrsResourceStrict,
+  type Patient,
   type Person,
   type Visit,
-  type Location,
-  type Patient,
 } from '@openmrs/esm-framework';
 import type React from 'react';
+import { type Order } from '@openmrs/esm-service-queues-app/src/types';
 
 export interface WardPatientCardProps {
   patient: Patient;
@@ -25,6 +26,8 @@ export const patientCardElementTypes = [
   'patient-obs',
   'patient-coded-obs-tags',
   'admission-time',
+  'patient-transfer',
+  'patient-pending-orders',
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
@@ -40,6 +43,7 @@ export interface AdmissionLocation {
   ward: Location;
   bedLayouts: Array<BedLayout>;
 }
+
 export interface Bed {
   id: number;
   uuid: string;
@@ -142,6 +146,20 @@ export interface Observation extends OpenmrsResourceStrict {
   voided: boolean;
 }
 
+export interface Diagnosis {
+  uuid: string;
+  display: string;
+  diagnosis: {
+    coded?: {
+      uuid: string;
+      display?: string;
+    };
+    nonCoded?: string;
+  };
+  certainty: string;
+  rank: number;
+}
+
 export interface Encounter extends OpenmrsResourceStrict {
   encounterDatetime?: string;
   patient?: Patient;
@@ -153,7 +171,7 @@ export interface Encounter extends OpenmrsResourceStrict {
   voided?: boolean;
   visit?: Visit;
   encounterProviders?: Array<EncounterProvider>;
-  diagnoses?: any;
+  diagnoses?: Array<Diagnosis>;
 }
 
 export interface EncounterProvider extends OpenmrsResourceStrict {
@@ -172,4 +190,8 @@ export interface EncounterRole extends OpenmrsResourceStrict {
   name?: string;
   description?: string;
   retired?: boolean;
+}
+
+export interface PatientOrderFetchResponse {
+  results: Array<Order>;
 }

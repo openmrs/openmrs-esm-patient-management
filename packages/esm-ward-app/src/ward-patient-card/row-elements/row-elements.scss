@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .bedNumber {
@@ -13,4 +14,37 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.waitingForItemContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  padding-right: spacing.$spacing-03;
+}
+
+.hourGlassIcon {
+  padding: spacing.$spacing-02;
+  padding-right: 0;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: colors.$gray-80;
+}
+
+.movementIcon {
+  padding: spacing.$spacing-02;
+  border-radius: 50%;
+  fill: $ui-03;
+  background-color: $color-blue-60-2;
+  margin-right: spacing.$spacing-02;
+}
+
+.chemistryReferenceIcon {
+  padding: spacing.$spacing-02;
+  border-radius: 50%;
+  fill: colors.$red-20;
+  background-color: colors.$red-70;
+  margin-right: spacing.$spacing-02;
 }

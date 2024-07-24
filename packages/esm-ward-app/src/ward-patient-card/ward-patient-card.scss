@@ -59,9 +59,18 @@
   flex-wrap: wrap;
 }
 
+.wardPatientCardWaitingFor {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  color: $ui-02;
+  background-color: colors.$gray-80;
+}
+
 .wardPatientName {
   @include type.type-style('heading-compact-02');
   color: $text-02;
+
   &::before {
     content: '' !important;
   }
@@ -78,6 +87,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   &.empty {
     background-color: $color-blue-10;
     color: $color-blue-60-2;
@@ -106,6 +116,7 @@
   > div:not(div:first-of-type) {
     display: flex;
     align-items: center;
+
     &::before {
       content: '·';
       padding: 0 spacing.$spacing-02;
