@@ -96,9 +96,11 @@ export interface InpatientRequest {
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';
 
 // InpatientRequestOld[] returned by:
-// GET /rest/emrapi/inpatient/admissionRequests
-// GET /rest/emrapi/inpatient/transferRequests
-// GET /rest/emrapi/inpatient/admissionAndTransferRequests
+//    GET /rest/emrapi/inpatient/visits
+// It is also returned by the following endpoints which have been deprecated:
+//    GET /rest/emrapi/inpatient/admissionRequests
+//    GET /rest/emrapi/inpatient/transferRequests
+//    GET /rest/emrapi/inpatient/admissionAndTransferRequests
 export interface InpatientRequestOld {
   patient: Patient;
   visit: Visit;
