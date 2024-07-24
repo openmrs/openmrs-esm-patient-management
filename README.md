@@ -4,14 +4,15 @@
 
 # OpenMRS Patient Management
 
-This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
+This repository contains frontend modules for O3. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
 
 - [Active visits app](packages/esm-active-visits-app/)
 - [Appointments app](packages/esm-appointments-app/)
-- [Service queues](packages/esm-service-queues-app/README.md)
-- [Patient search](packages/esm-patient-search-app)
-- [Patient registration](packages/esm-patient-registration-app)
+- [Bed management](packages/esm-bed-management-app/)
 - [Patient list management](packages/esm-patient-list-management-app)
+- [Patient registration](packages/esm-patient-registration-app)
+- [Patient search](packages/esm-patient-search-app)
+- [Service queues](packages/esm-service-queues-app/README.md)
 - [Ward](packages/esm-ward-app)
 
 ## Setup
