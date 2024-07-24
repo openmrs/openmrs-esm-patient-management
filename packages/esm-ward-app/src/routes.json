@@ -40,15 +40,16 @@
       "name":"admission-requests-workspace",
       "component": "admissionRequestWorkspace",
       "title":"admissionRequests",
-       "type":"admission-requests"
+      "type":"admission-requests"
     },
     {
-    "name": "ward-patient-workspace",
-    "component": "wardPatientWorkspace",
-    "type": "ward",
-    "title": "Ward Patient",
-    "width": "extra-wide",
-    "hasOwnSidebar": true,
-    "sidebarFamily": "ward-patient"
-  }]
+      "name": "ward-patient-workspace",
+      "component": "wardPatientWorkspace",
+      "type": "ward",
+      "title": "Ward Patient",
+      "width": "extra-wide",
+      "hasOwnSidebar": true,
+      "sidebarFamily": "ward-patient"
+    }
+  ]
 }
