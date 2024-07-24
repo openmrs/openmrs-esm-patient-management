@@ -11,7 +11,9 @@ const wardPatientAddress = (config: PatientAddressElementConfig) => {
 
     return (
       <div className={styles.wardPatientAddress}>
-        {addressFields?.map((field, i) => <div key={i}>{preferredAddress?.[field] as string}</div>)}
+        {addressFields?.map((field, i) =>
+          preferredAddress?.[field] ? <div key={i}>{preferredAddress?.[field] as string}</div> : <></>,
+        )}
       </div>
     );
   };

@@ -12,7 +12,7 @@ import { type Order } from '@openmrs/esm-service-queues-app/src/types';
 export interface WardPatientCardProps {
   patient: Patient;
   visit: Visit;
-  bed: Bed;
+  bed?: Bed;
 }
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;

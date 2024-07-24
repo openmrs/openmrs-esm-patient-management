@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import activeVisitsComponent from './active-visits-widget/active-visits.component';
 import visitDetailComponent from './visits-summary/visit-detail.component';
@@ -19,3 +19,13 @@ export function startupApp() {
 export const activeVisits = getSyncLifecycle(activeVisitsComponent, options);
 
 export const visitDetail = getSyncLifecycle(visitDetailComponent, options);
+
+export const homeActiveVisitsTile = getAsyncLifecycle(
+  () => import('./home-page-tiles/active-visits-metric-tile/active-visits-tile.component'),
+  options,
+);
+
+export const homeTotalVisitsTile = getAsyncLifecycle(
+  () => import('./home-page-tiles/total-visits-metric-tile/total-visits-tile.component'),
+  options,
+);

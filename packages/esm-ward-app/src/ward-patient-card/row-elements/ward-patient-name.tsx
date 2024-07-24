@@ -4,9 +4,9 @@ import styles from '../ward-patient-card.scss';
 
 const WardPatientName: WardPatientCardElement = ({ patient }) => {
   // TODO: BED-10
-  // make server return patient.display and use that instead
-  const { givenName, familyName } = patient?.person?.preferredName;
-  const name = `${givenName} ${familyName}`;
+  // TODO: this is a hack to support both the patient name rep returned by the bed endpoint (given and family) and the display used by the emr api; this should be fixed once the emr api endpoint is updated
+  const { givenName, familyName, display } = patient?.person?.preferredName || {};
+  const name = display ?? `${givenName} ${familyName}`;
   return <div className={styles.wardPatientName}>{name}</div>;
 };
 

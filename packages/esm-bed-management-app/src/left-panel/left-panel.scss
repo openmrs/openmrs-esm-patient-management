@@ -1,0 +1,41 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.leftPanel {
+  border-right: 1px solid colors.$gray-20;
+  padding-top: 1rem;
+
+  // Left nav menu item
+  :global(.cds--side-nav__link) {
+    color: colors.$gray-70;
+    @include type.type-style('heading-compact-01');
+
+    &:focus,
+    &:hover {
+      background-color: colors.$gray-10-hover;
+    }
+
+    // Active menu item
+    &:global(.active-left-nav-link) {
+      color: colors.$gray-100;
+      border-left: 0.25rem solid var(--brand-01);
+      outline: none;
+      padding: 0 0.75rem;
+      background-color: colors.$gray-20;
+    }
+  }
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  :global(.cds--side-nav__link) {
+    height: 2rem;
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  :global(.cds--side-nav__link) {
+    height: 3rem;
+  }
+}

@@ -19,6 +19,15 @@ replace_edited_strings = false
 keep_translations      = false
 resource_name          = esm-appointments-app
 
+[o:openmrs:p:openmrs-esm-patient-management:r:esm-bed-management-app]
+file_filter            = packages/esm-bed-management-app/translations/<lang>.json
+source_file            = packages/esm-bed-management-app/translations/en.json
+source_lang            = en
+type                   = KEYVALUEJSON
+replace_edited_strings = false
+keep_translations      = false
+resource_name          = esm-bed-management-app
+
 [o:openmrs:p:openmrs-esm-patient-management:r:esm-patient-list-management-app]
 file_filter            = packages/esm-patient-list-management-app/translations/<lang>.json
 source_file            = packages/esm-patient-list-management-app/translations/en.json

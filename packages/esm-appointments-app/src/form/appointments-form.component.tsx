@@ -280,9 +280,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     if (response?.data?.hasOwnProperty('SERVICE_UNAVAILABLE')) {
       errorMessage = t('serviceUnavailable', 'Appointment time is outside of service hours');
     } else if (response?.data?.hasOwnProperty('PATIENT_DOUBLE_BOOKING')) {
-      errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+      if (context !== 'editing') {
+        errorMessage = t('patientDoubleBooking', 'Patient already booked for an appointment at this time');
+      } else {
+        errorMessage = null;
+      }
     }
-    if (response.status === 200) {
+
+    if (response.status === 200 && errorMessage) {
       setIsSubmitting(false);
       showSnackbar({
         isLowContrast: true,

@@ -1,4 +1,3 @@
-import { type Visit, type Patient } from '@openmrs/esm-framework';
 import React from 'react';
 import EmptyBed from '../beds/empty-bed.component';
 import { type WardPatient, type Bed } from '../types';

@@ -148,6 +148,11 @@
           "default": "Create new appointment"
         }
       }
+    },
+    {
+      "name": "home-appointments-tile",
+      "slot": "home-metrics-tiles-slot",
+      "component": "homeAppointmentsTile"
     }
   ]
 }

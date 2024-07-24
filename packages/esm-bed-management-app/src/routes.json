@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "pages": [
+    {
+      "component": "root",
+      "route": "bed-management"
+    }
+  ],
+  "extensions": [
+    {
+      "component": "adminCardLink",
+      "name": "bed-management-admin-card-link",
+      "slot": "system-admin-page-card-link-slot"
+    },
+    {
+      "component": "adminLeftPanelLink",
+      "name": "bed-administration-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "bedTypeLeftPanelLink",
+      "name": "bed-type-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "bedTagLeftPanelLink",
+      "name": "bed-tag-left-panel-link",
+      "slot": "bed-management-left-panel-slot"
+    },
+    {
+      "component": "summaryLeftPanelLink",
+      "name": "bed-management-home-dashboard-link",
+      "slot": "bed-management-left-panel-slot",
+      "order": 0
+    },
+    {
+      "component": "bedAdmission",
+      "name": "bed-admission-dashboard",
+      "slot": "bed-admission-dashboard-slot"
+    },
+    {
+      "name": "bed-admission-dashboard-link",
+      "component": "bedAdmissionDashboardLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "bed-admission",
+        "slot": "bed-admission-dashboard-slot",
+        "title": "Bed-admission"
+      }
+    }
+  ]
+}
