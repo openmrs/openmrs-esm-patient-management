@@ -25,6 +25,7 @@ export const patientCardElementTypes = [
   'patient-obs',
   'patient-coded-obs-tags',
   'admission-time',
+  'patient-identifier',
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 

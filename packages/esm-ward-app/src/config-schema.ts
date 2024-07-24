@@ -6,19 +6,23 @@ const defaultWardPatientCard: WardPatientCardDefinition = {
   rows: [
     {
       rowType: 'header',
-      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address'],
+      elements: ['bed-number', 'patient-name', 'patient-age', 'patient-address', 'patient-identifier'],
     },
   ],
   appliedTo: null,
 };
 
 const defaultPatientAddressFields: Array<keyof PersonAddress> = ['cityVillage', 'country'];
-
+const defaultIdentifierTypeUuid = null;
+const defaultLabel = null;
 export const defaultPatientCardElementConfig: PatientCardElementConfig = {
   address: {
     addressFields: defaultPatientAddressFields,
   },
   obs: null,
+  identifier: {
+    identifierTypeUuid: defaultIdentifierTypeUuid,
+  },
   codedObsTags: null,
 };
 
@@ -27,6 +31,7 @@ export const builtInPatientCardElements: PatientCardElementType[] = [
   'patient-name',
   'patient-age',
   'patient-address',
+  'patient-identifier',
 ];
 
 export const configSchema: ConfigSchema = {
@@ -89,6 +94,25 @@ export const configSchema: ConfigSchema = {
               _description:
                 'Optional. If true, limits display to only observations within current visit. Defaults to false',
               _default: false,
+            },
+          },
+          identifier: {
+            _description: 'Config for the patientCardElementType "patient-identifier"',
+            identifierTypeUuid: {
+              _type: Type.UUID,
+              _description: 'The UUID of the identifier type to display',
+              _default: defaultIdentifierTypeUuid,
+            },
+            label: {
+              _type: Type.String,
+              _description:
+                'the custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.',
+              _default: defaultLabel,
+            },
+            labelI18nModule: {
+              _type: Type.String,
+              _description: 'Optional. The custom module to use for translation of the label',
+              _default: null,
             },
           },
           codedObsTags: {
@@ -251,6 +275,22 @@ export interface PatientObsElementConfig {
   onlyWithinCurrentVisit?: boolean;
 }
 
+export interface PatientIdentifierElementConfig {
+  /**
+   * By default the preferred patient identifier is chosen,but
+   * if uuid is given the identifier corresponding to uuid is displayed
+   */
+  identifierTypeUuid: string | null;
+  /**
+   * Optional. The custom label or i18n key to the translated label to display for patient identifier. If not provided, defaults to the patient-identifier name.
+   * (Note that this can be set to an empty string to not show a label)
+   */
+  label?: string;
+  /**
+   * Optional. The custom module to use for translation of the label
+   */
+  labelI18nModule?: string;
+}
 export interface PatientCodedObsTagsElementConfig {
   /**
    * Required. Identifies the concept to use to identify the desired observations.
@@ -298,5 +338,6 @@ export interface PatientCodedObsTagsElementConfig {
 export type PatientCardElementConfig = {
   address: PatientAddressElementConfig;
   obs: PatientObsElementConfig;
+  identifier: PatientIdentifierElementConfig;
   codedObsTags: PatientCodedObsTagsElementConfig;
 };

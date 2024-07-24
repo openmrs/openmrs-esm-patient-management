@@ -16,6 +16,8 @@ import styles from './ward-patient-card.scss';
 import wardPatientObs from './row-elements/ward-patient-obs';
 import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
 
+import wardPatientIdentifier from './row-elements/ward-patient-identifier';
+
 export function usePatientCardRows(location: string) {
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const patientCardRows = useMemo(() => {
@@ -85,6 +87,8 @@ function getPatientCardElementFromDefinition(
     case 'patient-obs': {
       return wardPatientObs(config.obs);
     }
+    case 'patient-identifier':
+      return wardPatientIdentifier(config);
     case 'patient-coded-obs-tags': {
       return wardPatientCodedObsTags(config.codedObsTags);
     }
