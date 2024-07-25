@@ -38,13 +38,16 @@ const WardView = () => {
   );
 };
 
+// display to use if bed management is installed
 const WardViewWithBedManagement = () => {
   const { location } = useWardLocation();
+  // fetch bed information for the ward
   const {
     admissionLocation,
     isLoading: isLoadingLocation,
     error: errorLoadingLocation,
   } = useAdmissionLocation(location?.uuid);
+  // fetch all patients admitted to the waard
   const {
     inpatientAdmissions,
     isLoading: isLoadingPatients,
@@ -61,6 +64,7 @@ const WardViewWithBedManagement = () => {
 
   if (admissionLocation != null || inpatientAdmissions != null) {
     const bedLayouts = admissionLocation && filterBeds(admissionLocation);
+    // iterate over all beds
     const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
@@ -69,6 +73,7 @@ const WardViewWithBedManagement = () => {
         if (inpatientAdmission) {
           return { patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true };
         } else {
+          // for some reason this patient is in a bed but not in the list of admitted patients, so we need to use the patient data from the bed endpoint
           return { patient: patient, visit: null, admitted: false };
         }
       });
@@ -131,6 +136,7 @@ const WardViewWithBedManagement = () => {
   }
 };
 
+// display to use if not using bed management
 const WardViewWithoutBedManagement = () => {
   const { location } = useWardLocation();
   const {
@@ -142,7 +148,6 @@ const WardViewWithoutBedManagement = () => {
 
   if (inpatientAdmissions) {
     const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
-      // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
       return (
         <UnassignedPatient
           wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
