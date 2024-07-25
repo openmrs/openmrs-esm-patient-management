@@ -1,7 +1,5 @@
 import { type Patient, type PersonAddress } from '@openmrs/esm-framework';
-import type { AdmittedPatient, InpatientRequest } from '../packages/esm-ward-app/src/types';
-import { mockLocationInpatientWard } from './locations.mock';
-import { mockPastVisit } from './visits.mock';
+import type { InpatientRequest } from '../packages/esm-ward-app/src/types';
 import { mockAddress } from './address.mock';
 
 // As received by `useInpatientRequest`

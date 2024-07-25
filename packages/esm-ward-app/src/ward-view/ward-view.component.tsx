@@ -8,8 +8,8 @@ import WardBed from './ward-bed.component';
 import { bedLayoutToBed, filterBeds } from './ward-view.resource';
 import styles from './ward-view.scss';
 import WardViewHeader from '../ward-view-header/ward-view-header.component';
-import { type AdmittedPatient, type WardPatient } from '../types';
-import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
+import { type InpatientAdmission, type WardPatient } from '../types';
+import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
 import UnassignedPatient from '../beds/unassigned-patient.component';
 
@@ -46,63 +46,48 @@ const WardViewWithBedManagement = () => {
     error: errorLoadingLocation,
   } = useAdmissionLocation(location?.uuid);
   const {
-    admittedPatients,
+    inpatientAdmissions,
     isLoading: isLoadingPatients,
     error: errorLoadingPatients,
-  } = useAdmittedPatients(location.uuid);
+  } = useInpatientAdmission(location.uuid);
   const { t } = useTranslation();
-  const admittedPatientsByUuid = useMemo(() => {
-    const map = new Map<string, AdmittedPatient>();
-    for (const admittedPatient of admittedPatients ?? []) {
-      map.set(admittedPatient.patient.uuid, admittedPatient);
+  const inpatientAdmissionsByPatientUuid = useMemo(() => {
+    const map = new Map<string, InpatientAdmission>();
+    for (const inpatientAdmission of inpatientAdmissions ?? []) {
+      map.set(inpatientAdmission.patient.uuid, inpatientAdmission);
     }
     return map;
-  }, [admittedPatients]);
+  }, [inpatientAdmissions]);
 
-  if (admissionLocation != null || admittedPatients != null) {
+  if (admissionLocation != null || inpatientAdmissions != null) {
     const bedLayouts = admissionLocation && filterBeds(admissionLocation);
     const wardBeds = bedLayouts?.map((bedLayout) => {
       const { patients } = bedLayout;
       const bed = bedLayoutToBed(bedLayout);
       const wardPatients: WardPatient[] = patients.map((patient) => {
-        const admittedPatient = admittedPatientsByUuid.get(patient.uuid);
-
-        if (admittedPatient) {
-          // ideally, we can just use the patient object within admittedPatient
-          // and not need the one from bedLayouts, however, the emr api
-          // does not respect custom representation right now and does not return
-          // all required fields for the patient object
-          // TODO: change after this is done. https://openmrs.atlassian.net/browse/EA-192
-          return { ...admittedPatient, patient, admitted: true };
+        const inpatientAdmission = inpatientAdmissionsByPatientUuid.get(patient.uuid);
+        if (inpatientAdmission) {
+          return { patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true };
+        } else {
+          return { patient: patient, visit: null, admitted: false };
         }
-
-        // patient assigned a bed but *not* admitted
-        // TODO: get the patient's visit and current location
-        return {
-          patient,
-          visit: null,
-          admitted: true,
-          currentLocation: null,
-          timeSinceAdmissionInMinutes: null,
-          timeAtInpatientLocationInMinutes: null,
-        };
       });
       return <WardBed key={bed.uuid} bed={bed} wardPatients={wardPatients} />;
     });
 
     const patientsInBedsUuids = bedLayouts?.flatMap((bedLayout) => bedLayout.patients.map((patient) => patient.uuid));
     const wardUnassignedPatients =
-      admittedPatients &&
-      admittedPatients
+      inpatientAdmissions &&
+      inpatientAdmissions
         .filter(
-          (admittedPatient) => !patientsInBedsUuids || !patientsInBedsUuids.includes(admittedPatient.patient.uuid),
+          (inpatientAdmission) =>
+            !patientsInBedsUuids || !patientsInBedsUuids.includes(inpatientAdmission.patient.uuid),
         )
-        .map((admittedPatient) => {
-          // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
+        .map((inpatientAdmission) => {
           return (
             <UnassignedPatient
-              wardPatient={{ ...admittedPatient, admitted: true }}
-              key={admittedPatient.patient.uuid}
+              wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+              key={inpatientAdmission.patient.uuid}
             />
           );
         });
@@ -149,17 +134,20 @@ const WardViewWithBedManagement = () => {
 const WardViewWithoutBedManagement = () => {
   const { location } = useWardLocation();
   const {
-    admittedPatients,
+    inpatientAdmissions,
     isLoading: isLoadingPatients,
     error: errorLoadingPatients,
-  } = useAdmittedPatients(location.uuid);
+  } = useInpatientAdmission(location.uuid);
   const { t } = useTranslation();
 
-  if (admittedPatients) {
-    const wardPatients = admittedPatients?.map((admittedPatient) => {
+  if (inpatientAdmissions) {
+    const wardPatients = inpatientAdmissions?.map((inpatientAdmission) => {
       // TODO: note that this might not display all the correct data until https://openmrs.atlassian.net/browse/EA-192 is done
       return (
-        <UnassignedPatient wardPatient={{ ...admittedPatient, admitted: true }} key={admittedPatient.patient.uuid} />
+        <UnassignedPatient
+          wardPatient={{ patient: inpatientAdmission.patient, visit: inpatientAdmission.visit, admitted: true }}
+          key={inpatientAdmission.patient.uuid}
+        />
       );
     });
     return <>{wardPatients}</>;

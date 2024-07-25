@@ -1,4 +1,4 @@
-import type { AdmissionLocation, Bed, BedLayout } from '../types';
+import type { AdmissionLocationFetchResponse, Bed, BedLayout } from '../types';
 
 // the server side has 2 slightly incompatible types for Bed
 export function bedLayoutToBed(bedLayout: BedLayout): Bed {
@@ -13,7 +13,7 @@ export function bedLayoutToBed(bedLayout: BedLayout): Bed {
   };
 }
 
-export function filterBeds(admissionLocation: AdmissionLocation): BedLayout[] {
+export function filterBeds(admissionLocation: AdmissionLocationFetchResponse): BedLayout[] {
   // admissionLocation.bedLayouts can contain row+column positions with no bed,
   // filter out layout positions with no real bed
   let collator = new Intl.Collator([], { numeric: true });
