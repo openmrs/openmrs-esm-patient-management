@@ -6,7 +6,7 @@ export function useInpatientAdmission(locationUuid: string) {
   const customRepresentation =
     'custom:(visit,' +
     'patient:(uuid,identifiers,voided,' +
-    'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate,voided)))';
+    'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)))';
   const apiUrl = `/ws/rest/emrapi/inpatient/admission?currentInpatientLocation=${locationUuid}`;
   const { data, ...rest } = useSWR<FetchResponse<InpatientAdmissionFetchResponse>, Error>(
     locationUuid

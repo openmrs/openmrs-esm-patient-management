@@ -7,7 +7,7 @@ export function useInpatientRequest(locationUuid: string) {
   const customRepresentation =
     'custom:(dispositionType,' +
       'patient:(uuid,identifiers,voided,' +
-        'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate,voided)))'
+        'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)))'
   const { data, ...rest } = useSWR<FetchResponse<InpatientRequestFetchResponse>, Error>(
     locationUuid
       ? `${restBaseUrl}/emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${locationUuid}&v=${customRepresentation}`
