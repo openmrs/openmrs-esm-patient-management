@@ -5,19 +5,13 @@ import { navigate } from '@openmrs/esm-framework';
 import { mockPatient } from '__mocks__';
 import EditPatientDetailsButton from './edit-patient-details-button.component';
 
+const mockNavigate = jest.mocked(navigate);
+
 describe('EditPatientDetailsButton', () => {
   const patientUuid = mockPatient.uuid;
 
   it('should navigate to the edit page when clicked', async () => {
     const user = userEvent.setup();
-    const mockNavigate = navigate as jest.Mock;
-
-    jest.mock('@openmrs/esm-framework', () => {
-      const originalModule = jest.requireActual('@openmrs/esm-framework');
-      return {
-        ...originalModule,
-      };
-    });
 
     render(<EditPatientDetailsButton patientUuid={patientUuid} />);
 

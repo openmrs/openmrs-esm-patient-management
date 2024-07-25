@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AdvancedSearch from './advanced-search.component';
 
-describe('AdvancedSearch: ', () => {
+describe('AdvancedSearch', () => {
   test('renders the advanced patient search in an overlay', async () => {
     renderAdvancedSearch();
 

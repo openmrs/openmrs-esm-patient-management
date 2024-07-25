@@ -1,12 +1,17 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import QueueServiceForm from './queue-service-form.workspace';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useLayoutType: () => 'desktop',
-  showSnackbar: jest.fn(),
-}));
+const defaultProps = {
+  closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
+  closeWorkspaceWithSavedChanges: jest.fn(),
+  setTitle: jest.fn(),
+};
+
+const mockUseLayoutType = jest.mocked(useLayoutType);
 
 jest.mock('./queue-service.resource', () => ({
   useServiceConcepts: () => ({
@@ -28,22 +33,24 @@ jest.mock('../patient-search/hooks/useQueueLocations', () => ({
 }));
 
 describe('QueueServiceForm', () => {
+  beforeEach(() => {
+    mockUseLayoutType.mockReturnValue('tablet');
+  });
+
   it('should display required error messages when form is submitted with missing fields', async () => {
     const user = userEvent.setup();
 
-    render(<QueueServiceForm toggleSearchType={() => {}} closePanel={() => {}} />);
+    renderQueueServiceForm();
 
     const submitButton = screen.getByText('Save');
-
     await user.click(submitButton);
-
     expect(screen.getByText('Missing queue name')).toBeInTheDocument();
   });
 
   it('should submit the form when all fields are filled', async () => {
     const user = userEvent.setup();
 
-    render(<QueueServiceForm toggleSearchType={() => {}} closePanel={() => {}} />);
+    renderQueueServiceForm();
 
     const queueNameInput = screen.getByLabelText('Queue name');
     const serviceSelect = screen.getByLabelText('Select a service type');
@@ -58,3 +65,7 @@ describe('QueueServiceForm', () => {
     expect(locationSelect).toHaveValue('34567eb0-b035-4acd-b284-da45f5067502');
   });
 });
+
+function renderQueueServiceForm() {
+  return render(<QueueServiceForm {...defaultProps} />);
+}

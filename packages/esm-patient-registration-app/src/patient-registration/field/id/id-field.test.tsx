@@ -1,74 +1,76 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import { Identifiers } from './id-field.component';
-import { type Resources, ResourcesContext } from '../../../offline.resources';
 import { Form, Formik } from 'formik';
-import { PatientRegistrationContext } from '../../patient-registration-context';
-import { openmrsID, mockedIdentifierTypes } from '__mocks__';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { Identifiers } from './id-field.component';
+import { mockOpenmrsId, mockIdentifierTypes, mockPatient, mockSession } from '__mocks__';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
+import { type Resources, ResourcesContext } from '../../../offline.resources';
+import { PatientRegistrationContext, type PatientRegistrationContextProps } from '../../patient-registration-context';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn().mockImplementation(() => ({
-    defaultPatientIdentifierTypes: ['OpenMRS ID'],
-  })),
-}));
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+
+const mockResourcesContextValue = {
+  addressTemplate: null,
+  currentSession: mockSession.data,
+  identifierTypes: [],
+  relationshipTypes: [],
+} as Resources;
+
+const mockInitialFormValues = {
+  additionalFamilyName: '',
+  additionalGivenName: '',
+  additionalMiddleName: '',
+  addNameInLocalLanguage: false,
+  address: {},
+  birthdate: null,
+  birthdateEstimated: false,
+  deathCause: '',
+  deathDate: '',
+  familyName: 'Doe',
+  gender: 'male',
+  givenName: 'John',
+  identifiers: mockOpenmrsId,
+  isDead: false,
+  middleName: 'Test',
+  monthsEstimated: 0,
+  patientUuid: mockPatient.uuid,
+  relationships: [],
+  telephoneNumber: '',
+  yearsEstimated: 0,
+};
+
+const initialContextValues: PatientRegistrationContextProps = {
+  currentPhoto: null,
+  inEditMode: false,
+  identifierTypes: [],
+  initialFormValues: mockInitialFormValues,
+  isOffline: false,
+  setCapturePhotoProps: jest.fn(),
+  setFieldValue: jest.fn(),
+  setInitialFormValues: jest.fn(),
+  validationSchema: null,
+  values: mockInitialFormValues,
+};
 
 describe('Identifiers', () => {
-  const mockResourcesContextValue = {
-    addressTemplate: {},
-    currentSession: {
-      authenticated: true,
-      sessionId: 'JSESSION',
-      currentProvider: { uuid: 'provider-uuid', identifier: 'PRO-123' },
-    },
-    relationshipTypes: [],
-    identifierTypes: [...mockedIdentifierTypes],
-  } as Resources;
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
+      defaultPatientIdentifierTypes: ['OpenMRS ID'],
+    });
+  });
 
   it('should render loading skeleton when identifier types are loading', () => {
-    render(
-      <ResourcesContext.Provider value={[]}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider
-              value={{
-                setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
-                setInitialFormValues: jest.fn(),
-                values: {
-                  identifiers: { openmrsID },
-                },
-              }}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
-    );
-    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
+    renderIdentifiers(initialContextValues);
+
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('should render identifier inputs when identifier types are loaded', () => {
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider
-              value={{
-                setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
-                setInitialFormValues: jest.fn(),
-                values: {
-                  identifiers: { openmrsID },
-                },
-              }}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
-    );
+    mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
+    renderIdentifiers(initialContextValues);
 
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
     const configureButton = screen.getByRole('button', { name: 'Configure' });
@@ -78,26 +80,8 @@ describe('Identifiers', () => {
 
   it('should open identifier selection overlay when "Configure" button is clicked', async () => {
     const user = userEvent.setup();
-
-    render(
-      <ResourcesContext.Provider value={mockResourcesContextValue}>
-        <Formik initialValues={{}} onSubmit={null}>
-          <Form>
-            <PatientRegistrationContext.Provider
-              value={{
-                setFieldValue: jest.fn(),
-                initialFormValues: { identifiers: { ...mockedIdentifierTypes[0] } },
-                setInitialFormValues: jest.fn(),
-                values: {
-                  identifiers: { openmrsID },
-                },
-              }}>
-              <Identifiers />
-            </PatientRegistrationContext.Provider>
-          </Form>
-        </Formik>
-      </ResourcesContext.Provider>,
-    );
+    mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
+    renderIdentifiers(initialContextValues);
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });
     await user.click(configureButton);
@@ -105,3 +89,17 @@ describe('Identifiers', () => {
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
   });
 });
+
+function renderIdentifiers(contextValues: PatientRegistrationContextProps) {
+  render(
+    <ResourcesContext.Provider value={mockResourcesContextValue}>
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <PatientRegistrationContext.Provider value={contextValues}>
+            <Identifiers />
+          </PatientRegistrationContext.Provider>
+        </Form>
+      </Formik>
+    </ResourcesContext.Provider>,
+  );
+}

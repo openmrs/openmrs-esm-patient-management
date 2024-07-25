@@ -36,7 +36,7 @@ export function useAppointments(patientUuid: string, startDate: string) {
 
   return {
     upcomingAppointment: upcomingAppointment ? upcomingAppointment : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
   };

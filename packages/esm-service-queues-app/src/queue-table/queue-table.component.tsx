@@ -1,6 +1,9 @@
 import React, { useEffect, useState, type FC } from 'react';
+import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  DataTableSkeleton,
   InlineLoading,
   Pagination,
   Table,
@@ -18,12 +21,9 @@ import {
   Tile,
 } from '@carbon/react';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { type QueueEntry, type QueueTableColumn } from '../types';
-import styles from './queue-table.scss';
 import { useColumns } from './cells/columns.resource';
-import classNames from 'classnames';
-import { DataTableSkeleton } from '@carbon/react';
+import styles from './queue-table.scss';
 
 interface QueueTableProps {
   queueEntries: QueueEntry[];

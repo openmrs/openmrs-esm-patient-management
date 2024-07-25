@@ -77,7 +77,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
 
   return {
     data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
-    isError: error,
+    error,
     isLoading,
     isValidating,
     mutate,
@@ -92,7 +92,7 @@ export function useAppointmentService() {
 
   return {
     data: data ? data.data : null,
-    isError: error,
+    error,
     isLoading,
   };
 }

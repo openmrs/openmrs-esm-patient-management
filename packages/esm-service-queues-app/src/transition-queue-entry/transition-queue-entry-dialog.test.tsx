@@ -1,49 +1,28 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { navigate } from '@openmrs/esm-framework';
-import { serveQueueEntry, updateQueueEntry } from '../active-visits/active-visits-table.resource';
+import { render, screen } from '@testing-library/react';
+import { getDefaultsFromConfigSchema, navigate, useConfig } from '@openmrs/esm-framework';
+import { configSchema, type ConfigObject } from '../config-schema';
+import {
+  type MappedVisitQueueEntry,
+  serveQueueEntry,
+  updateQueueEntry,
+} from '../active-visits/active-visits-table.resource';
 import { requeueQueueEntry } from './transition-queue-entry.resource';
 import TransitionQueueEntryModal from './transition-queue-entry-dialog.component';
 
-const mockedNavigate = navigate as jest.Mock;
+const mockNavigate = jest.mocked(navigate);
+const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  useTranslation: () => ({ t: jest.fn((key) => key) }),
-  navigate: jest.fn(),
   toOmrsIsoString: jest.fn(),
   toDateObjectStrict: jest.fn(),
-  useConfig: jest.fn(() => ({
-    concepts: {
-      defaultTransitionStatus: 'some-default-transition-status',
-    },
-    defaultIdentifierTypes: [
-      {
-        fieldName: 'openMrsId',
-        format: null,
-        identifierSources: [
-          {
-            uuid: '8549f706-7e85-4c1d-9424-217d50a2988b',
-            name: 'Generator for OpenMRS ID',
-            description: 'Generator for OpenMRS ID',
-            baseCharacterSet: '0123456789ACDEFGHJKLMNPRTUVWXY',
-            prefix: '',
-          },
-        ],
-        isPrimary: true,
-        name: 'OpenMRS ID',
-        required: true,
-        uniquenessBehavior: 'UNIQUE',
-        uuid: '05a29f94-c0ed-11e2-94be-8c13b969e334',
-      },
-    ],
-  })),
 }));
 
 jest.mock('../active-visits/active-visits-table.resource', () => ({
-  serveQueueEntry: jest.fn(() => Promise.resolve({ status: 200 })),
-  updateQueueEntry: jest.fn(() => Promise.resolve({ status: 201 })),
+  serveQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
+  updateQueueEntry: jest.fn().mockResolvedValue({ status: 201 }),
 }));
 
 jest.mock('../hooks/useQueueEntries', () => ({
@@ -51,7 +30,7 @@ jest.mock('../hooks/useQueueEntries', () => ({
 }));
 
 jest.mock('./transition-queue-entry.resource', () => ({
-  requeueQueueEntry: jest.fn(() => Promise.resolve({ status: 200 })),
+  requeueQueueEntry: jest.fn().mockResolvedValue({ status: 200 }),
 }));
 
 describe('TransitionQueueEntryModal', () => {
@@ -66,7 +45,17 @@ describe('TransitionQueueEntryModal', () => {
       name: 'Triage Queue',
     },
     name: 'John Doe',
-  };
+  } as unknown as MappedVisitQueueEntry;
+
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(configSchema),
+      concepts: {
+        defaultTransitionStatus: 'some-default-transition-status',
+      },
+      defaultIdentifierTypes: ['05ee9cf4-7242-4a17-b4d4-00f707265c8a', 'f85081e2-b4be-4e48-b3a4-7994b69bb101'],
+    } as ConfigObject);
+  });
 
   it('renders modal content', () => {
     const closeModal = jest.fn();
@@ -96,7 +85,7 @@ describe('TransitionQueueEntryModal', () => {
     await user.click(screen.getByText('Serve'));
 
     expect(updateQueueEntry).toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalled();
     expect(serveQueueEntry).toHaveBeenCalled();
-    expect(mockedNavigate).toHaveBeenCalled();
   });
 });

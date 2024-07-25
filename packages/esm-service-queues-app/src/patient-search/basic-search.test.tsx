@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BasicSearch from './basic-search.component';
 
-describe('BasicSearch: ', () => {
+describe('BasicSearch', () => {
   test('renders the basic patient search in an overlay', () => {
     renderBasicSearch();
 

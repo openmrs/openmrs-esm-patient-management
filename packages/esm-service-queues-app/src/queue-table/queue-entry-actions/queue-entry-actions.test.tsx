@@ -1,13 +1,13 @@
-import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
-import { screen } from '@testing-library/react';
-import { mockQueueEntryBrian, mockQueueSurgery, mockStatusInService, mockQueues } from '__mocks__';
 import React from 'react';
-import { renderWithSwr } from 'tools';
-import TransitionQueueEntryModal from './transition-queue-entry.modal';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
+import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { mockQueueEntryBrian, mockQueueSurgery, mockStatusInService, mockQueues } from '__mocks__';
+import { renderWithSwr } from 'tools';
 import EditQueueEntryModal from './edit-queue-entry.modal';
+import TransitionQueueEntryModal from './transition-queue-entry.modal';
 
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('../../hooks/useQueues', () => {
   return {
@@ -17,7 +17,7 @@ jest.mock('../../hooks/useQueues', () => {
   };
 });
 
-describe('TransitionQueueEntryModal: ', () => {
+describe('TransitionQueueEntryModal', () => {
   const queueEntry = mockQueueEntryBrian;
   const { queue } = queueEntry;
   const { allowedStatuses, allowedPriorities } = queue;
@@ -57,7 +57,7 @@ describe('TransitionQueueEntryModal: ', () => {
   });
 
   it('has an working submit button when selected queue and status is different from before', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
     });
     const user = userEvent.setup();
@@ -79,12 +79,12 @@ describe('TransitionQueueEntryModal: ', () => {
     expect(submitButton).toBeEnabled();
     await submitButton.click();
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
+    expect(mockOpenmrsFetch).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalled();
   });
 });
 
-describe('EditQueueEntryModal: ', () => {
+describe('EditQueueEntryModal', () => {
   const queueEntry = mockQueueEntryBrian;
   const { queue } = queueEntry;
   const { allowedStatuses, allowedPriorities } = queue;
@@ -124,7 +124,7 @@ describe('EditQueueEntryModal: ', () => {
   });
 
   it('has an working submit button when selected queue and status is different from before', async () => {
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       status: 200,
     });
     const user = userEvent.setup();
@@ -146,7 +146,7 @@ describe('EditQueueEntryModal: ', () => {
     expect(submitButton).toBeEnabled();
     await submitButton.click();
 
-    expect(mockedOpenmrsFetch).toHaveBeenCalled();
+    expect(mockOpenmrsFetch).toHaveBeenCalled();
     expect(showSnackbar).toHaveBeenCalled();
   });
 });

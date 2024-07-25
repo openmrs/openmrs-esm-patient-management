@@ -6,9 +6,9 @@ import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
-const mockedUseLocation = jest.mocked(useLocation);
-const mockedUseSession = jest.mocked(useSession);
-const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseLocation = jest.mocked(useLocation);
+const mockUseSession = jest.mocked(useSession);
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -17,7 +17,7 @@ jest.mock('react-router-dom', () => ({
 
 describe('ListsDashboard', () => {
   beforeEach(() => {
-    mockedUseLocation.mockReturnValue({
+    mockUseLocation.mockReturnValue({
       pathname: '/',
       search: '',
       hash: '',
@@ -25,9 +25,9 @@ describe('ListsDashboard', () => {
       key: 'default',
     });
 
-    mockedUseSession.mockReturnValue(mockSession.data);
+    mockUseSession.mockReturnValue(mockSession.data);
 
-    mockedOpenmrsFetch.mockResolvedValue({
+    mockOpenmrsFetch.mockResolvedValue({
       data: {
         results: [
           {

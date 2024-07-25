@@ -3,40 +3,45 @@ import dayjs from 'dayjs';
 import { Formik, Form } from 'formik';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
+import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../config-schema';
 import { DobField } from './dob.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
 import { type FormValues } from '../../patient-registration.types';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return {
-    ...originalModule,
-    useConfig: jest.fn().mockImplementation(() => ({
+const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  getLocale: jest.fn().mockReturnValue('en'),
+  OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
+    return (
+      <>
+        <label htmlFor={id}>{labelText}</label>
+        <input
+          id={id}
+          value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
+          onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
+        />
+      </>
+    );
+  }),
+}));
+
+describe('Dob', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue({
+      ...getDefaultsFromConfigSchema(esmPatientRegistrationSchema),
       fieldConfigurations: {
         dateOfBirth: {
           allowEstimatedDateOfBirth: true,
           useEstimatedDateOfBirth: { enabled: true, dayOfMonth: 0, month: 0 },
         },
-      },
-    })),
-    getLocale: jest.fn().mockReturnValue('en'),
-    OpenmrsDatePicker: jest.fn().mockImplementation(({ id, labelText, value, onChange }) => {
-      return (
-        <>
-          <label htmlFor={id}>{labelText}</label>
-          <input
-            id={id}
-            value={value ? dayjs(value).format('DD/MM/YYYY') : undefined}
-            onChange={(evt) => onChange(dayjs(evt.target.value).toDate())}
-          />
-        </>
-      );
-    }),
-  };
-});
+      } as RegistrationConfig['fieldConfigurations'],
+    });
+  });
 
-describe('Dob', () => {
   it('renders the fields in the birth section of the registration form', async () => {
     renderDob();
 

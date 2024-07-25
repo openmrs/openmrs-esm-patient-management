@@ -11,7 +11,6 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import {
   updateSelectedQueueStatus,
   updateSelectedService,
@@ -19,13 +18,14 @@ import {
   useSelectedQueueStatus,
   useSelectedService,
 } from '../helpers/helpers';
+import { useColumns } from './cells/columns.resource';
 import { useQueueEntries } from '../hooks/useQueueEntries';
+import useQueueStatuses from '../hooks/useQueueStatuses';
+import useQueueServices from '../hooks/useQueueService';
+import ClearQueueEntries from '../clear-queue-entries-dialog/clear-queue-entries.component';
 import QueueTableExpandedRow from './queue-table-expanded-row.component';
 import QueueTable from './queue-table.component';
 import styles from './queue-table.scss';
-import { useColumns } from './cells/columns.resource';
-import useQueueStatuses from '../hooks/useQueueStatuses';
-import useQueueServices from '../hooks/useQueueService';
 
 const serviceQueuesPatientSearchWorkspace = 'service-queues-patient-search';
 

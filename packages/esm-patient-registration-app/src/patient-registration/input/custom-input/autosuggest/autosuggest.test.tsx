@@ -1,8 +1,8 @@
 import React from 'react';
-import { Autosuggest } from './autosuggest.component';
 import { BrowserRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Autosuggest } from './autosuggest.component';
 
 const mockPersons = [
   {
@@ -23,17 +23,15 @@ const mockPersons = [
   },
 ];
 
-const mockedGetSearchResults = async (query: string) => {
+const mockGetSearchResults = async (query: string) => {
   return mockPersons.filter((person) => {
     return person.display.toUpperCase().includes(query.toUpperCase());
   });
 };
 
-const mockedHandleSuggestionSelected = jest.fn((field, value) => [field, value]);
+const mockHandleSuggestionSelected = jest.fn((field, value) => [field, value]);
 
 describe('Autosuggest', () => {
-  afterEach(() => mockedHandleSuggestionSelected.mockClear());
-
   it('renders a search box', () => {
     renderAutosuggest();
 
@@ -74,7 +72,7 @@ describe('Autosuggest', () => {
     const listitems = screen.getAllByRole('listitem');
     await user.click(listitems[0]);
 
-    expect(mockedHandleSuggestionSelected).toHaveBeenLastCalledWith('person', 'randomuuid1');
+    expect(mockHandleSuggestionSelected).toHaveBeenLastCalledWith('person', 'randomuuid1');
 
     list = screen.queryByRole('list');
     expect(list).not.toBeInTheDocument();
@@ -119,12 +117,12 @@ function renderAutosuggest() {
   render(
     <BrowserRouter>
       <Autosuggest
-        getSearchResults={mockedGetSearchResults}
+        getSearchResults={mockGetSearchResults}
         getDisplayValue={(item) => item.display}
         getFieldValue={(item) => item.uuid}
         id="person"
         labelText=""
-        onSuggestionSelected={mockedHandleSuggestionSelected}
+        onSuggestionSelected={mockHandleSuggestionSelected}
         placeholder="Find Person"
       />
     </BrowserRouter>,

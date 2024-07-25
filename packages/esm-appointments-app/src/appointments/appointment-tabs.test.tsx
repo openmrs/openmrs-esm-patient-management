@@ -1,6 +1,5 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockAppointmentsData } from '__mocks__';
@@ -10,8 +9,6 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
-    const user = userEvent.setup();
-
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockAppointmentsData.data });
 
     renderAppointmentTabs();

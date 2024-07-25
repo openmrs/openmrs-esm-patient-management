@@ -38,7 +38,7 @@ const tableHeaders = [
   },
 ];
 
-const testProps = {
+const defaultProps = {
   title: 'Scheduled appointments',
   patientData: mockMappedAppointmentsData.data,
   headers: tableHeaders,
@@ -46,7 +46,7 @@ const testProps = {
   isLoading: false,
 };
 
-describe('QueuePatientBaseTable: ', () => {
+describe('QueuePatientBaseTable', () => {
   it('renders a tabular overview of appointments data when available', async () => {
     const user = userEvent.setup();
 
@@ -80,14 +80,13 @@ describe('QueuePatientBaseTable: ', () => {
   });
 
   it('renders an empty state view if data is unavailable', async () => {
-    testProps.patientData = [];
-    renderQueueBaseTable();
+    renderQueueBaseTable({ patientData: [] });
 
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
   });
 });
 
-function renderQueueBaseTable() {
-  renderWithSwr(<QueuePatientBaseTable {...testProps} />);
+function renderQueueBaseTable(props = {}) {
+  renderWithSwr(<QueuePatientBaseTable {...defaultProps} {...props} />);
 }

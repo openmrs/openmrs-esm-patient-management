@@ -3,18 +3,14 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DummyDataInput, dummyFormValues } from './dummy-data-input.component';
 import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration-types';
+import { type FormValues } from '../../patient-registration.types';
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  validator: jest.fn(),
+}));
 
-  return {
-    ...originalModule,
-    validator: jest.fn(),
-  };
-});
-
-describe('dummy data input', () => {
+describe('Dummy data input', () => {
   let formValues: FormValues = initialFormValues;
 
   const setupInput = async () => {

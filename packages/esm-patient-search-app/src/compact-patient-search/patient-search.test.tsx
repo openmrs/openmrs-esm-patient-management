@@ -6,10 +6,10 @@ import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
 
-const mockedUseConfig = jest.mocked(useConfig);
+const mockUseConfig = jest.mocked(useConfig);
 
 describe('PatientSearch', () => {
-  beforeEach(() => mockedUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
+  beforeEach(() => mockUseConfig.mockReturnValue(getDefaultsFromConfigSchema(configSchema)));
 
   it('renders a loading state when search results are being fetched', () => {
     renderPatientSearch({
@@ -73,6 +73,7 @@ describe('PatientSearch', () => {
               uuid: '44c3efb0-2583-4c80-a79e-1f756a03c0a1',
               display: 'Outpatient Clinic',
             },
+            preferred: true,
           },
         ],
         person: {

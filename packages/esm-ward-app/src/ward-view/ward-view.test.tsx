@@ -1,12 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import {
-  type Person,
-  type ConfigSchema,
-  getDefaultsFromConfigSchema,
-  useConfig,
-  useFeatureFlag,
-} from '@openmrs/esm-framework';
+import { type ConfigSchema, getDefaultsFromConfigSchema, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import { mockAdmissionLocation, mockInpatientAdmissions } from '__mocks__';
 import { renderWithSwr } from 'tools';
@@ -20,7 +14,7 @@ jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
 });
 
-const mockedUseFeatureFlag = useFeatureFlag as jest.Mock;
+const mockUseFeatureFlag = jest.mocked(useFeatureFlag);
 
 jest.mock('../hooks/useWardLocation', () =>
   jest.fn().mockReturnValue({
@@ -31,13 +25,13 @@ jest.mock('../hooks/useWardLocation', () =>
   }),
 );
 
-const mockedUseWardLocation = useWardLocation as jest.Mock;
+const mockUseWardLocation = jest.mocked(useWardLocation);
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: jest.fn().mockReturnValue({}),
 }));
-const mockedUseParams = useParams as jest.Mock;
+const mockUseParams = useParams as jest.Mock;
 
 jest.mock('../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
@@ -61,7 +55,7 @@ jest.mocked(useInpatientAdmission).mockReturnValue({
   inpatientAdmissions: mockInpatientAdmissions,
 });
 
-describe('WardView:', () => {
+describe('WardView', () => {
   it('renders the session location when no location provided in URL', () => {
     renderWithSwr(<WardView />);
     const header = screen.getByRole('heading', { name: 'mock location' });
@@ -69,7 +63,7 @@ describe('WardView:', () => {
   });
 
   it('renders the location provided in URL', () => {
-    mockedUseParams.mockReturnValueOnce({ locationUuid: 'abcd' });
+    mockUseParams.mockReturnValueOnce({ locationUuid: 'abcd' });
     renderWithSwr(<WardView />);
     const header = screen.getByRole('heading', { name: 'mock location' });
     expect(header).toBeInTheDocument();
@@ -88,14 +82,14 @@ describe('WardView:', () => {
   });
 
   it('renders all admitted patients even if bed management module not installed', async () => {
-    mockedUseFeatureFlag.mockReturnValueOnce(false);
+    mockUseFeatureFlag.mockReturnValueOnce(false);
     renderWithSwr(<WardView />);
     const admittedPatientWithoutBed = screen.queryByText('Brian Johnson');
     expect(admittedPatientWithoutBed).toBeInTheDocument();
   });
 
   it('renders notification for invalid location uuid', () => {
-    mockedUseWardLocation.mockReturnValueOnce({
+    mockUseWardLocation.mockReturnValueOnce({
       location: null,
       isLoadingLocation: false,
       errorFetchingLocation: null,
@@ -118,7 +112,7 @@ describe('WardView:', () => {
       isLoading: false,
       admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
     });
-    mockedUseFeatureFlag.mockReturnValueOnce(true);
+    mockUseFeatureFlag.mockReturnValueOnce(true);
 
     renderWithSwr(<WardView />);
     const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
@@ -134,7 +128,7 @@ describe('WardView:', () => {
       isLoading: false,
       admissionLocation: { ...mockAdmissionLocation, bedLayouts: [] },
     });
-    mockedUseFeatureFlag.mockReturnValueOnce(false);
+    mockUseFeatureFlag.mockReturnValueOnce(false);
 
     renderWithSwr(<WardView />);
     const noBedsConfiguredForThisLocation = screen.queryByText('No beds configured for this location');
