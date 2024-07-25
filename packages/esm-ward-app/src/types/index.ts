@@ -16,6 +16,8 @@ export interface WardPatientCardProps {
 
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
 export type WardPatientCardElement = React.FC<WardPatientCardProps>;
+
+// WardPatient is a patient admitted to a ward, and/or in a bed on a ward
 export type WardPatient = {
   patient: Patient;
   visit?: Visit;
