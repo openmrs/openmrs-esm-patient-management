@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import OccupiedBed from './occupied-bed.component';
 import React from 'react';
-import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { bedLayoutToBed, filterBeds } from '../ward-view/ward-view.resource';
 import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
-import { mockAdmittedPatient } from '../../../../__mocks__/ward-patient';
+import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
+import { mockAdmittedPatient } from '../../../../__mocks__/patient.mock';
 
 const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
@@ -41,7 +41,13 @@ describe('Occupied bed: ', () => {
       <OccupiedBed
         wardPatients={[
           { ...mockAdmittedPatient, admitted: true },
-          { ...mockAdmittedPatient, admitted: true },
+          {
+            ...{
+              ...mockAdmittedPatient,
+              patient: { ...mockAdmittedPatient.patient, uuid: 'other-uuid' },
+              admitted: true,
+            },
+          },
         ]}
         bed={mockBed}
       />,
