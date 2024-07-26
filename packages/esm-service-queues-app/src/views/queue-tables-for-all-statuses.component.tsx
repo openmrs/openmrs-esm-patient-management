@@ -171,14 +171,16 @@ function QueueTableForQueueAndStatus({
   const filteredQueueEntries = filterQueueEntries(queueEntries, searchTerm, statusUuid);
   return (
     <div className={styles.statusTableContainer}>
-      <QueueTable
-        key={statusUuid}
-        queueEntries={filteredQueueEntries}
-        header={status.display}
-        isValidating={isValidating}
-        queueUuid={queue.uuid}
-        statusUuid={statusUuid}
-      />
+      <h5 className={styles.statusTableHeader}>{status.display}</h5>
+      <div className={styles.container}>
+        <QueueTable
+          key={statusUuid}
+          queueEntries={filteredQueueEntries}
+          isValidating={isValidating}
+          queueUuid={queue.uuid}
+          statusUuid={statusUuid}
+        />
+      </div>
     </div>
   );
 }
