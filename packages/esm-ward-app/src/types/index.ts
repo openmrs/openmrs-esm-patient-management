@@ -18,6 +18,13 @@ export interface WardPatientCardProps {
 export type WardPatientCardRow = React.FC<WardPatientCardProps>;
 export type WardPatientCardElement = React.FC<WardPatientCardProps>;
 
+// WardPatient is a patient admitted to a ward, and/or in a bed on a ward
+export type WardPatient = {
+  patient: Patient;
+  visit?: Visit;
+  admitted: boolean;
+};
+
 export const patientCardElementTypes = [
   'bed-number',
   'patient-name',
@@ -30,13 +37,10 @@ export const patientCardElementTypes = [
 ] as const;
 export type PatientCardElementType = (typeof patientCardElementTypes)[number];
 
-// a Ward Patient can either be a patient that is already admitted or a
-// patient that is awaiting admission
-export type WardPatient = (AdmittedPatient & { admitted: true }) | (InpatientRequestOld & { admitted: false });
-
 // server-side types defined in openmrs-module-bedmanagement:
 
-export interface AdmissionLocation {
+// note "AdmissionLocationResponse" isn't the clearest name, but it matches the endpoint; endpoint fetches bed information (including info about patients in those beds) for a location (as provided by the bed management module)
+export interface AdmissionLocationFetchResponse {
   totalBeds: number;
   occupiedBeds: number;
   ward: Location;
@@ -101,40 +105,14 @@ export interface InpatientRequest {
 
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';
 
-// InpatientRequestOld[] returned by:
-//    GET /rest/emrapi/inpatient/visits
-// It is also returned by the following endpoints which have been deprecated:
-//    GET /rest/emrapi/inpatient/admissionRequests
-//    GET /rest/emrapi/inpatient/transferRequests
-//    GET /rest/emrapi/inpatient/admissionAndTransferRequests
-/**
- * @deprecated
- */
-export interface InpatientRequestOld {
-  patient: Patient;
-  visit: Visit;
-  type: DispositionTypeOld;
-
-  // as of now, these fields are not included in the backend
-  encounter?: Encounter;
-  dispositionObs?: Observation;
-  dispositionLocation?: Location;
-  dispositionDate?: Date;
+// GET /rest/emrapi/inpatient/visits
+export interface InpatientAdmissionFetchResponse {
+  results: InpatientAdmission[];
 }
 
-/**
- * @deprecated
- */
-export type DispositionTypeOld = 'ADMISSION' | 'TRANSFER' | 'DISCHARGE';
-
-// AdmittedPatient[] returned by:
-// GET /rest/emrapi/inpatient/visits
-export interface AdmittedPatient {
+export interface InpatientAdmission {
   patient: Patient;
   visit: Visit;
-  currentLocation: Location;
-  timeSinceAdmissionInMinutes: number;
-  timeAtInpatientLocationInMinutes: number;
 }
 
 // TODO: Move these types to esm-core

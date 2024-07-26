@@ -1,6 +1,5 @@
 import { type Patient, type PersonAddress } from '@openmrs/esm-framework';
 import { mockAddress } from './address.mock';
-import { type AdmittedPatient } from '../packages/esm-ward-app/src/types';
 import { mockPastVisit } from './visits.mock';
 import { mockLocationInpatientWard } from './locations.mock';
 
@@ -22,6 +21,8 @@ export const mockPatientAlice: Patient = {
     causeOfDeath: null,
     preferredName: {
       display: 'Alice Johnson',
+      givenName: 'Alice',
+      familyName: 'Johnson',
       uuid: 'preferred-name-uuid',
     },
     preferredAddress: mockAddress as PersonAddress,
@@ -50,6 +51,12 @@ export const mockPatientBrian: Patient = {
     causeOfDeath: null,
     preferredName: null,
     preferredAddress: mockAddress as PersonAddress,
+    preferredName: {
+      display: 'Brian Johnson',
+      givenName: 'Brian ',
+      familyName: 'Johnson',
+      uuid: 'preferred-name-uuid',
+    },
     names: [null],
     addresses: [],
     attributes: [],
@@ -57,12 +64,4 @@ export const mockPatientBrian: Patient = {
     deathdateEstimated: null,
     causeOfDeathNonCoded: null,
   },
-};
-
-export const mockAdmittedPatient: AdmittedPatient = {
-  patient: mockPatientAlice,
-  visit: mockPastVisit.data.results[0],
-  currentLocation: mockLocationInpatientWard,
-  timeAtInpatientLocationInMinutes: 100,
-  timeSinceAdmissionInMinutes: 500,
 };
