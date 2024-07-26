@@ -8,13 +8,11 @@ import useWardLocation from '../hooks/useWardLocation';
 import styles from './admission-requests.scss';
 
 const AdmissionRequestsBar = () => {
-  const { location } = useWardLocation();
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(location?.uuid);
-  const admissionRequests = inpatientRequests?.filter((request) => request.type == 'ADMISSION');
+  const { inpatientRequests, isLoading, error } = useInpatientRequest(['ADMIT']);
   const { t } = useTranslation();
   const layout = useLayoutType();
 
-  if (isLoading || !admissionRequests?.length) {
+  if (isLoading || !inpatientRequests?.length) {
     return null;
   }
 
@@ -33,11 +31,11 @@ const AdmissionRequestsBar = () => {
       <Movement className={styles.movementIcon} size="24" />
       <span className={styles.content}>
         {t('admissionRequestsCount', '{{count}} admission requests', {
-          count: admissionRequests.length,
+          count: inpatientRequests.length,
         })}
       </span>
       <Button
-        onClick={() => launchWorkspace('admission-requests-workspace', { admissionRequests })}
+        onClick={() => launchWorkspace('admission-requests-workspace', { inpatientRequests })}
         renderIcon={ArrowRightIcon}
         kind="ghost"
         size={isDesktop(layout) ? 'sm' : 'lg'}>

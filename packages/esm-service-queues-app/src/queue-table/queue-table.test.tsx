@@ -80,7 +80,7 @@ describe('QueueTable', () => {
     renderWithSwr(<QueueTable queueEntries={mockQueueEntries} statusUuid={null} queueUuid={null} />);
 
     for (const entry of mockQueueEntries) {
-      const patientName = entry.patient.display;
+      const patientName = entry.patient.person.display;
       const row = screen.getByText(patientName).closest('tr');
 
       expect(within(row).getByText(entry.status.display)).toBeInTheDocument();

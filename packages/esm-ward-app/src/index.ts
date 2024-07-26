@@ -22,11 +22,13 @@ export const root = getSyncLifecycle(rootComponent, options);
 
 export const wardDashboardLink = getSyncLifecycle(createDashboardLink({ name: 'ward', title: 'wards' }), options);
 
+// t('admissionRequests', 'Admission Requests')
 export const admissionRequestWorkspace = getAsyncLifecycle(
-  () => import('./ward-workspace/admission-requests-workspace.component'),
+  () => import('./ward-workspace/admission-requests.workspace'),
   options,
 );
 
+// Title for this workspace is set dynamically
 export const wardPatientWorkspace = getAsyncLifecycle(
   () => import('./ward-patient-workspace/ward-patient.workspace'),
   options,

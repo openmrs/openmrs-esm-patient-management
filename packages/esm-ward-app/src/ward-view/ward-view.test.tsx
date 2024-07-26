@@ -8,20 +8,13 @@ import {
   useFeatureFlag,
 } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import { mockAdmissionLocation, mockInpatientVisits } from '__mocks__';
+import { mockAdmissionLocation, mockInpatientAdmissions } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import { configSchema } from '../config-schema';
 import { useAdmissionLocation } from '../hooks/useAdmissionLocation';
-import { mockPatientAlice } from '__mocks__';
-import { useAdmittedPatients } from '../hooks/useAdmittedPatients';
+import { useInpatientAdmission } from '../hooks/useInpatientAdmission';
 import useWardLocation from '../hooks/useWardLocation';
 import WardView from './ward-view.component';
-
-jest.replaceProperty(mockPatientAlice.person as Person, 'preferredName', {
-  uuid: '',
-  givenName: 'Alice',
-  familyName: 'Johnson',
-});
 
 jest.mocked(useConfig).mockReturnValue({
   ...getDefaultsFromConfigSchema<ConfigSchema>(configSchema),
@@ -49,8 +42,8 @@ const mockedUseParams = useParams as jest.Mock;
 jest.mock('../hooks/useAdmissionLocation', () => ({
   useAdmissionLocation: jest.fn(),
 }));
-jest.mock('../hooks/useAdmittedPatients', () => ({
-  useAdmittedPatients: jest.fn(),
+jest.mock('../hooks/useInpatientAdmission', () => ({
+  useInpatientAdmission: jest.fn(),
 }));
 
 jest.mocked(useAdmissionLocation).mockReturnValue({
@@ -60,12 +53,12 @@ jest.mocked(useAdmissionLocation).mockReturnValue({
   isLoading: false,
   admissionLocation: mockAdmissionLocation,
 });
-jest.mocked(useAdmittedPatients).mockReturnValue({
+jest.mocked(useInpatientAdmission).mockReturnValue({
   error: undefined,
   mutate: jest.fn(),
   isValidating: false,
   isLoading: false,
-  admittedPatients: mockInpatientVisits,
+  inpatientAdmissions: mockInpatientAdmissions,
 });
 
 describe('WardView:', () => {
@@ -90,14 +83,14 @@ describe('WardView:', () => {
 
   it('renders admitted patient without bed', async () => {
     renderWithSwr(<WardView />);
-    const admittedPatientWithoutBed = screen.queryByText('Nicks, Stevie');
+    const admittedPatientWithoutBed = screen.queryByText('Brian Johnson');
     expect(admittedPatientWithoutBed).toBeInTheDocument();
   });
 
   it('renders all admitted patients even if bed management module not installed', async () => {
     mockedUseFeatureFlag.mockReturnValueOnce(false);
     renderWithSwr(<WardView />);
-    const admittedPatientWithoutBed = screen.queryByText('Nicks, Stevie');
+    const admittedPatientWithoutBed = screen.queryByText('Brian Johnson');
     expect(admittedPatientWithoutBed).toBeInTheDocument();
   });
 

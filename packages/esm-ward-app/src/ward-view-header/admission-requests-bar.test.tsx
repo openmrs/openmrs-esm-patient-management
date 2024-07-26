@@ -4,19 +4,13 @@ import { renderWithSwr } from '../../../../tools/test-utils';
 import { screen } from '@testing-library/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import AdmissionRequestsBar from './admission-requests-bar.component';
-import { mockInpatientRequest } from '../../../../__mocks__/ward-patient';
+import { mockInpatientRequest } from '../../../../__mocks__/inpatient-request';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
-
-jest.mock('@openmrs/esm-framework', () => {
-  return {
-    ...jest.requireActual('@openmrs/esm-framework'),
-    launchWorkspace: jest.fn(),
-  };
-});
 
 jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
+
 const mockInpatientRequestResponse = {
   error: undefined,
   mutate: jest.fn(),
