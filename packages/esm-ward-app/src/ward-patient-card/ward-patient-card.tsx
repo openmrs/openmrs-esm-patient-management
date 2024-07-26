@@ -7,8 +7,7 @@ import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import { type WardPatientWorkspaceProps } from '../ward-patient-workspace/ward-patient.workspace';
 
 const WardPatientCard: React.FC<WardPatientCardProps> = (props) => {
-  const { locationUuid } = useParams();
-  const patientCardRows = usePatientCardRows(locationUuid);
+  const patientCardRows = usePatientCardRows();
 
   return (
     <div className={styles.wardPatientCard}>

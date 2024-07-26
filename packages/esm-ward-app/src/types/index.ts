@@ -1,10 +1,11 @@
-import {
-  type OpenmrsResource,
-  type OpenmrsResourceStrict,
-  type Person,
-  type Visit,
-  type Location,
-  type Patient,
+import type {
+  OpenmrsResource,
+  OpenmrsResourceStrict,
+  Person,
+  Visit,
+  Location,
+  Patient,
+  Concept,
 } from '@openmrs/esm-framework';
 import type React from 'react';
 
@@ -96,6 +97,10 @@ export interface InpatientRequestFetchResponse {
 export interface InpatientRequest {
   patient: Patient;
   dispositionType: DispositionType;
+  disposition: Concept;
+  dispositionEncounter?: Encounter;
+  dispositionObsGroup?: Observation;
+  dispositionLocation?: Location;
 }
 
 export type DispositionType = 'ADMIT' | 'TRANSFER' | 'DISCHARGE';

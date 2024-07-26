@@ -17,8 +17,12 @@ import wardPatientObs from './row-elements/ward-patient-obs';
 import wardPatientCodedObsTags from './row-elements/ward-patient-coded-obs-tags';
 
 import wardPatientIdentifier from './row-elements/ward-patient-identifier';
+import useWardLocation from '../hooks/useWardLocation';
 
-export function usePatientCardRows(location: string) {
+export function usePatientCardRows() {
+  const {
+    location: { uuid: locationUuid },
+  } = useWardLocation();
   const { wardPatientCards } = useConfig<WardConfigObject>();
   const patientCardRows = useMemo(() => {
     const { cardDefinitions, patientCardElementDefinitions } = wardPatientCards;
@@ -42,7 +46,7 @@ export function usePatientCardRows(location: string) {
     const cardDefinition = cardDefinitions.find((cardDef) => {
       const appliedTo = cardDef.appliedTo;
 
-      return appliedTo == null || appliedTo.some((criteria) => criteria.location == location);
+      return appliedTo == null || appliedTo.some((criteria) => criteria.location == locationUuid);
     });
 
     const ret = cardDefinition.rows.map((row) => {

@@ -41,18 +41,8 @@ const WardView = () => {
 // display to use if bed management is installed
 const WardViewWithBedManagement = () => {
   const { location } = useWardLocation();
-  // fetch bed information for the ward
-  const {
-    admissionLocation,
-    isLoading: isLoadingLocation,
-    error: errorLoadingLocation,
-  } = useAdmissionLocation(location?.uuid);
-  // fetch all patients admitted to the waard
-  const {
-    inpatientAdmissions,
-    isLoading: isLoadingPatients,
-    error: errorLoadingPatients,
-  } = useInpatientAdmission(location.uuid);
+  const { admissionLocation, isLoading: isLoadingLocation, error: errorLoadingLocation } = useAdmissionLocation();
+  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
   const { t } = useTranslation();
   const inpatientAdmissionsByPatientUuid = useMemo(() => {
     const map = new Map<string, InpatientAdmission>();
@@ -138,12 +128,7 @@ const WardViewWithBedManagement = () => {
 
 // display to use if not using bed management
 const WardViewWithoutBedManagement = () => {
-  const { location } = useWardLocation();
-  const {
-    inpatientAdmissions,
-    isLoading: isLoadingPatients,
-    error: errorLoadingPatients,
-  } = useInpatientAdmission(location.uuid);
+  const { inpatientAdmission, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
   const { t } = useTranslation();
 
   if (inpatientAdmissions) {

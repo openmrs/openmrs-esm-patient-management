@@ -1,17 +1,20 @@
 import { type FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import type { InpatientRequestFetchResponse } from '../types';
+import type { DispositionType, InpatientRequestFetchResponse } from '../types';
 import useSWR from 'swr';
+import useWardLocation from './useWardLocation';
 
-export function useInpatientRequest(locationUuid: string) {
-  // prettier-ignore
-  const customRepresentation =
-    'custom:(dispositionType,' +
-      'patient:(uuid,identifiers,voided,' +
-        'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)))'
+const defaultRep =
+  'custom:(dispositionLocation,dispositionType,disposition,dispositionEncounter:full,patient:default,dispositionObsGroup,visit)';
+
+export function useInpatientRequest(dispositionType: Array<DispositionType> = ['ADMIT'], rep: string = defaultRep) {
+  const { location } = useWardLocation();
+  const searchParams = new URLSearchParams();
+  searchParams.set('dispositionType', dispositionType.join(','));
+  searchParams.set('dispositionLocation', location?.uuid);
+  searchParams.set('v', rep);
+
   const { data, ...rest } = useSWR<FetchResponse<InpatientRequestFetchResponse>, Error>(
-    locationUuid
-      ? `${restBaseUrl}/emrapi/inpatient/request?dispositionType=ADMIT,TRANSFER&dispositionLocation=${locationUuid}&v=${customRepresentation}`
-      : null,
+    location?.uuid ? `${restBaseUrl}/emrapi/inpatient/request?${searchParams.toString()}` : null,
     openmrsFetch,
   );
 
