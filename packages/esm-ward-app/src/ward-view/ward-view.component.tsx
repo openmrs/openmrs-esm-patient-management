@@ -128,7 +128,7 @@ const WardViewWithBedManagement = () => {
 
 // display to use if not using bed management
 const WardViewWithoutBedManagement = () => {
-  const { inpatientAdmission, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
+  const { inpatientAdmissions, isLoading: isLoadingPatients, error: errorLoadingPatients } = useInpatientAdmission();
   const { t } = useTranslation();
 
   if (inpatientAdmissions) {

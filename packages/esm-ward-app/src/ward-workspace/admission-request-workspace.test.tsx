@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import AdmissionRequestsWorkspace from './admission-requests.workspace';
-import { defineConfigSchema, type Person } from '@openmrs/esm-framework';
+import { defineConfigSchema } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
 import { mockInpatientRequest, mockLocationInpatientWard } from '__mocks__';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
