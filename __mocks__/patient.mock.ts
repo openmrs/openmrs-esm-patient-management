@@ -20,7 +20,10 @@ export const mockPatientAlice: Patient = {
     dead: false,
     deathDate: null,
     causeOfDeath: null,
-    preferredName: null,
+    preferredName: {
+      display: 'Alice Johnson',
+      uuid: 'preferred-name-uuid',
+    },
     preferredAddress: mockAddress as PersonAddress,
     names: [null],
     addresses: [],

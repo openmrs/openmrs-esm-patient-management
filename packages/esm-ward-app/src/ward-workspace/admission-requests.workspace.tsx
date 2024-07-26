@@ -10,8 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 const AdmissionRequestsWorkspace: React.FC<DefaultWorkspaceProps> = () => {
   const { t } = useTranslation();
-  const { location } = useWardLocation();
-  const { inpatientRequests, isLoading, error } = useInpatientRequest(location?.uuid);
+  const { inpatientRequests, isLoading, error } = useInpatientRequest();
   const admissionRequests = inpatientRequests?.filter((request) => request.dispositionType == 'ADMIT');
 
   if (isLoading) {
@@ -30,8 +29,8 @@ const AdmissionRequestsWorkspace: React.FC<DefaultWorkspaceProps> = () => {
 
   return (
     <div className={styles.admissionRequestsWorkspace}>
-      {admissionRequests.map((admissionRequest) => (
-        <AdmissionRequestCard patient={admissionRequest.patient} />
+      {admissionRequests.map((admissionRequest, indx) => (
+        <AdmissionRequestCard key={indx} patient={admissionRequest.patient} />
       ))}
     </div>
   );

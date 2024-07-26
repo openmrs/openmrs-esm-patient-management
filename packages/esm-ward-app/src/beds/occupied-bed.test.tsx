@@ -6,6 +6,8 @@ import { getDefaultsFromConfigSchema, useConfig } from '@openmrs/esm-framework';
 import { configSchema, defaultPatientCardElementConfig } from '../config-schema';
 import { mockAdmissionLocation } from '../../../../__mocks__/wards.mock';
 import { mockAdmittedPatient } from '../../../../__mocks__/patient.mock';
+import { mockLocationInpatientWard } from '../../../../__mocks__/locations.mock';
+import useWardLocation from '../hooks/useWardLocation';
 
 const defaultConfig = getDefaultsFromConfigSchema(configSchema);
 
@@ -13,12 +15,17 @@ jest.mocked(useConfig).mockReturnValue(defaultConfig);
 
 const mockBedLayouts = filterBeds(mockAdmissionLocation);
 
-const mockBedToUse = mockBedLayouts[0];
-jest.replaceProperty(mockBedToUse.patients[0].person, 'preferredName', {
-  uuid: '',
-  givenName: 'Alice',
-  familyName: 'Johnson',
+jest.mock('../hooks/useWardLocation', () => jest.fn());
+
+const mockedUseWardLocation = useWardLocation as jest.Mock;
+mockedUseWardLocation.mockReturnValue({
+  location: mockLocationInpatientWard,
+  isLoadingLocation: false,
+  errorFetchingLocation: null,
+  invalidLocation: false,
 });
+
+const mockBedToUse = mockBedLayouts[0];
 const mockBed = bedLayoutToBed(mockBedToUse);
 
 describe('Occupied bed: ', () => {

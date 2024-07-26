@@ -1,23 +1,28 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import AdmissionRequestsWorkspace from './admission-requests-workspace.component';
+import AdmissionRequestsWorkspace from './admission-requests.workspace';
 import { defineConfigSchema, type Person } from '@openmrs/esm-framework';
 import { renderWithSwr } from 'tools';
-import { mockInpatientRequest } from '__mocks__';
+import { mockInpatientRequest, mockLocationInpatientWard } from '__mocks__';
 import { useInpatientRequest } from '../hooks/useInpatientRequest';
 import { configSchema } from '../config-schema';
+import useWardLocation from '../hooks/useWardLocation';
 
 defineConfigSchema('@openmrs/esm-ward-app', configSchema);
-
-jest.replaceProperty(mockInpatientRequest.patient.person as Person, 'preferredName', {
-  uuid: '',
-  givenName: 'Alice',
-  familyName: 'Johnson',
-});
 
 jest.mock('../hooks/useInpatientRequest', () => ({
   useInpatientRequest: jest.fn(),
 }));
+
+jest.mock('../hooks/useWardLocation', () => jest.fn());
+
+const mockUseWardLocation = useWardLocation as jest.Mock;
+mockUseWardLocation.mockReturnValue({
+  location: mockLocationInpatientWard,
+  isLoadingLocation: false,
+  errorFetchingLocation: null,
+  invalidLocation: false,
+});
 
 const mockInpatientRequestResponse = {
   error: undefined,
@@ -45,7 +50,6 @@ const workspaceProps = {
 describe('Admission Requests Workspace', () => {
   it('should render a admission request card', () => {
     renderWithSwr(<AdmissionRequestsWorkspace {...workspaceProps} />);
-    const { givenName, familyName } = mockInpatientRequest.patient.person!.preferredName!;
-    expect(screen.getByText(givenName + ' ' + familyName)).toBeInTheDocument();
+    expect(screen.getByText(mockInpatientRequest.patient.person?.preferredName?.display)).toBeInTheDocument();
   });
 });
