@@ -6,7 +6,6 @@ import { type PatientObsElementConfig } from '../../config-schema';
 import { useObs } from '../../hooks/useObs';
 import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
-import { moduleName } from '../../constant';
 import { obsCustomRepresentation } from './ward-patient-obs.resource';
 
 const wardPatientObs = (config: PatientObsElementConfig) => {

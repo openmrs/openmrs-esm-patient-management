@@ -3,7 +3,6 @@ import { translateFrom, type OpenmrsResource } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type PatientCodedObsTagsElementConfig } from '../../config-schema';
-import { moduleName } from '../../constant';
 import { useObs } from '../../hooks/useObs';
 import { type WardPatientCardElement } from '../../types';
 import styles from '../ward-patient-card.scss';
