@@ -28,6 +28,7 @@ const AdmissionRequestsWorkspace: React.FC<AdmissionRequestsWorkspaceProps> = ()
         onChange={handleSearch}
         size="lg"
         placeholder={t('searchForPatient', 'Search for a patient')}
+        disabled
       />
 
       <div className={styles.content}>

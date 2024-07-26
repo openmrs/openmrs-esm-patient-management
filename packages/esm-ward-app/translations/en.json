@@ -3,7 +3,7 @@
   "admissionRequestsCount_one": "{{count}} admission request",
   "admissionRequestsCount_other": "{{count}} admission requests",
   "admitPatient": "Admit patient",
-  "bedIdRequired": "Please select a bed to move forward",
+  "bedSelectionRequired": "Please select a bed to move forward",
   "bedShare": "Bed share",
   "cancel": "Cancel",
   "chooseAnOption": "Choose an option",
@@ -19,10 +19,14 @@
   "manage": "Manage",
   "noBedsConfigured": "No beds configured for this location",
   "other": "Other",
+  "patientAdmittedSuccessfully": "Patient admitted successfully",
+  "patientAdmittedSuccessfullySubtitle": "{{patientName}} has been successfully admitted to the bed {{bedNumber}}",
   "save": "Save",
+  "saving": "Saving...",
   "searchForPatient": "Search for a patient",
   "selectABed": "Select a bed",
   "transferElsewhere": "Transfer elsewhere",
   "unknown": "Unknown",
-  "wardPatientWorkspaceTitle": "Ward Patient"
+  "wardPatientWorkspaceTitle": "Ward Patient",
+  "wards": "Wards"
 }

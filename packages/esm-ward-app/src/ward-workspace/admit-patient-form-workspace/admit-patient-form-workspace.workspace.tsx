@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { type DefaultWorkspaceProps, ExtensionSlot, usePatient, type Patient } from '@openmrs/esm-framework';
+import {
+  type DefaultWorkspaceProps,
+  ExtensionSlot,
+  usePatient,
+  type Patient,
+  useConfig,
+  showSnackbar,
+} from '@openmrs/esm-framework';
 import styles from './admit-patient-form.scss';
 import { useAdmissionLocation } from '../../hooks/useAdmissionLocation';
 import useWardLocation from '../../hooks/useWardLocation';
@@ -11,6 +18,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, Row, Column, DropdownSkeleton, Dropdown, ButtonSet, Button } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
+import { assignPatientToBed, createEncounter } from '../../ward.resource';
+import type { WardConfigObject } from '../../config-schema';
+import { useInpatientRequest } from '../../hooks/useInpatientRequest';
 
 interface AdmitPatientFormWorkspaceProps extends DefaultWorkspaceProps {
   patient: Patient;
@@ -19,14 +29,17 @@ interface AdmitPatientFormWorkspaceProps extends DefaultWorkspaceProps {
 const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
   patient,
   closeWorkspace,
+  closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
-  const [showErrorNotifications, setShowErrorNotifications] = useState(false);
-  const { patient: fhirPatient, isLoading: isLoadingFhirPatient } = usePatient(patient?.uuid);
   const { location } = useWardLocation();
-  const { isLoading, admissionLocation } = useAdmissionLocation(location?.uuid);
-  const beds = isLoading ? [] : filterBeds(admissionLocation);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: mutateInpatientRequest } = useInpatientRequest();
+  const { admissionEncounterTypeUuid } = useConfig<WardConfigObject>();
+  const [showErrorNotifications, setShowErrorNotifications] = useState(false);
+  const { isLoading, admissionLocation, mutate: mutateAdmissionLocation } = useAdmissionLocation();
+  const beds = useMemo(() => (isLoading ? [] : filterBeds(admissionLocation)), [admissionLocation]);
   const getBedRepresentation = useCallback((bedLayout: BedLayout) => {
     const bedNumber = bedLayout.bedNumber;
     const patients =
@@ -40,7 +53,7 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     () =>
       z.object({
         bedId: z.number({
-          required_error: t('bedIdRequired', 'Please select a bed to move forward'),
+          required_error: t('bedSelectionRequired', 'Please select a bed to move forward'),
         }),
       }),
     [],
@@ -62,12 +75,42 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
-  const onSubmit = useCallback((values: FormValues) => {
-    setShowErrorNotifications(false);
-  }, []);
+  const onSubmit = useCallback(
+    (values: FormValues) => {
+      setShowErrorNotifications(false);
+      setIsSubmitting(true);
+      const bedSelected = beds.find((bed) => bed.bedId === values.bedId);
+      createEncounter(patient.uuid, admissionEncounterTypeUuid, location?.uuid)
+        .then(async (response) => {
+          if (response.ok) {
+            return assignPatientToBed(values.bedId, patient.uuid, response.data.uuid);
+          }
+        })
+        .then(() => {
+          setIsSubmitting(false);
+          showSnackbar({
+            kind: 'success',
+            title: t('patientAdmittedSuccessfully', 'Patient admitted successfully'),
+            subtitle: t(
+              'patientAdmittedSuccessfullySubtitle',
+              '{{patientName}} has been successfully admitted to the bed {{bedNumber}}',
+              {
+                patientName: patient.person.preferredName.display,
+                bedNumber: bedSelected.bedNumber,
+              },
+            ),
+          });
+          mutateAdmissionLocation();
+          mutateInpatientRequest();
+          closeWorkspaceWithSavedChanges();
+        });
+    },
+    [beds, patient, admissionEncounterTypeUuid, location, closeWorkspaceWithSavedChanges],
+  );
 
   const onError = useCallback((values) => {
     setShowErrorNotifications(true);
+    setIsSubmitting(false);
   }, []);
 
   return (
@@ -120,8 +163,8 @@ const AdmitPatientFormWorkspace: React.FC<AdmitPatientFormWorkspaceProps> = ({
         <Button size="xl" kind="secondary" onClick={() => closeWorkspace({ ignoreChanges: true })}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" size="xl">
-          {t('save', 'Save')}
+        <Button type="submit" size="xl" disabled={isSubmitting}>
+          {!isSubmitting ? t('save', 'Save') : t('saving', 'Saving...')}
         </Button>
       </ButtonSet>
     </Form>
