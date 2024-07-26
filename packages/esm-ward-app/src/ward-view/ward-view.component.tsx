@@ -40,16 +40,8 @@ const WardView = () => {
 
 const WardViewWithBedManagement = () => {
   const { location } = useWardLocation();
-  const {
-    admissionLocation,
-    isLoading: isLoadingLocation,
-    error: errorLoadingLocation,
-  } = useAdmissionLocation(location?.uuid);
-  const {
-    admittedPatients,
-    isLoading: isLoadingPatients,
-    error: errorLoadingPatients,
-  } = useAdmittedPatients(location.uuid);
+  const { admissionLocation, isLoading: isLoadingLocation, error: errorLoadingLocation } = useAdmissionLocation();
+  const { admittedPatients, isLoading: isLoadingPatients, error: errorLoadingPatients } = useAdmittedPatients();
   const { t } = useTranslation();
   const admittedPatientsByUuid = useMemo(() => {
     const map = new Map<string, AdmittedPatient>();
@@ -147,12 +139,7 @@ const WardViewWithBedManagement = () => {
 };
 
 const WardViewWithoutBedManagement = () => {
-  const { location } = useWardLocation();
-  const {
-    admittedPatients,
-    isLoading: isLoadingPatients,
-    error: errorLoadingPatients,
-  } = useAdmittedPatients(location.uuid);
+  const { admittedPatients, isLoading: isLoadingPatients, error: errorLoadingPatients } = useAdmittedPatients();
   const { t } = useTranslation();
 
   if (admittedPatients) {
