@@ -1,9 +1,14 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.defaultQueueTable {
+  margin: 1rem;
+}
+
 .container {
-  background-color: $ui-01;
+  border: 1px solid colors.$gray-20;
 }
 
 .headerContainer {
@@ -56,6 +61,11 @@
 
 .statusTableContainer {
   padding: spacing.$spacing-05;
+  background-color: $ui-01;
+}
+
+.statusTableHeader {
+  padding: spacing.$spacing-03 0;
 }
 
 .tableHeader {
@@ -193,8 +203,4 @@ html[dir='rtl'] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
-
-.paddedQueueTable {
-  padding: 0 spacing.$spacing-05;
 }
