@@ -83,7 +83,7 @@ test('Register an unknown patient', async ({ api, page }) => {
   });
 
   await test.step('And I fill the field for estimated age in years', async () => {
-    const estimatedAgeField = page.getByLabel(/estimated age in years/i);
+    const estimatedAgeField = await page.getByLabel(/estimated age in years/i);
     await estimatedAgeField.clear();
     await estimatedAgeField.fill('25');
   });
