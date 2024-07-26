@@ -23,7 +23,7 @@ describe('PastVisit', () => {
       isValidating: false,
     });
 
-    renderPastVisitTabs();
+    renderWithSwr(<PastVisitSummary patientUuid={mockPatient.id} encounters={[]} />);
 
     expect(screen.queryAllByText(/vitals/i));
     const vitalsTab = screen.getByRole('tab', { name: /vitals/i });
@@ -34,7 +34,3 @@ describe('PastVisit', () => {
     expect(vitalsTab).toHaveAttribute('aria-selected', 'true');
   });
 });
-
-function renderPastVisitTabs() {
-  renderWithSwr(<PastVisitSummary patientUuid={mockPatient.id} encounters={[]} />);
-}

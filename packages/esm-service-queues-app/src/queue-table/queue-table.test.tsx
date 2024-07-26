@@ -73,7 +73,7 @@ describe('QueueTable', () => {
   });
 
   it('renders an empty table with default columns when there are no queue entries', () => {
-    renderQueueTableWithSwr();
+    renderQueueTable();
 
     const rows = screen.queryAllByRole('row');
     expect(rows).toHaveLength(1); // should only have the header row
@@ -87,7 +87,7 @@ describe('QueueTable', () => {
   });
 
   it('renders queue entries with default columns', () => {
-    renderQueueTableWithSwr({ queueEntries: mockQueueEntries });
+    renderQueueTable({ queueEntries: mockQueueEntries });
 
     for (const entry of mockQueueEntries) {
       const patientName = entry.patient.person.display;
@@ -112,7 +112,7 @@ describe('QueueTable', () => {
       },
     });
 
-    renderQueueTableWithSwr({ queueEntries: mockQueueEntries, statusUuid: 'foo', queueUuid: 'bar' });
+    renderQueueTable({ queueEntries: mockQueueEntries, statusUuid: 'foo', queueUuid: 'bar' });
 
     const rows = screen.queryAllByRole('row');
     const headerRow = rows[0];
@@ -129,7 +129,7 @@ describe('QueueTable', () => {
       ...configWithCustomColumns,
     } as ConfigObject);
 
-    renderQueueTableWithSwr({ queueEntries: mockQueueEntries, statusUuid: 'foo', queueUuid: 'bar' });
+    renderQueueTable({ queueEntries: mockQueueEntries, statusUuid: 'foo', queueUuid: 'bar' });
 
     const rows = screen.queryAllByRole('row');
     const headerRow = rows[0];
@@ -146,7 +146,7 @@ describe('QueueTable', () => {
       ...configWithCustomColumns,
     } as ConfigObject);
 
-    renderQueueTableWithSwr({
+    renderQueueTable({
       queueEntries: mockQueueEntries,
       queueUuid: 'triage-queue-uuid',
       statusUuid: 'in-service-status-uuid',
@@ -190,7 +190,7 @@ describe('QueueTable', () => {
       },
     });
 
-    renderQueueTableWithSwr({
+    renderQueueTable({
       queueEntries: mockQueueEntries,
       queueUuid: 'triage-queue-uuid',
       statusUuid: null,
@@ -216,7 +216,7 @@ describe('QueueTable', () => {
       },
     });
 
-    renderQueueTableWithSwr({
+    renderQueueTable({
       queueEntries: mockQueueEntries,
       queueUuid: 'triage-queue-uuid',
       statusUuid: null,
@@ -230,6 +230,6 @@ describe('QueueTable', () => {
   });
 });
 
-function renderQueueTableWithSwr(props = {}) {
+function renderQueueTable(props = {}) {
   renderWithSwr(<QueueTable {...defaultProps} {...props} />);
 }

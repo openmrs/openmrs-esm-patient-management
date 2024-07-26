@@ -22,7 +22,7 @@ describe('VisitDetail', () => {
       isValidating: false,
     });
 
-    renderVisitDetail();
+    render(<VisitDetailComponent {...defaultProps} />);
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
@@ -41,7 +41,7 @@ describe('VisitDetail', () => {
       isValidating: false,
     });
 
-    renderVisitDetail();
+    render(<VisitDetailComponent {...defaultProps} />);
 
     expect(screen.getByText(/Some Visit Type/)).toBeInTheDocument();
     expect(screen.getByText(formatDate(mockVisitDate), { collapseWhitespace: false })).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('VisitDetail', () => {
       isValidating: false,
     });
 
-    renderVisitDetail();
+    render(<VisitDetailComponent {...defaultProps} />);
 
     await user.click(screen.getByText('All Encounters'));
     expect(screen.getByTestId('encountersTable')).toBeInTheDocument();
@@ -110,13 +110,9 @@ describe('VisitDetail', () => {
       isValidating: false,
     });
 
-    renderVisitDetail();
+    render(<VisitDetailComponent {...defaultProps} />);
 
     await user.click(screen.getByText('Visit Summary'));
     expect(screen.getByRole('tablist', { name: 'Visit summary tabs' })).toBeInTheDocument();
   });
 });
-
-function renderVisitDetail() {
-  render(<VisitDetailComponent {...defaultProps} />);
-}

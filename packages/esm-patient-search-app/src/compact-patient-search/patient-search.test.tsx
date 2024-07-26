@@ -6,6 +6,18 @@ import { configSchema } from '../config-schema';
 import { type SearchedPatient } from '../types';
 import PatientSearch from './patient-search.component';
 
+const defaultProps = {
+  currentPage: 0,
+  data: [],
+  fetchError: null,
+  hasMore: false,
+  isLoading: false,
+  loadingNewData: false,
+  setPage: jest.fn(),
+  totalResults: 1,
+  query: 'John',
+};
+
 const mockUseConfig = jest.mocked(useConfig);
 
 describe('PatientSearch', () => {
@@ -113,22 +125,10 @@ describe('PatientSearch', () => {
   });
 });
 
-function renderPatientSearch(otherProps = {}) {
-  const mockProps = {
-    currentPage: 0,
-    data: [],
-    fetchError: null,
-    hasMore: false,
-    isLoading: false,
-    loadingNewData: false,
-    setPage: jest.fn(),
-    totalResults: 1,
-    query: 'John',
-  };
-
-  return render(
+function renderPatientSearch(props = {}) {
+  render(
     <PatientSearchContext.Provider value={{}}>
-      <PatientSearch {...mockProps} {...otherProps} />
+      <PatientSearch {...defaultProps} {...props} />
     </PatientSearchContext.Provider>,
   );
 }

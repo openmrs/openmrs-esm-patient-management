@@ -41,7 +41,7 @@ const mockInitialFormValues = {
   yearsEstimated: 0,
 };
 
-const initialContextValues: PatientRegistrationContextProps = {
+const mockContextValues: PatientRegistrationContextProps = {
   currentPhoto: null,
   inEditMode: false,
   identifierTypes: [],
@@ -63,14 +63,35 @@ describe('Identifiers', () => {
   });
 
   it('should render loading skeleton when identifier types are loading', () => {
-    renderIdentifiers(initialContextValues);
+    render(
+      <ResourcesContext.Provider value={mockResourcesContextValue}>
+        <Formik initialValues={{}} onSubmit={null}>
+          <Form>
+            <PatientRegistrationContext.Provider value={mockContextValues}>
+              <Identifiers />
+            </PatientRegistrationContext.Provider>
+          </Form>
+        </Formik>
+      </ResourcesContext.Provider>,
+    );
 
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('should render identifier inputs when identifier types are loaded', () => {
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
-    renderIdentifiers(initialContextValues);
+
+    render(
+      <ResourcesContext.Provider value={mockResourcesContextValue}>
+        <Formik initialValues={{}} onSubmit={null}>
+          <Form>
+            <PatientRegistrationContext.Provider value={mockContextValues}>
+              <Identifiers />
+            </PatientRegistrationContext.Provider>
+          </Form>
+        </Formik>
+      </ResourcesContext.Provider>,
+    );
 
     expect(screen.getByText('Identifiers')).toBeInTheDocument();
     const configureButton = screen.getByRole('button', { name: 'Configure' });
@@ -81,7 +102,17 @@ describe('Identifiers', () => {
   it('should open identifier selection overlay when "Configure" button is clicked', async () => {
     const user = userEvent.setup();
     mockResourcesContextValue.identifierTypes = mockIdentifierTypes;
-    renderIdentifiers(initialContextValues);
+    render(
+      <ResourcesContext.Provider value={mockResourcesContextValue}>
+        <Formik initialValues={{}} onSubmit={null}>
+          <Form>
+            <PatientRegistrationContext.Provider value={mockContextValues}>
+              <Identifiers />
+            </PatientRegistrationContext.Provider>
+          </Form>
+        </Formik>
+      </ResourcesContext.Provider>,
+    );
 
     const configureButton = screen.getByRole('button', { name: 'Configure' });
     await user.click(configureButton);
@@ -89,17 +120,3 @@ describe('Identifiers', () => {
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
   });
 });
-
-function renderIdentifiers(contextValues: PatientRegistrationContextProps) {
-  render(
-    <ResourcesContext.Provider value={mockResourcesContextValue}>
-      <Formik initialValues={{}} onSubmit={null}>
-        <Form>
-          <PatientRegistrationContext.Provider value={contextValues}>
-            <Identifiers />
-          </PatientRegistrationContext.Provider>
-        </Form>
-      </Formik>
-    </ResourcesContext.Provider>,
-  );
-}

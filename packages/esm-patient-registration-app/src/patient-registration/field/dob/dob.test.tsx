@@ -8,7 +8,6 @@ import { type RegistrationConfig, esmPatientRegistrationSchema } from '../../../
 import { DobField } from './dob.component';
 import { PatientRegistrationContext } from '../../patient-registration-context';
 import { initialFormValues } from '../../patient-registration.component';
-import { type FormValues } from '../../patient-registration.types';
 
 const mockUseConfig = jest.mocked(useConfig<RegistrationConfig>);
 
@@ -43,7 +42,26 @@ describe('Dob', () => {
   });
 
   it('renders the fields in the birth section of the registration form', async () => {
-    renderDob();
+    render(
+      <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
+        <Form>
+          <PatientRegistrationContext.Provider
+            value={{
+              identifierTypes: [],
+              values: initialFormValues,
+              validationSchema: null,
+              inEditMode: false,
+              setFieldValue: () => {},
+              setCapturePhotoProps: (value) => {},
+              currentPhoto: '',
+              isOffline: false,
+              initialFormValues: initialFormValues,
+            }}>
+            <DobField />
+          </PatientRegistrationContext.Provider>
+        </Form>
+      </Formik>,
+    );
 
     expect(screen.getByRole('heading', { name: /birth/i })).toBeInTheDocument();
     expect(screen.getByText(/date of birth known?/i)).toBeInTheDocument();
@@ -59,38 +77,31 @@ describe('Dob', () => {
   it.skip('typing in the date picker input sets the date of birth', async () => {
     const user = userEvent.setup();
 
-    renderDob();
+    render(
+      <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
+        <Form>
+          <PatientRegistrationContext.Provider
+            value={{
+              identifierTypes: [],
+              values: initialFormValues,
+              validationSchema: null,
+              inEditMode: false,
+              setFieldValue: () => {},
+              setCapturePhotoProps: (value) => {},
+              currentPhoto: '',
+              isOffline: false,
+              initialFormValues: initialFormValues,
+            }}>
+            <DobField />
+          </PatientRegistrationContext.Provider>
+        </Form>
+      </Formik>,
+    );
 
     const dateInput = screen.getByLabelText(/Date of birth/i);
     expect(dateInput).toBeInTheDocument();
 
     await user.type(dateInput, '10/10/2022');
-
     expect(screen.getByPlaceholderText('dd/mm/YYYY')).toHaveValue('10/10/2022');
   });
 });
-
-function renderDob() {
-  let formValues: FormValues = initialFormValues;
-
-  render(
-    <Formik initialValues={{ birthdate: '' }} onSubmit={() => {}}>
-      <Form>
-        <PatientRegistrationContext.Provider
-          value={{
-            identifierTypes: [],
-            values: formValues,
-            validationSchema: null,
-            inEditMode: false,
-            setFieldValue: () => {},
-            setCapturePhotoProps: (value) => {},
-            currentPhoto: '',
-            isOffline: false,
-            initialFormValues: formValues,
-          }}>
-          <DobField />
-        </PatientRegistrationContext.Provider>
-      </Form>
-    </Formik>,
-  );
-}

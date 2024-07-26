@@ -17,7 +17,7 @@ describe('AppointmensOverview', () => {
   it('renders an empty state if appointments data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
-    renderAppointments();
+    renderWithSwr(<AppointmentsBase {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -36,7 +36,7 @@ describe('AppointmensOverview', () => {
 
     mockOpenmrsFetch.mockRejectedValueOnce(error);
 
-    renderAppointments();
+    renderWithSwr(<AppointmentsBase {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -53,7 +53,7 @@ describe('AppointmensOverview', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
 
-    renderAppointments();
+    renderWithSwr(<AppointmentsBase {...testProps} />);
 
     await waitForLoadingToFinish();
 
@@ -85,7 +85,3 @@ describe('AppointmensOverview', () => {
     expect(nextPageButton).toBeDisabled();
   });
 });
-
-function renderAppointments() {
-  renderWithSwr(<AppointmentsBase {...testProps} />);
-}

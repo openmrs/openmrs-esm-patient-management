@@ -63,7 +63,7 @@ describe('Clinic metrics', () => {
 
     mockOpenmrsFetch.mockReturnValue({ data: mockMetrics } as unknown as FetchResponse);
 
-    renderClinicMetrics();
+    render(<ClinicMetrics />);
 
     await screen.findByText(/Checked in patients/i);
     expect(screen.getByText(/100/i)).toBeInTheDocument();
@@ -74,7 +74,3 @@ describe('Clinic metrics', () => {
     expect(screen.getByText(/69/i)).toBeInTheDocument();
   });
 });
-
-function renderClinicMetrics() {
-  render(<ClinicMetrics />);
-}

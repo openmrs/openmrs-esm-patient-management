@@ -30,7 +30,7 @@ describe('Death info section', () => {
   const renderDeathInfoSection = (isDead) => {
     initialContextValues.values.isDead = isDead;
 
-    return render(
+    render(
       <PatientRegistrationContext.Provider value={initialContextValues}>
         <Formik initialValues={initialFormValues} onSubmit={jest.fn()}>
           <Form>

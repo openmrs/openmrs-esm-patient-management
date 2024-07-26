@@ -43,7 +43,13 @@ describe('PersonAttributeField', () => {
   });
 
   it('renders the text input field for String format', () => {
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
 
     const input = screen.getByLabelText(/Referred by/i) as HTMLInputElement;
     expect(screen.getByRole('heading')).toBeInTheDocument();
@@ -57,7 +63,14 @@ describe('PersonAttributeField', () => {
       showHeading: false,
     };
 
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
+
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
@@ -82,7 +95,13 @@ describe('PersonAttributeField', () => {
       isLoading: false,
     });
 
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
 
     const input = screen.getByLabelText(/Referred by/i) as HTMLInputElement;
     expect(input).toBeInTheDocument();
@@ -98,7 +117,13 @@ describe('PersonAttributeField', () => {
       error: null,
     });
 
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
 
     expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByText(/Patient attribute type has unknown format/i)).toBeInTheDocument();
@@ -119,7 +144,13 @@ describe('PersonAttributeField', () => {
       type: 'person attribute',
     };
 
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
 
     expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByText(/Unable to fetch person attribute type/i)).toBeInTheDocument();
@@ -140,18 +171,15 @@ describe('PersonAttributeField', () => {
       type: 'person attribute',
     };
 
-    renderPersonAttributeField();
+    render(
+      <Formik initialValues={{}} onSubmit={() => {}}>
+        <Form>
+          <PersonAttributeField fieldDefinition={fieldDefinition} />
+        </Form>
+      </Formik>,
+    );
+
     await screen.findByRole('heading', { name: /attribute/i });
     expect(screen.queryByLabelText(/Referred by/i)).not.toBeInTheDocument();
   });
 });
-
-function renderPersonAttributeField() {
-  render(
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <PersonAttributeField fieldDefinition={fieldDefinition} />
-      </Form>
-    </Formik>,
-  );
-}

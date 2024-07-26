@@ -35,14 +35,10 @@ describe('ScheduledVisits', () => {
   });
 
   it('should display recent and future scheduled visits', async () => {
-    renderPatientScheduledVisits();
+    renderWithSwr(<PatientScheduledVisits {...defaultProps} />);
 
     expect(screen.getByText(/Cardiology Consultation 1/i)).toBeInTheDocument();
     expect(screen.getByText(/08-Aug-2022, 02:56 PM · 10 Engineer VCT/i)).toBeInTheDocument();
     expect(screen.getByText(/No appointments found/i)).toBeInTheDocument();
   });
 });
-
-function renderPatientScheduledVisits() {
-  renderWithSwr(<PatientScheduledVisits {...defaultProps} />);
-}

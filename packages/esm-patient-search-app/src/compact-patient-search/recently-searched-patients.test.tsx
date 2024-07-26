@@ -6,6 +6,17 @@ import { PatientSearchContext } from '../patient-search-context';
 import { configSchema } from '../config-schema';
 import RecentlySearchedPatients from './recently-searched-patients.component';
 
+const defaultProps = {
+  currentPage: 0,
+  data: [],
+  fetchError: null,
+  hasMore: false,
+  isLoading: false,
+  loadingNewData: false,
+  setPage: jest.fn(),
+  totalResults: 0,
+};
+
 const mockUseConfig = jest.mocked(useConfig);
 
 describe('RecentlySearchedPatients', () => {
@@ -114,21 +125,10 @@ describe('RecentlySearchedPatients', () => {
   });
 });
 
-function renderRecentlySearchedPatients(overrideProps = {}) {
-  const mockProps = {
-    currentPage: 0,
-    data: [],
-    fetchError: null,
-    hasMore: false,
-    isLoading: false,
-    loadingNewData: false,
-    setPage: jest.fn(),
-    totalResults: 0,
-  };
-
-  return render(
+function renderRecentlySearchedPatients(props = {}) {
+  render(
     <PatientSearchContext.Provider value={{}}>
-      <RecentlySearchedPatients {...mockProps} {...overrideProps} />
+      <RecentlySearchedPatients {...defaultProps} {...props} />
     </PatientSearchContext.Provider>,
   );
 }

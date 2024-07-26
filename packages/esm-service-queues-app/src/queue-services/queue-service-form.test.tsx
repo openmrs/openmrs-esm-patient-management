@@ -40,7 +40,7 @@ describe('QueueServiceForm', () => {
   it('should display required error messages when form is submitted with missing fields', async () => {
     const user = userEvent.setup();
 
-    renderQueueServiceForm();
+    render(<QueueServiceForm {...defaultProps} />);
 
     const submitButton = screen.getByText('Save');
     await user.click(submitButton);
@@ -50,7 +50,7 @@ describe('QueueServiceForm', () => {
   it('should submit the form when all fields are filled', async () => {
     const user = userEvent.setup();
 
-    renderQueueServiceForm();
+    render(<QueueServiceForm {...defaultProps} />);
 
     const queueNameInput = screen.getByLabelText('Queue name');
     const serviceSelect = screen.getByLabelText('Select a service type');
@@ -65,7 +65,3 @@ describe('QueueServiceForm', () => {
     expect(locationSelect).toHaveValue('34567eb0-b035-4acd-b284-da45f5067502');
   });
 });
-
-function renderQueueServiceForm() {
-  return render(<QueueServiceForm {...defaultProps} />);
-}

@@ -4,7 +4,7 @@ import BasicSearch from './basic-search.component';
 
 describe('BasicSearch', () => {
   test('renders the basic patient search in an overlay', () => {
-    renderBasicSearch();
+    render(<BasicSearch toggleSearchType={jest.fn()} />);
 
     const searchbox = screen.getByRole('searchbox', { name: /search for a patient/i });
     const searchButton = screen.getByRole('button', { name: /^search$/i });
@@ -16,8 +16,3 @@ describe('BasicSearch', () => {
     expect(screen.getByText(/type the patient's name or unique id number/i)).toBeInTheDocument();
   });
 });
-
-function renderBasicSearch() {
-  const toggleSearchType = jest.fn();
-  render(<BasicSearch toggleSearchType={toggleSearchType} />);
-}

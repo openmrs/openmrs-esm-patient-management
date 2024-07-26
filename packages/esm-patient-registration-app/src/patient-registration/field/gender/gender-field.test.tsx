@@ -47,7 +47,13 @@ describe('GenderField', () => {
     });
   });
   it('has a label', () => {
-    renderGenderField();
+    render(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <GenderField />
+        </Form>
+      </Formik>,
+    );
 
     expect(screen.getByRole('heading', { name: /sex/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/^male/i)).toBeInTheDocument();
@@ -56,20 +62,16 @@ describe('GenderField', () => {
 
   it('checks an option', async () => {
     const user = userEvent.setup();
-    renderGenderField();
+    render(
+      <Formik initialValues={{}} onSubmit={null}>
+        <Form>
+          <GenderField />
+        </Form>
+      </Formik>,
+    );
 
     await user.click(screen.getByText(/female/i));
     expect(screen.getByLabelText(/female/i)).toBeChecked();
     expect(screen.getByLabelText(/^male/i)).not.toBeChecked();
   });
 });
-
-function renderGenderField() {
-  render(
-    <Formik initialValues={{}} onSubmit={null}>
-      <Form>
-        <GenderField />
-      </Form>
-    </Formik>,
-  );
-}

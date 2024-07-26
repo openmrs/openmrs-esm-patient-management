@@ -11,7 +11,7 @@ describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockAppointmentsData.data });
 
-    renderAppointmentTabs();
+    renderWithSwr(<AppointmentTabs appointmentServiceType="" />);
 
     await waitForLoadingToFinish();
 
@@ -46,7 +46,3 @@ describe('AppointmentTabs', () => {
     });
   });
 });
-
-function renderAppointmentTabs() {
-  renderWithSwr(<AppointmentTabs appointmentServiceType="" />);
-}

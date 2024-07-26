@@ -12,7 +12,11 @@ describe('Overlay', () => {
   it('renders the desktop version of the overlay', () => {
     mockUseLayoutType.mockReturnValue('small-desktop');
 
-    renderOverlay();
+    render(
+      <Overlay close={mockClose} header="Test Header">
+        Overlay content
+      </Overlay>,
+    );
 
     expect(screen.getByText('Test Header')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
@@ -22,7 +26,11 @@ describe('Overlay', () => {
     mockUseLayoutType.mockReturnValue('tablet');
     mockIsDesktop.mockReturnValue(false);
 
-    renderOverlay();
+    render(
+      <Overlay close={mockClose} header="Test Header">
+        Overlay content
+      </Overlay>,
+    );
 
     expect(screen.getByText('Test Header')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close overlay' })).toBeInTheDocument();
@@ -32,17 +40,13 @@ describe('Overlay', () => {
     const user = userEvent.setup();
     mockUseLayoutType.mockReturnValue('small-desktop');
 
-    renderOverlay();
+    render(
+      <Overlay close={mockClose} header="Test Header">
+        Overlay content
+      </Overlay>,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Close overlay' }));
     expect(mockClose).toHaveBeenCalled();
   });
 });
-
-function renderOverlay() {
-  render(
-    <Overlay close={mockClose} header="Test Header">
-      Overlay content
-    </Overlay>,
-  );
-}

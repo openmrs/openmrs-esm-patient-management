@@ -110,7 +110,7 @@ describe('AppointmentForm', () => {
   it('renders the appointments form showing all the relevant fields and values', async () => {
     mockOpenmrsFetch.mockReturnValue(mockUseAppointmentServiceData);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -139,7 +139,7 @@ describe('AppointmentForm', () => {
 
     mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -155,7 +155,7 @@ describe('AppointmentForm', () => {
     mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
     mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -193,7 +193,7 @@ describe('AppointmentForm', () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
     mockCreateAppointment.mockRejectedValueOnce(error);
 
-    renderAppointmentsForm();
+    renderWithSwr(<AppointmentForm {...defaultProps} />);
 
     await waitForLoadingToFinish();
 
@@ -214,7 +214,3 @@ describe('AppointmentForm', () => {
     await user.click(saveButton);
   });
 });
-
-function renderAppointmentsForm() {
-  renderWithSwr(<AppointmentForm {...defaultProps} />);
-}

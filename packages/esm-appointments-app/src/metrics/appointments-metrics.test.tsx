@@ -30,7 +30,7 @@ describe('Appointment metrics', () => {
   it('renders metrics from the appointments list', async () => {
     mockOpenmrsFetch.mockResolvedValue({ data: [] });
 
-    renderAppointmentMetrics();
+    render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
 
     await screen.findByText(/appointment metrics/i);
     expect(screen.getByText(/scheduled appointments/i)).toBeInTheDocument();
@@ -39,7 +39,3 @@ describe('Appointment metrics', () => {
     expect(screen.getByText(/4/i)).toBeInTheDocument();
   });
 });
-
-function renderAppointmentMetrics() {
-  render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
-}
