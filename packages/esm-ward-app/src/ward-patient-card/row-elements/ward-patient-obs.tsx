@@ -11,7 +11,7 @@ import { obsCustomRepresentation } from './ward-patient-obs.resource';
 
 const wardPatientObs = (config: PatientObsElementConfig) => {
   const WardPatientObs: WardPatientCardElement = ({ patient, visit }) => {
-    const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label, labelI18nModule: labelModule } = config;
+    const { conceptUuid, onlyWithinCurrentVisit, orderBy, limit, label } = config;
     const { data, isLoading } = useObs({ patient: patient.uuid, concept: conceptUuid }, obsCustomRepresentation);
     const { t } = useTranslation();
 
@@ -29,7 +29,7 @@ const wardPatientObs = (config: PatientObsElementConfig) => {
         ?.slice(0, limit ?? Number.MAX_VALUE);
 
       const labelToDisplay =
-        label != null ? translateFrom(labelModule ?? moduleName, label) : obsToDisplay?.[0]?.concept?.display;
+        label != label != null ? t(label) : obsToDisplay?.[0]?.concept?.display;
 
       const obsNodes = obsToDisplay?.map((o) => {
         const { value } = o;

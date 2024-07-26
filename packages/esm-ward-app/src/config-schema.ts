@@ -220,10 +220,6 @@ export interface PatientObsElementConfig {
    */
   label?: string;
 
-  /**
-   * Optional. The custom module to use for translation of the label
-   */
-  labelI18nModule?: string;
 
   /**
    * Optional. One of 'ascending' or 'descending', specifying whether to display the obs by obsDatetime ascendingly or descendingly. Defaults to descending.
@@ -253,10 +249,6 @@ export interface PatientCodedObsTagsElementConfig {
    * provided, defaults to the name of the concept.
    */
   summaryLabel?: string;
-  /**
-   * Optional. The custom module to use for translation of the summary label
-   */
-  summaryLabelI18nModule?: string;
 
   /**
    * The color of the summary tag.
