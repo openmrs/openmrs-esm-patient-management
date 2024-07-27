@@ -435,7 +435,6 @@ export type ColumnDefinition = {
   id: string;
   columnType?: ColumnType;
   header?: string;
-  headerI18nModule?: string;
   config: ColumnConfig;
 };
 
