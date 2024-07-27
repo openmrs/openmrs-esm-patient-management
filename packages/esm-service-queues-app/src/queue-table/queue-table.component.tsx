@@ -126,8 +126,10 @@ function QueueTable({
               <TableHead>
                 <TableRow>
                   {ExpandedRow && <TableExpandHeader enableToggle {...getExpandHeaderProps()} />}
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  {headers.map((header, i) => (
+                    <TableHeader key={i} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
                   ))}
                 </TableRow>
               </TableHead>

@@ -2,13 +2,13 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
-import { openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import { mockSession } from '__mocks__';
 import ListsDashboard from './lists-dashboard.component';
 
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseLocation = jest.mocked(useLocation);
 const mockUseSession = jest.mocked(useSession);
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -86,7 +86,7 @@ describe('ListsDashboard', () => {
           },
         ],
       },
-    });
+    } as unknown as FetchResponse);
   });
 
   it('renders the patient list page UI correctly', async () => {

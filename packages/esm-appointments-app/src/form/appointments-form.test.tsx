@@ -23,7 +23,7 @@ const defaultProps = {
 };
 
 const mockCreateAppointment = jest.mocked(saveAppointment);
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseSession = jest.mocked(useSession);
@@ -108,7 +108,7 @@ describe('AppointmentForm', () => {
   });
 
   it('renders the appointments form showing all the relevant fields and values', async () => {
-    mockOpenmrsFetch.mockReturnValue(mockUseAppointmentServiceData);
+    mockOpenmrsFetch.mockResolvedValue(mockUseAppointmentServiceData as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
 
@@ -137,7 +137,7 @@ describe('AppointmentForm', () => {
   it('closes the form and the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
+    mockOpenmrsFetch.mockResolvedValueOnce(mockUseAppointmentServiceData as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
 
@@ -152,7 +152,7 @@ describe('AppointmentForm', () => {
   it('renders a success snackbar  upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
+    mockOpenmrsFetch.mockResolvedValue({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
     mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' } as FetchResponse);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);
@@ -190,7 +190,7 @@ describe('AppointmentForm', () => {
       },
     };
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
+    mockOpenmrsFetch.mockResolvedValueOnce({ data: mockUseAppointmentServiceData } as unknown as FetchResponse);
     mockCreateAppointment.mockRejectedValueOnce(error);
 
     renderWithSwr(<AppointmentForm {...defaultProps} />);

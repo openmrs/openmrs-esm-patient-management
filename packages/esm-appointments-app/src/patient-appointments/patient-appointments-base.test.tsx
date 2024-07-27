@@ -1,9 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentsData } from '__mocks__';
 import { mockPatient, patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from 'tools';
+import { type AppointmentsFetchResponse } from '../types';
 import AppointmentsBase from './patient-appointments-base.component';
 
 const testProps = {
@@ -11,11 +12,13 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 describe('AppointmensOverview', () => {
   it('renders an empty state if appointments data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      data: [],
+    } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
     renderWithSwr(<AppointmentsBase {...testProps} />);
 
@@ -23,6 +26,7 @@ describe('AppointmensOverview', () => {
 
     expect(screen.getByRole('heading', { name: /appointments/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
+    expect(screen.getByText(/there are no upcoming appointments to display for this patient/i)).toBeInTheDocument();
   });
 
   it('renders an error state if there was a problem fetching appointments data', async () => {
@@ -51,7 +55,9 @@ describe('AppointmensOverview', () => {
   it(`renders a tabular overview of the patient's appointment schedule if available`, async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      ...mockAppointmentsData,
+    } as unknown as FetchResponse<AppointmentsFetchResponse>);
 
     renderWithSwr(<AppointmentsBase {...testProps} />);
 

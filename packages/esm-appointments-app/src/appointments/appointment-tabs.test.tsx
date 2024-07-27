@@ -1,15 +1,15 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from 'tools';
 import { mockAppointmentsData } from '__mocks__';
 import AppointmentTabs from './appointment-tabs.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 describe('AppointmentTabs', () => {
   xit(`renders tabs showing different appointment lists`, async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockAppointmentsData.data });
+    mockOpenmrsFetch.mockResolvedValue({ ...mockAppointmentsData } as unknown as FetchResponse);
 
     renderWithSwr(<AppointmentTabs appointmentServiceType="" />);
 

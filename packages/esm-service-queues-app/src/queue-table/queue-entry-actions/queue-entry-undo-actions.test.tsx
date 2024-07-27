@@ -1,13 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { screen } from '@testing-library/react';
 import { mockQueues, mockQueueEntryAlice } from '__mocks__';
 import { renderWithSwr } from 'tools';
 import UndoTransitionQueueEntryModal from './undo-transition-queue-entry.modal';
 import VoidQueueEntryModal from './void-queue-entry.modal';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('../../hooks/useQueues', () => {
   return {
@@ -25,6 +25,7 @@ describe('UndoTransitionQueueEntryModal', () => {
     const user = userEvent.setup();
 
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={closeModal} />);
+
     const cancelButton = screen.getByText('Cancel');
     await user.click(cancelButton);
     expect(closeModal).toHaveBeenCalled();
@@ -33,8 +34,10 @@ describe('UndoTransitionQueueEntryModal', () => {
   it('has an working submit button', async () => {
     mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
+
     renderWithSwr(<UndoTransitionQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Undo transition/ });
@@ -62,8 +65,10 @@ describe('VoidQueueEntryModal', () => {
   it('has an working submit button', async () => {
     mockOpenmrsFetch.mockResolvedValue({
       status: 200,
-    });
+    } as unknown as FetchResponse);
+
     const user = userEvent.setup();
+
     renderWithSwr(<VoidQueueEntryModal queueEntry={queueEntry} closeModal={() => {}} />);
 
     const submitButton = screen.getByRole('button', { name: /Delete queue entry/ });

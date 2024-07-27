@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { mockAppointmentMetrics, mockProvidersCount, mockStartTime } from '__mocks__';
 import AppointmentsMetrics from './appointments-metrics.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 
 jest.mock('../hooks/useClinicalMetrics', () => ({
   ...jest.requireActual('../hooks/useClinicalMetrics'),
@@ -28,7 +28,9 @@ jest.mock('../hooks/useClinicalMetrics', () => ({
 
 describe('Appointment metrics', () => {
   it('renders metrics from the appointments list', async () => {
-    mockOpenmrsFetch.mockResolvedValue({ data: [] });
+    mockOpenmrsFetch.mockResolvedValueOnce({
+      data: [],
+    } as unknown as FetchResponse);
 
     render(<AppointmentsMetrics appointmentServiceType="consultation-service-uuid" />);
 

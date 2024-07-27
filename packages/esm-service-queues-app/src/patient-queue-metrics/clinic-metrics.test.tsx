@@ -12,7 +12,7 @@ import { mockMetrics, mockServiceTypes, mockLocations, mockSession } from '__moc
 import { type ConfigObject, configSchema } from '../config-schema';
 import ClinicMetrics from './clinic-metrics.component';
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockOpenmrsFetch = jest.mocked(openmrsFetch);
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
 const mockUseLocations = jest.mocked(useLocations);
 const mockUseSession = jest.mocked(useSession);
@@ -61,7 +61,7 @@ describe('Clinic metrics', () => {
       visitQueueNumberAttributeUuid: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
     });
 
-    mockOpenmrsFetch.mockReturnValue({ data: mockMetrics } as unknown as FetchResponse);
+    mockOpenmrsFetch.mockResolvedValue({ data: mockMetrics } as unknown as FetchResponse);
 
     render(<ClinicMetrics />);
 
