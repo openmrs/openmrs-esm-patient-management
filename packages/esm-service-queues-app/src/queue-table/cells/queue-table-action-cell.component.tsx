@@ -13,7 +13,7 @@ export function QueueTableActionCell({ queueEntry }: QueueTableCellComponentProp
     <div className={styles.actionsCell}>
       <Button
         kind="ghost"
-        aria-label={t('actions', 'Actions')}
+        aria-label={t('transition', 'Transition')}
         onClick={() => {
           const dispose = showModal('transition-queue-entry-modal', {
             closeModal: () => dispose(),
