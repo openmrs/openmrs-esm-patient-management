@@ -26,6 +26,7 @@
   background: none;
   cursor: pointer;
   width: 100%;
+  height: auto !important;
 }
 
 .patientBanner {
@@ -58,6 +59,7 @@
 .demographics {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   margin-top: spacing.$spacing-02;
   @include type.type-style('body-compact-01');
   color: $text-02;
